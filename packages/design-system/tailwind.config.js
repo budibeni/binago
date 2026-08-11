@@ -3,7 +3,10 @@ module.exports = {
   content: [
     '../../packages/ui/src/**/*.{js,ts,jsx,tsx}',
     './src/**/*.{js,ts,jsx,tsx}',
+    '../../apps/business/src/**/*.{js,ts,jsx,tsx}',
+    '../../apps/personal/src/**/*.{js,ts,jsx,tsx}',
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       fontFamily: {

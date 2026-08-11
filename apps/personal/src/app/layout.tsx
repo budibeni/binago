@@ -16,6 +16,17 @@ export default function RootLayout({
   return (
     <html lang="id" suppressHydrationWarning>
       <body className="min-h-screen bg-surface text-foreground font-sans antialiased">
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                if (localStorage.getItem('binago.theme') === 'dark') {
+                  document.documentElement.classList.add('dark');
+                }
+              } catch (e) {}
+            `,
+          }}
+        />
         <PersonalShellLayout>
           {children}
         </PersonalShellLayout>

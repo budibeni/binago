@@ -74,8 +74,8 @@ export function Sidebar({
             'group flex items-center gap-2.5 rounded-md px-3 py-[7px] text-[13px] font-medium transition-colors duration-100',
             'focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400',
             isActive
-              ? 'bg-neutral-900 text-white shadow-sm'
-              : 'text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900',
+              ? 'bg-primary text-primary-foreground shadow-sm'
+              : 'text-foreground-muted hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:text-foreground',
             item.disabled && 'pointer-events-none opacity-40',
             collapsed && 'justify-center px-2',
           )}
@@ -117,7 +117,7 @@ export function Sidebar({
       {/* ── Brand Header ── */}
       <div
         className={cn(
-          'relative flex h-[52px] shrink-0 items-center border-b border-neutral-200',
+          'relative flex h-[52px] shrink-0 items-center border-b border-border',
           collapsed ? 'justify-center px-3' : 'justify-center px-4',
         )}
       >
@@ -139,11 +139,11 @@ export function Sidebar({
             <span className="font-extrabold tracking-tight text-3xl">
               {brandName === 'BINAGO' ? (
                 <>
-                  <span className="text-neutral-900">BINA</span>
+                  <span className="text-foreground">BINA</span>
                   <span className="text-red-600">GO</span>
                 </>
               ) : (
-                <span className="text-neutral-900">{brandName}</span>
+                <span className="text-foreground">{brandName}</span>
               )}
             </span>
           )}
@@ -192,7 +192,7 @@ export function Sidebar({
 
       {/* ── Footer (fixed, not scrollable) ── */}
       {bottomNavigation.length > 0 && (
-        <div className="shrink-0 border-t border-neutral-200">
+        <div className="shrink-0 border-t border-border">
           <div className="px-2.5 py-2">
             {renderNavItems(bottomNavigation)}
           </div>
@@ -206,7 +206,7 @@ export function Sidebar({
       {/* Desktop Sidebar */}
       <aside
         className={cn(
-          'hidden lg:flex flex-col border-r border-neutral-200 bg-white transition-all duration-200 shrink-0 z-20 h-full',
+          'hidden lg:flex flex-col border-r border-border bg-background transition-all duration-200 shrink-0 z-20 h-full',
           collapsed ? 'w-[56px]' : 'w-64',
           className,
         )}
@@ -224,7 +224,7 @@ export function Sidebar({
             aria-hidden="true"
           />
           {/* Drawer Panel */}
-          <aside className="fixed inset-y-0 left-0 w-64 border-r border-neutral-200 bg-white shadow-xl z-50">
+          <aside className="fixed inset-y-0 left-0 w-64 border-r border-border bg-background shadow-xl z-50">
             {sidebarContent}
           </aside>
         </div>

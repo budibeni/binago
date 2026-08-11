@@ -83,6 +83,30 @@ export function PersonalShellLayout({ children }: { children: React.ReactNode })
   const [theme, setTheme] = React.useState<'light' | 'dark'>('light');
   const [currentPath] = React.useState('/');
 
+  React.useEffect(() => {
+    try {
+      const savedTheme = localStorage.getItem('binago.theme') as 'light' | 'dark';
+      if (savedTheme) {
+        setTheme(savedTheme);
+        if (savedTheme === 'dark') document.documentElement.classList.add('dark');
+        else document.documentElement.classList.remove('dark');
+      }
+    } catch (e) {
+      console.warn('localStorage error', e);
+    }
+  }, []);
+
+  const handleThemeChange = React.useCallback((newTheme: 'light' | 'dark') => {
+    setTheme(newTheme);
+    try {
+      localStorage.setItem('binago.theme', newTheme);
+      if (newTheme === 'dark') document.documentElement.classList.add('dark');
+      else document.documentElement.classList.remove('dark');
+    } catch (e) {
+      console.warn('localStorage error', e);
+    }
+  }, []);
+
   const t = getTranslation(locale);
   const navigation = buildNavigation(locale);
 
@@ -99,7 +123,7 @@ export function PersonalShellLayout({ children }: { children: React.ReactNode })
       currentLocale={locale}
       onLocaleChange={setLocale}
       currentTheme={theme}
-      onThemeChange={setTheme}
+      onThemeChange={handleThemeChange}
       userMenuLabels={t.userMenu}
     >
       <PersonalLocaleContext.Provider value={locale}>

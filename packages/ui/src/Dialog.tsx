@@ -51,7 +51,7 @@ export const Dialog: React.FC<DialogProps> = ({
               )}
             </div>
             <RadixDialog.Close
-              className="shrink-0 rounded-md p-1 text-foreground-muted hover:text-foreground hover:bg-neutral-100 transition-colors focus:outline-none focus:ring-2 focus:ring-neutral-400"
+              className="shrink-0 rounded-md p-1 text-foreground-muted hover:text-foreground hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors focus:outline-none focus:ring-2 focus:ring-neutral-400"
               aria-label="Tutup dialog"
             >
               <X className="h-4 w-4" />

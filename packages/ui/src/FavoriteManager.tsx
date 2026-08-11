@@ -45,8 +45,8 @@ export function FavoriteSectionHeader({
     <div className="flex items-start justify-between gap-4 flex-wrap">
       {/* Left: title + subtitle */}
       <div>
-        <h2 className="text-base font-semibold text-neutral-900 leading-tight">{title}</h2>
-        <p className="mt-0.5 text-sm text-neutral-500">{subtitle}</p>
+        <h2 className="text-base font-semibold text-foreground leading-tight">{title}</h2>
+        <p className="mt-0.5 text-sm text-foreground-muted">{subtitle}</p>
       </div>
 
       {/* Right: single action button */}
@@ -85,16 +85,16 @@ export function FavoriteEmptyState({
   addButtonVariant = 'accent',
 }: FavoriteEmptyStateProps) {
   return (
-    <div className="w-full rounded-xl border border-dashed border-neutral-200 bg-white px-6 py-10 flex flex-col items-center justify-center text-center gap-4">
+    <div className="w-full rounded-xl border border-dashed border-border bg-background dark:bg-neutral-900 px-6 py-10 flex flex-col items-center justify-center text-center gap-4">
       {/* Icon */}
-      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-neutral-100">
-        <Star className="h-5 w-5 text-neutral-400" />
+      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-surface-elevated dark:bg-neutral-800">
+        <Star className="h-5 w-5 text-foreground-muted" />
       </div>
 
       {/* Text */}
       <div>
-        <p className="text-sm font-semibold text-neutral-800">{title}</p>
-        <p className="mt-1 text-sm text-neutral-500 max-w-xs">{description}</p>
+        <p className="text-sm font-semibold text-foreground">{title}</p>
+        <p className="mt-1 text-sm text-foreground-muted max-w-xs">{description}</p>
       </div>
 
       {/* CTA */}
@@ -179,7 +179,7 @@ export function FavoriteManager({
           {items.map((item) => (
             <div
               key={item.id}
-              className="flex items-start gap-3 rounded-lg border border-border p-3 hover:bg-neutral-50 transition-colors cursor-pointer"
+              className="flex items-start gap-3 rounded-lg border border-border p-3 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer"
               onClick={() => toggleItem(item.id)}
             >
               <Checkbox

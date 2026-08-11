@@ -29,6 +29,9 @@ importers:
       '@binago/design-system':
         specifier: workspace:*
         version: link:../../packages/design-system
+      '@binago/maps':
+        specifier: workspace:*
+        version: link:../../packages/maps
       '@binago/types':
         specifier: workspace:*
         version: link:../../packages/types

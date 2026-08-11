@@ -1,4 +1,5 @@
 # BINAGO — Task 05
+
 ## Tracking
 
 **Scope:** Frontend BINAGO  
@@ -9,9 +10,24 @@
 
 # 1. Tujuan
 
-Halaman Pemantauan dengan map, vehicle list, filter, status, detail panel dan dummy tracking data.
+Membangun fondasi Halaman Pemantauan BINAGO dengan component yang reusable untuk:
+
+- daftar kendaraan
+- pencarian kendaraan
+- filter kendaraan
+- status kendaraan
+- Live Tracking
+- Playback
+- Heatmap
+- Overview / detail kendaraan
+- dummy tracking data
+- responsive layout
 
 Task ini hanya mengerjakan scope yang disebutkan dalam dokumen ini dan dokumentasi terkait.
+
+Implementasi dilakukan secara bertahap per component.
+
+Jangan mengimplementasikan seluruh feature Tracking sekaligus apabila instruksi hanya meminta satu step.
 
 ---
 
@@ -23,8 +39,12 @@ Sebelum bekerja:
 2. Baca dokumentasi project yang relevan.
 3. Baca Task sebelumnya yang menjadi dependency.
 4. Periksa source code yang sudah ada.
-5. Jangan membuat ulang component yang sudah tersedia.
-6. Jangan memperluas scope.
+5. Periksa component foundation yang tersedia di `packages/ui`.
+6. Periksa foundation `packages/maps` yang tersedia dari TASK-02.
+7. Periksa component Tracking yang sudah dibuat pada step sebelumnya.
+8. Jangan membuat ulang component yang sudah tersedia.
+9. Jangan memperluas scope.
+10. Jangan mengerjakan step berikutnya tanpa instruksi baru.
 
 ---
 
@@ -35,158 +55,61 @@ Sebelum bekerja:
 - Default UI Indonesia.
 - Gunakan Tailwind CSS.
 - Gunakan reusable component.
+- Gunakan design token BINAGO.
 - Gunakan dummy/mock data.
-- Jangan membuat backend/API/database production.
+- Jangan membuat backend/API production.
+- Jangan membuat database production.
 - Jangan menggunakan Global Search pada Header.
 - Jangan mengerjakan Task berikutnya.
+- Jangan membuat component melakukan fetch data sendiri.
+- Jangan membuat component memiliki sumber data sendiri.
+- Data dan state utama dikelola oleh parent/page/feature.
+- Component menerima data melalui props.
+- Event dari component dikirim kembali melalui callback props.
+- Jangan membuat business logic di dalam presentation component jika logic tersebut seharusnya berada pada parent/feature.
+- Jangan membuat generic component baru jika component foundation yang sesuai sudah tersedia.
 
 ---
 
 # 4. Scope
 
-Halaman Pemantauan dengan map, vehicle list, filter, status, detail panel dan dummy tracking data.
+Task 05 mencakup fondasi frontend Tracking:
 
-Requirement detail feature akan ditetapkan secara spesifik di bagian implementasi Task dan harus mengikuti keputusan project yang telah disepakati.
+1. VehicleList
+2. LiveMap
+3. PlaybackPanel
+4. HeatmapPanel
+5. VehicleOverview
+6. Dummy tracking data
+7. Filter dan status kendaraan
+8. Composition component pada halaman Tracking
+9. Responsive behavior
+10. Internationalization
+11. Accessibility dasar
 
----
+Component tersebut dibuat secara terpisah dan reusable.
 
-# 5. Component
-
-Gunakan component foundation dan design system yang sudah tersedia.
-
-Jika membutuhkan component feature-specific, buat di feature terkait.
-
-Jangan membuat duplicate generic component.
-
----
-
-# 6. Data
-
-Gunakan dummy data yang realistis.
-
-Dummy data harus:
-
-- konsisten
-- cukup untuk menguji UI
-- memiliki relasi yang masuk akal
-- tidak menggunakan data pribadi nyata
+Tidak ada kewajiban untuk membuat satu parent component yang menggabungkan Live, Playback, dan Heatmap.
 
 ---
 
-# 7. Responsive
+# 5. Component Architecture
 
-Validasi minimal:
+## 5.1 Prinsip
+
+Tracking menggunakan pendekatan:
 
 ```text
-Desktop
-Tablet
-Mobile
-```
-
----
-
-# 8. Accessibility
-
-Perhatikan:
-
-- semantic HTML
-- keyboard navigation
-- focus state
-- form label
-- dialog accessibility
-- table accessibility
-- contrast
-
----
-
-# 9. Internationalization
-
-Semua label UI yang perlu diterjemahkan harus menggunakan i18n.
-
-Minimal:
-
-```text
-Indonesia
-English
-```
-
-Default:
-
-```text
-Indonesia
-```
-
----
-
-# 10. Validation
-
-Setelah implementasi:
-
-```text
-Typecheck
-ESLint
-Build
-Functional validation
-```
-
-Gunakan command project yang tersedia.
-
----
-
-# 11. Definition of Done
-
-Task dinyatakan selesai jika:
-
-- [ ] Seluruh scope Task selesai.
-- [ ] Tidak ada requirement utama yang tertinggal.
-- [ ] Reusable component digunakan.
-- [ ] Dummy data berfungsi.
-- [ ] Responsive diperiksa.
-- [ ] i18n diperiksa.
-- [ ] Accessibility dasar diperiksa.
-- [ ] Typecheck PASS jika tersedia.
-- [ ] ESLint PASS.
-- [ ] Build PASS.
-- [ ] Tidak ada perubahan di luar scope.
-- [ ] Completion Report dibuat.
-
----
-
-# 12. Completion Report
-
-Gunakan:
-
-```text
-# Laporan Penyelesaian Task 05
-
-## Status
-
-## Implementasi
-
-## File Dibuat
-
-## File Diubah
-
-## Component
-
-## Dummy Data
-
-## Validation
-
-## Masalah
-
-## Catatan
-
-## Task Berikutnya
-```
-
-`Task Berikutnya` hanya informasi.
-
----
-
-# 13. STOP
-
-Setelah Definition of Done dan Completion Report terpenuhi:
+Page / Feature
+    │
+    ├── Data
+    ├── State
+    ├── Event Handler
+    └── Component Composition
+             │
+             ├── VehicleList
+             ├── LiveMap
+             ├── PlaybackPanel
 
 > **BERHENTI.**
 
