@@ -6,7 +6,7 @@ import { PersonalShortcutGrid } from './PersonalShortcutGrid';
 import { PersonalInfoBar } from './PersonalInfoBar';
 import { usePersonalLocale } from '../../../components/PersonalShellLayout';
 import { getTranslation } from '../../../i18n';
-import { FavoriteManager, FavoriteSectionHeader } from '@binago/ui';
+import { FavoriteManager, FavoriteSectionHeader, FavoriteEmptyState } from '@binago/ui';
 import { PERSONAL_SHORTCUTS } from '../data/shortcuts';
 
 const STORAGE_KEY = 'binago.personal.favorites';
@@ -50,27 +50,33 @@ export function PersonalHomePage() {
 
   return (
     <div className="w-full max-w-[1400px] mx-auto px-6 py-6 flex flex-col gap-6">
-      {/* Page Header */}
-      <div>
-        <h1 className="text-xl font-bold text-neutral-900 leading-tight">{h.pageTitle}</h1>
-        <p className="mt-0.5 text-sm text-neutral-500">{h.pageSubtitle}</p>
-      </div>
 
       {/* Hero */}
       <PersonalHeroSection />
 
-      {/* Favorite section header */}
+      {/* Favorite section header — single "+ Tambah Shortcut" button */}
       <FavoriteSectionHeader
         title={h.favoritTitle}
         subtitle={h.favoritSubtitle}
-        manageLabel={h.manageFavorite}
         addLabel={h.addShortcut}
-        onManageClick={() => setIsManagerOpen(true)}
-        addButtonVariant="dark"
+        onAddClick={() => setIsManagerOpen(true)}
+        addButtonVariant="accent"
       />
 
-      {/* Shortcut grid — only rendered after localStorage is read (SSR safe) */}
-      {isLoaded && <PersonalShortcutGrid favorites={favorites} />}
+      {/* Shortcut grid or empty state — only rendered after localStorage is read (SSR safe) */}
+      {isLoaded && (
+        favorites.length > 0
+          ? <PersonalShortcutGrid favorites={favorites} />
+          : (
+            <FavoriteEmptyState
+              title={h.emptyFavoriteTitle}
+              description={h.emptyFavoriteDescription}
+              addLabel={h.addShortcut}
+              onAddClick={() => setIsManagerOpen(true)}
+              addButtonVariant="accent"
+            />
+          )
+      )}
 
       {/* Info bar */}
       <PersonalInfoBar />

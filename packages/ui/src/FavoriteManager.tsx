@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Edit2, Plus } from 'lucide-react';
+import { Plus, Star } from 'lucide-react';
 import { Dialog } from './Dialog';
 import { Checkbox } from './Checkbox';
 import { Button } from './Button';
@@ -17,25 +17,23 @@ export interface FavoriteItem {
 
 // ─── FavoriteSectionHeader ────────────────────────────────────────────────────
 // Generic header for the "Favorites" section.
-// Renders title, subtitle, and two action buttons.
+// Renders title, subtitle, and ONE action button ("+ Tambah Shortcut").
 // Completely domain-agnostic — all text and handlers passed via props.
 
 export interface FavoriteSectionHeaderProps {
   title: string;
   subtitle: string;
-  manageLabel: string;
   addLabel: string;
-  onManageClick: () => void;
-  /** Primary button variant: 'accent' (red) or 'dark' (neutral-900). Default: 'accent' */
+  onAddClick: () => void;
+  /** Button color variant: 'accent' (red/brand) or 'dark' (neutral-900). Default: 'accent' */
   addButtonVariant?: 'accent' | 'dark';
 }
 
 export function FavoriteSectionHeader({
   title,
   subtitle,
-  manageLabel,
   addLabel,
-  onManageClick,
+  onAddClick,
   addButtonVariant = 'accent',
 }: FavoriteSectionHeaderProps) {
   const addBtnClass =
@@ -47,25 +45,15 @@ export function FavoriteSectionHeader({
     <div className="flex items-start justify-between gap-4 flex-wrap">
       {/* Left: title + subtitle */}
       <div>
-        <div className="flex items-center gap-2 mb-0.5">
-          <h2 className="text-base font-semibold text-neutral-900">{title}</h2>
-        </div>
-        <p className="text-sm text-neutral-500">{subtitle}</p>
+        <h2 className="text-base font-semibold text-neutral-900 leading-tight">{title}</h2>
+        <p className="mt-0.5 text-sm text-neutral-500">{subtitle}</p>
       </div>
 
-      {/* Right: action buttons */}
-      <div className="flex items-center gap-2 shrink-0">
+      {/* Right: single action button */}
+      <div className="shrink-0">
         <button
           type="button"
-          onClick={onManageClick}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-200 bg-white px-3.5 py-2 text-xs font-medium text-neutral-700 hover:bg-neutral-50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400"
-        >
-          <Edit2 className="h-3.5 w-3.5" />
-          {manageLabel}
-        </button>
-        <button
-          type="button"
-          onClick={onManageClick}
+          onClick={onAddClick}
           className={addBtnClass}
         >
           <Plus className="h-3.5 w-3.5" />
@@ -76,8 +64,58 @@ export function FavoriteSectionHeader({
   );
 }
 
+// ─── FavoriteEmptyState ───────────────────────────────────────────────────────
+// Shown when the favorites list is empty.
+// Displays a centered card with title, description, and a CTA button.
+
+export interface FavoriteEmptyStateProps {
+  title: string;
+  description: string;
+  addLabel: string;
+  onAddClick: () => void;
+  /** Button color variant: 'accent' (red/brand) or 'dark' (neutral-900). Default: 'accent' */
+  addButtonVariant?: 'accent' | 'dark';
+}
+
+export function FavoriteEmptyState({
+  title,
+  description,
+  addLabel,
+  onAddClick,
+  addButtonVariant = 'accent',
+}: FavoriteEmptyStateProps) {
+  return (
+    <div className="w-full rounded-xl border border-dashed border-neutral-200 bg-white px-6 py-10 flex flex-col items-center justify-center text-center gap-4">
+      {/* Icon */}
+      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-neutral-100">
+        <Star className="h-5 w-5 text-neutral-400" />
+      </div>
+
+      {/* Text */}
+      <div>
+        <p className="text-sm font-semibold text-neutral-800">{title}</p>
+        <p className="mt-1 text-sm text-neutral-500 max-w-xs">{description}</p>
+      </div>
+
+      {/* CTA */}
+      <button
+        type="button"
+        onClick={onAddClick}
+        className={
+          addButtonVariant === 'dark'
+            ? 'inline-flex items-center gap-1.5 rounded-lg border border-neutral-300 bg-transparent px-4 py-2 text-xs font-medium text-neutral-800 hover:bg-neutral-50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-500'
+            : 'inline-flex items-center gap-1.5 rounded-lg border border-red-600 bg-transparent px-4 py-2 text-xs font-medium text-red-600 hover:bg-red-50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500'
+        }
+      >
+        <Plus className="h-3.5 w-3.5" />
+        {addLabel}
+      </button>
+    </div>
+  );
+}
+
 // ─── FavoriteManager ──────────────────────────────────────────────────────────
-// Generic dialog for managing favorite selections.
+// Generic dialog for managing favorite selections via checkboxes.
 // Domain-agnostic: no knowledge of Business/Personal/localStorage/routes.
 
 export interface FavoriteManagerProps {
@@ -105,7 +143,7 @@ export function FavoriteManager({
 }: FavoriteManagerProps) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
-  // Reset local selection when dialog opens
+  // Reset local selection each time dialog opens
   useEffect(() => {
     if (open) {
       setSelected(new Set(selectedIds));
@@ -156,7 +194,9 @@ export function FavoriteManager({
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="flex items-center gap-2">
-                  {item.icon && <item.icon className="h-4 w-4 text-foreground-muted shrink-0" />}
+                  {item.icon && (
+                    <item.icon className="h-4 w-4 text-foreground-muted shrink-0" />
+                  )}
                   <span className="text-sm font-semibold text-foreground leading-tight">
                     {item.label}
                   </span>

@@ -6,7 +6,7 @@ import { HomeShortcutGrid } from './HomeShortcutGrid';
 import { BusinessInfoBar } from './BusinessInfoBar';
 import { useBusinessLocale } from '../../../components/BusinessShellLayout';
 import { getTranslation } from '../../../i18n';
-import { FavoriteManager, FavoriteSectionHeader } from '@binago/ui';
+import { FavoriteManager, FavoriteSectionHeader, FavoriteEmptyState } from '@binago/ui';
 import { BUSINESS_SHORTCUTS } from '../data/shortcuts';
 
 const STORAGE_KEY = 'binago.business.favorites';
@@ -50,27 +50,33 @@ export function BusinessHomePage() {
 
   return (
     <div className="w-full max-w-[1400px] mx-auto px-6 py-6 flex flex-col gap-6">
-      {/* Page Header */}
-      <div>
-        <h1 className="text-xl font-bold text-neutral-900 leading-tight">{h.pageTitle}</h1>
-        <p className="mt-0.5 text-sm text-neutral-500">{h.pageSubtitle}</p>
-      </div>
 
       {/* Hero */}
       <BusinessHeroSection />
 
-      {/* Favorite section header */}
+      {/* Favorite section header — single "+ Tambah Shortcut" button */}
       <FavoriteSectionHeader
         title={h.favoritTitle}
         subtitle={h.favoritSubtitle}
-        manageLabel={h.manageFavorite}
         addLabel={h.addShortcut}
-        onManageClick={() => setIsManagerOpen(true)}
+        onAddClick={() => setIsManagerOpen(true)}
         addButtonVariant="accent"
       />
 
-      {/* Shortcut grid — only rendered after localStorage is read (SSR safe) */}
-      {isLoaded && <HomeShortcutGrid favorites={favorites} />}
+      {/* Shortcut grid or empty state — only rendered after localStorage is read (SSR safe) */}
+      {isLoaded && (
+        favorites.length > 0
+          ? <HomeShortcutGrid favorites={favorites} />
+          : (
+            <FavoriteEmptyState
+              title={h.emptyFavoriteTitle}
+              description={h.emptyFavoriteDescription}
+              addLabel={h.addShortcut}
+              onAddClick={() => setIsManagerOpen(true)}
+              addButtonVariant="accent"
+            />
+          )
+      )}
 
       {/* Info bar */}
       <BusinessInfoBar />
