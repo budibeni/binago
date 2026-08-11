@@ -1,0 +1,21 @@
+{
+  "name": "binago-monorepo",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev:business": "pnpm --filter @binago/business dev",
+    "dev:personal": "pnpm --filter @binago/personal dev",
+    "build": "pnpm --recursive run build",
+    "lint": "pnpm --recursive run lint",
+    "typecheck": "pnpm --recursive run typecheck",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\""
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^8.56.0",
+    "prettier": "^3.2.5",
+    "typescript": "^5.3.3"
+  },
+  "packageManager": "pnpm@8.15.4"
+}
