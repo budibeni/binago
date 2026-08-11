@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Download } from 'lucide-react';
+import { cn } from '@binago/utils';
 import { Button } from '../Button';
 import type { DataTableInstance, RowData } from './types';
 import type { DataTableExportConfig } from './types';
@@ -81,7 +82,7 @@ export function DataTableExport<TData extends RowData = RowData>({
       variant="outline"
       size="sm"
       onClick={handleExport}
-      className={className}
+      className={cn('h-8 gap-1.5 text-[13px]', className)}
       aria-label="Export CSV"
     >
       <Download className="h-3.5 w-3.5" />

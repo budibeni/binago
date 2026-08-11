@@ -173,7 +173,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
         {/* Mode Toggle */}
         <div className="absolute top-4 left-4 z-20">
           <div
-            className="flex items-center rounded-lg border border-neutral-200 bg-neutral-100/80 backdrop-blur-md p-1 shadow-sm"
+            className="flex items-center rounded-md border border-neutral-200 dark:border-neutral-700 bg-neutral-100/80 dark:bg-neutral-800/80 backdrop-blur-md p-0.5 shadow-sm gap-0.5"
             role="tablist"
             aria-label="Mode Pemantauan"
           >
@@ -184,14 +184,14 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
               aria-selected={mode === 'live'}
               onClick={() => setMode('live')}
               className={cn(
-                'flex items-center gap-2 px-5 py-1.5 text-[13px] font-bold rounded-md transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary',
+                'flex items-center gap-1.5 px-3 py-1 text-[12px] font-semibold rounded transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary',
                 mode === 'live'
-                  ? 'bg-white text-foreground shadow-sm'
-                  : 'text-foreground-muted hover:text-foreground hover:bg-neutral-200/50',
+                  ? 'bg-white dark:bg-neutral-700 text-foreground shadow-sm'
+                  : 'text-foreground-muted hover:text-foreground hover:bg-neutral-200/50 dark:hover:bg-neutral-700/40',
               )}
             >
               {/* Live Dot Icon */}
-              <svg className={cn("h-4 w-4", mode === 'live' ? "text-danger" : "text-foreground-muted")} viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+              <svg className={cn("h-3 w-3", mode === 'live' ? "text-danger" : "text-foreground-muted")} viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
                 <circle cx="8" cy="8" r="6" fill="currentColor" />
                 <circle cx="8" cy="8" r="2" fill="white" />
               </svg>
@@ -205,13 +205,13 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
               aria-selected={mode === 'playback'}
               onClick={() => setMode('playback')}
               className={cn(
-                'flex items-center gap-2 px-5 py-1.5 text-[13px] font-bold rounded-md transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary',
+                'flex items-center gap-1.5 px-3 py-1 text-[12px] font-semibold rounded transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary',
                 mode === 'playback'
-                  ? 'bg-white text-foreground shadow-sm'
-                  : 'text-foreground-muted hover:text-foreground hover:bg-neutral-200/50',
+                  ? 'bg-white dark:bg-neutral-700 text-foreground shadow-sm'
+                  : 'text-foreground-muted hover:text-foreground hover:bg-neutral-200/50 dark:hover:bg-neutral-700/40',
               )}
             >
-              <History className="h-4 w-4" aria-hidden="true" strokeWidth={2.5} />
+              <History className="h-3 w-3" aria-hidden="true" strokeWidth={2.5} />
               {tTracking.modePlayback}
             </button>
           </div>

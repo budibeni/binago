@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { flexRender, type RowData } from '@tanstack/react-table';
 import { cn } from '@binago/utils';
@@ -15,7 +17,7 @@ export function DataTableRow<TData extends RowData = RowData>({
   return (
     <tr
       className={cn(
-        'border-b border-border bg-background transition-colors duration-fast hover:bg-neutral-50/80',
+        'border-b border-border bg-background transition-colors duration-fast hover:bg-neutral-50/80 dark:hover:bg-neutral-800/30',
         className,
       )}
     >
@@ -25,7 +27,7 @@ export function DataTableRow<TData extends RowData = RowData>({
           <td
             key={cell.id}
             className={cn(
-              'px-4 py-3 text-sm text-foreground align-middle whitespace-nowrap',
+              'px-3 py-1.5 text-[13px] text-foreground align-middle whitespace-nowrap',
               isPinned && 'sticky z-10 bg-background shadow-[1px_0_0_0_rgba(0,0,0,0.05)]',
               (isPinned === 'start' || (isPinned as string) === 'left') && 'left-0',
               (isPinned === 'end' || (isPinned as string) === 'right') && 'right-0',

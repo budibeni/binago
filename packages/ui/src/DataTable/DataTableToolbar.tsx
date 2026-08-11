@@ -5,6 +5,8 @@ import { cn } from '@binago/utils';
 import { DataTableSearch } from './DataTableSearch';
 import { DataTableColumnToggle } from './DataTableColumnToggle';
 import { DataTableExport } from './DataTableExport';
+import { Filter } from 'lucide-react';
+import { Button } from '../Button';
 import type { DataTableInstance, DataTableExportConfig, RowData } from './types';
 import type { FetchState } from '@binago/types';
 
@@ -21,6 +23,10 @@ export interface DataTableToolbarProps<TData extends RowData = RowData> {
   showSearch?: boolean;
   showColumnToggle?: boolean;
   showExport?: boolean;
+  showFilter?: boolean;
+  isFilterOpen?: boolean;
+  onFilterOpenChange?: (open: boolean) => void;
+  activeFilterCount?: number;
 
   // Export config (opsional, bisa di-override via exportConfig)
   exportConfig?: DataTableExportConfig;
@@ -52,6 +58,10 @@ export function DataTableToolbar<TData extends RowData = RowData>({
   showSearch = true,
   showColumnToggle = true,
   showExport = true,
+  showFilter = false,
+  isFilterOpen,
+  onFilterOpenChange,
+  activeFilterCount,
   exportConfig,
   fetchState = 'idle',
   rightSlot,
@@ -63,7 +73,7 @@ export function DataTableToolbar<TData extends RowData = RowData>({
   return (
     <div
       className={cn(
-        'flex flex-wrap items-center justify-between gap-3',
+        'flex flex-wrap items-center justify-between gap-2',
         className,
       )}
       role="toolbar"
@@ -84,9 +94,31 @@ export function DataTableToolbar<TData extends RowData = RowData>({
         )}
       </div>
 
-      {/* Right area: custom slot + column toggle + export */}
+      {/* Right area: custom slot + filter + column toggle + export */}
       <div className="flex items-center gap-2 shrink-0">
         {rightSlot}
+        {showFilter && onFilterOpenChange && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onFilterOpenChange(!isFilterOpen)}
+            className={cn(
+              "h-8 gap-1.5 border-dashed text-[13px]",
+              isFilterOpen && "bg-accent text-accent-foreground"
+            )}
+          >
+            <Filter className="h-4 w-4" />
+            <span className="hidden sm:inline-block">Filter</span>
+            {activeFilterCount ? (
+              <>
+                <span className="mx-1 h-4 w-[1px] bg-border" />
+                <span className="rounded-sm bg-primary px-1 text-[10px] font-semibold tabular-nums text-primary-foreground">
+                  {activeFilterCount}
+                </span>
+              </>
+            ) : null}
+          </Button>
+        )}
         {showColumnToggle && (
           <DataTableColumnToggle table={table} />
         )}

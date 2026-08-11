@@ -36,7 +36,7 @@ export const SearchBar = React.forwardRef<HTMLInputElement, SearchBarProps>(
 
     return (
       <div className={cn('relative flex items-center w-full max-w-xs', className)}>
-        <Search className="absolute left-3 h-4 w-4 text-foreground-muted pointer-events-none shrink-0" />
+        <Search className="absolute left-2.5 h-3.5 w-3.5 text-foreground-muted pointer-events-none shrink-0" />
         <input
           ref={ref}
           id={id}
@@ -46,7 +46,7 @@ export const SearchBar = React.forwardRef<HTMLInputElement, SearchBarProps>(
           placeholder={placeholder}
           disabled={disabled}
           className={cn(
-            'h-9 w-full rounded-md border border-border bg-background pl-9 pr-8 text-sm text-foreground',
+            'h-8 w-full rounded border border-border bg-background pl-8 pr-7 text-[13px] text-foreground',
             'placeholder:text-foreground-subtle transition-colors duration-base',
             'focus:outline-none focus:ring-2 focus:ring-neutral-400 focus:ring-offset-1',
             'disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-neutral-50',

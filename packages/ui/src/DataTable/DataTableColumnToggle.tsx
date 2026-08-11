@@ -38,7 +38,7 @@ export function DataTableColumnToggle<TData extends RowData = RowData>({
         <Button
           variant="outline"
           size="sm"
-          className={cn('gap-1.5', className)}
+          className={cn('h-8 gap-1.5 text-[13px]', className)}
           aria-label="Toggle kolom"
         >
           <Columns3 className="h-3.5 w-3.5" />

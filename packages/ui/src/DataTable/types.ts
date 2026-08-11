@@ -18,6 +18,7 @@ export type {
   ReactTable,
   Row,
   RowData,
+  SortingState,
   StockFeatures,
 };
 
@@ -59,6 +60,34 @@ export interface DataTableExportConfig {
   enabled?: boolean;
 }
 
+export type DataTableFilterFieldType = 'pills-single' | 'pills-multi' | 'checkbox-group';
+
+export interface DataTableFilterOption {
+  value: string;
+  label: string;
+  count?: number;
+  colorClass?: string;
+  activeClass?: string;
+}
+
+export interface DataTableFilterField {
+  id: string; // Used as key in the filter state
+  label: string; // e.g., "Status", "Group"
+  type: DataTableFilterFieldType;
+  options: DataTableFilterOption[];
+}
+
+export interface DataTableFilterConfig {
+  fields: DataTableFilterField[];
+  state: Record<string, string | string[]>; // Record of field.id -> selected value(s)
+  onStateChange: (state: Record<string, string | string[]>) => void;
+  onClearAll?: () => void;
+  labels?: {
+    title?: string;
+    clearAll?: string;
+  };
+}
+
 export interface DataTableBaseProps<TData extends RowData = RowData> {
   data: TData[];
   columns: DataTableColumnDef<TData>[];
@@ -73,8 +102,11 @@ export interface DataTableBaseProps<TData extends RowData = RowData> {
   infiniteConfig?: DataTableInfiniteConfig;
   freezeConfig?: DataTableFreezeConfig;
   exportConfig?: DataTableExportConfig;
+  filterConfig?: DataTableFilterConfig;
 
   // Controlled states
+  isFilterOpen?: boolean;
+  onFilterOpenChange?: (open: boolean) => void;
   sorting?: SortingState;
   onSortingChange?: (sorting: SortingState) => void;
   columnFilters?: ColumnFiltersState;
@@ -94,6 +126,12 @@ export interface DataTableBaseProps<TData extends RowData = RowData> {
   noResultDescription?: string;
   className?: string;
   tableClassName?: string;
-  toolbarSlot?: ReactNode;
+  toolbarSlot?: ReactNode | ((props: {
+    table: DataTableInstance<TData>;
+    showFilter?: boolean;
+    isFilterOpen?: boolean;
+    onFilterOpenChange?: (open: boolean) => void;
+    activeFilterCount?: number;
+  }) => ReactNode);
   paginationSlot?: ReactNode;
 }

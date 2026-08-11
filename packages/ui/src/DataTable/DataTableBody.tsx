@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import type { RowData } from '@tanstack/react-table';
 import type { FetchState } from '@binago/types';

@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { flexRender, type RowData } from '@tanstack/react-table';
 import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
@@ -16,7 +18,7 @@ export function DataTableHeader<TData extends RowData = RowData>({
   return (
     <thead
       className={cn(
-        'bg-surface border-b border-border text-xs font-semibold text-foreground-muted uppercase tracking-wider',
+        'bg-surface border-b border-border text-[11px] font-semibold text-foreground-muted uppercase tracking-wide',
         stickyHeader && 'sticky top-0 z-20 bg-surface shadow-sm',
       )}
     >
@@ -32,7 +34,7 @@ export function DataTableHeader<TData extends RowData = RowData>({
                 key={header.id}
                 colSpan={header.colSpan}
                 className={cn(
-                  'px-4 py-3 text-left align-middle font-semibold select-none whitespace-nowrap',
+                  'px-3 py-2 text-left align-middle font-semibold select-none whitespace-nowrap',
                   canSort && 'cursor-pointer hover:bg-neutral-200/50 transition-colors',
                   isPinned &&
                     'sticky z-30 bg-surface shadow-[1px_0_0_0_rgba(0,0,0,0.05)]',

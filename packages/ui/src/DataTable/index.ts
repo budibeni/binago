@@ -7,7 +7,9 @@ export { DataTableSearch } from './DataTableSearch';
 export { DataTableColumnToggle } from './DataTableColumnToggle';
 export { DataTableExport } from './DataTableExport';
 export { DataTableToolbar } from './DataTableToolbar';
+export { DataTableFilterPanel } from './DataTableFilterPanel';
 export { useInfiniteScroll } from './useInfiniteScroll';
+export { useDataTable } from './useDataTable';
 export type {
   DataTableColumnDef,
   DataTableInstance,
@@ -17,8 +19,13 @@ export type {
   DataTableInfiniteConfig,
   DataTableFreezeConfig,
   DataTableExportConfig,
+  DataTableFilterConfig,
+  DataTableFilterField,
+  DataTableFilterOption,
+  DataTableFilterFieldType,
   ColumnDef,
   ColumnVisibilityState,
+  SortingState,
   ReactTable,
   Row,
   RowData,
