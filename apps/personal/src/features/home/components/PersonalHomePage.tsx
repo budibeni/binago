@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import { PersonalHeroSection } from './PersonalHeroSection';
 import { PersonalShortcutGrid } from './PersonalShortcutGrid';
-import { PersonalInfoBar } from './PersonalInfoBar';
 import { usePersonalLocale } from '../../../components/PersonalShellLayout';
 import { getTranslation } from '../../../i18n';
 import { FavoriteManager, FavoriteSectionHeader, FavoriteEmptyState } from '@binago/ui';
@@ -78,8 +77,6 @@ export function PersonalHomePage() {
           )
       )}
 
-      {/* Info bar */}
-      <PersonalInfoBar />
 
       {/* Favorite Manager Dialog */}
       <FavoriteManager

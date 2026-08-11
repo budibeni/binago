@@ -87,7 +87,7 @@ export function Sidebar({
             <Icon
               className={cn(
                 'h-[17px] w-[17px] shrink-0 transition-colors',
-                isActive ? 'text-white' : 'text-neutral-400 group-hover:text-neutral-600',
+                isActive ? 'text-red-500' : 'text-neutral-400 group-hover:text-neutral-600',
               )}
             />
           )}
@@ -117,22 +117,34 @@ export function Sidebar({
       {/* ── Brand Header ── */}
       <div
         className={cn(
-          'flex h-[52px] shrink-0 items-center border-b border-neutral-200 px-4',
-          collapsed ? 'justify-center px-3' : 'justify-between',
+          'relative flex h-[52px] shrink-0 items-center border-b border-neutral-200',
+          collapsed ? 'justify-center px-3' : 'justify-center px-4',
         )}
       >
-        {/* Logo / Brand */}
+        {/* Logo / Brand / Expand Button */}
         <div className="flex items-center gap-2 min-w-0">
-          {brandLogo ? (
+          {collapsed && onCollapsedChange ? (
+            <button
+              type="button"
+              onClick={() => onCollapsedChange(!collapsed)}
+              className="flex items-center justify-center rounded-md p-2 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700 transition-colors"
+              aria-label="Perluas Sidebar"
+              title="Perluas Sidebar"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
+          ) : brandLogo ? (
             brandLogo
           ) : (
-            <span
-              className={cn(
-                'font-bold tracking-tight text-neutral-900',
-                collapsed ? 'text-base' : 'text-[17px]',
+            <span className="font-extrabold tracking-tight text-3xl">
+              {brandName === 'BINAGO' ? (
+                <>
+                  <span className="text-neutral-900">BINA</span>
+                  <span className="text-red-600">GO</span>
+                </>
+              ) : (
+                <span className="text-neutral-900">{brandName}</span>
               )}
-            >
-              {collapsed ? brandName.charAt(0) : brandName}
             </span>
           )}
         </div>
@@ -141,7 +153,7 @@ export function Sidebar({
         <button
           type="button"
           onClick={() => onMobileOpenChange?.(false)}
-          className="lg:hidden rounded-md p-1 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700 transition-colors"
+          className="absolute right-3 top-1/2 -translate-y-1/2 lg:hidden rounded-md p-1 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700 transition-colors"
           aria-label="Tutup Menu"
         >
           <X className="h-4.5 w-4.5" />
@@ -152,7 +164,7 @@ export function Sidebar({
           <button
             type="button"
             onClick={() => onCollapsedChange(!collapsed)}
-            className="hidden lg:flex items-center justify-center rounded-md p-1.5 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700 transition-colors"
+            className="absolute right-2 top-1/2 -translate-y-1/2 hidden lg:flex items-center justify-center rounded-md p-1.5 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700 transition-colors"
             aria-label="Ciutkan Sidebar"
             title="Ciutkan Sidebar"
           >
@@ -179,28 +191,13 @@ export function Sidebar({
       </nav>
 
       {/* ── Footer (fixed, not scrollable) ── */}
-      <div className="shrink-0 border-t border-neutral-200">
-        {bottomNavigation.length > 0 && (
+      {bottomNavigation.length > 0 && (
+        <div className="shrink-0 border-t border-neutral-200">
           <div className="px-2.5 py-2">
             {renderNavItems(bottomNavigation)}
           </div>
-        )}
-
-        {/* Collapse expand button (desktop, collapsed state) */}
-        {collapsed && onCollapsedChange && (
-          <div className="flex justify-center pb-2 px-2">
-            <button
-              type="button"
-              onClick={() => onCollapsedChange(!collapsed)}
-              className="flex items-center justify-center rounded-md p-2 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700 transition-colors w-full"
-              aria-label="Perluas Sidebar"
-              title="Perluas Sidebar"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </button>
-          </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 

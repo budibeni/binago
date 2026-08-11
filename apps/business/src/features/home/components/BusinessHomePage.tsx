@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import { BusinessHeroSection } from './BusinessHeroSection';
 import { HomeShortcutGrid } from './HomeShortcutGrid';
-import { BusinessInfoBar } from './BusinessInfoBar';
 import { useBusinessLocale } from '../../../components/BusinessShellLayout';
 import { getTranslation } from '../../../i18n';
 import { FavoriteManager, FavoriteSectionHeader, FavoriteEmptyState } from '@binago/ui';
@@ -78,8 +77,6 @@ export function BusinessHomePage() {
           )
       )}
 
-      {/* Info bar */}
-      <BusinessInfoBar />
 
       {/* Favorite Manager Dialog */}
       <FavoriteManager
