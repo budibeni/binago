@@ -2,12 +2,11 @@
 
 import React, { useEffect, useState } from 'react';
 import { PersonalHeroSection } from './PersonalHeroSection';
-import { PersonalFavoriteSection } from './PersonalFavoriteSection';
 import { PersonalShortcutGrid } from './PersonalShortcutGrid';
 import { PersonalInfoBar } from './PersonalInfoBar';
 import { usePersonalLocale } from '../../../components/PersonalShellLayout';
 import { getTranslation } from '../../../i18n';
-import { FavoriteManager } from '@binago/ui';
+import { FavoriteManager, FavoriteSectionHeader } from '@binago/ui';
 import { PERSONAL_SHORTCUTS } from '../data/shortcuts';
 
 const STORAGE_KEY = 'binago.personal.favorites';
@@ -30,7 +29,7 @@ export function PersonalHomePage() {
       } else {
         setFavorites(DEFAULT_FAVORITES);
       }
-    } catch (e) {
+    } catch {
       setFavorites(DEFAULT_FAVORITES);
     }
     setIsLoaded(true);
@@ -60,10 +59,17 @@ export function PersonalHomePage() {
       {/* Hero */}
       <PersonalHeroSection />
 
-      {/* Favorite Section header */}
-      <PersonalFavoriteSection onManageClick={() => setIsManagerOpen(true)} />
+      {/* Favorite section header */}
+      <FavoriteSectionHeader
+        title={h.favoritTitle}
+        subtitle={h.favoritSubtitle}
+        manageLabel={h.manageFavorite}
+        addLabel={h.addShortcut}
+        onManageClick={() => setIsManagerOpen(true)}
+        addButtonVariant="dark"
+      />
 
-      {/* Shortcut grid */}
+      {/* Shortcut grid — only rendered after localStorage is read (SSR safe) */}
       {isLoaded && <PersonalShortcutGrid favorites={favorites} />}
 
       {/* Info bar */}

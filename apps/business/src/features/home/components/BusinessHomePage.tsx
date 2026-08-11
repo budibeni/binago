@@ -2,12 +2,11 @@
 
 import React, { useEffect, useState } from 'react';
 import { BusinessHeroSection } from './BusinessHeroSection';
-import { BusinessFavoriteSection } from './BusinessFavoriteSection';
 import { HomeShortcutGrid } from './HomeShortcutGrid';
 import { BusinessInfoBar } from './BusinessInfoBar';
 import { useBusinessLocale } from '../../../components/BusinessShellLayout';
 import { getTranslation } from '../../../i18n';
-import { FavoriteManager } from '@binago/ui';
+import { FavoriteManager, FavoriteSectionHeader } from '@binago/ui';
 import { BUSINESS_SHORTCUTS } from '../data/shortcuts';
 
 const STORAGE_KEY = 'binago.business.favorites';
@@ -30,7 +29,7 @@ export function BusinessHomePage() {
       } else {
         setFavorites(DEFAULT_FAVORITES);
       }
-    } catch (e) {
+    } catch {
       setFavorites(DEFAULT_FAVORITES);
     }
     setIsLoaded(true);
@@ -60,10 +59,17 @@ export function BusinessHomePage() {
       {/* Hero */}
       <BusinessHeroSection />
 
-      {/* Favorite Section header */}
-      <BusinessFavoriteSection onManageClick={() => setIsManagerOpen(true)} />
+      {/* Favorite section header */}
+      <FavoriteSectionHeader
+        title={h.favoritTitle}
+        subtitle={h.favoritSubtitle}
+        manageLabel={h.manageFavorite}
+        addLabel={h.addShortcut}
+        onManageClick={() => setIsManagerOpen(true)}
+        addButtonVariant="accent"
+      />
 
-      {/* Shortcut grid */}
+      {/* Shortcut grid — only rendered after localStorage is read (SSR safe) */}
       {isLoaded && <HomeShortcutGrid favorites={favorites} />}
 
       {/* Info bar */}
