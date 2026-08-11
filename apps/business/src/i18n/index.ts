@@ -92,7 +92,7 @@ export const dictionaries = {
 
     // Tracking
     tracking: {
-      title: 'Pemantauan',
+      title: 'Filter',
       unitCount: 'Unit',
       searchPlaceholder: 'Cari plat nomor, grup, atau nama driver',
       filterSettings: 'Pengaturan Filter',
@@ -113,6 +113,17 @@ export const dictionaries = {
       modePlayback: 'Playback',
       modeHeatmap: 'Heatmap',
       share: 'Bagikan',
+      emptyTitle: 'Tidak ada kendaraan ditemukan',
+      emptyDescription: 'Coba sesuaikan kata kunci atau filter status.',
+      refreshData: 'Muat ulang data',
+      hidePanel: 'Sembunyikan Panel',
+      showPanel: 'Buka Pemantauan',
+      overviewDriverGroup: 'Pengemudi / Grup',
+      overviewSpeed: 'Kecepatan Saat Ini',
+      overviewLocation: 'Lokasi Terakhir',
+      overviewLastUpdate: 'Pembaruan Terakhir',
+      overviewClose: 'Tutup Panel Overview',
+      overviewNoDriver: 'Tanpa Pengemudi',
     },
   },
   en: {
@@ -206,7 +217,7 @@ export const dictionaries = {
 
     // Tracking
     tracking: {
-      title: 'Tracking',
+      title: 'Filter',
       unitCount: 'Units',
       searchPlaceholder: 'Search plate, group, or driver name',
       filterSettings: 'Filter Settings',
@@ -227,6 +238,17 @@ export const dictionaries = {
       modePlayback: 'Playback',
       modeHeatmap: 'Heatmap',
       share: 'Share',
+      emptyTitle: 'No vehicles found',
+      emptyDescription: 'Try adjusting search keywords or status filters.',
+      refreshData: 'Refresh data',
+      hidePanel: 'Hide Panel',
+      showPanel: 'Open Monitoring',
+      overviewDriverGroup: 'Driver / Group',
+      overviewSpeed: 'Current Speed',
+      overviewLocation: 'Last Location',
+      overviewLastUpdate: 'Last Update',
+      overviewClose: 'Close Overview Panel',
+      overviewNoDriver: 'No Driver',
     },
   },
 };

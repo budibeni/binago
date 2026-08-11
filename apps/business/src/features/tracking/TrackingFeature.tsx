@@ -1,13 +1,15 @@
 'use client';
 
 import React from 'react';
-import { Map, History } from 'lucide-react';
+import { Map, History, ChevronLeft, Filter } from 'lucide-react';
 import { cn } from '@binago/utils';
 import { VehicleList } from './components/VehicleList';
 import { LiveMap } from './components/LiveMap';
 import { PlaybackPanel } from './components/PlaybackPanel';
+import { VehicleOverviewPanel } from './components/VehicleOverviewPanel';
 import { mockVehicleGroups, mockVehicles } from './data/mockTrackingData';
 import { getTranslation } from '../../i18n';
+import { useBusinessLocale } from '../../components/BusinessShellLayout';
 import type { StatusFilter, DateRange, PlaybackState } from './types/tracking';
 import type { Locale } from '@binago/types';
 
@@ -21,7 +23,9 @@ interface TrackingFeatureProps {
   locale?: Locale;
 }
 
-export function TrackingFeature({ locale = 'id' }: TrackingFeatureProps) {
+export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
+  const contextLocale = useBusinessLocale();
+  const locale = localeProp ?? contextLocale ?? 'id';
   const t = getTranslation(locale);
   const tTracking = t.tracking;
 
@@ -33,6 +37,7 @@ export function TrackingFeature({ locale = 'id' }: TrackingFeatureProps) {
   const [statusFilter, setStatusFilter] = React.useState<StatusFilter>('all');
   const [selectedVehicleId, setSelectedVehicleId] = React.useState<string | null>(null);
   const [selectedVehicleIds, setSelectedVehicleIds] = React.useState<string[]>([]);
+  const [isVehicleListVisible, setIsVehicleListVisible] = React.useState(true);
 
   // ── Playback state ────────────────────────────────────────────────────────
   const [playbackVehicleId, setPlaybackVehicleId] = React.useState<string | null>(null);
@@ -71,10 +76,14 @@ export function TrackingFeature({ locale = 'id' }: TrackingFeatureProps) {
     setSelectedVehicleId(vehicleId);
   }, []);
 
-  const handleVehicleCheck = React.useCallback((vehicleId: string, checked: boolean) => {
-    setSelectedVehicleIds((prev: string[]) =>
-      checked ? [...prev, vehicleId] : prev.filter((id: string) => id !== vehicleId),
-    );
+  const handleVehicleCheck = React.useCallback((idOrIds: string | string[], checked: boolean) => {
+    setSelectedVehicleIds((prev: string[]) => {
+      const ids = Array.isArray(idOrIds) ? idOrIds : [idOrIds];
+      if (checked) {
+        return Array.from(new Set([...prev, ...ids]));
+      }
+      return prev.filter(id => !ids.includes(id));
+    });
   }, []);
 
   const handleSelectAll = React.useCallback((checked: boolean) => {
@@ -148,6 +157,10 @@ export function TrackingFeature({ locale = 'id' }: TrackingFeatureProps) {
     noDriver: tTracking.noDriver,
     speedUnit: tTracking.speedUnit,
     groupSummary: tTracking.groupSummary,
+    emptyTitle: tTracking.emptyTitle,
+    emptyDescription: tTracking.emptyDescription,
+    refreshData: tTracking.refreshData,
+    hidePanel: tTracking.hidePanel,
   }), [tTracking]);
 
   // ── Render ────────────────────────────────────────────────────────────────
@@ -218,7 +231,7 @@ export function TrackingFeature({ locale = 'id' }: TrackingFeatureProps) {
         <div
           className={cn(
             'shrink-0 border-t border-border bg-background transition-all duration-300 ease-in-out',
-            mode === 'playback' ? 'h-[160px] opacity-100 translate-y-0' : 'h-0 opacity-0 translate-y-10 pointer-events-none overflow-hidden'
+            mode === 'playback' ? 'h-[120px] opacity-100 translate-y-0' : 'h-0 opacity-0 translate-y-10 pointer-events-none overflow-hidden'
           )}
           aria-hidden={mode !== 'playback'}
         >
@@ -236,24 +249,82 @@ export function TrackingFeature({ locale = 'id' }: TrackingFeatureProps) {
             onSeek={handleSeek}
           />
         </div>
+
+        {/* Bottom Overview Panel (Live Mode) */}
+        <div
+          className={cn(
+            'shrink-0 border-t border-border bg-background transition-all duration-300 ease-in-out',
+            (mode === 'live' && selectedVehicleId) ? 'h-[110px] opacity-100 translate-y-0' : 'h-0 opacity-0 translate-y-10 pointer-events-none overflow-hidden'
+          )}
+          aria-hidden={mode !== 'live' || !selectedVehicleId}
+        >
+          <VehicleOverviewPanel 
+            vehicle={mockVehicles.find(v => v.id === selectedVehicleId) || null}
+            onClose={() => setSelectedVehicleId(null)}
+            locale={locale}
+          />
+        </div>
       </div>
 
-      {/* Right Sidebar: VehicleList */}
-      <div className="shrink-0 w-[320px] flex flex-col h-full border-l border-border bg-background shadow-[-4px_0_15px_-3px_rgba(0,0,0,0.05)] z-10">
-        <VehicleList
-          groups={mockVehicleGroups}
-          selectedVehicleId={selectedVehicleId}
-          selectedVehicleIds={selectedVehicleIds}
-          search={search}
-          statusFilter={statusFilter}
-          onVehicleSelect={handleVehicleSelect}
-          onSearchChange={setSearch}
-          onStatusFilterChange={setStatusFilter}
-          onVehicleCheck={handleVehicleCheck}
-          onSelectAll={handleSelectAll}
-          labels={vehicleListLabels}
-        />
-      </div>
+      {/* Right Sidebar: VehicleList or Collapsed Vertical Tab */}
+      {mode === 'live' && (
+        <div
+          className={cn(
+            'shrink-0 h-full z-10 transition-all duration-300 ease-in-out flex flex-col',
+            isVehicleListVisible
+              ? 'w-[320px] border-l border-border bg-background shadow-[-4px_0_15px_-3px_rgba(0,0,0,0.05)]'
+              : 'w-[34px] py-2 items-center bg-transparent border-l border-border/40'
+          )}
+        >
+          {isVehicleListVisible ? (
+            <VehicleList
+              groups={mockVehicleGroups}
+              selectedVehicleId={selectedVehicleId}
+              selectedVehicleIds={selectedVehicleIds}
+              search={search}
+              statusFilter={statusFilter}
+              onVehicleSelect={handleVehicleSelect}
+              onSearchChange={setSearch}
+              onStatusFilterChange={setStatusFilter}
+              onVehicleCheck={handleVehicleCheck}
+              onSelectAll={handleSelectAll}
+              onClose={() => setIsVehicleListVisible(false)}
+              labels={vehicleListLabels}
+            />
+          ) : (
+            <div className="flex flex-col items-center gap-2.5 h-full w-full">
+              {/* Expand button */}
+              <button
+                type="button"
+                onClick={() => setIsVehicleListVisible(true)}
+                className="flex h-6 w-6 items-center justify-center text-foreground-muted hover:text-foreground transition-colors focus:outline-none shrink-0"
+                title="Buka Panel Pemantauan"
+              >
+                <ChevronLeft className="h-3.5 w-3.5" />
+              </button>
+
+              {/* Vertical Tab Button */}
+              <button
+                type="button"
+                onClick={() => setIsVehicleListVisible(true)}
+                className="flex flex-col items-center py-2 px-0.5 text-foreground group shrink-0 transition-opacity hover:opacity-80"
+                title="Buka Pemantauan"
+              >
+
+                {/* Vertical Text */}
+                <div className="flex flex-col items-center gap-1 font-bold text-[8.5px] tracking-widest text-foreground-muted group-hover:text-foreground uppercase select-none mb-2 transition-colors">
+                  {tTracking.title.toUpperCase().split('').map((char, index) => (
+                    <span key={index} className="leading-none">{char}</span>
+                  ))}
+                </div>
+
+                {/* Active Indicator Square */}
+                <div className="h-1 w-1 bg-primary animate-pulse" />
+              </button>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
