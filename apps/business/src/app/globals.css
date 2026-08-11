@@ -1,1 +1,93 @@
-@import '@binago/design-system/src/base.css';
+@import '@fontsource-variable/inter';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Design Tokens ───────────────────────────────── */
+:root {
+  /* Brand */
+  --color-brand-black: #0F0F0F;
+  --color-brand-red: #D72B2B;
+
+  /* Semantic */
+  --color-danger: #EF4444;
+  --color-danger-foreground: #FFFFFF;
+  --color-success: #22C55E;
+  --color-success-foreground: #FFFFFF;
+  --color-warning: #F59E0B;
+  --color-warning-foreground: #FFFFFF;
+  --color-info: #3B82F6;
+  --color-info-foreground: #FFFFFF;
+
+  /* Neutral (Zinc) */
+  --color-neutral-50: #FAFAFA;
+  --color-neutral-100: #F4F4F5;
+  --color-neutral-200: #E4E4E7;
+  --color-neutral-300: #D4D4D8;
+  --color-neutral-400: #A1A1AA;
+  --color-neutral-500: #71717A;
+  --color-neutral-600: #52525B;
+  --color-neutral-700: #3F3F46;
+  --color-neutral-800: #27272A;
+  --color-neutral-900: #18181B;
+  --color-neutral-950: #09090B;
+
+  /* Background / Surface */
+  --color-background: #FFFFFF;
+  --color-surface: #FAFAFA;
+  --color-surface-elevated: #F4F4F5;
+  --color-border: #E4E4E7;
+  --color-border-strong: #D4D4D8;
+
+  /* Text */
+  --color-foreground: #0F0F0F;
+  --color-foreground-muted: #71717A;
+  --color-foreground-subtle: #A1A1AA;
+
+  /* Primary (Brand Black based) */
+  --color-primary: #0F0F0F;
+  --color-primary-hover: #27272A;
+  --color-primary-foreground: #FFFFFF;
+
+  /* Accent (Brand Red based) */
+  --color-accent: #D72B2B;
+  --color-accent-hover: #B91C1C;
+  --color-accent-foreground: #FFFFFF;
+
+  /* Radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-full: 9999px;
+
+  /* Shadow */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+
+  /* Transition */
+  --transition-fast: 100ms ease;
+  --transition-base: 150ms ease;
+  --transition-slow: 300ms ease;
+
+  /* Font */
+  --font-sans: 'Inter Variable', 'Inter', ui-sans-serif, system-ui, sans-serif;
+}
+
+/* ─── Base Styles ─────────────────────────────────── */
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}

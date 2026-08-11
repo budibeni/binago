@@ -1,39 +1,86 @@
 'use client';
 
-import React from 'react';
-import { ContentHeader } from '@binago/ui';
-import { PersonalMetricCards } from './PersonalMetricCards';
+import React, { useEffect, useState } from 'react';
+import { PersonalHeroSection } from './PersonalHeroSection';
+import { PersonalFavoriteSection } from './PersonalFavoriteSection';
 import { PersonalShortcutGrid } from './PersonalShortcutGrid';
-import { PersonalStatusWidget } from './PersonalStatusWidget';
+import { PersonalInfoBar } from './PersonalInfoBar';
 import { usePersonalLocale } from '../../../components/PersonalShellLayout';
 import { getTranslation } from '../../../i18n';
+import { FavoriteManager } from '@binago/ui';
+import { PERSONAL_SHORTCUTS } from '../data/shortcuts';
+
+const STORAGE_KEY = 'binago.personal.favorites';
+const DEFAULT_FAVORITES = ['tracking', 'gpsDevices', 'geofences', 'reports'];
 
 export function PersonalHomePage() {
   const locale = usePersonalLocale();
   const t = getTranslation(locale);
+  const h = t.home;
+
+  const [favorites, setFavorites] = useState<string[]>([]);
+  const [isManagerOpen, setIsManagerOpen] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        setFavorites(JSON.parse(saved));
+      } else {
+        setFavorites(DEFAULT_FAVORITES);
+      }
+    } catch (e) {
+      setFavorites(DEFAULT_FAVORITES);
+    }
+    setIsLoaded(true);
+  }, []);
+
+  const handleSaveFavorites = (newFavorites: string[]) => {
+    setFavorites(newFavorites);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(newFavorites));
+    setIsManagerOpen(false);
+  };
+
+  const favoriteItems = PERSONAL_SHORTCUTS.map(s => ({
+    id: s.id,
+    label: h.shortcuts[s.translationKey].label,
+    description: h.shortcuts[s.translationKey].desc,
+    icon: s.icon,
+  }));
 
   return (
-    <div className="flex flex-col gap-6 max-w-5xl mx-auto p-4 md:p-6 w-full">
-      <ContentHeader
-        title={`${t.home.greeting}, Budi Beni`}
-        subtitle={t.home.subtitle}
-      />
-
-      <section aria-label={t.home.title}>
-        <PersonalMetricCards />
-      </section>
-
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-        <section className="lg:col-span-3 flex flex-col gap-4" aria-label={t.home.shortcuts}>
-          <h2 className="text-lg font-semibold text-foreground">{t.home.shortcuts}</h2>
-          <PersonalShortcutGrid />
-        </section>
-
-        <section className="lg:col-span-2 flex flex-col gap-4" aria-label={t.home.status}>
-          <h2 className="text-lg font-semibold text-foreground">{t.home.status}</h2>
-          <PersonalStatusWidget />
-        </section>
+    <div className="w-full max-w-[1400px] mx-auto px-6 py-6 flex flex-col gap-6">
+      {/* Page Header */}
+      <div>
+        <h1 className="text-xl font-bold text-neutral-900 leading-tight">{h.pageTitle}</h1>
+        <p className="mt-0.5 text-sm text-neutral-500">{h.pageSubtitle}</p>
       </div>
+
+      {/* Hero */}
+      <PersonalHeroSection />
+
+      {/* Favorite Section header */}
+      <PersonalFavoriteSection onManageClick={() => setIsManagerOpen(true)} />
+
+      {/* Shortcut grid */}
+      {isLoaded && <PersonalShortcutGrid favorites={favorites} />}
+
+      {/* Info bar */}
+      <PersonalInfoBar />
+
+      {/* Favorite Manager Dialog */}
+      <FavoriteManager
+        open={isManagerOpen}
+        onOpenChange={setIsManagerOpen}
+        title={h.favoriteDialogTitle}
+        description={h.favoriteDialogDescription}
+        items={favoriteItems}
+        selectedIds={favorites}
+        onSave={handleSaveFavorites}
+        cancelLabel={h.cancel}
+        saveLabel={h.save}
+      />
     </div>
   );
 }

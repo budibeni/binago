@@ -10,6 +10,7 @@ export interface SidebarProps {
   brandName?: string;
   brandLogo?: React.ReactNode;
   navigation: NavGroup[];
+  bottomNavigation?: NavItem[];
   currentPath?: string;
   onNavigate?: (href: string) => void;
   collapsed?: boolean;
@@ -23,6 +24,7 @@ export function Sidebar({
   brandName = 'BINAGO',
   brandLogo,
   navigation,
+  bottomNavigation = [],
   currentPath = '/',
   onNavigate,
   collapsed = false,
@@ -51,7 +53,6 @@ export function Sidebar({
       e.preventDefault();
       onNavigate(item.href);
     }
-    // Close mobile drawer on navigation
     if (mobileOpen) {
       onMobileOpenChange?.(false);
     }
@@ -59,7 +60,9 @@ export function Sidebar({
 
   const renderNavItems = (items: NavItem[]) => {
     return items.map((item) => {
-      const isActive = currentPath === item.href || (item.href !== '/' && currentPath.startsWith(item.href));
+      const isActive =
+        currentPath === item.href ||
+        (item.href !== '/' && currentPath.startsWith(item.href));
       const Icon = item.icon;
 
       return (
@@ -68,36 +71,37 @@ export function Sidebar({
           href={item.href}
           onClick={(e) => handleItemClick(e, item)}
           className={cn(
-            'group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-fast',
-            'focus:outline-none focus:ring-2 focus:ring-neutral-400',
+            'group flex items-center gap-2.5 rounded-md px-3 py-[7px] text-[13px] font-medium transition-colors duration-100',
+            'focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400',
             isActive
-              ? 'bg-primary text-primary-foreground font-semibold shadow-xs'
-              : 'text-foreground-muted hover:bg-neutral-100 hover:text-foreground',
-            item.disabled && 'pointer-events-none opacity-50',
+              ? 'bg-neutral-900 text-white shadow-sm'
+              : 'text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900',
+            item.disabled && 'pointer-events-none opacity-40',
             collapsed && 'justify-center px-2',
           )}
-          title={collapsed ? item.label : undefined}
+          title={item.label}
           aria-current={isActive ? 'page' : undefined}
+          aria-label={item.label}
         >
           {Icon && (
             <Icon
               className={cn(
-                'h-5 w-5 shrink-0 transition-colors',
-                isActive ? 'text-primary-foreground' : 'text-foreground-muted group-hover:text-foreground',
+                'h-[17px] w-[17px] shrink-0 transition-colors',
+                isActive ? 'text-white' : 'text-neutral-400 group-hover:text-neutral-600',
               )}
             />
           )}
 
           {!collapsed && (
-            <span className="flex-1 truncate">{item.label}</span>
+            <span className="flex-1 truncate leading-tight">{item.label}</span>
           )}
 
           {!collapsed && item.badge !== undefined && (
             <Badge
               variant={item.badgeVariant || 'default'}
               className={cn(
-                'ml-auto text-[10px] px-1.5 py-0',
-                isActive && 'bg-primary-foreground/20 text-primary-foreground border-primary-foreground/30',
+                'ml-auto text-[10px] px-1.5 py-0 h-4',
+                isActive && 'bg-white/20 text-white border-white/30',
               )}
             >
               {item.badge}
@@ -109,106 +113,121 @@ export function Sidebar({
   };
 
   const sidebarContent = (
-    <div className="flex h-full flex-col justify-between">
-      {/* Brand Header */}
-      <div>
-        <div
-          className={cn(
-            'flex h-14 items-center border-b border-border px-4',
-            collapsed ? 'justify-center px-2' : 'justify-between',
+    <div className="flex h-full flex-col">
+      {/* ── Brand Header ── */}
+      <div
+        className={cn(
+          'flex h-[52px] shrink-0 items-center border-b border-neutral-200 px-4',
+          collapsed ? 'justify-center px-3' : 'justify-between',
+        )}
+      >
+        {/* Logo / Brand */}
+        <div className="flex items-center gap-2 min-w-0">
+          {brandLogo ? (
+            brandLogo
+          ) : (
+            <span
+              className={cn(
+                'font-bold tracking-tight text-neutral-900',
+                collapsed ? 'text-base' : 'text-[17px]',
+              )}
+            >
+              {collapsed ? brandName.charAt(0) : brandName}
+            </span>
           )}
-        >
-          <div className="flex items-center gap-2.5 min-w-0">
-            {brandLogo || (
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary font-bold text-primary-foreground text-xs shadow-sm">
-                B
-              </div>
-            )}
-            {!collapsed && (
-              <span className="text-base font-bold text-foreground truncate tracking-tight">
-                {brandName}
-              </span>
-            )}
-          </div>
-
-          {/* Close button inside mobile drawer */}
-          <button
-            type="button"
-            onClick={() => onMobileOpenChange?.(false)}
-            className="lg:hidden rounded-md p-1 text-foreground-muted hover:bg-neutral-100 transition-colors"
-            aria-label="Tutup Menu"
-          >
-            <X className="h-5 w-5" />
-          </button>
         </div>
 
-        {/* Navigation Groups */}
-        <nav className="space-y-4 p-3 overflow-y-auto max-h-[calc(100vh-7.5rem)]">
-          {navigation.map((group, idx) => (
-            <div key={group.id || idx} className="space-y-1">
-              {group.title && !collapsed && (
-                <div className="px-3 text-[11px] font-semibold text-foreground-subtle uppercase tracking-wider mb-1">
-                  {group.title}
-                </div>
-              )}
-              <div className="space-y-0.5">{renderNavItems(group.items)}</div>
-            </div>
-          ))}
-        </nav>
-      </div>
+        {/* Close (mobile) */}
+        <button
+          type="button"
+          onClick={() => onMobileOpenChange?.(false)}
+          className="lg:hidden rounded-md p-1 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700 transition-colors"
+          aria-label="Tutup Menu"
+        >
+          <X className="h-4.5 w-4.5" />
+        </button>
 
-      {/* Footer Collapse Toggle (Desktop only) */}
-      {onCollapsedChange && (
-        <div className="hidden lg:flex border-t border-border p-2">
+        {/* Collapse toggle (desktop) */}
+        {!collapsed && onCollapsedChange && (
           <button
             type="button"
             onClick={() => onCollapsedChange(!collapsed)}
-            className={cn(
-              'flex w-full items-center gap-2 rounded-lg p-2 text-xs font-medium text-foreground-muted hover:bg-neutral-100 hover:text-foreground transition-colors',
-              collapsed && 'justify-center',
-            )}
-            aria-label={collapsed ? 'Perluas Sidebar' : 'Ciutkan Sidebar'}
-            title={collapsed ? 'Perluas Sidebar' : 'Ciutkan Sidebar'}
+            className="hidden lg:flex items-center justify-center rounded-md p-1.5 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700 transition-colors"
+            aria-label="Ciutkan Sidebar"
+            title="Ciutkan Sidebar"
           >
-            {collapsed ? (
-              <ChevronRight className="h-4 w-4 shrink-0" />
-            ) : (
-              <>
-                <ChevronLeft className="h-4 w-4 shrink-0" />
-                <span>Ciutkan Navigasi</span>
-              </>
-            )}
+            <ChevronLeft className="h-4 w-4" />
           </button>
-        </div>
-      )}
+        )}
+      </div>
+
+      {/* ── Navigation (scrollable) ── */}
+      <nav
+        className="flex-1 min-h-0 overflow-y-auto py-3 px-2.5 space-y-3"
+        aria-label="Navigasi utama"
+      >
+        {navigation.map((group, idx) => (
+          <div key={group.id || idx} className="space-y-0.5">
+            {group.title && !collapsed && (
+              <div className="px-2.5 pb-1 pt-0.5 text-[10.5px] font-semibold uppercase tracking-widest text-neutral-400 select-none">
+                {group.title}
+              </div>
+            )}
+            <div className="space-y-0.5">{renderNavItems(group.items)}</div>
+          </div>
+        ))}
+      </nav>
+
+      {/* ── Footer (fixed, not scrollable) ── */}
+      <div className="shrink-0 border-t border-neutral-200">
+        {bottomNavigation.length > 0 && (
+          <div className="px-2.5 py-2">
+            {renderNavItems(bottomNavigation)}
+          </div>
+        )}
+
+        {/* Collapse expand button (desktop, collapsed state) */}
+        {collapsed && onCollapsedChange && (
+          <div className="flex justify-center pb-2 px-2">
+            <button
+              type="button"
+              onClick={() => onCollapsedChange(!collapsed)}
+              className="flex items-center justify-center rounded-md p-2 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700 transition-colors w-full"
+              aria-label="Perluas Sidebar"
+              title="Perluas Sidebar"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 
   return (
     <>
-      {/* Desktop Sidebar (Sticky/Fixed) */}
+      {/* Desktop Sidebar */}
       <aside
         className={cn(
-          'hidden lg:flex flex-col border-r border-border bg-background transition-all duration-base shrink-0 z-20',
-          collapsed ? 'w-16' : 'w-60',
+          'hidden lg:flex flex-col border-r border-neutral-200 bg-white transition-all duration-200 shrink-0 z-20 h-full',
+          collapsed ? 'w-[56px]' : 'w-64',
           className,
         )}
       >
         {sidebarContent}
       </aside>
 
-      {/* Mobile Drawer (Slide-over + Backdrop Overlay) */}
+      {/* Mobile Drawer */}
       {mobileOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
-          {/* Backdrop Overlay */}
+          {/* Backdrop */}
           <div
-            className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity duration-base"
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm"
             onClick={() => onMobileOpenChange?.(false)}
             aria-hidden="true"
           />
-
           {/* Drawer Panel */}
-          <aside className="fixed inset-y-0 left-0 w-64 border-r border-border bg-background shadow-xl transition-transform duration-base z-50">
+          <aside className="fixed inset-y-0 left-0 w-64 border-r border-neutral-200 bg-white shadow-xl z-50">
             {sidebarContent}
           </aside>
         </div>

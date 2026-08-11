@@ -4,21 +4,26 @@ export const dictionaries = {
   id: {
     appName: 'BINAGO Personal',
     welcome: 'Selamat Datang di BINAGO Personal',
-    foundationReady: 'Application Shell Berhasil Terintegrasi',
 
     // Navigation Labels
     nav: {
+      home: 'Beranda',
       tracking: 'Pemantauan',
-      devices: 'Perangkat',
+      vehicles: 'Kendaraan',
+      gpsDevices: 'GPS & Perangkat',
       geofences: 'Geofence',
       reports: 'Laporan',
       settings: 'Pengaturan',
+      helpCenter: 'Pusat Bantuan',
     },
 
     // Nav Group Titles
     navGroup: {
       main: 'Utama',
+      operational: 'Operasional',
       system: 'Sistem',
+      analysis: 'Analisis',
+      settings: 'Pengaturan',
     },
 
     // User Menu
@@ -28,40 +33,62 @@ export const dictionaries = {
       logout: 'Keluar',
     },
 
-    // Shell Verification Page
-    // Home / Dashboard
+    // Home
     home: {
       title: 'Beranda',
-      greeting: 'Halo',
-      subtitle: 'Pantau posisi dan keamanan kendaraan Anda.',
+      pageTitle: 'Beranda',
+      pageSubtitle: 'Pantau kendaraan Anda dengan mudah dan real-time.',
+      heroGreeting: 'Selamat datang kembali,',
+      heroSubtitle: 'Pantau kendaraan Anda, lihat posisi secara real-time, dan kelola perangkat GPS dalam satu platform.',
       metrics: {
         registeredVehicles: 'Kendaraan Terdaftar',
-        gpsStatus: 'Status GPS',
-        activeGeofences: 'Geofence Aktif',
+        movingVehicles: 'Kendaraan Bergerak',
+        activeAlerts: 'Peringatan Aktif',
+        onlineDevices: 'Perangkat Online',
       },
-      shortcuts: 'Pintasan Personal',
-      status: 'Status Kendaraan Pribadi',
-      noStatus: 'Belum ada data status kendaraan.',
+      favoritTitle: 'Favorit Saya',
+      favoritSubtitle: 'Akses cepat ke menu yang paling sering Anda gunakan.',
+      manageFavorite: 'Kelola Favorit',
+      addShortcut: 'Tambah Shortcut',
+      favoriteDialogTitle: 'Kelola Favorit',
+      favoriteDialogDescription: 'Pilih menu yang ingin ditampilkan pada Favorit Saya.',
+      cancel: 'Batal',
+      save: 'Simpan',
+      infoBarText: 'Anda dapat menandai menu sebagai favorit dengan klik ikon bintang di menu manapun.',
+      learnMore: 'Pelajari lebih lanjut',
+      shortcuts: {
+        tracking: { label: 'Pemantauan', desc: 'Lihat posisi kendaraan di peta' },
+        vehicles: { label: 'Kendaraan', desc: 'Kelola data kendaraan Anda' },
+        geofences: { label: 'Geofence', desc: 'Kelola zona aman dan pembatas' },
+        gpsDevices: { label: 'GPS & Perangkat', desc: 'Kelola perangkat pelacak GPS' },
+        reports: { label: 'Laporan', desc: 'Riwayat dan ringkasan perjalanan' },
+        settings: { label: 'Pengaturan', desc: 'Pengaturan akun dan aplikasi' },
+      },
     },
   },
   en: {
     appName: 'BINAGO Personal',
     welcome: 'Welcome to BINAGO Personal',
-    foundationReady: 'Application Shell Integrated Successfully',
 
     // Navigation Labels
     nav: {
+      home: 'Home',
       tracking: 'Tracking',
-      devices: 'Devices',
+      vehicles: 'Vehicles',
+      gpsDevices: 'GPS & Devices',
       geofences: 'Geofences',
       reports: 'Reports',
       settings: 'Settings',
+      helpCenter: 'Help Center',
     },
 
     // Nav Group Titles
     navGroup: {
       main: 'Main',
+      operational: 'Operational',
       system: 'System',
+      analysis: 'Analysis',
+      settings: 'Settings',
     },
 
     // User Menu
@@ -71,20 +98,37 @@ export const dictionaries = {
       logout: 'Log Out',
     },
 
-    // Shell Verification Page
-    // Home / Dashboard
+    // Home
     home: {
       title: 'Home',
-      greeting: 'Hello',
-      subtitle: 'Monitor the position and security of your vehicles.',
+      pageTitle: 'Home',
+      pageSubtitle: 'Monitor your vehicles easily and in real-time.',
+      heroGreeting: 'Welcome back,',
+      heroSubtitle: 'Monitor your vehicles, view their location in real-time, and manage GPS devices on one platform.',
       metrics: {
         registeredVehicles: 'Registered Vehicles',
-        gpsStatus: 'GPS Status',
-        activeGeofences: 'Active Geofences',
+        movingVehicles: 'Moving Vehicles',
+        activeAlerts: 'Active Alerts',
+        onlineDevices: 'Online Devices',
       },
-      shortcuts: 'Personal Shortcuts',
-      status: 'Personal Vehicle Status',
-      noStatus: 'No vehicle status data available.',
+      favoritTitle: 'My Favorites',
+      favoritSubtitle: 'Quick access to your most frequently used menus.',
+      manageFavorite: 'Manage Favorites',
+      addShortcut: 'Add Shortcut',
+      favoriteDialogTitle: 'Manage Favorites',
+      favoriteDialogDescription: 'Select the menus you want to show in My Favorites.',
+      cancel: 'Cancel',
+      save: 'Save',
+      infoBarText: 'You can mark menus as favorites by clicking the star icon on any menu.',
+      learnMore: 'Learn more',
+      shortcuts: {
+        tracking: { label: 'Tracking', desc: 'View vehicle location on the map' },
+        vehicles: { label: 'Vehicles', desc: 'Manage your vehicle data' },
+        geofences: { label: 'Geofences', desc: 'Manage safe zones and boundaries' },
+        gpsDevices: { label: 'GPS & Devices', desc: 'Manage GPS tracking devices' },
+        reports: { label: 'Reports', desc: 'Trip history and summaries' },
+        settings: { label: 'Settings', desc: 'Account and application settings' },
+      },
     },
   },
 };

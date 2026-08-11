@@ -1,5 +1,9 @@
 export interface MetricSummary {
   totalVehicles: number;
+  movingVehicles: number;
+  activeAlerts: number;
+  tripsToday: number;
+  // kept for backward compat
   activeVehicles: number;
   idleVehicles: number;
   activeDrivers: number;
@@ -8,12 +12,16 @@ export interface MetricSummary {
 }
 
 export const mockMetricSummary: MetricSummary = {
-  totalVehicles: 124,
-  activeVehicles: 98,
-  idleVehicles: 26,
-  activeDrivers: 85,
-  ongoingDeliveries: 42,
-  onlineDevices: 110,
+  totalVehicles: 1250,
+  movingVehicles: 840,
+  activeAlerts: 15,
+  tripsToday: 320,
+  // legacy fields
+  activeVehicles: 840,
+  idleVehicles: 410,
+  activeDrivers: 620,
+  ongoingDeliveries: 186,
+  onlineDevices: 1180,
 };
 
 export interface FleetAttentionItem {

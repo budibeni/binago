@@ -5,12 +5,13 @@ import { cn } from '@binago/utils';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import type { BreadcrumbItem } from './Breadcrumb';
-import type { NavGroup, UserInfo, Locale } from '@binago/types';
+import type { NavGroup, NavItem, UserInfo, Locale } from '@binago/types';
 
 export interface AppShellProps {
   brandName?: string;
   brandLogo?: React.ReactNode;
   navigation: NavGroup[];
+  bottomNavigation?: NavItem[];
   currentPath?: string;
   onNavigate?: (href: string) => void;
   breadcrumbItems?: BreadcrumbItem[];
@@ -37,6 +38,7 @@ export function AppShell({
   brandName = 'BINAGO',
   brandLogo,
   navigation,
+  bottomNavigation = [],
   currentPath = '/',
   onNavigate,
   breadcrumbItems = [],
@@ -64,6 +66,7 @@ export function AppShell({
         brandName={brandName}
         brandLogo={brandLogo}
         navigation={navigation}
+        bottomNavigation={bottomNavigation}
         currentPath={currentPath}
         onNavigate={onNavigate}
         collapsed={collapsed}
@@ -90,9 +93,9 @@ export function AppShell({
           rightSlot={headerRightSlot}
         />
 
-        {/* Content Area */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-surface">
-          <div className="mx-auto max-w-7xl w-full">{children}</div>
+        {/* Content Area — pages control their own padding/max-width */}
+        <main className="flex-1 overflow-y-auto bg-surface">
+          {children}
         </main>
 
         {/* Optional Footer */}
