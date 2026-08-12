@@ -1,6 +1,6 @@
 import React from 'react';
-import { PersonalHomePage } from '../features/home/components/PersonalHomePage';
+import { MonitoringPage } from '../features/tracking/components/MonitoringPage';
 
 export default function HomePage() {
-  return <PersonalHomePage />;
+  return <MonitoringPage />;
 }
