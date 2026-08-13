@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Bell } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Bell, CheckCircle2 } from 'lucide-react';
 import { usePersonalLocale } from '@/components/PersonalShellLayout';
 import { getTranslation } from '@/i18n';
-import { cn } from '@binago/utils';
+import { Switch } from '@binago/ui';
 
 interface NotificationSetting {
   id: string;
@@ -32,41 +32,59 @@ export function NotificationsSection() {
     exitGeofence: true,
   });
 
-  const toggle = (id: string) => {
-    setToggles(prev => ({ ...prev, [id]: !prev[id] }));
+  const [showFeedback, setShowFeedback] = useState(false);
+
+  useEffect(() => {
+    if (!showFeedback) return;
+    const timer = setTimeout(() => setShowFeedback(false), 2500);
+    return () => clearTimeout(timer);
+  }, [showFeedback]);
+
+  const handleToggle = (id: string, checked: boolean) => {
+    setToggles(prev => ({ ...prev, [id]: checked }));
+    setShowFeedback(true);
   };
 
   return (
-    <div className="bg-white border border-neutral-200 rounded-2xl p-4 md:p-6 flex flex-col gap-6">
-      <div className="flex items-center gap-4">
-        <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-yellow-50 text-yellow-500 shrink-0">
-          <Bell className="w-6 h-6" />
+    <div className="flex flex-col gap-4">
+      {/* Inline Feedback */}
+      {showFeedback && (
+        <div
+          className="flex items-center gap-2 px-4 py-3 rounded-xl bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800/40 text-green-700 dark:text-green-400 text-sm font-medium"
+          role="status"
+          aria-live="polite"
+        >
+          <CheckCircle2 className="w-4 h-4 shrink-0" aria-hidden="true" />
+          {s.savedSuccess}
         </div>
-        <div>
-          <h3 className="text-base font-bold text-neutral-900">{s.title}</h3>
-        </div>
-      </div>
+      )}
 
-      <div className="flex flex-col gap-4">
-        {NOTIFICATION_SETTINGS.map(({ id, labelKey }) => (
-          <div key={id} className="flex items-center justify-between border-b border-neutral-100 last:border-0 pb-4 last:pb-0">
-            <span className="text-sm font-medium text-neutral-900">{s[labelKey as keyof typeof s]}</span>
-            
-            {/* Simple toggle switch */}
-            <button
-              onClick={() => toggle(id)}
-              className={cn(
-                "w-11 h-6 rounded-full transition-colors relative",
-                toggles[id] ? "bg-red-500" : "bg-neutral-200"
-              )}
-            >
-              <div className={cn(
-                "absolute top-1 w-4 h-4 rounded-full bg-white transition-all",
-                toggles[id] ? "left-6" : "left-1"
-              )} />
-            </button>
+      <div className="bg-surface border border-border rounded-2xl p-4 md:p-6 flex flex-col gap-6">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-yellow-50 dark:bg-yellow-950/20 text-yellow-500 shrink-0">
+            <Bell className="w-6 h-6" aria-hidden="true" />
           </div>
-        ))}
+          <div>
+            <h3 className="text-base font-bold text-foreground">{s.title}</h3>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-4">
+          {NOTIFICATION_SETTINGS.map(({ id, labelKey }) => (
+            <div key={id} className="flex items-center justify-between border-b border-border last:border-0 pb-4 last:pb-0">
+              <label htmlFor={`notif-${id}`} className="text-sm font-medium text-foreground cursor-pointer">
+                {s[labelKey as keyof typeof s] as string}
+              </label>
+              
+              <Switch
+                id={`notif-${id}`}
+                checked={toggles[id] || false}
+                onCheckedChange={(checked) => handleToggle(id, checked)}
+                aria-label={s[labelKey as keyof typeof s] as string}
+              />
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

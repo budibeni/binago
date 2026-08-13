@@ -11,6 +11,8 @@ export interface GeofenceData {
   id: string;
   name: string;
   radius: number;
+  latitude: number;
+  longitude: number;
   status: 'active' | 'inactive';
 }
 
@@ -50,8 +52,8 @@ export const mockDevices: DeviceData[] = [
 ];
 
 export const mockGeofences: GeofenceData[] = [
-  { id: 'geo-1', name: 'Rumah', radius: 100, status: 'active' },
-  { id: 'geo-2', name: 'Kantor', radius: 200, status: 'active' },
-  { id: 'geo-3', name: 'Sekolah', radius: 150, status: 'inactive' },
-  { id: 'geo-4', name: 'Gym', radius: 120, status: 'active' },
+  { id: 'geo-1', name: 'Rumah', radius: 100, latitude: -6.2088, longitude: 106.8456, status: 'active' },
+  { id: 'geo-2', name: 'Kantor', radius: 200, latitude: -6.2255, longitude: 106.8322, status: 'active' },
+  { id: 'geo-3', name: 'Sekolah', radius: 150, latitude: -6.2133, longitude: 106.8211, status: 'inactive' },
+  { id: 'geo-4', name: 'Gym', radius: 120, latitude: -6.2411, longitude: 106.8123, status: 'active' },
 ];

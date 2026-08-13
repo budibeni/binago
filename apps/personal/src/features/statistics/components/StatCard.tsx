@@ -25,7 +25,7 @@ export function StatCard({
   className
 }: StatCardProps) {
   return (
-    <div className={cn("rounded-2xl p-5 md:p-6 flex flex-col gap-4 shadow-sm border bg-white border-neutral-200", className)}>
+    <div className={cn("rounded-2xl p-5 md:p-6 flex flex-col gap-4 shadow-sm border bg-surface border-border", className)}>
       
       {/* Top: Icon */}
       {Icon && (
@@ -36,16 +36,16 @@ export function StatCard({
       
       <div className="flex flex-col flex-grow justify-between gap-4">
         <div>
-          <h3 className="text-sm font-medium text-neutral-500 mb-1">{title}</h3>
+          <h3 className="text-sm font-medium text-foreground-muted mb-1">{title}</h3>
           <div className="flex items-baseline gap-1.5">
-            <span className="text-3xl font-semibold tracking-tight text-neutral-900">{data.value}</span>
-            {unit && <span className="text-sm font-medium text-neutral-500">{unit}</span>}
+            <span className="text-3xl font-semibold tracking-tight text-foreground">{data.value}</span>
+            {unit && <span className="text-sm font-medium text-foreground-muted">{unit}</span>}
           </div>
         </div>
         
         {/* Bottom row: label and diff */}
-        <div className="flex items-center justify-between mt-2 pt-4 border-t border-neutral-100">
-          <span className="text-xs font-medium text-neutral-400">{labelLeft || title}</span>
+        <div className="flex items-center justify-between mt-2 pt-4 border-t border-border">
+          <span className="text-xs font-medium text-foreground-subtle">{labelLeft || title}</span>
           
           {data.diff && (
             <span className={cn(

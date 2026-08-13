@@ -82,7 +82,7 @@ export function SettingsMenu({ onSelect }: SettingsMenuProps) {
       title: s.about.title,
       description: s.about.desc,
       icon: Info,
-      iconBg: 'bg-neutral-100 text-neutral-500',
+      iconBg: 'bg-surface-elevated text-foreground-muted',
     },
   ];
 
@@ -92,20 +92,20 @@ export function SettingsMenu({ onSelect }: SettingsMenuProps) {
         <button
           key={item.id}
           onClick={() => onSelect(item.id)}
-          className="flex items-center gap-4 bg-white border border-neutral-200 rounded-2xl p-4 text-left hover:bg-neutral-50 transition-colors w-full"
+          className="flex items-center gap-4 bg-surface border border-border rounded-2xl p-4 text-left hover:bg-surface-elevated transition-colors w-full"
         >
           <div className={cn("flex items-center justify-center w-12 h-12 rounded-xl shrink-0", item.iconBg)}>
             <item.icon className="w-6 h-6" />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="text-base font-semibold text-neutral-900 truncate">
+            <h3 className="text-base font-semibold text-foreground truncate">
               {item.title}
             </h3>
-            <p className="text-sm text-neutral-500 truncate mt-0.5">
+            <p className="text-sm text-foreground-muted truncate mt-0.5">
               {item.description}
             </p>
           </div>
-          <ChevronRight className="w-5 h-5 text-neutral-400 shrink-0" />
+          <ChevronRight className="w-5 h-5 text-foreground-subtle shrink-0" />
         </button>
       ))}
     </div>

@@ -15,7 +15,7 @@ export const Badge: React.FC<BadgeProps> = ({
   ...props
 }) => {
   const variants = {
-    default: 'bg-neutral-100 text-neutral-700 border border-neutral-200',
+    default: 'bg-surface-elevated text-foreground-muted border border-border',
     info: 'bg-info/10 text-info border border-info/20',
     success: 'bg-success/10 text-success border border-success/20',
     warning: 'bg-warning/10 text-warning border border-warning/20',

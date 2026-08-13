@@ -22,7 +22,7 @@ export function PeriodSelector({ selectedPeriod, onPeriodChange }: PeriodSelecto
   ];
 
   return (
-    <div className="flex p-1 bg-neutral-100 rounded-xl">
+    <div className="flex p-1 bg-surface-elevated rounded-xl">
       {periods.map(period => (
         <button
           key={period.id}
@@ -30,8 +30,8 @@ export function PeriodSelector({ selectedPeriod, onPeriodChange }: PeriodSelecto
           className={cn(
             "flex-1 px-4 py-2 text-sm font-semibold rounded-lg transition-all text-center",
             selectedPeriod === period.id 
-              ? "bg-white text-red-600 shadow-sm" 
-              : "text-neutral-500 hover:text-neutral-700"
+              ? "bg-surface text-red-600 shadow-sm" 
+              : "text-foreground-subtle hover:text-foreground-muted"
           )}
         >
           {period.label}

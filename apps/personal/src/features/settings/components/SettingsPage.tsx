@@ -48,18 +48,18 @@ export function SettingsPage() {
         {activeSection !== 'overview' && (
           <button 
             onClick={() => setActiveSection('overview')}
-            className="mr-3 p-2 -ml-2 rounded-full hover:bg-neutral-100 transition-colors"
+            className="mr-3 p-2 -ml-2 rounded-full hover:bg-surface-elevated transition-colors"
             aria-label={t.settings.back}
           >
-            <ChevronLeft className="w-6 h-6 text-neutral-700" />
+            <ChevronLeft className="w-6 h-6 text-foreground" />
           </button>
         )}
         <div>
-          <h1 className="text-2xl font-bold text-neutral-900">
+          <h1 className="text-2xl font-bold text-foreground">
             {getSectionTitle()}
           </h1>
           {getSectionSubtitle() && (
-            <p className="text-sm text-neutral-500 mt-1">
+            <p className="text-sm text-foreground-muted mt-1">
               {getSectionSubtitle()}
             </p>
           )}

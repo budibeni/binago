@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { Clock, Zap, Activity, Info } from 'lucide-react';
+import { Clock, Zap, Activity, Info, BarChart3 } from 'lucide-react';
 import { mockVehicles } from '../../tracking/data/mockTrackingData';
 import { mockStatisticsData } from '../data/mockStatisticsData';
 import { StatisticPeriod } from '../types';
@@ -13,6 +13,7 @@ import { PrimaryStatCard } from './PrimaryStatCard';
 import { StatisticsTrend } from './StatisticsTrend';
 import { usePersonalLocale } from '@/components/PersonalShellLayout';
 import { getTranslation } from '@/i18n';
+import { EmptyState } from '@/components/EmptyState';
 
 export function StatisticsPage() {
   const locale = usePersonalLocale();
@@ -179,14 +180,21 @@ export function StatisticsPage() {
           )}
 
           {/* Info Footer */}
-          <div className="flex items-center gap-3 mt-4 text-xs font-medium text-neutral-500 bg-neutral-50 border border-neutral-100 rounded-xl p-4">
+          <div className="flex items-center gap-3 mt-4 text-xs font-medium text-foreground-muted bg-surface-elevated border border-border rounded-xl p-4">
             <Info className="w-4 h-4 text-red-500 shrink-0" />
             <p>{t.statistics?.footerInfo || "Data statistik dihitung berdasarkan riwayat perjalanan kendaraan."}</p>
           </div>
         </>
       ) : (
-        <div className="flex items-center justify-center py-20 bg-white rounded-2xl border border-neutral-200">
-          <p className="text-neutral-500">{t.statistics?.emptyState || "Data statistik tidak tersedia untuk periode ini."}</p>
+        <div className="bg-surface rounded-2xl border border-border">
+          <EmptyState
+            icon={BarChart3}
+            title={t.statistics?.emptyState || 'Data statistik tidak tersedia untuk periode ini.'}
+            description={locale === 'en' 
+              ? 'Try selecting a different date or vehicle.'
+              : 'Coba pilih tanggal atau kendaraan yang berbeda.'
+            }
+          />
         </div>
       )}
     </div>

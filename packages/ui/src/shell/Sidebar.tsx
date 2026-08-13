@@ -75,7 +75,7 @@ export function Sidebar({
             'focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400',
             isActive
               ? 'bg-primary text-primary-foreground shadow-sm'
-              : 'text-foreground-muted hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:text-foreground',
+              : 'text-foreground-muted hover:bg-surface-elevated hover:text-foreground',
             item.disabled && 'pointer-events-none opacity-40',
             collapsed && 'justify-center px-2',
           )}
@@ -87,7 +87,7 @@ export function Sidebar({
             <Icon
               className={cn(
                 'h-[17px] w-[17px] shrink-0 transition-colors',
-                isActive ? 'text-red-500' : 'text-neutral-400 group-hover:text-neutral-600',
+                isActive ? 'text-red-500' : 'text-foreground-muted group-hover:text-foreground',
               )}
             />
           )}
@@ -127,7 +127,7 @@ export function Sidebar({
             <button
               type="button"
               onClick={() => onCollapsedChange(!collapsed)}
-              className="flex items-center justify-center rounded-md p-2 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700 transition-colors"
+              className="flex items-center justify-center rounded-md p-2 text-foreground-muted hover:bg-surface-elevated hover:text-foreground transition-colors"
               aria-label="Perluas Sidebar"
               title="Perluas Sidebar"
             >
@@ -153,7 +153,7 @@ export function Sidebar({
         <button
           type="button"
           onClick={() => onMobileOpenChange?.(false)}
-          className="absolute right-3 top-1/2 -translate-y-1/2 lg:hidden rounded-md p-1 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700 transition-colors"
+          className="absolute right-3 top-1/2 -translate-y-1/2 lg:hidden rounded-md p-1 text-foreground-muted hover:bg-surface-elevated hover:text-foreground transition-colors"
           aria-label="Tutup Menu"
         >
           <X className="h-4.5 w-4.5" />
@@ -164,7 +164,7 @@ export function Sidebar({
           <button
             type="button"
             onClick={() => onCollapsedChange(!collapsed)}
-            className="absolute right-2 top-1/2 -translate-y-1/2 hidden lg:flex items-center justify-center rounded-md p-1.5 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700 transition-colors"
+            className="absolute right-2 top-1/2 -translate-y-1/2 hidden lg:flex items-center justify-center rounded-md p-1.5 text-foreground-muted hover:bg-surface-elevated hover:text-foreground transition-colors"
             aria-label="Ciutkan Sidebar"
             title="Ciutkan Sidebar"
           >
@@ -181,7 +181,7 @@ export function Sidebar({
         {navigation.map((group, idx) => (
           <div key={group.id || idx} className="space-y-0.5">
             {group.title && !collapsed && (
-              <div className="px-2.5 pb-1 pt-0.5 text-[10.5px] font-semibold uppercase tracking-widest text-neutral-400 select-none">
+              <div className="px-2.5 pb-1 pt-0.5 text-[10.5px] font-semibold uppercase tracking-widest text-foreground-muted select-none">
                 {group.title}
               </div>
             )}

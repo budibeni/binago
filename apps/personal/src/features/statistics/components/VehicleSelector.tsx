@@ -32,23 +32,23 @@ export function VehicleSelector({ vehicles, selectedVehicleId, onSelect }: Vehic
     <div className="relative w-full md:w-64" ref={containerRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between bg-white border border-neutral-200 rounded-xl px-4 py-2 hover:bg-neutral-50 transition-colors"
+        className="w-full flex items-center justify-between bg-surface border border-border rounded-xl px-4 py-2 hover:bg-surface-elevated transition-colors"
       >
         <div className="flex items-center gap-3">
           {/* Car Thumbnail Placeholder */}
-          <div className="w-10 h-6 bg-neutral-800 text-neutral-200 rounded flex items-center justify-center shrink-0">
+          <div className="w-10 h-6 bg-surface-elevated border border-border text-foreground-subtle rounded flex items-center justify-center shrink-0">
             <Car className="w-4 h-4" />
           </div>
           <div className="text-left flex flex-col justify-center h-10">
-            <h3 className="text-sm font-bold text-neutral-900 leading-tight">{selectedVehicle.plateNumber}</h3>
-            <p className="text-xs text-neutral-500 leading-tight">{selectedVehicle.name || 'Kendaraan Pribadi'}</p>
+            <h3 className="text-sm font-bold text-foreground leading-tight">{selectedVehicle.plateNumber}</h3>
+            <p className="text-xs text-foreground-muted leading-tight">{selectedVehicle.name || 'Kendaraan Pribadi'}</p>
           </div>
         </div>
-        <ChevronDown className={`w-4 h-4 text-neutral-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`w-4 h-4 text-foreground-subtle transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-neutral-200 rounded-xl shadow-lg z-50 overflow-hidden">
+        <div className="absolute top-full left-0 right-0 mt-2 bg-surface border border-border rounded-xl shadow-lg z-50 overflow-hidden">
           {vehicles.map(vehicle => (
             <button
               key={vehicle.id}
@@ -56,14 +56,14 @@ export function VehicleSelector({ vehicles, selectedVehicleId, onSelect }: Vehic
                 onSelect(vehicle.id);
                 setIsOpen(false);
               }}
-              className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-neutral-50 transition-colors ${selectedVehicle.id === vehicle.id ? 'bg-neutral-50' : ''}`}
+              className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-surface-elevated transition-colors ${selectedVehicle.id === vehicle.id ? 'bg-surface-elevated' : ''}`}
             >
-              <div className="w-10 h-6 bg-neutral-800 text-neutral-200 rounded flex items-center justify-center shrink-0">
+              <div className="w-10 h-6 bg-surface-elevated border border-border text-foreground-subtle rounded flex items-center justify-center shrink-0">
                 <Car className="w-4 h-4" />
               </div>
               <div className="flex flex-col justify-center h-10">
-                <h3 className="text-sm font-bold text-neutral-900 leading-tight">{vehicle.plateNumber}</h3>
-                <p className="text-xs text-neutral-500 leading-tight">{vehicle.name || 'Kendaraan Pribadi'}</p>
+                <h3 className="text-sm font-bold text-foreground leading-tight">{vehicle.plateNumber}</h3>
+                <p className="text-xs text-foreground-muted leading-tight">{vehicle.name || 'Kendaraan Pribadi'}</p>
               </div>
             </button>
           ))}

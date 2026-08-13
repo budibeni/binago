@@ -15,11 +15,11 @@ export function StatisticsTrend({ title, data, unit }: StatisticsTrendProps) {
   const ticks = [120, 90, 60, 30, 0];
 
   return (
-    <div className="bg-white border border-neutral-200 rounded-2xl p-6 shadow-sm">
+    <div className="bg-surface border border-border rounded-2xl p-6 shadow-sm">
       <div className="flex justify-between items-start mb-8">
         <div>
-          <h3 className="text-base font-bold text-neutral-900">{title}</h3>
-          <p className="text-xs text-neutral-500">({unit})</p>
+          <h3 className="text-base font-bold text-foreground">{title}</h3>
+          <p className="text-xs text-foreground-muted">({unit})</p>
         </div>
       </div>
       
@@ -28,8 +28,8 @@ export function StatisticsTrend({ title, data, unit }: StatisticsTrendProps) {
         <div className="absolute inset-0 flex flex-col justify-between" style={{ height: `${chartHeight}px` }}>
           {ticks.map((tick, i) => (
             <div key={i} className="flex items-center w-full">
-              <span className="text-xs text-neutral-400 w-8 shrink-0">{tick}</span>
-              <div className="w-full border-b border-dashed border-neutral-200" />
+              <span className="text-xs text-foreground-subtle w-8 shrink-0">{tick}</span>
+              <div className="w-full border-b border-dashed border-border" />
             </div>
           ))}
         </div>
@@ -44,14 +44,14 @@ export function StatisticsTrend({ title, data, unit }: StatisticsTrendProps) {
               <div key={index} className="flex flex-col items-center flex-1 gap-3 relative group h-full justify-end">
                 {/* Value on top of bar */}
                 <div 
-                  className={`text-xs font-bold mb-1 transition-opacity ${isLast ? 'text-red-600' : 'text-neutral-700'}`}
+                  className={`text-xs font-bold mb-1 transition-opacity ${isLast ? 'text-red-600' : 'text-foreground'}`}
                 >
                   {item.value}
                 </div>
                 
                 {/* Bar */}
                 <div 
-                  className={`w-full max-w-[2.5rem] rounded-t-md transition-all duration-300 ${isLast ? 'bg-red-600' : 'bg-gradient-to-b from-red-400 to-red-50'}`}
+                  className={`w-full max-w-[2.5rem] rounded-t-md transition-all duration-300 ${isLast ? 'bg-red-600' : 'bg-gradient-to-b from-red-400 to-red-50 dark:to-transparent'}`}
                   style={{ height: `${heightPercent}%`, minHeight: '4px' }}
                 />
               </div>
@@ -63,7 +63,7 @@ export function StatisticsTrend({ title, data, unit }: StatisticsTrendProps) {
         <div className="flex items-center justify-between pl-8 pr-2 mt-4">
           {data.map((item, index) => (
             <div key={index} className="flex-1 flex justify-center">
-              <span className="text-xs font-medium text-neutral-500">{item.label}</span>
+              <span className="text-xs font-medium text-foreground-muted">{item.label}</span>
             </div>
           ))}
         </div>

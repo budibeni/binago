@@ -15,6 +15,7 @@ export function MonitoringPage() {
   const [selectedVehicleId, setSelectedVehicleId] = useState<string | undefined>();
   const [isListVisible, setIsListVisible] = useState(true);
   const [playbackTripId, setPlaybackTripId] = useState<string | null>(null);
+  const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
 
   const filteredVehicles = useMemo(() => {
     return mockVehicles.filter((vehicle) => {
@@ -56,10 +57,12 @@ export function MonitoringPage() {
 
   const handleTripSelect = (trip: Trip) => {
     setPlaybackTripId(trip.id);
+    setSelectedTrip(trip);
   };
 
   const handleBackFromPlayback = () => {
     setPlaybackTripId(null);
+    setSelectedTrip(null);
   };
 
   // If in playback mode, render full-view PlaybackPage
@@ -67,6 +70,8 @@ export function MonitoringPage() {
     return (
       <PlaybackPage 
         playbackData={activePlaybackData} 
+        trip={selectedTrip}
+        vehicle={selectedVehicle}
         onBack={handleBackFromPlayback} 
       />
     );
