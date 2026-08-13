@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { ArrowLeft, Car, MapPin, Clock, PlayCircle, Route, WifiOff } from 'lucide-react';
+import { ArrowLeft, Car, MapPin, Clock, Play, Route, WifiOff, ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react';
 import { Vehicle, Trip, VehicleStatus } from '../types';
 import { usePersonalLocale } from '@/components/PersonalShellLayout';
 import { getTranslation } from '@/i18n';
@@ -12,11 +12,15 @@ export interface VehicleDetailProps {
   trips: Trip[];
   onBack: () => void;
   onTripSelect: (trip: Trip) => void;
+  selectedDate?: string;
+  onDateChange?: (date: string) => void;
 }
 
 export function VehicleDetail({
   vehicle,
   trips,
+  selectedDate,
+  onDateChange,
   onBack,
   onTripSelect,
 }: VehicleDetailProps) {
@@ -59,6 +63,30 @@ export function VehicleDetail({
     if (minutes > 0) return locale === 'en' ? `${minutes}m ago` : `${minutes} menit lalu`;
     return locale === 'en' ? 'just now' : 'baru saja';
   };
+
+  const dateObj = selectedDate 
+    ? new Date(Number(selectedDate.split('-')[0]), Number(selectedDate.split('-')[1]) - 1, Number(selectedDate.split('-')[2])) 
+    : new Date();
+  
+  const dateOptions: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long', year: 'numeric' };
+  const formattedDate = dateObj.toLocaleDateString(locale === 'id' ? 'id-ID' : 'en-US', dateOptions);
+  
+  const today = new Date();
+  const isToday = dateObj.getDate() === today.getDate() && dateObj.getMonth() === today.getMonth() && dateObj.getFullYear() === today.getFullYear();
+
+  const handlePrevDay = () => {
+    const prev = new Date(dateObj);
+    prev.setDate(prev.getDate() - 1);
+    onDateChange?.(`${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}-${String(prev.getDate()).padStart(2, '0')}`);
+  };
+
+  const handleNextDay = () => {
+    const next = new Date(dateObj);
+    next.setDate(next.getDate() + 1);
+    onDateChange?.(`${next.getFullYear()}-${String(next.getMonth() + 1).padStart(2, '0')}-${String(next.getDate()).padStart(2, '0')}`);
+  };
+
+  const filteredTrips = trips.filter(trip => !selectedDate || trip.date === selectedDate);
 
   return (
     <div className="flex flex-col h-full bg-surface text-foreground border-r border-border">
@@ -132,18 +160,54 @@ export function VehicleDetail({
 
         {/* Trip History */}
         <div className="p-4">
-          <h3 className="font-semibold text-sm mb-3">{t.tracking?.tripHistory || 'Riwayat Perjalanan'}</h3>
+          <div className="flex items-center justify-between bg-surface-elevated rounded-xl p-1 mb-4 border border-border">
+            <button
+              onClick={handlePrevDay}
+              className="p-2 text-foreground-muted hover:text-foreground hover:bg-surface rounded-lg transition-colors"
+              aria-label={t.tracking?.prevDay || 'Hari sebelumnya'}
+              title={t.tracking?.prevDay || 'Hari sebelumnya'}
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            
+            <div className="flex items-center gap-2 relative">
+              <span className="text-sm font-semibold text-foreground">
+                {formattedDate} {isToday && <span className="text-foreground-muted font-normal">({t.tracking?.today || 'Hari ini'})</span>}
+              </span>
+              <div className="relative w-5 h-5 flex items-center justify-center">
+                <CalendarDays className="w-4 h-4 text-foreground-muted" />
+                <input
+                  type="date"
+                  className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                  value={selectedDate || ''}
+                  onChange={(e) => {
+                    if (e.target.value) onDateChange?.(e.target.value);
+                  }}
+                  title="Pilih Tanggal"
+                />
+              </div>
+            </div>
+
+            <button
+              onClick={handleNextDay}
+              className="p-2 text-foreground-muted hover:text-foreground hover:bg-surface rounded-lg transition-colors"
+              aria-label={t.tracking?.nextDay || 'Hari berikutnya'}
+              title={t.tracking?.nextDay || 'Hari berikutnya'}
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
           
-          {trips.length === 0 ? (
+          {filteredTrips.length === 0 ? (
             <EmptyState
               icon={Route}
-              title={t.tracking?.noTrips || 'Belum ada perjalanan'}
-              description={t.tracking?.noTripsDesc}
+              title={t.tracking?.noTripsDate || 'Tidak ada perjalanan'}
+              description={t.tracking?.noTripsDateDesc || 'Kendaraan tidak melakukan perjalanan pada tanggal ini.'}
               className="py-8 px-2"
             />
           ) : (
             <div className="space-y-3">
-              {trips.map((trip) => (
+              {filteredTrips.map((trip) => (
                 <div 
                   key={trip.id}
                   onClick={() => onTripSelect(trip)}
@@ -153,10 +217,21 @@ export function VehicleDetail({
                   onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onTripSelect(trip); } }}
                 >
                   <div className="flex justify-between items-start mb-2">
-                    <div className="text-sm font-semibold text-foreground">
+                    <div className="text-sm font-semibold text-foreground mt-1">
                       {formatTime(trip.startTime)} - {formatTime(trip.endTime)}
                     </div>
-                    <PlayCircle className="w-5 h-5 text-foreground-subtle group-hover:text-red-500 transition-colors" aria-hidden="true" />
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onTripSelect(trip);
+                      }}
+                      className="w-10 h-10 shrink-0 rounded-full flex items-center justify-center bg-red-50 dark:bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-500 group-hover:bg-red-100 dark:group-hover:bg-red-500/20 group-hover:border-red-500/50 hover:!bg-red-200 dark:hover:!bg-red-500/30 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-surface active:scale-95 ml-3"
+                      aria-label={t.tracking?.playTrip || 'Putar perjalanan'}
+                      title={t.tracking?.playTrip || 'Putar perjalanan'}
+                    >
+                      <Play className="w-4 h-4 fill-current ml-0.5" aria-hidden="true" />
+                    </button>
                   </div>
                   
                   <div className="flex items-center gap-2 text-sm text-foreground-muted mb-2">

@@ -58,13 +58,27 @@ export const mockVehicles: Vehicle[] = [
   },
 ];
 
+const today = new Date();
+const getLocalDateString = (d: Date) => {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+};
+
+const dateToday = getLocalDateString(today);
+const dateYesterday = getLocalDateString(new Date(today.getTime() - 24 * 60 * 60 * 1000));
+const dateOther = getLocalDateString(new Date(today.getTime() - 2 * 24 * 60 * 60 * 1000));
+
 export const mockTripsByVehicleId: Record<string, Trip[]> = {
   'v-001': [
+    // Today
     {
       id: 't-001-1',
       vehicleId: 'v-001',
-      startTime: new Date(Date.now() - 1000 * 60 * 60 * 3).toISOString(), // 3 hours ago
-      endTime: new Date(Date.now() - 1000 * 60 * 60 * 2.4).toISOString(), // 2.4 hours ago
+      date: dateToday,
+      startTime: new Date(today.getTime() - 1000 * 60 * 60 * 3).toISOString(), // 3 hours ago
+      endTime: new Date(today.getTime() - 1000 * 60 * 60 * 2.4).toISOString(), // 2.4 hours ago
       distance: 18.2,
       duration: 36,
       avgSpeed: 40,
@@ -75,22 +89,65 @@ export const mockTripsByVehicleId: Record<string, Trip[]> = {
     {
       id: 't-001-2',
       vehicleId: 'v-001',
-      startTime: new Date(Date.now() - 1000 * 60 * 60 * 1.5).toISOString(),
-      endTime: new Date(Date.now() - 1000 * 60 * 60 * 1.2).toISOString(),
+      date: dateToday,
+      startTime: new Date(today.getTime() - 1000 * 60 * 60 * 1.5).toISOString(),
+      endTime: new Date(today.getTime() - 1000 * 60 * 60 * 1.2).toISOString(),
       distance: 9.7,
       duration: 18,
       avgSpeed: 32,
       maxSpeed: 55,
       startAddress: 'Kantor',
       endAddress: 'Customer',
+    },
+    // Yesterday
+    {
+      id: 't-001-3',
+      vehicleId: 'v-001',
+      date: dateYesterday,
+      startTime: new Date(today.getTime() - 24 * 60 * 60 * 1000 - 1000 * 60 * 60 * 16).toISOString(),
+      endTime: new Date(today.getTime() - 24 * 60 * 60 * 1000 - 1000 * 60 * 60 * 15.4).toISOString(),
+      distance: 17.5,
+      duration: 35,
+      avgSpeed: 38,
+      maxSpeed: 60,
+      startAddress: 'Rumah',
+      endAddress: 'Kantor',
+    },
+    {
+      id: 't-001-4',
+      vehicleId: 'v-001',
+      date: dateYesterday,
+      startTime: new Date(today.getTime() - 24 * 60 * 60 * 1000 - 1000 * 60 * 60 * 6).toISOString(),
+      endTime: new Date(today.getTime() - 24 * 60 * 60 * 1000 - 1000 * 60 * 60 * 5.3).toISOString(),
+      distance: 18.1,
+      duration: 38,
+      avgSpeed: 35,
+      maxSpeed: 62,
+      startAddress: 'Kantor',
+      endAddress: 'Rumah',
+    },
+    // Other Date
+    {
+      id: 't-001-5',
+      vehicleId: 'v-001',
+      date: dateOther,
+      startTime: new Date(today.getTime() - 2 * 24 * 60 * 60 * 1000 - 1000 * 60 * 60 * 8).toISOString(),
+      endTime: new Date(today.getTime() - 2 * 24 * 60 * 60 * 1000 - 1000 * 60 * 60 * 7.1).toISOString(),
+      distance: 22.4,
+      duration: 54,
+      avgSpeed: 42,
+      maxSpeed: 70,
+      startAddress: 'Rumah',
+      endAddress: 'Gudang',
     }
   ],
   'v-002': [
     {
       id: 't-002-1',
       vehicleId: 'v-002',
-      startTime: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(),
-      endTime: new Date(Date.now() - 1000 * 60 * 60 * 4.2).toISOString(),
+      date: dateToday,
+      startTime: new Date(today.getTime() - 1000 * 60 * 60 * 5).toISOString(),
+      endTime: new Date(today.getTime() - 1000 * 60 * 60 * 4.2).toISOString(),
       distance: 12.5,
       duration: 48,
       avgSpeed: 25,
@@ -128,14 +185,26 @@ function generateDummyPoints(startLat: number, startLng: number, endLat: number,
 export const mockPlaybackData: PlaybackData[] = [
   {
     tripId: 't-001-1',
-    points: generateDummyPoints(-6.2000, 106.8166, -6.2200, 106.8300, 20, new Date(Date.now() - 1000 * 60 * 60 * 3), 36)
+    points: generateDummyPoints(-6.2000, 106.8166, -6.2200, 106.8300, 20, new Date(today.getTime() - 1000 * 60 * 60 * 3), 36)
   },
   {
     tripId: 't-001-2',
-    points: generateDummyPoints(-6.2200, 106.8300, -6.2400, 106.8100, 15, new Date(Date.now() - 1000 * 60 * 60 * 1.5), 18)
+    points: generateDummyPoints(-6.2200, 106.8300, -6.2400, 106.8100, 15, new Date(today.getTime() - 1000 * 60 * 60 * 1.5), 18)
+  },
+  {
+    tripId: 't-001-3',
+    points: generateDummyPoints(-6.2000, 106.8166, -6.2200, 106.8300, 20, new Date(today.getTime() - 24 * 60 * 60 * 1000 - 1000 * 60 * 60 * 16), 35)
+  },
+  {
+    tripId: 't-001-4',
+    points: generateDummyPoints(-6.2200, 106.8300, -6.2000, 106.8166, 20, new Date(today.getTime() - 24 * 60 * 60 * 1000 - 1000 * 60 * 60 * 6), 38)
+  },
+  {
+    tripId: 't-001-5',
+    points: generateDummyPoints(-6.2000, 106.8166, -6.2500, 106.8000, 30, new Date(today.getTime() - 2 * 24 * 60 * 60 * 1000 - 1000 * 60 * 60 * 8), 54)
   },
   {
     tripId: 't-002-1',
-    points: generateDummyPoints(-6.1800, 106.8200, -6.1500, 106.8500, 25, new Date(Date.now() - 1000 * 60 * 60 * 5), 48)
+    points: generateDummyPoints(-6.1800, 106.8200, -6.1500, 106.8500, 25, new Date(today.getTime() - 1000 * 60 * 60 * 5), 48)
   }
 ];

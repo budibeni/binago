@@ -13,6 +13,10 @@ export function MonitoringPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<VehicleStatus | 'all'>('all');
   const [selectedVehicleId, setSelectedVehicleId] = useState<string | undefined>();
+  const [selectedDate, setSelectedDate] = useState<string>(() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  });
   const [isListVisible, setIsListVisible] = useState(true);
   const [playbackTripId, setPlaybackTripId] = useState<string | null>(null);
   const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
@@ -48,6 +52,8 @@ export function MonitoringPage() {
 
   const handleVehicleSelect = (id: string) => {
     setSelectedVehicleId(id);
+    const d = new Date();
+    setSelectedDate(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`);
     setIsListVisible(true);
   };
 
@@ -104,6 +110,8 @@ export function MonitoringPage() {
             <VehicleDetail
               vehicle={selectedVehicle}
               trips={selectedVehicleTrips}
+              selectedDate={selectedDate}
+              onDateChange={setSelectedDate}
               onBack={handleBackToList}
               onTripSelect={handleTripSelect}
             />

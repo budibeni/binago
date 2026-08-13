@@ -21,6 +21,7 @@ export interface Vehicle {
 export interface Trip {
   id: string;
   vehicleId: string;
+  date: string; // YYYY-MM-DD
   startTime: string; // ISO string
   endTime: string; // ISO string
   distance: number; // in km

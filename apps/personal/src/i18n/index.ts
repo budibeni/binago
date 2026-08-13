@@ -116,6 +116,12 @@ export const dictionaries = {
       speedLabel: 'Kecepatan',
       showControls: 'Tampilkan kontrol',
       hideControls: 'Sembunyikan kontrol',
+      playTrip: 'Putar perjalanan',
+      today: 'Hari ini',
+      noTripsDate: 'Tidak ada perjalanan',
+      noTripsDateDesc: 'Kendaraan tidak melakukan perjalanan pada tanggal ini.',
+      prevDay: 'Hari sebelumnya',
+      nextDay: 'Hari berikutnya',
     },
 
     // Statistics
@@ -373,6 +379,12 @@ export const dictionaries = {
       speedLabel: 'Speed',
       showControls: 'Show controls',
       hideControls: 'Hide controls',
+      playTrip: 'Play trip',
+      today: 'Today',
+      noTripsDate: 'No trips',
+      noTripsDateDesc: 'No trips were recorded for this vehicle on this date.',
+      prevDay: 'Previous day',
+      nextDay: 'Next day',
     },
 
     // Statistics
