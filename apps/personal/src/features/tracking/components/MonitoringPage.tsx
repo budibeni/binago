@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { VehicleList } from './VehicleList';
 import { VehicleDetail } from './VehicleDetail';
 import { LiveMap } from './LiveMap';
@@ -20,6 +21,17 @@ export function MonitoringPage() {
   const [isListVisible, setIsListVisible] = useState(true);
   const [playbackTripId, setPlaybackTripId] = useState<string | null>(null);
   const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const vid = searchParams.get('vehicleId');
+    if (vid && mockVehicles.some(v => v.id === vid)) {
+      setSelectedVehicleId(vid);
+      setIsListVisible(true);
+      // Clean up URL without reloading
+      window.history.replaceState(null, '', '/');
+    }
+  }, [searchParams]);
 
   const filteredVehicles = useMemo(() => {
     return mockVehicles.filter((vehicle) => {

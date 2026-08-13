@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { ChevronDown } from 'lucide-react';
+
 
 export interface StatisticsTrendProps {
   title: string;

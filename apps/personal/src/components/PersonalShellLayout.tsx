@@ -9,6 +9,7 @@ import {
 import type { NavItem, UserInfo, Locale } from '@binago/types';
 import { getTranslation } from '../i18n';
 import { PersonalAppShell } from './PersonalAppShell';
+import { NotificationProvider } from '../features/notifications/context/NotificationContext';
 
 const DUMMY_USER: UserInfo = {
   name: 'Andi Pratama',
@@ -64,18 +65,20 @@ export function PersonalShellLayout({ children }: { children: React.ReactNode })
   const navigation = buildNavigation(locale);
 
   return (
-    <PersonalAppShell
-      navigation={navigation}
-      user={DUMMY_USER}
-      currentLocale={locale}
-      onLocaleChange={setLocale}
-      currentTheme={theme}
-      onThemeChange={handleThemeChange}
-      userMenuLabels={t.userMenu}
-    >
-      <PersonalLocaleContext.Provider value={locale}>
-        {children}
-      </PersonalLocaleContext.Provider>
-    </PersonalAppShell>
+    <NotificationProvider>
+      <PersonalAppShell
+        navigation={navigation}
+        user={DUMMY_USER}
+        currentLocale={locale}
+        onLocaleChange={setLocale}
+        currentTheme={theme}
+        onThemeChange={handleThemeChange}
+        userMenuLabels={t.userMenu}
+      >
+        <PersonalLocaleContext.Provider value={locale}>
+          {children}
+        </PersonalLocaleContext.Provider>
+      </PersonalAppShell>
+    </NotificationProvider>
   );
 }

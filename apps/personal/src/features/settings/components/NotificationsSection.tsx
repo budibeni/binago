@@ -5,6 +5,7 @@ import { Bell, CheckCircle2 } from 'lucide-react';
 import { usePersonalLocale } from '@/components/PersonalShellLayout';
 import { getTranslation } from '@/i18n';
 import { Switch } from '@binago/ui';
+import { useNotifications } from '../../notifications/context/NotificationContext';
 
 interface NotificationSetting {
   id: string;
@@ -15,6 +16,7 @@ const NOTIFICATION_SETTINGS: NotificationSetting[] = [
   { id: 'movement', labelKey: 'movement' },
   { id: 'stop', labelKey: 'stop' },
   { id: 'offline', labelKey: 'offline' },
+  { id: 'deviceUnplugged', labelKey: 'deviceUnplugged' },
   { id: 'enterGeofence', labelKey: 'enterGeofence' },
   { id: 'exitGeofence', labelKey: 'exitGeofence' },
 ];
@@ -23,14 +25,7 @@ export function NotificationsSection() {
   const locale = usePersonalLocale();
   const t = getTranslation(locale);
   const s = t.settings.notifications;
-
-  const [toggles, setToggles] = useState<Record<string, boolean>>({
-    movement: true,
-    stop: false,
-    offline: true,
-    enterGeofence: true,
-    exitGeofence: true,
-  });
+  const { settings, updateSettings } = useNotifications();
 
   const [showFeedback, setShowFeedback] = useState(false);
 
@@ -41,7 +36,7 @@ export function NotificationsSection() {
   }, [showFeedback]);
 
   const handleToggle = (id: string, checked: boolean) => {
-    setToggles(prev => ({ ...prev, [id]: checked }));
+    updateSettings({ [id]: checked });
     setShowFeedback(true);
   };
 
@@ -78,7 +73,7 @@ export function NotificationsSection() {
               
               <Switch
                 id={`notif-${id}`}
-                checked={toggles[id] || false}
+                checked={settings[id as keyof typeof settings] || false}
                 onCheckedChange={(checked) => handleToggle(id, checked)}
                 aria-label={s[labelKey as keyof typeof s] as string}
               />

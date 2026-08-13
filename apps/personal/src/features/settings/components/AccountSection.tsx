@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { User } from 'lucide-react';
 import { usePersonalLocale } from '@/components/PersonalShellLayout';
 import { getTranslation } from '@/i18n';
 

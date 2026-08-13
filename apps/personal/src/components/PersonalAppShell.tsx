@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@binago/utils';
 import { LanguageToggle, ThemeToggle, UserMenu } from '@binago/ui';
+import { NotificationPopover } from '../features/notifications/components/NotificationPopover';
 import type { NavItem, UserInfo, Locale } from '@binago/types';
 
 export interface PersonalAppShellProps {
@@ -78,8 +79,10 @@ export function PersonalAppShell({
           </nav>
         </div>
 
-        {/* Right Tools (Language, Theme, User) */}
+        {/* Right Tools (Notification, Language, Theme, User) */}
         <div className="flex items-center gap-1.5 shrink-0">
+          <NotificationPopover />
+
           {onLocaleChange && (
             <LanguageToggle
               currentLocale={currentLocale}

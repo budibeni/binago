@@ -124,6 +124,34 @@ export const dictionaries = {
       nextDay: 'Hari berikutnya',
     },
 
+    // Notifications
+    notifications: {
+      title: 'Notifikasi',
+      markAllAsRead: 'Tandai semua dibaca',
+      viewAll: 'Lihat semua notifikasi',
+      emptyStateTitle: 'Tidak ada notifikasi',
+      emptyStateDesc: 'Belum ada aktivitas yang perlu diperhatikan',
+      vehicleStarted: '{vehicle} mulai bergerak.',
+      vehicleStopped: '{vehicle} berhenti.',
+      vehicleOffline: '{vehicle} tidak mengirim data lokasi.',
+      deviceUnplugged: 'Perangkat GPS terindikasi terputus dari kendaraan.',
+      deviceUnpluggedTitle: 'Perangkat GPS dicabut',
+      enteredGeofence: '{vehicle} masuk {geofence}.',
+      exitedGeofence: '{vehicle} keluar dari {geofence}.',
+      detail: {
+        title: 'Detail Notifikasi',
+        back: 'Kembali',
+        viewVehicle: 'Lihat Kendaraan',
+        eventTime: 'Waktu Kejadian',
+        eventType: 'Jenis Kejadian',
+        vehicle: 'Kendaraan',
+        status: 'Status',
+        unread: 'Belum Dibaca',
+        read: 'Sudah Dibaca',
+        notFound: 'Notifikasi Tidak Ditemukan',
+      },
+    },
+
     // Statistics
     statistics: {
       totalDistance: 'Total Jarak',
@@ -210,6 +238,7 @@ export const dictionaries = {
         movement: 'Kendaraan mulai bergerak',
         stop: 'Kendaraan berhenti',
         offline: 'Kendaraan offline',
+        deviceUnplugged: 'Perangkat GPS dicabut',
         enterGeofence: 'Masuk Geofence',
         exitGeofence: 'Keluar Geofence',
         savedSuccess: 'Pengaturan notifikasi berhasil disimpan.',
@@ -387,6 +416,34 @@ export const dictionaries = {
       nextDay: 'Next day',
     },
 
+    // Notifications
+    notifications: {
+      title: 'Notifications',
+      markAllAsRead: 'Mark all as read',
+      viewAll: 'View all notifications',
+      emptyStateTitle: 'No notifications',
+      emptyStateDesc: 'No activity needs your attention',
+      vehicleStarted: '{vehicle} started moving.',
+      vehicleStopped: '{vehicle} stopped.',
+      vehicleOffline: '{vehicle} is offline.',
+      deviceUnplugged: 'GPS device unplugged from vehicle.',
+      deviceUnpluggedTitle: 'GPS device unplugged',
+      enteredGeofence: '{vehicle} entered {geofence}.',
+      exitedGeofence: '{vehicle} exited {geofence}.',
+      detail: {
+        title: 'Notification Detail',
+        back: 'Back',
+        viewVehicle: 'View Vehicle',
+        eventTime: 'Event Time',
+        eventType: 'Event Type',
+        vehicle: 'Vehicle',
+        status: 'Status',
+        unread: 'Unread',
+        read: 'Read',
+        notFound: 'Notification Not Found',
+      },
+    },
+
     // Statistics
     statistics: {
       totalDistance: 'Total Distance',
@@ -473,6 +530,7 @@ export const dictionaries = {
         movement: 'Vehicle starts moving',
         stop: 'Vehicle stops',
         offline: 'Vehicle offline',
+        deviceUnplugged: 'GPS device unplugged',
         enterGeofence: 'Enter Geofence',
         exitGeofence: 'Exit Geofence',
         savedSuccess: 'Notification settings saved.',
