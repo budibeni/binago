@@ -1,5 +1,5 @@
 import React from 'react';
-import { Play, Square, WifiOff, Plug, MapPin } from 'lucide-react';
+import { Play, Square, WifiOff, Plug, MapPin, ShieldAlert, ShieldCheck } from 'lucide-react';
 import { NotificationEvent } from '../types';
 import { getTranslation } from '@/i18n';
 import { Locale } from '@adatrack/types';
@@ -37,6 +37,10 @@ export function NotificationItem({ notification, locale, onClick }: Notification
         return n.exitedGeofence
           .replace('{vehicle}', vehicleNameOrPlate)
           .replace('{geofence}', notification.context?.geofenceName || 'Area');
+      case 'vehicle_security':
+        return notification.context?.status === 'success' 
+          ? notification.context?.action === 'secure' ? 'Kendaraan diamankan' : 'Pengamanan dinonaktifkan'
+          : 'Pengamanan gagal';
       default:
         return '';
     }
@@ -46,6 +50,11 @@ export function NotificationItem({ notification, locale, onClick }: Notification
     switch (notification.type) {
       case 'device_unplugged':
         return n.deviceUnpluggedTitle;
+      case 'vehicle_security':
+        if (notification.context?.status === 'success') {
+          return notification.context?.action === 'secure' ? '🔒 Kendaraan diamankan' : '🔓 Pengamanan dinonaktifkan';
+        }
+        return '⚠️ Pengamanan gagal';
       default:
         return vehicleNameOrPlate; // Usually the vehicle plate is the title for other events
     }
@@ -65,6 +74,11 @@ export function NotificationItem({ notification, locale, onClick }: Notification
         return { Icon: MapPin, color: 'text-green-600 dark:text-green-500', bg: 'bg-green-50 dark:bg-green-950/30' };
       case 'geofence_exit':
         return { Icon: MapPin, color: 'text-amber-600 dark:text-amber-500', bg: 'bg-amber-50 dark:bg-amber-950/30' };
+      case 'vehicle_security':
+        if (notification.context?.status === 'success') {
+          return { Icon: ShieldCheck, color: 'text-blue-600 dark:text-blue-500', bg: 'bg-blue-50 dark:bg-blue-950/30' };
+        }
+        return { Icon: ShieldAlert, color: 'text-red-600 dark:text-red-500', bg: 'bg-red-50 dark:bg-red-950/30' };
       default:
         return { Icon: MapPin, color: 'text-neutral-500', bg: 'bg-neutral-100' };
     }

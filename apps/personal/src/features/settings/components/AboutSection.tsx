@@ -1,9 +1,9 @@
 'use client';
 
 import React from 'react';
-import { Info } from 'lucide-react';
 import { usePersonalLocale } from '@/components/PersonalShellLayout';
 import { getTranslation } from '@/i18n';
+import { AdatrackLogo } from '@adatrack/ui';
 
 export function AboutSection() {
   const locale = usePersonalLocale();
@@ -12,8 +12,8 @@ export function AboutSection() {
 
   return (
     <div className="bg-surface border border-border rounded-2xl p-6 flex flex-col items-center text-center gap-6 py-12">
-      <div className="flex items-center justify-center w-20 h-20 rounded-2xl bg-surface-elevated text-foreground-muted shrink-0">
-        <Info className="w-10 h-10" />
+      <div className="flex flex-col items-center justify-center gap-2">
+        <AdatrackLogo className="text-5xl md:text-6xl mx-auto mb-4" />
       </div>
       
       <div>

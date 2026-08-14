@@ -10,6 +10,7 @@ import type { NavItem, UserInfo, Locale } from '@adatrack/types';
 import { getTranslation } from '../i18n';
 import { PersonalAppShell } from './PersonalAppShell';
 import { NotificationProvider } from '../features/notifications/context/NotificationContext';
+import { ShareLocationProvider } from '../features/sharing/context/ShareLocationContext';
 
 const DUMMY_USER: UserInfo = {
   name: 'Andi Pratama',
@@ -66,19 +67,21 @@ export function PersonalShellLayout({ children }: { children: React.ReactNode })
 
   return (
     <NotificationProvider>
-      <PersonalAppShell
-        navigation={navigation}
-        user={DUMMY_USER}
-        currentLocale={locale}
-        onLocaleChange={setLocale}
-        currentTheme={theme}
-        onThemeChange={handleThemeChange}
-        userMenuLabels={t.userMenu}
-      >
-        <PersonalLocaleContext.Provider value={locale}>
-          {children}
-        </PersonalLocaleContext.Provider>
-      </PersonalAppShell>
+      <ShareLocationProvider>
+        <PersonalAppShell
+          navigation={navigation}
+          user={DUMMY_USER}
+          currentLocale={locale}
+          onLocaleChange={setLocale}
+          currentTheme={theme}
+          onThemeChange={handleThemeChange}
+          userMenuLabels={t.userMenu}
+        >
+          <PersonalLocaleContext.Provider value={locale}>
+            {children}
+          </PersonalLocaleContext.Provider>
+        </PersonalAppShell>
+      </ShareLocationProvider>
     </NotificationProvider>
   );
 }

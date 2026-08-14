@@ -1,4 +1,5 @@
 export type VehicleStatus = 'driving' | 'idle' | 'parking' | 'offline';
+export type SecurityStatus = 'normal' | 'securing' | 'secured' | 'releasing' | 'failed';
 
 export interface Location {
   lat: number;
@@ -12,6 +13,7 @@ export interface Vehicle {
   name?: string;
   type: string;
   status: VehicleStatus;
+  securityStatus?: SecurityStatus;
   speed?: number;
   driver?: string;
   lastUpdate: string; // ISO string

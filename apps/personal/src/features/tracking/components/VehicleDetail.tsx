@@ -1,11 +1,13 @@
 'use client';
 
-import React from 'react';
-import { ArrowLeft, Car, MapPin, Clock, Play, Route, WifiOff, ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react';
+import React, { useState } from 'react';
+import { ArrowLeft, Car, MapPin, Clock, Play, Route, WifiOff, ChevronLeft, ChevronRight, CalendarDays, Share2 } from 'lucide-react';
 import { Vehicle, Trip, VehicleStatus } from '../types';
 import { usePersonalLocale } from '@/components/PersonalShellLayout';
 import { getTranslation } from '@/i18n';
 import { EmptyState } from '@/components/EmptyState';
+import { ShareLocationDialog } from '@/features/sharing/components/ShareLocationDialog';
+import { useShareLocation } from '@/features/sharing/context/ShareLocationContext';
 
 export interface VehicleDetailProps {
   vehicle: Vehicle;
@@ -26,6 +28,10 @@ export function VehicleDetail({
 }: VehicleDetailProps) {
   const locale = usePersonalLocale();
   const t = getTranslation(locale);
+  const ls = t.locationSharing;
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const { getActiveSession } = useShareLocation();
+  const activeShare = getActiveSession(vehicle.id);
 
   const getStatusDisplay = (status: VehicleStatus) => {
     switch(status) {
@@ -156,6 +162,36 @@ export function VehicleDetail({
               </span>
             </div>
           </div>
+        </div>
+
+        {/* Share Location Action */}
+        <div className="px-4 pb-4 pt-2 border-b border-border flex flex-col gap-2">
+          {activeShare && (
+            <button
+              type="button"
+              onClick={() => setShareDialogOpen(true)}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800/40 text-blue-700 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors text-left w-full"
+            >
+              <Share2 className="w-4 h-4 shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold leading-none">{ls.activeSharing}</p>
+                <p className="text-[11px] mt-0.5 opacity-80">{ls.manageSharing}</p>
+              </div>
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={() => setShareDialogOpen(true)}
+            className="flex items-center justify-center gap-2 w-full py-2 px-3 rounded-lg border border-border bg-surface-elevated hover:bg-surface text-sm font-medium text-foreground transition-colors"
+          >
+            <Share2 className="w-4 h-4" />
+            {activeShare ? ls.manageSharing : ls.shareLocation}
+          </button>
+          <ShareLocationDialog
+            vehicle={vehicle}
+            open={shareDialogOpen}
+            onOpenChange={setShareDialogOpen}
+          />
         </div>
 
         {/* Trip History */}

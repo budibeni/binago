@@ -20,6 +20,7 @@ interface NotificationContextValue {
   markAsRead: (id: string) => void;
   markAllAsRead: () => void;
   updateSettings: (newSettings: Partial<NotificationSettings>) => void;
+  addNotification: (notification: Omit<NotificationEvent, 'id' | 'read' | 'timestamp'>) => void;
 }
 
 const NotificationContext = createContext<NotificationContextValue | undefined>(undefined);
@@ -62,6 +63,16 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     setSettings(prev => ({ ...prev, ...newSettings }));
   };
 
+  const addNotification = (notification: Omit<NotificationEvent, 'id' | 'read' | 'timestamp'>) => {
+    const newNotif: NotificationEvent = {
+      ...notification,
+      id: `n-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      read: false,
+      timestamp: new Date().toISOString(),
+    };
+    setNotifications(prev => [newNotif, ...prev]);
+  };
+
   const value = {
     notifications: filteredNotifications,
     settings,
@@ -69,6 +80,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     markAsRead,
     markAllAsRead,
     updateSettings,
+    addNotification,
   };
 
   return (

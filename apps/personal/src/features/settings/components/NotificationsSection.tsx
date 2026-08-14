@@ -76,6 +76,7 @@ export function NotificationsSection() {
                 checked={settings[id as keyof typeof settings] || false}
                 onCheckedChange={(checked) => handleToggle(id, checked)}
                 aria-label={s[labelKey as keyof typeof s] as string}
+                className="data-[state=checked]:!bg-yellow-500"
               />
             </div>
           ))}
