@@ -11,8 +11,8 @@ import {
   Folder,
   Grid,
 } from 'lucide-react';
-import { cn } from '@binago/utils';
-import { Checkbox } from '@binago/ui';
+import { cn } from '@adatrack/utils';
+import { Checkbox } from '@adatrack/ui';
 import type {
   TrackingVehicle,
   TrackingVehicleGroup,
@@ -20,7 +20,7 @@ import type {
   GroupStatusSummary,
 } from '../types/tracking';
 
-// ─── Helper: compute group status summary ─────────────────────────────────────
+// â”€â”€â”€ Helper: compute group status summary â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function computeGroupSummary(vehicles: TrackingVehicle[]): GroupStatusSummary {
   return vehicles.reduce(
@@ -32,7 +32,7 @@ function computeGroupSummary(vehicles: TrackingVehicle[]): GroupStatusSummary {
   );
 }
 
-// ─── Helper: filter vehicles ──────────────────────────────────────────────────
+// â”€â”€â”€ Helper: filter vehicles â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function filterVehicles(
   vehicles: TrackingVehicle[],
@@ -51,7 +51,7 @@ function filterVehicles(
   });
 }
 
-// ─── Status Config ────────────────────────────────────────────────────────────
+// â”€â”€â”€ Status Config â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const statusConfig = {
   driving: {
@@ -76,7 +76,7 @@ const statusConfig = {
   },
 };
 
-// ─── StatusBadge ──────────────────────────────────────────────────────────────
+// â”€â”€â”€ StatusBadge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface StatusBadgeProps {
   status: TrackingVehicle['status'];
@@ -100,7 +100,7 @@ function StatusBadge({ status, labels }: StatusBadgeProps) {
   );
 }
 
-// ─── VehicleListItem ──────────────────────────────────────────────────────────
+// â”€â”€â”€ VehicleListItem â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface VehicleListItemProps {
   vehicle: TrackingVehicle;
@@ -176,7 +176,7 @@ function VehicleListItem({
   );
 }
 
-// ─── VehicleGroupHeader ───────────────────────────────────────────────────────
+// â”€â”€â”€ VehicleGroupHeader â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface VehicleGroupHeaderProps {
   group: TrackingVehicleGroup;
@@ -251,7 +251,7 @@ function VehicleGroupHeader({
   );
 }
 
-// ─── VehicleList Props ──────────────────────────────────────────────────────────
+// â”€â”€â”€ VehicleList Props â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export interface VehicleListProps {
   /** All vehicle groups with their vehicles */
@@ -299,7 +299,7 @@ export interface VehicleListProps {
   className?: string;
 }
 
-// ─── VehicleList Component ────────────────────────────────────────────────────
+// â”€â”€â”€ VehicleList Component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export function VehicleList({
   groups,
@@ -316,7 +316,7 @@ export function VehicleList({
   labels,
   className,
 }: VehicleListProps) {
-  // ── Local state: which groups are expanded ──────────────────────────────────
+  // â”€â”€ Local state: which groups are expanded â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const [expandedGroups, setExpandedGroups] = React.useState<Record<string, boolean>>(() =>
     Object.fromEntries(groups.map((g) => [g.id, true])),
   );
@@ -325,7 +325,7 @@ export function VehicleList({
     setExpandedGroups((prev) => ({ ...prev, [groupId]: !prev[groupId] }));
   };
 
-  // ── Computed: filter vehicles per group ─────────────────────────────────────
+  // â”€â”€ Computed: filter vehicles per group â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const filteredGroups = groups
     .map((group) => ({
       ...group,
@@ -344,14 +344,14 @@ export function VehicleList({
   const totalAllUnfiltered = allVehiclesUnfiltered.length;
   const overallSummary = computeGroupSummary(allVehiclesUnfiltered);
 
-  // ── Computed: select all state ──────────────────────────────────────────────
+  // â”€â”€ Computed: select all state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const allVisibleIds = filteredGroups.flatMap((g) => g.filteredVehicles.map((v) => v.id));
   const allChecked =
     allVisibleIds.length > 0 && allVisibleIds.every((id) => selectedVehicleIds.includes(id));
   const someChecked =
     !allChecked && allVisibleIds.some((id) => selectedVehicleIds.includes(id));
 
-  // ── Status filter tabs config ───────────────────────────────────────────────
+  // â”€â”€ Status filter tabs config â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const statusFilters: { key: StatusFilter; label: string; count: number }[] = [
     { key: 'all', label: labels.statusAll, count: totalAllUnfiltered },
     { key: 'driving', label: labels.statusDriving, count: overallSummary.driving },
@@ -375,7 +375,7 @@ export function VehicleList({
       )}
       aria-label={labels.title}
     >
-      {/* ── Panel Header ──────────────────────────────────────────────────── */}
+      {/* â”€â”€ Panel Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className="shrink-0 flex items-center justify-between px-3 h-[40px] border-b border-border bg-neutral-50/30 dark:bg-neutral-900/10">
         <div className="flex items-center gap-2">
           <h2 className="text-[11px] font-semibold text-foreground uppercase tracking-wider">
@@ -398,7 +398,7 @@ export function VehicleList({
         )}
       </div>
 
-      {/* ── Search ────────────────────────────────────────────────────────── */}
+      {/* â”€â”€ Search â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className="shrink-0 flex items-center gap-2 px-3 py-2 border-b border-border">
         <div className="relative flex-1 min-w-0">
           <Search
@@ -430,7 +430,7 @@ export function VehicleList({
         </button>
       </div>
 
-      {/* ── Status Filter ─────────────────────────────────────────────────── */}
+      {/* â”€â”€ Status Filter â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className="shrink-0 border-b border-border px-3 py-2 bg-neutral-50/50 dark:bg-neutral-900/30">
         <div className="flex flex-wrap gap-1.5" role="group" aria-label="Filter status kendaraan">
           {statusFilters.map(({ key, label, count }) => {
@@ -457,7 +457,7 @@ export function VehicleList({
         </div>
       </div>
 
-      {/* ── Select All ────────────────────────────────────────────────────── */}
+      {/* â”€â”€ Select All â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className="shrink-0 flex items-center gap-2.5 px-3 py-2.5 border-b border-border bg-background">
         <Checkbox
           id="vehicle-list-select-all"
@@ -473,7 +473,7 @@ export function VehicleList({
         </label>
       </div>
 
-      {/* ── Scrollable Vehicle List ───────────────────────────────────────── */}
+      {/* â”€â”€ Scrollable Vehicle List â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className="flex-1 min-h-0 overflow-y-auto px-3 py-3" role="list" aria-label="Daftar kendaraan">
         {filteredGroups.length === 0 && (
           <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
@@ -532,7 +532,7 @@ export function VehicleList({
         })}
       </div>
 
-      {/* ── Footer Summary ────────────────────────────────────────────────── */}
+      {/* â”€â”€ Footer Summary â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className="shrink-0 flex items-center justify-center px-3 py-2 border-t border-border bg-neutral-50 dark:bg-neutral-900/50">
         <p className="text-[11px] font-medium text-foreground-muted">
           {labels.groupSummary(filteredGroups.length, totalVisible)}

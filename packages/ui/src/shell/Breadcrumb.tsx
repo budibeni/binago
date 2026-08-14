@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { ChevronRight, Home } from 'lucide-react';
-import { cn } from '@binago/utils';
+import { cn } from '@adatrack/utils';
 
 export interface BreadcrumbItem {
   label: string;

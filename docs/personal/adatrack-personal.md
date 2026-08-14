@@ -1,20 +1,20 @@
-# BINAGO Personal
+# ADATRACK Personal
 
 ## Official Product & UI Guideline
 
-**Product:** BINAGO Personal  
+**Product:** ADATRACK Personal  
 **Platform:** Web App  
 **Scope:** Personal GPS Tracking  
 **Design Approach:** Mobile-first  
 **Default Language:** Indonesia  
 **Data Stage:** Dummy/Mock  
-**Brand:** BINAGO
+**Brand:** ADATRACK
 
 ---
 
 # 1. Product Overview
 
-BINAGO Personal adalah aplikasi GPS Tracking untuk pengguna pribadi yang memiliki kendaraan sendiri, baik mobil maupun motor.
+ADATRACK Personal adalah aplikasi GPS Tracking untuk pengguna pribadi yang memiliki kendaraan sendiri, baik mobil maupun motor.
 
 Aplikasi berfokus pada pengalaman yang sederhana, visual, ringan, dan mudah digunakan untuk kebutuhan sehari-hari.
 
@@ -32,13 +32,13 @@ Fokus utama:
 - mengatur geofence
 - mengatur notifikasi
 
-BINAGO Personal ditujukan untuk pengguna dengan jumlah kendaraan yang relatif sedikit, sehingga interface tidak boleh terasa seperti sistem fleet management enterprise.
+ADATRACK Personal ditujukan untuk pengguna dengan jumlah kendaraan yang relatif sedikit, sehingga interface tidak boleh terasa seperti sistem fleet management enterprise.
 
 ---
 
 # 2. Product Character
 
-BINAGO Personal harus memiliki karakter:
+ADATRACK Personal harus memiliki karakter:
 
 - clean
 - modern
@@ -52,25 +52,25 @@ BINAGO Personal harus memiliki karakter:
 - nyaman digunakan dengan satu tangan pada mobile
 - tetap elegan pada desktop
 
-BINAGO Personal bukan versi kecil dari BINAGO Business.
+ADATRACK Personal bukan versi kecil dari ADATRACK Business.
 
 Perbedaan utama:
 
 ```text
-BINAGO Business
-    ↓
+ADATRACK Business
+    â†“
 Enterprise / Fleet Management
-    ↓
+    â†“
 Data banyak
 Operasional
 Monitoring fleet
 Management
 Reporting
 
-BINAGO Personal
-    ↓
+ADATRACK Personal
+    â†“
 Individual Vehicle Tracking
-    ↓
+    â†“
 Sederhana
 Personal
 Visual
@@ -82,7 +82,7 @@ Daily usage
 
 # 3. Visual Reference
 
-BINAGO Personal memiliki satu visual reference utama.
+ADATRACK Personal memiliki satu visual reference utama.
 
 File:
 
@@ -90,7 +90,7 @@ File:
 docs/personal/personal-overview.png
 ```
 
-Gambar tersebut berisi keseluruhan referensi visual BINAGO Personal, termasuk:
+Gambar tersebut berisi keseluruhan referensi visual ADATRACK Personal, termasuk:
 
 1. Login
 2. Pemantauan / Live Map
@@ -105,7 +105,7 @@ Gambar tersebut berisi keseluruhan referensi visual BINAGO Personal, termasuk:
 
 ## 3.1 Fungsi Visual Reference
 
-`personal-overview.png` merupakan **visual design reference** resmi BINAGO Personal.
+`personal-overview.png` merupakan **visual design reference** resmi ADATRACK Personal.
 
 Gunakan gambar tersebut untuk memahami:
 
@@ -146,7 +146,7 @@ Jika terdapat perbedaan antara visual reference dengan dokumentasi project, guna
 2. Architecture
 3. Design System
 4. UI Guidelines
-5. docs/personal/binago-personal.md
+5. docs/personal/adatrack-personal.md
 6. PERSONAL task specification
 7. personal-overview.png
 ```
@@ -157,7 +157,7 @@ Visual reference tidak boleh digunakan untuk membenarkan implementasi yang berte
 
 # 4. Brand Identity
 
-Identitas resmi BINAGO:
+Identitas resmi ADATRACK:
 
 ```text
 BINA = HITAM
@@ -167,19 +167,19 @@ GO   = MERAH
 Penulisan brand:
 
 ```text
-BINAGO
+ADATRACK
 ```
 
 dengan:
 
 ```text
-BINA → Hitam
-GO   → Merah
+BINA â†’ Hitam
+GO   â†’ Merah
 ```
 
 ## 4.1 Brand Color
 
-Merah merupakan primary brand accent BINAGO.
+Merah merupakan primary brand accent ADATRACK.
 
 Gunakan merah untuk:
 
@@ -200,7 +200,7 @@ Hitam digunakan untuk:
 
 ## 4.2 Warna yang Tidak Boleh Menggantikan Brand
 
-Orange bukan warna brand BINAGO.
+Orange bukan warna brand ADATRACK.
 
 Jangan menggunakan orange sebagai primary brand color.
 
@@ -221,7 +221,7 @@ Penggunaan warna semantic seperti green, yellow, gray, dan red tetap diperbolehk
 
 ## 5.1 Mobile-first
 
-BINAGO Personal dikembangkan dengan pendekatan mobile-first.
+ADATRACK Personal dikembangkan dengan pendekatan mobile-first.
 
 Mobile adalah baseline utama.
 
@@ -229,9 +229,9 @@ Prioritas:
 
 ```text
 Mobile
-   ↓
+   â†“
 Tablet
-   ↓
+   â†“
 Desktop
 ```
 
@@ -260,7 +260,7 @@ Informasi sekunder dapat ditempatkan pada:
 
 ## 5.3 Visual First
 
-BINAGO Personal adalah aplikasi tracking.
+ADATRACK Personal adalah aplikasi tracking.
 
 Informasi yang berhubungan dengan lokasi dan kendaraan harus mudah dipahami secara visual.
 
@@ -299,7 +299,7 @@ Jangan membuat setiap halaman memiliki gaya visual sendiri.
 
 # 6. Primary Navigation
 
-BINAGO Personal memiliki tiga primary navigation:
+ADATRACK Personal memiliki tiga primary navigation:
 
 ```text
 Pemantauan
@@ -310,11 +310,11 @@ Pengaturan
 Struktur:
 
 ```text
-BINAGO Personal
-│
-├── Pemantauan
-├── Statistik
-└── Pengaturan
+ADATRACK Personal
+â”‚
+â”œâ”€â”€ Pemantauan
+â”œâ”€â”€ Statistik
+â””â”€â”€ Pengaturan
 ```
 
 ---
@@ -326,14 +326,14 @@ Pada mobile gunakan **Bottom Navigation**.
 Struktur:
 
 ```text
-┌─────────────────────────────────┐
-│                                 │
-│           CONTENT               │
-│                                 │
-│                                 │
-├─────────────────────────────────┤
-│ Pemantauan │ Statistik │ Pengaturan │
-└─────────────────────────────────┘
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚                                 â”‚
+â”‚           CONTENT               â”‚
+â”‚                                 â”‚
+â”‚                                 â”‚
+â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
+â”‚ Pemantauan â”‚ Statistik â”‚ Pengaturan â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
 ```
 
 Primary navigation harus selalu mudah dijangkau.
@@ -351,11 +351,11 @@ Pada desktop gunakan **Top Navigation**.
 Contoh:
 
 ```text
-┌───────────────────────────────────────────────────────┐
-│ BINAGO Personal                                       │
-│                                                       │
-│ Pemantauan        Statistik        Pengaturan         │
-└───────────────────────────────────────────────────────┘
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚ ADATRACK Personal                                       â”‚
+â”‚                                                       â”‚
+â”‚ Pemantauan        Statistik        Pengaturan         â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
 ```
 
 Desktop Personal **tidak menggunakan Sidebar Business sebagai primary navigation**.
@@ -389,7 +389,7 @@ Setelah login, pengguna diarahkan ke:
 Pemantauan
 ```
 
-Pemantauan menjadi pengalaman utama BINAGO Personal.
+Pemantauan menjadi pengalaman utama ADATRACK Personal.
 
 Aplikasi Personal tidak perlu menggunakan dashboard enterprise yang penuh dengan banyak widget.
 
@@ -397,11 +397,11 @@ Prioritas:
 
 ```text
 User
- ↓
+ â†“
 Pemantauan
- ↓
+ â†“
 Kendaraan
- ↓
+ â†“
 Lokasi
 ```
 
@@ -413,15 +413,15 @@ Flow utama:
 
 ```text
 Login
-  ↓
+  â†“
 Pemantauan
-  ↓
+  â†“
 Pilih Kendaraan
-  ↓
+  â†“
 Detail Kendaraan
-  ↓
+  â†“
 Riwayat Perjalanan
-  ↓
+  â†“
 Playback
 ```
 
@@ -429,15 +429,15 @@ Flow statistik:
 
 ```text
 Pemantauan
-  ↓
+  â†“
 Statistik
-  ↓
+  â†“
 Ringkasan
-  ↓
+  â†“
 Harian
-  ↓
+  â†“
 Mingguan
-  ↓
+  â†“
 Bulanan
 ```
 
@@ -445,13 +445,13 @@ Flow pengaturan:
 
 ```text
 Pengaturan
-  ├── Kendaraan Saya
-  ├── Perangkat GPS
-  ├── Notifikasi
-  ├── Geofence
-  ├── Akun
-  ├── Bantuan
-  └── Tentang Aplikasi
+  â”œâ”€â”€ Kendaraan Saya
+  â”œâ”€â”€ Perangkat GPS
+  â”œâ”€â”€ Notifikasi
+  â”œâ”€â”€ Geofence
+  â”œâ”€â”€ Akun
+  â”œâ”€â”€ Bantuan
+  â””â”€â”€ Tentang Aplikasi
 ```
 
 ---
@@ -461,41 +461,41 @@ Pengaturan
 Struktur utama Personal:
 
 ```text
-BINAGO Personal
-│
-├── Pemantauan
-│   ├── VehicleList
-│   ├── LiveMap
-│   └── VehicleDetail
-│
-├── Statistik
-│   ├── Summary
-│   ├── Daily
-│   ├── Weekly
-│   └── Monthly
-│
-└── Pengaturan
-    ├── Kendaraan
-    ├── Perangkat GPS
-    ├── Notifikasi
-    ├── Geofence
-    ├── Akun
-    ├── Bantuan
-    └── Tentang
+ADATRACK Personal
+â”‚
+â”œâ”€â”€ Pemantauan
+â”‚   â”œâ”€â”€ VehicleList
+â”‚   â”œâ”€â”€ LiveMap
+â”‚   â””â”€â”€ VehicleDetail
+â”‚
+â”œâ”€â”€ Statistik
+â”‚   â”œâ”€â”€ Summary
+â”‚   â”œâ”€â”€ Daily
+â”‚   â”œâ”€â”€ Weekly
+â”‚   â””â”€â”€ Monthly
+â”‚
+â””â”€â”€ Pengaturan
+    â”œâ”€â”€ Kendaraan
+    â”œâ”€â”€ Perangkat GPS
+    â”œâ”€â”€ Notifikasi
+    â”œâ”€â”€ Geofence
+    â”œâ”€â”€ Akun
+    â”œâ”€â”€ Bantuan
+    â””â”€â”€ Tentang
 ```
 
 ---
 
 # 13. Monitoring
 
-Pemantauan adalah feature utama BINAGO Personal.
+Pemantauan adalah feature utama ADATRACK Personal.
 
 Struktur utama:
 
 ```text
 Pemantauan
-├── VehicleList
-└── LiveMap
+â”œâ”€â”€ VehicleList
+â””â”€â”€ LiveMap
 ```
 
 VehicleList dan LiveMap merupakan component terpisah.
@@ -552,9 +552,9 @@ Flow:
 
 ```text
 Riwayat Perjalanan
-       ↓
+       â†“
 Pilih Perjalanan
-       ↓
+       â†“
 Playback
 ```
 
@@ -615,7 +615,7 @@ Contoh:
 
 ```text
 07:12 - 07:48
-Rumah → Kantor
+Rumah â†’ Kantor
 18,2 km
 36 menit
 ```
@@ -632,10 +632,10 @@ Struktur:
 
 ```text
 Statistik
-├── Ringkasan
-├── Harian
-├── Mingguan
-└── Bulanan
+â”œâ”€â”€ Ringkasan
+â”œâ”€â”€ Harian
+â”œâ”€â”€ Mingguan
+â””â”€â”€ Bulanan
 ```
 
 Statistik dapat menampilkan:
@@ -682,13 +682,13 @@ Struktur:
 
 ```text
 Pengaturan
-├── Kendaraan Saya
-├── Perangkat GPS
-├── Notifikasi
-├── Geofence
-├── Akun
-├── Bantuan
-└── Tentang Aplikasi
+â”œâ”€â”€ Kendaraan Saya
+â”œâ”€â”€ Perangkat GPS
+â”œâ”€â”€ Notifikasi
+â”œâ”€â”€ Geofence
+â”œâ”€â”€ Akun
+â”œâ”€â”€ Bantuan
+â””â”€â”€ Tentang Aplikasi
 ```
 
 Gunakan list/card yang sederhana.
@@ -784,9 +784,9 @@ Selama tahap frontend:
 
 ```text
 Page / Feature
-      ↓
+      â†“
 Dummy Data
-      ↓
+      â†“
 Component
 ```
 
@@ -961,10 +961,10 @@ Interactive element harus dapat digunakan melalui keyboard jika memungkinkan.
 Gunakan component dari:
 
 ```text
-@binago/ui
-@binago/design-system
-@binago/types
-@binago/utils
+@adatrack/ui
+@adatrack/design-system
+@adatrack/types
+@adatrack/utils
 ```
 
 jika sesuai.
@@ -993,15 +993,15 @@ Gunakan prinsip:
 
 ```text
 Generic
-   ↓
+   â†“
 packages/ui
 
 Business-specific
-   ↓
+   â†“
 apps/business
 
 Personal-specific
-   ↓
+   â†“
 apps/personal
 ```
 
@@ -1013,7 +1013,7 @@ Component harus benar-benar generic sebelum dipindahkan ke shared package.
 
 # 30. Theme
 
-BINAGO Personal mengikuti design system BINAGO.
+ADATRACK Personal mengikuti design system ADATRACK.
 
 Theme harus mendukung:
 
@@ -1083,10 +1083,10 @@ Offline
 Status dapat menggunakan semantic color:
 
 ```text
-Driving  → success
-Idle     → warning
-Parking  → neutral
-Offline  → danger
+Driving  â†’ success
+Idle     â†’ warning
+Parking  â†’ neutral
+Offline  â†’ danger
 ```
 
 Warna semantic tidak menggantikan brand color.
@@ -1113,7 +1113,7 @@ Contoh:
 Belum ada kendaraan
 
 Tambahkan kendaraan untuk mulai menggunakan
-BINAGO Personal.
+ADATRACK Personal.
 ```
 
 Jangan menampilkan halaman kosong tanpa penjelasan.
@@ -1198,26 +1198,26 @@ Contoh:
 
 ```text
 apps/personal/src/
-│
-├── app/
-│
-├── components/
-│
-├── features/
-│   ├── monitoring/
-│   │   ├── components/
-│   │   ├── data/
-│   │   ├── types/
-│   │   └── ...
-│   │
-│   ├── vehicle-detail/
-│   ├── playback/
-│   ├── statistics/
-│   ├── settings/
-│   ├── geofence/
-│   └── notifications/
-│
-└── i18n/
+â”‚
+â”œâ”€â”€ app/
+â”‚
+â”œâ”€â”€ components/
+â”‚
+â”œâ”€â”€ features/
+â”‚   â”œâ”€â”€ monitoring/
+â”‚   â”‚   â”œâ”€â”€ components/
+â”‚   â”‚   â”œâ”€â”€ data/
+â”‚   â”‚   â”œâ”€â”€ types/
+â”‚   â”‚   â””â”€â”€ ...
+â”‚   â”‚
+â”‚   â”œâ”€â”€ vehicle-detail/
+â”‚   â”œâ”€â”€ playback/
+â”‚   â”œâ”€â”€ statistics/
+â”‚   â”œâ”€â”€ settings/
+â”‚   â”œâ”€â”€ geofence/
+â”‚   â””â”€â”€ notifications/
+â”‚
+â””â”€â”€ i18n/
 ```
 
 Jangan memasukkan business logic feature ke `app/` jika dapat ditempatkan dengan lebih tepat di `features/`.
@@ -1226,7 +1226,7 @@ Jangan memasukkan business logic feature ke `app/` jika dapat ditempatkan dengan
 
 # 41. Task Structure
 
-Implementasi BINAGO Personal menggunakan task terpisah:
+Implementasi ADATRACK Personal menggunakan task terpisah:
 
 ```text
 docs/personal/tasks/
@@ -1296,9 +1296,9 @@ Tujuannya adalah menjaga konsistensi produk.
 
 ---
 
-# 44. What BINAGO Personal Is Not
+# 44. What ADATRACK Personal Is Not
 
-BINAGO Personal bukan:
+ADATRACK Personal bukan:
 
 - fleet management enterprise
 - ERP
@@ -1319,7 +1319,7 @@ Sebelum mengerjakan feature:
 
 1. Baca `AGENTS.md`.
 2. Baca dokumentasi project yang relevan.
-3. Baca `docs/personal/binago-personal.md`.
+3. Baca `docs/personal/adatrack-personal.md`.
 4. Baca task yang sedang dikerjakan.
 5. Periksa source code yang sudah tersedia.
 6. Gunakan component yang sudah tersedia.
@@ -1331,13 +1331,13 @@ Sebelum mengerjakan feature:
 
 # 46. AI Instructions
 
-Ketika AI mengerjakan BINAGO Personal:
+Ketika AI mengerjakan ADATRACK Personal:
 
 ```text
 Baca terlebih dahulu:
 
 1. AGENTS.md
-2. docs/personal/binago-personal.md
+2. docs/personal/adatrack-personal.md
 3. task yang sedang dikerjakan
 4. dokumentasi dependency yang relevan
 5. source code terkait
@@ -1346,12 +1346,12 @@ Baca terlebih dahulu:
 
 AI harus memahami bahwa:
 
-- BINAGO Personal berbeda dari BINAGO Business.
+- ADATRACK Personal berbeda dari ADATRACK Business.
 - Personal menggunakan mobile-first.
 - Mobile menggunakan Bottom Navigation.
 - Desktop menggunakan Top Navigation.
 - Tidak menggunakan Sidebar Business sebagai primary navigation.
-- Brand BINAGO adalah BINA hitam + GO merah.
+- Brand ADATRACK adalah BINA hitam + GO merah.
 - Visual reference adalah acuan desain, bukan pixel-perfect specification.
 - Component tidak boleh fetch data sendiri.
 - Dummy data dikelola feature/page.
@@ -1400,9 +1400,9 @@ Selama tahap frontend:
 
 ```text
 UI
-↓
+â†“
 Mock Data
-↓
+â†“
 Component
 ```
 
@@ -1520,7 +1520,7 @@ Jangan mengerjakan task berikutnya tanpa instruksi baru dari user.
 
 # 53. Final Product Direction
 
-BINAGO Personal harus terasa seperti:
+ADATRACK Personal harus terasa seperti:
 
 ```text
 Personal
@@ -1548,12 +1548,12 @@ Pengalaman utama pengguna harus selalu kembali kepada tujuan utama:
 
 ```text
 "Di mana kendaraan saya?"
-        ↓
+        â†“
 "Apa statusnya?"
-        ↓
+        â†“
 "Apa yang terjadi hari ini?"
-        ↓
+        â†“
 "Bagaimana riwayat perjalanannya?"
 ```
 
-Semua keputusan UI dan UX BINAGO Personal harus mendukung tujuan tersebut.
+Semua keputusan UI dan UX ADATRACK Personal harus mendukung tujuan tersebut.

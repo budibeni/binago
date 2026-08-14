@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { ChevronRight, ChevronLeft, ChevronDown, ChevronUp, Car } from 'lucide-react';
-import { cn } from '@binago/utils';
+import { cn } from '@adatrack/utils';
 import { usePersonalLocale } from '@/components/PersonalShellLayout';
 import { getTranslation } from '@/i18n';
 import { Vehicle, VehicleStatus } from '../types';

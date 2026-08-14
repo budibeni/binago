@@ -1,5 +1,5 @@
 import React from 'react';
-import { cn } from '@binago/utils';
+import { cn } from '@adatrack/utils';
 
 export interface ContentHeaderProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
   title: React.ReactNode;

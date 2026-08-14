@@ -2,7 +2,7 @@
 
 import React from 'react';
 import * as RadixSeparator from '@radix-ui/react-separator';
-import { cn } from '@binago/utils';
+import { cn } from '@adatrack/utils';
 
 export interface SeparatorProps extends React.ComponentPropsWithoutRef<typeof RadixSeparator.Root> {}
 

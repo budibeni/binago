@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { User, Settings, LogOut, ChevronDown } from 'lucide-react';
-import { cn } from '@binago/utils';
+import { cn } from '@adatrack/utils';
 import { Avatar } from '../Avatar';
 import {
   DropdownMenu,
@@ -10,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../Dropdown';
-import type { UserInfo } from '@binago/types';
+import type { UserInfo } from '@adatrack/types';
 
 export interface UserMenuProps {
   user: UserInfo;

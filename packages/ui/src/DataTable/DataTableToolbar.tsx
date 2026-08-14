@@ -1,14 +1,14 @@
 'use client';
 
 import React from 'react';
-import { cn } from '@binago/utils';
+import { cn } from '@adatrack/utils';
 import { DataTableSearch } from './DataTableSearch';
 import { DataTableColumnToggle } from './DataTableColumnToggle';
 import { DataTableExport } from './DataTableExport';
 import { Filter } from 'lucide-react';
 import { Button } from '../Button';
 import type { DataTableInstance, DataTableExportConfig, RowData } from './types';
-import type { FetchState } from '@binago/types';
+import type { FetchState } from '@adatrack/types';
 
 export interface DataTableToolbarProps<TData extends RowData = RowData> {
   table: DataTableInstance<TData>;
@@ -44,7 +44,7 @@ export interface DataTableToolbarProps<TData extends RowData = RowData> {
 
 /**
  * DataTableToolbar menggabungkan search, column toggle, export, dan custom action slot.
- * Dirancang untuk dirender di atas tabel — biasanya dipass melalui prop `toolbarSlot` pada DataTable.
+ * Dirancang untuk dirender di atas tabel â€” biasanya dipass melalui prop `toolbarSlot` pada DataTable.
  *
  * Layout:
  * [leftSlot] [search]          [rightSlot] [columnToggle] [export]

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { cn } from '@binago/utils';
+import { cn } from '@adatrack/utils';
 import { StatisticPeriod } from '../types';
 import { usePersonalLocale } from '@/components/PersonalShellLayout';
 import { getTranslation } from '@/i18n';

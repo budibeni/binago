@@ -23,13 +23,13 @@ import {
   Settings,
   CircleHelp,
 } from 'lucide-react';
-import { AppShell } from '@binago/ui';
-import type { NavGroup, NavItem, UserInfo, Locale } from '@binago/types';
+import { AppShell } from '@adatrack/ui';
+import type { NavGroup, NavItem, UserInfo, Locale } from '@adatrack/types';
 import { getTranslation } from '../i18n';
 
 const DUMMY_USER: UserInfo = {
   name: 'Budi Setiawan',
-  email: 'budi.setiawan@binago.id',
+  email: 'budi.setiawan@adatrack.id',
   role: 'Super Admin',
   initials: 'BS',
 };
@@ -128,7 +128,7 @@ export function BusinessShellLayout({ children }: { children: React.ReactNode })
 
   React.useEffect(() => {
     try {
-      const savedTheme = localStorage.getItem('binago.theme') as 'light' | 'dark';
+      const savedTheme = localStorage.getItem('adatrack.theme') as 'light' | 'dark';
       if (savedTheme) {
         setTheme(savedTheme);
         if (savedTheme === 'dark') document.documentElement.classList.add('dark');
@@ -142,7 +142,7 @@ export function BusinessShellLayout({ children }: { children: React.ReactNode })
   const handleThemeChange = React.useCallback((newTheme: 'light' | 'dark') => {
     setTheme(newTheme);
     try {
-      localStorage.setItem('binago.theme', newTheme);
+      localStorage.setItem('adatrack.theme', newTheme);
       if (newTheme === 'dark') document.documentElement.classList.add('dark');
       else document.documentElement.classList.remove('dark');
     } catch (e) {
@@ -161,7 +161,7 @@ export function BusinessShellLayout({ children }: { children: React.ReactNode })
 
   return (
     <AppShell
-      brandName="BINAGO"
+      brandName="ADATRACK"
       navigation={navigation}
       bottomNavigation={buildBottomNavigation(locale)}
       currentPath={currentPath}

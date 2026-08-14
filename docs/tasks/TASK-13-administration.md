@@ -1,7 +1,7 @@
-# BINAGO — Task 13
+# ADATRACK â€” Task 13
 ## Administration
 
-**Scope:** Frontend BINAGO  
+**Scope:** Frontend ADATRACK  
 **Data:** Dummy/Mock  
 **Bahasa dokumentasi:** Indonesia
 

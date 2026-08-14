@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Columns3 } from 'lucide-react';
-import { cn } from '@binago/utils';
+import { cn } from '@adatrack/utils';
 import { Button } from '../Button';
 import {
   DropdownMenu,

@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { X, MapPin, Clock, Gauge, Car, User } from 'lucide-react';
-import { cn } from '@binago/utils';
-import type { Locale } from '@binago/types';
+import { cn } from '@adatrack/utils';
+import type { Locale } from '@adatrack/types';
 import { getTranslation } from '../../../i18n';
 import type { TrackingVehicle } from '../types/tracking';
 
@@ -57,7 +57,7 @@ export function VehicleOverviewPanel({ vehicle, onClose, locale = 'id', classNam
   return (
     <div className={cn('flex flex-col h-full w-full bg-background shadow-[-4px_-4px_15px_-3px_rgba(0,0,0,0.02)]', className)}>
       
-      {/* ── Top Row ────────────────────────────────────────────────────────── */}
+      {/* â”€â”€ Top Row â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className="flex items-center justify-between gap-3 px-3 py-1.5 border-b border-border shrink-0 h-[40px] bg-neutral-50/50 dark:bg-neutral-900/30">
         <div className="flex items-center gap-3">
           <h2 className="text-[14px] font-bold text-foreground tracking-widest uppercase">
@@ -86,7 +86,7 @@ export function VehicleOverviewPanel({ vehicle, onClose, locale = 'id', classNam
         </button>
       </div>
 
-      {/* ── Details Grid ─────────────────────────────────────────────────── */}
+      {/* â”€â”€ Details Grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className="flex-1 py-2 px-3 overflow-hidden flex items-center">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 w-full">
           

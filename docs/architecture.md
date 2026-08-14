@@ -1,4 +1,4 @@
-# BINAGO — Architecture
+# ADATRACK â€” Architecture
 
 ## 1. Prinsip
 
@@ -9,9 +9,9 @@ Jangan membuat abstraction sebelum ada kebutuhan.
 ## 2. Application
 
 ```text
-BINAGO Platform
-├── Business
-└── Personal
+ADATRACK Platform
+â”œâ”€â”€ Business
+â””â”€â”€ Personal
 ```
 
 Application Business dan Personal terpisah.
@@ -22,16 +22,16 @@ Target struktur:
 
 ```text
 apps/
-├── business/
-└── personal/
+â”œâ”€â”€ business/
+â””â”€â”€ personal/
 
 packages/
-├── ui/
-├── design-system/
-├── maps/
-├── icons/
-├── utils/
-└── types/
+â”œâ”€â”€ ui/
+â”œâ”€â”€ design-system/
+â”œâ”€â”€ maps/
+â”œâ”€â”€ icons/
+â”œâ”€â”€ utils/
+â””â”€â”€ types/
 ```
 
 ## 4. Frontend Boundary
@@ -40,9 +40,9 @@ Saat ini:
 
 ```text
 UI
-↓
+â†“
 Feature Logic
-↓
+â†“
 Dummy / Mock Data
 ```
 

@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { AlertCircle } from 'lucide-react';
-import { cn } from '@binago/utils';
-import { Button } from '@binago/ui';
+import { cn } from '@adatrack/utils';
+import { Button } from '@adatrack/ui';
 
 export interface ErrorStateProps {
   title: string;

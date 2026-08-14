@@ -1,6 +1,6 @@
 import React from 'react';
-import { cn } from '@binago/utils';
-import type { SemanticVariant } from '@binago/types';
+import { cn } from '@adatrack/utils';
+import type { SemanticVariant } from '@adatrack/types';
 import { AlertCircle, CheckCircle2, Info, TriangleAlert, X } from 'lucide-react';
 
 export interface AlertProps extends React.HTMLAttributes<HTMLDivElement> {

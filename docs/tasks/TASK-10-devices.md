@@ -1,7 +1,7 @@
-# BINAGO — Task 10
+# ADATRACK â€” Task 10
 ## Devices
 
-**Scope:** Frontend BINAGO  
+**Scope:** Frontend ADATRACK  
 **Data:** Dummy/Mock  
 **Bahasa dokumentasi:** Indonesia
 

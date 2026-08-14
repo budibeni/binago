@@ -1,8 +1,8 @@
-# BINAGO Personal — PERSONAL-04
+# ADATRACK Personal â€” PERSONAL-04
 
 ## Playback
 
-**Scope:** Frontend BINAGO Personal  
+**Scope:** Frontend ADATRACK Personal  
 **Data:** Dummy/Mock  
 **Bahasa dokumentasi:** Indonesia
 
@@ -16,11 +16,11 @@ Flow:
 
 ```text
 Vehicle Detail
-    ↓
+    â†“
 Riwayat Perjalanan
-    ↓
+    â†“
 Pilih Perjalanan
-    ↓
+    â†“
 Playback
 ```
 

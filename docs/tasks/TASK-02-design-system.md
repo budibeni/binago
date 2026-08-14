@@ -1,7 +1,7 @@
-# BINAGO — Task 02
+# ADATRACK â€” Task 02
 ## Design System
 
-**Scope:** Frontend BINAGO  
+**Scope:** Frontend ADATRACK  
 **Data:** Dummy/Mock  
 **Bahasa dokumentasi:** Indonesia
 

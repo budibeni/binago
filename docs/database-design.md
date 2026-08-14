@@ -1,4 +1,4 @@
-# BINAGO — Database Design
+# ADATRACK â€” Database Design
 
 ## Status
 

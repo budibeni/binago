@@ -1,8 +1,8 @@
-# BINAGO Personal — PERSONAL-05
+# ADATRACK Personal â€” PERSONAL-05
 
 ## Statistics
 
-**Scope:** Frontend BINAGO Personal  
+**Scope:** Frontend ADATRACK Personal  
 **Data:** Dummy/Mock  
 **Bahasa dokumentasi:** Indonesia
 
@@ -10,7 +10,7 @@
 
 # 1. Tujuan
 
-Membangun halaman Statistik BINAGO Personal.
+Membangun halaman Statistik ADATRACK Personal.
 
 Statistik menjadi salah satu dari tiga primary navigation:
 
@@ -67,7 +67,7 @@ Gunakan:
 - Card
 - Tabs jika sesuai
 - Chart/visualisasi jika diperlukan
-- design tokens BINAGO
+- design tokens ADATRACK
 
 DataTable bukan komponen utama untuk statistik Personal.
 

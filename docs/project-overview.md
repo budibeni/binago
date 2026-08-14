@@ -1,11 +1,11 @@
-# BINAGO — Project Overview
+# ADATRACK â€” Project Overview
 
 ## 1. Gambaran Umum
 
-BINAGO adalah platform yang memiliki dua application terpisah:
+ADATRACK adalah platform yang memiliki dua application terpisah:
 
-- BINAGO Business
-- BINAGO Personal
+- ADATRACK Business
+- ADATRACK Personal
 
 Pengembangan saat ini berfokus pada frontend.
 
@@ -41,7 +41,7 @@ Keduanya tidak digabung sebagai satu navigation.
 
 ## 4. Prinsip
 
-BINAGO harus:
+ADATRACK harus:
 
 - modern
 - clean

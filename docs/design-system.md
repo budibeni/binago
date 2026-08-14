@@ -1,8 +1,8 @@
-# BINAGO — Design System
+# ADATRACK â€” Design System
 
 ## 1. Tujuan
 
-Menyediakan visual language dan reusable component yang konsisten untuk BINAGO.
+Menyediakan visual language dan reusable component yang konsisten untuk ADATRACK.
 
 ## 2. Technology
 

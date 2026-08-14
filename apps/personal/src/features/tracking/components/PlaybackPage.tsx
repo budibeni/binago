@@ -8,7 +8,7 @@ import { PlaybackData, Trip, Vehicle } from '../types';
 import { usePersonalLocale } from '@/components/PersonalShellLayout';
 import { getTranslation } from '@/i18n';
 import { EmptyState } from '@/components/EmptyState';
-import { cn } from '@binago/utils';
+import { cn } from '@adatrack/utils';
 
 export interface PlaybackPageProps {
   playbackData: PlaybackData;
@@ -37,7 +37,7 @@ export function PlaybackPage({ playbackData, trip, vehicle, onBack }: PlaybackPa
     };
   }, []);
 
-  // Handle Playback Loop — speed-aware
+  // Handle Playback Loop â€” speed-aware
   useEffect(() => {
     if (isPlaying) {
       const intervalMs = Math.max(50, 1000 / speedMultiplier);
@@ -112,7 +112,7 @@ export function PlaybackPage({ playbackData, trip, vehicle, onBack }: PlaybackPa
   return (
     <div className="absolute inset-0 z-50 flex flex-col bg-background overflow-hidden">
 
-      {/* ======= MAP — full background ======= */}
+      {/* ======= MAP â€” full background ======= */}
       <div className="absolute inset-0 z-0">
         <PlaybackMap
           data={playbackData}

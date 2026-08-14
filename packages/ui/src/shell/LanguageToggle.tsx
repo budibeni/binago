@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../Dropdown';
-import type { Locale } from '@binago/types';
+import type { Locale } from '@adatrack/types';
 
 export interface LanguageToggleProps {
   currentLocale: Locale;

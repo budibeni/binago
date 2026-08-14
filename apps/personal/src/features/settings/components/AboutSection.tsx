@@ -17,7 +17,7 @@ export function AboutSection() {
       </div>
       
       <div>
-        <h3 className="text-xl font-bold text-foreground">BINAGO Personal</h3>
+        <h3 className="text-xl font-bold text-foreground">ADATRACK Personal</h3>
         <p className="text-sm text-foreground-muted mt-2 max-w-sm mx-auto leading-relaxed">
           {s.description}
         </p>

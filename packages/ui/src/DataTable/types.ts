@@ -10,7 +10,7 @@ import type {
   SortingState,
   StockFeatures,
 } from '@tanstack/react-table';
-import type { DataTableMode, FetchParams, FetchState } from '@binago/types';
+import type { DataTableMode, FetchParams, FetchState } from '@adatrack/types';
 
 export type {
   ColumnDef,

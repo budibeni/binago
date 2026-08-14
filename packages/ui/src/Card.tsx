@@ -1,5 +1,5 @@
 import React from 'react';
-import { cn } from '@binago/utils';
+import { cn } from '@adatrack/utils';
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: 'default' | 'bordered' | 'flat';

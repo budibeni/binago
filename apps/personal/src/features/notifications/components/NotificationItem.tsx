@@ -2,8 +2,8 @@ import React from 'react';
 import { Play, Square, WifiOff, Plug, MapPin } from 'lucide-react';
 import { NotificationEvent } from '../types';
 import { getTranslation } from '@/i18n';
-import { Locale } from '@binago/types';
-import { cn } from '@binago/utils';
+import { Locale } from '@adatrack/types';
+import { cn } from '@adatrack/utils';
 import { mockVehicles } from '../../tracking/data/mockTrackingData';
 
 interface NotificationItemProps {

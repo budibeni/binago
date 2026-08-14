@@ -1,12 +1,12 @@
-# BINAGO — Design System Reference
+# ADATRACK â€” Design System Reference
 
-Dokumentasi resmi Design System BINAGO mencakup design tokens, komponen UI foundation, UI patterns, DataTable foundation, dan Maps foundation.
+Dokumentasi resmi Design System ADATRACK mencakup design tokens, komponen UI foundation, UI patterns, DataTable foundation, dan Maps foundation.
 
 ---
 
 ## 1. Design Tokens
 
-Design tokens BINAGO didefinisikan secara tersentralisasi pada `@binago/design-system` melalui CSS custom properties (`base.css`) dan didaftarkan pada konfigurasi Tailwind CSS (`tailwind.config.js`).
+Design tokens ADATRACK didefinisikan secara tersentralisasi pada `@adatrack/design-system` melalui CSS custom properties (`base.css`) dan didaftarkan pada konfigurasi Tailwind CSS (`tailwind.config.js`).
 
 ### Typography
 - **Font Family**: Inter (`font-sans`), dengan fallback `system-ui, sans-serif`.
@@ -41,7 +41,7 @@ Menggunakan skala Zinc Tailwind untuk netral, dengan warna brand dan semantik ya
 ### Spacing & Radius
 - **Border Radius**:
   - `sm`: 4px (`rounded-sm`)
-  - `md`: 6px (`rounded-md` — default)
+  - `md`: 6px (`rounded-md` â€” default)
   - `lg`: 8px (`rounded-lg`)
   - `full`: 9999px (`rounded-full`)
 
@@ -57,7 +57,7 @@ Menggunakan skala Zinc Tailwind untuk netral, dengan warna brand dan semantik ya
 
 ---
 
-## 2. UI Components (`@binago/ui`)
+## 2. UI Components (`@adatrack/ui`)
 
 Seluruh 21 komponen foundation dibangun secara accessible menggunakan semantik HTML5 dan primitive Radix UI:
 
@@ -85,7 +85,7 @@ Seluruh 21 komponen foundation dibangun secara accessible menggunakan semantik H
 
 ---
 
-## 3. UI Patterns (`@binago/ui/patterns`)
+## 3. UI Patterns (`@adatrack/ui/patterns`)
 
 Komponen layout dan komposisi reusable:
 
@@ -102,7 +102,7 @@ Komponen layout dan komposisi reusable:
 
 ---
 
-## 4. DataTable Foundation (`@binago/ui/DataTable`)
+## 4. DataTable Foundation (`@adatrack/ui/DataTable`)
 
 Mesin tabel berbasis **TanStack Table v9.1.2** yang fleksibel dan server-side ready.
 
@@ -111,7 +111,7 @@ Mesin tabel berbasis **TanStack Table v9.1.2** yang fleksibel dan server-side re
 - `DataTableHeader`: Header tabel dengan indikator sorting, sticky header, dan column pinning.
 - `DataTableBody`: Body tabel yang menangani state `idle`, `loading`, `error`, `empty`, dan `no-result`.
 - `DataTableRow`: Baris data dengan dukungan sticky column pinning.
-- `DataTablePagination`: Kontrol navigasi halaman, range data (`1–10 dari 120 baris`), dan pemilih `pageSize`.
+- `DataTablePagination`: Kontrol navigasi halaman, range data (`1â€“10 dari 120 baris`), dan pemilih `pageSize`.
 - `DataTableSearch`: Wrapper SearchBar ter-debounce (300ms) untuk pencarian teks global.
 - `DataTableColumnToggle`: Dropdown pemilih visibilitas kolom dengan counter kolom tersembunyi.
 - `DataTableExport`: Export data ter-filter & ter-lihat ke format CSV (UTF-8 BOM).
@@ -142,7 +142,7 @@ Bila `onFetch` disediakan:
 
 ---
 
-## 5. Maps Foundation (`@binago/maps`)
+## 5. Maps Foundation (`@adatrack/maps`)
 
 Package skeleton provider-agnostic untuk peta interaktif:
 
@@ -155,16 +155,16 @@ Package skeleton provider-agnostic untuk peta interaktif:
 
 ## 6. Penggunaan Package Workspace
 
-Monorepo BINAGO mengorganisir package sebagai berikut:
+Monorepo ADATRACK mengorganisir package sebagai berikut:
 
 ```ts
-import '@binago/design-system/src/base.css'; // Di-import pada app/globals.css
-import { Button, Input, Dialog, Select } from '@binago/ui';
-import { SearchBar, EmptyState } from '@binago/ui/patterns'; // atau via '@binago/ui'
-import { DataTable, DataTableToolbar, DataTablePagination } from '@binago/ui/DataTable';
-import { MapContainer, MapControls, MapOverlay } from '@binago/maps';
-import type { Size, FetchState, FetchParams } from '@binago/types';
-import { cn } from '@binago/utils';
+import '@adatrack/design-system/src/base.css'; // Di-import pada app/globals.css
+import { Button, Input, Dialog, Select } from '@adatrack/ui';
+import { SearchBar, EmptyState } from '@adatrack/ui/patterns'; // atau via '@adatrack/ui'
+import { DataTable, DataTableToolbar, DataTablePagination } from '@adatrack/ui/DataTable';
+import { MapContainer, MapControls, MapOverlay } from '@adatrack/maps';
+import type { Size, FetchState, FetchParams } from '@adatrack/types';
+import { cn } from '@adatrack/utils';
 ```
 
 ---

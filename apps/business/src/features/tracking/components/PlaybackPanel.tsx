@@ -13,15 +13,15 @@ import {
   ChevronDown,
   Search,
 } from 'lucide-react';
-import { cn } from '@binago/utils';
-import { Button, Spinner, Dialog } from '@binago/ui';
+import { cn } from '@adatrack/utils';
+import { Button, Spinner, Dialog } from '@adatrack/ui';
 import type {
   TrackingVehicle,
   DateRange,
   PlaybackState,
 } from '../types/tracking';
 
-// ─── Helper: format seconds to HH:MM:SS ──────────────────────────────────────
+// â”€â”€â”€ Helper: format seconds to HH:MM:SS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function formatDuration(seconds: number): string {
   const h = Math.floor(seconds / 3600);
   const m = Math.floor((seconds % 3600) / 60);
@@ -37,7 +37,7 @@ function calcProgress(current: number, total: number): number {
   return Math.min(100, Math.max(0, (current / total) * 100));
 }
 
-// ─── PlaybackPanel Props ───────────────────────────────────────────────────────
+// â”€â”€â”€ PlaybackPanel Props â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export interface PlaybackPanelProps {
   vehicles: TrackingVehicle[];
   selectedVehicleId: string | null;
@@ -92,7 +92,7 @@ export function PlaybackPanel({
   return (
     <div className={cn('flex flex-col h-full w-full bg-white shadow-[-4px_-4px_15px_-3px_rgba(0,0,0,0.02)]', className)}>
       
-      {/* ── Top Row ────────────────────────────────────────────────────────── */}
+      {/* â”€â”€ Top Row â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className="flex items-center gap-3 px-4 py-2 border-b border-border shrink-0 h-[48px]">
         {/* Logo */}
         <div className="flex items-center gap-2 pr-3 border-border shrink-0">
@@ -169,7 +169,7 @@ export function PlaybackPanel({
         </Button>
       </div>
 
-      {/* ── Bottom Row (Controls & Timeline) ──────────────────────────────── */}
+      {/* â”€â”€ Bottom Row (Controls & Timeline) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className="flex-1 flex flex-col justify-between">
         <div className="flex items-center px-4 py-3 gap-4">
           
@@ -267,7 +267,7 @@ export function PlaybackPanel({
         </div>
       </div>
 
-      {/* ── Vehicle Selection Dialog ───────────────────────────────────────── */}
+      {/* â”€â”€ Vehicle Selection Dialog â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <Dialog
         open={isVehicleDialogOpen}
         onOpenChange={(open) => {

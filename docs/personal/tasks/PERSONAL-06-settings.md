@@ -1,8 +1,8 @@
-# BINAGO Personal — PERSONAL-06
+# ADATRACK Personal â€” PERSONAL-06
 
 ## Settings
 
-**Scope:** Frontend BINAGO Personal  
+**Scope:** Frontend ADATRACK Personal  
 **Data:** Dummy/Mock  
 **Bahasa dokumentasi:** Indonesia
 
@@ -10,7 +10,7 @@
 
 # 1. Tujuan
 
-Membangun halaman Pengaturan BINAGO Personal.
+Membangun halaman Pengaturan ADATRACK Personal.
 
 Pengaturan merupakan primary navigation:
 
@@ -26,11 +26,11 @@ Menu:
 
 ```text
 Pengaturan
-├── Kendaraan Saya
-├── Perangkat GPS
-├── Akun
-├── Bantuan
-└── Tentang Aplikasi
+â”œâ”€â”€ Kendaraan Saya
+â”œâ”€â”€ Perangkat GPS
+â”œâ”€â”€ Akun
+â”œâ”€â”€ Bantuan
+â””â”€â”€ Tentang Aplikasi
 ```
 
 Notifikasi dan Geofence memiliki task khusus dan tidak diimplementasikan sebagai feature penuh pada task ini.
@@ -87,7 +87,7 @@ Sediakan halaman sederhana untuk:
 - Bantuan
 - FAQ jika diperlukan
 - versi aplikasi
-- informasi BINAGO Personal
+- informasi ADATRACK Personal
 
 ---
 

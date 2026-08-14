@@ -1,4 +1,4 @@
-import { Locale } from '@binago/types';
+import { Locale } from '@adatrack/types';
 
 export const dictionaries = {
   id: {
@@ -13,8 +13,8 @@ export const dictionaries = {
       saved: 'Berhasil disimpan.',
       deleted: 'Berhasil dihapus.',
     },
-    appName: 'BINAGO Personal',
-    welcome: 'Selamat Datang di BINAGO Personal',
+    appName: 'ADATRACK Personal',
+    welcome: 'Selamat Datang di ADATRACK Personal',
 
     // Navigation Labels
     nav: {
@@ -305,8 +305,8 @@ export const dictionaries = {
       saved: 'Saved successfully.',
       deleted: 'Deleted successfully.',
     },
-    appName: 'BINAGO Personal',
-    welcome: 'Welcome to BINAGO Personal',
+    appName: 'ADATRACK Personal',
+    welcome: 'Welcome to ADATRACK Personal',
 
     // Navigation Labels
     nav: {

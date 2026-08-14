@@ -1,8 +1,8 @@
-# BINAGO Personal — PERSONAL-01
+# ADATRACK Personal â€” PERSONAL-01
 
 ## Personal Shell & Navigation
 
-**Scope:** Frontend BINAGO Personal  
+**Scope:** Frontend ADATRACK Personal  
 **Data:** Dummy/Mock  
 **Bahasa dokumentasi:** Indonesia
 
@@ -10,7 +10,7 @@
 
 # 1. Tujuan
 
-Membangun Application Shell khusus BINAGO Personal yang mobile-first, berbeda dari Shell BINAGO Business, dan menjadi fondasi seluruh halaman Personal.
+Membangun Application Shell khusus ADATRACK Personal yang mobile-first, berbeda dari Shell ADATRACK Business, dan menjadi fondasi seluruh halaman Personal.
 
 Shell harus mendukung:
 
@@ -32,7 +32,7 @@ Task ini hanya mengerjakan Personal Shell dan navigation.
 Sebelum bekerja:
 
 1. Baca `AGENTS.md`.
-2. Baca `docs/binago-personal.md`.
+2. Baca `docs/adatrack-personal.md`.
 3. Baca dokumentasi project yang relevan.
 4. Periksa implementasi `apps/personal` yang sudah ada.
 5. Periksa component generic yang tersedia di `packages/ui`.
@@ -59,7 +59,7 @@ Sebelum bekerja:
 
 # 4. Navigation
 
-BINAGO Personal memiliki tiga primary navigation:
+ADATRACK Personal memiliki tiga primary navigation:
 
 1. Pemantauan
 2. Statistik
@@ -70,13 +70,13 @@ BINAGO Personal memiliki tiga primary navigation:
 Gunakan Bottom Navigation.
 
 ```text
-┌─────────────────────────────────┐
-│                                 │
-│          CONTENT AREA           │
-│                                 │
-├─────────────────────────────────┤
-│ Pemantauan  Statistik  Pengaturan│
-└─────────────────────────────────┘
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚                                 â”‚
+â”‚          CONTENT AREA           â”‚
+â”‚                                 â”‚
+â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
+â”‚ Pemantauan  Statistik  Pengaturanâ”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
 ```
 
 ## Desktop
@@ -84,11 +84,11 @@ Gunakan Bottom Navigation.
 Gunakan Top Navigation.
 
 ```text
-┌──────────────────────────────────────────────┐
-│ BINAGO Personal                              │
-│                                              │
-│ Pemantauan    Statistik    Pengaturan       │
-└──────────────────────────────────────────────┘
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚ ADATRACK Personal                              â”‚
+â”‚                                              â”‚
+â”‚ Pemantauan    Statistik    Pengaturan       â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
 ```
 
 Jangan menggunakan Sidebar Business sebagai navigation utama Personal.
@@ -97,7 +97,7 @@ Jangan menggunakan Sidebar Business sebagai navigation utama Personal.
 
 # 5. Component Architecture
 
-Gunakan component generic dari `@binago/ui` jika tersedia.
+Gunakan component generic dari `@adatrack/ui` jika tersedia.
 
 Component khusus Personal berada di:
 

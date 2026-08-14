@@ -1,8 +1,8 @@
-# BINAGO — AGENTS.md
+# ADATRACK â€” AGENTS.md
 
 ## AI Development Instructions
 
-Dokumen ini adalah **acuan utama Antigravity AI** ketika bekerja pada project BINAGO.
+Dokumen ini adalah **acuan utama Antigravity AI** ketika bekerja pada project ADATRACK.
 
 Antigravity AI **WAJIB membaca file ini sebelum melakukan perubahan apa pun pada project**.
 
@@ -12,9 +12,9 @@ Detail architecture, design system, business rules, UI guidelines, dan requireme
 
 # 1. LOKASI REPOSITORY DAN DOKUMENTASI
 
-`AGENTS.md` berada di root repository BINAGO.
+`AGENTS.md` berada di root repository ADATRACK.
 
-Seluruh dokumentasi resmi project BINAGO berada di:
+Seluruh dokumentasi resmi project ADATRACK berada di:
 
 ```text
 /docs
@@ -23,39 +23,39 @@ Seluruh dokumentasi resmi project BINAGO berada di:
 Struktur utamanya:
 
 ```text
-BINAGO/
-├── AGENTS.md
-│
-└── docs/
-    ├── README.md
-    ├── project-overview.md
-    ├── architecture.md
-    ├── folder-structure.md
-    ├── development-rules.md
-    ├── business-rules.md
-    ├── design-system.md
-    ├── ui-guidelines.md
-    ├── database-design.md
-    ├── api-standard.md
-    ├── coding-standard.md
-    ├── deployment.md
-    ├── task-roadmap.md
-    │
-    └── tasks/
-        ├── TASK-01-foundation.md
-        ├── TASK-02-design-system.md
-        ├── TASK-03-application-shell.md
-        ├── TASK-04-home.md
-        ├── TASK-05-tracking.md
-        ├── TASK-06-vehicles.md
-        ├── TASK-07-drivers.md
-        ├── TASK-08-deliveries.md
-        ├── TASK-09-maintenance.md
-        ├── TASK-10-devices.md
-        ├── TASK-11-geofences.md
-        ├── TASK-12-reports.md
-        ├── TASK-13-administration.md
-        └── TASK-14-production-readiness.md
+ADATRACK/
+â”œâ”€â”€ AGENTS.md
+â”‚
+â””â”€â”€ docs/
+    â”œâ”€â”€ README.md
+    â”œâ”€â”€ project-overview.md
+    â”œâ”€â”€ architecture.md
+    â”œâ”€â”€ folder-structure.md
+    â”œâ”€â”€ development-rules.md
+    â”œâ”€â”€ business-rules.md
+    â”œâ”€â”€ design-system.md
+    â”œâ”€â”€ ui-guidelines.md
+    â”œâ”€â”€ database-design.md
+    â”œâ”€â”€ api-standard.md
+    â”œâ”€â”€ coding-standard.md
+    â”œâ”€â”€ deployment.md
+    â”œâ”€â”€ task-roadmap.md
+    â”‚
+    â””â”€â”€ tasks/
+        â”œâ”€â”€ TASK-01-foundation.md
+        â”œâ”€â”€ TASK-02-design-system.md
+        â”œâ”€â”€ TASK-03-application-shell.md
+        â”œâ”€â”€ TASK-04-home.md
+        â”œâ”€â”€ TASK-05-tracking.md
+        â”œâ”€â”€ TASK-06-vehicles.md
+        â”œâ”€â”€ TASK-07-drivers.md
+        â”œâ”€â”€ TASK-08-deliveries.md
+        â”œâ”€â”€ TASK-09-maintenance.md
+        â”œâ”€â”€ TASK-10-devices.md
+        â”œâ”€â”€ TASK-11-geofences.md
+        â”œâ”€â”€ TASK-12-reports.md
+        â”œâ”€â”€ TASK-13-administration.md
+        â””â”€â”€ TASK-14-production-readiness.md
 ```
 
 ### Aturan lokasi dokumentasi
@@ -74,14 +74,14 @@ BINAGO/
 Nama project:
 
 ```text
-BINAGO
+ADATRACK
 ```
 
-BINAGO memiliki dua application:
+ADATRACK memiliki dua application:
 
 ```text
-BINAGO Business
-BINAGO Personal
+ADATRACK Business
+ADATRACK Personal
 ```
 
 Business dan Personal merupakan application yang terpisah, tetapi dapat menggunakan shared foundation yang memang bersifat reusable.
@@ -129,20 +129,20 @@ Jangan membuat architecture production yang belum diperlukan.
 Istilah resmi adalah **Task**, bukan Fase atau Phase.
 
 ```text
-Task 01 — Foundation
-Task 02 — Design System
-Task 03 — Application Shell
-Task 04 — Home
-Task 05 — Tracking
-Task 06 — Vehicles
-Task 07 — Drivers
-Task 08 — Deliveries
-Task 09 — Maintenance
-Task 10 — Devices
-Task 11 — Geofences
-Task 12 — Reports
-Task 13 — Administration
-Task 14 — Production Readiness
+Task 01 â€” Foundation
+Task 02 â€” Design System
+Task 03 â€” Application Shell
+Task 04 â€” Home
+Task 05 â€” Tracking
+Task 06 â€” Vehicles
+Task 07 â€” Drivers
+Task 08 â€” Deliveries
+Task 09 â€” Maintenance
+Task 10 â€” Devices
+Task 11 â€” Geofences
+Task 12 â€” Reports
+Task 13 â€” Administration
+Task 14 â€” Production Readiness
 ```
 
 Nama Task internal menggunakan English. Label UI menggunakan Bahasa Indonesia.
@@ -155,7 +155,7 @@ AI hanya mengerjakan Task aktif dan tidak otomatis mengerjakan Task berikutnya.
 
 Dokumentasi wajib menggunakan Bahasa Indonesia.
 
-UI BINAGO mendukung:
+UI ADATRACK mendukung:
 
 ```text
 Indonesia
@@ -191,29 +191,29 @@ Contoh:
 
 ```text
 features/
-├── tracking/
-├── vehicles/
-├── drivers/
-├── deliveries/
-├── maintenance/
-├── devices/
-├── geofences/
-├── reports/
-└── administration/
+â”œâ”€â”€ tracking/
+â”œâ”€â”€ vehicles/
+â”œâ”€â”€ drivers/
+â”œâ”€â”€ deliveries/
+â”œâ”€â”€ maintenance/
+â”œâ”€â”€ devices/
+â”œâ”€â”€ geofences/
+â”œâ”€â”€ reports/
+â””â”€â”€ administration/
 ```
 
 Label UI:
 
 ```text
-tracking       → Pemantauan
-vehicles       → Armada
-drivers        → Pengemudi
-deliveries     → Pengiriman
-maintenance    → Perawatan
-devices        → Perangkat
-geofences      → Geofence
-reports        → Laporan
-administration → Administrasi
+tracking       â†’ Pemantauan
+vehicles       â†’ Armada
+drivers        â†’ Pengemudi
+deliveries     â†’ Pengiriman
+maintenance    â†’ Perawatan
+devices        â†’ Perangkat
+geofences      â†’ Geofence
+reports        â†’ Laporan
+administration â†’ Administrasi
 ```
 
 Jangan menggunakan Bahasa Indonesia untuk identifier teknis.
@@ -297,25 +297,25 @@ Setiap Task:
 
 ```text
 Baca AGENTS.md
-↓
+â†“
 Identifikasi Task aktif
-↓
+â†“
 Baca dokumentasi relevan dari /docs
-↓
+â†“
 Baca Task aktif dari /docs/tasks/
-↓
+â†“
 Periksa source code
-↓
+â†“
 Buat implementation plan
-↓
+â†“
 Implementasi
-↓
+â†“
 Validation
-↓
+â†“
 Periksa Definition of Done
-↓
+â†“
 Completion Report
-↓
+â†“
 STOP
 ```
 
@@ -357,7 +357,7 @@ Jangan membuat duplicate generic component.
 
 # 11. DESIGN SYSTEM
 
-Gunakan Design System BINAGO yang telah ditentukan.
+Gunakan Design System ADATRACK yang telah ditentukan.
 
 Jika kebutuhan sudah dapat dipenuhi component existing, gunakan component existing.
 
@@ -367,7 +367,7 @@ Jangan membuat pola UI baru tanpa kebutuhan.
 
 # 12. UI / UX
 
-UI BINAGO harus:
+UI ADATRACK harus:
 
 - modern
 - clean
@@ -414,9 +414,9 @@ Prioritas:
 
 ```text
 Local state
-↓
+â†“
 Feature state
-↓
+â†“
 Shared/global state
 ```
 
@@ -426,7 +426,7 @@ Jangan menggunakan global state jika local/feature state cukup.
 
 # 16. DATATABLE
 
-Gunakan DataTable Foundation BINAGO.
+Gunakan DataTable Foundation ADATRACK.
 
 Kemampuan:
 
@@ -485,9 +485,9 @@ Jika architecture existing benar-benar tidak dapat memenuhi kebutuhan:
 
 ```text
 STOP
-→ jelaskan masalah
-→ jelaskan opsi
-→ minta arahan
+â†’ jelaskan masalah
+â†’ jelaskan opsi
+â†’ minta arahan
 ```
 
 ---

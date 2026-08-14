@@ -1,6 +1,6 @@
 import React from 'react';
 import { Filter, X } from 'lucide-react';
-import { cn } from '@binago/utils';
+import { cn } from '@adatrack/utils';
 import { Badge } from '../Badge';
 
 export interface FilterBarProps extends React.HTMLAttributes<HTMLDivElement> {

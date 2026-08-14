@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Download } from 'lucide-react';
-import { cn } from '@binago/utils';
+import { cn } from '@adatrack/utils';
 import { Button } from '../Button';
 import type { DataTableInstance, RowData } from './types';
 import type { DataTableExportConfig } from './types';

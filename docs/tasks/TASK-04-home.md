@@ -1,7 +1,7 @@
-# BINAGO — Task 04
+# ADATRACK â€” Task 04
 ## Home
 
-**Scope:** Frontend BINAGO  
+**Scope:** Frontend ADATRACK  
 **Data:** Dummy/Mock  
 **Bahasa dokumentasi:** Indonesia
 
@@ -9,7 +9,7 @@
 
 # 1. Tujuan
 
-Halaman Beranda BINAGO Business dengan shortcut/favourite menu, summary dan dummy data sesuai desain yang telah disepakati.
+Halaman Beranda ADATRACK Business dengan shortcut/favourite menu, summary dan dummy data sesuai desain yang telah disepakati.
 
 Task ini hanya mengerjakan scope yang disebutkan dalam dokumen ini dan dokumentasi terkait.
 
@@ -44,7 +44,7 @@ Sebelum bekerja:
 
 # 4. Scope
 
-Halaman Beranda BINAGO Business dengan shortcut/favourite menu, summary dan dummy data sesuai desain yang telah disepakati.
+Halaman Beranda ADATRACK Business dengan shortcut/favourite menu, summary dan dummy data sesuai desain yang telah disepakati.
 
 Requirement detail feature akan ditetapkan secara spesifik di bagian implementasi Task dan harus mengikuti keputusan project yang telah disepakati.
 

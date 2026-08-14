@@ -1,5 +1,5 @@
 import React from 'react';
-import { cn } from '@binago/utils';
+import { cn } from '@adatrack/utils';
 import { Spinner } from '../Spinner';
 
 export interface LoadingStateProps extends React.HTMLAttributes<HTMLDivElement> {

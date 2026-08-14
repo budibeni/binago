@@ -1,12 +1,12 @@
 'use client';
 
 import React from 'react';
-import { MapContainer, MapControls } from '@binago/maps';
-import { cn } from '@binago/utils';
+import { MapContainer, MapControls } from '@adatrack/maps';
+import { cn } from '@adatrack/utils';
 import { Navigation2, Truck } from 'lucide-react';
 import type { TrackingVehicle } from '../types/tracking';
 
-// ─── Dummy Projection Helper ──────────────────────────────────────────────────
+// â”€â”€â”€ Dummy Projection Helper â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Maps Jakarta coordinates to percentage for the dummy map visualization.
 // Bounds roughly cover Jakarta area.
 const JAKARTA_BOUNDS = {
@@ -27,7 +27,7 @@ function projectCoordinates(lat: number, lng: number) {
   return { left: `${x}%`, top: `${y}%` };
 }
 
-// ─── Marker Component ─────────────────────────────────────────────────────────
+// â”€â”€â”€ Marker Component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface MapMarkerProps {
   vehicle: TrackingVehicle;
@@ -88,7 +88,7 @@ function MapMarker({ vehicle, isSelected, onClick }: MapMarkerProps) {
   );
 }
 
-// ─── LiveMap Props ────────────────────────────────────────────────────────────
+// â”€â”€â”€ LiveMap Props â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export interface LiveMapProps {
   vehicles: TrackingVehicle[];
@@ -97,7 +97,7 @@ export interface LiveMapProps {
   className?: string;
 }
 
-// ─── LiveMap Component ────────────────────────────────────────────────────────
+// â”€â”€â”€ LiveMap Component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export function LiveMap({
   vehicles,

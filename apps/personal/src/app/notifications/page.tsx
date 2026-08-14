@@ -2,7 +2,7 @@ import { NotificationCenter } from '@/features/notifications/components/Notifica
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Notifications - BINAGO Personal',
+  title: 'Notifications - ADATRACK Personal',
   description: 'View all your GPS tracking notifications.',
 };
 

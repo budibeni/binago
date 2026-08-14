@@ -2,7 +2,7 @@
 
 import React from 'react';
 import * as RadixTabs from '@radix-ui/react-tabs';
-import { cn } from '@binago/utils';
+import { cn } from '@adatrack/utils';
 
 export const Tabs = RadixTabs.Root;
 

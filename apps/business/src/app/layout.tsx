@@ -4,8 +4,8 @@ import './globals.css';
 import { BusinessShellLayout } from '../components/BusinessShellLayout';
 
 export const metadata: Metadata = {
-  title: 'BINAGO Business',
-  description: 'BINAGO Business — Platform Manajemen Armada dan Logistik',
+  title: 'ADATRACK Business',
+  description: 'ADATRACK Business â€” Platform Manajemen Armada dan Logistik',
 };
 
 export default function RootLayout({
@@ -20,7 +20,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `
               try {
-                if (localStorage.getItem('binago.theme') === 'dark') {
+                if (localStorage.getItem('adatrack.theme') === 'dark') {
                   document.documentElement.classList.add('dark');
                 }
               } catch (e) {}

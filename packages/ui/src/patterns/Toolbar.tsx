@@ -1,5 +1,5 @@
 import React from 'react';
-import { cn } from '@binago/utils';
+import { cn } from '@adatrack/utils';
 import { Button, type ButtonProps } from '../Button';
 
 export interface ToolbarProps extends React.HTMLAttributes<HTMLDivElement> {}

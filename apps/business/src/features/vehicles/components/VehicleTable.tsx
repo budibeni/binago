@@ -2,12 +2,12 @@
 
 import React from 'react';
 import { MoreHorizontal, Eye, Edit2, MapPin, Trash2 } from 'lucide-react';
-import { cn } from '@binago/utils';
+import { cn } from '@adatrack/utils';
 import {
   Badge, Button,
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent,
   DropdownMenuItem, DropdownMenuSeparator,
-} from '@binago/ui';
+} from '@adatrack/ui';
 import {
   useDataTable,
   DataTableHeader,
@@ -20,10 +20,10 @@ import {
   type DataTableFilterConfig,
   type ColumnVisibilityState,
   type SortingState,
-} from '@binago/ui';
+} from '@adatrack/ui';
 import type { Vehicle } from '../types/vehicle';
 
-// ─── Types ───────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface VehicleTableLabels {
   colPlateNumber: string;
@@ -74,7 +74,7 @@ interface VehicleTableProps {
   className?: string;
 }
 
-// ─── Status Badge ─────────────────────────────────────────────────────────────
+// â”€â”€â”€ Status Badge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function getStatusBadge(status: Vehicle['status'], labels: VehicleTableLabels) {
   const map = {
@@ -87,7 +87,7 @@ function getStatusBadge(status: Vehicle['status'], labels: VehicleTableLabels) {
   return <Badge variant={cfg.variant} dot>{cfg.label}</Badge>;
 }
 
-// ─── Column Factory ───────────────────────────────────────────────────────────
+// â”€â”€â”€ Column Factory â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function buildColumns(
   labels: VehicleTableLabels,
@@ -319,7 +319,7 @@ function buildColumns(
   ];
 }
 
-// ─── Default Column Visibility ────────────────────────────────────────────────
+// â”€â”€â”€ Default Column Visibility â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const DEFAULT_COLUMN_VISIBILITY = {
   vehicleCategory: false,
@@ -331,7 +331,7 @@ const DEFAULT_COLUMN_VISIBILITY = {
   registrationExpiry: false,
 };
 
-// ─── Component ───────────────────────────────────────────────────────────────
+// â”€â”€â”€ Component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export function VehicleTable({
   data,
@@ -361,7 +361,7 @@ export function VehicleTable({
   );
 
   const processedData = React.useMemo(() => {
-    let result = [...data];
+    const result = [...data];
     if (sorting.length > 0) {
       const { id, desc } = sorting[0];
       result.sort((a, b) => {
@@ -370,7 +370,9 @@ export function VehicleTable({
         
         // Handle dates
         if (id === 'lastUpdate' || id === 'registrationExpiry') {
+           // eslint-disable-next-line @typescript-eslint/no-explicit-any
            valA = new Date(valA as string).getTime() as any;
+           // eslint-disable-next-line @typescript-eslint/no-explicit-any
            valB = new Date(valB as string).getTime() as any;
         }
 
@@ -395,7 +397,7 @@ export function VehicleTable({
     onPageSizeChange: (s) => { setPageSize(s); setPageIndex(0); },
   };
 
-  // Create the table instance directly — no injection tricks needed
+  // Create the table instance directly â€” no injection tricks needed
   const table = useDataTable<Vehicle>({
     data: processedData,
     columns,
@@ -412,7 +414,7 @@ export function VehicleTable({
 
   return (
     <div className={cn('flex flex-col gap-3', className)}>
-      {/* Toolbar — directly uses table instance, no injection needed */}
+      {/* Toolbar â€” directly uses table instance, no injection needed */}
       <DataTableToolbar
         table={table}
         searchValue={searchValue}
@@ -445,7 +447,7 @@ export function VehicleTable({
           </div>
         </div>
 
-        {/* Filter panel — full height */}
+        {/* Filter panel â€” full height */}
         {isFilterOpen && (
           <div className="w-full lg:w-[280px] shrink-0 self-stretch">
             <DataTableFilterPanel config={filterConfig} className="h-full" />

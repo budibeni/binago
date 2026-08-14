@@ -3,7 +3,7 @@
 import React from 'react';
 import * as RadixSelect from '@radix-ui/react-select';
 import { Check, ChevronDown } from 'lucide-react';
-import { cn } from '@binago/utils';
+import { cn } from '@adatrack/utils';
 
 export const Select = RadixSelect.Root;
 export const SelectValue = RadixSelect.Value;

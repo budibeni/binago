@@ -8,3 +8,4 @@ export * from './EmptyState';
 export * from './LoadingState';
 export * from './SplitView';
 export * from './ResizablePanel';
+export * from './AdatrackLogo';

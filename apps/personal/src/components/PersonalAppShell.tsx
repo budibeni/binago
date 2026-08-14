@@ -3,11 +3,10 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Navigation } from 'lucide-react';
-import { cn } from '@binago/utils';
-import { LanguageToggle, ThemeToggle, UserMenu } from '@binago/ui';
+import { cn } from '@adatrack/utils';
+import { LanguageToggle, ThemeToggle, UserMenu, AdatrackLogo } from '@adatrack/ui';
 import { NotificationPopover } from '../features/notifications/components/NotificationPopover';
-import type { NavItem, UserInfo, Locale } from '@binago/types';
+import type { NavItem, UserInfo, Locale } from '@adatrack/types';
 
 export interface PersonalAppShellProps {
   navigation: NavItem[];
@@ -50,10 +49,8 @@ export function PersonalAppShell({
       <header className="shrink-0 sticky top-0 z-30 flex h-14 w-full items-center justify-between border-b border-border bg-background/95 px-4 shadow-sm backdrop-blur-sm">
         <div className="flex items-center gap-6">
           {/* Brand Logo */}
-          <Link href="/" className="flex items-center font-bold text-lg tracking-tighter hover:opacity-90 transition-opacity" aria-label="BINAGO">
-            <span className="text-foreground">BIN</span>
-            <Navigation className="w-5 h-5 text-red-600 mx-0.5" fill="currentColor" />
-            <span className="text-foreground">GO</span>
+          <Link href="/" className="flex items-center hover:opacity-90 transition-opacity" aria-label="Beranda">
+            <AdatrackLogo className="text-xl" />
           </Link>
 
           {/* Desktop Top Navigation */}

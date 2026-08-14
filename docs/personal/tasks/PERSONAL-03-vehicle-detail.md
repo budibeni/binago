@@ -1,8 +1,8 @@
-# BINAGO Personal — PERSONAL-03
+# ADATRACK Personal â€” PERSONAL-03
 
 ## Vehicle Detail & Trip History
 
-**Scope:** Frontend BINAGO Personal  
+**Scope:** Frontend ADATRACK Personal  
 **Data:** Dummy/Mock  
 **Bahasa dokumentasi:** Indonesia
 
@@ -16,11 +16,11 @@ Flow:
 
 ```text
 Pemantauan
-    ↓
+    â†“
 Pilih Kendaraan
-    ↓
+    â†“
 Vehicle Detail
-    ↓
+    â†“
 Riwayat Perjalanan
 ```
 
@@ -74,9 +74,9 @@ Contoh:
 
 ```text
 Riwayat Perjalanan
-      ↓
+      â†“
 Pilih Perjalanan
-      ↓
+      â†“
 Playback
 ```
 
@@ -86,11 +86,11 @@ Implementasi Playback dikerjakan di PERSONAL-04.
 
 # 5. UI
 
-Gunakan component foundation BINAGO.
+Gunakan component foundation ADATRACK.
 
 Mobile-first.
 
-Detail kendaraan harus mudah dipahami tanpa information density seperti BINAGO Business.
+Detail kendaraan harus mudah dipahami tanpa information density seperti ADATRACK Business.
 
 ---
 

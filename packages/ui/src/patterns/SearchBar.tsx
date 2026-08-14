@@ -1,6 +1,6 @@
 import React from 'react';
 import { Search, X } from 'lucide-react';
-import { cn } from '@binago/utils';
+import { cn } from '@adatrack/utils';
 
 export interface SearchBarProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> {

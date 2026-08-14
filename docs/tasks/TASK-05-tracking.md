@@ -1,8 +1,8 @@
-# BINAGO — Task 05
+# ADATRACK â€” Task 05
 
 ## Tracking
 
-**Scope:** Frontend BINAGO  
+**Scope:** Frontend ADATRACK  
 **Data:** Dummy/Mock  
 **Bahasa dokumentasi:** Indonesia
 
@@ -10,7 +10,7 @@
 
 # 1. Tujuan
 
-Membangun fondasi Halaman Pemantauan BINAGO dengan component yang reusable untuk:
+Membangun fondasi Halaman Pemantauan ADATRACK dengan component yang reusable untuk:
 
 - daftar kendaraan
 - pencarian kendaraan
@@ -55,7 +55,7 @@ Sebelum bekerja:
 - Default UI Indonesia.
 - Gunakan Tailwind CSS.
 - Gunakan reusable component.
-- Gunakan design token BINAGO.
+- Gunakan design token ADATRACK.
 - Gunakan dummy/mock data.
 - Jangan membuat backend/API production.
 - Jangan membuat database production.
@@ -101,15 +101,15 @@ Tracking menggunakan pendekatan:
 
 ```text
 Page / Feature
-    │
-    ├── Data
-    ├── State
-    ├── Event Handler
-    └── Component Composition
-             │
-             ├── VehicleList
-             ├── LiveMap
-             ├── PlaybackPanel
+    â”‚
+    â”œâ”€â”€ Data
+    â”œâ”€â”€ State
+    â”œâ”€â”€ Event Handler
+    â””â”€â”€ Component Composition
+             â”‚
+             â”œâ”€â”€ VehicleList
+             â”œâ”€â”€ LiveMap
+             â”œâ”€â”€ PlaybackPanel
 
 > **BERHENTI.**
 

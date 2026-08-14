@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { MapContainer } from '@binago/maps';
+import { MapContainer } from '@adatrack/maps';
 import { PlaybackData } from '../types';
 
 export interface PlaybackMapProps {

@@ -1,6 +1,6 @@
 import React from 'react';
-import { cn } from '@binago/utils';
-import type { Size } from '@binago/types';
+import { cn } from '@adatrack/utils';
+import type { Size } from '@adatrack/types';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'destructive';

@@ -5,7 +5,7 @@ import { Car } from 'lucide-react';
 import { usePersonalLocale } from '@/components/PersonalShellLayout';
 import { getTranslation } from '@/i18n';
 import { mockVehicles } from '../../tracking/data/mockTrackingData';
-import { cn } from '@binago/utils';
+import { cn } from '@adatrack/utils';
 
 export function VehiclesSection() {
   const locale = usePersonalLocale();

@@ -1,8 +1,8 @@
-# BINAGO Personal — PERSONAL-07
+# ADATRACK Personal â€” PERSONAL-07
 
 ## Geofence & Notification
 
-**Scope:** Frontend BINAGO Personal  
+**Scope:** Frontend ADATRACK Personal  
 **Data:** Dummy/Mock  
 **Bahasa dokumentasi:** Indonesia
 
@@ -16,8 +16,8 @@ Struktur:
 
 ```text
 Pengaturan
-├── Geofence
-└── Notifikasi
+â”œâ”€â”€ Geofence
+â””â”€â”€ Notifikasi
 ```
 
 Keduanya bukan primary navigation.
@@ -174,9 +174,9 @@ COMPLETED
 ## Implementasi
 - Menambahkan mock data latitude dan longitude pada `mockSettingsData.ts`.
 - Menambahkan translasi form Geofence pada `i18n/index.ts`.
-- Refactor `NotificationsSection.tsx` menggunakan komponen `Switch` dari `@binago/ui`.
-- Implementasi penuh `GeofenceSection.tsx` mencakup List, form Tambah/Edit dengan validasi, representasi visual peta menggunakan `MapContainer`, dan Dialog Hapus dari `@binago/ui`. Semua menggunakan local state sesuai arahan dummy/mock data.
-- Memperbarui UI form Tambah/Edit Geofence agar sesuai dengan visual direction BINAGO Personal (mobile-first, bottom-sheet style di mobile, layout input yang lebih lega, penyesuaian tombol dan elemen map).
+- Refactor `NotificationsSection.tsx` menggunakan komponen `Switch` dari `@adatrack/ui`.
+- Implementasi penuh `GeofenceSection.tsx` mencakup List, form Tambah/Edit dengan validasi, representasi visual peta menggunakan `MapContainer`, dan Dialog Hapus dari `@adatrack/ui`. Semua menggunakan local state sesuai arahan dummy/mock data.
+- Memperbarui UI form Tambah/Edit Geofence agar sesuai dengan visual direction ADATRACK Personal (mobile-first, bottom-sheet style di mobile, layout input yang lebih lega, penyesuaian tombol dan elemen map).
 - Melakukan RE-DESIGN pada Geofence List menjadi UI yang lebih compact (Card to List Item), mengubah prioritas action button, merapikan hierarchy header utama (menghapus heading redundant), dan mengubah interaksi (klik item untuk masuk mode edit) sehingga terasa lebih "personal app" alih-alih "admin dashboard".
 
 ## File Dibuat
@@ -189,8 +189,8 @@ COMPLETED
 - `apps/personal/src/i18n/index.ts`
 
 ## Component
-- `@binago/ui`: Switch, Button, Dialog, Input, Label
-- `@binago/maps`: MapContainer
+- `@adatrack/ui`: Switch, Button, Dialog, Input, Label
+- `@adatrack/maps`: MapContainer
 
 ## Dummy Data
 - Memperbarui `GeofenceData` dengan `latitude` dan `longitude`

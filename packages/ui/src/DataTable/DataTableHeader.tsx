@@ -3,7 +3,7 @@
 import React from 'react';
 import { flexRender, type RowData } from '@tanstack/react-table';
 import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
-import { cn } from '@binago/utils';
+import { cn } from '@adatrack/utils';
 import type { DataTableInstance } from './types';
 
 export interface DataTableHeaderProps<TData extends RowData = RowData> {

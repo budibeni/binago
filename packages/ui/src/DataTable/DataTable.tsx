@@ -2,7 +2,7 @@
 
 import React from 'react';
 import type { RowData } from '@tanstack/react-table';
-import { cn } from '@binago/utils';
+import { cn } from '@adatrack/utils';
 import type { DataTableBaseProps } from './types';
 import { useDataTable } from './useDataTable';
 import { useInfiniteScroll } from './useInfiniteScroll';

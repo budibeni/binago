@@ -3,7 +3,7 @@
 import React from 'react';
 import * as RadixCheckbox from '@radix-ui/react-checkbox';
 import { Check } from 'lucide-react';
-import { cn } from '@binago/utils';
+import { cn } from '@adatrack/utils';
 
 export interface CheckboxProps
   extends React.ComponentPropsWithoutRef<typeof RadixCheckbox.Root> {

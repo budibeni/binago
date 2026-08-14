@@ -2,7 +2,7 @@
 
 import React from 'react';
 import type { RowData } from '@tanstack/react-table';
-import type { FetchState } from '@binago/types';
+import type { FetchState } from '@adatrack/types';
 import { DataTableRow } from './DataTableRow';
 import { Skeleton } from '../Skeleton';
 import { EmptyState } from '../patterns/EmptyState';

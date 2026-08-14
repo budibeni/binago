@@ -1,4 +1,4 @@
-# BINAGO — Business Rules
+# ADATRACK â€” Business Rules
 
 ## 1. Prinsip
 
@@ -8,7 +8,7 @@ Rule yang belum ditentukan harus dikonsultasikan.
 
 ## 2. Application Separation
 
-BINAGO Business dan BINAGO Personal adalah application terpisah.
+ADATRACK Business dan ADATRACK Personal adalah application terpisah.
 
 ## 3. Frontend Scope
 

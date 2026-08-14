@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { HelpCircle, ChevronDown } from 'lucide-react';
 import { usePersonalLocale } from '@/components/PersonalShellLayout';
 import { getTranslation } from '@/i18n';
-import { cn } from '@binago/utils';
+import { cn } from '@adatrack/utils';
 
 export function HelpSection() {
   const locale = usePersonalLocale();

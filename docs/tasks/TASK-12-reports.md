@@ -1,7 +1,7 @@
-# BINAGO — Task 12
+# ADATRACK â€” Task 12
 ## Reports
 
-**Scope:** Frontend BINAGO  
+**Scope:** Frontend ADATRACK  
 **Data:** Dummy/Mock  
 **Bahasa dokumentasi:** Indonesia
 

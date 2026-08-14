@@ -3,7 +3,7 @@
 import React from 'react';
 import * as RadixDialog from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
-import { cn } from '@binago/utils';
+import { cn } from '@adatrack/utils';
 
 export interface DialogProps {
   open: boolean;

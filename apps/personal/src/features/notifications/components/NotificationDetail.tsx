@@ -6,7 +6,7 @@ import { ArrowLeft, CarFront, BellRing, Navigation2, LogOut, PowerOff, ShieldChe
 import { useNotifications } from '../context/NotificationContext';
 import { usePersonalLocale } from '@/components/PersonalShellLayout';
 import { getTranslation } from '@/i18n';
-import { Button, EmptyState } from '@binago/ui';
+import { Button, EmptyState } from '@adatrack/ui';
 import { NotificationType } from '../types';
 import { mockVehicles } from '@/features/tracking/data/mockTrackingData';
 

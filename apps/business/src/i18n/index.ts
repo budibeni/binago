@@ -1,9 +1,9 @@
-import { Locale } from '@binago/types';
+import { Locale } from '@adatrack/types';
 
 export const dictionaries = {
   id: {
-    appName: 'BINAGO Business',
-    welcome: 'Selamat Datang di BINAGO Business',
+    appName: 'ADATRACK Business',
+    welcome: 'Selamat Datang di ADATRACK Business',
 
     // Navigation Labels
     nav: {
@@ -107,7 +107,7 @@ export const dictionaries = {
       viewVideo: 'Video',
       noDriver: 'Tanpa Driver',
       speedUnit: 'km/jam',
-      groupSummary: (groups: number, vehicles: number) => `${groups} grup · ${vehicles} kendaraan`,
+      groupSummary: (groups: number, vehicles: number) => `${groups} grup Â· ${vehicles} kendaraan`,
       andMore: 'dan seterusnya',
       modeLive: 'Live',
       modePlayback: 'Playback',
@@ -132,7 +132,7 @@ export const dictionaries = {
       pageSubtitle: 'Kelola data kendaraan, grup, dan status armada Anda.',
       addVehicle: 'Tambah Kendaraan',
       searchPlaceholder: 'Cari plat nomor, kendaraan, atau pengemudi...',
-      exportFilename: 'armada-binago',
+      exportFilename: 'armada-adatrack',
       filterStatus: 'Status',
       filterGroup: 'Grup',
       filterCategory: 'Kategori',
@@ -180,8 +180,8 @@ export const dictionaries = {
     },
   },
   en: {
-    appName: 'BINAGO Business',
-    welcome: 'Welcome to BINAGO Business',
+    appName: 'ADATRACK Business',
+    welcome: 'Welcome to ADATRACK Business',
 
     // Navigation Labels
     nav: {
@@ -285,7 +285,7 @@ export const dictionaries = {
       viewVideo: 'Video',
       noDriver: 'No Driver',
       speedUnit: 'km/h',
-      groupSummary: (groups: number, vehicles: number) => `${groups} groups · ${vehicles} vehicles`,
+      groupSummary: (groups: number, vehicles: number) => `${groups} groups Â· ${vehicles} vehicles`,
       andMore: 'and more',
       modeLive: 'Live',
       modePlayback: 'Playback',
@@ -310,7 +310,7 @@ export const dictionaries = {
       pageSubtitle: 'Manage your fleet vehicle data, groups, and status.',
       addVehicle: 'Add Vehicle',
       searchPlaceholder: 'Search plate, vehicle, or driver...',
-      exportFilename: 'fleet-binago',
+      exportFilename: 'fleet-adatrack',
       filterStatus: 'Status',
       filterGroup: 'Group',
       filterCategory: 'Category',

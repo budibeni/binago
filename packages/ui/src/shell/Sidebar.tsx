@@ -2,9 +2,10 @@
 
 import React from 'react';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
-import { cn } from '@binago/utils';
+import { cn } from '@adatrack/utils';
 import { Badge } from '../Badge';
-import type { NavGroup, NavItem } from '@binago/types';
+import { AdatrackLogo } from '../patterns';
+import type { NavGroup, NavItem } from '@adatrack/types';
 
 export interface SidebarProps {
   brandName?: string;
@@ -21,7 +22,7 @@ export interface SidebarProps {
 }
 
 export function Sidebar({
-  brandName = 'BINAGO',
+  brandName = 'ADATRACK',
   brandLogo,
   navigation,
   bottomNavigation = [],
@@ -114,7 +115,7 @@ export function Sidebar({
 
   const sidebarContent = (
     <div className="flex h-full flex-col">
-      {/* ── Brand Header ── */}
+      {/* â”€â”€ Brand Header â”€â”€ */}
       <div
         className={cn(
           'relative flex h-[52px] shrink-0 items-center border-b border-border',
@@ -135,16 +136,11 @@ export function Sidebar({
             </button>
           ) : brandLogo ? (
             brandLogo
+          ) : brandName === 'ADATRACK' ? (
+            <AdatrackLogo className="text-[26px]" />
           ) : (
             <span className="font-extrabold tracking-tight text-3xl">
-              {brandName === 'BINAGO' ? (
-                <>
-                  <span className="text-foreground">BINA</span>
-                  <span className="text-red-600">GO</span>
-                </>
-              ) : (
-                <span className="text-foreground">{brandName}</span>
-              )}
+              <span className="text-foreground">{brandName}</span>
             </span>
           )}
         </div>
@@ -173,7 +169,7 @@ export function Sidebar({
         )}
       </div>
 
-      {/* ── Navigation (scrollable) ── */}
+      {/* â”€â”€ Navigation (scrollable) â”€â”€ */}
       <nav
         className="flex-1 min-h-0 overflow-y-auto py-3 px-2.5 space-y-3"
         aria-label="Navigasi utama"
@@ -190,7 +186,7 @@ export function Sidebar({
         ))}
       </nav>
 
-      {/* ── Footer (fixed, not scrollable) ── */}
+      {/* â”€â”€ Footer (fixed, not scrollable) â”€â”€ */}
       {bottomNavigation.length > 0 && (
         <div className="shrink-0 border-t border-border">
           <div className="px-2.5 py-2">

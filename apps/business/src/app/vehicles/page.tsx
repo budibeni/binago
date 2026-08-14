@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { VehiclesFeature } from '../../features/vehicles/VehiclesFeature';
 
 export const metadata: Metadata = {
-  title: 'Armada — BINAGO Business',
+  title: 'Armada â€” ADATRACK Business',
   description: 'Kelola armada kendaraan, grup, dan operasional bisnis Anda.',
 };
 

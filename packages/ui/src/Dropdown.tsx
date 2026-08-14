@@ -3,7 +3,7 @@
 import React from 'react';
 import * as RadixDropdownMenu from '@radix-ui/react-dropdown-menu';
 import { Check, ChevronRight, Circle } from 'lucide-react';
-import { cn } from '@binago/utils';
+import { cn } from '@adatrack/utils';
 
 export const DropdownMenu = RadixDropdownMenu.Root;
 export const DropdownMenuTrigger = RadixDropdownMenu.Trigger;

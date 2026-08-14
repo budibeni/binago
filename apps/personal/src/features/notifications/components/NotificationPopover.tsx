@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Bell, Check } from 'lucide-react';
-import { Popover, PopoverContent, PopoverTrigger } from '@binago/ui';
+import { Popover, PopoverContent, PopoverTrigger } from '@adatrack/ui';
 import { useNotifications } from '../context/NotificationContext';
 import { usePersonalLocale } from '@/components/PersonalShellLayout';
 import { getTranslation } from '@/i18n';
 import { NotificationItem } from './NotificationItem';
 import { useRouter } from 'next/navigation';
-import { cn } from '@binago/utils';
+import { cn } from '@adatrack/utils';
 
 export function NotificationPopover() {
   const { notifications, unreadCount, markAllAsRead } = useNotifications();

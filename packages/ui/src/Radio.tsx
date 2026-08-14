@@ -3,7 +3,7 @@
 import React from 'react';
 import * as RadixRadioGroup from '@radix-ui/react-radio-group';
 import { Circle } from 'lucide-react';
-import { cn } from '@binago/utils';
+import { cn } from '@adatrack/utils';
 
 export interface RadioGroupProps
   extends React.ComponentPropsWithoutRef<typeof RadixRadioGroup.Root> {}

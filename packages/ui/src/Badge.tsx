@@ -1,6 +1,6 @@
 import React from 'react';
-import { cn } from '@binago/utils';
-import type { SemanticVariant } from '@binago/types';
+import { cn } from '@adatrack/utils';
+import type { SemanticVariant } from '@adatrack/types';
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   variant?: 'default' | SemanticVariant;

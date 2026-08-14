@@ -2,13 +2,13 @@
 
 import React from 'react';
 import { Menu } from 'lucide-react';
-import { cn } from '@binago/utils';
+import { cn } from '@adatrack/utils';
 import { Button } from '../Button';
 import { Breadcrumb, type BreadcrumbItem } from './Breadcrumb';
 import { UserMenu } from './UserMenu';
 import { LanguageToggle } from './LanguageToggle';
 import { ThemeToggle } from './ThemeToggle';
-import type { UserInfo, Locale } from '@binago/types';
+import type { UserInfo, Locale } from '@adatrack/types';
 
 export interface HeaderProps {
   breadcrumbItems?: BreadcrumbItem[];

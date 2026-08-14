@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
-import { cn } from '@binago/utils';
+import { cn } from '@adatrack/utils';
 import { Button } from '../Button';
 import type { DataTablePaginationConfig } from './types';
 
@@ -33,7 +33,7 @@ export function DataTablePagination({
   const canPreviousPage = pageIndex > 0;
   const canNextPage = pageIndex < pageCount - 1;
 
-  // Display range: e.g. "1–10 dari 120"
+  // Display range: e.g. "1â€“10 dari 120"
   const from = totalCount === 0 ? 0 : pageIndex * pageSize + 1;
   const to = Math.min((pageIndex + 1) * pageSize, totalCount);
 
@@ -49,7 +49,7 @@ export function DataTablePagination({
       <div className="flex items-center gap-3">
         <span className="shrink-0 text-xs">
           {totalCount > 0
-            ? `${from}–${to} dari ${totalCount.toLocaleString('id-ID')} baris`
+            ? `${from}â€“${to} dari ${totalCount.toLocaleString('id-ID')} baris`
             : 'Tidak ada data'}
         </span>
 

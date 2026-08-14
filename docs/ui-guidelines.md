@@ -1,8 +1,8 @@
-# BINAGO — UI Guidelines
+# ADATRACK â€” UI Guidelines
 
 ## 1. Karakter Visual
 
-BINAGO harus terlihat:
+ADATRACK harus terlihat:
 
 - modern
 - clean
@@ -16,9 +16,9 @@ Gunakan struktur:
 
 ```text
 Application Shell
-├── Sidebar
-├── Header
-└── Content Area
+â”œâ”€â”€ Sidebar
+â”œâ”€â”€ Header
+â””â”€â”€ Content Area
 ```
 
 Detail layout ditentukan pada Task Application Shell.

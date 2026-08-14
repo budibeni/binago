@@ -1,7 +1,7 @@
-# BINAGO — Task 01
+# ADATRACK â€” Task 01
 ## Foundation
 
-**Scope:** Frontend BINAGO  
+**Scope:** Frontend ADATRACK  
 **Data:** Dummy/Mock  
 **Bahasa dokumentasi:** Indonesia
 

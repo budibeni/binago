@@ -2,7 +2,7 @@
 
 import React from 'react';
 import * as RadixPopover from '@radix-ui/react-popover';
-import { cn } from '@binago/utils';
+import { cn } from '@adatrack/utils';
 
 export const Popover = RadixPopover.Root;
 export const PopoverTrigger = RadixPopover.Trigger;

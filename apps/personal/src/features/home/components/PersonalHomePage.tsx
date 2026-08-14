@@ -5,10 +5,10 @@ import { PersonalHeroSection } from './PersonalHeroSection';
 import { PersonalShortcutGrid } from './PersonalShortcutGrid';
 import { usePersonalLocale } from '../../../components/PersonalShellLayout';
 import { getTranslation } from '../../../i18n';
-import { FavoriteManager, FavoriteSectionHeader, FavoriteEmptyState } from '@binago/ui';
+import { FavoriteManager, FavoriteSectionHeader, FavoriteEmptyState } from '@adatrack/ui';
 import { PERSONAL_SHORTCUTS } from '../data/shortcuts';
 
-const STORAGE_KEY = 'binago.personal.favorites';
+const STORAGE_KEY = 'adatrack.personal.favorites';
 const DEFAULT_FAVORITES = ['tracking', 'gpsDevices', 'geofences', 'reports'];
 
 export function PersonalHomePage() {
@@ -53,7 +53,7 @@ export function PersonalHomePage() {
       {/* Hero */}
       <PersonalHeroSection />
 
-      {/* Favorite section header — single "+ Tambah Shortcut" button */}
+      {/* Favorite section header â€” single "+ Tambah Shortcut" button */}
       <FavoriteSectionHeader
         title={h.favoritTitle}
         subtitle={h.favoritSubtitle}
@@ -62,7 +62,7 @@ export function PersonalHomePage() {
         addButtonVariant="accent"
       />
 
-      {/* Shortcut grid or empty state — only rendered after localStorage is read (SSR safe) */}
+      {/* Shortcut grid or empty state â€” only rendered after localStorage is read (SSR safe) */}
       {isLoaded && (
         favorites.length > 0
           ? <PersonalShortcutGrid favorites={favorites} />

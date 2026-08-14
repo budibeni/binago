@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { flexRender, type RowData } from '@tanstack/react-table';
-import { cn } from '@binago/utils';
+import { cn } from '@adatrack/utils';
 import type { DataTableRowInstance } from './types';
 
 export interface DataTableRowProps<TData extends RowData = RowData> {

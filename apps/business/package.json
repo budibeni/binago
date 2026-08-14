@@ -1,5 +1,5 @@
 {
-  "name": "@binago/business",
+  "name": "@adatrack/business",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -10,11 +10,12 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@binago/ui": "workspace:*",
-    "@binago/utils": "workspace:*",
-    "@binago/types": "workspace:*",
-    "@binago/design-system": "workspace:*",
-    "@binago/maps": "workspace:*",
+    "@adatrack/design-system": "workspace:*",
+    "@adatrack/maps": "workspace:*",
+    "@adatrack/types": "workspace:*",
+    "@adatrack/ui": "workspace:*",
+    "@adatrack/utils": "workspace:*",
+    "@tanstack/react-table": "^9.1.2",
     "lucide-react": "^1.31.0",
     "next": "^14.1.0",
     "react": "^18.2.0",

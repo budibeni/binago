@@ -1,4 +1,4 @@
-# BINAGO — Coding Standard
+# ADATRACK â€” Coding Standard
 
 ## 1. Language
 
@@ -17,10 +17,10 @@ Component harus memiliki API yang jelas dan tidak memiliki business logic jika b
 ## 4. Naming
 
 ```text
-PascalCase → component/type
-camelCase → variable/function
-UPPER_SNAKE_CASE → constant tertentu jika sesuai kebutuhan
-kebab-case → file/route yang memang mengikuti convention
+PascalCase â†’ component/type
+camelCase â†’ variable/function
+UPPER_SNAKE_CASE â†’ constant tertentu jika sesuai kebutuhan
+kebab-case â†’ file/route yang memang mengikuti convention
 ```
 
 ## 5. Styling

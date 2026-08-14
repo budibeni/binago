@@ -1,11 +1,11 @@
 'use client';
 
 import React from 'react';
-import { cn } from '@binago/utils';
+import { cn } from '@adatrack/utils';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import type { BreadcrumbItem } from './Breadcrumb';
-import type { NavGroup, NavItem, UserInfo, Locale } from '@binago/types';
+import type { NavGroup, NavItem, UserInfo, Locale } from '@adatrack/types';
 
 export interface AppShellProps {
   brandName?: string;
@@ -35,7 +35,7 @@ export interface AppShellProps {
 }
 
 export function AppShell({
-  brandName = 'BINAGO',
+  brandName = 'ADATRACK',
   brandLogo,
   navigation,
   bottomNavigation = [],
@@ -93,7 +93,7 @@ export function AppShell({
           rightSlot={headerRightSlot}
         />
 
-        {/* Content Area — pages control their own padding/max-width */}
+        {/* Content Area â€” pages control their own padding/max-width */}
         <main className="flex-1 overflow-y-auto bg-surface">
           {children}
         </main>

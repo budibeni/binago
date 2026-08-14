@@ -1,6 +1,6 @@
-# BINAGO — Dokumentasi Project
+# ADATRACK â€” Dokumentasi Project
 
-Folder `/docs` berisi seluruh dokumentasi resmi project BINAGO.
+Folder `/docs` berisi seluruh dokumentasi resmi project ADATRACK.
 
 ## Urutan membaca
 
@@ -8,11 +8,11 @@ Untuk Antigravity AI:
 
 ```text
 /AGENTS.md
-↓
+â†“
 /docs/README.md
-↓
+â†“
 Dokumentasi yang relevan
-↓
+â†“
 /docs/tasks/TASK-XX-*.md
 ```
 
@@ -68,7 +68,7 @@ TASK-14-production-readiness.md
 - Dokumentasi menggunakan Bahasa Indonesia.
 - Identifier teknis menggunakan English.
 - Label UI default menggunakan Bahasa Indonesia.
-- BINAGO Business dan BINAGO Personal adalah application terpisah.
+- ADATRACK Business dan ADATRACK Personal adalah application terpisah.
 - Scope saat ini berfokus pada frontend.
 - Data yang digunakan adalah dummy/mock data.
 - Jangan membuat production backend, database, API, GPS engine, atau integrasi perangkat nyata pada scope frontend saat ini.

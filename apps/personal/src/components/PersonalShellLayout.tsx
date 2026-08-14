@@ -6,7 +6,7 @@ import {
   Activity,
   Settings,
 } from 'lucide-react';
-import type { NavItem, UserInfo, Locale } from '@binago/types';
+import type { NavItem, UserInfo, Locale } from '@adatrack/types';
 import { getTranslation } from '../i18n';
 import { PersonalAppShell } from './PersonalAppShell';
 import { NotificationProvider } from '../features/notifications/context/NotificationContext';
@@ -39,7 +39,7 @@ export function PersonalShellLayout({ children }: { children: React.ReactNode })
 
   React.useEffect(() => {
     try {
-      const savedTheme = localStorage.getItem('binago.theme') as 'light' | 'dark';
+      const savedTheme = localStorage.getItem('adatrack.theme') as 'light' | 'dark';
       if (savedTheme) {
         setTheme(savedTheme);
         if (savedTheme === 'dark') document.documentElement.classList.add('dark');
@@ -53,7 +53,7 @@ export function PersonalShellLayout({ children }: { children: React.ReactNode })
   const handleThemeChange = React.useCallback((newTheme: 'light' | 'dark') => {
     setTheme(newTheme);
     try {
-      localStorage.setItem('binago.theme', newTheme);
+      localStorage.setItem('adatrack.theme', newTheme);
       if (newTheme === 'dark') document.documentElement.classList.add('dark');
       else document.documentElement.classList.remove('dark');
     } catch (e) {

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { cn } from '@binago/utils';
+import { cn } from '@adatrack/utils';
 import { MapPin } from 'lucide-react';
 
 export interface MapCoordinates {
@@ -44,7 +44,7 @@ export const MapContainer = React.forwardRef<HTMLDivElement, MapContainerProps>(
       controlsSlot,
       toolbarSlot,
       overlaySlot,
-      placeholderText = 'Map Provider Placeholder (BINAGO Maps Foundation)',
+      placeholderText = 'Map Provider Placeholder (ADATRACK Maps Foundation)',
       children,
       ...props
     },

@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Bell, CheckCircle2 } from 'lucide-react';
 import { usePersonalLocale } from '@/components/PersonalShellLayout';
 import { getTranslation } from '@/i18n';
-import { Switch } from '@binago/ui';
+import { Switch } from '@adatrack/ui';
 import { useNotifications } from '../../notifications/context/NotificationContext';
 
 interface NotificationSetting {

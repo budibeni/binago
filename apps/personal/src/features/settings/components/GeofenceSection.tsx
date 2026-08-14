@@ -5,9 +5,9 @@ import { ShieldAlert, Plus, CheckCircle2 } from 'lucide-react';
 import { usePersonalLocale } from '@/components/PersonalShellLayout';
 import { getTranslation } from '@/i18n';
 import { mockGeofences, GeofenceData } from '../data/mockSettingsData';
-import { cn } from '@binago/utils';
-import { Switch, Button, Dialog, Input, Label } from '@binago/ui';
-import { MapContainer } from '@binago/maps';
+import { cn } from '@adatrack/utils';
+import { Switch, Button, Dialog, Input, Label } from '@adatrack/ui';
+import { MapContainer } from '@adatrack/maps';
 import { EmptyState } from '@/components/EmptyState';
 
 // --- Inline feedback hook ---
@@ -170,7 +170,7 @@ export function GeofenceSection() {
                   checked={geo.status === 'active'}
                   onCheckedChange={(checked) => handleToggleStatus(geo.id, checked)}
                   className="data-[state=checked]:bg-green-500"
-                  aria-label={`${geo.name} — ${geo.status === 'active' ? s.active : s.inactive}`}
+                  aria-label={`${geo.name} â€” ${geo.status === 'active' ? s.active : s.inactive}`}
                 />
                 <span className={cn(
                   "text-xs font-semibold",

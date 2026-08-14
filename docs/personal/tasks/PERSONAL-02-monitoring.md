@@ -1,8 +1,8 @@
-# BINAGO Personal — PERSONAL-02
+# ADATRACK Personal â€” PERSONAL-02
 
 ## Monitoring
 
-**Scope:** Frontend BINAGO Personal  
+**Scope:** Frontend ADATRACK Personal  
 **Data:** Dummy/Mock  
 **Bahasa dokumentasi:** Indonesia
 
@@ -10,7 +10,7 @@
 
 # 1. Tujuan
 
-Membangun halaman Pemantauan BINAGO Personal sebagai halaman utama setelah login.
+Membangun halaman Pemantauan ADATRACK Personal sebagai halaman utama setelah login.
 
 Fokus:
 
@@ -24,8 +24,8 @@ Struktur utama:
 
 ```text
 Pemantauan
-├── VehicleList
-└── LiveMap
+â”œâ”€â”€ VehicleList
+â””â”€â”€ LiveMap
 ```
 
 Tidak membuat Playback atau Heatmap pada task ini.
@@ -35,7 +35,7 @@ Tidak membuat Playback atau Heatmap pada task ini.
 # 2. Prasyarat
 
 1. Baca `AGENTS.md`.
-2. Baca `docs/binago-personal.md`.
+2. Baca `docs/adatrack-personal.md`.
 3. Baca PERSONAL-01.
 4. Periksa source code Personal.
 5. Gunakan component yang sudah tersedia.
@@ -90,7 +90,7 @@ Menampilkan:
 - map controls
 - informasi singkat jika diperlukan
 
-Map menggunakan foundation `@binago/maps` jika sesuai.
+Map menggunakan foundation `@adatrack/maps` jika sesuai.
 
 ---
 
@@ -98,21 +98,21 @@ Map menggunakan foundation `@binago/maps` jika sesuai.
 
 ```text
 Monitoring Page
-      │
-      ├── vehicles
-      ├── selectedVehicleId
-      ├── filter
-      └── search
-             │
-             ↓
+      â”‚
+      â”œâ”€â”€ vehicles
+      â”œâ”€â”€ selectedVehicleId
+      â”œâ”€â”€ filter
+      â””â”€â”€ search
+             â”‚
+             â†“
         VehicleList
-             │
+             â”‚
        onVehicleSelect()
-             │
-             ↓
+             â”‚
+             â†“
         Monitoring Page
-             │
-             ↓
+             â”‚
+             â†“
           LiveMap
 ```
 
@@ -134,9 +134,9 @@ Bottom Navigation
 Tablet/Desktop dapat menggunakan layout dua area:
 
 ```text
-┌──────────────┬──────────────────────┐
-│ Vehicle List │      Live Map        │
-└──────────────┴──────────────────────┘
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚ Vehicle List â”‚      Live Map        â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
 ```
 
 Composition final mengikuti hasil validasi UX.

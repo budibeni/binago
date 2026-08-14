@@ -1,7 +1,7 @@
-# BINAGO — Task 14
+# ADATRACK â€” Task 14
 ## Production Readiness
 
-**Scope:** Frontend BINAGO  
+**Scope:** Frontend ADATRACK  
 **Data:** Dummy/Mock  
 **Bahasa dokumentasi:** Indonesia
 

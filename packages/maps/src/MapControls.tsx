@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { cn } from '@binago/utils';
+import { cn } from '@adatrack/utils';
 import { Plus, Minus, RotateCcw, Layers } from 'lucide-react';
 
 export interface MapControlsProps extends React.HTMLAttributes<HTMLDivElement> {

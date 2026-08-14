@@ -26,21 +26,24 @@ importers:
 
   apps/business:
     dependencies:
-      '@binago/design-system':
+      '@adatrack/design-system':
         specifier: workspace:*
         version: link:../../packages/design-system
-      '@binago/maps':
+      '@adatrack/maps':
         specifier: workspace:*
         version: link:../../packages/maps
-      '@binago/types':
+      '@adatrack/types':
         specifier: workspace:*
         version: link:../../packages/types
-      '@binago/ui':
+      '@adatrack/ui':
         specifier: workspace:*
         version: link:../../packages/ui
-      '@binago/utils':
+      '@adatrack/utils':
         specifier: workspace:*
         version: link:../../packages/utils
+      '@tanstack/react-table':
+        specifier: ^9.1.2
+        version: 9.1.2(react-dom@18.3.1)(react@18.3.1)
       lucide-react:
         specifier: ^1.31.0
         version: 1.31.0(react@18.3.1)
@@ -84,16 +87,19 @@ importers:
 
   apps/personal:
     dependencies:
-      '@binago/design-system':
+      '@adatrack/design-system':
         specifier: workspace:*
         version: link:../../packages/design-system
-      '@binago/types':
+      '@adatrack/maps':
+        specifier: workspace:*
+        version: link:../../packages/maps
+      '@adatrack/types':
         specifier: workspace:*
         version: link:../../packages/types
-      '@binago/ui':
+      '@adatrack/ui':
         specifier: workspace:*
         version: link:../../packages/ui
-      '@binago/utils':
+      '@adatrack/utils':
         specifier: workspace:*
         version: link:../../packages/utils
       lucide-react:
@@ -152,10 +158,10 @@ importers:
 
   packages/maps:
     dependencies:
-      '@binago/types':
+      '@adatrack/types':
         specifier: workspace:*
         version: link:../types
-      '@binago/utils':
+      '@adatrack/utils':
         specifier: workspace:*
         version: link:../utils
       lucide-react:
@@ -189,10 +195,10 @@ importers:
 
   packages/ui:
     dependencies:
-      '@binago/types':
+      '@adatrack/types':
         specifier: workspace:*
         version: link:../types
-      '@binago/utils':
+      '@adatrack/utils':
         specifier: workspace:*
         version: link:../utils
       '@radix-ui/react-checkbox':

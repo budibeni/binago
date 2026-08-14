@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { cn } from '@binago/utils';
+import { cn } from '@adatrack/utils';
 import { LucideIcon, ChevronUp, ChevronDown } from 'lucide-react';
 import { MetricValue } from '../types';
 

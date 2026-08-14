@@ -1,4 +1,4 @@
-# BINAGO — Development Rules
+# ADATRACK â€” Development Rules
 
 ## 1. General
 
@@ -23,7 +23,7 @@ Feature component boleh mengandung logic domain feature.
 Prioritas:
 
 ```text
-local → feature → global
+local â†’ feature â†’ global
 ```
 
 Gunakan global state hanya jika diperlukan.

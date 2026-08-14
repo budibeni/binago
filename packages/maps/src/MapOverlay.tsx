@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { cn } from '@binago/utils';
+import { cn } from '@adatrack/utils';
 import { X } from 'lucide-react';
 
 export interface MapOverlayProps extends React.HTMLAttributes<HTMLDivElement> {

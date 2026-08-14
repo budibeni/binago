@@ -5,7 +5,7 @@ import { Smartphone } from 'lucide-react';
 import { usePersonalLocale } from '@/components/PersonalShellLayout';
 import { getTranslation } from '@/i18n';
 import { mockDevices } from '../data/mockSettingsData';
-import { cn } from '@binago/utils';
+import { cn } from '@adatrack/utils';
 
 export function DevicesSection() {
   const locale = usePersonalLocale();

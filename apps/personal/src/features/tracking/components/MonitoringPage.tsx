@@ -8,7 +8,7 @@ import { LiveMap } from './LiveMap';
 import { PlaybackPage } from './PlaybackPage';
 import { mockVehicles, mockTripsByVehicleId, mockPlaybackData } from '../data/mockTrackingData';
 import { VehicleStatus, Trip } from '../types';
-import { cn } from '@binago/utils';
+import { cn } from '@adatrack/utils';
 
 export function MonitoringPage() {
   const [searchQuery, setSearchQuery] = useState('');

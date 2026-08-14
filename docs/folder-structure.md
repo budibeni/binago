@@ -1,4 +1,4 @@
-# BINAGO — Folder Structure
+# ADATRACK â€” Folder Structure
 
 ## 1. Aturan Penamaan
 
@@ -9,31 +9,31 @@ UI menggunakan Bahasa Indonesia/English melalui i18n.
 ## 2. Struktur Target
 
 ```text
-binago/
-├── apps/
-│   ├── business/
-│   │   └── src/
-│   │       ├── app/
-│   │       ├── components/
-│   │       ├── features/
-│   │       ├── hooks/
-│   │       ├── stores/
-│   │       ├── types/
-│   │       ├── utils/
-│   │       └── config/
-│   │
-│   └── personal/
-│       └── src/
-│
-├── packages/
-│   ├── ui/
-│   ├── design-system/
-│   ├── maps/
-│   ├── icons/
-│   ├── utils/
-│   └── types/
-│
-└── docs/
+adatrack/
+â”œâ”€â”€ apps/
+â”‚   â”œâ”€â”€ business/
+â”‚   â”‚   â””â”€â”€ src/
+â”‚   â”‚       â”œâ”€â”€ app/
+â”‚   â”‚       â”œâ”€â”€ components/
+â”‚   â”‚       â”œâ”€â”€ features/
+â”‚   â”‚       â”œâ”€â”€ hooks/
+â”‚   â”‚       â”œâ”€â”€ stores/
+â”‚   â”‚       â”œâ”€â”€ types/
+â”‚   â”‚       â”œâ”€â”€ utils/
+â”‚   â”‚       â””â”€â”€ config/
+â”‚   â”‚
+â”‚   â””â”€â”€ personal/
+â”‚       â””â”€â”€ src/
+â”‚
+â”œâ”€â”€ packages/
+â”‚   â”œâ”€â”€ ui/
+â”‚   â”œâ”€â”€ design-system/
+â”‚   â”œâ”€â”€ maps/
+â”‚   â”œâ”€â”€ icons/
+â”‚   â”œâ”€â”€ utils/
+â”‚   â””â”€â”€ types/
+â”‚
+â””â”€â”€ docs/
 ```
 
 ## 3. Feature Naming
@@ -57,15 +57,15 @@ administration
 Gunakan translation key:
 
 ```text
-tracking → Pemantauan
-vehicles → Armada
-drivers → Pengemudi
-deliveries → Pengiriman
-maintenance → Perawatan
-devices → Perangkat
-geofences → Geofence
-reports → Laporan
-administration → Administrasi
+tracking â†’ Pemantauan
+vehicles â†’ Armada
+drivers â†’ Pengemudi
+deliveries â†’ Pengiriman
+maintenance â†’ Perawatan
+devices â†’ Perangkat
+geofences â†’ Geofence
+reports â†’ Laporan
+administration â†’ Administrasi
 ```
 
 ## 5. Prinsip

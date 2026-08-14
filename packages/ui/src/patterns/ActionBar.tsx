@@ -1,5 +1,5 @@
 import React from 'react';
-import { cn } from '@binago/utils';
+import { cn } from '@adatrack/utils';
 
 export interface ActionBarProps extends React.HTMLAttributes<HTMLDivElement> {
   leftActions?: React.ReactNode;

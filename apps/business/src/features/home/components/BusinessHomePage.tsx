@@ -5,10 +5,10 @@ import { BusinessHeroSection } from './BusinessHeroSection';
 import { HomeShortcutGrid } from './HomeShortcutGrid';
 import { useBusinessLocale } from '../../../components/BusinessShellLayout';
 import { getTranslation } from '../../../i18n';
-import { FavoriteManager, FavoriteSectionHeader, FavoriteEmptyState } from '@binago/ui';
+import { FavoriteManager, FavoriteSectionHeader, FavoriteEmptyState } from '@adatrack/ui';
 import { BUSINESS_SHORTCUTS } from '../data/shortcuts';
 
-const STORAGE_KEY = 'binago.business.favorites';
+const STORAGE_KEY = 'adatrack.business.favorites';
 const DEFAULT_FAVORITES = ['tracking', 'vehicles', 'drivers', 'deliveries', 'maintenance', 'gpsDevices'];
 
 export function BusinessHomePage() {
@@ -53,7 +53,7 @@ export function BusinessHomePage() {
       {/* Hero */}
       <BusinessHeroSection />
 
-      {/* Favorite section header — single "+ Tambah Shortcut" button */}
+      {/* Favorite section header â€” single "+ Tambah Shortcut" button */}
       <FavoriteSectionHeader
         title={h.favoritTitle}
         subtitle={h.favoritSubtitle}
@@ -62,7 +62,7 @@ export function BusinessHomePage() {
         addButtonVariant="accent"
       />
 
-      {/* Shortcut grid or empty state — only rendered after localStorage is read (SSR safe) */}
+      {/* Shortcut grid or empty state â€” only rendered after localStorage is read (SSR safe) */}
       {isLoaded && (
         favorites.length > 0
           ? <HomeShortcutGrid favorites={favorites} />

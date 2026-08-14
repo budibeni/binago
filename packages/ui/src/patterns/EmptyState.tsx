@@ -1,6 +1,6 @@
 import React from 'react';
 import { FileQuestion } from 'lucide-react';
-import { cn } from '@binago/utils';
+import { cn } from '@adatrack/utils';
 
 export interface EmptyStateProps extends React.HTMLAttributes<HTMLDivElement> {
   icon?: React.ElementType;

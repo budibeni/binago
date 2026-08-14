@@ -4,8 +4,8 @@ import './globals.css';
 import { PersonalShellLayout } from '../components/PersonalShellLayout';
 
 export const metadata: Metadata = {
-  title: 'BINAGO Personal',
-  description: 'BINAGO Personal — Aplikasi Pelacakan Kendaraan Pribadi',
+  title: 'ADATRACK Personal',
+  description: 'ADATRACK Personal â€” Aplikasi Pelacakan Kendaraan Pribadi',
 };
 
 export default function RootLayout({
@@ -20,7 +20,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `
               try {
-                if (localStorage.getItem('binago.theme') === 'dark') {
+                if (localStorage.getItem('adatrack.theme') === 'dark') {
                   document.documentElement.classList.add('dark');
                 }
               } catch (e) {}

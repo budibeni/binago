@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { CheckCircle2 } from 'lucide-react';
-import type { Locale } from '@binago/types';
+import type { Locale } from '@adatrack/types';
 
 export interface ShellVerificationPageProps {
   locale: Locale;
@@ -16,21 +16,21 @@ export interface ShellVerificationPageProps {
 }
 
 /**
- * ShellVerificationPage — placeholder sederhana untuk membuktikan Application Shell berjalan.
+ * ShellVerificationPage â€” placeholder sederhana untuk membuktikan Application Shell berjalan.
  * BUKAN halaman Home/Dashboard. Tidak ada statistik, chart, atau business data.
  * Home/Dashboard akan dikerjakan pada TASK-04.
  */
 export function ShellVerificationPage({ locale, theme, labels }: ShellVerificationPageProps) {
   const checks = [
     'AppShell terintegrasi',
-    'Sidebar — expanded, collapsed, dan mobile drawer',
-    'Header — breadcrumb, language toggle, theme toggle, user menu',
+    'Sidebar â€” expanded, collapsed, dan mobile drawer',
+    'Header â€” breadcrumb, language toggle, theme toggle, user menu',
     'Navigasi aktif teridentifikasi',
-    'Mobile drawer — open/close dengan overlay',
+    'Mobile drawer â€” open/close dengan overlay',
     'Keyboard Escape menutup drawer',
-    'UserMenu — avatar, nama, role, aksi profil',
-    'LanguageToggle — ID/EN switching',
-    'ThemeToggle — light/dark',
+    'UserMenu â€” avatar, nama, role, aksi profil',
+    'LanguageToggle â€” ID/EN switching',
+    'ThemeToggle â€” light/dark',
     'Tidak ada Global Search pada Header',
     'Tanpa fitur Home/Task-04',
   ];

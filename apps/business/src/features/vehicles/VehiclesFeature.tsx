@@ -9,9 +9,9 @@ import { mockVehicles, mockVehicleGroups, filterVehicles } from './data/mockVehi
 import { VehicleTable } from './components/VehicleTable';
 import { VehicleDetailDrawer } from './components/VehicleDetailDrawer';
 import type { Vehicle, VehicleStatusFilter } from './types/vehicle';
-import type { DataTableFilterConfig } from '@binago/ui';
+import type { DataTableFilterConfig } from '@adatrack/ui';
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function computeStatusCounts(vehicles: Vehicle[], search: string, groupIds: string[]) {
   const base = filterVehicles(vehicles, search, 'all', groupIds);
@@ -24,7 +24,7 @@ function computeStatusCounts(vehicles: Vehicle[], search: string, groupIds: stri
   };
 }
 
-// ─── Component ───────────────────────────────────────────────────────────────
+// â”€â”€â”€ Component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export function VehiclesFeature() {
   const locale = useBusinessLocale();
@@ -33,7 +33,7 @@ export function VehiclesFeature() {
   const t = getTranslation(locale);
   const tV = t.vehicles;
 
-  // ── State ──────────────────────────────────────────────────────────────────
+  // â”€â”€ State â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const [search, setSearch] = React.useState('');
   const [filterState, setFilterState] = React.useState<Record<string, string | string[]>>({
     status: 'all',
@@ -47,7 +47,7 @@ export function VehiclesFeature() {
   const [detailVehicle, setDetailVehicle] = React.useState<Vehicle | null>(null);
   const [drawerOpen, setDrawerOpen] = React.useState(false);
 
-  // ── Filtered data ──────────────────────────────────────────────────────────
+  // â”€â”€ Filtered data â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const filteredVehicles = React.useMemo(
     () => filterVehicles(mockVehicles, search, statusFilter, selectedGroupIds),
     [search, statusFilter, selectedGroupIds],
@@ -58,7 +58,7 @@ export function VehiclesFeature() {
     [search, selectedGroupIds],
   );
 
-  // ── Handlers ───────────────────────────────────────────────────────────────
+  // â”€â”€ Handlers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const handleViewDetail = React.useCallback((vehicle: Vehicle) => {
     setDetailVehicle(vehicle);
     setDrawerOpen(true);
@@ -69,7 +69,7 @@ export function VehiclesFeature() {
   }, []);
 
   const handleEdit = React.useCallback((vehicle: Vehicle) => {
-    // TODO: open edit modal (Task 06 scope terbatas — hanya placeholder)
+    // TODO: open edit modal (Task 06 scope terbatas â€” hanya placeholder)
     console.log('Edit vehicle:', vehicle.id);
   }, []);
 
@@ -80,13 +80,13 @@ export function VehiclesFeature() {
   }, [router]);
 
   const handleDelete = React.useCallback((vehicle: Vehicle) => {
-    // TODO: confirmation dialog (Task 06 scope terbatas — hanya placeholder)
+    // TODO: confirmation dialog (Task 06 scope terbatas â€” hanya placeholder)
     console.log('Delete vehicle:', vehicle.id);
   }, []);
 
   // Filter toggle/clear logic is now handled by DataTableFilterPanel internally via onStateChange
 
-  // ── Labels ──────────────────────────────────────────────────────────────────
+  // â”€â”€ Labels â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const tableLabels = React.useMemo(() => ({
     colPlateNumber: tV.colPlateNumber,
     colVehicle: tV.colVehicle,
@@ -146,7 +146,7 @@ export function VehiclesFeature() {
     statusOffline: tV.statusOffline,
   }), [tV]);
 
-  // ── Filter Config ────────────────────────────────────────────────────────────
+  // â”€â”€ Filter Config â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const filterConfig: DataTableFilterConfig = React.useMemo(() => ({
     state: filterState,
     onStateChange: setFilterState,
@@ -211,7 +211,7 @@ export function VehiclesFeature() {
     ],
   }), [filterState, filterLabels, statusCounts]);
 
-  // ── Render ─────────────────────────────────────────────────────────────────
+  // â”€â”€ Render â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   return (
     <div className="flex flex-col h-full w-full">
 

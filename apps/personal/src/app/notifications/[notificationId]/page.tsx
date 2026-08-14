@@ -2,7 +2,7 @@ import { NotificationDetail } from '@/features/notifications/components/Notifica
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Notification Detail - BINAGO Personal',
+  title: 'Notification Detail - ADATRACK Personal',
   description: 'View notification details.',
 };
 

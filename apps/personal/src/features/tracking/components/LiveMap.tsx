@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { MapContainer, MapViewport } from '@binago/maps';
+import { MapContainer, MapViewport } from '@adatrack/maps';
 import { Vehicle } from '../types';
 
 export interface LiveMapProps {
