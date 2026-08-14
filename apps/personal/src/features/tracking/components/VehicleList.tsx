@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { ChevronRight, ChevronLeft, ChevronDown, ChevronUp, Car } from 'lucide-react';
+import { ChevronRight, ChevronLeft, ChevronDown, ChevronUp, Car, Eye, EyeOff } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import { usePersonalLocale } from '@/components/PersonalShellLayout';
 import { getTranslation } from '@/i18n';
@@ -17,6 +17,8 @@ export interface VehicleListProps {
   onStatusFilterChange: (status: VehicleStatus | 'all') => void;
   isListVisible: boolean;
   onToggleList: () => void;
+  hiddenVehicleIds: Set<string>;
+  onToggleVehicleVisibility: (id: string) => void;
 }
 
 export function VehicleList({
@@ -25,6 +27,8 @@ export function VehicleList({
   onVehicleSelect,
   isListVisible,
   onToggleList,
+  hiddenVehicleIds,
+  onToggleVehicleVisibility,
 }: VehicleListProps) {
   
   const locale = usePersonalLocale();
@@ -137,7 +141,24 @@ export function VehicleList({
                     </div>
                   </div>
 
-                  <ChevronRight className="w-4 h-4 text-foreground-subtle shrink-0 group-hover:text-foreground-muted transition-colors" />
+                  <div className="flex items-center gap-1 shrink-0">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onToggleVehicleVisibility(vehicle.id);
+                      }}
+                      className="p-1.5 text-foreground-subtle hover:text-foreground hover:bg-surface-elevated rounded-md transition-colors group/btn"
+                      title={hiddenVehicleIds.has(vehicle.id) ? 'Tampilkan di peta' : 'Sembunyikan dari peta'}
+                    >
+                      {hiddenVehicleIds.has(vehicle.id) ? (
+                        <EyeOff className="w-4 h-4 text-neutral-400 group-hover/btn:text-neutral-500" />
+                      ) : (
+                        <Eye className="w-4 h-4 text-blue-500 group-hover/btn:text-blue-600" />
+                      )}
+                    </button>
+                    <ChevronRight className="w-4 h-4 text-foreground-subtle shrink-0 group-hover:text-foreground-muted transition-colors" />
+                  </div>
                 </div>
               );
             })

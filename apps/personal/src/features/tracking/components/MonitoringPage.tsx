@@ -19,6 +19,8 @@ export function MonitoringPage() {
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   });
   const [isListVisible, setIsListVisible] = useState(true);
+  const [isDetailVisible, setIsDetailVisible] = useState(() => mockVehicles.length !== 1);
+  const [hiddenVehicleIds, setHiddenVehicleIds] = useState<Set<string>>(new Set());
   const [playbackTripId, setPlaybackTripId] = useState<string | null>(null);
   const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
   const searchParams = useSearchParams();
@@ -32,6 +34,14 @@ export function MonitoringPage() {
       window.history.replaceState(null, '', '/');
     }
   }, [searchParams]);
+
+  useEffect(() => {
+    // Auto-select if there is exactly 1 vehicle in the system
+    if (mockVehicles.length === 1 && !selectedVehicleId) {
+      setSelectedVehicleId(mockVehicles[0].id);
+      setIsListVisible(true);
+    }
+  }, [selectedVehicleId]);
 
   const filteredVehicles = useMemo(() => {
     return mockVehicles.filter((vehicle) => {
@@ -47,6 +57,10 @@ export function MonitoringPage() {
       return true;
     });
   }, [searchQuery, statusFilter]);
+
+  const mapVehicles = useMemo(() => {
+    return filteredVehicles.filter(v => !hiddenVehicleIds.has(v.id));
+  }, [filteredVehicles, hiddenVehicleIds]);
 
   const selectedVehicle = useMemo(() => {
     return mockVehicles.find(v => v.id === selectedVehicleId);
@@ -67,6 +81,16 @@ export function MonitoringPage() {
     const d = new Date();
     setSelectedDate(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`);
     setIsListVisible(true);
+    setIsDetailVisible(true);
+  };
+
+  const toggleVehicleVisibility = (id: string) => {
+    setHiddenVehicleIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
   };
 
   const handleBackToList = () => {
@@ -101,7 +125,7 @@ export function MonitoringPage() {
       {/* Map Area - Full Background */}
       <div className="absolute inset-0 z-0">
         <LiveMap
-          vehicles={filteredVehicles}
+          vehicles={mapVehicles}
           selectedVehicleId={selectedVehicleId}
         />
       </div>
@@ -111,7 +135,7 @@ export function MonitoringPage() {
         className={cn(
           "absolute z-10 bottom-0 left-0 right-0 top-auto md:top-4 md:bottom-4 md:left-4 md:right-auto md:w-[380px] pointer-events-none flex flex-col justify-end md:justify-start transition-all duration-300 ease-in-out",
           selectedVehicleId
-            ? "h-[60vh] md:h-auto md:max-h-full"
+            ? (isDetailVisible ? "h-[60vh] md:h-auto md:max-h-full" : "h-[56px] md:h-[56px]")
             : isListVisible 
               ? "h-[55vh] md:h-auto md:max-h-full" 
               : "h-[56px] md:h-[56px]" // matches header height approx
@@ -119,14 +143,17 @@ export function MonitoringPage() {
       >
         <div className="pointer-events-auto bg-white shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-neutral-200/60 h-full flex flex-col rounded-t-3xl md:rounded-2xl overflow-hidden transition-all duration-300">
           {selectedVehicle ? (
-            <VehicleDetail
-              vehicle={selectedVehicle}
-              trips={selectedVehicleTrips}
-              selectedDate={selectedDate}
-              onDateChange={setSelectedDate}
-              onBack={handleBackToList}
-              onTripSelect={handleTripSelect}
-            />
+              <VehicleDetail
+                vehicle={selectedVehicle}
+                trips={selectedVehicleTrips}
+                selectedDate={selectedDate}
+                onDateChange={setSelectedDate}
+                onBack={handleBackToList}
+                onTripSelect={handleTripSelect}
+                showBackButton={mockVehicles.length > 1}
+                isDetailVisible={isDetailVisible}
+                onToggleDetail={() => setIsDetailVisible(!isDetailVisible)}
+              />
           ) : (
             <VehicleList
               vehicles={filteredVehicles}
@@ -138,6 +165,8 @@ export function MonitoringPage() {
               onStatusFilterChange={setStatusFilter}
               isListVisible={isListVisible}
               onToggleList={() => setIsListVisible(!isListVisible)}
+              hiddenVehicleIds={hiddenVehicleIds}
+              onToggleVehicleVisibility={toggleVehicleVisibility}
             />
           )}
         </div>

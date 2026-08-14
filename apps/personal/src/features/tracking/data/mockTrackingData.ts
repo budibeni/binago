@@ -164,13 +164,13 @@ export const mockTripsByVehicleId: Record<string, Trip[]> = {
 function generateDummyPoints(startLat: number, startLng: number, endLat: number, endLng: number, pointsCount: number, baseTime: Date, durationMinutes: number): PlaybackPoint[] {
   const points: PlaybackPoint[] = [];
   const timeStep = (durationMinutes * 60 * 1000) / pointsCount;
-  
+
   for (let i = 0; i <= pointsCount; i++) {
     const fraction = i / pointsCount;
     // Add some slight curve/noise to make it look like a road instead of straight line
     const noiseLat = Math.sin(fraction * Math.PI) * 0.005;
     const noiseLng = Math.cos(fraction * Math.PI) * 0.005;
-    
+
     points.push({
       lat: startLat + (endLat - startLat) * fraction + noiseLat,
       lng: startLng + (endLng - startLng) * fraction + noiseLng,
