@@ -12,6 +12,7 @@ export interface Vehicle {
   plateNumber: string;
   name?: string;
   type: string;
+  category?: 'car' | 'motorcycle';
   status: VehicleStatus;
   securityStatus?: SecurityStatus;
   speed?: number;

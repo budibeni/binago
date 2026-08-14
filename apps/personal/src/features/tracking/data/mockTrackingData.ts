@@ -6,6 +6,7 @@ export const mockVehicles: Vehicle[] = [
     plateNumber: 'B 1234 ABC',
     name: 'Mobil Pribadi',
     type: 'Toyota Avanza',
+    category: 'car',
     status: 'driving',
     speed: 45,
     lastUpdate: new Date(Date.now() - 1000 * 60).toISOString(),
@@ -20,6 +21,7 @@ export const mockVehicles: Vehicle[] = [
     plateNumber: 'B 5678 DEF',
     name: 'Motor Operasional',
     type: 'Honda Beat',
+    category: 'motorcycle',
     status: 'parking',
     speed: 0,
     lastUpdate: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
@@ -34,6 +36,7 @@ export const mockVehicles: Vehicle[] = [
     plateNumber: 'B 9012 GHI',
     name: 'Mobil Cadangan',
     type: 'Honda Brio',
+    category: 'car',
     status: 'idle',
     speed: 0,
     lastUpdate: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
@@ -48,6 +51,7 @@ export const mockVehicles: Vehicle[] = [
     plateNumber: 'D 3456 JKL',
     name: 'Motor Istri',
     type: 'Yamaha NMAX',
+    category: 'motorcycle',
     status: 'offline',
     lastUpdate: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
     location: {
@@ -83,8 +87,8 @@ export const mockTripsByVehicleId: Record<string, Trip[]> = {
       duration: 36,
       avgSpeed: 40,
       maxSpeed: 65,
-      startAddress: 'Rumah',
-      endAddress: 'Kantor',
+      startAddress: 'Geofence Rumah Utama',
+      endAddress: 'Geofence Kantor Pusat',
     },
     {
       id: 't-001-2',
@@ -96,8 +100,8 @@ export const mockTripsByVehicleId: Record<string, Trip[]> = {
       duration: 18,
       avgSpeed: 32,
       maxSpeed: 55,
-      startAddress: 'Kantor',
-      endAddress: 'Customer',
+      startAddress: 'Geofence Kantor Pusat',
+      endAddress: 'Senayan City Mall, Lobby Selatan',
     },
     // Yesterday
     {
@@ -110,8 +114,8 @@ export const mockTripsByVehicleId: Record<string, Trip[]> = {
       duration: 35,
       avgSpeed: 38,
       maxSpeed: 60,
-      startAddress: 'Rumah',
-      endAddress: 'Kantor',
+      startAddress: 'Jl. Pegangsaan Timur No.56, Menteng',
+      endAddress: 'Geofence Kantor Pusat',
     },
     {
       id: 't-001-4',
@@ -123,8 +127,8 @@ export const mockTripsByVehicleId: Record<string, Trip[]> = {
       duration: 38,
       avgSpeed: 35,
       maxSpeed: 62,
-      startAddress: 'Kantor',
-      endAddress: 'Rumah',
+      startAddress: 'Geofence Kantor Pusat',
+      endAddress: 'Geofence Rumah Utama',
     },
     // Other Date
     {
@@ -137,8 +141,8 @@ export const mockTripsByVehicleId: Record<string, Trip[]> = {
       duration: 54,
       avgSpeed: 42,
       maxSpeed: 70,
-      startAddress: 'Rumah',
-      endAddress: 'Gudang',
+      startAddress: 'Geofence Rumah Utama',
+      endAddress: 'Komp. Pergudangan Marunda, Kav. 5',
     }
   ],
   'v-002': [
@@ -152,8 +156,8 @@ export const mockTripsByVehicleId: Record<string, Trip[]> = {
       duration: 48,
       avgSpeed: 25,
       maxSpeed: 50,
-      startAddress: 'Kantor',
-      endAddress: 'Gudang',
+      startAddress: 'Geofence Kantor Pusat',
+      endAddress: 'Geofence Gudang Cikarang',
     }
   ],
   'v-003': [],

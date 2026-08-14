@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { ChevronRight, ChevronLeft, ChevronDown, ChevronUp, Car, Eye, EyeOff } from 'lucide-react';
+import { ChevronRight, ChevronLeft, ChevronDown, ChevronUp, CarFront, Motorbike } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import { usePersonalLocale } from '@/components/PersonalShellLayout';
 import { getTranslation } from '@/i18n';
@@ -23,36 +23,35 @@ export interface VehicleListProps {
 
 export function VehicleList({
   vehicles,
-  selectedVehicleId,
   onVehicleSelect,
   isListVisible,
   onToggleList,
   hiddenVehicleIds,
   onToggleVehicleVisibility,
 }: VehicleListProps) {
-  
+
   const locale = usePersonalLocale();
   const t = getTranslation(locale);
-  
+
   const getStatusDisplay = (status: VehicleStatus) => {
-    switch(status) {
+    switch (status) {
       case 'driving':
-        return { text: t.tracking.statusDriving, color: 'text-green-600', dot: 'bg-green-500' };
+        return { text: t.tracking.statusDriving, color: 'text-green-600', dot: 'bg-green-500', iconColor: 'text-green-600' };
       case 'idle':
-        return { text: t.tracking.statusIdle, color: 'text-amber-600', dot: 'bg-amber-500' };
+        return { text: t.tracking.statusIdle, color: 'text-amber-600', dot: 'bg-amber-500', iconColor: 'text-amber-500' };
       case 'parking':
-        return { text: t.tracking.statusParking, color: 'text-neutral-500', dot: 'bg-neutral-400' };
+        return { text: t.tracking.statusParking, color: 'text-blue-600', dot: 'bg-blue-500', iconColor: 'text-blue-500' };
       case 'offline':
-        return { text: t.tracking.statusOffline, color: 'text-foreground-muted', dot: 'bg-neutral-400' };
+        return { text: t.tracking.statusOffline, color: 'text-foreground-muted', dot: 'bg-neutral-400', iconColor: 'text-neutral-500' };
       default:
-        return { text: status, color: 'text-foreground-muted', dot: 'bg-neutral-400' };
+        return { text: status, color: 'text-foreground-muted', dot: 'bg-neutral-400', iconColor: 'text-neutral-400' };
     }
   };
 
   return (
     <div className="flex flex-col h-full bg-surface text-foreground border-r border-border">
       {/* Header */}
-      <div 
+      <div
         className={cn(
           "flex items-center justify-between px-5 py-4 shrink-0 cursor-pointer select-none transition-colors",
           !isListVisible && "hover:bg-surface-elevated"
@@ -65,10 +64,10 @@ export function VehicleList({
         <div className="flex items-center gap-2">
           <h2 className="font-semibold text-[15px]">{t.nav.vehicles}</h2>
           <span className="bg-surface-elevated text-foreground-muted text-[11px] font-medium px-2 py-0.5 rounded-full">
-            {vehicles.length}
+            {vehicles.length - hiddenVehicleIds.size}/{vehicles.length}
           </span>
         </div>
-        <button 
+        <button
           className="p-1 -mr-1 text-foreground-subtle hover:text-foreground-muted transition-colors"
           aria-label={isListVisible ? t.tracking.hideList : t.nav.vehicles}
           tabIndex={-1}
@@ -94,17 +93,23 @@ export function VehicleList({
           {vehicles.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full min-h-[200px] text-center px-4">
               <div className="w-12 h-12 rounded-2xl bg-surface-elevated flex items-center justify-center mb-3 border border-border">
-                <Car className="h-6 w-6 text-foreground-subtle" aria-hidden="true" />
+                <CarFront className="h-6 w-6 text-foreground-subtle" aria-hidden="true" />
               </div>
               <p className="text-sm font-medium text-foreground">{t.tracking.emptyList}</p>
               <p className="text-xs text-foreground-muted mt-1">{t.tracking.emptyListDesc}</p>
             </div>
           ) : (
             vehicles.map((vehicle) => {
-              const isSelected = vehicle.id === selectedVehicleId;
+              const isMapVisible = !hiddenVehicleIds.has(vehicle.id);
               const statusDisplay = getStatusDisplay(vehicle.status);
-              const speed = vehicle.speed || 0;
               
+              const speedText = (isMapVisible && vehicle.status !== 'offline') ? `${vehicle.speed || 0} ${t.tracking.speedUnit}` : '—';
+              const nameClass = isMapVisible ? 'text-foreground' : 'text-neutral-400';
+              const plateClass = isMapVisible ? 'text-foreground-muted' : 'text-neutral-400/70';
+              const statusText = isMapVisible ? statusDisplay.text : (t.tracking?.hidden || 'Disembunyikan');
+              const statusColor = isMapVisible ? statusDisplay.color : 'text-neutral-400';
+              const iconColor = isMapVisible ? statusDisplay.iconColor : 'text-neutral-300';
+
               return (
                 <div
                   key={vehicle.id}
@@ -112,53 +117,50 @@ export function VehicleList({
                     e.stopPropagation();
                     onVehicleSelect(vehicle.id);
                   }}
-                  className={cn(
-                    'flex items-center p-3 rounded-xl border transition-all cursor-pointer bg-surface group',
-                    isSelected 
-                      ? 'border-red-500 shadow-[0_0_0_1px_rgba(239,68,68,1)]' 
-                      : 'border-border hover:border-neutral-300 dark:hover:border-neutral-600 hover:shadow-sm'
-                  )}
+                  className="flex items-center p-4 rounded-xl border border-border bg-surface transition-all cursor-pointer overflow-hidden hover:border-neutral-300 dark:hover:border-neutral-600 hover:shadow-sm"
                 >
-                  <div className="w-14 h-14 shrink-0 flex items-center justify-center rounded-lg bg-surface-elevated text-foreground-muted mr-3">
-                    <Car className="w-8 h-8" />
-                  </div>
-                  
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onToggleVehicleVisibility(vehicle.id);
+                    }}
+                    className={cn(
+                      "w-12 h-12 shrink-0 flex items-center justify-center rounded-lg mr-4 transition-colors",
+                      iconColor
+                    )}
+                    title={isMapVisible ? 'Tampilkan di peta' : 'Sembunyikan dari peta'}
+                  >
+                    {vehicle.category === 'motorcycle' ? (
+                      <Motorbike className="w-8 h-8" strokeWidth={1.5} />
+                    ) : (
+                      <CarFront className="w-8 h-8" strokeWidth={1.5} />
+                    )}
+                  </button>
+
                   <div className="flex-1 min-w-0 flex justify-between items-center">
-                    <div className="flex flex-col truncate pr-2">
-                      <span className="font-semibold text-sm truncate text-foreground">{vehicle.type}</span>
-                      <span className="text-xs text-foreground-muted mt-0.5">{vehicle.plateNumber}</span>
+                    <div className="flex flex-col truncate pr-2 gap-0.5">
+                      <span className={cn("font-semibold text-[15px] truncate", nameClass)}>{vehicle.type}</span>
+                      <span className={cn("text-[13px]", plateClass)}>{vehicle.plateNumber}</span>
                     </div>
-                    <div className="flex flex-col items-end shrink-0 pr-2">
-                      <span className="font-semibold text-xs text-foreground">
-                        {speed} {t.tracking.speedUnit}
+                    <div className="flex flex-col items-end shrink-0 pl-2 gap-1.5">
+                      <span className={cn("font-semibold text-[13px]", isMapVisible ? 'text-foreground' : 'text-neutral-400')}>
+                        {speedText}
                       </span>
-                      <div className="flex items-center gap-1 mt-0.5">
-                        <span className={cn('w-1.5 h-1.5 rounded-full', statusDisplay.dot)} />
-                        <span className={cn('text-[11px] font-medium', statusDisplay.color)}>
-                          {statusDisplay.text}
+                      <div className="flex items-center gap-1.5">
+                        {isMapVisible ? (
+                          <span className={cn('w-2 h-2 rounded-full', statusDisplay.dot)} />
+                        ) : (
+                          <span className="w-2 h-2 rounded-full border border-neutral-400 bg-transparent" />
+                        )}
+                        <span className={cn('text-xs font-medium', statusColor)}>
+                          {statusText}
                         </span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1 shrink-0">
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onToggleVehicleVisibility(vehicle.id);
-                      }}
-                      className="p-1.5 text-foreground-subtle hover:text-foreground hover:bg-surface-elevated rounded-md transition-colors group/btn"
-                      title={hiddenVehicleIds.has(vehicle.id) ? 'Tampilkan di peta' : 'Sembunyikan dari peta'}
-                    >
-                      {hiddenVehicleIds.has(vehicle.id) ? (
-                        <EyeOff className="w-4 h-4 text-neutral-400 group-hover/btn:text-neutral-500" />
-                      ) : (
-                        <Eye className="w-4 h-4 text-blue-500 group-hover/btn:text-blue-600" />
-                      )}
-                    </button>
-                    <ChevronRight className="w-4 h-4 text-foreground-subtle shrink-0 group-hover:text-foreground-muted transition-colors" />
-                  </div>
+                  <ChevronRight className="w-4 h-4 text-neutral-300 shrink-0 ml-3" />
                 </div>
               );
             })
@@ -169,7 +171,7 @@ export function VehicleList({
       {/* Bottom Button - only shown when visible */}
       {isListVisible && (
         <div className="p-4 pt-2 shrink-0 border-t border-border bg-surface">
-          <button 
+          <button
             onClick={onToggleList}
             className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg border border-border text-sm font-medium text-foreground hover:bg-surface-elevated transition-colors"
           >

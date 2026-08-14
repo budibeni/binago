@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Share2, Car, Clock, CheckCircle2, Copy, X } from 'lucide-react';
+import { Share2, CheckCircle2, Copy, Car, Clock } from 'lucide-react';
 import { Button, Dialog } from '@adatrack/ui';
 import { cn } from '@adatrack/utils';
 import { Vehicle } from '../../tracking/types';
@@ -25,8 +25,8 @@ type Step = 'select' | 'success' | 'manage';
 
 export function ShareLocationDialog({ vehicle, open, onOpenChange }: ShareLocationDialogProps) {
   const locale = usePersonalLocale();
-  const ls = getTranslation(locale).locationSharing;
   const t = getTranslation(locale);
+  const ls = t.locationSharing;
 
   const { getActiveSession, createSession, revokeSession } = useShareLocation();
 
@@ -47,7 +47,6 @@ export function ShareLocationDialog({ vehicle, open, onOpenChange }: ShareLocati
 
   const handleOpen = (isOpen: boolean) => {
     if (!isOpen) {
-      // Reset state when closing
       setCopied(false);
       setShowStopConfirm(false);
       const active = getActiveSession(vehicle.id);
@@ -68,7 +67,6 @@ export function ShareLocationDialog({ vehicle, open, onOpenChange }: ShareLocati
       setCopied(true);
       setTimeout(() => setCopied(false), 2500);
     } catch {
-      // Fallback: select text
       const el = document.createElement('textarea');
       el.value = shareUrl;
       document.body.appendChild(el);
@@ -84,12 +82,11 @@ export function ShareLocationDialog({ vehicle, open, onOpenChange }: ShareLocati
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `${vehicle.name || vehicle.type} — ADATRACK`,
+          title: `${vehicle.type} — ADATRACK`,
           text: ls.sharedBy,
           url: shareUrl,
         });
       } catch {
-        // User cancelled or share failed — fallback to copy
         handleCopyLink();
       }
     } else {
@@ -103,19 +100,8 @@ export function ShareLocationDialog({ vehicle, open, onOpenChange }: ShareLocati
       revokeSession(session.id);
       setCreatedSession(null);
       setShowStopConfirm(false);
-      setStep('select');
+      handleOpen(false); // Close dialog completely
     }
-  };
-
-  const getDurationLabel = (h: Duration): string => {
-    const labels: Record<Duration, string> = {
-      1: ls.duration1h,
-      2: ls.duration2h,
-      4: ls.duration4h,
-      8: ls.duration8h,
-      24: ls.duration24h,
-    };
-    return labels[h];
   };
 
   const formatCountdown = (expiresAt: string): string => {
@@ -123,19 +109,34 @@ export function ShareLocationDialog({ vehicle, open, onOpenChange }: ShareLocati
     const totalSeconds = Math.floor(diff / 1000);
     const h = Math.floor(totalSeconds / 3600);
     const m = Math.floor((totalSeconds % 3600) / 60);
-    const s = totalSeconds % 60;
-    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    return `${h} ${locale === 'id' ? 'jam' : 'hrs'} ${m} ${locale === 'id' ? 'mnt' : 'mins'}`;
   };
 
-  const renderVehicleChip = () => (
-    <div className="flex items-center gap-3 p-3 bg-surface-elevated rounded-xl border border-border">
-      <div className="w-10 h-10 rounded-lg bg-red-50 dark:bg-red-950/30 text-red-500 dark:text-red-400 flex items-center justify-center shrink-0">
-        <Car className="w-5 h-5" />
+  const renderVehicleHeader = () => (
+    <div className="flex items-center gap-3 pb-4 mb-4 border-b border-border">
+      <div className="w-10 h-10 rounded-full bg-red-50 dark:bg-red-500/10 text-red-500 flex items-center justify-center shrink-0">
+        <Share2 className="w-5 h-5" />
       </div>
       <div>
-        <p className="font-semibold text-foreground text-sm leading-none">{vehicle.name || vehicle.type}</p>
-        <p className="text-xs text-foreground-muted mt-1">{vehicle.plateNumber}</p>
+        <p className="font-bold text-foreground text-[14px] leading-tight">{vehicle.type}</p>
+        <p className="text-[12px] font-medium text-foreground-muted mt-0.5">{vehicle.plateNumber}</p>
       </div>
+    </div>
+  );
+
+  const renderLinkBox = () => (
+    <div className="flex items-center gap-2 p-2 pl-3 bg-surface-elevated rounded-xl border border-border">
+      <span className="text-[12px] text-foreground-muted font-mono flex-1 min-w-0 truncate select-all">{shareUrl}</span>
+      <button
+        type="button"
+        onClick={handleCopyLink}
+        className={cn(
+          "shrink-0 h-8 px-2.5 rounded-lg flex items-center justify-center transition-colors text-[11px] font-bold uppercase",
+          copied ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400" : "bg-neutral-100 dark:bg-neutral-800 text-foreground hover:bg-neutral-200 dark:hover:bg-neutral-700"
+        )}
+      >
+        {copied ? ls.linkCopied || 'Tersalin' : ls.copyLink || 'Salin'}
+      </button>
     </div>
   );
 
@@ -145,12 +146,15 @@ export function ShareLocationDialog({ vehicle, open, onOpenChange }: ShareLocati
         open={open}
         onOpenChange={handleOpen}
         title={ls.stopSharingTitle}
-        description={ls.stopSharingDesc}
       >
-        {renderVehicleChip()}
-        <div className="flex justify-end gap-3 mt-4">
-          <Button variant="outline" onClick={() => setShowStopConfirm(false)}>{ls.cancel}</Button>
-          <Button variant="destructive" onClick={handleStopSharing}>{ls.confirmStop}</Button>
+        <div className="pt-2 flex flex-col gap-4">
+          <p className="text-[13px] text-foreground">
+            {ls.stopSharingDesc} <strong>{vehicle.type}</strong>
+          </p>
+          <div className="flex gap-3 justify-end mt-2">
+            <Button variant="outline" className="rounded-xl px-5 py-2 h-auto text-[13px]" onClick={() => setShowStopConfirm(false)}>{ls.cancel}</Button>
+            <Button variant="destructive" className="rounded-xl px-5 py-2 h-auto text-[13px]" onClick={handleStopSharing}>{ls.confirmStop}</Button>
+          </div>
         </div>
       </Dialog>
     );
@@ -163,104 +167,73 @@ export function ShareLocationDialog({ vehicle, open, onOpenChange }: ShareLocati
         onOpenChange={handleOpen}
         title={ls.shareLocationTitle}
       >
-        <div className="flex flex-col gap-4">
-          {renderVehicleChip()}
+        <div className="pt-2">
+          {renderVehicleHeader()}
 
-          <div>
-            <p className="text-sm font-semibold text-foreground mb-3">{ls.chooseDuration}</p>
-            <div className="grid grid-cols-5 gap-2">
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-[13px] font-bold text-foreground">{ls.chooseDuration}</span>
+              <span className="text-[12px] font-semibold text-red-600 dark:text-red-400">{selectedDuration} {locale === 'id' ? 'Jam' : 'Hrs'}</span>
+            </div>
+            
+            <div className="flex items-center gap-1 p-1 bg-neutral-100 dark:bg-neutral-900 rounded-[12px] border border-neutral-200 dark:border-neutral-800">
               {DURATION_OPTIONS.map((h) => (
                 <button
                   key={h}
                   type="button"
                   onClick={() => setSelectedDuration(h)}
                   className={cn(
-                    'flex flex-col items-center justify-center py-3 px-1 rounded-xl border text-center transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500',
+                    'flex-1 py-1.5 text-[13px] font-semibold rounded-[8px] transition-all duration-200',
                     selectedDuration === h
-                      ? 'border-red-500 bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400'
-                      : 'border-border bg-surface-elevated text-foreground hover:border-red-200 dark:hover:border-red-800',
+                      ? 'bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-sm'
+                      : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-200/50 dark:hover:bg-neutral-800/50'
                   )}
-                  aria-pressed={selectedDuration === h}
-                  aria-label={getDurationLabel(h)}
                 >
-                  <Clock className="w-4 h-4 mb-1 opacity-70" />
-                  <span className="text-xs font-bold">{h}j</span>
+                  {h}{locale === 'id' ? 'j' : 'h'}
                 </button>
               ))}
             </div>
-            <p className="text-xs text-foreground-muted mt-2">{ls.duration1h} — {ls.duration24h}</p>
           </div>
 
-          <div className="flex justify-end gap-3">
-            <Button variant="outline" onClick={() => handleOpen(false)}>{ls.cancel}</Button>
-            <Button variant="primary" onClick={handleCreate} className="gap-2">
-              <Share2 className="w-4 h-4" />
-              {ls.create}
-            </Button>
-          </div>
-        </div>
-      </Dialog>
-    );
-  }
-
-  if (step === 'success' && currentSession) {
-    const expiresInLabel = `${currentSession.durationHours} ${currentSession.durationHours === 1 ? getDurationLabel(1) : getDurationLabel(currentSession.durationHours as Duration)}`;
-
-    return (
-      <Dialog
-        open={open}
-        onOpenChange={handleOpen}
-        title={ls.locationShared}
-      >
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center gap-2 p-3 rounded-xl bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800/40 text-green-700 dark:text-green-400">
-            <CheckCircle2 className="w-5 h-5 shrink-0" />
-            <div>
-              <p className="text-sm font-semibold">{ls.locationShared}</p>
-              <p className="text-xs mt-0.5">{ls.linkActive} {expiresInLabel}</p>
-            </div>
-          </div>
-
-          {renderVehicleChip()}
-
-          {/* URL Display */}
-          <div className="flex items-center gap-2 p-2.5 rounded-lg bg-surface-elevated border border-border">
-            <span className="text-xs text-foreground-muted font-mono break-all flex-1 min-w-0 truncate">{shareUrl}</span>
-            <button
-              type="button"
-              onClick={handleCopyLink}
-              className="shrink-0 p-1.5 rounded-md hover:bg-surface transition-colors"
-              aria-label={ls.copyLink}
-            >
-              {copied
-                ? <CheckCircle2 className="w-4 h-4 text-green-500" />
-                : <Copy className="w-4 h-4 text-foreground-muted" />
-              }
-            </button>
-          </div>
-          {copied && <p className="text-xs text-green-600 dark:text-green-400 -mt-2">{ls.linkCopied}</p>}
-
-          <div className="flex flex-col sm:flex-row gap-2">
-            <Button variant="outline" onClick={handleCopyLink} className="flex-1 gap-2">
-              <Copy className="w-4 h-4" />
-              {ls.copyLink}
-            </Button>
-            <Button variant="primary" onClick={handleShare} className="flex-1 gap-2">
-              <Share2 className="w-4 h-4" />
-              {ls.share}
-            </Button>
-          </div>
-
-          <Button variant="ghost" onClick={() => handleOpen(false)} className="gap-2 text-foreground-muted">
-            <X className="w-4 h-4" />
-            {ls.close}
+          <Button className="w-full rounded-xl font-bold py-3 h-auto text-[14px] shadow-sm bg-red-600 hover:bg-red-700 text-white dark:bg-red-600 dark:hover:bg-red-700" onClick={handleCreate}>
+            {ls.create}
           </Button>
         </div>
       </Dialog>
     );
   }
 
-  // step === 'manage' — active sharing already exists
+  if (step === 'success' && currentSession) {
+    return (
+      <Dialog
+        open={open}
+        onOpenChange={handleOpen}
+        title={ls.shareLocationTitle}
+      >
+        <div className="pt-2">
+          {renderVehicleHeader()}
+
+          <div className="flex flex-col gap-4 mb-6">
+            <div className="flex items-start gap-3 p-3 rounded-xl bg-green-50 dark:bg-green-950/30 border border-green-100 dark:border-green-900/50 text-green-800 dark:text-green-300">
+              <CheckCircle2 className="w-5 h-5 shrink-0 text-green-500 mt-0.5" />
+              <div>
+                <p className="text-[13px] font-bold">{ls.locationShared}</p>
+                <p className="text-[12px] mt-0.5 opacity-90 leading-snug">{ls.linkActive} {currentSession.durationHours} {locale === 'id' ? 'jam' : 'hrs'}</p>
+              </div>
+            </div>
+
+            {renderLinkBox()}
+          </div>
+
+          <Button className="w-full rounded-xl font-bold py-3 h-auto text-[14px] gap-2 shadow-sm bg-red-600 hover:bg-red-700 text-white dark:bg-red-600 dark:hover:bg-red-700" onClick={handleShare}>
+            <Share2 className="w-4 h-4" />
+            {ls.share}
+          </Button>
+        </div>
+      </Dialog>
+    );
+  }
+
   if (step === 'manage' && activeSession) {
     return (
       <Dialog
@@ -268,58 +241,30 @@ export function ShareLocationDialog({ vehicle, open, onOpenChange }: ShareLocati
         onOpenChange={handleOpen}
         title={ls.manageSharing}
       >
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center gap-2 p-3 rounded-xl bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800/40 text-blue-700 dark:text-blue-400">
-            <Share2 className="w-5 h-5 shrink-0" />
-            <div>
-              <p className="text-sm font-semibold">{ls.activeSharing}</p>
-              <p className="text-xs mt-0.5">{ls.expiresIn}: {formatCountdown(activeSession.expiresAt)}</p>
+        <div className="pt-2">
+          {renderVehicleHeader()}
+
+          <div className="flex flex-col gap-4 mb-6">
+            <div className="flex items-start gap-3 p-3 rounded-xl bg-blue-50 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/50 text-blue-800 dark:text-blue-300">
+              <Clock className="w-5 h-5 shrink-0 text-blue-500 mt-0.5" />
+              <div>
+                <p className="text-[13px] font-bold">{ls.activeSharing}</p>
+                <p className="text-[12px] mt-0.5 opacity-90 leading-snug">{ls.expiresIn}: {formatCountdown(activeSession.expiresAt)}</p>
+              </div>
             </div>
+
+            {renderLinkBox()}
           </div>
 
-          {renderVehicleChip()}
-
-          <div className="flex items-center gap-2 p-2.5 rounded-lg bg-surface-elevated border border-border">
-            <span className="text-xs text-foreground-muted font-mono flex-1 min-w-0 truncate">
-              {`${PUBLIC_BASE_URL}/${activeSession.token}`}
-            </span>
-            <button
-              type="button"
-              onClick={handleCopyLink}
-              className="shrink-0 p-1.5 rounded-md hover:bg-surface transition-colors"
-              aria-label={ls.copyLink}
-            >
-              {copied
-                ? <CheckCircle2 className="w-4 h-4 text-green-500" />
-                : <Copy className="w-4 h-4 text-foreground-muted" />
-              }
-            </button>
-          </div>
-          {copied && <p className="text-xs text-green-600 dark:text-green-400 -mt-2">{ls.linkCopied}</p>}
-
-          <div className="flex flex-col sm:flex-row gap-2">
-            <Button variant="outline" onClick={handleCopyLink} className="flex-1 gap-2">
-              <Copy className="w-4 h-4" />
-              {ls.copyLink}
-            </Button>
-            <Button variant="primary" onClick={handleShare} className="flex-1 gap-2">
+          <div className="flex flex-col gap-2">
+            <Button className="w-full rounded-xl font-bold py-3 h-auto text-[14px] gap-2 shadow-sm bg-red-600 hover:bg-red-700 text-white dark:bg-red-600 dark:hover:bg-red-700" onClick={handleShare}>
               <Share2 className="w-4 h-4" />
               {ls.share}
             </Button>
+            <Button variant="ghost" className="w-full rounded-xl font-bold py-3 h-auto text-[14px] text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10" onClick={() => setShowStopConfirm(true)}>
+              {ls.stopSharing}
+            </Button>
           </div>
-
-          <Button
-            variant="destructive"
-            onClick={() => setShowStopConfirm(true)}
-            className="gap-2"
-          >
-            <X className="w-4 h-4" />
-            {ls.stopSharing}
-          </Button>
-
-          <Button variant="ghost" onClick={() => handleOpen(false)} className="text-foreground-muted">
-            {t.common.back}
-          </Button>
         </div>
       </Dialog>
     );

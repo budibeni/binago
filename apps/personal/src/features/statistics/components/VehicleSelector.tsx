@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { ChevronDown, Car } from 'lucide-react';
+import { ChevronDown, CarFront, Motorbike } from 'lucide-react';
 import { Vehicle } from '../../tracking/types';
 
 export interface VehicleSelectorProps {
@@ -37,7 +37,11 @@ export function VehicleSelector({ vehicles, selectedVehicleId, onSelect }: Vehic
         <div className="flex items-center gap-3">
           {/* Car Thumbnail Placeholder */}
           <div className="w-10 h-6 bg-surface-elevated border border-border text-foreground-subtle rounded flex items-center justify-center shrink-0">
-            <Car className="w-4 h-4" />
+            {selectedVehicle.category === 'motorcycle' ? (
+              <Motorbike className="w-4 h-4" />
+            ) : (
+              <CarFront className="w-4 h-4" />
+            )}
           </div>
           <div className="text-left flex flex-col justify-center h-10">
             <h3 className="text-sm font-bold text-foreground leading-tight">{selectedVehicle.plateNumber}</h3>
@@ -59,7 +63,11 @@ export function VehicleSelector({ vehicles, selectedVehicleId, onSelect }: Vehic
               className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-surface-elevated transition-colors ${selectedVehicle.id === vehicle.id ? 'bg-surface-elevated' : ''}`}
             >
               <div className="w-10 h-6 bg-surface-elevated border border-border text-foreground-subtle rounded flex items-center justify-center shrink-0">
-                <Car className="w-4 h-4" />
+                {vehicle.category === 'motorcycle' ? (
+                  <Motorbike className="w-4 h-4" />
+                ) : (
+                  <CarFront className="w-4 h-4" />
+                )}
               </div>
               <div className="flex flex-col justify-center h-10">
                 <h3 className="text-sm font-bold text-foreground leading-tight">{vehicle.plateNumber}</h3>

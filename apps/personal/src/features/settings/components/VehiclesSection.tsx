@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Car, Lock, Unlock, ShieldCheck, Loader2 } from 'lucide-react';
+import { CarFront, Lock, Unlock, ShieldCheck, Loader2, Motorbike } from 'lucide-react';
 import { usePersonalLocale } from '@/components/PersonalShellLayout';
 import { getTranslation } from '@/i18n';
 import { mockVehicles } from '../../tracking/data/mockTrackingData';
@@ -124,7 +124,11 @@ function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
       <div className="flex flex-col md:flex-row gap-4">
         <div className="flex items-start md:items-center gap-4 flex-1">
           <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-red-50 text-red-500 dark:bg-red-950/30 dark:text-red-400 shrink-0">
-            <Car className="w-6 h-6" />
+            {vehicle.category === 'motorcycle' ? (
+              <Motorbike className="w-6 h-6" />
+            ) : (
+              <CarFront className="w-6 h-6" />
+            )}
           </div>
           <div>
             <h3 className="text-base font-bold text-foreground">{vehicle.name}</h3>
@@ -177,7 +181,11 @@ function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
         <div className="py-2">
           <div className="flex items-center gap-3 p-3 bg-surface-elevated rounded-lg border border-border">
             <div className="w-10 h-10 rounded-lg bg-red-50 text-red-500 dark:bg-red-950/30 dark:text-red-400 flex items-center justify-center shrink-0">
-              <Car className="w-5 h-5" />
+              {vehicle.category === 'motorcycle' ? (
+                <Motorbike className="w-5 h-5" />
+              ) : (
+                <CarFront className="w-5 h-5" />
+              )}
             </div>
             <div>
               <p className="font-semibold text-foreground text-sm">{vehicle.name}</p>
