@@ -1,8 +1,9 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useRef, useContext } from 'react';
 import { cn } from '@adatrack/utils';
-import { MapPin } from 'lucide-react';
+import * as maplibregl from 'maplibre-gl';
+import { MapProvider, MapContext } from './MapContext';
 
 export interface MapCoordinates {
   lat: number;
@@ -17,89 +18,146 @@ export interface MapViewport {
 export interface MapContainerProps extends React.HTMLAttributes<HTMLDivElement> {
   viewport?: MapViewport;
   onViewportChange?: (viewport: MapViewport) => void;
-  /**
-   * Slot untuk MapControls (tombol zoom, layer toggle, dll.)
-   */
   controlsSlot?: React.ReactNode;
-  /**
-   * Slot untuk MapToolbar (action bar melayang di bagian atas peta)
-   */
   toolbarSlot?: React.ReactNode;
-  /**
-   * Slot untuk MapOverlay (info card / side panel di atas peta)
-   */
   overlaySlot?: React.ReactNode;
   /**
-   * Pesan placeholder jika tidak ada provider peta nyata yang di-mount.
+   * Style URL untuk peta (mendukung light/dark theme dari aplikasi)
+   */
+  mapStyleUrl?: string;
+  /**
+   * Deprecated: Placeholder text for compatibility with older code
    */
   placeholderText?: string;
 }
 
-export const MapContainer = React.forwardRef<HTMLDivElement, MapContainerProps>(
-  (
-    {
-      className,
-      viewport = { center: { lat: -6.2, lng: 106.816667 }, zoom: 12 },
-      onViewportChange: _onViewportChange,
-      controlsSlot,
-      toolbarSlot,
-      overlaySlot,
-      placeholderText = 'Map Provider Placeholder (ADATRACK Maps Foundation)',
-      children,
-      ...props
-    },
-    ref,
-  ) => {
-    return (
-      <div
-        ref={ref}
-        className={cn(
-          'relative w-full h-full min-h-[300px] overflow-hidden rounded-lg border border-border bg-neutral-100 shadow-sm',
-          className,
-        )}
-        role="region"
-        aria-label="Tampilan Peta"
-        {...props}
-      >
-        {/* Background placeholder pattern saat provider belum terpasang */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center select-none bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-background border border-border shadow-sm text-primary mb-3">
-            <MapPin className="h-6 w-6" />
-          </div>
-          <p className="text-sm font-medium text-foreground max-w-sm">
-            {placeholderText}
-          </p>
-          <p className="text-xs text-foreground-muted mt-1 font-mono">
-            lat: {viewport.center.lat.toFixed(4)}, lng: {viewport.center.lng.toFixed(4)} | zoom: {viewport.zoom}
-          </p>
+// Inner component yang memiliki akses ke MapContext untuk men-set map instance
+function MapContainerInner({
+  className,
+  viewport = { center: { lat: -6.2, lng: 106.816667 }, zoom: 12 },
+  onViewportChange,
+  controlsSlot,
+  toolbarSlot,
+  overlaySlot,
+  mapStyleUrl = 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
+  children,
+  innerRef,
+  ...props
+}: MapContainerProps & { innerRef: React.ForwardedRef<HTMLDivElement> }) {
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<maplibregl.Map | null>(null);
+  const { setMap } = useContext(MapContext);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!mapContainerRef.current) return;
+    if (mapRef.current) return;
+
+    console.log('CONTAINER SIZE:', mapContainerRef.current.clientWidth, mapContainerRef.current.clientHeight);
+    console.log('INITIALIZING MAPLIBRE with URL:', mapStyleUrl);
+    
+    const map = new maplibregl.Map({
+      container: mapContainerRef.current,
+      style: mapStyleUrl,
+      center: [viewport.center.lng, viewport.center.lat],
+      zoom: viewport.zoom,
+      attributionControl: false,
+    });
+
+    mapRef.current = map;
+
+    map.on('load', () => {
+      console.log('MAPLIBRE LOAD EVENT FIRED!');
+      setMap(map);
+    });
+
+    map.on('error', (e) => {
+      console.error('MAPLIBRE ERROR:', e.error || e);
+    });
+
+    const updateViewport = () => {
+      if (onViewportChange) {
+        const center = map.getCenter();
+        onViewportChange({
+          center: { lat: center.lat, lng: center.lng },
+          zoom: map.getZoom(),
+        });
+      }
+    };
+
+    map.on('moveend', updateViewport);
+
+    return () => {
+      map.remove();
+      mapRef.current = null;
+      setMap(null);
+    };
+  }, []);
+
+  // Track current style to prevent redundant setStyle calls
+  const currentStyleRef = useRef(mapStyleUrl);
+
+  // Effect to update style when mapStyleUrl changes
+  useEffect(() => {
+    if (mapRef.current && mapStyleUrl && currentStyleRef.current !== mapStyleUrl) {
+      console.log('UPDATING MAP STYLE TO:', mapStyleUrl);
+      currentStyleRef.current = mapStyleUrl;
+      // We should technically check if map is loaded, but setStyle usually handles it.
+      // The bug was calling it on initial mount with the SAME style.
+      mapRef.current.setStyle(mapStyleUrl);
+    }
+  }, [mapStyleUrl]);
+
+  return (
+    <div
+      ref={innerRef}
+      className={cn(
+        'relative w-full h-full min-h-[300px] overflow-hidden rounded-lg border border-border bg-neutral-100 shadow-sm',
+        className,
+      )}
+      role="region"
+      aria-label="Tampilan Peta"
+      {...props}
+    >
+      {/* Container maplibre */}
+      <div ref={mapContainerRef} className="absolute inset-0 w-full h-full" />
+
+      {/* Slots */}
+      {toolbarSlot && (
+        <div className="absolute top-3 left-3 right-3 z-10 pointer-events-none">
+          <div className="pointer-events-auto inline-block">{toolbarSlot}</div>
         </div>
+      )}
 
-        {/* Floating toolbar slot (top) */}
-        {toolbarSlot && (
-          <div className="absolute top-3 left-3 right-3 z-10 pointer-events-none">
-            <div className="pointer-events-auto inline-block">{toolbarSlot}</div>
-          </div>
-        )}
+      {overlaySlot && (
+        <div className="absolute top-3 left-3 bottom-3 z-10 pointer-events-none max-w-sm">
+          <div className="pointer-events-auto h-full">{overlaySlot}</div>
+        </div>
+      )}
 
-        {/* Floating overlay slot (side/panel) */}
-        {overlaySlot && (
-          <div className="absolute top-3 left-3 bottom-3 z-10 pointer-events-none max-w-sm">
-            <div className="pointer-events-auto h-full">{overlaySlot}</div>
-          </div>
-        )}
+      {controlsSlot && (
+        <div className="absolute bottom-3 right-3 z-10 pointer-events-none">
+          <div className="pointer-events-auto">{controlsSlot}</div>
+        </div>
+      )}
 
-        {/* Floating controls slot (bottom right) */}
-        {controlsSlot && (
-          <div className="absolute bottom-3 right-3 z-10 pointer-events-none">
-            <div className="pointer-events-auto">{controlsSlot}</div>
-          </div>
-        )}
+      {/* Layer/Marker children yang membutuhkan akses ke useInternalMap */}
+      {children && (
+        <div className="absolute inset-0 z-10 pointer-events-none">
+          {children}
+        </div>
+      )}
+    </div>
+  );
+}
 
-        {/* Content/children slot for future custom map layers */}
-        {children && <div className="relative z-0 h-full w-full">{children}</div>}
-      </div>
+export const MapContainer = React.forwardRef<HTMLDivElement, MapContainerProps>(
+  (props, ref) => {
+    return (
+      <MapProvider>
+        <MapContainerInner {...props} innerRef={ref} />
+      </MapProvider>
     );
   },
 );
-
 MapContainer.displayName = 'MapContainer';
