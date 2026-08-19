@@ -1,18 +1,22 @@
-export { MapContainer } from './MapContainer';
-export { MapControls } from './MapControls';
-export { MapToolbar } from './MapToolbar';
-export { MapOverlay } from './MapOverlay';
-export { MapMarker } from './MapMarker';
-export { MapPopup } from './MapPopup';
-export { useMapActions } from './MapContext';
+// Core
+export * from './core/MapContext';
+export * from './core/MapContainer';
+export * from './core/MapMarker';
+export * from './core/MapPopup';
+export * from './core/MapOverlay';
 
-export type {
-  MapContainerProps,
-  MapCoordinates,
-  MapViewport,
-} from './MapContainer';
-export type { MapControlsProps } from './MapControls';
-export type { MapToolbarProps } from './MapToolbar';
-export type { MapOverlayProps } from './MapOverlay';
-export type { MapMarkerProps } from './MapMarker';
-export type { MapPopupProps } from './MapPopup';
+// Controls
+export * from './controls/BasemapSwitcher';
+export * from './controls/MapControls';
+export * from './controls/MapControlPanel';
+export * from './controls/MapToolbar';
+
+// Tracking
+export * from './tracking/types';
+export * from './tracking/utils';
+export * from './tracking/TrackingMap';
+
+// Tools & Basemaps (Unchanged structure)
+export * from './basemaps/types';
+export * from './tools/types';
+export * from './i18n';

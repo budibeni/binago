@@ -1,189 +1,130 @@
 'use client';
 
-import React, { useEffect, useRef, useState, useMemo } from 'react';
-import { MapContainer, MapViewport, useMapActions, MapPopup, MapControls } from '@adatrack/maps';
+import React, { useMemo, useState } from 'react';
+import { cn } from '@adatrack/utils';
+import {
+  TrackingMap,
+  MapPopup,
+} from '@adatrack/maps';
+import type {
+  MapEntityOption,
+  MapGeofenceOption,
+  GeofenceCheckRequest,
+  GeofenceCheckResult,
+} from '@adatrack/maps';
 import { Vehicle } from '../types';
 import { VehicleMarker } from './VehicleMarker';
-import { useCurrentTheme } from '../../../hooks/useCurrentTheme';
+import { usePersonalLocale } from '@/components/PersonalShellLayout';
 
 export interface LiveMapProps {
   vehicles: Vehicle[];
   selectedVehicleId?: string;
+  visibleVehicleIds?: string[];
 }
 
-// Inner component that has access to map context
-function LiveMapInner({ vehicles, selectedVehicleId }: LiveMapProps) {
-  const { fitBounds, panTo, zoomIn, zoomOut } = useMapActions();
-  const hasInitializedBounds = useRef(false);
-  const [focusedVehicleId, setFocusedVehicleId] = useState<string | null>(null);
+// Mock geofence data — business data di apps/personal, bukan di @adatrack/maps
+const MOCK_GEOFENCES: MapGeofenceOption[] = [
+  { id: 'g-001', label: 'Geofence Rumah Utama' },
+  { id: 'g-002', label: 'Geofence Kantor Pusat' },
+  { id: 'g-003', label: 'Geofence Gudang Cikarang' },
+  { id: 'g-004', label: 'Geofence Area Pelabuhan' },
+];
 
-  // Active vehicles are those that are "selected" globally
-  const activeVehicles = useMemo(() => {
-    return selectedVehicleId 
-      ? vehicles.filter(v => v.id === selectedVehicleId)
-      : vehicles;
-  }, [vehicles, selectedVehicleId]);
-
-  const focusedVehicle = useMemo(() => {
-    return focusedVehicleId ? activeVehicles.find(v => v.id === focusedVehicleId) : null;
-  }, [focusedVehicleId, activeVehicles]);
-
-  const fitToActiveVehicles = React.useCallback(() => {
-    if (activeVehicles.length === 0) return;
-
-    if (activeVehicles.length === 1) {
-      panTo({ lat: activeVehicles[0].location.lat, lng: activeVehicles[0].location.lng });
-    } else {
-      let minLat = 90, maxLat = -90, minLng = 180, maxLng = -180;
-      activeVehicles.forEach(v => {
-        if (v.location.lat < minLat) minLat = v.location.lat;
-        if (v.location.lat > maxLat) maxLat = v.location.lat;
-        if (v.location.lng < minLng) minLng = v.location.lng;
-        if (v.location.lng > maxLng) maxLng = v.location.lng;
-      });
-
-      if (minLat !== 90 && maxLat !== -90 && minLng !== 180 && maxLng !== -180) {
-        if (minLat !== maxLat || minLng !== maxLng) {
-          fitBounds(
-            [[minLng, minLat], [maxLng, maxLat]],
-            { padding: 50 }
-          );
-        } else {
-          panTo({ lat: minLat, lng: minLng });
-        }
-      }
-    }
-  }, [activeVehicles, fitBounds, panTo]);
-
-  useEffect(() => {
-    // Only run this once for initial fit bounds
-    if (hasInitializedBounds.current) return;
-    if (activeVehicles.length > 0) {
-      fitToActiveVehicles();
-      hasInitializedBounds.current = true;
-    }
-  }, [activeVehicles, fitToActiveVehicles]);
-
-  // Handle global selection changes (e.g. from VehicleList)
-  const prevSelectedId = useRef<string | undefined>(selectedVehicleId);
-  useEffect(() => {
-    if (hasInitializedBounds.current && selectedVehicleId && selectedVehicleId !== prevSelectedId.current) {
-      // When selection changes to a specific vehicle, auto-focus it
-      setFocusedVehicleId(selectedVehicleId);
-      const selected = vehicles.find((v) => v.id === selectedVehicleId);
-      if (selected) {
-        panTo(selected.location);
-      }
-    } else if (hasInitializedBounds.current && !selectedVehicleId && prevSelectedId.current) {
-      // Selection changed to "All"
-      setFocusedVehicleId(null);
-      fitToActiveVehicles();
-    }
-    prevSelectedId.current = selectedVehicleId;
-  }, [selectedVehicleId, vehicles, panTo, fitToActiveVehicles]);
-
-  const handleMarkerClick = (id: string) => {
-    setFocusedVehicleId(id);
-    const v = activeVehicles.find(v => v.id === id);
-    if (v) {
-      panTo(v.location);
-    }
+// Mock geofence check — implementasi spatial sesungguhnya di apps/personal atau backend
+async function mockCheckEntityGeofence(req: GeofenceCheckRequest): Promise<GeofenceCheckResult> {
+  await new Promise((r) => setTimeout(r, 800));
+  
+  // Simulasi sederhana
+  const inside = req.entityId === 'v-001' && req.geofenceId === 'g-001';
+  return {
+    inside,
+    distance: inside ? 0 : Math.floor(Math.random() * 3000) + 50,
+    label: inside ? 'Unit berada di dalam geofence.' : 'Unit berada di luar geofence.',
   };
+}
 
-  const handleClosePopup = () => {
-    setFocusedVehicleId(null);
-  };
+export function LiveMap({ vehicles, selectedVehicleId, visibleVehicleIds = [] }: LiveMapProps) {
+  const locale = usePersonalLocale();
+  // Internal selection state khusus personal jika tidak ada global selection yg masuk
+  const [internalSelectedId, setInternalSelectedId] = useState<string | null>(selectedVehicleId || null);
+  
+  // Sinkronisasi prop ke state internal jika prop berubah
+  React.useEffect(() => {
+    setInternalSelectedId(selectedVehicleId || null);
+  }, [selectedVehicleId]);
 
-  return (
-    <>
-      {vehicles.map((vehicle) => {
-        // Selection state: if selectedVehicleId exists, only that vehicle is selected (visible).
-        // If not, all are selected (visible)
-        const isSelected = selectedVehicleId ? vehicle.id === selectedVehicleId : true;
-        
-        return (
-          <VehicleMarker 
-            key={vehicle.id} 
-            vehicle={vehicle} 
-            selected={isSelected}
-            onClick={handleMarkerClick}
-          />
-        );
-      })}
-
-      {focusedVehicle && (
-        <MapPopup 
-          position={focusedVehicle.location} 
-          onClose={handleClosePopup}
-          offset={[0, -20]}
-        >
-          <div className="p-3 bg-white text-neutral-900 rounded-lg shadow-sm w-48 font-sans">
-            <h4 className="font-bold text-sm truncate">{focusedVehicle.type || focusedVehicle.name}</h4>
-            <p className="text-xs text-neutral-500 mb-2">{focusedVehicle.plateNumber}</p>
-            
-            <div className="flex items-center gap-2 mb-2">
-              <span className={`w-2 h-2 rounded-full ${
-                focusedVehicle.status === 'driving' ? 'bg-green-500' :
-                focusedVehicle.status === 'idle' ? 'bg-amber-500' :
-                focusedVehicle.status === 'parking' ? 'bg-blue-500' : 'bg-neutral-500'
-              }`} />
-              <span className="text-xs capitalize font-medium">{focusedVehicle.status}</span>
-            </div>
-            
-            {focusedVehicle.speed !== undefined && focusedVehicle.status !== 'offline' && (
-              <p className="text-xs font-medium">
-                {focusedVehicle.speed} km/j
-              </p>
-            )}
-
-            <button 
-              className="mt-3 w-full py-1.5 px-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 text-xs font-semibold rounded transition-colors"
-              onClick={() => {
-                // In real app, might dispatch an event or call a context to open detail panel.
-              }}
-            >
-              Lihat Detail
-            </button>
-          </div>
-        </MapPopup>
-      )}
-
-      {/* MapControls placed directly over the map */}
-      <div className="absolute bottom-6 right-4 z-10 pointer-events-auto">
-        <MapControls 
-          onZoomIn={zoomIn} 
-          onZoomOut={zoomOut} 
-          onResetView={fitToActiveVehicles} 
-          showLayerControl={false}
-        />
-      </div>
-    </>
+  // Build entity options for GeofenceCheckTool
+  const entityOptions: MapEntityOption[] = useMemo(
+    () =>
+      vehicles.map((v) => ({
+        id: v.id,
+        label: `${v.plateNumber}${v.name ? ` · ${v.name}` : ''}`,
+      })),
+    [vehicles],
   );
-}
-
-export function LiveMap({ vehicles, selectedVehicleId }: LiveMapProps) {
-  const [viewport, setViewport] = React.useState<MapViewport>({
-    center: { lat: -6.2146, lng: 106.8451 },
-    zoom: 12,
-  });
-
-  const theme = useCurrentTheme();
-
-  // Configurable Map Style
-  const mapStyleUrl = theme === 'dark'
-    ? 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
-    : 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json';
 
   return (
     <div className="w-full h-full relative">
-      <MapContainer
-        viewport={viewport}
-        onViewportChange={setViewport}
-        mapStyleUrl={mapStyleUrl}
+      <TrackingMap<Vehicle>
+        entities={vehicles}
+        selectedIds={visibleVehicleIds}
+        
+        // Resolvers
+        getId={(v) => v.id}
+        getPosition={(v) => v.location}
+        
+        // Renderers
+        renderMarker={(vehicle, { selected, focused, onClick }) => (
+          <VehicleMarker
+            key={vehicle.id}
+            vehicle={vehicle}
+            selected={selected || focused}
+            onClick={() => {
+              onClick();
+              setInternalSelectedId(vehicle.id);
+            }}
+          />
+        )}
+        renderPopup={(focusedVehicle, onClose) => (
+          <MapPopup
+            position={focusedVehicle.location}
+            onClose={() => {
+              onClose();
+              setInternalSelectedId(null);
+            }}
+            offset={[0, -15]}
+          >
+            <div className="p-3 bg-background text-foreground rounded-xl w-52 font-sans relative">
+              <h4 className="font-semibold text-sm truncate pr-6">{focusedVehicle.type || focusedVehicle.name}</h4>
+              <p className="text-xs text-foreground-muted mb-3">{focusedVehicle.plateNumber}</p>
+
+              <div className="flex items-center gap-2 mb-2">
+                <span
+                  className={cn(
+                    'w-2 h-2 rounded-full',
+                    focusedVehicle.status === 'driving' && 'bg-success',
+                    focusedVehicle.status === 'idle' && 'bg-warning',
+                    focusedVehicle.status === 'parking' && 'bg-info',
+                    focusedVehicle.status === 'offline' && 'bg-neutral-500'
+                  )}
+                />
+                <span className="text-xs capitalize font-medium">{focusedVehicle.status}</span>
+              </div>
+
+              {focusedVehicle.speed !== undefined && focusedVehicle.status !== 'offline' && (
+                <p className="text-xs font-medium">{focusedVehicle.speed} km/j</p>
+              )}
+            </div>
+          </MapPopup>
+        )}
+
+        geofences={MOCK_GEOFENCES}
+        entityOptions={entityOptions}
+        checkGeofenceFn={mockCheckEntityGeofence}
+        entityLabel="Kendaraan"
+        locale={locale}
         className="w-full h-full border-0 rounded-none min-h-0"
-      >
-        <LiveMapInner vehicles={vehicles} selectedVehicleId={selectedVehicleId} />
-      </MapContainer>
+      />
     </div>
   );
 }

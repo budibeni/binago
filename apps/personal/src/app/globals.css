@@ -109,3 +109,23 @@
     -moz-osx-font-smoothing: grayscale;
   }
 }
+
+/* ─── MapLibre Overrides ──────────────────────────── */
+@layer components {
+  .maplibregl-popup-content {
+    background-color: var(--color-background) !important;
+    border: 1px solid var(--color-border) !important;
+    border-radius: var(--radius-xl) !important;
+    box-shadow: var(--shadow-lg) !important;
+    padding: 0 !important;
+  }
+  
+  .maplibregl-popup-tip {
+    /* Hide the default maplibre tip as it's hard to style nicely with borders */
+    display: none !important;
+  }
+
+  .maplibregl-popup-close-button {
+    display: none !important;
+  }
+}

@@ -15,7 +15,9 @@ export function VehicleMarker({ vehicle, selected, onClick }: VehicleMarkerProps
   const isMotorcycle = vehicle.category === 'motorcycle';
   
   // Selection vs Status: Marker icon color ONLY reflects selection state.
-  const bgColor = selected ? 'bg-blue-600 text-white border-white' : 'bg-neutral-500 text-white border-white opacity-80';
+  const markerClasses = selected
+    ? 'bg-accent text-accent-foreground border-white shadow-md shadow-accent/20 z-10'
+    : 'bg-background text-foreground-muted border-border shadow-sm';
 
   return (
     <MapMarker
@@ -30,9 +32,9 @@ export function VehicleMarker({ vehicle, selected, onClick }: VehicleMarkerProps
           if (onClick) onClick(vehicle.id);
         }}
         className={cn(
-          "flex items-center justify-center rounded-full shadow-md border-2 cursor-pointer transition-transform",
-          selected ? "scale-110 z-10 hover:scale-125" : "scale-90 hover:scale-100",
-          bgColor,
+          "flex items-center justify-center rounded-full border-2 cursor-pointer transition-all duration-200",
+          selected ? "scale-110 z-10 hover:scale-110" : "scale-90 hover:scale-100 hover:text-foreground",
+          markerClasses,
           isMotorcycle ? "w-8 h-8" : "w-10 h-10"
         )}
         title={`${vehicle.plateNumber}`}

@@ -6,5 +6,6 @@ module.exports = {
   content: [
     './src/**/*.{js,ts,jsx,tsx}',
     '../../packages/ui/src/**/*.{js,ts,jsx,tsx}',
+    '../../packages/maps/src/**/*.{js,ts,jsx,tsx}',
   ],
 };

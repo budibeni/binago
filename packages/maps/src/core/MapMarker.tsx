@@ -5,7 +5,7 @@ import { useInternalMap } from './MapContext';
 
 export interface MapMarkerProps {
   /**
-   * Unique ID of the marker (e.g. vehicle id)
+   * Unique ID of the marker (e.g. entity id)
    */
   id: string;
   /**
@@ -41,7 +41,7 @@ export function MapMarker({
   useEffect(() => {
     const el = document.createElement('div');
     el.className = 'map-marker-container';
-    el.setAttribute('data-vehicle-id', id);
+    el.setAttribute('data-marker-id', id);
     setMarkerElement(el);
     
     return () => {

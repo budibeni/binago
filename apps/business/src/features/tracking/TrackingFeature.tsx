@@ -222,6 +222,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
           <LiveMap
             vehicles={mockVehicles}
             selectedVehicleId={selectedVehicleId}
+            selectedVehicleIds={selectedVehicleIds.length === 0 ? mockVehicles.map(v => v.id) : selectedVehicleIds}
             onVehicleSelect={handleMapSelect}
             className="absolute inset-0 w-full h-full"
           />

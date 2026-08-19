@@ -125,8 +125,9 @@ export function MonitoringPage() {
       {/* Map Area - Full Background */}
       <div className="absolute inset-0 z-0">
         <LiveMap
-          vehicles={mapVehicles}
+          vehicles={filteredVehicles}
           selectedVehicleId={selectedVehicleId}
+          visibleVehicleIds={filteredVehicles.filter(v => !hiddenVehicleIds.has(v.id)).map(v => v.id)}
         />
       </div>
       
