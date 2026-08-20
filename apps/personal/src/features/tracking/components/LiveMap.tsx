@@ -15,6 +15,7 @@ import type {
 import { Vehicle } from '../types';
 import { VehicleMarker } from './VehicleMarker';
 import { usePersonalLocale } from '@/components/PersonalShellLayout';
+import { Car, Bike } from 'lucide-react';
 
 export interface LiveMapProps {
   vehicles: Vehicle[];
@@ -72,6 +73,14 @@ export function LiveMap({ vehicles, selectedVehicleId, visibleVehicleIds = [] }:
         // Resolvers
         getId={(v) => v.id}
         getPosition={(v) => v.location}
+        
+        // Marker Presentation
+        getLabel={(v) => v.plateNumber}
+        getIcon={(v) => {
+          return v.category === 'motorcycle' 
+            ? <Bike className="w-5 h-5" /> 
+            : <Car className="w-5 h-5" />;
+        }}
         
         // Renderers
         renderMarker={(vehicle, { selected, focused, onClick }) => (

@@ -16,7 +16,8 @@ import {
   Check,
   X,
   Navigation,
-  Target
+  Target,
+  MapPin, // <-- added
 } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import { useMapActions } from '../core/MapContext';
@@ -48,10 +49,16 @@ export interface MapControlPanelProps {
   entityLabel?: string;
   className?: string;
   locale?: Locale;
+  
+  // Marker Style Toggle
+  hasCustomMarker?: boolean;
+  markerStyle?: 'default' | 'custom';
+  onMarkerStyleChange?: (style: 'default' | 'custom') => void;
 }
 
 type ActivePanel =
   | 'basemap'
+  | 'markerStyle'
   | 'more'
   | 'search'
   | 'geofence'
@@ -77,6 +84,9 @@ export function MapControlPanel({
   entityLabel,
   className,
   locale = 'id',
+  hasCustomMarker,
+  markerStyle = 'default',
+  onMarkerStyleChange,
 }: MapControlPanelProps) {
   const { zoomIn, zoomOut } = useMapActions();
   const t = getMapTranslation(locale);
@@ -184,6 +194,50 @@ export function MapControlPanel({
                     </button>
                   );
                 })}
+              </div>
+            </FloatingCard>
+          )}
+
+          {/* ── Marker Style picker ── */}
+          {active === 'markerStyle' && hasCustomMarker && (
+            <FloatingCard aria-label="Tampilan Marker">
+              <div className="p-1 min-w-[180px]" role="listbox" aria-label="Tampilan Marker">
+                <button
+                  type="button"
+                  role="option"
+                  aria-selected={markerStyle === 'default'}
+                  onClick={() => { onMarkerStyleChange?.('default'); closeAll(); }}
+                  className={cn(
+                    'w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors text-left',
+                    markerStyle === 'default'
+                      ? 'bg-accent/10 text-accent font-medium'
+                      : 'text-foreground-muted hover:bg-surface hover:text-foreground',
+                  )}
+                >
+                  <span className="w-4 flex justify-center shrink-0">
+                    {markerStyle === 'default' && <Check className="w-4 h-4 text-accent" />}
+                  </span>
+                  <MapPin className={cn('w-4 h-4 shrink-0', markerStyle === 'default' ? 'text-accent' : 'text-foreground-subtle')} />
+                  <span className="truncate">Default Marker</span>
+                </button>
+                <button
+                  type="button"
+                  role="option"
+                  aria-selected={markerStyle === 'custom'}
+                  onClick={() => { onMarkerStyleChange?.('custom'); closeAll(); }}
+                  className={cn(
+                    'w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors text-left',
+                    markerStyle === 'custom'
+                      ? 'bg-accent/10 text-accent font-medium'
+                      : 'text-foreground-muted hover:bg-surface hover:text-foreground',
+                  )}
+                >
+                  <span className="w-4 flex justify-center shrink-0">
+                    {markerStyle === 'custom' && <Check className="w-4 h-4 text-accent" />}
+                  </span>
+                  <Navigation className={cn('w-4 h-4 shrink-0', markerStyle === 'custom' ? 'text-accent' : 'text-foreground-subtle')} />
+                  <span className="truncate">Custom Marker</span>
+                </button>
               </div>
             </FloatingCard>
           )}
@@ -305,6 +359,20 @@ export function MapControlPanel({
         />
 
         <Sep />
+
+        {/* Marker Style */}
+        {hasCustomMarker && (
+          <>
+            <IconBtn
+              id="ctrl-marker-style"
+              icon={MapPin}
+              label="Tampilan Marker"
+              onClick={() => toggle('markerStyle')}
+              active={active === 'markerStyle'}
+            />
+            <Sep />
+          </>
+        )}
 
         {/* More Tools */}
         <IconBtn

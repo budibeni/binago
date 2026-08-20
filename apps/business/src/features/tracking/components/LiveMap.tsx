@@ -16,6 +16,8 @@ import type { TrackingVehicle } from '../types/tracking';
 import { VehicleMarker } from './VehicleMarker';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
 
+import { Truck, Bus } from 'lucide-react';
+
 // ─── LiveMap Props ─────────────────────────────────────────────────────────────
 
 export interface LiveMapProps {
@@ -91,6 +93,15 @@ export function LiveMap({ vehicles, selectedVehicleId, visibleVehicleIds = [] }:
         // Resolvers
         getId={(v) => v.id}
         getPosition={(v) => v.location}
+        
+        // Marker Presentation
+        getLabel={(v) => v.plateNumber}
+        getIcon={(v) => {
+          const isMinibus = v.vehicleType?.toLowerCase().includes('minibus')
+            || v.vehicleType?.toLowerCase().includes('hiace')
+            || v.vehicleType?.toLowerCase().includes('bus');
+          return isMinibus ? <Bus className="w-5 h-5" /> : <Truck className="w-5 h-5" />;
+        }}
 
         // Renderers
         renderMarker={(vehicle, { selected, focused, onClick }) => (

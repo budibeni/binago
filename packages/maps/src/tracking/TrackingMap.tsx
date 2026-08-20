@@ -15,6 +15,10 @@ import type {
 } from '../tools/types';
 import { defaultNominatimSearch, calcEntityBounds } from './utils';
 
+import useSupercluster from 'use-supercluster';
+import { ClusterMarker } from './ClusterMarker';
+import { EntityMarker } from './EntityMarker';
+
 export interface TrackingMapProps<T> {
   /** Data seluruh entitas (kendaraan, device, dll) yang tersedia */
   entities: T[];
@@ -28,10 +32,20 @@ export interface TrackingMapProps<T> {
   /** Resolver: Mendapatkan arah pergerakan entitas (0-360) (opsional) */
   getHeading?: (entity: T) => number;
   
-  /** Renderer: Komponen marker untuk entitas */
-  renderMarker: (entity: T, state: { selected: boolean; focused: boolean; onClick: () => void }) => React.ReactNode;
+  /** Renderer opsional: Jika disuplai, consumer bisa membuat UI marker kustom (Marker Style: Custom) */
+  renderMarker?: (entity: T, state: { selected: boolean; focused: boolean; onClick: () => void }) => React.ReactNode;
+  /** Resolver: Mendapatkan teks label untuk EntityMarker bawaan */
+  getLabel?: (entity: T) => string | undefined;
+  /** Resolver: Mendapatkan ikon untuk EntityMarker bawaan */
+  getIcon?: (entity: T) => React.ReactNode;
+  /** Resolver: Mendapatkan warna marker untuk EntityMarker bawaan */
+  getColor?: (entity: T) => string | undefined;
+
   /** Renderer: Komponen popup untuk entitas ketika difokuskan (opsional) */
   renderPopup?: (entity: T, onClose: () => void) => React.ReactNode;
+
+  /** Mengaktifkan fitur clustering (default: true) */
+  enableClustering?: boolean;
 
   /** Callback abstrak pencarian alamat (bisa default public API atau backend custom) */
   searchAddressFn?: (query: string) => Promise<LocationSearchResult[]>;
@@ -57,7 +71,11 @@ function TrackingMapInner<T>({
   getPosition,
   getHeading,
   renderMarker,
+  getLabel,
+  getIcon,
+  getColor,
   renderPopup,
+  enableClustering = true,
   searchAddressFn = defaultNominatimSearch,
   geofences,
   entityOptions,
@@ -76,11 +94,59 @@ function TrackingMapInner<T>({
   // Internal state: entitas mana yang sedang diklik (ditampilkan popup)
   const [focusedEntityId, setFocusedEntityId] = useState<string | null>(null);
 
+  // Marker style state
+  const [markerStyle, setMarkerStyle] = useState<'default' | 'custom'>('default');
+
+  // Clustering states
+  const [bounds, setBounds] = useState<[number, number, number, number] | undefined>(undefined);
+  const [zoom, setZoom] = useState<number>(12);
+
+  useEffect(() => {
+    if (!map) return;
+    const update = () => {
+      const b = map.getBounds();
+      setBounds([b.getWest(), b.getSouth(), b.getEast(), b.getNorth()]);
+      setZoom(map.getZoom());
+    };
+    update();
+    map.on('move', update);
+    map.on('zoom', update);
+    return () => {
+      map.off('move', update);
+      map.off('zoom', update);
+    };
+  }, [map]);
+
   const hasInitializedBounds = useRef(false);
 
   const visibleEntities = useMemo(() => {
     return entities.filter((e) => selectedIds.includes(getId(e)));
   }, [entities, selectedIds, getId]);
+
+  const points = useMemo(() => {
+    return visibleEntities.map((entity) => {
+      const pos = getPosition(entity);
+      return {
+        type: 'Feature' as const,
+        properties: {
+          cluster: false,
+          entityId: getId(entity),
+          entity,
+        },
+        geometry: {
+          type: 'Point' as const,
+          coordinates: [Math.min(Math.max(pos.lng, -180), 180), Math.min(Math.max(pos.lat, -90), 90)],
+        },
+      };
+    });
+  }, [visibleEntities, getPosition, getId]);
+
+  const { clusters, supercluster } = useSupercluster({
+    points,
+    bounds,
+    zoom,
+    options: { radius: 75, maxZoom: 20 },
+  });
 
   const focusedEntity = useMemo(() => {
     return focusedEntityId ? entities.find((e) => getId(e) === focusedEntityId) : null;
@@ -88,9 +154,9 @@ function TrackingMapInner<T>({
 
   const handleFitSelected = useCallback(() => {
     const positions = visibleEntities.map(getPosition);
-    const bounds = calcEntityBounds(positions);
-    if (bounds) {
-      fitBounds(bounds, { padding: 50 });
+    const boundsObj = calcEntityBounds(positions);
+    if (boundsObj) {
+      fitBounds(boundsObj, { padding: 50 });
     }
   }, [visibleEntities, getPosition, fitBounds]);
 
@@ -104,13 +170,15 @@ function TrackingMapInner<T>({
   useEffect(() => {
     if (visibleEntities.length > 0 && !hasInitializedBounds.current) {
       const positions = visibleEntities.map(getPosition);
-      const bounds = calcEntityBounds(positions);
-      if (bounds) {
-        fitBounds(bounds, { padding: 50 });
+      const boundsObj = calcEntityBounds(positions);
+      if (boundsObj) {
+        fitBounds(boundsObj, { padding: 50 });
         hasInitializedBounds.current = true;
       }
     }
   }, [visibleEntities, getPosition, fitBounds]);
+
+  const markersToRender = enableClustering && bounds ? clusters : points;
 
   return (
     <div className={className} style={{ width: '100%', height: '100%', display: 'flex' }}>
@@ -132,26 +200,75 @@ function TrackingMapInner<T>({
             onCheckEntityGeofence={checkGeofenceFn}
             entityLabel={entityLabel}
             locale={locale}
+            hasCustomMarker={!!renderMarker}
+            markerStyle={markerStyle}
+            onMarkerStyleChange={setMarkerStyle}
           />
         }
       >
-        {/* Render entitas yang visible (sesuai selectedIds atau semua jika kosong) */}
-        {visibleEntities.map((entity) => {
-          const id = getId(entity);
+        {/* Render entitas yang visible (sesuai selectedIds atau semua jika kosong) atau clusters */}
+        {markersToRender.map((cluster) => {
+          const [lng, lat] = cluster.geometry.coordinates;
+          const props = cluster.properties as any;
+          const isCluster = props.cluster;
+          const pointCount = props.point_count;
+          const clusterId = (cluster as any).id as number;
+
+          if (isCluster) {
+            return (
+              <ClusterMarker
+                key={`cluster-${clusterId}`}
+                id={clusterId.toString()}
+                position={{ lat, lng }}
+                count={pointCount}
+                onClick={() => {
+                  if (!supercluster || !map) return;
+                  const expansionZoom = Math.min(
+                    supercluster.getClusterExpansionZoom(clusterId),
+                    20
+                  );
+                  map.flyTo({
+                    center: [lng, lat],
+                    zoom: expansionZoom,
+                    speed: 1.2
+                  });
+                }}
+              />
+            );
+          }
+
+          const entity = props.entity as T;
+          const id = props.entityId;
           const selected = selectedIds.includes(id);
           const focused = focusedEntityId === id;
           
+          const onClickEntity = () => {
+            setFocusedEntityId(id);
+            const pos = getPosition(entity);
+            panTo({ lat: pos.lat, lng: pos.lng });
+          };
+          
           return (
             <React.Fragment key={id}>
-              {renderMarker(entity, {
-                selected,
-                focused,
-                onClick: () => {
-                  setFocusedEntityId(id);
-                  const pos = getPosition(entity);
-                  panTo({ lat: pos.lat, lng: pos.lng });
-                }
-              })}
+              {markerStyle === 'custom' && renderMarker ? (
+                renderMarker(entity, {
+                  selected,
+                  focused,
+                  onClick: onClickEntity
+                })
+              ) : (
+                <EntityMarker
+                  id={id}
+                  position={getPosition(entity)}
+                  heading={getHeading?.(entity)}
+                  label={getLabel?.(entity)}
+                  icon={getIcon?.(entity)}
+                  color={getColor?.(entity)}
+                  selected={selected}
+                  focused={focused}
+                  onClick={onClickEntity}
+                />
+              )}
             </React.Fragment>
           );
         })}
