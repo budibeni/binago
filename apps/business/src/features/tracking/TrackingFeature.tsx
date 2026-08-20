@@ -108,6 +108,13 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
     stopTimer();
   }, [stopTimer]);
 
+  const handlePlaybackRequest = React.useCallback((vehicleId: string) => {
+    setMode('playback');
+    setPlaybackVehicleId(vehicleId);
+    setPlaybackState({ status: 'idle', totalDuration: 0, currentTime: 0 });
+    stopTimer();
+  }, [stopTimer]);
+
   const handleLoadHistory = React.useCallback(() => {
     if (!playbackVehicleId) return;
     stopTimer();
@@ -232,7 +239,12 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
           <LiveMap
             vehicles={allVehiclesUnfiltered}
             selectedVehicleId={selectedVehicleId || undefined}
-            visibleVehicleIds={allVehiclesUnfiltered.map(v => v.id).filter(id => selectedVehicleIds.includes(id))}
+            visibleVehicleIds={
+              mode === 'playback'
+                ? (playbackVehicleId ? [playbackVehicleId] : [])
+                : allVehiclesUnfiltered.map(v => v.id).filter(id => selectedVehicleIds.includes(id))
+            }
+            onPlaybackRequest={handlePlaybackRequest}
           />
         </div>
 

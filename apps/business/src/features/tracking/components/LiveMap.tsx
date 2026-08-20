@@ -25,6 +25,7 @@ export interface LiveMapProps {
   vehicles: TrackingVehicle[];
   selectedVehicleId?: string;
   visibleVehicleIds?: string[];
+  onPlaybackRequest?: (vehicleId: string) => void;
 }
 
 // ─── Mock geofence data ────────────────────────────────────────────────────────
@@ -68,7 +69,7 @@ const STATUS_LABEL: Record<TrackingVehicle['status'], string> = {
 
 // ─── LiveMap ───────────────────────────────────────────────────────────────────
 
-export function LiveMap({ vehicles, selectedVehicleId, visibleVehicleIds = [] }: LiveMapProps) {
+export function LiveMap({ vehicles, selectedVehicleId, visibleVehicleIds = [], onPlaybackRequest }: LiveMapProps) {
   const locale = useBusinessLocale();
   const [internalSelectedId, setInternalSelectedId] = React.useState<string | null>(selectedVehicleId || null);
 
@@ -127,7 +128,9 @@ export function LiveMap({ vehicles, selectedVehicleId, visibleVehicleIds = [] }:
                 setInternalSelectedId(null);
               }}
               locale={locale}
-              onPlayback={() => console.log('Playback clicked', focusedVehicle.id)}
+              onPlayback={() => {
+                if (onPlaybackRequest) onPlaybackRequest(focusedVehicle.id);
+              }}
               onShareLocation={() => console.log('Share clicked', focusedVehicle.id)}
             />
           </MapPopup>
