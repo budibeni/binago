@@ -74,3 +74,35 @@ export interface PlaybackState {
   errorMessage?: string;
 }
 
+// ─── Trip ──────────────────────────────────────────────────────────────────────
+
+export interface Trip {
+  id: string;
+  vehicleId: string;
+  date: string;       // YYYY-MM-DD
+  startTime: string;  // ISO string
+  endTime: string;    // ISO string
+  distance: number;   // km
+  duration: number;   // minutes
+  avgSpeed: number;   // km/h
+  maxSpeed: number;   // km/h
+  startAddress: string;
+  endAddress: string;
+}
+
+// ─── Playback Point ────────────────────────────────────────────────────────────
+
+export interface PlaybackPoint {
+  lat: number;
+  lng: number;
+  timestamp: string;  // ISO string
+  speed: number;      // km/h
+  heading?: number;   // degrees 0-360
+}
+
+// ─── Playback Data ─────────────────────────────────────────────────────────────
+
+export interface PlaybackData {
+  tripId: string;
+  points: PlaybackPoint[];
+}

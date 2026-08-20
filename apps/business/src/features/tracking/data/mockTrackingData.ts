@@ -1,4 +1,5 @@
-import type { TrackingVehicle, TrackingVehicleGroup } from '../types/tracking';
+import type { TrackingVehicle, TrackingVehicleGroup, Trip, PlaybackData, PlaybackPoint } from '../types/tracking';
+
 
 // ─── Dummy Vehicles — Group: Hino Dutro ───────────────────────────────────────
 
@@ -306,4 +307,334 @@ export const mockVehicleGroups: TrackingVehicleGroup[] = [
 export const mockVehicles: TrackingVehicle[] = [
   ...hinoDutroVehicles,
   ...toyotaHiaceVehicles,
+];
+
+// ─── Date helpers ─────────────────────────────────────────────────────────────
+
+const _today = new Date();
+const _getLocalDate = (d: Date) => {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+};
+
+const _dateToday = _getLocalDate(_today);
+const _dateYesterday = _getLocalDate(new Date(_today.getTime() - 24 * 60 * 60 * 1000));
+const _date2DaysAgo = _getLocalDate(new Date(_today.getTime() - 2 * 24 * 60 * 60 * 1000));
+
+// ─── Mock Trips by Vehicle ID ──────────────────────────────────────────────────
+
+export const mockTripsByVehicleId: Record<string, Trip[]> = {
+  // ─ veh-001 (B 9027 PU — Alwi — Hino Dutro)
+  'veh-001': [
+    {
+      id: 'trip-001-1',
+      vehicleId: 'veh-001',
+      date: _dateToday,
+      startTime: new Date(_today.getTime() - 1000 * 60 * 60 * 5).toISOString(),
+      endTime: new Date(_today.getTime() - 1000 * 60 * 60 * 4.1).toISOString(),
+      distance: 32.4,
+      duration: 54,
+      avgSpeed: 36,
+      maxSpeed: 68,
+      startAddress: 'Gudang Pusat, Jakarta Barat',
+      endAddress: 'Geofence Pelabuhan, Tanjung Priok',
+    },
+    {
+      id: 'trip-001-2',
+      vehicleId: 'veh-001',
+      date: _dateToday,
+      startTime: new Date(_today.getTime() - 1000 * 60 * 60 * 2.5).toISOString(),
+      endTime: new Date(_today.getTime() - 1000 * 60 * 60 * 1.8).toISOString(),
+      distance: 18.7,
+      duration: 42,
+      avgSpeed: 27,
+      maxSpeed: 55,
+      startAddress: 'Geofence Pelabuhan, Tanjung Priok',
+      endAddress: 'Jl. Sudirman No. 12, Jakarta Pusat',
+    },
+    {
+      id: 'trip-001-3',
+      vehicleId: 'veh-001',
+      date: _dateYesterday,
+      startTime: new Date(_today.getTime() - 24 * 60 * 60 * 1000 - 1000 * 60 * 60 * 7).toISOString(),
+      endTime: new Date(_today.getTime() - 24 * 60 * 60 * 1000 - 1000 * 60 * 60 * 6).toISOString(),
+      distance: 28.1,
+      duration: 60,
+      avgSpeed: 28,
+      maxSpeed: 60,
+      startAddress: 'Gudang Pusat, Jakarta Barat',
+      endAddress: 'Geofence Gudang Utama, Cawang',
+    },
+    {
+      id: 'trip-001-4',
+      vehicleId: 'veh-001',
+      date: _date2DaysAgo,
+      startTime: new Date(_today.getTime() - 2 * 24 * 60 * 60 * 1000 - 1000 * 60 * 60 * 9).toISOString(),
+      endTime: new Date(_today.getTime() - 2 * 24 * 60 * 60 * 1000 - 1000 * 60 * 60 * 7.5).toISOString(),
+      distance: 44.2,
+      duration: 90,
+      avgSpeed: 29,
+      maxSpeed: 72,
+      startAddress: 'Gudang Pusat, Jakarta Barat',
+      endAddress: 'Komp. Pergudangan Marunda, Kav. 12',
+    },
+  ],
+
+  // ─ veh-002 (B 9329 PYX — Yudi — Hino Dutro)
+  'veh-002': [
+    {
+      id: 'trip-002-1',
+      vehicleId: 'veh-002',
+      date: _dateToday,
+      startTime: new Date(_today.getTime() - 1000 * 60 * 60 * 6).toISOString(),
+      endTime: new Date(_today.getTime() - 1000 * 60 * 60 * 5).toISOString(),
+      distance: 21.5,
+      duration: 60,
+      avgSpeed: 22,
+      maxSpeed: 50,
+      startAddress: 'Gudang Pusat, Jakarta Barat',
+      endAddress: 'Jl. Gajah Mada No. 5, Jakarta Barat',
+    },
+    {
+      id: 'trip-002-2',
+      vehicleId: 'veh-002',
+      date: _dateYesterday,
+      startTime: new Date(_today.getTime() - 24 * 60 * 60 * 1000 - 1000 * 60 * 60 * 8).toISOString(),
+      endTime: new Date(_today.getTime() - 24 * 60 * 60 * 1000 - 1000 * 60 * 60 * 6.8).toISOString(),
+      distance: 35.0,
+      duration: 72,
+      avgSpeed: 29,
+      maxSpeed: 65,
+      startAddress: 'Jl. Gajah Mada No. 5, Jakarta Barat',
+      endAddress: 'Geofence Pelabuhan, Tanjung Priok',
+    },
+  ],
+
+  // ─ veh-003 (B 9330 PYX — Agus) — sedang driving, belum ada trip hari ini selesai
+  'veh-003': [
+    {
+      id: 'trip-003-1',
+      vehicleId: 'veh-003',
+      date: _dateYesterday,
+      startTime: new Date(_today.getTime() - 24 * 60 * 60 * 1000 - 1000 * 60 * 60 * 10).toISOString(),
+      endTime: new Date(_today.getTime() - 24 * 60 * 60 * 1000 - 1000 * 60 * 60 * 9).toISOString(),
+      distance: 19.8,
+      duration: 60,
+      avgSpeed: 20,
+      maxSpeed: 45,
+      startAddress: 'Gudang Pusat, Jakarta Barat',
+      endAddress: 'Jl. Fatmawati No. 30, Jakarta Selatan',
+    },
+  ],
+
+  // ─ veh-101 (B 1201 KJA — Lukman — Toyota Hiace)
+  'veh-101': [
+    {
+      id: 'trip-101-1',
+      vehicleId: 'veh-101',
+      date: _dateToday,
+      startTime: new Date(_today.getTime() - 1000 * 60 * 60 * 4).toISOString(),
+      endTime: new Date(_today.getTime() - 1000 * 60 * 60 * 3.2).toISOString(),
+      distance: 24.6,
+      duration: 48,
+      avgSpeed: 31,
+      maxSpeed: 70,
+      startAddress: 'Pool Kendaraan Slipi, Jakarta Barat',
+      endAddress: 'Jl. Duri Kosambi No. 7, Jakarta Barat',
+    },
+    {
+      id: 'trip-101-2',
+      vehicleId: 'veh-101',
+      date: _dateYesterday,
+      startTime: new Date(_today.getTime() - 24 * 60 * 60 * 1000 - 1000 * 60 * 60 * 6).toISOString(),
+      endTime: new Date(_today.getTime() - 24 * 60 * 60 * 1000 - 1000 * 60 * 60 * 5.2).toISOString(),
+      distance: 15.3,
+      duration: 48,
+      avgSpeed: 19,
+      maxSpeed: 55,
+      startAddress: 'Pool Kendaraan Slipi, Jakarta Barat',
+      endAddress: 'Kantor Pusat Tanah Abang, Jakarta Pusat',
+    },
+  ],
+
+  // ─ veh-102, 103, 104, 105 — kosong (vehicle terbatas trip-nya)
+  'veh-102': [],
+  'veh-103': [],
+  'veh-104': [],
+  'veh-105': [],
+  'veh-106': [
+    {
+      id: 'trip-106-1',
+      vehicleId: 'veh-106',
+      date: _dateToday,
+      startTime: new Date(_today.getTime() - 1000 * 60 * 60 * 3).toISOString(),
+      endTime: new Date(_today.getTime() - 1000 * 60 * 60 * 2.2).toISOString(),
+      distance: 38.4,
+      duration: 48,
+      avgSpeed: 48,
+      maxSpeed: 90,
+      startAddress: 'Pool Kendaraan Slipi, Jakarta Barat',
+      endAddress: 'Tol Kebun Jeruk Arah Timur',
+    },
+  ],
+};
+
+// ─── Helper: generate dummy playback points ────────────────────────────────────
+
+function generateDummyPoints(
+  startLat: number,
+  startLng: number,
+  endLat: number,
+  endLng: number,
+  pointsCount: number,
+  baseTime: Date,
+  durationMinutes: number,
+): PlaybackPoint[] {
+  const points: PlaybackPoint[] = [];
+  const timeStep = (durationMinutes * 60 * 1000) / pointsCount;
+
+  for (let i = 0; i <= pointsCount; i++) {
+    const fraction = i / pointsCount;
+    // Tambahkan noise ringan agar terlihat seperti jalur jalan, bukan garis lurus
+    const noiseLat = Math.sin(fraction * Math.PI) * 0.006;
+    const noiseLng = Math.cos(fraction * Math.PI * 1.3) * 0.004;
+
+    const lat = startLat + (endLat - startLat) * fraction + noiseLat;
+    const lng = startLng + (endLng - startLng) * fraction + noiseLng;
+
+    // Hitung heading dari titik sebelumnya
+    let heading = 0;
+    if (i > 0) {
+      const prev = points[i - 1];
+      const dLng = lng - prev.lng;
+      const dLat = lat - prev.lat;
+      heading = (Math.atan2(dLng, dLat) * 180) / Math.PI;
+    }
+
+    points.push({
+      lat,
+      lng,
+      timestamp: new Date(baseTime.getTime() + timeStep * i).toISOString(),
+      speed: Math.floor(25 + Math.random() * 45), // 25–70 km/h
+      heading: Math.round(heading),
+    });
+  }
+
+  return points;
+}
+
+// ─── Mock Playback Data ────────────────────────────────────────────────────────
+
+export const mockPlaybackData: PlaybackData[] = [
+  // veh-001 trips
+  {
+    tripId: 'trip-001-1',
+    points: generateDummyPoints(
+      -6.2000, 106.7900,   // Gudang Pusat, Jakarta Barat
+      -6.1100, 106.8700,   // Tanjung Priok
+      25,
+      new Date(_today.getTime() - 1000 * 60 * 60 * 5),
+      54,
+    ),
+  },
+  {
+    tripId: 'trip-001-2',
+    points: generateDummyPoints(
+      -6.1100, 106.8700,   // Tanjung Priok
+      -6.2088, 106.8456,   // Jl. Sudirman
+      18,
+      new Date(_today.getTime() - 1000 * 60 * 60 * 2.5),
+      42,
+    ),
+  },
+  {
+    tripId: 'trip-001-3',
+    points: generateDummyPoints(
+      -6.2000, 106.7900,   // Gudang Pusat
+      -6.2300, 106.8550,   // Cawang
+      22,
+      new Date(_today.getTime() - 24 * 60 * 60 * 1000 - 1000 * 60 * 60 * 7),
+      60,
+    ),
+  },
+  {
+    tripId: 'trip-001-4',
+    points: generateDummyPoints(
+      -6.2000, 106.7900,   // Gudang Pusat
+      -6.1050, 106.9200,   // Marunda
+      30,
+      new Date(_today.getTime() - 2 * 24 * 60 * 60 * 1000 - 1000 * 60 * 60 * 9),
+      90,
+    ),
+  },
+
+  // veh-002 trips
+  {
+    tripId: 'trip-002-1',
+    points: generateDummyPoints(
+      -6.2000, 106.7900,   // Gudang Pusat
+      -6.1754, 106.8272,   // Jl. Gajah Mada
+      20,
+      new Date(_today.getTime() - 1000 * 60 * 60 * 6),
+      60,
+    ),
+  },
+  {
+    tripId: 'trip-002-2',
+    points: generateDummyPoints(
+      -6.1754, 106.8272,   // Jl. Gajah Mada
+      -6.1100, 106.8700,   // Tanjung Priok
+      25,
+      new Date(_today.getTime() - 24 * 60 * 60 * 1000 - 1000 * 60 * 60 * 8),
+      72,
+    ),
+  },
+
+  // veh-003 trips
+  {
+    tripId: 'trip-003-1',
+    points: generateDummyPoints(
+      -6.2000, 106.7900,   // Gudang Pusat
+      -6.2297, 106.8295,   // Jl. Fatmawati
+      20,
+      new Date(_today.getTime() - 24 * 60 * 60 * 1000 - 1000 * 60 * 60 * 10),
+      60,
+    ),
+  },
+
+  // veh-101 trips
+  {
+    tripId: 'trip-101-1',
+    points: generateDummyPoints(
+      -6.2000, 106.7900,   // Pool Slipi
+      -6.1750, 106.7900,   // Duri Kosambi
+      20,
+      new Date(_today.getTime() - 1000 * 60 * 60 * 4),
+      48,
+    ),
+  },
+  {
+    tripId: 'trip-101-2',
+    points: generateDummyPoints(
+      -6.2000, 106.7900,   // Pool Slipi
+      -6.2120, 106.8050,   // Tanah Abang
+      18,
+      new Date(_today.getTime() - 24 * 60 * 60 * 1000 - 1000 * 60 * 60 * 6),
+      48,
+    ),
+  },
+
+  // veh-106 trips
+  {
+    tripId: 'trip-106-1',
+    points: generateDummyPoints(
+      -6.2000, 106.7900,   // Pool Slipi
+      -6.1500, 106.7750,   // Tol Kebun Jeruk
+      22,
+      new Date(_today.getTime() - 1000 * 60 * 60 * 3),
+      48,
+    ),
+  },
 ];

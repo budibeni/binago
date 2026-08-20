@@ -160,10 +160,10 @@ function MapContainerInner({
         </div>
       )}
 
-      {/* Toolbar slot — top center / top left sesuai consumer */}
+      {/* Toolbar slot — bottom right (desktop), top right (mobile) */}
       {toolbarSlot && (
-        <div className="absolute top-4 left-4 right-4 z-[60] pointer-events-none flex justify-center md:justify-center">
-          <div className="pointer-events-auto flex">{toolbarSlot}</div>
+        <div className="absolute top-4 right-4 md:top-auto md:bottom-4 md:right-4 z-[60] pointer-events-none">
+          <div className="pointer-events-auto">{toolbarSlot}</div>
         </div>
       )}
 
@@ -183,7 +183,7 @@ function MapContainerInner({
 
       {/* Children — markers, popups, tools that use map context */}
       {children && (
-        <div className="absolute inset-0 z-[20] pointer-events-none">
+        <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
           {children}
         </div>
       )}

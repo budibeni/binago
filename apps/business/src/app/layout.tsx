@@ -1,6 +1,7 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import './globals.css';
+import '@adatrack/maps/styles.css';
 import { BusinessShellLayout } from '../components/BusinessShellLayout';
 
 export const metadata: Metadata = {

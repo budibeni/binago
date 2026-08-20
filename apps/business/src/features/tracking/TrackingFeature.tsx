@@ -36,7 +36,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
   const [search, setSearch] = React.useState('');
   const [statusFilter, setStatusFilter] = React.useState<StatusFilter>('all');
   const [selectedVehicleId, setSelectedVehicleId] = React.useState<string | null>(null);
-  const [selectedVehicleIds, setSelectedVehicleIds] = React.useState<string[]>([]);
+  const [selectedVehicleIds, setSelectedVehicleIds] = React.useState<string[]>(() => mockVehicles.map((v) => v.id));
   const [isVehicleListVisible, setIsVehicleListVisible] = React.useState(true);
 
   // â”€â”€ Playback state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -52,8 +52,22 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
     currentTime: 0,
   });
 
-  // â”€â”€ Timer ref â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ——— Timer ref ——————————————————————————————————————————————————————————————————————————————
   const timerRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // ─── Computed ────────────────────────────────────────────────────────────────
+  const allVehiclesUnfiltered = React.useMemo(() => {
+    const q = search.toLowerCase().trim();
+    return mockVehicles.filter((v) => {
+      const matchStatus = statusFilter === 'all' || v.status === statusFilter;
+      const matchSearch =
+        !q ||
+        v.plateNumber.toLowerCase().includes(q) ||
+        v.groupName.toLowerCase().includes(q) ||
+        (v.driverName?.toLowerCase().includes(q) ?? false);
+      return matchStatus && matchSearch;
+    });
+  }, [search, statusFilter]);
 
   const stopTimer = React.useCallback(() => {
     if (timerRef.current) {
@@ -66,14 +80,10 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
     return () => stopTimer();
   }, [stopTimer]);
 
-  // â”€â”€ VehicleList handlers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ——— VehicleList handlers ——————————————————————————————————————————————————————————————————
 
   const handleVehicleSelect = React.useCallback((vehicleId: string) => {
     setSelectedVehicleId((prev) => (prev === vehicleId ? null : vehicleId));
-  }, []);
-
-  const handleMapSelect = React.useCallback((vehicleId: string | null) => {
-    setSelectedVehicleId(vehicleId);
   }, []);
 
   const handleVehicleCheck = React.useCallback((idOrIds: string | string[], checked: boolean) => {
@@ -220,13 +230,12 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
         {/* Map Area */}
         <div className="flex-1 relative">
           <LiveMap
-            vehicles={mockVehicles}
-            selectedVehicleId={selectedVehicleId}
-            selectedVehicleIds={selectedVehicleIds.length === 0 ? mockVehicles.map(v => v.id) : selectedVehicleIds}
-            onVehicleSelect={handleMapSelect}
-            className="absolute inset-0 w-full h-full"
+            vehicles={allVehiclesUnfiltered}
+            selectedVehicleId={selectedVehicleId || undefined}
+            visibleVehicleIds={allVehiclesUnfiltered.map(v => v.id).filter(id => selectedVehicleIds.includes(id))}
           />
         </div>
+
 
         {/* Bottom Playback Panel */}
         <div
@@ -259,7 +268,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
           )}
           aria-hidden={mode !== 'live' || !selectedVehicleId}
         >
-          <VehicleOverviewPanel 
+          <VehicleOverviewPanel
             vehicle={mockVehicles.find(v => v.id === selectedVehicleId) || null}
             onClose={() => setSelectedVehicleId(null)}
             locale={locale}

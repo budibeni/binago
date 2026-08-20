@@ -5,7 +5,6 @@ import { cn } from '@adatrack/utils';
 import {
   TrackingMap,
   MapPopup,
-  MapMarker as GenericMapMarker,
 } from '@adatrack/maps';
 import type {
   MapEntityOption,
@@ -13,41 +12,67 @@ import type {
   GeofenceCheckRequest,
   GeofenceCheckResult,
 } from '@adatrack/maps';
-import { Navigation2, Truck } from 'lucide-react';
 import type { TrackingVehicle } from '../types/tracking';
+import { VehicleMarker } from './VehicleMarker';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
 
 // ─── LiveMap Props ─────────────────────────────────────────────────────────────
 
 export interface LiveMapProps {
   vehicles: TrackingVehicle[];
-  selectedVehicleId: string | null;
-  selectedVehicleIds: string[];
-  onVehicleSelect: (id: string | null) => void;
-  className?: string;
+  selectedVehicleId?: string;
+  visibleVehicleIds?: string[];
 }
 
-// Mock geofence data
+// ─── Mock geofence data ────────────────────────────────────────────────────────
+
 const MOCK_GEOFENCES: MapGeofenceOption[] = [
   { id: 'g-b-001', label: 'Geofence Gudang Utama' },
-  { id: 'g-b-002', label: 'Geofence Pelabuhan' },
+  { id: 'g-b-002', label: 'Geofence Pelabuhan Tanjung Priok' },
+  { id: 'g-b-003', label: 'Geofence Kantor Pusat' },
+  { id: 'g-b-004', label: 'Geofence Pool Kendaraan Slipi' },
 ];
+
+// ─── Mock geofence check ───────────────────────────────────────────────────────
 
 async function mockCheckEntityGeofence(req: GeofenceCheckRequest): Promise<GeofenceCheckResult> {
   await new Promise((r) => setTimeout(r, 800));
-  const inside = req.geofenceId === 'g-b-001';
+  const inside = req.geofenceId === 'g-b-001' && req.entityId === 'veh-004';
   return {
     inside,
-    distance: inside ? 0 : Math.floor(Math.random() * 3000) + 50,
-    label: inside ? 'Kendaraan berada di dalam geofence.' : 'Kendaraan berada di luar geofence.',
+    distance: inside ? 0 : Math.floor(Math.random() * 5000) + 100,
+    label: inside
+      ? 'Kendaraan berada di dalam geofence.'
+      : 'Kendaraan berada di luar geofence.',
   };
 }
 
-// ─── LiveMap Wrapper ────────────────────────────────────────────────────────────
+// ─── Status helpers ────────────────────────────────────────────────────────────
 
-export function LiveMap({ vehicles, selectedVehicleId, selectedVehicleIds, onVehicleSelect, className }: LiveMapProps) {
+const STATUS_DOT: Record<TrackingVehicle['status'], string> = {
+  driving: 'bg-success',
+  idle:    'bg-warning',
+  parking: 'bg-info',
+  offline: 'bg-neutral-400',
+};
+
+const STATUS_LABEL: Record<TrackingVehicle['status'], string> = {
+  driving: 'Berjalan',
+  idle:    'Idle',
+  parking: 'Parkir',
+  offline: 'Offline',
+};
+
+// ─── LiveMap ───────────────────────────────────────────────────────────────────
+
+export function LiveMap({ vehicles, selectedVehicleId, visibleVehicleIds = [] }: LiveMapProps) {
   const locale = useBusinessLocale();
-  
+  const [internalSelectedId, setInternalSelectedId] = React.useState<string | null>(selectedVehicleId || null);
+
+  React.useEffect(() => {
+    setInternalSelectedId(selectedVehicleId || null);
+  }, [selectedVehicleId]);
+
   const entityOptions: MapEntityOption[] = useMemo(
     () =>
       vehicles.map((v) => ({
@@ -58,93 +83,84 @@ export function LiveMap({ vehicles, selectedVehicleId, selectedVehicleIds, onVeh
   );
 
   return (
-    <div className={cn('w-full h-full relative', className)}>
+    <div className="w-full h-full relative">
       <TrackingMap<TrackingVehicle>
         entities={vehicles}
-        selectedIds={selectedVehicleIds}
-        
+        selectedIds={visibleVehicleIds}
+
         // Resolvers
         getId={(v) => v.id}
         getPosition={(v) => v.location}
-        
-        // Renderers
-        renderMarker={(vehicle, { selected, focused, onClick }) => {
-          const statusColors = {
-            driving: 'bg-success text-success-foreground border-success ring-success/30',
-            idle: 'bg-warning text-warning-foreground border-warning ring-warning/30',
-            parking: 'bg-neutral-600 text-white border-neutral-600 ring-neutral-600/30 dark:bg-neutral-500 dark:border-neutral-500',
-            offline: 'bg-danger text-danger-foreground border-danger ring-danger/30',
-          };
-          const colorClass = statusColors[vehicle.status] || statusColors.offline;
 
-          return (
-            <GenericMapMarker id={vehicle.id} position={vehicle.location}>
-              <div
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onClick();
-                  // Propagate up to parent selection if needed
-                  onVehicleSelect(vehicle.id);
-                }}
-                className={cn(
-                  'flex h-8 w-8 items-center justify-center rounded-full border-[2.5px] shadow-sm transition-all duration-300 group',
-                  colorClass,
-                  (selected || focused) ? 'ring-4 scale-110 z-20' : 'hover:scale-105 hover:z-20 z-10'
-                )}
-              >
-                {vehicle.status === 'driving' ? (
-                  <Navigation2 className="h-4 w-4 shrink-0" aria-hidden="true" />
-                ) : (
-                  <Truck className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-                )}
-                
-                {/* Tooltip on hover */}
-                {!(selected || focused) && (
-                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
-                    <div className="bg-foreground text-background text-[11px] font-semibold px-2 py-1 rounded shadow-md whitespace-nowrap">
-                      {vehicle.plateNumber}
-                    </div>
-                    <div className="w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-foreground mx-auto" />
-                  </div>
-                )}
-              </div>
-            </GenericMapMarker>
-          );
-        }}
+        // Renderers
+        renderMarker={(vehicle, { selected, focused, onClick }) => (
+          <VehicleMarker
+            key={vehicle.id}
+            vehicle={vehicle}
+            selected={selected || focused}
+            onClick={() => {
+              onClick();
+              setInternalSelectedId(vehicle.id);
+            }}
+          />
+        )}
         renderPopup={(focusedVehicle, onClose) => (
           <MapPopup
             position={focusedVehicle.location}
             onClose={() => {
               onClose();
-              // Jika aplikasi ingin membersihkan selection saat popup ditutup:
-              // onVehicleSelect(null);
+              setInternalSelectedId(null);
             }}
             offset={[0, -15]}
           >
-            <div className="p-3 bg-background text-foreground rounded-xl w-52 font-sans relative">
-              <h4 className="font-semibold text-sm truncate pr-6">{focusedVehicle.plateNumber}</h4>
-              <p className="text-xs text-foreground-muted mb-3">{focusedVehicle.driverName || 'Tidak ada pengemudi'}</p>
+            <div className="p-3 bg-background text-foreground rounded-xl w-56 font-sans relative">
+              {/* Vehicle type */}
+              {focusedVehicle.vehicleType && (
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-foreground-subtle mb-0.5">
+                  {focusedVehicle.vehicleType}
+                </p>
+              )}
 
-              <div className="flex items-center gap-2 mb-2">
-                <span
-                  className={cn(
-                    'w-2 h-2 rounded-full',
-                    focusedVehicle.status === 'driving' && 'bg-success',
-                    focusedVehicle.status === 'idle' && 'bg-warning',
-                    focusedVehicle.status === 'parking' && 'bg-info',
-                    focusedVehicle.status === 'offline' && 'bg-neutral-500'
-                  )}
-                />
-                <span className="text-xs capitalize font-medium">{focusedVehicle.status}</span>
+              {/* Plate number */}
+              <h4 className="font-bold text-sm truncate pr-6 leading-tight">
+                {focusedVehicle.plateNumber}
+              </h4>
+
+              {/* Driver name */}
+              <p className="text-xs text-foreground-muted mt-0.5 mb-3 truncate">
+                {focusedVehicle.driverName ?? 'Tidak ada pengemudi'}
+              </p>
+
+              {/* Status row */}
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-1.5">
+                  <span
+                    className={cn(
+                      'w-2 h-2 rounded-full shrink-0',
+                      STATUS_DOT[focusedVehicle.status],
+                    )}
+                  />
+                  <span className="text-xs font-medium">
+                    {STATUS_LABEL[focusedVehicle.status]}
+                  </span>
+                </div>
+
+                {/* Speed (only when not offline) */}
+                {focusedVehicle.speed !== undefined && focusedVehicle.status !== 'offline' && (
+                  <span className="text-xs font-semibold tabular-nums">
+                    {focusedVehicle.speed} <span className="font-normal text-foreground-muted">km/j</span>
+                  </span>
+                )}
               </div>
 
-              {focusedVehicle.speed !== undefined && focusedVehicle.status !== 'offline' && (
-                <p className="text-xs font-medium">{focusedVehicle.speed} km/j</p>
-              )}
+              {/* Group name */}
+              <p className="text-[10px] text-foreground-subtle mt-2 truncate">
+                {focusedVehicle.groupName}
+              </p>
             </div>
           </MapPopup>
         )}
-        
+
         geofences={MOCK_GEOFENCES}
         entityOptions={entityOptions}
         checkGeofenceFn={mockCheckEntityGeofence}

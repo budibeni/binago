@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { TrackingFeature } from '../../features/tracking/TrackingFeature';
 
 export const metadata: Metadata = {
-  title: 'Pemantauan â€” ADATRACK Business',
+  title: 'Pemantauan — ADATRACK Business',
   description: 'Pantau armada kendaraan Anda secara real-time di satu layar.',
 };
 

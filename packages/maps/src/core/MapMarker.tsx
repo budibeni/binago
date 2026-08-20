@@ -17,10 +17,6 @@ export interface MapMarkerProps {
    */
   heading?: number;
   /**
-   * Whether the marker is selected. If false, it might not render or render differently.
-   */
-  selected?: boolean;
-  /**
    * Custom marker element
    */
   children?: React.ReactNode;
@@ -30,12 +26,15 @@ export function MapMarker({
   id,
   position,
   heading = 0,
-  selected = true,
   children,
 }: MapMarkerProps) {
   const map = useInternalMap();
   const markerRef = useRef<maplibregl.Marker | null>(null);
   const [markerElement, setMarkerElement] = useState<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    console.log(`[MapMarker ${id}] map:`, !!map, 'markerElement:', !!markerElement);
+  }, [map, markerElement, id]);
 
   // Initialize the DOM element exactly once
   useEffect(() => {
@@ -49,16 +48,9 @@ export function MapMarker({
     };
   }, [id]);
 
+  // Add/update/remove marker from map
   useEffect(() => {
     if (!map || !markerElement) return;
-
-    if (!selected) {
-      if (markerRef.current) {
-        markerRef.current.remove();
-        markerRef.current = null;
-      }
-      return;
-    }
 
     if (!markerRef.current) {
       markerRef.current = new maplibregl.Marker({
@@ -67,6 +59,8 @@ export function MapMarker({
       })
         .setLngLat([position.lng, position.lat])
         .addTo(map);
+      
+      console.log(`[MapMarker ${id}] addTo(map) called! parentNode:`, markerElement.parentNode?.nodeName, 'in DOM?', document.body.contains(markerElement));
     } else {
       markerRef.current.setLngLat([position.lng, position.lat]);
       markerRef.current.setRotation(heading);
@@ -77,7 +71,7 @@ export function MapMarker({
         markerRef.current.addTo(map);
       }
     }
-  }, [map, markerElement, position.lat, position.lng, heading, selected]);
+  }, [map, markerElement, position.lat, position.lng, heading]);
 
   // Clean up on unmount
   useEffect(() => {
@@ -89,7 +83,7 @@ export function MapMarker({
     };
   }, []);
 
-  if (!selected || !markerElement) return null;
+  if (!markerElement) return null;
 
   // Render children into the DOM element controlled by MapLibre
   return createPortal(children, markerElement);
