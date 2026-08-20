@@ -25,8 +25,8 @@ export function EntityMarker({
   focused = false,
   onClick,
 }: EntityMarkerProps) {
-  // Use user color or default fallback (e.g. brand black/primary)
-  const markerColor = color || 'var(--color-primary)';
+  // Gunakan warna biru cerah (default navigasi umum) jika tidak ada warna spesifik yang diberikan
+  const markerColor = color || '#2563eb'; // blue-600
   
   // Selection or focus state
   const isHighlighted = selected || focused;
@@ -34,41 +34,60 @@ export function EntityMarker({
   return (
     <MapMarker id={id} position={position} heading={0}>
       <div 
-        className="relative flex flex-col items-center pointer-events-auto"
+        className="relative flex flex-col items-center pointer-events-auto group"
         onClick={(e) => {
           e.stopPropagation();
           if (onClick) onClick();
         }}
       >
-        {/* The Icon Container */}
+        {/* Static Base Glow (Very thin and subtle) */}
+        <div 
+          className="absolute top-3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-full blur-sm pointer-events-none opacity-[0.05]"
+          style={{ backgroundColor: markerColor }}
+        />
+
+        {/* Signal Ping Animation (Simulates emitting a signal) */}
         <div 
           className={cn(
-            "flex items-center justify-center rounded-full border-2 cursor-pointer transition-all duration-200",
-            isHighlighted ? "scale-110 z-10 hover:scale-110" : "scale-90 hover:scale-100",
-            "w-10 h-10 shadow-sm"
+            "absolute top-3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-5 h-5 rounded-full blur-[2px] pointer-events-none",
+            "animate-ping motion-reduce:animate-none",
+            isHighlighted ? "opacity-25" : "opacity-10"
           )}
-          style={{
-            backgroundColor: 'var(--color-background)',
-            borderColor: markerColor,
-            color: markerColor,
-            ...(isHighlighted && {
-              backgroundColor: markerColor,
-              color: 'var(--color-background)',
-              boxShadow: `0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1), 0 0 0 4px ${markerColor}33`, // custom glow
-            })
-          }}
+          style={{ backgroundColor: markerColor, animationDuration: '3s' }}
+        />
+
+        {/* Directional Beacon Arrow (Rotates) */}
+        <div 
+          className="relative transition-transform duration-500 ease-out flex items-center justify-center pointer-events-none z-10"
+          style={{ transform: `rotate(${heading}deg)` }}
         >
-          {icon}
+          {/* Navigation Arrow */}
+          <svg
+            viewBox="0 0 24 24"
+            className={cn(
+              "w-6 h-6 md:w-7 md:h-7 transition-transform duration-300",
+              isHighlighted ? "scale-110 drop-shadow-md" : "scale-100 drop-shadow-sm"
+            )}
+            style={{ 
+              fill: markerColor, 
+              stroke: '#ffffff',
+              strokeWidth: 1.25,
+              strokeLinejoin: 'round',
+              strokeLinecap: 'round'
+            }}
+          >
+            <path d="M12 2L21 21L12 17L3 21L12 2Z" />
+          </svg>
         </div>
 
-        {/* The Floating Label */}
+        {/* The Pill Label */}
         {label && (
           <div 
             className={cn(
-              "absolute top-full mt-1 px-2 py-0.5 whitespace-nowrap rounded-md shadow-sm transition-opacity duration-200",
-              "text-[11px] font-semibold tracking-wide border",
-              isHighlighted ? "opacity-100 z-20" : "opacity-90",
-              "bg-background/90 backdrop-blur-sm border-border text-foreground"
+              "mt-0.5 px-2.5 py-0.5 whitespace-nowrap rounded-full shadow-sm transition-all duration-200 z-30",
+              "text-[11px] font-bold tracking-wide",
+              isHighlighted ? "opacity-100 scale-105 shadow-md" : "opacity-95 scale-100",
+              "bg-background text-foreground border border-border"
             )}
           >
             {label}

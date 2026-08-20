@@ -93,6 +93,7 @@ export function LiveMap({ vehicles, selectedVehicleId, visibleVehicleIds = [] }:
         // Resolvers
         getId={(v) => v.id}
         getPosition={(v) => v.location}
+        getHeading={(v) => (v as any).heading || Math.floor(Math.random() * 360)}
         
         // Marker Presentation
         getLabel={(v) => v.plateNumber}
