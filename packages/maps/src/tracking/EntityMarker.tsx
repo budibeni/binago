@@ -25,15 +25,15 @@ export function EntityMarker({
   focused = false,
   onClick,
 }: EntityMarkerProps) {
-  // Gunakan warna biru cerah (default navigasi umum) jika tidak ada warna spesifik yang diberikan
-  const markerColor = color || '#2563eb'; // blue-600
-  
+  // Gunakan warna merah (sesuai logo ADATRACK) jika tidak ada warna spesifik yang diberikan
+  const markerColor = color || '#ef4444'; // red-500
+
   // Selection or focus state
   const isHighlighted = selected || focused;
 
   return (
     <MapMarker id={id} position={position} heading={0}>
-      <div 
+      <div
         className="relative flex flex-col items-center pointer-events-auto group"
         onClick={(e) => {
           e.stopPropagation();
@@ -41,13 +41,13 @@ export function EntityMarker({
         }}
       >
         {/* Static Base Glow (Very thin and subtle) */}
-        <div 
+        <div
           className="absolute top-3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-full blur-sm pointer-events-none opacity-[0.05]"
           style={{ backgroundColor: markerColor }}
         />
 
         {/* Signal Ping Animation (Simulates emitting a signal) */}
-        <div 
+        <div
           className={cn(
             "absolute top-3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-5 h-5 rounded-full blur-[2px] pointer-events-none",
             "animate-ping motion-reduce:animate-none",
@@ -57,7 +57,7 @@ export function EntityMarker({
         />
 
         {/* Directional Beacon Arrow (Rotates) */}
-        <div 
+        <div
           className="relative transition-transform duration-500 ease-out flex items-center justify-center pointer-events-none z-10"
           style={{ transform: `rotate(${heading}deg)` }}
         >
@@ -68,8 +68,8 @@ export function EntityMarker({
               "w-6 h-6 md:w-7 md:h-7 transition-transform duration-300",
               isHighlighted ? "scale-110 drop-shadow-md" : "scale-100 drop-shadow-sm"
             )}
-            style={{ 
-              fill: markerColor, 
+            style={{
+              fill: markerColor,
               stroke: '#ffffff',
               strokeWidth: 1.25,
               strokeLinejoin: 'round',
@@ -84,10 +84,10 @@ export function EntityMarker({
         {label && (
           <div 
             className={cn(
-              "mt-0.5 px-2.5 py-0.5 whitespace-nowrap rounded-full shadow-sm transition-all duration-200 z-30",
-              "text-[11px] font-bold tracking-wide",
+              "mt-0.5 px-1.5 py-[2px] whitespace-nowrap rounded shadow-sm transition-all duration-200 z-30",
+              "text-[9px] font-bold tracking-wider uppercase leading-none",
               isHighlighted ? "opacity-100 scale-105 shadow-md" : "opacity-95 scale-100",
-              "bg-background text-foreground border border-border"
+              "bg-black text-white dark:bg-white dark:text-black border border-black/20 dark:border-white/20"
             )}
           >
             {label}

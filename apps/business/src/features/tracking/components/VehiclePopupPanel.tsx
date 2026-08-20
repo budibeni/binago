@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   X,
   MapPin,
@@ -13,19 +13,24 @@ import {
   Wifi,
   SquareDashedBottom,
   Layers,
-  Truck,
-  Bus,
+  Share2,
+  Navigation,
+  History
 } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import type { Locale } from '@adatrack/types';
 import { getTranslation } from '../../../i18n';
 import type { TrackingVehicle } from '../types/tracking';
+import { ShareLocationDialog } from '../../sharing/components/ShareLocationDialog';
+import { useShareLocation } from '../../sharing/context/ShareLocationContext';
 
-interface VehicleOverviewPanelProps {
+interface VehiclePopupPanelProps {
   vehicle: TrackingVehicle | null;
   onClose: () => void;
   locale?: Locale;
   className?: string;
+  onPlayback?: () => void;
+  onShareLocation?: () => void;
 }
 
 // ─── Status config ─────────────────────────────────────────────────────────────
@@ -71,13 +76,13 @@ function InfoRow({
   valueClassName?: string;
 }) {
   return (
-    <div className="flex items-start gap-2">
-      <Icon className="h-3.5 w-3.5 text-foreground-subtle mt-[1px] shrink-0" />
+    <div className="flex items-start gap-1.5">
+      <Icon className="h-3 w-3 text-foreground-subtle mt-[1px] shrink-0" />
       <div className="min-w-0 flex-1">
-        <p className="text-[9.5px] font-semibold uppercase tracking-wider text-foreground-muted mb-0.5">
+        <p className="text-[9px] font-semibold uppercase tracking-wider text-foreground-muted mb-px">
           {label}
         </p>
-        <p className={cn('text-[11.5px] font-semibold text-foreground leading-snug', valueClassName)}>
+        <p className={cn('text-[11px] font-semibold text-foreground leading-snug', valueClassName)}>
           {value}
         </p>
       </div>
@@ -85,14 +90,26 @@ function InfoRow({
   );
 }
 
-// ─── VehicleOverviewPanel ─────────────────────────────────────────────────────
+// ─── VehiclePopupPanel ────────────────────────────────────────────────────────
 
-export function VehicleOverviewPanel({ vehicle, onClose, locale = 'id', className }: VehicleOverviewPanelProps) {
+export function VehiclePopupPanel({ 
+  vehicle, 
+  onClose, 
+  locale = 'id', 
+  className,
+  onPlayback,
+  onShareLocation
+}: VehiclePopupPanelProps) {
   if (!vehicle) return null;
 
   const t = getTranslation(locale);
   const tTracking = t.tracking;
   const status = STATUS_CONFIG[vehicle.status];
+  
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const shareContext = useShareLocation();
+  // Safe check if context is available (in case provider is missing)
+  const activeShare = shareContext?.getActiveSession(vehicle.id);
 
   const dateObj = new Date(vehicle.lastUpdate);
   const formattedDate = [
@@ -107,28 +124,23 @@ export function VehicleOverviewPanel({ vehicle, onClose, locale = 'id', classNam
 
   const coords = `${vehicle.location.lat.toFixed(4)} , ${vehicle.location.lng.toFixed(4)}`;
 
-  const isMinibus = vehicle.vehicleType?.toLowerCase().includes('hiace')
-    || vehicle.vehicleType?.toLowerCase().includes('bus')
-    || vehicle.vehicleType?.toLowerCase().includes('minibus');
-  const VehicleIcon = isMinibus ? Bus : Truck;
-
   return (
-    <div className={cn('flex flex-col h-full w-full bg-background', className)}>
+    <div className={cn('flex flex-col w-[420px] bg-background rounded-xl overflow-hidden shadow-2xl ring-1 ring-border', className)}>
 
       {/* ── Header ─────────────────────────────────────────────────────────── */}
-      <div className="flex items-center gap-3 px-4 py-2 border-b border-border bg-neutral-50/60 dark:bg-neutral-900/40 shrink-0">
-
+      <div className="flex items-center gap-2 px-3 py-1.5 border-b border-border bg-background shrink-0">
+        
         {/* Vehicle Icon */}
-        <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-neutral-100 dark:bg-neutral-800 border border-border shrink-0 text-foreground-muted">
-          <VehicleIcon className="w-5 h-5" />
+        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 shrink-0 text-primary">
+          <Navigation className="w-3.5 h-3.5 fill-current" />
         </div>
 
         {/* Plate + subtitle */}
         <div className="min-w-0 flex-1">
-          <h2 className="text-[14px] font-extrabold text-foreground tracking-widest uppercase leading-none">
+          <h2 className="text-[13px] font-extrabold text-foreground tracking-widest uppercase leading-none">
             {vehicle.plateNumber}
           </h2>
-          <p className="text-[11px] text-foreground-muted leading-tight mt-0.5 truncate">
+          <p className="text-[10px] text-foreground-muted leading-tight mt-0.5 truncate">
             {[vehicle.city, vehicle.vehicleType].filter(Boolean).join(' · ')}
           </p>
         </div>
@@ -136,12 +148,12 @@ export function VehicleOverviewPanel({ vehicle, onClose, locale = 'id', classNam
         {/* Status badge */}
         <span
           className={cn(
-            'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold leading-none shrink-0',
+            'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold leading-none shrink-0',
             status.bg,
             status.color,
           )}
         >
-          <span className={cn('w-1.5 h-1.5 rounded-full shrink-0', status.dot)} />
+          <span className={cn('w-1 h-1 rounded-full shrink-0', status.dot)} />
           {status.label}
         </span>
 
@@ -149,31 +161,31 @@ export function VehicleOverviewPanel({ vehicle, onClose, locale = 'id', classNam
         <button
           type="button"
           onClick={onClose}
-          className="flex h-7 w-7 items-center justify-center rounded-md text-foreground-muted hover:bg-neutral-200/60 dark:hover:bg-neutral-700/50 hover:text-foreground transition-colors focus:outline-none shrink-0"
-          aria-label={tTracking.overviewClose}
+          className="flex h-7 w-7 items-center justify-center rounded-lg border border-border text-foreground-muted hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors focus:outline-none ml-1 shrink-0"
+          aria-label="Tutup"
         >
-          <X className="h-4 w-4" />
+          <X className="w-3.5 h-3.5" />
         </button>
       </div>
 
       {/* ── Body — 3-column grid ───────────────────────────────────────────── */}
-      <div className="flex-1 grid grid-cols-3 divide-x divide-border overflow-hidden">
-
+      <div className="grid grid-cols-3 divide-x divide-border overflow-hidden">
+        
         {/* ── Col 1: Driver, Speed, ACC, Alarm ─────────────────────── */}
-        <div className="flex flex-col gap-3 px-4 py-3 overflow-hidden">
+        <div className="flex flex-col gap-2 px-2.5 py-2 overflow-hidden">
           <InfoRow
             icon={User}
-            label="Driver"
+            label={tTracking.popupDriver}
             value={vehicle.driverName || '-'}
           />
           <InfoRow
             icon={Gauge}
-            label="Speed"
+            label={tTracking.popupSpeed}
             value={`${vehicle.speed} km/h`}
           />
           <InfoRow
             icon={KeyRound}
-            label="ACC"
+            label={tTracking.popupAcc}
             value={
               vehicle.acc !== undefined
                 ? <span className={vehicle.acc ? 'text-emerald-600 dark:text-emerald-400' : 'text-danger font-bold'}>{vehicle.acc ? 'ON' : 'OFF'}</span>
@@ -182,17 +194,17 @@ export function VehicleOverviewPanel({ vehicle, onClose, locale = 'id', classNam
           />
           <InfoRow
             icon={Bell}
-            label="Alarm / Event"
+            label={tTracking.popupAlarm}
             value={vehicle.alarmEvent || '-'}
             valueClassName={vehicle.alarmEvent && vehicle.alarmEvent !== '-' ? 'text-danger' : undefined}
           />
         </div>
 
         {/* ── Col 2: Address, Geofence Location, Geofence Area ─────── */}
-        <div className="flex flex-col gap-3 px-4 py-3 overflow-hidden">
+        <div className="flex flex-col gap-2 px-2.5 py-2 overflow-hidden">
           <InfoRow
             icon={MapPin}
-            label="Address"
+            label={tTracking.popupAddress}
             value={
               <span className="text-accent">
                 {vehicle.location.address || '-'}
@@ -201,35 +213,75 @@ export function VehicleOverviewPanel({ vehicle, onClose, locale = 'id', classNam
           />
           <InfoRow
             icon={SquareDashedBottom}
-            label="Geofence Location"
+            label={tTracking.popupGeofenceLocation}
             value={vehicle.geofenceName && vehicle.geofenceName !== '-' ? vehicle.geofenceName : '-'}
           />
           <InfoRow
             icon={Layers}
-            label="Geofence Area"
+            label={tTracking.popupGeofenceArea}
             value={vehicle.geofenceArea && vehicle.geofenceArea !== '-' ? vehicle.geofenceArea : '-'}
           />
         </div>
 
         {/* ── Col 3: Coordinates, GPS SN, Last Update ───────────────── */}
-        <div className="flex flex-col gap-3 px-4 py-3 overflow-hidden">
+        <div className="flex flex-col gap-2 px-2.5 py-2 overflow-hidden">
           <InfoRow
             icon={Crosshair}
-            label="Coordinates"
+            label={tTracking.popupCoordinates}
             value={coords}
           />
           <InfoRow
             icon={Wifi}
-            label="GPS SN"
+            label={tTracking.popupGpsSn}
             value={vehicle.gpsSerialNumber || '-'}
           />
           <InfoRow
             icon={Clock}
-            label="Last Update"
+            label={tTracking.popupLastUpdate}
             value={formattedDate}
           />
         </div>
       </div>
+
+      {/* ── Footer ─────────────────────────────────────────────────────────── */}
+      <div className="flex items-center gap-2 px-3 py-1.5 border-t border-border bg-background">
+        <button
+          type="button"
+          onClick={onPlayback}
+          className="flex-1 flex items-center justify-center gap-1.5 py-1 px-3 rounded text-primary bg-primary/10 hover:bg-primary/20 transition-colors focus:outline-none"
+        >
+          <History className="w-3 h-3" />
+          <span className="text-[11px] font-semibold">{tTracking.popupPlayback}</span>
+        </button>
+        {activeShare ? (
+          <button
+            type="button"
+            onClick={() => setShareDialogOpen(true)}
+            className="flex-1 flex items-center justify-center gap-1.5 py-1 px-3 rounded bg-primary/10 text-primary transition-colors focus:outline-none"
+          >
+            <Share2 className="w-3 h-3 fill-current" />
+            <span className="text-[11px] font-semibold">{locale === 'id' ? 'DIBAGIKAN' : 'SHARED'}</span>
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={(e) => {
+              if (onShareLocation) onShareLocation();
+              setShareDialogOpen(true);
+            }}
+            className="flex-1 flex items-center justify-center gap-1.5 py-1 px-3 rounded text-foreground-muted hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors focus:outline-none"
+          >
+            <Share2 className="w-3 h-3" />
+            <span className="text-[11px] font-semibold">{tTracking.popupShareLocation}</span>
+          </button>
+        )}
+      </div>
+
+      <ShareLocationDialog
+        vehicle={vehicle}
+        open={shareDialogOpen}
+        onOpenChange={setShareDialogOpen}
+      />
     </div>
   );
 }

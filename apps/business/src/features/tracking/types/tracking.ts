@@ -27,10 +27,16 @@ export interface TrackingVehicle {
   groupId: string;
   groupName: string;
   status: VehicleStatus;
-  speed: number;           // km/h
+  speed: number;             // km/h
   location: VehicleLocation;
-  lastUpdate: string;      // ISO 8601
-  vehicleType?: string;    // e.g. 'Truk', 'Minibus'
+  lastUpdate: string;        // ISO 8601
+  vehicleType?: string;      // e.g. 'Truk', 'Minibus', 'CDE Long Chiller'
+  city?: string;             // e.g. 'Jakarta', 'Bandung'
+  acc?: boolean;             // Ignition status
+  geofenceName?: string;     // Current geofence name
+  geofenceArea?: string;     // Current geofence area
+  gpsSerialNumber?: string;  // GPS device serial number
+  alarmEvent?: string;       // Latest alarm/event
 }
 
 // ─── Vehicle Group ─────────────────────────────────────────────────────────────

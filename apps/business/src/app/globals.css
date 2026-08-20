@@ -109,3 +109,26 @@
     -moz-osx-font-smoothing: grayscale;
   }
 }
+
+@layer components {
+  .custom-vehicle-popup .maplibregl-popup-content {
+    padding: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+  
+  /* Match the popup tip to our dynamic background color */
+  .custom-vehicle-popup.maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
+    border-top-color: var(--color-background);
+  }
+  .custom-vehicle-popup.maplibregl-popup-anchor-top .maplibregl-popup-tip {
+    border-bottom-color: var(--color-background);
+  }
+  .custom-vehicle-popup.maplibregl-popup-anchor-left .maplibregl-popup-tip {
+    border-right-color: var(--color-background);
+  }
+  .custom-vehicle-popup.maplibregl-popup-anchor-right .maplibregl-popup-tip {
+    border-left-color: var(--color-background);
+  }
+}

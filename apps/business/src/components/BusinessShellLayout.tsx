@@ -26,6 +26,7 @@ import {
 import { AppShell } from '@adatrack/ui';
 import type { NavGroup, NavItem, UserInfo, Locale } from '@adatrack/types';
 import { getTranslation } from '../i18n';
+import { ShareLocationProvider } from '../features/sharing/context/ShareLocationContext';
 
 const DUMMY_USER: UserInfo = {
   name: 'Budi Setiawan',
@@ -173,9 +174,11 @@ export function BusinessShellLayout({ children }: { children: React.ReactNode })
       onThemeChange={handleThemeChange}
       userMenuLabels={t.userMenu}
     >
-      <BusinessLocaleContext.Provider value={locale}>
-        {children}
-      </BusinessLocaleContext.Provider>
+      <ShareLocationProvider>
+        <BusinessLocaleContext.Provider value={locale}>
+          {children}
+        </BusinessLocaleContext.Provider>
+      </ShareLocationProvider>
     </AppShell>
   );
 }

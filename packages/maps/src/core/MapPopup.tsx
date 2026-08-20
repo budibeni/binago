@@ -7,42 +7,55 @@ export interface MapPopupProps {
   children: React.ReactNode;
   onClose?: () => void;
   offset?: number | [number, number];
+  className?: string;
 }
 
-export function MapPopup({ position, children, onClose, offset = 15 }: MapPopupProps) {
+export function MapPopup({ position, children, onClose, offset = 15, className }: MapPopupProps) {
   const map = useInternalMap();
   const popupRef = useRef<maplibregl.Popup | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const onCloseRef = useRef(onClose);
 
+  // Keep the ref up-to-date without triggering the effect
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  });
+
+  // Create popup once — only re-run when map/offset change (not onClose)
   useEffect(() => {
     if (!map || !containerRef.current) return;
 
-    if (!popupRef.current) {
-      popupRef.current = new maplibregl.Popup({
-        closeButton: !!onClose,
-        closeOnClick: false,
-        offset,
-      })
-        .setDOMContent(containerRef.current)
-        .setLngLat([position.lng, position.lat])
-        .addTo(map);
+    const handleClose = () => {
+      onCloseRef.current?.();
+    };
 
-      if (onClose) {
-        popupRef.current.on('close', onClose);
-      }
-    } else {
+    const popup = new maplibregl.Popup({
+      closeButton: false,
+      closeOnClick: false,
+      offset,
+      className,
+    })
+      .setDOMContent(containerRef.current)
+      .setLngLat([position.lng, position.lat])
+      .addTo(map);
+
+    popup.on('close', handleClose);
+    popupRef.current = popup;
+
+    return () => {
+      popup.off('close', handleClose);
+      popup.remove();
+      popupRef.current = null;
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [map, offset]);
+
+  // Update position without recreating popup
+  useEffect(() => {
+    if (popupRef.current) {
       popupRef.current.setLngLat([position.lng, position.lat]);
     }
-  }, [map, position.lat, position.lng, offset, onClose]);
-
-  useEffect(() => {
-    return () => {
-      if (popupRef.current) {
-        popupRef.current.remove();
-        popupRef.current = null;
-      }
-    };
-  }, []);
+  }, [position.lat, position.lng]);
 
   return (
     <div style={{ display: 'none' }}>

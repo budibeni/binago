@@ -18,6 +18,10 @@ import {
   Navigation,
   Target,
   MapPin, // <-- added
+  Crosshair,
+  Tag,
+  MapPinSearch,
+  CarFront,
 } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import { useMapActions } from '../core/MapContext';
@@ -151,11 +155,12 @@ export function MapControlPanel({
       isActive: isFullscreen,
     },
     { id: 'search'   as const, Icon: Search,    label: tb.search,   onClick: () => toggle('search'),   isActive: active === 'search' },
-    { id: 'geofence' as const, Icon: CircleDot, label: tb.geofence, onClick: () => toggle('geofence'), isActive: active === 'geofence' },
+    { id: 'geofence' as const, Icon: MapPinSearch, label: tb.geofence, onClick: () => toggle('geofence'), isActive: active === 'geofence' },
+    ...(hasCustomMarker ? [{ id: 'markerStyle' as const, Icon: Tag, label: tb.markerStyle, onClick: () => toggle('markerStyle'), isActive: active === 'markerStyle' }] : []),
     { id: 'measure'  as const, Icon: Ruler,     label: tb.measure,  onClick: () => toggle('measure'),  isActive: active === 'measure' },
   ];
 
-  const isMoreActive = active === 'more' || active === 'search' || active === 'geofence' || active === 'measure';
+  const isMoreActive = active === 'more' || active === 'search' || active === 'geofence' || active === 'measure' || active === 'markerStyle';
 
   return (
     <div ref={panelRef} className={cn('relative', className)}>
@@ -200,8 +205,8 @@ export function MapControlPanel({
 
           {/* ── Marker Style picker ── */}
           {active === 'markerStyle' && hasCustomMarker && (
-            <FloatingCard aria-label="Tampilan Marker">
-              <div className="p-1 min-w-[180px]" role="listbox" aria-label="Tampilan Marker">
+            <FloatingCard aria-label={tb.markerStyle}>
+              <div className="p-1 min-w-[180px]" role="listbox" aria-label={tb.markerStyle}>
                 <button
                   type="button"
                   role="option"
@@ -217,8 +222,8 @@ export function MapControlPanel({
                   <span className="w-4 flex justify-center shrink-0">
                     {markerStyle === 'default' && <Check className="w-4 h-4 text-accent" />}
                   </span>
-                  <MapPin className={cn('w-4 h-4 shrink-0', markerStyle === 'default' ? 'text-accent' : 'text-foreground-subtle')} />
-                  <span className="truncate">Default Marker</span>
+                  <Navigation className={cn('w-4 h-4 shrink-0', markerStyle === 'default' ? 'text-accent' : 'text-foreground-subtle')} />
+                  <span className="truncate">{tb.defaultMarker}</span>
                 </button>
                 <button
                   type="button"
@@ -235,8 +240,8 @@ export function MapControlPanel({
                   <span className="w-4 flex justify-center shrink-0">
                     {markerStyle === 'custom' && <Check className="w-4 h-4 text-accent" />}
                   </span>
-                  <Navigation className={cn('w-4 h-4 shrink-0', markerStyle === 'custom' ? 'text-accent' : 'text-foreground-subtle')} />
-                  <span className="truncate">Custom Marker</span>
+                  <CarFront className={cn('w-4 h-4 shrink-0', markerStyle === 'custom' ? 'text-accent' : 'text-foreground-subtle')} />
+                  <span className="truncate">{tb.customMarker}</span>
                 </button>
               </div>
             </FloatingCard>
@@ -244,7 +249,7 @@ export function MapControlPanel({
 
           {/* ── More tools menu ── */}
           {active === 'more' && (
-            <FloatingCard aria-label="Alat Lainnya">
+            <FloatingCard aria-label={tb.moreTools}>
               <div className="p-1 min-w-[192px]">
                 {moreTools.map(({ id, Icon, label, onClick, isActive }) => (
                   <button
@@ -343,42 +348,18 @@ export function MapControlPanel({
         {/* Fit Selected (Target) */}
         <IconBtn
           id="ctrl-fit-selected"
-          icon={Target}
-          label="Tampilkan Pilihan"
+          icon={Crosshair}
+          label={tb.fitSelected}
           onClick={onFitSelected}
         />
 
         <Sep />
 
-        {/* Reset North (Navigation) */}
-        <IconBtn
-          id="ctrl-reset-north"
-          icon={Navigation}
-          label="Reset Arah Utara"
-          onClick={onResetNorth}
-        />
-
-        <Sep />
-
-        {/* Marker Style */}
-        {hasCustomMarker && (
-          <>
-            <IconBtn
-              id="ctrl-marker-style"
-              icon={MapPin}
-              label="Tampilan Marker"
-              onClick={() => toggle('markerStyle')}
-              active={active === 'markerStyle'}
-            />
-            <Sep />
-          </>
-        )}
-
         {/* More Tools */}
         <IconBtn
           id="ctrl-more-tools"
           icon={MoreHorizontal}
-          label="Alat Lainnya"
+          label={tb.moreTools}
           onClick={() => toggle('more')}
           active={isMoreActive}
         />

@@ -6,6 +6,7 @@ import {
   TrackingMap,
   MapPopup,
 } from '@adatrack/maps';
+import { VehiclePopupPanel } from './VehiclePopupPanel';
 import type {
   MapEntityOption,
   MapGeofenceOption,
@@ -110,66 +111,25 @@ export function LiveMap({ vehicles, selectedVehicleId, visibleVehicleIds = [] }:
             key={vehicle.id}
             vehicle={vehicle}
             selected={selected || focused}
-            onClick={() => {
-              onClick();
-              setInternalSelectedId(vehicle.id);
-            }}
+            onClick={onClick}
           />
         )}
         renderPopup={(focusedVehicle, onClose) => (
           <MapPopup
             position={focusedVehicle.location}
-            onClose={() => {
-              onClose();
-              setInternalSelectedId(null);
-            }}
             offset={[0, -15]}
+            className="custom-vehicle-popup"
           >
-            <div className="p-3 bg-background text-foreground rounded-xl w-56 font-sans relative">
-              {/* Vehicle type */}
-              {focusedVehicle.vehicleType && (
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-foreground-subtle mb-0.5">
-                  {focusedVehicle.vehicleType}
-                </p>
-              )}
-
-              {/* Plate number */}
-              <h4 className="font-bold text-sm truncate pr-6 leading-tight">
-                {focusedVehicle.plateNumber}
-              </h4>
-
-              {/* Driver name */}
-              <p className="text-xs text-foreground-muted mt-0.5 mb-3 truncate">
-                {focusedVehicle.driverName ?? 'Tidak ada pengemudi'}
-              </p>
-
-              {/* Status row */}
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-1.5">
-                  <span
-                    className={cn(
-                      'w-2 h-2 rounded-full shrink-0',
-                      STATUS_DOT[focusedVehicle.status],
-                    )}
-                  />
-                  <span className="text-xs font-medium">
-                    {STATUS_LABEL[focusedVehicle.status]}
-                  </span>
-                </div>
-
-                {/* Speed (only when not offline) */}
-                {focusedVehicle.speed !== undefined && focusedVehicle.status !== 'offline' && (
-                  <span className="text-xs font-semibold tabular-nums">
-                    {focusedVehicle.speed} <span className="font-normal text-foreground-muted">km/j</span>
-                  </span>
-                )}
-              </div>
-
-              {/* Group name */}
-              <p className="text-[10px] text-foreground-subtle mt-2 truncate">
-                {focusedVehicle.groupName}
-              </p>
-            </div>
+            <VehiclePopupPanel 
+              vehicle={focusedVehicle} 
+              onClose={() => {
+                onClose();
+                setInternalSelectedId(null);
+              }}
+              locale={locale}
+              onPlayback={() => console.log('Playback clicked', focusedVehicle.id)}
+              onShareLocation={() => console.log('Share clicked', focusedVehicle.id)}
+            />
           </MapPopup>
         )}
 
