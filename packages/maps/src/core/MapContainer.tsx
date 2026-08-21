@@ -141,7 +141,7 @@ function MapContainerInner({
     <div
       ref={innerRef}
       className={cn(
-        'relative w-full h-full min-h-[300px] overflow-hidden rounded-lg border border-border bg-neutral-100 shadow-sm',
+        'relative w-full h-full min-h-[300px] overflow-hidden border border-border bg-neutral-100',
         className,
       )}
       role="region"

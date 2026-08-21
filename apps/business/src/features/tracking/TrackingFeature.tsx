@@ -278,7 +278,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
         <div
           className={cn(
             'shrink-0 border-t border-border bg-background transition-all duration-300 ease-in-out',
-            (mode === 'live' && selectedVehicleId) ? 'h-[148px] opacity-100 translate-y-0' : 'h-0 opacity-0 translate-y-10 pointer-events-none overflow-hidden'
+            (mode === 'live' && selectedVehicleId) ? 'h-[180px] opacity-100 translate-y-0' : 'h-0 opacity-0 translate-y-10 pointer-events-none overflow-hidden'
           )}
           aria-hidden={mode !== 'live' || !selectedVehicleId}
         >
@@ -286,6 +286,10 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
             vehicle={mockVehicles.find(v => v.id === selectedVehicleId) || null}
             onClose={() => setSelectedVehicleId(null)}
             locale={locale}
+            onPlayback={() => {
+              if (selectedVehicleId) handlePlaybackRequest(selectedVehicleId);
+            }}
+            onShareLocation={() => console.log('Share clicked', selectedVehicleId)}
           />
         </div>
       </div>

@@ -48,7 +48,7 @@ export function Header({
   return (
     <header
       className={cn(
-        'sticky top-0 z-30 flex h-14 w-full items-center justify-between border-b border-border bg-background/95 px-4 shadow-sm backdrop-blur-sm',
+        'sticky top-0 z-30 flex h-[52px] w-full items-center justify-between border-b border-border bg-background px-4 shadow-sm',
         className,
       )}
     >

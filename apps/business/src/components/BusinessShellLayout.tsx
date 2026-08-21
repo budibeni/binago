@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { usePathname } from 'next/navigation';
 import {
   Home,
   Map,
@@ -125,7 +126,7 @@ export function useBusinessLocale() {
 export function BusinessShellLayout({ children }: { children: React.ReactNode }) {
   const [locale, setLocale] = React.useState<Locale>('id');
   const [theme, setTheme] = React.useState<'light' | 'dark'>('light');
-  const [currentPath] = React.useState('/');
+  const currentPath = usePathname() || '/';
 
   React.useEffect(() => {
     try {

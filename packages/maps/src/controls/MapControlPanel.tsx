@@ -317,11 +317,11 @@ export function MapControlPanel({
           PRIMARY CONTROL PANEL
           ═══════════════════════════════════════════════════════════ */}
       <div className={cn(
-        'flex bg-background rounded-xl border border-border shadow-lg overflow-hidden',
+        'flex bg-background rounded-[10px] border border-border shadow-lg overflow-hidden p-1 gap-1',
         // Mobile: horizontal row, auto width
         'flex-row',
-        // Desktop: vertical column, fixed 48px width
-        'md:flex-col md:w-12',
+        // Desktop: vertical column
+        'md:flex-col md:w-auto',
       )}>
 
         {/* Basemap */}
@@ -405,8 +405,8 @@ function Sep() {
   return (
     <div className={cn(
       'bg-border shrink-0',
-      'w-px self-stretch my-1',
-      'md:w-auto md:h-px md:self-auto md:my-0 md:mx-2',
+      'w-px self-stretch my-0.5',
+      'md:w-auto md:h-px md:self-stretch md:my-0 md:mx-0.5',
     )} />
   );
 }
@@ -430,7 +430,7 @@ function IconBtn({ id, icon: Icon, label, onClick, active }: IconBtnProps) {
       aria-label={label}
       aria-pressed={active}
       className={cn(
-        'flex items-center justify-center w-10 h-10 m-0.5 rounded-lg transition-all duration-150 shrink-0',
+        'flex items-center justify-center w-8 h-8 rounded-md transition-all duration-150 shrink-0',
         active
           ? 'bg-accent/10 text-accent ring-1 ring-accent/20'
           : 'text-foreground-muted hover:bg-surface hover:text-foreground',

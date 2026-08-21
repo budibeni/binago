@@ -10,7 +10,6 @@ import {
   MapPin,
   Folder,
   Grid,
-  MoreVertical,
   LayoutGrid,
   Play,
   PauseCircle,
@@ -156,10 +155,6 @@ function VehicleListItem({
       <div className="flex items-center justify-end shrink-0 mx-1">
         <StatusBadge status={vehicle.status} labels={statusLabels} />
       </div>
-
-      <button type="button" className="text-neutral-300 hover:text-neutral-500 focus:outline-none shrink-0" onClick={(e) => e.stopPropagation()}>
-        <MoreVertical className="w-3.5 h-3.5" />
-      </button>
     </div>
   );
 }
