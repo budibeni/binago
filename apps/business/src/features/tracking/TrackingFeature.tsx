@@ -8,11 +8,12 @@ import { LiveMap } from './components/LiveMap';
 import { PlaybackMap } from './components/PlaybackMap';
 import { PlaybackPanel } from './components/PlaybackPanel';
 import { VehicleOverviewPanel } from './components/VehicleOverviewPanel';
+import { TrackingCustomTable } from './components/TrackingCustomTable';
 import { mockVehicleGroups, mockVehicles, generateMockPlaybackData } from './data/mockTrackingData';
 import type { MockPlaybackData } from './data/mockTrackingData';
 import { getTranslation } from '../../i18n';
 import { useBusinessLocale } from '../../components/BusinessShellLayout';
-import type { StatusFilter, DateRange, PlaybackState } from './types/tracking';
+import type { StatusFilter, DateRange, PlaybackState, TrackingView } from './types/tracking';
 import type { Locale } from '@adatrack/types';
 
 // â”€â”€â”€ Mode â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -33,6 +34,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
 
   // â”€â”€ Mode â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const [mode, setMode] = React.useState<TrackingMode>('live');
+  const [view, setView] = React.useState<TrackingView>('map');
 
   // â”€â”€ VehicleList state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const [search, setSearch] = React.useState('');
@@ -320,12 +322,23 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
     <div className="flex h-full w-full overflow-hidden bg-surface">
 
       {/* Main Area: Map & Playback */}
-      <div className="flex-1 flex flex-col h-full min-w-0 relative">
+      <div className="flex-1 flex flex-col h-full min-w-0 relative bg-background">
 
-        {/* Mode Toggle */}
-        <div className="absolute top-4 left-4 z-20">
+
+
+        {/* View: Table */}
+        {view === 'table' && (
+          <TrackingCustomTable
+            vehicles={allVehiclesUnfiltered.filter(v => selectedVehicleIds.includes(v.id))}
+            onVehicleSelect={(id) => setSelectedVehicleId(id)}
+            locale={locale}
+          />
+        )}
+
+        {/* Mode Toggle (only in map view) */}
+        <div className={cn("absolute top-4 left-4 z-20", view !== 'map' && 'hidden')}>
           <div
-            className="flex items-center rounded-md border border-border bg-neutral-100/80 dark:bg-neutral-800/80 backdrop-blur-md p-0.5 shadow-sm gap-0.5"
+            className="flex items-center rounded-md border border-border bg-neutral-100 dark:bg-neutral-800 p-0.5 shadow-sm gap-0.5"
             role="tablist"
             aria-label="Mode Pemantauan"
           >
@@ -369,8 +382,8 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
           </div>
         </div>
 
-        {/* Map Area: Live (always mounted, hidden in playback mode) */}
-        <div className={cn('flex-1 relative', mode !== 'live' && 'hidden')}>
+        {/* Map Area: Live (always mounted, hidden in playback mode or table view) */}
+        <div className={cn('flex-1 relative', (mode !== 'live' || view !== 'map') && 'hidden')}>
           <LiveMap
             vehicles={allVehiclesUnfiltered}
             selectedVehicleId={selectedVehicleId || undefined}
@@ -379,8 +392,8 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
           />
         </div>
 
-        {/* Map Area: Playback (always mounted, hidden in live mode) */}
-        <div className={cn('flex-1 relative', mode !== 'playback' && 'hidden')}>
+        {/* Map Area: Playback (always mounted, hidden in live mode or table view) */}
+        <div className={cn('flex-1 relative', (mode !== 'playback' || view !== 'map') && 'hidden')}>
           <PlaybackMap
             vehicle={playbackVehicle}
             playbackTrack={playbackTrack}
@@ -394,9 +407,9 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
         <div
           className={cn(
             'shrink-0 border-t border-border bg-background transition-all duration-300 ease-in-out',
-            mode === 'playback' ? 'h-[120px] opacity-100 translate-y-0' : 'h-0 opacity-0 translate-y-10 pointer-events-none overflow-hidden'
+            (mode === 'playback' && view === 'map') ? 'h-[120px] opacity-100 translate-y-0' : 'h-0 opacity-0 translate-y-10 pointer-events-none overflow-hidden'
           )}
-          aria-hidden={mode !== 'playback'}
+          aria-hidden={mode !== 'playback' || view !== 'map'}
         >
           <PlaybackPanel
             vehicles={mockVehicles}
@@ -418,8 +431,8 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
         {/* Bottom Overview Panel (Live Mode) */}
         <div
           className={cn(
-            'shrink-0 border-t border-border bg-background transition-all duration-300 ease-in-out',
-            (mode === 'live' && selectedVehicleId) ? 'h-[180px] opacity-100 translate-y-0' : 'h-0 opacity-0 translate-y-10 pointer-events-none overflow-hidden'
+            'shrink-0 bg-background transition-all duration-300 ease-in-out',
+            (mode === 'live' && selectedVehicleId) ? 'h-[180px] border-t border-border opacity-100 translate-y-0' : 'h-0 opacity-0 translate-y-10 pointer-events-none overflow-hidden'
           )}
           aria-hidden={mode !== 'live' || !selectedVehicleId}
         >
@@ -429,6 +442,35 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
             locale={locale}
             onShareLocation={() => console.log('Share clicked', selectedVehicleId)}
           />
+        </div>
+
+        {/* Tab Navigation (Map | Table) - Classic Design at Bottom */}
+        <div className="shrink-0 flex items-center justify-start border-t border-border bg-surface w-full px-4 h-[34px] z-10">
+          <button
+            type="button"
+            onClick={() => setView('map')}
+            className={cn(
+              'px-4 h-full text-xs font-semibold border-b-2 transition-colors focus:outline-none flex items-center gap-1.5 pt-[2px]',
+              view === 'map' ? 'border-b-foreground text-foreground' : 'border-b-transparent text-foreground-muted hover:text-foreground'
+            )}
+          >
+            <Map className="h-3.5 w-3.5" />
+            {locale === 'en' ? 'Maps' : 'Peta'}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setView('table');
+              setMode('live'); // Tabel hanya untuk Live
+            }}
+            className={cn(
+              'px-4 h-full text-xs font-semibold border-b-2 transition-colors focus:outline-none flex items-center gap-1.5 pt-[2px]',
+              view === 'table' ? 'border-b-foreground text-foreground' : 'border-b-transparent text-foreground-muted hover:text-foreground'
+            )}
+          >
+            <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2" /><path d="M3 9h18" /><path d="M3 15h18" /><path d="M9 3v18" /><path d="M15 3v18" /></svg>
+            {locale === 'en' ? 'Table' : 'Tabel'}
+          </button>
         </div>
       </div>
 

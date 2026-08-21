@@ -186,10 +186,10 @@ export function Sidebar({
         ))}
       </nav>
 
-      {/* â”€â”€ Footer (fixed, not scrollable) â”€â”€ */}
+      {/* ── Footer (fixed, not scrollable) ── */}
       {bottomNavigation.length > 0 && (
-        <div className="shrink-0 border-t border-border">
-          <div className="px-2.5 py-2">
+        <div className="shrink-0 flex flex-col justify-center border-t border-border h-[38px]">
+          <div className="px-2.5">
             {renderNavItems(bottomNavigation)}
           </div>
         </div>

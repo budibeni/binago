@@ -1,0 +1,122 @@
+import React from 'react';
+import { cn } from '@adatrack/utils';
+import type { TrackingVehicle, VehicleStatus } from '../types/tracking';
+import { getTranslation } from '@/i18n';
+import { MapPin } from 'lucide-react';
+
+export interface TrackingCustomTableProps {
+  vehicles: TrackingVehicle[];
+  onVehicleSelect: (vehicleId: string) => void;
+  locale: 'id' | 'en';
+}
+
+function StatusBadge({ status, label }: { status: VehicleStatus; label: string }) {
+  const isOnline = status === 'driving' || status === 'idle' || status === 'parking';
+  const colorClass = 
+    status === 'driving' ? 'bg-emerald-500' :
+    status === 'parking' ? 'bg-blue-500' :
+    status === 'idle' ? 'bg-amber-500' :
+    'bg-neutral-400 dark:bg-neutral-500';
+
+  return (
+    <div className="flex items-center gap-2">
+      <div className={cn("h-2 w-2 rounded-full", colorClass)} />
+      <span className="text-sm font-medium">{label}</span>
+    </div>
+  );
+}
+
+export function TrackingCustomTable({ vehicles, onVehicleSelect, locale }: TrackingCustomTableProps) {
+  const t = getTranslation(locale);
+  const tTracking = t.tracking;
+
+  const getStatusLabel = (status: VehicleStatus) => {
+    switch (status) {
+      case 'driving': return tTracking.statusDriving;
+      case 'idle': return tTracking.statusIdle;
+      case 'parking': return tTracking.statusParking;
+      case 'offline': return tTracking.statusOffline;
+      default: return status;
+    }
+  };
+
+  const formatDate = (isoString: string) => {
+    try {
+      const d = new Date(isoString);
+      return d.toLocaleString(locale === 'id' ? 'id-ID' : 'en-US', {
+        month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit'
+      });
+    } catch {
+      return isoString;
+    }
+  };
+
+  return (
+    <div className="flex-1 w-full h-full bg-surface overflow-auto border-t border-border">
+      <table className="w-full text-left border-collapse min-w-[800px]">
+        <thead className="sticky top-0 bg-neutral-100 dark:bg-neutral-800 border-b border-border z-10">
+          <tr>
+            <th className="px-4 py-3 text-xs font-semibold text-foreground-muted whitespace-nowrap">
+              ID
+            </th>
+            <th className="px-4 py-3 text-xs font-semibold text-foreground-muted whitespace-nowrap">
+              Status
+            </th>
+            <th className="px-4 py-3 text-xs font-semibold text-foreground-muted whitespace-nowrap">
+              Grup
+            </th>
+            <th className="px-4 py-3 text-xs font-semibold text-foreground-muted whitespace-nowrap">
+              {tTracking.speedUnit?.replace('km/h', 'Kecepatan') || 'Kecepatan'} (km/h)
+            </th>
+            <th className="px-4 py-3 text-xs font-semibold text-foreground-muted whitespace-nowrap">
+              Lokasi
+            </th>
+            <th className="px-4 py-3 text-xs font-semibold text-foreground-muted whitespace-nowrap">
+              {tTracking.overviewLastUpdate || 'Update Terakhir'}
+            </th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-border">
+          {vehicles.length === 0 ? (
+            <tr>
+              <td colSpan={6} className="px-4 py-8 text-center text-foreground-muted text-sm">
+                {tTracking.emptyDescription || 'Tidak ada kendaraan.'}
+              </td>
+            </tr>
+          ) : (
+            vehicles.map((v) => (
+              <tr 
+                key={v.id} 
+                onClick={() => onVehicleSelect(v.id)}
+                className="group hover:bg-neutral-50 dark:hover:bg-neutral-800/50 cursor-pointer transition-colors"
+              >
+                <td className="px-4 py-3 text-sm">
+                  <div className="font-semibold text-foreground">{v.plateNumber}</div>
+                  <div className="text-xs text-foreground-muted">{v.driverName || tTracking.noDriver}</div>
+                </td>
+                <td className="px-4 py-3 text-sm">
+                  <StatusBadge status={v.status} label={getStatusLabel(v.status)} />
+                </td>
+                <td className="px-4 py-3 text-sm text-foreground-muted">
+                  {v.groupName}
+                </td>
+                <td className="px-4 py-3 text-sm">
+                  <div className="font-medium text-foreground">{v.speed}</div>
+                </td>
+                <td className="px-4 py-3 text-sm max-w-[200px] truncate" title={v.location.address}>
+                  <div className="flex items-center gap-1.5 text-foreground-muted group-hover:text-foreground transition-colors">
+                    <MapPin className="h-3.5 w-3.5 shrink-0 opacity-70" />
+                    <span className="truncate">{v.location.address || `${v.location.lat.toFixed(4)}, ${v.location.lng.toFixed(4)}`}</span>
+                  </div>
+                </td>
+                <td className="px-4 py-3 text-sm text-foreground-muted whitespace-nowrap">
+                  {formatDate(v.lastUpdate)}
+                </td>
+              </tr>
+            ))
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+}

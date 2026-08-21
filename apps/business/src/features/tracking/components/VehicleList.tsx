@@ -181,12 +181,12 @@ function VehicleGroupHeader({
   totalCount,
 }: VehicleGroupHeaderProps) {
   return (
-    <div 
+    <div
       className="flex items-center gap-2 px-2.5 py-2 cursor-pointer bg-white dark:bg-neutral-900 hover:bg-[#fafafa] dark:hover:bg-neutral-800 transition-colors"
       onClick={onToggle}
     >
       <ChevronDown className={cn("w-3.5 h-3.5 text-neutral-400 transition-transform", !isExpanded && "-rotate-90")} />
-      
+
       <div onClick={(e) => e.stopPropagation()} className="shrink-0 flex items-center bg-transparent">
         <Checkbox
           id={`group-check-${group.id}`}
@@ -198,11 +198,11 @@ function VehicleGroupHeader({
       </div>
 
       <Folder className="h-[14px] w-[14px] text-[#e6b941] fill-[#f4cb5d] shrink-0 ml-0.5" />
-      
+
       <span className="text-[11px] font-bold text-foreground flex-1 truncate ml-0.5 tracking-tight">
         {group.name}
       </span>
-      
+
       <span className="text-[10px] font-bold text-neutral-500 bg-[#fafafa] dark:bg-neutral-800 border border-border px-1.5 py-0.5 rounded-md leading-none">
         {totalCount}
       </span>
@@ -281,8 +281,8 @@ export function VehicleList({
     .filter((g) => g.filteredVehicles.length > 0 || !search);
 
   const totalVisible = filteredGroups.reduce((s, g) => s + g.filteredVehicles.length, 0);
-  
-  const allVehiclesUnfiltered = search 
+
+  const allVehiclesUnfiltered = search
     ? groups.flatMap((g) => filterVehicles(g.vehicles, search, 'all'))
     : groups.flatMap((g) => g.vehicles);
 
@@ -364,15 +364,15 @@ export function VehicleList({
         <div className="flex items-center justify-between">
           {statusFilters.map(({ key, label, count }) => {
             const isSelected = statusFilter === key;
-            
+
             const IconContent = () => {
               if (key === 'all') return <LayoutGrid className={cn("w-4 h-4 mb-1", isSelected ? 'text-[#de3531]' : 'text-[#de3531]')} />;
               if (key === 'driving') return <Play className={cn("w-4 h-4 mb-1", isSelected ? 'text-success fill-transparent' : 'text-success fill-transparent')} />;
               if (key === 'idle') return <PauseCircle className="w-4 h-4 mb-1 text-amber-500" />;
               if (key === 'parking') return (
-                 <div className="w-4 h-4 mb-1 rounded-full border-[1.5px] border-blue-500 flex items-center justify-center">
-                   <span className="text-[9px] font-bold text-blue-500 leading-none">P</span>
-                 </div>
+                <div className="w-4 h-4 mb-1 rounded-full border-[1.5px] border-blue-500 flex items-center justify-center">
+                  <span className="text-[9px] font-bold text-blue-500 leading-none">P</span>
+                </div>
               );
               if (key === 'offline') return <CircleDot className="w-4 h-4 mb-1 text-neutral-400" />;
               return null;
@@ -434,7 +434,7 @@ export function VehicleList({
         {filteredGroups.map((group) => {
           const isExpanded = expandedGroups[group.id] ?? true;
           const groupVisibleIds = group.filteredVehicles.map(v => v.id);
-          
+
           const isGroupChecked = groupVisibleIds.length > 0 && groupVisibleIds.every(id => selectedVehicleIds.includes(id));
           const isGroupIndeterminate = !isGroupChecked && groupVisibleIds.some(id => selectedVehicleIds.includes(id));
           const groupCheckState = isGroupIndeterminate ? 'indeterminate' : isGroupChecked;
@@ -475,7 +475,7 @@ export function VehicleList({
       </div>
 
       {/* ── Footer ────────────────────────────────────────────────────────── */}
-      <div className="shrink-0 flex items-center justify-between px-3 py-2 border-t border-border bg-[#fafafa] dark:bg-neutral-900">
+      <div className="shrink-0 flex items-center justify-between px-3 h-[34px] border-t border-border bg-[#fafafa] dark:bg-neutral-900">
         <span className="text-[10px] font-semibold text-neutral-400 tracking-tight">
           {labels.groupSummary ? labels.groupSummary(filteredGroups.length) : `${filteredGroups.length} grup`}
         </span>

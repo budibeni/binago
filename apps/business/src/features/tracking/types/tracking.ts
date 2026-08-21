@@ -5,6 +5,7 @@ export type VehicleStatus = 'driving' | 'idle' | 'parking' | 'offline';
 // ─── View Mode ─────────────────────────────────────────────────────────────────
 
 export type TrackingViewMode = 'map' | 'video';
+export type TrackingView = 'map' | 'table';
 
 // ─── Status Filter ─────────────────────────────────────────────────────────────
 
