@@ -18,6 +18,7 @@ import {
   History
 } from 'lucide-react';
 import { cn } from '@adatrack/utils';
+import { Button } from '@adatrack/ui';
 import type { Locale } from '@adatrack/types';
 import { getTranslation } from '../../../i18n';
 import type { TrackingVehicle } from '../types/tracking';
@@ -92,10 +93,10 @@ function InfoRow({
 
 // ─── VehiclePopupPanel ────────────────────────────────────────────────────────
 
-export function VehiclePopupPanel({ 
-  vehicle, 
-  onClose, 
-  locale = 'id', 
+export function VehiclePopupPanel({
+  vehicle,
+  onClose,
+  locale = 'id',
   className,
   onPlayback,
   onShareLocation
@@ -105,7 +106,7 @@ export function VehiclePopupPanel({
   const t = getTranslation(locale);
   const tTracking = t.tracking;
   const status = STATUS_CONFIG[vehicle.status];
-  
+
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const shareContext = useShareLocation();
   // Safe check if context is available (in case provider is missing)
@@ -129,7 +130,7 @@ export function VehiclePopupPanel({
 
       {/* ── Header ─────────────────────────────────────────────────────────── */}
       <div className="flex items-center gap-2 px-3 py-1.5 border-b border-border bg-background shrink-0">
-        
+
         {/* Vehicle Icon */}
         <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 shrink-0 text-primary">
           <Navigation className="w-3.5 h-3.5 fill-current" />
@@ -170,7 +171,7 @@ export function VehiclePopupPanel({
 
       {/* ── Body — 3-column grid ───────────────────────────────────────────── */}
       <div className="grid grid-cols-3 divide-x divide-border overflow-hidden">
-        
+
         {/* ── Col 1: Driver, Speed, ACC, Alarm ─────────────────────── */}
         <div className="flex flex-col gap-2 px-2.5 py-2 overflow-hidden">
           <InfoRow
@@ -244,36 +245,42 @@ export function VehiclePopupPanel({
       </div>
 
       {/* ── Footer ─────────────────────────────────────────────────────────── */}
-      <div className="flex items-center gap-2 px-3 py-1.5 border-t border-border bg-background">
-        <button
+      <div className="flex items-center gap-2 px-3 py-2 border-t border-border bg-background">
+        <Button
           type="button"
           onClick={onPlayback}
-          className="flex-1 flex items-center justify-center gap-1.5 py-1 px-3 rounded text-primary bg-primary/10 hover:bg-primary/20 transition-colors focus:outline-none"
+          variant="primary"
+          size="sm"
+          className="flex-1 rounded-lg shadow-sm text-xs font-semibold"
+          leftIcon={<History className="w-3.5 h-3.5" />}
         >
-          <History className="w-3 h-3" />
-          <span className="text-[11px] font-semibold">{tTracking.popupPlayback}</span>
-        </button>
+          {tTracking.popupPlayback}
+        </Button>
         {activeShare ? (
-          <button
+          <Button
             type="button"
             onClick={() => setShareDialogOpen(true)}
-            className="flex-1 flex items-center justify-center gap-1.5 py-1 px-3 rounded bg-primary/10 text-primary transition-colors focus:outline-none"
+            variant="outline"
+            size="sm"
+            className="flex-1 rounded-lg border-emerald-500/30 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 hover:text-emerald-800 dark:bg-emerald-500/10 dark:text-emerald-400 dark:hover:bg-emerald-500/20 text-xs font-semibold"
+            leftIcon={<Share2 className="w-3.5 h-3.5 fill-current" />}
           >
-            <Share2 className="w-3 h-3 fill-current" />
-            <span className="text-[11px] font-semibold">{locale === 'id' ? 'DIBAGIKAN' : 'SHARED'}</span>
-          </button>
+            {locale === 'id' ? 'DIBAGIKAN' : 'SHARED'}
+          </Button>
         ) : (
-          <button
+          <Button
             type="button"
             onClick={(e) => {
               if (onShareLocation) onShareLocation();
               setShareDialogOpen(true);
             }}
-            className="flex-1 flex items-center justify-center gap-1.5 py-1 px-3 rounded text-foreground-muted hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors focus:outline-none"
+            variant="outline"
+            size="sm"
+            className="flex-1 rounded-lg text-xs font-semibold"
+            leftIcon={<Share2 className="w-3.5 h-3.5" />}
           >
-            <Share2 className="w-3 h-3" />
-            <span className="text-[11px] font-semibold">{tTracking.popupShareLocation}</span>
-          </button>
+            {tTracking.popupShareLocation}
+          </Button>
         )}
       </div>
 

@@ -178,6 +178,8 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
     emptyDescription: tTracking.emptyDescription,
     refreshData: tTracking.refreshData,
     hidePanel: tTracking.hidePanel,
+    lastUpdated: tTracking.overviewLastUpdate,
+    selectAllInGroup: (groupName: string) => `${tTracking.selectAll} - ${groupName}`,
   }), [tTracking]);
 
   // â”€â”€ Render â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€

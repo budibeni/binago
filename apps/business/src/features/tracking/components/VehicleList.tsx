@@ -10,6 +10,11 @@ import {
   MapPin,
   Folder,
   Grid,
+  MoreVertical,
+  LayoutGrid,
+  Play,
+  PauseCircle,
+  CircleDot
 } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import { Checkbox } from '@adatrack/ui';
@@ -20,7 +25,7 @@ import type {
   GroupStatusSummary,
 } from '../types/tracking';
 
-// â”€â”€â”€ Helper: compute group status summary â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Helper: compute group status summary ─────────────────────────────────────
 
 function computeGroupSummary(vehicles: TrackingVehicle[]): GroupStatusSummary {
   return vehicles.reduce(
@@ -32,7 +37,7 @@ function computeGroupSummary(vehicles: TrackingVehicle[]): GroupStatusSummary {
   );
 }
 
-// â”€â”€â”€ Helper: filter vehicles â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Helper: filter vehicles ──────────────────────────────────────────────
 
 function filterVehicles(
   vehicles: TrackingVehicle[],
@@ -51,32 +56,28 @@ function filterVehicles(
   });
 }
 
-// â”€â”€â”€ Status Config â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Status Config ────────────────────────────────────────────────────────
 
 const statusConfig = {
   driving: {
     color: 'text-success',
-    bg: 'bg-success/15 dark:bg-success/20',
     dot: 'bg-success',
   },
   idle: {
-    color: 'text-warning-600 dark:text-warning-400',
-    bg: 'bg-warning/15 dark:bg-warning/20',
-    dot: 'bg-warning',
+    color: 'text-amber-500 dark:text-amber-400',
+    dot: 'bg-amber-500',
   },
   parking: {
-    color: 'text-neutral-600 dark:text-neutral-400',
-    bg: 'bg-neutral-100 dark:bg-neutral-800',
-    dot: 'bg-neutral-400 dark:bg-neutral-500',
+    color: 'text-blue-500 dark:text-blue-400',
+    dot: 'bg-blue-500',
   },
   offline: {
-    color: 'text-danger',
-    bg: 'bg-danger/15 dark:bg-danger/20',
-    dot: 'bg-danger',
+    color: 'text-neutral-500 dark:text-neutral-400',
+    dot: 'bg-neutral-400',
   },
 };
 
-// â”€â”€â”€ StatusBadge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── StatusBadge ──────────────────────────────────────────────────────────
 
 interface StatusBadgeProps {
   status: TrackingVehicle['status'];
@@ -87,20 +88,14 @@ function StatusBadge({ status, labels }: StatusBadgeProps) {
   const c = statusConfig[status];
 
   return (
-    <span
-      className={cn(
-        'inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-medium leading-none',
-        c.bg,
-        c.color,
-      )}
-    >
-      <span className={cn('h-1.5 w-1.5 rounded-full shrink-0', c.dot)} />
+    <span className="inline-flex items-center gap-1.5 text-[10px] font-medium text-foreground tracking-tight">
+      <span className={cn('h-1 w-1 rounded-full shrink-0', c.dot)} />
       {labels[status]}
     </span>
   );
 }
 
-// â”€â”€â”€ VehicleListItem â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── VehicleListItem ──────────────────────────────────────────────────────
 
 interface VehicleListItemProps {
   vehicle: TrackingVehicle;
@@ -120,16 +115,13 @@ function VehicleListItem({
   onSelect,
   onCheck,
   noDriverLabel,
-  speedUnit,
   statusLabels,
 }: VehicleListItemProps) {
   return (
     <div
       className={cn(
-        'group relative flex items-center gap-2 py-1 pr-2 cursor-pointer transition-colors',
-        isSelected
-          ? 'bg-neutral-100 dark:bg-neutral-800/80 rounded-r-md'
-          : 'hover:bg-neutral-50 dark:hover:bg-neutral-800/40 rounded-r-md'
+        'group flex items-center gap-2 py-1.5 px-2.5 cursor-pointer transition-colors',
+        isSelected ? 'bg-neutral-50 dark:bg-neutral-800/80' : 'hover:bg-[#fafafa] dark:hover:bg-neutral-800/40'
       )}
       onClick={() => onSelect(vehicle.id)}
       role="button"
@@ -142,41 +134,37 @@ function VehicleListItem({
       }}
       aria-selected={isSelected}
     >
-      {/* Horizontal branch line */}
-      <div className="absolute left-[-15px] top-1/2 w-[11px] border-t border-neutral-400 dark:border-neutral-600 -z-10" />
-
-      {/* Checkbox */}
-      <div onClick={(e) => e.stopPropagation()} className="shrink-0 flex items-center z-10 bg-background">
+      <div onClick={(e) => e.stopPropagation()} className="shrink-0 flex items-center bg-transparent mr-1.5">
         <Checkbox
           id={`vehicle-check-${vehicle.id}`}
           checked={isChecked}
           onCheckedChange={(checked) => onCheck(vehicle.id, !!checked)}
           aria-label={`Pilih ${vehicle.plateNumber}`}
+          className="h-3.5 w-3.5 data-[state=checked]:bg-neutral-400 data-[state=checked]:border-neutral-400 data-[state=checked]:text-white rounded-sm shadow-none"
         />
       </div>
 
-      {/* Grid Icon */}
-      <Grid className="h-[15px] w-[15px] text-slate-400 fill-slate-300 shrink-0 z-10" />
-
-      {/* Plate + Driver */}
-      <div className="flex-1 min-w-0 flex items-center gap-1.5 ml-0.5 z-10">
-        <span className="text-[13px] font-medium text-foreground whitespace-nowrap">
+      <div className="flex-1 min-w-0 flex items-center gap-1.5 ml-0.5">
+        <span className="text-[11px] font-bold text-foreground whitespace-nowrap tracking-tight">
           {vehicle.plateNumber}
         </span>
-        <span className="text-[13px] text-foreground-muted whitespace-nowrap truncate">
+        <span className="text-[10px] font-medium text-neutral-400 whitespace-nowrap truncate tracking-tight">
           / {vehicle.driverName ?? noDriverLabel}
         </span>
       </div>
 
-      {/* Status */}
-      <div className="flex flex-col items-end gap-1 shrink-0 z-10">
+      <div className="flex items-center justify-end shrink-0 mx-1">
         <StatusBadge status={vehicle.status} labels={statusLabels} />
       </div>
+
+      <button type="button" className="text-neutral-300 hover:text-neutral-500 focus:outline-none shrink-0" onClick={(e) => e.stopPropagation()}>
+        <MoreVertical className="w-3.5 h-3.5" />
+      </button>
     </div>
   );
 }
 
-// â”€â”€â”€ VehicleGroupHeader â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── VehicleGroupHeader ───────────────────────────────────────────────────
 
 interface VehicleGroupHeaderProps {
   group: TrackingVehicleGroup;
@@ -184,9 +172,8 @@ interface VehicleGroupHeaderProps {
   onToggle: () => void;
   isChecked: boolean | 'indeterminate';
   onCheck: (checked: boolean) => void;
-  summary: GroupStatusSummary;
+  selectAllInGroupLabel?: string;
   totalCount: number;
-  statusLabels: { driving: string; idle: string; parking: string; offline: string };
 }
 
 function VehicleGroupHeader({
@@ -195,88 +182,53 @@ function VehicleGroupHeader({
   onToggle,
   isChecked,
   onCheck,
-  summary,
+  selectAllInGroupLabel,
   totalCount,
-  statusLabels,
 }: VehicleGroupHeaderProps) {
-  const summaryParts = [
-    summary.driving > 0 && { label: `${summary.driving} ${statusLabels.driving}`, status: 'driving' as const },
-    summary.idle > 0 && { label: `${summary.idle} ${statusLabels.idle}`, status: 'idle' as const },
-    summary.parking > 0 && { label: `${summary.parking} ${statusLabels.parking}`, status: 'parking' as const },
-    summary.offline > 0 && { label: `${summary.offline} ${statusLabels.offline}`, status: 'offline' as const },
-  ].filter(Boolean) as { label: string; status: TrackingVehicle['status'] }[];
-
   return (
-    <div className="flex flex-col w-full group/header">
-      <div className="flex items-center gap-1.5">
-        {/* Toggle Button */}
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onToggle();
-          }}
-          className="z-10 flex items-center justify-center w-3.5 h-3.5 border border-neutral-400 bg-background text-foreground-muted hover:border-foreground hover:text-foreground transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-primary"
-          aria-expanded={isExpanded}
-        >
-          {isExpanded ? (
-            <span className="text-[11px] leading-[0] font-bold block mb-[3px]">-</span>
-          ) : (
-            <span className="text-[11px] leading-[0] font-bold block mb-[1px]">+</span>
-          )}
-        </button>
-
-        {/* Group Info Container */}
-        <div className="flex flex-1 items-center gap-1.5 px-2 py-1 rounded bg-[#eaf4f7] border border-[#d6edf3] dark:bg-cyan-900/20 dark:border-cyan-800/50 mr-2 transition-colors hover:bg-[#e1f0f4] dark:hover:bg-cyan-900/30">
-          <div onClick={(e) => e.stopPropagation()} className="shrink-0 flex items-center">
-            <Checkbox
-              checked={isChecked}
-              onCheckedChange={(c) => onCheck(!!c)}
-              aria-label={`Pilih grup ${group.name}`}
-            />
-          </div>
-          
-          <Folder className="h-4 w-4 text-[#e6b941] fill-[#f4cb5d] shrink-0" />
-          
-          <span className="text-[14px] text-foreground whitespace-nowrap overflow-hidden text-ellipsis mr-2">
-            {group.name}
-          </span>
-          
-          <div className="flex-1 flex items-center justify-end gap-x-1.5">
-             <span className="text-[11px] font-semibold text-foreground-muted bg-background/50 px-1.5 py-0.5 rounded shadow-sm leading-none">{totalCount}</span>
-          </div>
-        </div>
+    <div 
+      className="flex items-center gap-2 px-2.5 py-2 cursor-pointer bg-white dark:bg-neutral-900 hover:bg-[#fafafa] dark:hover:bg-neutral-800 transition-colors"
+      onClick={onToggle}
+    >
+      <ChevronDown className={cn("w-3.5 h-3.5 text-neutral-400 transition-transform", !isExpanded && "-rotate-90")} />
+      
+      <div onClick={(e) => e.stopPropagation()} className="shrink-0 flex items-center bg-transparent">
+        <Checkbox
+          id={`group-check-${group.id}`}
+          checked={isChecked}
+          onCheckedChange={(checked) => onCheck(!!checked)}
+          aria-label={selectAllInGroupLabel || `Pilih semua di grup ${group.name}`}
+          className="h-3.5 w-3.5 data-[state=checked]:bg-neutral-400 data-[state=checked]:border-neutral-400 data-[state=checked]:text-white data-[state=indeterminate]:bg-neutral-400 data-[state=indeterminate]:border-neutral-400 data-[state=indeterminate]:text-white rounded-sm shadow-none"
+        />
       </div>
+
+      <Folder className="h-[14px] w-[14px] text-[#e6b941] fill-[#f4cb5d] shrink-0 ml-0.5" />
+      
+      <span className="text-[11px] font-bold text-foreground flex-1 truncate ml-0.5 tracking-tight">
+        {group.name}
+      </span>
+      
+      <span className="text-[10px] font-bold text-neutral-500 bg-[#fafafa] dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700 px-1.5 py-0.5 rounded-md leading-none">
+        {totalCount}
+      </span>
     </div>
   );
 }
 
-// â”€â”€â”€ VehicleList Props â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── VehicleList Props ────────────────────────────────────────────────────
 
 export interface VehicleListProps {
-  /** All vehicle groups with their vehicles */
   groups: TrackingVehicleGroup[];
-  /** Currently highlighted vehicle id (on map) */
   selectedVehicleId: string | null;
-  /** Checked vehicle ids (multi-select) */
   selectedVehicleIds: string[];
-  /** Current search query */
   search: string;
-  /** Current status filter */
   statusFilter: StatusFilter;
-  /** Callback when a vehicle row is clicked */
   onVehicleSelect: (vehicleId: string) => void;
-  /** Callback when search changes */
   onSearchChange: (q: string) => void;
-  /** Callback when status filter changes */
   onStatusFilterChange: (filter: StatusFilter) => void;
-  /** Callback when a vehicle checkbox is toggled (supports multiple for group toggle) */
   onVehicleCheck: (vehicleId: string | string[], checked: boolean) => void;
-  /** Callback to select/deselect all visible vehicles */
   onSelectAll: (checked: boolean) => void;
-  /** Optional callback to close/hide sidebar */
   onClose?: () => void;
-  /** i18n labels */
   labels: {
     title: string;
     unitCount: string;
@@ -290,16 +242,18 @@ export interface VehicleListProps {
     statusOffline: string;
     noDriver: string;
     speedUnit: string;
-    groupSummary: (groups: number, vehicles: number) => string;
+    groupSummary: (groups: number) => string;
     emptyTitle?: string;
     emptyDescription?: string;
     refreshData?: string;
     hidePanel?: string;
+    lastUpdated?: string;
+    selectAllInGroup?: (groupName: string) => string;
   };
   className?: string;
 }
 
-// â”€â”€â”€ VehicleList Component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── VehicleList Component ────────────────────────────────────────────────
 
 export function VehicleList({
   groups,
@@ -316,7 +270,6 @@ export function VehicleList({
   labels,
   className,
 }: VehicleListProps) {
-  // â”€â”€ Local state: which groups are expanded â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const [expandedGroups, setExpandedGroups] = React.useState<Record<string, boolean>>(() =>
     Object.fromEntries(groups.map((g) => [g.id, true])),
   );
@@ -325,7 +278,6 @@ export function VehicleList({
     setExpandedGroups((prev) => ({ ...prev, [groupId]: !prev[groupId] }));
   };
 
-  // â”€â”€ Computed: filter vehicles per group â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const filteredGroups = groups
     .map((group) => ({
       ...group,
@@ -333,10 +285,8 @@ export function VehicleList({
     }))
     .filter((g) => g.filteredVehicles.length > 0 || !search);
 
-  // Total visible matching search & filter
   const totalVisible = filteredGroups.reduce((s, g) => s + g.filteredVehicles.length, 0);
   
-  // Total overall stats (regardless of current filter, used for the filter counts)
   const allVehiclesUnfiltered = search 
     ? groups.flatMap((g) => filterVehicles(g.vehicles, search, 'all'))
     : groups.flatMap((g) => g.vehicles);
@@ -344,14 +294,12 @@ export function VehicleList({
   const totalAllUnfiltered = allVehiclesUnfiltered.length;
   const overallSummary = computeGroupSummary(allVehiclesUnfiltered);
 
-  // â”€â”€ Computed: select all state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const allVisibleIds = filteredGroups.flatMap((g) => g.filteredVehicles.map((v) => v.id));
   const allChecked =
     allVisibleIds.length > 0 && allVisibleIds.every((id) => selectedVehicleIds.includes(id));
   const someChecked =
     !allChecked && allVisibleIds.some((id) => selectedVehicleIds.includes(id));
 
-  // â”€â”€ Status filter tabs config â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const statusFilters: { key: StatusFilter; label: string; count: number }[] = [
     { key: 'all', label: labels.statusAll, count: totalAllUnfiltered },
     { key: 'driving', label: labels.statusDriving, count: overallSummary.driving },
@@ -370,18 +318,18 @@ export function VehicleList({
   return (
     <aside
       className={cn(
-        'flex flex-col h-full bg-background border-r border-border overflow-hidden',
+        'flex flex-col h-full bg-white dark:bg-neutral-950 border-r border-border overflow-hidden',
         className,
       )}
       aria-label={labels.title}
     >
-      {/* â”€â”€ Panel Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
-      <div className="shrink-0 flex items-center justify-between px-3 h-[40px] border-b border-border bg-neutral-50/30 dark:bg-neutral-900/10">
+      {/* ── Header ────────────────────────────────────────────────────────── */}
+      <div className="shrink-0 flex items-center justify-between px-3 h-[40px] bg-white dark:bg-neutral-900 border-b border-neutral-100 dark:border-neutral-800">
         <div className="flex items-center gap-2">
-          <h2 className="text-[11px] font-semibold text-foreground uppercase tracking-wider">
+          <h2 className="text-[12px] font-bold text-foreground tracking-tight">
             {labels.title}
           </h2>
-          <span className="text-[10px] font-bold text-foreground-muted bg-neutral-200/60 dark:bg-neutral-800 px-1.5 py-0.5 rounded-full leading-none">
+          <span className="text-[10px] font-bold text-[#de3531] bg-red-50 dark:bg-red-900/20 px-1.5 py-0.5 rounded-md leading-none">
             {totalAllUnfiltered}
           </span>
         </div>
@@ -389,141 +337,140 @@ export function VehicleList({
           <button
             type="button"
             onClick={onClose}
-            className="flex h-6 w-6 items-center justify-center rounded text-foreground-muted hover:bg-neutral-200/50 hover:text-foreground transition-colors"
-            title={labels.hidePanel || "Sembunyikan Panel"}
-            aria-label={labels.hidePanel || "Sembunyikan Panel"}
+            className="flex h-6 w-6 items-center justify-center rounded text-neutral-400 hover:bg-neutral-50 hover:text-foreground transition-colors"
           >
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-3.5 w-3.5" />
           </button>
         )}
       </div>
 
-      {/* â”€â”€ Search â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
-      <div className="shrink-0 flex items-center gap-2 px-3 py-2 border-b border-border">
+      {/* ── Search ────────────────────────────────────────────────────────── */}
+      <div className="shrink-0 px-3 py-2 bg-white dark:bg-neutral-900 border-b border-neutral-100 dark:border-neutral-800 flex gap-2">
         <div className="relative flex-1 min-w-0">
-          <Search
-            className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground-muted pointer-events-none"
-            aria-hidden="true"
-          />
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-neutral-400 pointer-events-none" />
           <input
             type="search"
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder={labels.searchPlaceholder}
-            className={cn(
-              'w-full h-8 rounded-md border border-border bg-background pl-8 pr-3 text-[12px] text-foreground placeholder:text-foreground-subtle',
-              'focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors',
-            )}
-            aria-label={labels.searchPlaceholder}
+            className="w-full h-8 rounded-md border border-neutral-200 dark:border-neutral-800 bg-[#fafafa] dark:bg-neutral-900 pl-8 pr-3 text-[12px] text-foreground focus:outline-none focus:border-neutral-300 focus:bg-white transition-all placeholder:text-neutral-400"
           />
         </div>
         <button
           type="button"
-          className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background text-foreground-muted hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:text-foreground transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-primary shrink-0"
-          aria-label={labels.refreshData || "Muat ulang data"}
-          title={labels.refreshData || "Muat ulang data"}
-          onClick={() => {
-            // TODO: implement refresh logic if passed down, or just mock it for now.
-          }}
+          className="flex h-8 w-8 items-center justify-center rounded-md border border-neutral-200 dark:border-neutral-800 bg-[#fafafa] dark:bg-neutral-900 text-neutral-500 hover:bg-white dark:hover:bg-neutral-800 transition-colors shrink-0"
         >
-          <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" />
+          <RefreshCw className="h-3.5 w-3.5" />
         </button>
       </div>
 
-      {/* â”€â”€ Status Filter â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
-      <div className="shrink-0 border-b border-border px-3 py-2 bg-neutral-50/50 dark:bg-neutral-900/30">
-        <div className="flex flex-wrap gap-1.5" role="group" aria-label="Filter status kendaraan">
+      {/* ── Tabs ──────────────────────────────────────────────────────────── */}
+      <div className="shrink-0 bg-white dark:bg-neutral-900 border-b border-neutral-100 dark:border-neutral-800 px-1">
+        <div className="flex items-center justify-between">
           {statusFilters.map(({ key, label, count }) => {
             const isSelected = statusFilter === key;
+            
+            const IconContent = () => {
+              if (key === 'all') return <LayoutGrid className={cn("w-4 h-4 mb-1", isSelected ? 'text-[#de3531]' : 'text-[#de3531]')} />;
+              if (key === 'driving') return <Play className={cn("w-4 h-4 mb-1", isSelected ? 'text-success fill-transparent' : 'text-success fill-transparent')} />;
+              if (key === 'idle') return <PauseCircle className="w-4 h-4 mb-1 text-amber-500" />;
+              if (key === 'parking') return (
+                 <div className="w-4 h-4 mb-1 rounded-full border-[1.5px] border-blue-500 flex items-center justify-center">
+                   <span className="text-[9px] font-bold text-blue-500 leading-none">P</span>
+                 </div>
+              );
+              if (key === 'offline') return <CircleDot className="w-4 h-4 mb-1 text-neutral-400" />;
+              return null;
+            };
+
             return (
               <button
                 key={key}
-                type="button"
                 onClick={() => onStatusFilterChange(key)}
                 className={cn(
-                  'inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium transition-colors border',
-                  'focus:outline-none focus-visible:ring-1 focus-visible:ring-primary focus-visible:ring-offset-1',
-                  isSelected
-                    ? 'bg-foreground text-background border-foreground'
-                    : 'bg-background text-foreground-muted border-border hover:border-foreground/30 hover:text-foreground',
+                  "flex-1 flex flex-col items-center py-2 border-b-2 transition-colors focus:outline-none",
+                  isSelected ? 'border-[#de3531]' : 'border-transparent hover:border-neutral-100'
                 )}
-                aria-pressed={isSelected}
-                aria-label={`Filter: ${label} (${count})`}
               >
-                {label} <span className={cn('opacity-70', isSelected && 'font-semibold')}>{count}</span>
+                <IconContent />
+                <span className={cn("text-[10px] font-bold leading-none mb-0.5 tracking-tight", isSelected ? 'text-[#de3531]' : 'text-neutral-500')}>
+                  {key === 'all' ? labels.statusAll : label}
+                </span>
+                <span className={cn("text-[10px] font-bold leading-none", isSelected ? 'text-[#de3531]' : 'text-neutral-500')}>
+                  {count}
+                </span>
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* â”€â”€ Select All â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
-      <div className="shrink-0 flex items-center gap-2.5 px-3 py-2.5 border-b border-border bg-background">
-        <Checkbox
-          id="vehicle-list-select-all"
-          checked={someChecked ? 'indeterminate' : allChecked}
-          onCheckedChange={(checked) => onSelectAll(!!checked)}
-          aria-label={labels.allUnits}
-        />
-        <label
-          htmlFor="vehicle-list-select-all"
-          className="text-[11px] font-bold text-foreground uppercase tracking-wider cursor-pointer select-none"
-        >
-          {labels.allUnits.toUpperCase()}
-        </label>
+      {/* ── Select All ────────────────────────────────────────────────────── */}
+      <div className="shrink-0 flex items-center justify-between px-3 py-2 bg-[#fafafa] dark:bg-neutral-900 border-b border-neutral-100 dark:border-neutral-800">
+        <div className="flex items-center gap-2.5">
+          <Checkbox
+            id="vehicle-list-select-all"
+            checked={someChecked ? 'indeterminate' : allChecked}
+            onCheckedChange={(checked) => onSelectAll(!!checked)}
+            aria-label="Semua"
+            className="h-3.5 w-3.5 data-[state=checked]:bg-neutral-700 data-[state=checked]:border-neutral-700 data-[state=checked]:text-white data-[state=indeterminate]:bg-neutral-700 data-[state=indeterminate]:border-neutral-700 data-[state=indeterminate]:text-white rounded-sm"
+          />
+          <label
+            htmlFor="vehicle-list-select-all"
+            className="text-[11px] font-bold text-foreground cursor-pointer select-none tracking-tight"
+          >
+            {labels.statusAll}
+          </label>
+        </div>
+        <span className="text-[10px] font-bold text-neutral-500 bg-white dark:bg-neutral-800 px-1.5 py-0.5 border border-neutral-100 dark:border-neutral-700 rounded-md leading-none">
+          {totalAllUnfiltered}
+        </span>
       </div>
 
-      {/* â”€â”€ Scrollable Vehicle List â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
-      <div className="flex-1 min-h-0 overflow-y-auto px-3 py-3" role="list" aria-label="Daftar kendaraan">
+      {/* ── Scrollable List ───────────────────────────────────────────────── */}
+      <div className="flex-1 min-h-0 overflow-y-auto px-3 py-3 space-y-2.5 bg-[#fcfcfc] dark:bg-neutral-950" role="list">
         {filteredGroups.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-            <MapPin className="h-10 w-10 text-border mb-4" aria-hidden="true" />
-            <p className="text-[14px] font-medium text-foreground">{labels.emptyTitle || 'Tidak ada kendaraan ditemukan'}</p>
-            <p className="text-[13px] text-foreground-muted mt-1">
-              {labels.emptyDescription || 'Coba sesuaikan kata kunci atau filter status.'}
-            </p>
+          <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+            <MapPin className="h-8 w-8 text-neutral-300 mb-3" />
+            <p className="text-[12px] font-medium text-foreground">{labels.emptyTitle || 'Tidak ada kendaraan'}</p>
           </div>
         )}
 
         {filteredGroups.map((group) => {
-          const summary = computeGroupSummary(group.vehicles);
           const isExpanded = expandedGroups[group.id] ?? true;
-
-          // Compute group check state
           const groupVisibleIds = group.filteredVehicles.map(v => v.id);
+          
           const isGroupChecked = groupVisibleIds.length > 0 && groupVisibleIds.every(id => selectedVehicleIds.includes(id));
           const isGroupIndeterminate = !isGroupChecked && groupVisibleIds.some(id => selectedVehicleIds.includes(id));
           const groupCheckState = isGroupIndeterminate ? 'indeterminate' : isGroupChecked;
 
           return (
-            <div key={group.id} role="listitem" className="mb-3 last:mb-0">
-              {/* Group Header */}
+            <div key={group.id} role="listitem" className="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-md shadow-[0_2px_8px_-4px_rgba(0,0,0,0.03)] overflow-hidden">
               <VehicleGroupHeader
                 group={group}
                 isExpanded={isExpanded}
                 onToggle={() => toggleGroup(group.id)}
                 isChecked={groupCheckState}
                 onCheck={(c) => onVehicleCheck(groupVisibleIds, c)}
-                summary={summary}
+                selectAllInGroupLabel={labels.selectAllInGroup ? labels.selectAllInGroup(group.name) : undefined}
                 totalCount={group.vehicles.length}
-                statusLabels={statusLabels}
               />
 
-              {/* Vehicle Items (Tree Branch) */}
               {isExpanded && (
-                <div className="relative ml-[6px] pl-[15px] border-l border-neutral-400 dark:border-neutral-600 mt-1 flex flex-col gap-0.5">
+                <div className="flex flex-col border-t border-neutral-100 dark:border-neutral-800">
                   {group.filteredVehicles.map((vehicle) => (
-                    <VehicleListItem
-                      key={vehicle.id}
-                      vehicle={vehicle}
-                      isSelected={vehicle.id === selectedVehicleId}
-                      isChecked={selectedVehicleIds.includes(vehicle.id)}
-                      onSelect={onVehicleSelect}
-                      onCheck={onVehicleCheck}
-                      noDriverLabel={labels.noDriver}
-                      speedUnit={labels.speedUnit}
-                      statusLabels={statusLabels}
-                    />
+                    <div key={vehicle.id} className="border-b border-neutral-100 dark:border-neutral-800 last:border-0">
+                      <VehicleListItem
+                        vehicle={vehicle}
+                        isSelected={vehicle.id === selectedVehicleId}
+                        isChecked={selectedVehicleIds.includes(vehicle.id)}
+                        onSelect={onVehicleSelect}
+                        onCheck={onVehicleCheck}
+                        noDriverLabel={labels.noDriver}
+                        speedUnit={labels.speedUnit}
+                        statusLabels={statusLabels}
+                      />
+                    </div>
                   ))}
                 </div>
               )}
@@ -532,11 +479,15 @@ export function VehicleList({
         })}
       </div>
 
-      {/* â”€â”€ Footer Summary â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
-      <div className="shrink-0 flex items-center justify-center px-3 py-2 border-t border-border bg-neutral-50 dark:bg-neutral-900/50">
-        <p className="text-[11px] font-medium text-foreground-muted">
-          {labels.groupSummary(filteredGroups.length, totalVisible)}
-        </p>
+      {/* ── Footer ────────────────────────────────────────────────────────── */}
+      <div className="shrink-0 flex items-center justify-between px-3 py-2 border-t border-neutral-100 dark:border-neutral-800 bg-[#fafafa] dark:bg-neutral-900">
+        <span className="text-[10px] font-semibold text-neutral-400 tracking-tight">
+          {labels.groupSummary ? labels.groupSummary(filteredGroups.length) : `${filteredGroups.length} grup`}
+        </span>
+        <div className="flex items-center gap-1.5 text-[10px] font-medium text-neutral-400 tracking-tight">
+          <RefreshCw className="w-3 h-3" />
+          <span>{labels.lastUpdated || 'Terakhir diperbarui'} 10:45:23</span>
+        </div>
       </div>
     </aside>
   );
