@@ -5,9 +5,11 @@ import { Map, History, ChevronLeft, Filter } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import { VehicleList } from './components/VehicleList';
 import { LiveMap } from './components/LiveMap';
+import { PlaybackMap } from './components/PlaybackMap';
 import { PlaybackPanel } from './components/PlaybackPanel';
 import { VehicleOverviewPanel } from './components/VehicleOverviewPanel';
-import { mockVehicleGroups, mockVehicles } from './data/mockTrackingData';
+import { mockVehicleGroups, mockVehicles, generateMockPlaybackData } from './data/mockTrackingData';
+import type { MockPlaybackData } from './data/mockTrackingData';
 import { getTranslation } from '../../i18n';
 import { useBusinessLocale } from '../../components/BusinessShellLayout';
 import type { StatusFilter, DateRange, PlaybackState } from './types/tracking';
@@ -42,8 +44,9 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
   // â”€â”€ Playback state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const [playbackVehicleId, setPlaybackVehicleId] = React.useState<string | null>(null);
   const [dateRange, setDateRange] = React.useState<DateRange>({
-    date: new Date().toISOString().slice(0, 10),
+    startDate: new Date().toISOString().slice(0, 10),
     startTime: '06:00',
+    endDate: new Date().toISOString().slice(0, 10),
     endTime: '18:00',
   });
   const [playbackState, setPlaybackState] = React.useState<PlaybackState>({
@@ -51,9 +54,18 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
     totalDuration: 0,
     currentTime: 0,
   });
+  const [playbackData, setPlaybackData] = React.useState<MockPlaybackData | null>(null);
+  const [playbackPointIndex, setPlaybackPointIndex] = React.useState(0);
+  const [playbackSpeed, setPlaybackSpeed] = React.useState(1);
 
   // ——— Timer ref ——————————————————————————————————————————————————————————————————————————————
   const timerRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
+  const playbackDataRef = React.useRef<MockPlaybackData | null>(null);
+  const playbackSpeedRef = React.useRef(1);
+
+  // Keep refs in sync
+  React.useEffect(() => { playbackDataRef.current = playbackData; }, [playbackData]);
+  React.useEffect(() => { playbackSpeedRef.current = playbackSpeed; }, [playbackSpeed]);
 
   // ─── Computed ────────────────────────────────────────────────────────────────
   const allVehiclesUnfiltered = React.useMemo(() => {
@@ -68,6 +80,108 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
       return matchStatus && matchSearch;
     });
   }, [search, statusFilter]);
+
+  // ── Playback derived state ──────────────────────────────────────────────────
+  const playbackTrack = React.useMemo(() => {
+    if (!playbackData) return undefined;
+    return playbackData.points.map(p => ({ lat: p.lat, lng: p.lng }));
+  }, [playbackData]);
+
+  const playbackPassedTrack = React.useMemo(() => {
+    if (!playbackTrack || playbackPointIndex < 0) return undefined;
+    return playbackTrack.slice(0, playbackPointIndex + 1);
+  }, [playbackTrack, playbackPointIndex]);
+
+  const playbackParkingEvents = React.useMemo(() => {
+    if (!playbackData) return undefined;
+    const events: {
+      lat: number;
+      lng: number;
+      address: string;
+      startTimestamp: string;
+      durationSecs: number;
+      pointIndex: number;
+      speed: number;
+      odometer: number;
+    }[] = [];
+    let parkingStart: number | null = null;
+    let parkingStartTimestamp = '';
+
+    playbackData.points.forEach((p, idx) => {
+      if (p.speed === 0) {
+        if (parkingStart === null) {
+          parkingStart = idx;
+          parkingStartTimestamp = p.timestamp;
+        }
+      } else {
+        if (parkingStart !== null) {
+          const durationSecs = (idx - parkingStart) * 15;
+          const point = playbackData.points[parkingStart];
+          events.push({
+            lat: point.lat,
+            lng: point.lng,
+            address: point.address ?? `${point.lat.toFixed(5)}, ${point.lng.toFixed(5)}`,
+            startTimestamp: parkingStartTimestamp,
+            durationSecs,
+            pointIndex: parkingStart,
+            speed: 0,
+            odometer: point.odometer,
+          });
+          parkingStart = null;
+        }
+      }
+    });
+
+    // Handle parking at end of route
+    if (parkingStart !== null) {
+      const durationSecs = (playbackData.points.length - parkingStart) * 15;
+      const point = playbackData.points[parkingStart];
+      events.push({
+        lat: point.lat,
+        lng: point.lng,
+        address: point.address ?? `${point.lat.toFixed(5)}, ${point.lng.toFixed(5)}`,
+        startTimestamp: parkingStartTimestamp,
+        durationSecs,
+        pointIndex: parkingStart,
+        speed: 0,
+        odometer: point.odometer,
+      });
+    }
+
+    return events;
+  }, [playbackData]);
+
+  const vehiclesForMap = React.useMemo(() => {
+    if (mode !== 'playback' || !playbackData || !playbackVehicleId) return allVehiclesUnfiltered;
+    const currentPoint = playbackData.points[playbackPointIndex];
+    if (!currentPoint) return allVehiclesUnfiltered;
+    return allVehiclesUnfiltered.map(v => {
+      if (v.id !== playbackVehicleId) return v;
+      return {
+        ...v,
+        location: { lat: currentPoint.lat, lng: currentPoint.lng, address: v.location.address },
+        speed: currentPoint.speed,
+        heading: currentPoint.heading,
+        status: currentPoint.speed > 0 ? 'driving' as const : 'parking' as const,
+      };
+    });
+  }, [allVehiclesUnfiltered, mode, playbackData, playbackVehicleId, playbackPointIndex]);
+
+  // Vehicle with position overridden for PlaybackMap
+  const playbackVehicle = React.useMemo(() => {
+    if (!playbackVehicleId) return null;
+    const base = allVehiclesUnfiltered.find(v => v.id === playbackVehicleId) ?? null;
+    if (!base || !playbackData) return base;
+    const currentPoint = playbackData.points[playbackPointIndex];
+    if (!currentPoint) return base;
+    return {
+      ...base,
+      location: { lat: currentPoint.lat, lng: currentPoint.lng, address: base.location.address },
+      speed: currentPoint.speed,
+      heading: currentPoint.heading,
+      status: currentPoint.speed > 0 ? 'driving' as const : 'parking' as const,
+    };
+  }, [allVehiclesUnfiltered, playbackVehicleId, playbackData, playbackPointIndex]);
 
   const stopTimer = React.useCallback(() => {
     if (timerRef.current) {
@@ -119,10 +233,16 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
     if (!playbackVehicleId) return;
     stopTimer();
     setPlaybackState({ status: 'loading', totalDuration: 0, currentTime: 0 });
+    setPlaybackData(null);
+    setPlaybackPointIndex(0);
     setTimeout(() => {
-      setPlaybackState({ status: 'ready', totalDuration: 3600, currentTime: 0 });
-    }, 1500);
-  }, [playbackVehicleId, stopTimer]);
+      const startDatetime = new Date(`${dateRange.startDate}T${dateRange.startTime}:00`);
+      const data = generateMockPlaybackData(playbackVehicleId, startDatetime);
+      setPlaybackData(data);
+      playbackDataRef.current = data;
+      setPlaybackState({ status: 'ready', totalDuration: data.totalDurationSecs, currentTime: 0 });
+    }, 1200);
+  }, [playbackVehicleId, dateRange, stopTimer]);
 
   const handlePlay = React.useCallback(() => {
     setPlaybackState((prev: PlaybackState) => {
@@ -130,16 +250,23 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
       return { ...prev, status: 'playing' as const };
     });
     timerRef.current = setInterval(() => {
-      setPlaybackState((prev: PlaybackState) => {
-        if (prev.status !== 'playing') { stopTimer(); return prev; }
-        const next = prev.currentTime + 1;
-        if (next >= prev.totalDuration) {
-          stopTimer();
-          return { ...prev, status: 'ready' as const, currentTime: prev.totalDuration };
-        }
-        return { ...prev, currentTime: next };
+      const data = playbackDataRef.current;
+      if (!data) return;
+      const speed = playbackSpeedRef.current;
+      setPlaybackPointIndex((prev) => {
+        const next = Math.min(prev + speed, data.points.length - 1);
+        setPlaybackState((ps: PlaybackState) => {
+          if (ps.status !== 'playing') { stopTimer(); return ps; }
+          const currentTime = next * 15; // 15s per point
+          if (next >= data.points.length - 1) {
+            stopTimer();
+            return { ...ps, status: 'ready' as const, currentTime: ps.totalDuration };
+          }
+          return { ...ps, currentTime };
+        });
+        return next;
       });
-    }, 100);
+    }, 200);
   }, [stopTimer]);
 
   const handlePause = React.useCallback(() => {
@@ -153,9 +280,15 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
   }, [stopTimer]);
 
   const handleSeek = React.useCallback((progress: number) => {
+    const data = playbackDataRef.current;
+    if (!data) return;
+    const targetTime = (progress / 100) * data.totalDurationSecs;
+    const targetIndex = Math.round(targetTime / 15);
+    const clampedIndex = Math.min(Math.max(0, targetIndex), data.points.length - 1);
+    setPlaybackPointIndex(clampedIndex);
     setPlaybackState((prev: PlaybackState) => ({
       ...prev,
-      currentTime: (progress / 100) * prev.totalDuration,
+      currentTime: clampedIndex * 15,
     }));
   }, []);
 
@@ -236,17 +369,23 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
           </div>
         </div>
 
-        {/* Map Area */}
-        <div className="flex-1 relative">
+        {/* Map Area: Live (always mounted, hidden in playback mode) */}
+        <div className={cn('flex-1 relative', mode !== 'live' && 'hidden')}>
           <LiveMap
             vehicles={allVehiclesUnfiltered}
             selectedVehicleId={selectedVehicleId || undefined}
-            visibleVehicleIds={
-              mode === 'playback'
-                ? (playbackVehicleId ? [playbackVehicleId] : [])
-                : allVehiclesUnfiltered.map(v => v.id).filter(id => selectedVehicleIds.includes(id))
-            }
+            visibleVehicleIds={allVehiclesUnfiltered.map(v => v.id).filter(id => selectedVehicleIds.includes(id))}
             onPlaybackRequest={handlePlaybackRequest}
+          />
+        </div>
+
+        {/* Map Area: Playback (always mounted, hidden in live mode) */}
+        <div className={cn('flex-1 relative', mode !== 'playback' && 'hidden')}>
+          <PlaybackMap
+            vehicle={playbackVehicle}
+            playbackTrack={playbackTrack}
+            playbackPassedTrack={playbackPassedTrack}
+            playbackParkingEvents={playbackParkingEvents}
           />
         </div>
 
@@ -271,6 +410,8 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
             onPause={handlePause}
             onStop={handleStop}
             onSeek={handleSeek}
+            speed={playbackSpeed}
+            onSpeedChange={setPlaybackSpeed}
           />
         </div>
 
@@ -286,9 +427,6 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
             vehicle={mockVehicles.find(v => v.id === selectedVehicleId) || null}
             onClose={() => setSelectedVehicleId(null)}
             locale={locale}
-            onPlayback={() => {
-              if (selectedVehicleId) handlePlaybackRequest(selectedVehicleId);
-            }}
             onShareLocation={() => console.log('Share clicked', selectedVehicleId)}
           />
         </div>

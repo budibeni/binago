@@ -26,6 +26,9 @@ export interface LiveMapProps {
   selectedVehicleId?: string;
   visibleVehicleIds?: string[];
   onPlaybackRequest?: (vehicleId: string) => void;
+  playbackTrack?: { lat: number; lng: number }[];
+  playbackPassedTrack?: { lat: number; lng: number }[];
+  playbackParkingEvents?: { lat: number; lng: number }[];
 }
 
 // ─── Mock geofence data ────────────────────────────────────────────────────────
@@ -69,7 +72,7 @@ const STATUS_LABEL: Record<TrackingVehicle['status'], string> = {
 
 // ─── LiveMap ───────────────────────────────────────────────────────────────────
 
-export function LiveMap({ vehicles, selectedVehicleId, visibleVehicleIds = [], onPlaybackRequest }: LiveMapProps) {
+export function LiveMap({ vehicles, selectedVehicleId, visibleVehicleIds = [], onPlaybackRequest, playbackTrack, playbackPassedTrack, playbackParkingEvents }: LiveMapProps) {
   const locale = useBusinessLocale();
   const [internalSelectedId, setInternalSelectedId] = React.useState<string | null>(selectedVehicleId || null);
 
@@ -141,6 +144,9 @@ export function LiveMap({ vehicles, selectedVehicleId, visibleVehicleIds = [], o
         checkGeofenceFn={mockCheckEntityGeofence}
         entityLabel="Kendaraan"
         locale={locale}
+        playbackTrack={playbackTrack}
+        playbackPassedTrack={playbackPassedTrack}
+        playbackParkingEvents={playbackParkingEvents}
         className="w-full h-full border-0 rounded-none min-h-0"
       />
     </div>

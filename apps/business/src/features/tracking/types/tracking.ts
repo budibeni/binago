@@ -59,8 +59,9 @@ export interface GroupStatusSummary {
 // ─── Date Range ────────────────────────────────────────────────────────────────
 
 export interface DateRange {
-  date: string;       // ISO date string: YYYY-MM-DD
+  startDate: string;  // ISO date string: YYYY-MM-DD
   startTime: string;  // HH:MM
+  endDate: string;    // ISO date string: YYYY-MM-DD
   endTime: string;    // HH:MM
 }
 

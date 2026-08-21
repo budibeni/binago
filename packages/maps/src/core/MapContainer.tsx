@@ -86,11 +86,14 @@ function MapContainerInner({
 
     // Fire style load listeners whenever style reloads (basemap switch)
     map.on('styledata', () => {
-      // styledata fires on every style change, including basemap switch
+      // styledata fires on every style change, including basemap switch.
+      // This is more reliable than style.load when switching styles using setStyle()
+      if (map.isStyleLoaded()) {
+        styleLoadListeners.current.forEach((l) => l.callback());
+      }
     });
 
     map.on('style.load', () => {
-      // Re-notify all tools that style has been (re)loaded so they can re-register sources/layers
       styleLoadListeners.current.forEach((l) => l.callback());
     });
 

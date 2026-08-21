@@ -7,7 +7,7 @@ import { AdatrackLogo } from '@adatrack/ui';
 import { ShareSession } from '@/features/sharing/types';
 import { mockShareSessions } from '@/features/sharing/data/mockLocationSharing';
 import { mockVehicles } from '@/features/tracking/data/mockTrackingData';
-import { Vehicle } from '@/features/tracking/types';
+import type { TrackingVehicle as Vehicle } from '@/features/tracking/types/tracking';
 
 // Inline mini-dictionary for public page (no shell locale context available)
 const translations = {
@@ -170,7 +170,7 @@ function LiveTrackingView({ data }: { data: ResolvedData }) {
             center: { lat: vehicle.location.lat, lng: vehicle.location.lng },
             zoom: 15,
           }}
-          placeholderText={`${vehicle.type} • ${vehicle.plateNumber}`}
+          placeholderText={`${vehicle.vehicleType ?? ''} • ${vehicle.plateNumber}`}
           className="w-full h-full min-h-[50vh] rounded-none border-0"
         />
       </div>
@@ -184,7 +184,7 @@ function LiveTrackingView({ data }: { data: ResolvedData }) {
               <Car className="w-6 h-6" />
             </div>
             <div>
-              <h1 className="font-bold text-foreground text-base leading-tight">{vehicle.name || vehicle.type}</h1>
+              <h1 className="font-bold text-foreground text-base leading-tight">{vehicle.vehicleType ?? vehicle.plateNumber}</h1>
               <p className="text-sm text-foreground-muted">{vehicle.plateNumber}</p>
             </div>
           </div>

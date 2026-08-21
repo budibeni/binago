@@ -7,10 +7,12 @@ export interface MapPopupProps {
   children: React.ReactNode;
   onClose?: () => void;
   offset?: number | [number, number];
+  anchor?: 'top' | 'bottom' | 'left' | 'right' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
   className?: string;
+  autoPanPadding?: number | { top?: number; bottom?: number; left?: number; right?: number };
 }
 
-export function MapPopup({ position, children, onClose, offset = 15, className }: MapPopupProps) {
+export function MapPopup({ position, children, onClose, offset = 15, anchor, className, autoPanPadding }: MapPopupProps) {
   const map = useInternalMap();
   const popupRef = useRef<maplibregl.Popup | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -29,12 +31,20 @@ export function MapPopup({ position, children, onClose, offset = 15, className }
       onCloseRef.current?.();
     };
 
-    const popup = new maplibregl.Popup({
+    const popupOptions: maplibregl.PopupOptions = {
       closeButton: false,
       closeOnClick: false,
       offset,
+      anchor,
       className,
-    })
+    };
+
+    if (autoPanPadding !== undefined) {
+      // Use any to bypass strict type checking if maplibre types are slightly different
+      (popupOptions as any).autoPanPadding = autoPanPadding;
+    }
+
+    const popup = new maplibregl.Popup(popupOptions)
       .setDOMContent(containerRef.current)
       .setLngLat([position.lng, position.lat])
       .addTo(map);

@@ -137,6 +137,25 @@ export const dictionaries = {
       popupLastUpdate: 'Update Terakhir',
       popupPlayback: 'Playback',
       popupShareLocation: 'Bagikan Lokasi',
+      // Playback specific
+      playbackEmpty: 'Pilih kendaraan dan muat histori untuk memulai playback.',
+      playbackStop: 'Berhenti',
+      playbackParking: 'Parkir',
+      playbackTime: 'Waktu',
+      playbackDuration: 'Durasi',
+      playbackOdometer: 'Odometer',
+      playbackOpenMaps: 'Maps',
+      playbackMarkerTooltip: 'Posisi Berhenti — Klik untuk detail',
+      // Playback panel
+      playbackSelectVehicle: 'Pilih kendaraan',
+      playbackSelectVehicleTitle: 'Pilih Kendaraan',
+      playbackSelectVehicleDesc: 'Cari dan pilih kendaraan untuk memuat histori perjalanannya.',
+      playbackLoading: 'Memuat...',
+      playbackLoadHistory: 'Muat Histori',
+      playbackErrorLoad: 'Gagal memuat histori',
+      playbackInstructions: 'Pilih kendaraan dan tentukan rentang waktu untuk memuat histori perjalanan.',
+      playbackSearchPlaceholder: 'Cari plat nomor atau pengemudi...',
+      playbackNoVehicle: 'Kendaraan tidak ditemukan',
     },
 
     // Vehicles
@@ -369,6 +388,25 @@ export const dictionaries = {
       popupLastUpdate: 'Last Update',
       popupPlayback: 'Playback',
       popupShareLocation: 'Share Location',
+      // Playback specific
+      playbackEmpty: 'Select a vehicle and load history to start playback.',
+      playbackStop: 'Stop',
+      playbackParking: 'Parking',
+      playbackTime: 'Time',
+      playbackDuration: 'Duration',
+      playbackOdometer: 'Odometer',
+      playbackOpenMaps: 'Maps',
+      playbackMarkerTooltip: 'Stop Position — Click for details',
+      // Playback panel
+      playbackSelectVehicle: 'Select vehicle',
+      playbackSelectVehicleTitle: 'Select Vehicle',
+      playbackSelectVehicleDesc: 'Search and select a vehicle to load its history.',
+      playbackLoading: 'Loading...',
+      playbackLoadHistory: 'Load History',
+      playbackErrorLoad: 'Failed to load history',
+      playbackInstructions: 'Select a vehicle and time range to load travel history.',
+      playbackSearchPlaceholder: 'Search plate number or driver...',
+      playbackNoVehicle: 'Vehicle not found',
     },
 
     // Vehicles

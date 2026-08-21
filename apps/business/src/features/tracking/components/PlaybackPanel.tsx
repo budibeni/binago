@@ -6,7 +6,7 @@ import {
   Pause,
   SkipBack,
   SkipForward,
-  Download,
+  Route,
   Calendar,
   Clock,
   History,
@@ -15,6 +15,8 @@ import {
 } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import { Button, Spinner, Dialog } from '@adatrack/ui';
+import { useBusinessLocale } from '@/components/BusinessShellLayout';
+import { getTranslation } from '@/i18n';
 import type {
   TrackingVehicle,
   DateRange,
@@ -50,6 +52,8 @@ export interface PlaybackPanelProps {
   onPause: () => void;
   onStop: () => void;
   onSeek?: (progress: number) => void;
+  speed?: number;
+  onSpeedChange?: (speed: number) => void;
   className?: string;
 }
 
@@ -65,8 +69,13 @@ export function PlaybackPanel({
   onPause,
   onStop,
   onSeek,
+  speed = 1,
+  onSpeedChange,
   className,
 }: PlaybackPanelProps) {
+  const locale = useBusinessLocale();
+  const tTracking = getTranslation(locale).tracking;
+
   const { status, totalDuration, currentTime, errorMessage } = playbackState;
   const progress = calcProgress(currentTime, totalDuration);
 
@@ -78,7 +87,7 @@ export function PlaybackPanel({
   const isPlaying = status === 'playing';
   const isIdle = status === 'idle';
   const isError = status === 'error';
-  const canLoad = !!selectedVehicleId && !!dateRange.date && !isLoading;
+  const canLoad = !!selectedVehicleId && !!dateRange.startDate && !!dateRange.endDate && !isLoading;
 
   const trackRef = React.useRef<HTMLDivElement>(null);
 
@@ -114,25 +123,25 @@ export function PlaybackPanel({
             <span className="truncate pr-2 font-medium">
               {selectedVehicleId 
                 ? vehicles.find(v => v.id === selectedVehicleId)?.plateNumber 
-                : 'Pilih kendaraan'}
+                : tTracking.playbackSelectVehicle}
             </span>
             <ChevronDown className="h-3 w-3 text-foreground-muted shrink-0" />
           </button>
 
-          {/* Date Picker */}
-          <div className="relative w-32">
+          {/* Start Date */}
+          <div className="relative w-32 shrink-0">
             <input
               type="date"
               className="w-full h-8 rounded-md border border-neutral-200 bg-white px-2.5 pr-8 text-[11px] text-foreground focus:outline-none focus:ring-1 focus:ring-danger focus:border-danger disabled:opacity-50 [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:w-full"
-              value={dateRange.date}
-              onChange={(e) => onDateRangeChange({ ...dateRange, date: e.target.value })}
+              value={dateRange.startDate}
+              onChange={(e) => onDateRangeChange({ ...dateRange, startDate: e.target.value })}
               disabled={isLoading || isPlaying}
             />
             <Calendar className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-foreground-muted" strokeWidth={2} />
           </div>
 
           {/* Start Time */}
-          <div className="relative w-20">
+          <div className="relative w-20 shrink-0">
             <input
               type="time"
               className="w-full h-8 rounded-md border border-neutral-200 bg-white px-2.5 pr-7 text-[11px] text-foreground focus:outline-none focus:ring-1 focus:ring-danger focus:border-danger disabled:opacity-50 [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:w-full"
@@ -143,10 +152,22 @@ export function PlaybackPanel({
             <Clock className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-foreground-muted" strokeWidth={2} />
           </div>
           
-          <span className="text-foreground-muted text-[11px]">-</span>
+          <span className="text-foreground-muted text-[11px] shrink-0">-</span>
           
+          {/* End Date */}
+          <div className="relative w-32 shrink-0">
+            <input
+              type="date"
+              className="w-full h-8 rounded-md border border-neutral-200 bg-white px-2.5 pr-8 text-[11px] text-foreground focus:outline-none focus:ring-1 focus:ring-danger focus:border-danger disabled:opacity-50 [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:w-full"
+              value={dateRange.endDate}
+              onChange={(e) => onDateRangeChange({ ...dateRange, endDate: e.target.value })}
+              disabled={isLoading || isPlaying}
+            />
+            <Calendar className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-foreground-muted" strokeWidth={2} />
+          </div>
+
           {/* End Time */}
-          <div className="relative w-20">
+          <div className="relative w-20 shrink-0">
             <input
               type="time"
               className="w-full h-8 rounded-md border border-neutral-200 bg-white px-2.5 pr-7 text-[11px] text-foreground focus:outline-none focus:ring-1 focus:ring-danger focus:border-danger disabled:opacity-50 [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:w-full"
@@ -164,8 +185,8 @@ export function PlaybackPanel({
           disabled={!canLoad}
           onClick={onLoad}
         >
-          {isLoading ? <Spinner size="sm" className="mr-1.5 text-white" /> : <Download className="h-3.5 w-3.5 mr-1.5" />}
-          {isLoading ? 'Memuat...' : 'Muat Histori'}
+          {isLoading ? <Spinner size="sm" className="mr-1.5 text-white" /> : <Route className="h-3.5 w-3.5 mr-1.5" />}
+          {isLoading ? tTracking.playbackLoading : tTracking.playbackLoadHistory}
         </Button>
       </div>
 
@@ -200,11 +221,13 @@ export function PlaybackPanel({
             <div className="relative w-[48px] ml-1">
               <select
                 disabled={!hasData}
+                value={speed}
+                onChange={(e) => onSpeedChange?.(Number(e.target.value))}
                 className="w-full h-7 rounded-md border border-neutral-200 bg-white px-2 text-[11px] text-foreground font-medium appearance-none focus:outline-none focus:ring-1 focus:ring-danger disabled:opacity-50"
               >
-                <option value="1">1x</option>
-                <option value="2">2x</option>
-                <option value="5">5x</option>
+                <option value={1}>1x</option>
+                <option value={2}>2x</option>
+                <option value={5}>5x</option>
               </select>
               <span className="pointer-events-none absolute right-1.5 top-1/2 -translate-y-1/2 text-foreground-muted">
                 <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="m6 9 6 6 6-6" strokeLinecap="round" strokeLinejoin="round" /></svg>
@@ -257,25 +280,25 @@ export function PlaybackPanel({
         {/* Footer State Message */}
         <div className="h-6 bg-neutral-50/80 flex items-center justify-center text-[10px] text-foreground-muted font-medium border-t border-border/50">
           {isError ? (
-            <span className="text-danger">{errorMessage || 'Gagal memuat histori'}</span>
+            <span className="text-danger">{errorMessage || tTracking.playbackErrorLoad}</span>
           ) : (
             <>
               <History className="h-3 w-3 mr-1.5" />
-              Pilih kendaraan dan tentukan rentang waktu untuk memuat histori perjalanan.
+              {tTracking.playbackInstructions}
             </>
           )}
         </div>
       </div>
 
-      {/* â”€â”€ Vehicle Selection Dialog â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      {/* ──────────────────────────────────────────────────────────────────────────── */}
       <Dialog
         open={isVehicleDialogOpen}
         onOpenChange={(open) => {
           setIsVehicleDialogOpen(open);
           if (!open) setVehicleSearch('');
         }}
-        title="Pilih Kendaraan"
-        description="Cari dan pilih kendaraan untuk memuat histori perjalanannya."
+        title={tTracking.playbackSelectVehicleTitle}
+        description={tTracking.playbackSelectVehicleDesc}
       >
         <div className="flex flex-col gap-4">
           <div className="relative">
@@ -284,7 +307,7 @@ export function PlaybackPanel({
               type="search"
               value={vehicleSearch}
               onChange={(e) => setVehicleSearch(e.target.value)}
-              placeholder="Cari plat nomor atau pengemudi..."
+              placeholder={tTracking.playbackSearchPlaceholder}
               className="w-full h-10 rounded-md border border-neutral-200 bg-white pl-9 pr-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-primary transition-colors"
             />
           </div>
@@ -294,7 +317,7 @@ export function PlaybackPanel({
                 (v.driverName?.toLowerCase() || '').includes(vehicleSearch.toLowerCase())
               ).length === 0 ? (
                 <div className="px-4 py-8 text-center text-[13px] text-foreground-muted">
-                  Kendaraan tidak ditemukan
+                  {tTracking.playbackNoVehicle}
                 </div>
               ) : (
                 vehicles.filter(v => 
@@ -315,7 +338,7 @@ export function PlaybackPanel({
                     )}
                   >
                     <span className="text-[14px] font-semibold text-foreground">{v.plateNumber}</span>
-                    <span className="text-[12px] text-foreground-muted">{v.driverName || 'Tanpa pengemudi'}</span>
+                    <span className="text-[12px] text-foreground-muted">{v.driverName || tTracking.noDriver}</span>
                   </button>
                 ))
             )}

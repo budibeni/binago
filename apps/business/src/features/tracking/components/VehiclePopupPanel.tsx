@@ -15,7 +15,8 @@ import {
   Layers,
   Share2,
   Navigation,
-  History
+  History,
+  ExternalLink
 } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import { Button } from '@adatrack/ui';
@@ -249,9 +250,8 @@ export function VehiclePopupPanel({
         <Button
           type="button"
           onClick={onPlayback}
-          variant="primary"
           size="sm"
-          className="flex-1 rounded-lg shadow-sm text-xs font-semibold"
+          className="flex-1 rounded-lg shadow-sm text-xs font-semibold bg-red-600 hover:bg-red-700 text-white border-0"
           leftIcon={<History className="w-3.5 h-3.5" />}
         >
           {tTracking.popupPlayback}
@@ -265,7 +265,7 @@ export function VehiclePopupPanel({
             className="flex-1 rounded-lg border-emerald-500/30 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 hover:text-emerald-800 dark:bg-emerald-500/10 dark:text-emerald-400 dark:hover:bg-emerald-500/20 text-xs font-semibold"
             leftIcon={<Share2 className="w-3.5 h-3.5 fill-current" />}
           >
-            {locale === 'id' ? 'DIBAGIKAN' : 'SHARED'}
+            {locale === 'id' ? 'Dibagikan' : 'Shared'}
           </Button>
         ) : (
           <Button
@@ -276,12 +276,25 @@ export function VehiclePopupPanel({
             }}
             variant="outline"
             size="sm"
-            className="flex-1 rounded-lg text-xs font-semibold"
+            className="flex-1 rounded-lg text-xs font-semibold border-border"
             leftIcon={<Share2 className="w-3.5 h-3.5" />}
           >
-            {tTracking.popupShareLocation}
+            {locale === 'id' ? 'Bagikan' : 'Share'}
           </Button>
         )}
+        <Button
+          type="button"
+          onClick={() => {
+            const url = `https://www.google.com/maps?q=${vehicle.location.lat},${vehicle.location.lng}`;
+            window.open(url, '_blank', 'noopener,noreferrer');
+          }}
+          variant="outline"
+          size="sm"
+          className="flex-1 rounded-lg text-xs font-semibold border-border text-foreground hover:bg-muted"
+          leftIcon={<ExternalLink className="w-3.5 h-3.5" />}
+        >
+          Maps
+        </Button>
       </div>
 
       <ShareLocationDialog

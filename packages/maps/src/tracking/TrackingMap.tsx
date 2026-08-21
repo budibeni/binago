@@ -18,6 +18,8 @@ import { defaultNominatimSearch, calcEntityBounds } from './utils';
 import useSupercluster from 'use-supercluster';
 import { ClusterMarker } from './ClusterMarker';
 import { EntityMarker } from './EntityMarker';
+import { PlaybackRouteRenderer } from './PlaybackRouteRenderer';
+import { MapMarker } from '../core/MapMarker';
 
 export interface TrackingMapProps<T> {
   /** Data seluruh entitas (kendaraan, device, dll) yang tersedia */
@@ -62,6 +64,15 @@ export interface TrackingMapProps<T> {
   locale?: Locale;
   /** Custom class untuk container */
   className?: string;
+
+  /** Koordinat rute playback untuk digambar di peta (opsional) */
+  playbackTrack?: { lat: number; lng: number }[];
+  /** Koordinat rute playback yang sudah dilewati (opsional) */
+  playbackPassedTrack?: { lat: number; lng: number }[];
+  /** Lokasi parkir/berhenti di histori rute playback (opsional) */
+  playbackParkingEvents?: { lat: number; lng: number }[];
+  /** Optional children rendered inside MapProvider for accessing map context */
+  children?: React.ReactNode;
 }
 
 function TrackingMapInner<T>({
@@ -83,6 +94,10 @@ function TrackingMapInner<T>({
   entityLabel,
   locale = 'id',
   className,
+  playbackTrack,
+  playbackPassedTrack,
+  playbackParkingEvents,
+  children,
 }: TrackingMapProps<T>) {
   const [basemap, setBasemap] = useState<BasemapId>('standard');
   const [viewport, setViewport] = useState({ center: { lat: -6.2, lng: 106.816667 }, zoom: 12 });
@@ -278,7 +293,27 @@ function TrackingMapInner<T>({
           focusedEntity,
           () => setFocusedEntityId(null)
         )}
+
+        {/* Playback route polyline */}
+        {playbackTrack && playbackTrack.length > 1 && (
+          <PlaybackRouteRenderer track={playbackTrack} passedTrack={playbackPassedTrack} />
+        )}
+
+        {/* Playback parking spots */}
+        {playbackParkingEvents && playbackParkingEvents.map((p, idx) => (
+          <MapMarker key={`park-${idx}`} id={`park-${idx}`} position={p}>
+            <div 
+              className="bg-indigo-600 text-white border-2 border-white rounded-full shadow-md flex items-center justify-center font-bold text-xs" 
+              style={{ width: '24px', height: '24px' }}
+              title="Posisi Berhenti/Parkir"
+            >
+              P
+            </div>
+          </MapMarker>
+        ))}
       </MapContainer>
+      {/* Children rendered inside MapProvider for context access */}
+      {children}
     </div>
   );
 }
