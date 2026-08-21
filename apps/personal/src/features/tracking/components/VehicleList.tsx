@@ -49,7 +49,7 @@ export function VehicleList({
   };
 
   return (
-    <div className="flex flex-col h-full bg-surface text-foreground border-r border-border">
+    <div className="flex flex-col h-full bg-surface text-foreground border-r border-neutral-200 dark:border-neutral-800">
       {/* Header */}
       <div
         className={cn(
@@ -92,7 +92,7 @@ export function VehicleList({
         <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-3">
           {vehicles.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full min-h-[200px] text-center px-4">
-              <div className="w-12 h-12 rounded-2xl bg-surface-elevated flex items-center justify-center mb-3 border border-border">
+              <div className="w-12 h-12 rounded-2xl bg-surface-elevated flex items-center justify-center mb-3 border border-neutral-200 dark:border-neutral-800">
                 <CarFront className="h-6 w-6 text-foreground-subtle" aria-hidden="true" />
               </div>
               <p className="text-sm font-medium text-foreground">{t.tracking.emptyList}</p>
@@ -117,7 +117,7 @@ export function VehicleList({
                     e.stopPropagation();
                     onVehicleSelect(vehicle.id);
                   }}
-                  className="flex items-center p-4 rounded-xl border border-border bg-surface transition-all cursor-pointer overflow-hidden hover:border-neutral-300 dark:hover:border-neutral-600 hover:shadow-sm"
+                  className="flex items-center p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-surface transition-all cursor-pointer overflow-hidden hover:border-neutral-300 dark:hover:border-neutral-700 hover:shadow-sm"
                 >
                   <button
                     type="button"
@@ -170,10 +170,11 @@ export function VehicleList({
 
       {/* Bottom Button - only shown when visible */}
       {isListVisible && (
-        <div className="p-4 pt-2 shrink-0 border-t border-border bg-surface">
+        <div className="p-4 pt-2 shrink-0 border-t border-neutral-200 dark:border-neutral-800 bg-surface">
           <button
+            type="button"
             onClick={onToggleList}
-            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg border border-border text-sm font-medium text-foreground hover:bg-surface-elevated transition-colors"
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg border border-neutral-200 dark:border-neutral-800 text-sm font-medium text-foreground hover:bg-surface-elevated transition-colors"
           >
             <ChevronDown className="w-4 h-4 md:hidden" />
             <ChevronLeft className="w-4 h-4 hidden md:block" />

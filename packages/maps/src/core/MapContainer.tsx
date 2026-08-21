@@ -59,13 +59,28 @@ function MapContainerInner({
 
   const currentBasemapRef = useRef<BasemapId>(basemap);
 
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  // Deteksi dark mode dari tag <html> (class="dark")
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const checkDark = () => document.documentElement.classList.contains('dark');
+    setIsDarkMode(checkDark());
+
+    const observer = new MutationObserver(() => setIsDarkMode(checkDark()));
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
+
+  const effectiveBasemap = basemap === 'standard' && isDarkMode ? 'dark' : basemap;
+
   // Initial map setup — runs once only
   useEffect(() => {
     if (typeof window === 'undefined') return;
     if (!mapContainerRef.current) return;
     if (mapRef.current) return;
 
-    const initialStyle = resolveStyle(basemap) as string | maplibregl.StyleSpecification;
+    const initialStyle = resolveStyle(effectiveBasemap) as string | maplibregl.StyleSpecification;
 
     const map = new maplibregl.Map({
       container: mapContainerRef.current,
@@ -76,7 +91,7 @@ function MapContainerInner({
     });
 
     mapRef.current = map;
-    currentBasemapRef.current = basemap;
+    currentBasemapRef.current = effectiveBasemap;
 
     map.on('load', () => {
       setMap(map);
@@ -118,7 +133,14 @@ function MapContainerInner({
 
     map.on('moveend', updateViewport);
 
+    // Force map resize when container resizes (fixes flexbox animation gaps)
+    const resizeObserver = new ResizeObserver(() => {
+      if (map) map.resize();
+    });
+    resizeObserver.observe(mapContainerRef.current);
+
     return () => {
+      resizeObserver.disconnect();
       map.remove();
       mapRef.current = null;
       setMap(null);
@@ -128,23 +150,23 @@ function MapContainerInner({
   // Basemap change — calls setStyle() and preserves custom sources/layers via style.load event
   useEffect(() => {
     if (!mapRef.current) return;
-    if (currentBasemapRef.current === basemap) return;
+    if (currentBasemapRef.current === effectiveBasemap) return;
 
-    currentBasemapRef.current = basemap;
-    const newStyle = resolveStyle(basemap) as string | maplibregl.StyleSpecification;
+    currentBasemapRef.current = effectiveBasemap;
+    const newStyle = resolveStyle(effectiveBasemap) as string | maplibregl.StyleSpecification;
 
     mapRef.current.setStyle(newStyle);
     // After setStyle(), map fires 'style.load' → we dispatch to styleLoadListeners in the 'style.load' handler above
-  }, [basemap]);
+  }, [effectiveBasemap]);
 
   // Active attribution from current basemap
-  const attribution = BASEMAP_METADATA[basemap]?.attribution ?? '';
+  const attribution = BASEMAP_METADATA[effectiveBasemap]?.attribution ?? '';
 
   return (
     <div
       ref={innerRef}
       className={cn(
-        'relative w-full h-full min-h-[300px] overflow-hidden border border-border bg-neutral-100',
+        'relative w-full h-full min-h-[300px] overflow-hidden border border-neutral-200 dark:border-neutral-800 bg-neutral-100 dark:bg-background',
         className,
       )}
       role="region"

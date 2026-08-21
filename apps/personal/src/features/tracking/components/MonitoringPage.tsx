@@ -142,7 +142,7 @@ export function MonitoringPage() {
               : "h-[56px] md:h-[56px]" // matches header height approx
         )}
       >
-        <div className="pointer-events-auto bg-white shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-neutral-200/60 h-full flex flex-col rounded-t-3xl md:rounded-2xl overflow-hidden transition-all duration-300">
+        <div className="pointer-events-auto bg-surface shadow-2xl dark:shadow-[0_8px_30px_rgba(0,0,0,0.6)] border border-neutral-200 dark:border-neutral-800 h-full flex flex-col rounded-t-3xl md:rounded-2xl overflow-hidden transition-all duration-300">
           {selectedVehicle ? (
               <VehicleDetail
                 vehicle={selectedVehicle}

@@ -33,6 +33,14 @@ export const BASEMAP_METADATA: Record<
     attribution:
       '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>',
   },
+  dark: {
+    label: 'Gelap',
+    provider: 'CartoDB Dark Matter',
+    usagePolicy:
+      'Free/public development provider. License: CC BY 3.0. Attribution wajib ditampilkan.',
+    attribution:
+      '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>',
+  },
   osm: {
     label: 'OpenStreetMap',
     provider: 'OpenStreetMap',
@@ -87,6 +95,12 @@ const STANDARD_STYLE_URL =
   'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json';
 
 /**
+ * CartoDB Dark Matter vector style URL.
+ */
+const DARK_STYLE_URL =
+  'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json';
+
+/**
  * OSM raster tile URL.
  * Gunakan HTTPS. Hormati OSM Tile Usage Policy.
  */
@@ -111,6 +125,9 @@ export function getBasemapStyle(id: BasemapId): string | object {
     case 'standard':
       return STANDARD_STYLE_URL;
 
+    case 'dark':
+      return DARK_STYLE_URL;
+
     case 'osm':
       return buildRasterTileStyle(OSM_TILE_URL, BASEMAP_METADATA.osm.attribution);
 
@@ -128,6 +145,7 @@ export function getBasemapStyle(id: BasemapId): string | object {
 // Pre-computed map untuk akses langsung (backward compat)
 export const BASEMAP_STYLES: Record<BasemapId, string | object> = {
   standard: getBasemapStyle('standard'),
+  dark: getBasemapStyle('dark'),
   osm: getBasemapStyle('osm'),
   satellite: getBasemapStyle('satellite'),
 };

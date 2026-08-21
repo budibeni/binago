@@ -75,7 +75,7 @@ export function Sidebar({
             'group flex items-center gap-2.5 rounded-md px-3 py-[7px] text-[13px] font-medium transition-colors duration-100',
             'focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400',
             isActive
-              ? 'bg-primary text-primary-foreground shadow-sm'
+              ? 'bg-primary text-primary-foreground dark:bg-surface-elevated dark:text-foreground shadow-sm'
               : 'text-foreground-muted hover:bg-surface-elevated hover:text-foreground',
             item.disabled && 'pointer-events-none opacity-40',
             collapsed && 'justify-center px-2',

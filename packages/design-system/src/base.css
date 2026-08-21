@@ -79,6 +79,7 @@
 
 /* ─── Dark Mode Tokens ────────────────────────────── */
 .dark {
+  color-scheme: dark;
   /* Background / Surface */
   --color-background: #09090B;
   --color-surface: #18181B;

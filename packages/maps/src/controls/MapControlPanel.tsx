@@ -17,11 +17,12 @@ import {
   X,
   Navigation,
   Target,
-  MapPin, // <-- added
+  MapPin,
   Crosshair,
   Tag,
   MapPinSearch,
   CarFront,
+  Moon,
 } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import { useMapActions } from '../core/MapContext';
@@ -71,6 +72,7 @@ type ActivePanel =
 
 const BASEMAP_ICONS: Record<BasemapId, React.FC<{ className?: string }>> = {
   standard: MapIcon,
+  dark: Moon,
   osm: MapPinned,
   satellite: Satellite,
 };
@@ -142,6 +144,7 @@ export function MapControlPanel({
 
   const basemapOptions: { id: BasemapId; label: string; Icon: React.FC<{ className?: string }> }[] = [
     { id: 'standard',  label: bm.standard,  Icon: BASEMAP_ICONS.standard },
+    { id: 'dark',      label: bm.dark, Icon: BASEMAP_ICONS.dark },
     { id: 'osm',       label: bm.osm,       Icon: BASEMAP_ICONS.osm },
     { id: 'satellite', label: bm.satellite, Icon: BASEMAP_ICONS.satellite },
   ];

@@ -27,6 +27,7 @@ export const mapDictionaries = {
     basemap: {
       label: 'Tampilan Peta',
       standard: 'Standar',
+      dark: 'Gelap',
       osm: 'OpenStreetMap',
       satellite: 'Satelit',
     },
@@ -114,6 +115,7 @@ export const mapDictionaries = {
     basemap: {
       label: 'Map View',
       standard: 'Standard',
+      dark: 'Dark',
       osm: 'OpenStreetMap',
       satellite: 'Satellite',
     },

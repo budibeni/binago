@@ -203,7 +203,7 @@ function VehicleGroupHeader({
         {group.name}
       </span>
       
-      <span className="text-[10px] font-bold text-neutral-500 bg-[#fafafa] dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700 px-1.5 py-0.5 rounded-md leading-none">
+      <span className="text-[10px] font-bold text-neutral-500 bg-[#fafafa] dark:bg-neutral-800 border border-border px-1.5 py-0.5 rounded-md leading-none">
         {totalCount}
       </span>
     </div>
@@ -319,7 +319,7 @@ export function VehicleList({
       aria-label={labels.title}
     >
       {/* ── Header ────────────────────────────────────────────────────────── */}
-      <div className="shrink-0 flex items-center justify-between px-3 h-[40px] bg-white dark:bg-neutral-900 border-b border-neutral-100 dark:border-neutral-800">
+      <div className="shrink-0 flex items-center justify-between px-3 h-[40px] bg-white dark:bg-neutral-900 border-b border-border">
         <div className="flex items-center gap-2">
           <h2 className="text-[12px] font-bold text-foreground tracking-tight">
             {labels.title}
@@ -340,7 +340,7 @@ export function VehicleList({
       </div>
 
       {/* ── Search ────────────────────────────────────────────────────────── */}
-      <div className="shrink-0 px-3 py-2 bg-white dark:bg-neutral-900 border-b border-neutral-100 dark:border-neutral-800 flex gap-2">
+      <div className="shrink-0 px-3 py-2 bg-white dark:bg-neutral-900 border-b border-border flex gap-2">
         <div className="relative flex-1 min-w-0">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-neutral-400 pointer-events-none" />
           <input
@@ -348,19 +348,19 @@ export function VehicleList({
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder={labels.searchPlaceholder}
-            className="w-full h-8 rounded-md border border-neutral-200 dark:border-neutral-800 bg-[#fafafa] dark:bg-neutral-900 pl-8 pr-3 text-[12px] text-foreground focus:outline-none focus:border-neutral-300 focus:bg-white transition-all placeholder:text-neutral-400"
+            className="w-full h-8 rounded-md border border-border bg-[#fafafa] dark:bg-neutral-900 pl-8 pr-3 text-[12px] text-foreground focus:outline-none focus:border-neutral-300 focus:bg-white transition-all placeholder:text-neutral-400"
           />
         </div>
         <button
           type="button"
-          className="flex h-8 w-8 items-center justify-center rounded-md border border-neutral-200 dark:border-neutral-800 bg-[#fafafa] dark:bg-neutral-900 text-neutral-500 hover:bg-white dark:hover:bg-neutral-800 transition-colors shrink-0"
+          className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-[#fafafa] dark:bg-neutral-900 text-neutral-500 hover:bg-white dark:hover:bg-neutral-800 transition-colors shrink-0"
         >
           <RefreshCw className="h-3.5 w-3.5" />
         </button>
       </div>
 
       {/* ── Tabs ──────────────────────────────────────────────────────────── */}
-      <div className="shrink-0 bg-white dark:bg-neutral-900 border-b border-neutral-100 dark:border-neutral-800 px-1">
+      <div className="shrink-0 bg-white dark:bg-neutral-900 border-b border-border px-1">
         <div className="flex items-center justify-between">
           {statusFilters.map(({ key, label, count }) => {
             const isSelected = statusFilter === key;
@@ -401,7 +401,7 @@ export function VehicleList({
       </div>
 
       {/* ── Select All ────────────────────────────────────────────────────── */}
-      <div className="shrink-0 flex items-center justify-between px-3 py-2 bg-[#fafafa] dark:bg-neutral-900 border-b border-neutral-100 dark:border-neutral-800">
+      <div className="shrink-0 flex items-center justify-between px-3 py-2 bg-[#fafafa] dark:bg-neutral-900 border-b border-border">
         <div className="flex items-center gap-2.5">
           <Checkbox
             id="vehicle-list-select-all"
@@ -417,7 +417,7 @@ export function VehicleList({
             {labels.statusAll}
           </label>
         </div>
-        <span className="text-[10px] font-bold text-neutral-500 bg-white dark:bg-neutral-800 px-1.5 py-0.5 border border-neutral-100 dark:border-neutral-700 rounded-md leading-none">
+        <span className="text-[10px] font-bold text-neutral-500 bg-white dark:bg-neutral-800 px-1.5 py-0.5 border border-border rounded-md leading-none">
           {totalAllUnfiltered}
         </span>
       </div>
@@ -440,7 +440,7 @@ export function VehicleList({
           const groupCheckState = isGroupIndeterminate ? 'indeterminate' : isGroupChecked;
 
           return (
-            <div key={group.id} role="listitem" className="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-md shadow-[0_2px_8px_-4px_rgba(0,0,0,0.03)] overflow-hidden">
+            <div key={group.id} role="listitem" className="bg-white dark:bg-neutral-900 border border-border rounded-md shadow-[0_2px_8px_-4px_rgba(0,0,0,0.03)] overflow-hidden">
               <VehicleGroupHeader
                 group={group}
                 isExpanded={isExpanded}
@@ -452,9 +452,9 @@ export function VehicleList({
               />
 
               {isExpanded && (
-                <div className="flex flex-col border-t border-neutral-100 dark:border-neutral-800">
+                <div className="flex flex-col border-t border-border">
                   {group.filteredVehicles.map((vehicle) => (
-                    <div key={vehicle.id} className="border-b border-neutral-100 dark:border-neutral-800 last:border-0">
+                    <div key={vehicle.id} className="border-b border-border last:border-0">
                       <VehicleListItem
                         vehicle={vehicle}
                         isSelected={vehicle.id === selectedVehicleId}
@@ -475,7 +475,7 @@ export function VehicleList({
       </div>
 
       {/* ── Footer ────────────────────────────────────────────────────────── */}
-      <div className="shrink-0 flex items-center justify-between px-3 py-2 border-t border-neutral-100 dark:border-neutral-800 bg-[#fafafa] dark:bg-neutral-900">
+      <div className="shrink-0 flex items-center justify-between px-3 py-2 border-t border-border bg-[#fafafa] dark:bg-neutral-900">
         <span className="text-[10px] font-semibold text-neutral-400 tracking-tight">
           {labels.groupSummary ? labels.groupSummary(filteredGroups.length) : `${filteredGroups.length} grup`}
         </span>

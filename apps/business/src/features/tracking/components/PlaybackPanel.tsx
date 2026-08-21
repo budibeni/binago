@@ -34,6 +34,26 @@ function formatDuration(seconds: number): string {
   return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
 }
 
+function formatAbsoluteTime(dateStr: string, timeStr: string, progressSeconds: number, showDate: boolean = false): string {
+  if (!dateStr || !timeStr) return formatDuration(progressSeconds);
+  const d = new Date(`${dateStr}T${timeStr}`);
+  if (isNaN(d.getTime())) return formatDuration(progressSeconds);
+  
+  d.setSeconds(d.getSeconds() + progressSeconds);
+  
+  const h = d.getHours().toString().padStart(2, '0');
+  const m = d.getMinutes().toString().padStart(2, '0');
+  const s = d.getSeconds().toString().padStart(2, '0');
+  const timeFormatted = `${h}:${m}:${s}`;
+  
+  if (showDate) {
+    const day = d.getDate().toString().padStart(2, '0');
+    const month = (d.getMonth() + 1).toString().padStart(2, '0');
+    return `${day}/${month} ${timeFormatted}`;
+  }
+  return timeFormatted;
+}
+
 function calcProgress(current: number, total: number): number {
   if (total <= 0) return 0;
   return Math.min(100, Math.max(0, (current / total) * 100));
@@ -98,8 +118,39 @@ export function PlaybackPanel({
     onSeek(ratio * 100);
   };
 
+  const ticks = React.useMemo(() => {
+    if (!dateRange.startDate || !dateRange.startTime || !dateRange.endDate || !dateRange.endTime) {
+      return ['06:00', '08:00', '10:00', '12:00', '14:00', '16:00', '18:00'];
+    }
+    const start = new Date(`${dateRange.startDate}T${dateRange.startTime}`).getTime();
+    const end = new Date(`${dateRange.endDate}T${dateRange.endTime}`).getTime();
+    if (isNaN(start) || isNaN(end) || end <= start) {
+      return ['06:00', '08:00', '10:00', '12:00', '14:00', '16:00', '18:00'];
+    }
+    
+    const showDate = dateRange.startDate !== dateRange.endDate;
+    
+    const generatedTicks = [];
+    const step = (end - start) / 6;
+    for (let i = 0; i <= 6; i++) {
+      const d = new Date(start + step * i);
+      const h = d.getHours().toString().padStart(2, '0');
+      const m = d.getMinutes().toString().padStart(2, '0');
+      const timeStr = `${h}:${m}`;
+      
+      if (showDate) {
+        const day = d.getDate().toString().padStart(2, '0');
+        const month = (d.getMonth() + 1).toString().padStart(2, '0');
+        generatedTicks.push(`${day}/${month} ${timeStr}`);
+      } else {
+        generatedTicks.push(timeStr);
+      }
+    }
+    return generatedTicks;
+  }, [dateRange]);
+
   return (
-    <div className={cn('flex flex-col h-full w-full bg-white shadow-[-4px_-4px_15px_-3px_rgba(0,0,0,0.02)]', className)}>
+    <div className={cn('flex flex-col h-full w-full bg-white dark:bg-surface shadow-[-4px_-4px_15px_-3px_rgba(0,0,0,0.02)]', className)}>
       
       {/* â”€â”€ Top Row â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className="flex items-center gap-3 px-4 py-2 border-b border-border shrink-0 h-[48px]">
@@ -116,7 +167,7 @@ export function PlaybackPanel({
           {/* Vehicle Selector (Dialog Trigger) */}
           <button
             type="button"
-            className="flex items-center justify-between w-40 h-8 rounded-md border border-neutral-200 bg-white px-2.5 text-[11px] text-foreground focus:outline-none focus:ring-1 focus:ring-danger focus:border-danger disabled:opacity-50 transition-colors hover:bg-neutral-50"
+            className="flex items-center justify-between w-40 h-8 rounded-md border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 px-2.5 text-[11px] text-foreground focus:outline-none focus:ring-1 focus:ring-danger focus:border-danger disabled:opacity-50 transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-800"
             disabled={isLoading || isPlaying}
             onClick={() => setIsVehicleDialogOpen(true)}
           >
@@ -132,7 +183,7 @@ export function PlaybackPanel({
           <div className="relative w-32 shrink-0">
             <input
               type="date"
-              className="w-full h-8 rounded-md border border-neutral-200 bg-white px-2.5 pr-8 text-[11px] text-foreground focus:outline-none focus:ring-1 focus:ring-danger focus:border-danger disabled:opacity-50 [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:w-full"
+              className="w-full h-8 rounded-md border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 px-2.5 pr-8 text-[11px] text-foreground focus:outline-none focus:ring-1 focus:ring-danger focus:border-danger disabled:opacity-50 [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:w-full"
               value={dateRange.startDate}
               onChange={(e) => onDateRangeChange({ ...dateRange, startDate: e.target.value })}
               disabled={isLoading || isPlaying}
@@ -144,7 +195,7 @@ export function PlaybackPanel({
           <div className="relative w-20 shrink-0">
             <input
               type="time"
-              className="w-full h-8 rounded-md border border-neutral-200 bg-white px-2.5 pr-7 text-[11px] text-foreground focus:outline-none focus:ring-1 focus:ring-danger focus:border-danger disabled:opacity-50 [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:w-full"
+              className="w-full h-8 rounded-md border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 px-2.5 pr-7 text-[11px] text-foreground focus:outline-none focus:ring-1 focus:ring-danger focus:border-danger disabled:opacity-50 [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:w-full"
               value={dateRange.startTime}
               onChange={(e) => onDateRangeChange({ ...dateRange, startTime: e.target.value })}
               disabled={isLoading || isPlaying}
@@ -158,7 +209,7 @@ export function PlaybackPanel({
           <div className="relative w-32 shrink-0">
             <input
               type="date"
-              className="w-full h-8 rounded-md border border-neutral-200 bg-white px-2.5 pr-8 text-[11px] text-foreground focus:outline-none focus:ring-1 focus:ring-danger focus:border-danger disabled:opacity-50 [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:w-full"
+              className="w-full h-8 rounded-md border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 px-2.5 pr-8 text-[11px] text-foreground focus:outline-none focus:ring-1 focus:ring-danger focus:border-danger disabled:opacity-50 [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:w-full"
               value={dateRange.endDate}
               onChange={(e) => onDateRangeChange({ ...dateRange, endDate: e.target.value })}
               disabled={isLoading || isPlaying}
@@ -170,7 +221,7 @@ export function PlaybackPanel({
           <div className="relative w-20 shrink-0">
             <input
               type="time"
-              className="w-full h-8 rounded-md border border-neutral-200 bg-white px-2.5 pr-7 text-[11px] text-foreground focus:outline-none focus:ring-1 focus:ring-danger focus:border-danger disabled:opacity-50 [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:w-full"
+              className="w-full h-8 rounded-md border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 px-2.5 pr-7 text-[11px] text-foreground focus:outline-none focus:ring-1 focus:ring-danger focus:border-danger disabled:opacity-50 [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:w-full"
               value={dateRange.endTime}
               onChange={(e) => onDateRangeChange({ ...dateRange, endTime: e.target.value })}
               disabled={isLoading || isPlaying}
@@ -199,20 +250,20 @@ export function PlaybackPanel({
             <button
               onClick={isPlaying ? onPause : onPlay}
               disabled={!hasData}
-              className="flex items-center justify-center h-7 w-7 rounded-full border border-neutral-200 bg-white text-foreground hover:bg-neutral-50 disabled:opacity-50 transition-colors"
+              className="flex items-center justify-center h-7 w-7 rounded-full border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-foreground hover:bg-neutral-50 dark:hover:bg-neutral-800 disabled:opacity-50 transition-colors"
             >
               {isPlaying ? <Pause className="h-3 w-3" fill="currentColor" /> : <Play className="h-3 w-3 ml-0.5" fill="currentColor" />}
             </button>
             <button
               onClick={onStop}
               disabled={!hasData}
-              className="flex items-center justify-center h-7 w-7 rounded-full border border-neutral-200 bg-white text-foreground hover:bg-neutral-50 disabled:opacity-50 transition-colors"
+              className="flex items-center justify-center h-7 w-7 rounded-full border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-foreground hover:bg-neutral-50 dark:hover:bg-neutral-800 disabled:opacity-50 transition-colors"
             >
               <SkipBack className="h-3 w-3" fill="currentColor" />
             </button>
             <button
               disabled={!hasData}
-              className="flex items-center justify-center h-7 w-7 rounded-full border border-neutral-200 bg-white text-foreground hover:bg-neutral-50 disabled:opacity-50 transition-colors"
+              className="flex items-center justify-center h-7 w-7 rounded-full border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-foreground hover:bg-neutral-50 dark:hover:bg-neutral-800 disabled:opacity-50 transition-colors"
             >
               <SkipForward className="h-3 w-3" fill="currentColor" />
             </button>
@@ -223,7 +274,7 @@ export function PlaybackPanel({
                 disabled={!hasData}
                 value={speed}
                 onChange={(e) => onSpeedChange?.(Number(e.target.value))}
-                className="w-full h-7 rounded-md border border-neutral-200 bg-white px-2 text-[11px] text-foreground font-medium appearance-none focus:outline-none focus:ring-1 focus:ring-danger disabled:opacity-50"
+                className="w-full h-7 rounded-md border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 px-2 text-[11px] text-foreground font-medium appearance-none focus:outline-none focus:ring-1 focus:ring-danger disabled:opacity-50"
               >
                 <option value={1}>1x</option>
                 <option value={2}>2x</option>
@@ -241,10 +292,10 @@ export function PlaybackPanel({
             {/* Tooltip */}
             {hasData && (
               <div 
-                className="absolute top-0 -translate-x-1/2 -mt-1 bg-danger text-white text-[10px] font-bold px-1.5 py-0.5 rounded shadow-sm z-10 transition-all duration-100 ease-linear"
+                className="absolute top-0 -translate-x-1/2 -mt-1 bg-danger text-white text-[10px] font-bold px-1.5 py-0.5 rounded shadow-sm z-10 transition-all duration-100 ease-linear whitespace-nowrap"
                 style={{ left: `${progress}%` }}
               >
-                {formatDuration(currentTime)}
+                {formatAbsoluteTime(dateRange.startDate, dateRange.startTime, currentTime, dateRange.startDate !== dateRange.endDate)}
                 <div className="absolute bottom-[-3px] left-1/2 -translate-x-1/2 w-0 h-0 border-l-[3px] border-l-transparent border-r-[3px] border-r-transparent border-t-[4px] border-t-danger" />
               </div>
             )}
@@ -265,20 +316,16 @@ export function PlaybackPanel({
 
             {/* Ticks */}
             <div className="flex justify-between items-center text-[10px] text-foreground-muted font-medium mt-2">
-              <span>06:00</span>
-              <span>08:00</span>
-              <span>10:00</span>
-              <span>12:00</span>
-              <span>14:00</span>
-              <span>16:00</span>
-              <span>18:00</span>
+              {ticks.map((t, i) => (
+                <span key={i}>{t}</span>
+              ))}
             </div>
           </div>
 
         </div>
 
         {/* Footer State Message */}
-        <div className="h-6 bg-neutral-50/80 flex items-center justify-center text-[10px] text-foreground-muted font-medium border-t border-border/50">
+        <div className="h-6 bg-neutral-50/80 dark:bg-neutral-800/80 flex items-center justify-center text-[10px] text-foreground-muted font-medium border-t border-border/50">
           {isError ? (
             <span className="text-danger">{errorMessage || tTracking.playbackErrorLoad}</span>
           ) : (
@@ -308,7 +355,7 @@ export function PlaybackPanel({
               value={vehicleSearch}
               onChange={(e) => setVehicleSearch(e.target.value)}
               placeholder={tTracking.playbackSearchPlaceholder}
-              className="w-full h-10 rounded-md border border-neutral-200 bg-white pl-9 pr-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-primary transition-colors"
+              className="w-full h-10 rounded-md border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 pl-9 pr-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-primary transition-colors"
             />
           </div>
           <div className="flex flex-col max-h-[300px] overflow-y-auto border border-neutral-100 rounded-md">
@@ -333,7 +380,7 @@ export function PlaybackPanel({
                       setVehicleSearch('');
                     }}
                     className={cn(
-                      "flex flex-col items-start px-4 py-2.5 text-left border-b border-neutral-100 hover:bg-neutral-50 last:border-b-0 transition-colors focus:outline-none focus:bg-neutral-50",
+                      "flex flex-col items-start px-4 py-2.5 text-left border-b border-neutral-100 hover:bg-neutral-50 dark:hover:bg-neutral-800 last:border-b-0 transition-colors focus:outline-none focus:bg-neutral-50",
                       v.id === selectedVehicleId && "bg-primary/5 hover:bg-primary/10"
                     )}
                   >

@@ -28,6 +28,74 @@ export function PlaybackPage({ playbackData, trip, vehicle, onBack }: PlaybackPa
   const [showControls, setShowControls] = useState(true);
 
   const points = playbackData.points;
+  
+  // ── Playback derived state ──────────────────────────────────────────────────
+  const playbackTrack = React.useMemo(() => {
+    return points.map(p => ({ lat: p.lat, lng: p.lng }));
+  }, [points]);
+
+  const playbackPassedTrack = React.useMemo(() => {
+    if (currentIndex < 0) return undefined;
+    return playbackTrack.slice(0, currentIndex + 1);
+  }, [playbackTrack, currentIndex]);
+
+  const playbackParkingEvents = React.useMemo(() => {
+    const events: {
+      lat: number;
+      lng: number;
+      address: string;
+      startTimestamp: string;
+      durationSecs: number;
+      pointIndex: number;
+      speed: number;
+      odometer: number;
+    }[] = [];
+    let parkingStart: number | null = null;
+    let parkingStartTimestamp = '';
+
+    points.forEach((p, idx) => {
+      if (p.speed === 0) {
+        if (parkingStart === null) {
+          parkingStart = idx;
+          parkingStartTimestamp = p.timestamp;
+        }
+      } else {
+        if (parkingStart !== null) {
+          const durationSecs = (idx - parkingStart) * 15;
+          const point = points[parkingStart];
+          events.push({
+            lat: point.lat,
+            lng: point.lng,
+            address: `${point.lat.toFixed(5)}, ${point.lng.toFixed(5)}`, // Fallback address
+            startTimestamp: parkingStartTimestamp,
+            durationSecs,
+            pointIndex: parkingStart,
+            speed: 0,
+            odometer: 0, // Fallback odometer
+          });
+          parkingStart = null;
+        }
+      }
+    });
+
+    // Handle parking at end of route
+    if (parkingStart !== null) {
+      const durationSecs = (points.length - parkingStart) * 15;
+      const point = points[parkingStart];
+      events.push({
+        lat: point.lat,
+        lng: point.lng,
+        address: `${point.lat.toFixed(5)}, ${point.lng.toFixed(5)}`,
+        startTimestamp: parkingStartTimestamp,
+        durationSecs,
+        pointIndex: parkingStart,
+        speed: 0,
+        odometer: 0,
+      });
+    }
+
+    return events;
+  }, [points]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Clear timer on unmount
@@ -112,11 +180,15 @@ export function PlaybackPage({ playbackData, trip, vehicle, onBack }: PlaybackPa
   return (
     <div className="absolute inset-0 z-50 flex flex-col bg-background overflow-hidden">
 
-      {/* ======= MAP â€” full background ======= */}
+      {/* ======= MAP — full background ======= */}
       <div className="absolute inset-0 z-0">
         <PlaybackMap
           data={playbackData}
           currentIndex={currentIndex}
+          vehicle={vehicle}
+          playbackTrack={playbackTrack}
+          playbackPassedTrack={playbackPassedTrack}
+          playbackParkingEvents={playbackParkingEvents}
         />
       </div>
 

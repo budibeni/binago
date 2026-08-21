@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Map as MapIcon, MapPinned, Satellite, Check, ChevronDown } from 'lucide-react';
+import { Map as MapIcon, MapPinned, Satellite, Check, ChevronDown, Moon } from 'lucide-react';
 import type { BasemapId } from '../basemaps/types';
 import { cn } from '@adatrack/utils';
 import { Locale, getMapTranslation } from '../i18n';
@@ -20,6 +20,7 @@ export interface BasemapSwitcherProps {
 
 const ICONS: Record<BasemapId, React.FC<{ className?: string }>> = {
   standard: MapIcon,
+  dark: Moon,
   osm: MapPinned,
   satellite: Satellite,
 };
@@ -45,6 +46,7 @@ export function BasemapSwitcher({ value, onChange, className, compact = false, l
 
   const OPTIONS: { id: BasemapId; label: string; icon: React.FC<{ className?: string }> }[] = [
     { id: 'standard', label: t.standard, icon: ICONS.standard },
+    { id: 'dark', label: t.dark, icon: ICONS.dark },
     { id: 'osm', label: t.osm, icon: ICONS.osm },
     { id: 'satellite', label: t.satellite, icon: ICONS.satellite },
   ];

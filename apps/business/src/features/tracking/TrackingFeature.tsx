@@ -325,7 +325,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
         {/* Mode Toggle */}
         <div className="absolute top-4 left-4 z-20">
           <div
-            className="flex items-center rounded-md border border-neutral-200 dark:border-neutral-700 bg-neutral-100/80 dark:bg-neutral-800/80 backdrop-blur-md p-0.5 shadow-sm gap-0.5"
+            className="flex items-center rounded-md border border-border bg-neutral-100/80 dark:bg-neutral-800/80 backdrop-blur-md p-0.5 shadow-sm gap-0.5"
             role="tablist"
             aria-label="Mode Pemantauan"
           >
@@ -438,8 +438,8 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
           className={cn(
             'shrink-0 h-full z-10 transition-all duration-300 ease-in-out flex flex-col',
             isVehicleListVisible
-              ? 'w-[320px] border-l border-border bg-background shadow-[-4px_0_15px_-3px_rgba(0,0,0,0.05)]'
-              : 'w-[34px] py-2 items-center bg-transparent border-l border-border/40'
+              ? 'w-[320px] border-l border-neutral-200 dark:border-neutral-800 bg-background shadow-[-4px_0_15px_-3px_rgba(0,0,0,0.05)]'
+              : 'w-[34px] py-2 items-center bg-transparent border-l border-neutral-200 dark:border-neutral-800'
           )}
         >
           {isVehicleListVisible ? (

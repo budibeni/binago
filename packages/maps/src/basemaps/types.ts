@@ -1,1 +1,1 @@
-export type BasemapId = 'standard' | 'osm' | 'satellite';
+export type BasemapId = 'standard' | 'dark' | 'osm' | 'satellite';
