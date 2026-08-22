@@ -8,6 +8,7 @@ import {
   Truck,
   UserRound,
   MapPinned,
+  Layers,
   Route,
   Package,
   Wrench,
@@ -44,16 +45,17 @@ function buildNavigation(locale: Locale): NavGroup[] {
       title: t.navGroup.main,
       items: [
         { id: 'home', label: t.nav.home, href: '/', icon: Home },
+        { id: 'tracking', label: t.nav.tracking, href: '/tracking', icon: Map },
       ],
     },
     {
-      id: 'operational',
-      title: t.navGroup.operational,
+      id: 'master',
+      title: t.navGroup.master,
       items: [
-        { id: 'tracking', label: t.nav.tracking, href: '/tracking', icon: Map },
         { id: 'vehicles', label: t.nav.vehicles, href: '/vehicles', icon: Truck },
         { id: 'drivers', label: t.nav.drivers, href: '/drivers', icon: UserRound },
         { id: 'geofences', label: t.nav.geofences, href: '/geofences', icon: MapPinned },
+        { id: 'groups', label: t.nav.groups, href: '/groups', icon: Layers },
       ],
     },
     {
@@ -155,11 +157,27 @@ export function BusinessShellLayout({ children }: { children: React.ReactNode })
   const t = getTranslation(locale);
   const navigation = buildNavigation(locale);
 
-  // In a real app, breadcrumbs would be dynamic based on currentPath.
-  // For now, we pass a static breadcrumb or let the page define it. 
-  // AppShell currently requires breadcrumbItems prop.
-  // Let's provide a basic one.
-  const breadcrumbItems = [{ label: 'Beranda' }];
+  const breadcrumbItems: { label: string; href?: string }[] = [];
+  let foundItem = null;
+  let foundGroup = null;
+
+  for (const group of navigation) {
+    for (const item of group.items) {
+      if (item.href === currentPath) {
+        foundItem = item;
+        foundGroup = group;
+        break;
+      }
+    }
+    if (foundItem) break;
+  }
+
+  if (foundItem && currentPath !== '/') {
+    breadcrumbItems.push({ label: foundGroup?.title || '' });
+    breadcrumbItems.push({ label: foundItem.label });
+  } else {
+    breadcrumbItems.push({ label: t.nav.home });
+  }
 
   return (
     <AppShell

@@ -9,6 +9,7 @@ export const dictionaries = {
     nav: {
       home: 'Beranda',
       tracking: 'Pemantauan',
+      groups: 'Manajemen Grup',
       vehicles: 'Armada',
       drivers: 'Pengemudi',
       geofences: 'Geofence',
@@ -33,7 +34,8 @@ export const dictionaries = {
 
     // Nav Group Titles
     navGroup: {
-      main: 'Utama',
+      main: 'Menu Utama',
+      master: 'Master Data',
       operational: 'Operasional',
       transportation: 'Transportasi',
       asset: 'Aset',
@@ -88,6 +90,29 @@ export const dictionaries = {
         incidents: { label: 'Insiden', desc: 'Kelola insiden dan tindak lanjut' },
         gpsDevices: { label: 'GPS & Perangkat', desc: 'Kelola perangkat GPS dan sensor' },
       },
+    },
+
+    // Groups
+    groups: {
+      title: 'Grup',
+      pageTitle: 'Manajemen Grup',
+      pageSubtitle: 'Kelola pengelompokan data master (Armada, Pengemudi, Geofence).',
+      tabs: {
+        vehicles: 'Armada',
+        drivers: 'Pengemudi',
+        geofences: 'Geofence',
+      },
+      table: {
+        name: 'Nama Grup',
+        description: 'Deskripsi',
+        memberCount: 'Jumlah Anggota',
+        actions: 'Aksi',
+      },
+      actions: {
+        add: 'Tambah Grup',
+        edit: 'Edit',
+        delete: 'Hapus',
+      }
     },
 
     // Tracking
@@ -211,7 +236,7 @@ export const dictionaries = {
       cancel: 'Batal',
       confirm: 'Hapus',
     },
-    
+
     // Sharing
     locationSharing: {
       shareLocation: 'Bagikan Lokasi',
@@ -261,6 +286,7 @@ export const dictionaries = {
     nav: {
       home: 'Home',
       tracking: 'Tracking',
+      groups: 'Group Management',
       vehicles: 'Vehicles',
       drivers: 'Drivers',
       geofences: 'Geofences',
@@ -285,7 +311,8 @@ export const dictionaries = {
 
     // Nav Group Titles
     navGroup: {
-      main: 'Main',
+      main: 'Main Menu',
+      master: 'Master Data',
       operational: 'Operational',
       transportation: 'Transportation',
       asset: 'Assets',
@@ -340,6 +367,29 @@ export const dictionaries = {
         incidents: { label: 'Incidents', desc: 'Manage incidents and follow-up' },
         gpsDevices: { label: 'GPS & Devices', desc: 'Manage GPS devices and sensors' },
       },
+    },
+
+    // Groups
+    groups: {
+      title: 'Groups',
+      pageTitle: 'Group Management',
+      pageSubtitle: 'Manage master data groupings (Vehicles, Drivers, Geofences).',
+      tabs: {
+        vehicles: 'Vehicles',
+        drivers: 'Drivers',
+        geofences: 'Geofences',
+      },
+      table: {
+        name: 'Group Name',
+        description: 'Description',
+        memberCount: 'Members',
+        actions: 'Actions',
+      },
+      actions: {
+        add: 'Add Group',
+        edit: 'Edit',
+        delete: 'Delete',
+      }
     },
 
     // Tracking
@@ -463,7 +513,7 @@ export const dictionaries = {
       cancel: 'Cancel',
       confirm: 'Delete',
     },
-    
+
     // Sharing
     locationSharing: {
       shareLocation: 'Share Location',

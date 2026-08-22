@@ -82,7 +82,7 @@ export function EntityMarker({
 
         {/* The Pill Label */}
         {label && (
-          <div 
+          <div
             className={cn(
               "mt-0.5 px-1.5 py-[2px] whitespace-nowrap rounded shadow-sm transition-all duration-200 z-30",
               "text-[9px] font-bold tracking-wider uppercase leading-none",

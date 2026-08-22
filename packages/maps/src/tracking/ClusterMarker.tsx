@@ -12,12 +12,12 @@ export interface ClusterMarkerProps {
 export function ClusterMarker({ id, position, count, onClick }: ClusterMarkerProps) {
   // Ukuran dinamis berdasarkan jumlah (minimal 32px, maksimal 56px)
   const size = Math.min(32 + count, 56);
-  
+
   // Tentukan warna berdasarkan jumlah
   // Mengikuti referensi gambar: hijau untuk jumlah kecil, kuning/orange untuk jumlah besar
   const isSmall = count < 10;
-  
-  const baseColor = isSmall 
+
+  const baseColor = isSmall
     ? "bg-[#8BC34A] text-white ring-[#8BC34A]/40" // Hijau seperti gambar
     : "bg-[#FFCA28] text-[#333] ring-[#FFCA28]/40"; // Kuning seperti gambar
 

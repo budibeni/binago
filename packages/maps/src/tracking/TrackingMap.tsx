@@ -26,14 +26,14 @@ export interface TrackingMapProps<T> {
   entities: T[];
   /** Array ID entitas yang sedang terpilih (dikendalikan oleh consumer state) */
   selectedIds: string[];
-  
+
   /** Resolver: Mendapatkan unik ID dari entitas */
   getId: (entity: T) => string;
   /** Resolver: Mendapatkan koordinat terkini dari entitas */
   getPosition: (entity: T) => { lat: number; lng: number };
   /** Resolver: Mendapatkan arah pergerakan entitas (0-360) (opsional) */
   getHeading?: (entity: T) => number;
-  
+
   /** Renderer opsional: Jika disuplai, consumer bisa membuat UI marker kustom (Marker Style: Custom) */
   renderMarker?: (entity: T, state: { selected: boolean; focused: boolean; onClick: () => void }) => React.ReactNode;
   /** Resolver: Mendapatkan teks label untuk EntityMarker bawaan */
@@ -57,7 +57,7 @@ export interface TrackingMapProps<T> {
   entityOptions?: MapEntityOption[];
   /** Fungsi untuk validasi geofence (mock atau real API) */
   checkGeofenceFn?: (req: GeofenceCheckRequest) => Promise<GeofenceCheckResult>;
-  
+
   /** Label UI untuk entitas (misal: "Kendaraan", "Perangkat") */
   entityLabel?: string;
   /** Bahasa interface map */
@@ -256,13 +256,13 @@ function TrackingMapInner<T>({
           const id = props.entityId;
           const selected = selectedIds.includes(id);
           const focused = focusedEntityId === id;
-          
+
           const onClickEntity = () => {
             setFocusedEntityId(id);
             const pos = getPosition(entity);
             panTo({ lat: pos.lat, lng: pos.lng });
           };
-          
+
           return (
             <React.Fragment key={id}>
               {markerStyle === 'custom' && renderMarker ? (
@@ -302,8 +302,8 @@ function TrackingMapInner<T>({
         {/* Playback parking spots */}
         {playbackParkingEvents && playbackParkingEvents.map((p, idx) => (
           <MapMarker key={`park-${idx}`} id={`park-${idx}`} position={p}>
-            <div 
-              className="bg-indigo-600 text-white border-2 border-white rounded-full shadow-md flex items-center justify-center font-bold text-xs" 
+            <div
+              className="bg-indigo-600 text-white border-2 border-white rounded-full shadow-md flex items-center justify-center font-bold text-xs"
               style={{ width: '24px', height: '24px' }}
               title="Posisi Berhenti/Parkir"
             >
