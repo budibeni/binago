@@ -1,4 +1,4 @@
-# ADATRACK â€” Project Overview
+# ADATRACK - Project Overview
 
 ## 1. Gambaran Umum
 

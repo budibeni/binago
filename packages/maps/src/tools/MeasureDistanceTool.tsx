@@ -10,7 +10,7 @@ import { Locale, getMapTranslation } from '../i18n';
 const SOURCE_ID = 'adatrack-measure-line';
 const LAYER_LINE_ID = 'adatrack-measure-line-layer';
 
-/** Haversine formula — jarak antara dua koordinat dalam meter */
+/** Haversine formula - jarak antara dua koordinat dalam meter */
 function haversineMeters(
   lat1: number, lng1: number,
   lat2: number, lng2: number,
@@ -65,7 +65,7 @@ export function MeasureDistanceTool({ active, onDeactivate, className, locale = 
     return el;
   };
 
-  // ——— Register / update map sources and layers ———
+  // --- Register / update map sources and layers ---
   const registerMapSources = useCallback(() => {
     if (!map) return;
 
@@ -282,7 +282,7 @@ export function MeasureDistanceTool({ active, onDeactivate, className, locale = 
             {formatDistance(distance)}
           </p>
         ) : (
-          <p className="text-foreground-subtle text-2xl font-black leading-none">—</p>
+          <p className="text-foreground-subtle text-2xl font-black leading-none">-</p>
         )}
       </div>
 

@@ -8,7 +8,7 @@ import { PlaybackData, Vehicle } from '../types';
 import { usePersonalLocale } from '@/components/PersonalShellLayout';
 import { getTranslation } from '@/i18n';
 
-// ─── Types ─────────────────────────────────────────────────────────────────────
+// --- Types ---------------------------------------------------------------------
 export interface ParkingEvent {
   lat: number;
   lng: number;
@@ -29,7 +29,7 @@ export interface PlaybackMapProps {
   playbackParkingEvents?: ParkingEvent[];
 }
 
-// ─── Fit Bounds ────────────────────────────────────────────────────────────────
+// --- Fit Bounds ----------------------------------------------------------------
 function PlaybackFitBounds({ track }: { track?: { lat: number; lng: number }[] }) {
   const mapActions = useMapActions();
 
@@ -59,7 +59,7 @@ function PlaybackFitBounds({ track }: { track?: { lat: number; lng: number }[] }
   return null;
 }
 
-// ─── Helpers ───────────────────────────────────────────────────────────────────
+// --- Helpers -------------------------------------------------------------------
 function formatDuration(secs: number): string {
   const h = Math.floor(secs / 3600);
   const m = Math.floor((secs % 3600) / 60);
@@ -79,7 +79,7 @@ function formatTimestamp(iso: string): string {
   }
 }
 
-// ─── InfoRow ──────────────────────────────────────────────────────────────────
+// --- InfoRow ------------------------------------------------------------------
 function InfoRow({
   icon: Icon,
   label,
@@ -106,7 +106,7 @@ function InfoRow({
   );
 }
 
-// ─── Parking Marker with Popup ─────────────────────────────────────────────────
+// --- Parking Marker with Popup -------------------------------------------------
 function ParkingMarkerWithPopup({ 
   event, 
   index, 
@@ -203,7 +203,7 @@ function ParkingMarkerWithPopup({
   );
 }
 
-// ─── PlaybackMap Main Component ────────────────────────────────────────────────
+// --- PlaybackMap Main Component ------------------------------------------------
 export function PlaybackMap({
   data,
   currentIndex,

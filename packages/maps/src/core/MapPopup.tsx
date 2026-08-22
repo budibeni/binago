@@ -23,7 +23,7 @@ export function MapPopup({ position, children, onClose, offset = 15, anchor, cla
     onCloseRef.current = onClose;
   });
 
-  // Create popup once — only re-run when map/offset change (not onClose)
+  // Create popup once - only re-run when map/offset change (not onClose)
   useEffect(() => {
     if (!map || !containerRef.current) return;
 

@@ -1,4 +1,4 @@
-# ADATRACK â€” Task 02
+# ADATRACK - Task 02
 ## Design System
 
 **Scope:** Frontend ADATRACK  

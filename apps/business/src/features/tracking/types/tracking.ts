@@ -1,17 +1,17 @@
-// ─── Vehicle Status ────────────────────────────────────────────────────────────
+// --- Vehicle Status ------------------------------------------------------------
 
 export type VehicleStatus = 'driving' | 'idle' | 'parking' | 'offline';
 
-// ─── View Mode ─────────────────────────────────────────────────────────────────
+// --- View Mode -----------------------------------------------------------------
 
 export type TrackingViewMode = 'map' | 'video';
 export type TrackingView = 'map' | 'table' | 'notification';
 
-// ─── Status Filter ─────────────────────────────────────────────────────────────
+// --- Status Filter -------------------------------------------------------------
 
 export type StatusFilter = 'all' | VehicleStatus;
 
-// ─── Location ──────────────────────────────────────────────────────────────────
+// --- Location ------------------------------------------------------------------
 
 export interface VehicleLocation {
   lat: number;
@@ -19,7 +19,7 @@ export interface VehicleLocation {
   address?: string;
 }
 
-// ─── Vehicle ───────────────────────────────────────────────────────────────────
+// --- Vehicle -------------------------------------------------------------------
 
 export interface TrackingVehicle {
   id: string;
@@ -41,7 +41,7 @@ export interface TrackingVehicle {
   isLocationShared?: boolean; // Whether the vehicle's location is currently being shared
 }
 
-// ─── Vehicle Group ─────────────────────────────────────────────────────────────
+// --- Vehicle Group -------------------------------------------------------------
 
 export interface TrackingVehicleGroup {
   id: string;
@@ -49,7 +49,7 @@ export interface TrackingVehicleGroup {
   vehicles: TrackingVehicle[];
 }
 
-// ─── Group Status Summary ──────────────────────────────────────────────────────
+// --- Group Status Summary ------------------------------------------------------
 
 export interface GroupStatusSummary {
   driving: number;
@@ -58,7 +58,7 @@ export interface GroupStatusSummary {
   offline: number;
 }
 
-// ─── Date Range ────────────────────────────────────────────────────────────────
+// --- Date Range ----------------------------------------------------------------
 
 export interface DateRange {
   startDate: string;  // ISO date string: YYYY-MM-DD
@@ -67,15 +67,15 @@ export interface DateRange {
   endTime: string;    // HH:MM
 }
 
-// ─── Playback Status ───────────────────────────────────────────────────────────
+// --- Playback Status -----------------------------------------------------------
 
 export type PlaybackStatus = 'idle' | 'loading' | 'ready' | 'playing' | 'paused' | 'error';
 
-// ─── Playback State ────────────────────────────────────────────────────────────
+// --- Playback State ------------------------------------------------------------
 
 export interface PlaybackState {
   status: PlaybackStatus;
-  /** Total duration in seconds — only meaningful when status is 'ready' | 'playing' | 'paused' */
+  /** Total duration in seconds - only meaningful when status is 'ready' | 'playing' | 'paused' */
   totalDuration: number;
   /** Current playback position in seconds */
   currentTime: number;
@@ -83,7 +83,7 @@ export interface PlaybackState {
   errorMessage?: string;
 }
 
-// ─── Trip ──────────────────────────────────────────────────────────────────────
+// --- Trip ----------------------------------------------------------------------
 
 export interface Trip {
   id: string;
@@ -99,7 +99,7 @@ export interface Trip {
   endAddress: string;
 }
 
-// ─── Playback Point ────────────────────────────────────────────────────────────
+// --- Playback Point ------------------------------------------------------------
 
 export interface PlaybackPoint {
   lat: number;
@@ -109,7 +109,7 @@ export interface PlaybackPoint {
   heading?: number;   // degrees 0-360
 }
 
-// ─── Playback Data ─────────────────────────────────────────────────────────────
+// --- Playback Data -------------------------------------------------------------
 
 export interface PlaybackData {
   tripId: string;

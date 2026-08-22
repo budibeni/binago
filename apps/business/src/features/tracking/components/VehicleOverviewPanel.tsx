@@ -31,7 +31,7 @@ interface VehicleOverviewPanelProps {
   onShareLocation?: () => void;
 }
 
-// ─── Status config ─────────────────────────────────────────────────────────────
+// --- Status config -------------------------------------------------------------
 
 const STATUS_CONFIG = {
   driving: {
@@ -60,7 +60,7 @@ const STATUS_CONFIG = {
   },
 } as const;
 
-// ─── InfoRow ──────────────────────────────────────────────────────────────────
+// --- InfoRow ------------------------------------------------------------------
 
 function InfoRow({
   icon: Icon,
@@ -88,7 +88,7 @@ function InfoRow({
   );
 }
 
-// ─── VehicleOverviewPanel ─────────────────────────────────────────────────────
+// --- VehicleOverviewPanel -----------------------------------------------------
 
 export function VehicleOverviewPanel({
   vehicle,
@@ -127,7 +127,7 @@ export function VehicleOverviewPanel({
   return (
     <div className={cn('flex flex-col h-full w-full bg-background', className)}>
 
-      {/* ── Header ─────────────────────────────────────────────────────────── */}
+      {/* -- Header ----------------------------------------------------------- */}
       <div className="flex items-center gap-2 px-3 py-2 border-b border-border bg-neutral-50/60 dark:bg-neutral-900/40 shrink-0">
 
         {/* Vehicle Icon */}
@@ -192,10 +192,10 @@ export function VehicleOverviewPanel({
         </div>
       </div>
 
-      {/* ── Body — 4-column grid ───────────────────────────────────────────── */}
+      {/* -- Body - 4-column grid --------------------------------------------- */}
       <div className="flex-1 grid grid-cols-4 divide-x divide-border overflow-hidden">
 
-        {/* ── Col 1: Driver, Speed, ACC ─────────────────────── */}
+        {/* -- Col 1: Driver, Speed, ACC ----------------------- */}
         <div className="flex flex-col gap-1.5 px-2.5 py-1.5 overflow-hidden">
           <InfoRow
             icon={User}
@@ -218,7 +218,7 @@ export function VehicleOverviewPanel({
           />
         </div>
 
-        {/* ── Col 2: Address, Alarm ─────── */}
+        {/* -- Col 2: Address, Alarm ------- */}
         <div className="flex flex-col gap-1.5 px-2.5 py-1.5 overflow-hidden">
           <InfoRow
             icon={MapPin}
@@ -237,7 +237,7 @@ export function VehicleOverviewPanel({
           />
         </div>
 
-        {/* ── Col 3: Geofence Location, Geofence Area ─────── */}
+        {/* -- Col 3: Geofence Location, Geofence Area ------- */}
         <div className="flex flex-col gap-1.5 px-2.5 py-1.5 overflow-hidden">
           <InfoRow
             icon={SquareDashedBottom}
@@ -251,7 +251,7 @@ export function VehicleOverviewPanel({
           />
         </div>
 
-        {/* ── Col 4: Coordinates, GPS SN, Last Update ───────────────── */}
+        {/* -- Col 4: Coordinates, GPS SN, Last Update ----------------- */}
         <div className="flex flex-col gap-1.5 px-2.5 py-1.5 overflow-hidden">
           <InfoRow
             icon={Crosshair}

@@ -53,7 +53,7 @@ export function BusinessHomePage() {
       {/* Hero */}
       <BusinessHeroSection />
 
-      {/* Favorite section header â€” single "+ Tambah Shortcut" button */}
+      {/* Favorite section header - single "+ Tambah Shortcut" button */}
       <FavoriteSectionHeader
         title={h.favoritTitle}
         subtitle={h.favoritSubtitle}
@@ -62,7 +62,7 @@ export function BusinessHomePage() {
         addButtonVariant="accent"
       />
 
-      {/* Shortcut grid or empty state â€” only rendered after localStorage is read (SSR safe) */}
+      {/* Shortcut grid or empty state - only rendered after localStorage is read (SSR safe) */}
       {isLoaded && (
         favorites.length > 0
           ? <HomeShortcutGrid favorites={favorites} />

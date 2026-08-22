@@ -1,4 +1,4 @@
-# ADATRACK â€” Task 14
+# ADATRACK - Task 14
 ## Production Readiness
 
 **Scope:** Frontend ADATRACK  

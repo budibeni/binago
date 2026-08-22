@@ -1,4 +1,4 @@
-# ADATRACK â€” Dokumentasi Project
+# ADATRACK - Dokumentasi Project
 
 Folder `/docs` berisi seluruh dokumentasi resmi project ADATRACK.
 
@@ -8,11 +8,11 @@ Untuk Antigravity AI:
 
 ```text
 /AGENTS.md
-â†“
+â†"
 /docs/README.md
-â†“
+â†"
 Dokumentasi yang relevan
-â†“
+â†"
 /docs/tasks/TASK-XX-*.md
 ```
 

@@ -4,7 +4,7 @@ import { PublicLocationPage } from '@/features/sharing/components/PublicLocation
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
-    title: 'Berbagi Lokasi — ADATRACK',
+    title: 'Berbagi Lokasi - ADATRACK',
     description: 'Lihat lokasi kendaraan yang dibagikan secara langsung.',
     robots: { index: false, follow: false },
   };

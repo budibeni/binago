@@ -166,7 +166,7 @@ export function MapControlPanel({
       {active && (
         <div className="absolute right-0 top-full mt-2 md:right-full md:top-auto md:bottom-0 md:mt-0 md:mr-2.5 z-[70]">
 
-          {/* ── Basemap picker ── */}
+          {/* -- Basemap picker -- */}
           {active === 'basemap' && (
             <FloatingCard aria-label={bm.label}>
               <div className="p-1 min-w-[180px]" role="listbox" aria-label={bm.label}>
@@ -198,7 +198,7 @@ export function MapControlPanel({
             </FloatingCard>
           )}
 
-          {/* ── Marker Style picker ── */}
+          {/* -- Marker Style picker -- */}
           {active === 'markerStyle' && hasCustomMarker && (
             <FloatingCard aria-label={tb.markerStyle}>
               <div className="p-1 min-w-[180px]" role="listbox" aria-label={tb.markerStyle}>
@@ -242,7 +242,7 @@ export function MapControlPanel({
             </FloatingCard>
           )}
 
-          {/* ── More tools menu ── */}
+          {/* -- More tools menu -- */}
           {active === 'more' && (
             <FloatingCard aria-label={tb.moreTools}>
               <div className="p-1 min-w-[192px]">
@@ -268,7 +268,7 @@ export function MapControlPanel({
             </FloatingCard>
           )}
 
-          {/* ── Tool panels ── */}
+          {/* -- Tool panels -- */}
           {(active === 'search' || active === 'geofence' || active === 'measure') && (
             <FloatingCard aria-label={
               active === 'search' ? tb.search :
@@ -375,7 +375,7 @@ export function MapControlPanel({
   );
 }
 
-// ── FloatingCard ──
+// -- FloatingCard --
 function FloatingCard({ children, 'aria-label': ariaLabel }: { children: React.ReactNode; 'aria-label'?: string }) {
   return (
     <div
@@ -388,7 +388,7 @@ function FloatingCard({ children, 'aria-label': ariaLabel }: { children: React.R
   );
 }
 
-// ── PanelHeader ──
+// -- PanelHeader --
 function PanelHeader({ title, onClose, closeLabel }: { title: string; onClose: () => void; closeLabel?: string }) {
   return (
     <div className="flex items-center justify-between px-4 py-3 border-b border-border">
@@ -406,7 +406,7 @@ function PanelHeader({ title, onClose, closeLabel }: { title: string; onClose: (
   );
 }
 
-// ── Sep — responsive separator ──
+// -- Sep - responsive separator --
 function Sep() {
   return (
     <div className={cn(
@@ -417,7 +417,7 @@ function Sep() {
   );
 }
 
-// ── IconBtn ──
+// -- IconBtn --
 interface IconBtnProps {
   id: string;
   icon: React.FC<{ className?: string }>;

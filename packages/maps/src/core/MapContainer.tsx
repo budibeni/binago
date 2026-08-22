@@ -29,7 +29,7 @@ export interface MapContainerProps extends React.HTMLAttributes<HTMLDivElement> 
    */
   basemap?: BasemapId;
   /**
-   * @deprecated — Gunakan basemap prop untuk memilih basemap.
+   * @deprecated - Gunakan basemap prop untuk memilih basemap.
    */
   placeholderText?: string;
 }
@@ -74,7 +74,7 @@ function MapContainerInner({
 
   const effectiveBasemap = basemap === 'standard' && isDarkMode ? 'dark' : basemap;
 
-  // Initial map setup — runs once only
+  // Initial map setup - runs once only
   useEffect(() => {
     if (typeof window === 'undefined') return;
     if (!mapContainerRef.current) return;
@@ -147,7 +147,7 @@ function MapContainerInner({
     };
   }, []);
 
-  // Basemap change — calls setStyle() and preserves custom sources/layers via style.load event
+  // Basemap change - calls setStyle() and preserves custom sources/layers via style.load event
   useEffect(() => {
     if (!mapRef.current) return;
     if (currentBasemapRef.current === effectiveBasemap) return;
@@ -185,35 +185,35 @@ function MapContainerInner({
         </div>
       )}
 
-      {/* Toolbar slot — bottom right (desktop), top right (mobile) */}
+      {/* Toolbar slot - bottom right (desktop), top right (mobile) */}
       {toolbarSlot && (
         <div className="absolute top-4 right-4 md:top-auto md:bottom-4 md:right-4 z-[60] pointer-events-none">
           <div className="pointer-events-auto">{toolbarSlot}</div>
         </div>
       )}
 
-      {/* Overlay slot — left side panel */}
+      {/* Overlay slot - left side panel */}
       {overlaySlot && (
         <div className="absolute top-3 left-3 bottom-3 z-[60] pointer-events-none max-w-sm">
           <div className="pointer-events-auto h-full">{overlaySlot}</div>
         </div>
       )}
 
-      {/* Controls slot — bottom right (zoom +/-) */}
+      {/* Controls slot - bottom right (zoom +/-) */}
       {controlsSlot && (
         <div className="absolute bottom-8 right-3 z-[50] pointer-events-none">
           <div className="pointer-events-auto">{controlsSlot}</div>
         </div>
       )}
 
-      {/* Children — markers, popups, tools that use map context */}
+      {/* Children - markers, popups, tools that use map context */}
       {children && (
         <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
           {children}
         </div>
       )}
 
-      {/* Dynamic attribution — bottom right, above controls */}
+      {/* Dynamic attribution - bottom right, above controls */}
       {attribution && (
         <div
           className="absolute bottom-1 right-1 z-[40] pointer-events-none"

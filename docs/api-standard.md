@@ -1,4 +1,4 @@
-# ADATRACK â€” API Standard
+# ADATRACK - API Standard
 
 ## Status
 

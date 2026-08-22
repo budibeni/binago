@@ -29,7 +29,7 @@ export function PlaybackPage({ playbackData, trip, vehicle, onBack }: PlaybackPa
 
   const points = playbackData.points;
   
-  // ── Playback derived state ──────────────────────────────────────────────────
+  // -- Playback derived state --------------------------------------------------
   const playbackTrack = React.useMemo(() => {
     return points.map(p => ({ lat: p.lat, lng: p.lng }));
   }, [points]);
@@ -105,7 +105,7 @@ export function PlaybackPage({ playbackData, trip, vehicle, onBack }: PlaybackPa
     };
   }, []);
 
-  // Handle Playback Loop â€” speed-aware
+  // Handle Playback Loop - speed-aware
   useEffect(() => {
     if (isPlaying) {
       const intervalMs = Math.max(50, 1000 / speedMultiplier);
@@ -180,7 +180,7 @@ export function PlaybackPage({ playbackData, trip, vehicle, onBack }: PlaybackPa
   return (
     <div className="absolute inset-0 z-50 flex flex-col bg-background overflow-hidden">
 
-      {/* ======= MAP — full background ======= */}
+      {/* ======= MAP - full background ======= */}
       <div className="absolute inset-0 z-0">
         <PlaybackMap
           data={playbackData}

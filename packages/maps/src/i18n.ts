@@ -47,9 +47,9 @@ export const mapDictionaries = {
     geofence: {
       entityLabel: 'Objek',
       geofenceLabel: 'Geofence',
-      selectEntity: '— Pilih objek —',
+      selectEntity: '- Pilih objek -',
       searchEntity: 'Cari objek...',
-      selectGeofence: '— Pilih geofence —',
+      selectGeofence: '- Pilih geofence -',
       searchGeofence: 'Cari geofence...',
       noResult: 'Tidak ada hasil',
       errorEmpty: 'Pilih objek dan geofence terlebih dahulu.',
@@ -135,9 +135,9 @@ export const mapDictionaries = {
     geofence: {
       entityLabel: 'Entity',
       geofenceLabel: 'Geofence',
-      selectEntity: '— Select entity —',
+      selectEntity: '- Select entity -',
       searchEntity: 'Search entity...',
-      selectGeofence: '— Select geofence —',
+      selectGeofence: '- Select geofence -',
       searchGeofence: 'Search geofence...',
       noResult: 'No result',
       errorEmpty: 'Please select both entity and geofence.',

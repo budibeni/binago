@@ -16,21 +16,21 @@ export interface ShellVerificationPageProps {
 }
 
 /**
- * ShellVerificationPage â€” placeholder sederhana untuk membuktikan Application Shell berjalan.
+ * ShellVerificationPage - placeholder sederhana untuk membuktikan Application Shell berjalan.
  * BUKAN halaman Home/Dashboard. Tidak ada statistik, chart, atau business data.
  * Home/Dashboard akan dikerjakan pada TASK-04.
  */
 export function ShellVerificationPage({ locale, theme, labels }: ShellVerificationPageProps) {
   const checks = [
     'AppShell terintegrasi',
-    'Sidebar â€” expanded, collapsed, dan mobile drawer',
-    'Header â€” breadcrumb, language toggle, theme toggle, user menu',
+    'Sidebar - expanded, collapsed, dan mobile drawer',
+    'Header - breadcrumb, language toggle, theme toggle, user menu',
     'Navigasi aktif teridentifikasi',
-    'Mobile drawer â€” open/close dengan overlay',
+    'Mobile drawer - open/close dengan overlay',
     'Keyboard Escape menutup drawer',
-    'UserMenu â€” avatar, nama, role, aksi profil',
-    'LanguageToggle â€” ID/EN switching',
-    'ThemeToggle â€” light/dark',
+    'UserMenu - avatar, nama, role, aksi profil',
+    'LanguageToggle - ID/EN switching',
+    'ThemeToggle - light/dark',
     'Tidak ada Global Search pada Header',
     'Tanpa fitur Home/Task-04',
   ];

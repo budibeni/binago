@@ -44,7 +44,7 @@ export interface DataTableToolbarProps<TData extends RowData = RowData> {
 
 /**
  * DataTableToolbar menggabungkan search, column toggle, export, dan custom action slot.
- * Dirancang untuk dirender di atas tabel â€” biasanya dipass melalui prop `toolbarSlot` pada DataTable.
+ * Dirancang untuk dirender di atas tabel - biasanya dipass melalui prop `toolbarSlot` pada DataTable.
  *
  * Layout:
  * [leftSlot] [search]          [rightSlot] [columnToggle] [export]

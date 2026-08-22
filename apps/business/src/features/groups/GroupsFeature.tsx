@@ -25,7 +25,7 @@ export function GroupsFeature({ locale }: GroupsFeatureProps) {
   const currentTabData = tabs.find(t => t.id === activeTab)?.data || [];
 
   const tableLabels = {
-    searchPlaceholder: t.tracking.searchPlaceholder, // Reuse search placeholder or create specific one
+    searchPlaceholder: tGroups.table.searchPlaceholder,
     nameCol: tGroups.table.name,
     descCol: tGroups.table.description,
     memberCountCol: tGroups.table.memberCount,
@@ -36,43 +36,46 @@ export function GroupsFeature({ locale }: GroupsFeatureProps) {
   };
 
   return (
-    <div className="flex flex-col h-full w-full bg-background overflow-hidden p-6 gap-4">
+    <div className="flex flex-col h-full w-full bg-neutral-50 dark:bg-neutral-900/30 p-4 items-center overflow-hidden">
       
-      {/* Tabs */}
-      <div className="flex items-center gap-1 p-1 bg-surface border border-border rounded-lg w-fit shrink-0 shadow-sm">
-        {tabs.map((tab) => {
-          const Icon = tab.icon;
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={cn(
-                'flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-md transition-all',
-                isActive 
-                  ? 'bg-background text-foreground shadow-sm ring-1 ring-border/50' 
-                  : 'text-foreground-muted hover:text-foreground hover:bg-neutral-200/50 dark:hover:bg-neutral-800/50'
-              )}
-            >
-              <Icon className={cn("w-4 h-4", isActive ? "text-danger" : "opacity-70")} />
-              {tab.label}
-            </button>
-          );
-        })}
-      </div>
+      <div className="w-full h-full flex flex-col bg-background border border-border/60 rounded-xl shadow-sm overflow-hidden">
+        
+        {/* Tabs - Segmented Control (Compact) */}
+        <div className="w-full flex justify-center py-3 border-b border-border/50 bg-neutral-50/50 dark:bg-neutral-900/50">
+          <div className="flex items-center p-1 bg-neutral-200/50 dark:bg-neutral-800/50 rounded-lg">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={cn(
+                    'flex items-center gap-2 px-4 py-1.5 text-sm font-medium rounded-md transition-all',
+                    isActive 
+                      ? 'text-danger shadow-sm bg-background border border-border/50' 
+                      : 'text-foreground-muted hover:text-foreground hover:bg-neutral-300/30 dark:hover:bg-neutral-700/30'
+                  )}
+                >
+                  <Icon className={cn("w-4 h-4", isActive && "scale-105")} />
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
-      {/* Content Area */}
-      <div className="flex-1 min-h-0">
-        {/* We use key to force unmount/remount of table when tab changes, 
-            so local state (like search) resets automatically */}
-        <GroupDataTable 
-          key={activeTab}
-          groups={currentTabData} 
-          locale={locale} 
-          labels={tableLabels}
-        />
+        {/* Content Area */}
+        <div className="flex-1 min-h-0 p-4">
+          <GroupDataTable 
+            key={activeTab}
+            activeTab={activeTab}
+            groups={currentTabData} 
+            locale={locale} 
+            labels={tableLabels}
+          />
+        </div>
       </div>
-      
     </div>
   );
 }

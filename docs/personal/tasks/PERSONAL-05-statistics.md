@@ -1,4 +1,4 @@
-# ADATRACK Personal â€” PERSONAL-05
+# ADATRACK Personal - PERSONAL-05
 
 ## Statistics
 

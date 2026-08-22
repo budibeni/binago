@@ -58,9 +58,9 @@ Perbedaan utama:
 
 ```text
 ADATRACK Business
-    â†“
+    â†"
 Enterprise / Fleet Management
-    â†“
+    â†"
 Data banyak
 Operasional
 Monitoring fleet
@@ -68,9 +68,9 @@ Management
 Reporting
 
 ADATRACK Personal
-    â†“
+    â†"
 Individual Vehicle Tracking
-    â†“
+    â†"
 Sederhana
 Personal
 Visual
@@ -173,8 +173,8 @@ ADATRACK
 dengan:
 
 ```text
-BINA â†’ Hitam
-GO   â†’ Merah
+BINA â†' Hitam
+GO   â†' Merah
 ```
 
 ## 4.1 Brand Color
@@ -229,9 +229,9 @@ Prioritas:
 
 ```text
 Mobile
-   â†“
+   â†"
 Tablet
-   â†“
+   â†"
 Desktop
 ```
 
@@ -311,10 +311,10 @@ Struktur:
 
 ```text
 ADATRACK Personal
-â”‚
-â”œâ”€â”€ Pemantauan
-â”œâ”€â”€ Statistik
-â””â”€â”€ Pengaturan
+â"‚
+â"œâ"€â"€ Pemantauan
+â"œâ"€â"€ Statistik
+â""â"€â"€ Pengaturan
 ```
 
 ---
@@ -326,14 +326,14 @@ Pada mobile gunakan **Bottom Navigation**.
 Struktur:
 
 ```text
-â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-â”‚                                 â”‚
-â”‚           CONTENT               â”‚
-â”‚                                 â”‚
-â”‚                                 â”‚
-â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
-â”‚ Pemantauan â”‚ Statistik â”‚ Pengaturan â”‚
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+â"Œâ"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"
+â"‚                                 â"‚
+â"‚           CONTENT               â"‚
+â"‚                                 â"‚
+â"‚                                 â"‚
+â"œâ"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"¤
+â"‚ Pemantauan â"‚ Statistik â"‚ Pengaturan â"‚
+â""â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"˜
 ```
 
 Primary navigation harus selalu mudah dijangkau.
@@ -351,11 +351,11 @@ Pada desktop gunakan **Top Navigation**.
 Contoh:
 
 ```text
-â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-â”‚ ADATRACK Personal                                       â”‚
-â”‚                                                       â”‚
-â”‚ Pemantauan        Statistik        Pengaturan         â”‚
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+â"Œâ"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"
+â"‚ ADATRACK Personal                                       â"‚
+â"‚                                                       â"‚
+â"‚ Pemantauan        Statistik        Pengaturan         â"‚
+â""â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"˜
 ```
 
 Desktop Personal **tidak menggunakan Sidebar Business sebagai primary navigation**.
@@ -397,11 +397,11 @@ Prioritas:
 
 ```text
 User
- â†“
+ â†"
 Pemantauan
- â†“
+ â†"
 Kendaraan
- â†“
+ â†"
 Lokasi
 ```
 
@@ -413,15 +413,15 @@ Flow utama:
 
 ```text
 Login
-  â†“
+  â†"
 Pemantauan
-  â†“
+  â†"
 Pilih Kendaraan
-  â†“
+  â†"
 Detail Kendaraan
-  â†“
+  â†"
 Riwayat Perjalanan
-  â†“
+  â†"
 Playback
 ```
 
@@ -429,15 +429,15 @@ Flow statistik:
 
 ```text
 Pemantauan
-  â†“
+  â†"
 Statistik
-  â†“
+  â†"
 Ringkasan
-  â†“
+  â†"
 Harian
-  â†“
+  â†"
 Mingguan
-  â†“
+  â†"
 Bulanan
 ```
 
@@ -445,13 +445,13 @@ Flow pengaturan:
 
 ```text
 Pengaturan
-  â”œâ”€â”€ Kendaraan Saya
-  â”œâ”€â”€ Perangkat GPS
-  â”œâ”€â”€ Notifikasi
-  â”œâ”€â”€ Geofence
-  â”œâ”€â”€ Akun
-  â”œâ”€â”€ Bantuan
-  â””â”€â”€ Tentang Aplikasi
+  â"œâ"€â"€ Kendaraan Saya
+  â"œâ"€â"€ Perangkat GPS
+  â"œâ"€â"€ Notifikasi
+  â"œâ"€â"€ Geofence
+  â"œâ"€â"€ Akun
+  â"œâ"€â"€ Bantuan
+  â""â"€â"€ Tentang Aplikasi
 ```
 
 ---
@@ -462,26 +462,26 @@ Struktur utama Personal:
 
 ```text
 ADATRACK Personal
-â”‚
-â”œâ”€â”€ Pemantauan
-â”‚   â”œâ”€â”€ VehicleList
-â”‚   â”œâ”€â”€ LiveMap
-â”‚   â””â”€â”€ VehicleDetail
-â”‚
-â”œâ”€â”€ Statistik
-â”‚   â”œâ”€â”€ Summary
-â”‚   â”œâ”€â”€ Daily
-â”‚   â”œâ”€â”€ Weekly
-â”‚   â””â”€â”€ Monthly
-â”‚
-â””â”€â”€ Pengaturan
-    â”œâ”€â”€ Kendaraan
-    â”œâ”€â”€ Perangkat GPS
-    â”œâ”€â”€ Notifikasi
-    â”œâ”€â”€ Geofence
-    â”œâ”€â”€ Akun
-    â”œâ”€â”€ Bantuan
-    â””â”€â”€ Tentang
+â"‚
+â"œâ"€â"€ Pemantauan
+â"‚   â"œâ"€â"€ VehicleList
+â"‚   â"œâ"€â"€ LiveMap
+â"‚   â""â"€â"€ VehicleDetail
+â"‚
+â"œâ"€â"€ Statistik
+â"‚   â"œâ"€â"€ Summary
+â"‚   â"œâ"€â"€ Daily
+â"‚   â"œâ"€â"€ Weekly
+â"‚   â""â"€â"€ Monthly
+â"‚
+â""â"€â"€ Pengaturan
+    â"œâ"€â"€ Kendaraan
+    â"œâ"€â"€ Perangkat GPS
+    â"œâ"€â"€ Notifikasi
+    â"œâ"€â"€ Geofence
+    â"œâ"€â"€ Akun
+    â"œâ"€â"€ Bantuan
+    â""â"€â"€ Tentang
 ```
 
 ---
@@ -494,8 +494,8 @@ Struktur utama:
 
 ```text
 Pemantauan
-â”œâ”€â”€ VehicleList
-â””â”€â”€ LiveMap
+â"œâ"€â"€ VehicleList
+â""â"€â"€ LiveMap
 ```
 
 VehicleList dan LiveMap merupakan component terpisah.
@@ -552,9 +552,9 @@ Flow:
 
 ```text
 Riwayat Perjalanan
-       â†“
+       â†"
 Pilih Perjalanan
-       â†“
+       â†"
 Playback
 ```
 
@@ -615,7 +615,7 @@ Contoh:
 
 ```text
 07:12 - 07:48
-Rumah â†’ Kantor
+Rumah â†' Kantor
 18,2 km
 36 menit
 ```
@@ -632,10 +632,10 @@ Struktur:
 
 ```text
 Statistik
-â”œâ”€â”€ Ringkasan
-â”œâ”€â”€ Harian
-â”œâ”€â”€ Mingguan
-â””â”€â”€ Bulanan
+â"œâ"€â"€ Ringkasan
+â"œâ"€â"€ Harian
+â"œâ"€â"€ Mingguan
+â""â"€â"€ Bulanan
 ```
 
 Statistik dapat menampilkan:
@@ -682,13 +682,13 @@ Struktur:
 
 ```text
 Pengaturan
-â”œâ”€â”€ Kendaraan Saya
-â”œâ”€â”€ Perangkat GPS
-â”œâ”€â”€ Notifikasi
-â”œâ”€â”€ Geofence
-â”œâ”€â”€ Akun
-â”œâ”€â”€ Bantuan
-â””â”€â”€ Tentang Aplikasi
+â"œâ"€â"€ Kendaraan Saya
+â"œâ"€â"€ Perangkat GPS
+â"œâ"€â"€ Notifikasi
+â"œâ"€â"€ Geofence
+â"œâ"€â"€ Akun
+â"œâ"€â"€ Bantuan
+â""â"€â"€ Tentang Aplikasi
 ```
 
 Gunakan list/card yang sederhana.
@@ -784,9 +784,9 @@ Selama tahap frontend:
 
 ```text
 Page / Feature
-      â†“
+      â†"
 Dummy Data
-      â†“
+      â†"
 Component
 ```
 
@@ -993,15 +993,15 @@ Gunakan prinsip:
 
 ```text
 Generic
-   â†“
+   â†"
 packages/ui
 
 Business-specific
-   â†“
+   â†"
 apps/business
 
 Personal-specific
-   â†“
+   â†"
 apps/personal
 ```
 
@@ -1083,10 +1083,10 @@ Offline
 Status dapat menggunakan semantic color:
 
 ```text
-Driving  â†’ success
-Idle     â†’ warning
-Parking  â†’ neutral
-Offline  â†’ danger
+Driving  â†' success
+Idle     â†' warning
+Parking  â†' neutral
+Offline  â†' danger
 ```
 
 Warna semantic tidak menggantikan brand color.
@@ -1198,26 +1198,26 @@ Contoh:
 
 ```text
 apps/personal/src/
-â”‚
-â”œâ”€â”€ app/
-â”‚
-â”œâ”€â”€ components/
-â”‚
-â”œâ”€â”€ features/
-â”‚   â”œâ”€â”€ monitoring/
-â”‚   â”‚   â”œâ”€â”€ components/
-â”‚   â”‚   â”œâ”€â”€ data/
-â”‚   â”‚   â”œâ”€â”€ types/
-â”‚   â”‚   â””â”€â”€ ...
-â”‚   â”‚
-â”‚   â”œâ”€â”€ vehicle-detail/
-â”‚   â”œâ”€â”€ playback/
-â”‚   â”œâ”€â”€ statistics/
-â”‚   â”œâ”€â”€ settings/
-â”‚   â”œâ”€â”€ geofence/
-â”‚   â””â”€â”€ notifications/
-â”‚
-â””â”€â”€ i18n/
+â"‚
+â"œâ"€â"€ app/
+â"‚
+â"œâ"€â"€ components/
+â"‚
+â"œâ"€â"€ features/
+â"‚   â"œâ"€â"€ monitoring/
+â"‚   â"‚   â"œâ"€â"€ components/
+â"‚   â"‚   â"œâ"€â"€ data/
+â"‚   â"‚   â"œâ"€â"€ types/
+â"‚   â"‚   â""â"€â"€ ...
+â"‚   â"‚
+â"‚   â"œâ"€â"€ vehicle-detail/
+â"‚   â"œâ"€â"€ playback/
+â"‚   â"œâ"€â"€ statistics/
+â"‚   â"œâ"€â"€ settings/
+â"‚   â"œâ"€â"€ geofence/
+â"‚   â""â"€â"€ notifications/
+â"‚
+â""â"€â"€ i18n/
 ```
 
 Jangan memasukkan business logic feature ke `app/` jika dapat ditempatkan dengan lebih tepat di `features/`.
@@ -1400,9 +1400,9 @@ Selama tahap frontend:
 
 ```text
 UI
-â†“
+â†"
 Mock Data
-â†“
+â†"
 Component
 ```
 
@@ -1548,11 +1548,11 @@ Pengalaman utama pengguna harus selalu kembali kepada tujuan utama:
 
 ```text
 "Di mana kendaraan saya?"
-        â†“
+        â†"
 "Apa statusnya?"
-        â†“
+        â†"
 "Apa yang terjadi hari ini?"
-        â†“
+        â†"
 "Bagaimana riwayat perjalanannya?"
 ```
 

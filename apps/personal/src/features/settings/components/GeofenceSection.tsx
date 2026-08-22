@@ -170,7 +170,7 @@ export function GeofenceSection() {
                   checked={geo.status === 'active'}
                   onCheckedChange={(checked) => handleToggleStatus(geo.id, checked)}
                   className="data-[state=checked]:bg-green-500"
-                  aria-label={`${geo.name} â€” ${geo.status === 'active' ? s.active : s.inactive}`}
+                  aria-label={`${geo.name} - ${geo.status === 'active' ? s.active : s.inactive}`}
                 />
                 <span className={cn(
                   "text-xs font-semibold",

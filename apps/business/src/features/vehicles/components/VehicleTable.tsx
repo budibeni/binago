@@ -23,7 +23,7 @@ import {
 } from '@adatrack/ui';
 import type { Vehicle } from '../types/vehicle';
 
-// â”€â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€â"€ Types â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 interface VehicleTableLabels {
   colPlateNumber: string;
@@ -74,7 +74,7 @@ interface VehicleTableProps {
   className?: string;
 }
 
-// â”€â”€â”€ Status Badge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€â"€ Status Badge â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 function getStatusBadge(status: Vehicle['status'], labels: VehicleTableLabels) {
   const map = {
@@ -87,7 +87,7 @@ function getStatusBadge(status: Vehicle['status'], labels: VehicleTableLabels) {
   return <Badge variant={cfg.variant} dot>{cfg.label}</Badge>;
 }
 
-// â”€â”€â”€ Column Factory â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€â"€ Column Factory â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 function buildColumns(
   labels: VehicleTableLabels,
@@ -319,7 +319,7 @@ function buildColumns(
   ];
 }
 
-// â”€â”€â”€ Default Column Visibility â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€â"€ Default Column Visibility â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 const DEFAULT_COLUMN_VISIBILITY = {
   vehicleCategory: false,
@@ -331,7 +331,7 @@ const DEFAULT_COLUMN_VISIBILITY = {
   registrationExpiry: false,
 };
 
-// â”€â”€â”€ Component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€â"€ Component â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 export function VehicleTable({
   data,
@@ -397,7 +397,7 @@ export function VehicleTable({
     onPageSizeChange: (s) => { setPageSize(s); setPageIndex(0); },
   };
 
-  // Create the table instance directly â€” no injection tricks needed
+  // Create the table instance directly - no injection tricks needed
   const table = useDataTable<Vehicle>({
     data: processedData,
     columns,
@@ -414,7 +414,7 @@ export function VehicleTable({
 
   return (
     <div className={cn('flex flex-col gap-3', className)}>
-      {/* Toolbar â€” directly uses table instance, no injection needed */}
+      {/* Toolbar - directly uses table instance, no injection needed */}
       <DataTableToolbar
         table={table}
         searchValue={searchValue}
@@ -447,7 +447,7 @@ export function VehicleTable({
           </div>
         </div>
 
-        {/* Filter panel â€” full height */}
+        {/* Filter panel - full height */}
         {isFilterOpen && (
           <div className="w-full lg:w-[280px] shrink-0 self-stretch">
             <DataTableFilterPanel config={filterConfig} className="h-full" />

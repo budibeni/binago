@@ -1,4 +1,4 @@
-# ADATRACK â€” Task 01
+# ADATRACK - Task 01
 ## Foundation
 
 **Scope:** Frontend ADATRACK  

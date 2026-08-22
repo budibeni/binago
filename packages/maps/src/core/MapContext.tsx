@@ -67,7 +67,7 @@ export function useStyleLoadCallback(callback: (() => void) | null) {
   }, []);
 }
 
-// Hook publik dengan minimal API — tipe maplibre tidak diekspos ke layer aplikasi
+// Hook publik dengan minimal API - tipe maplibre tidak diekspos ke layer aplikasi
 export interface MapActions {
   panTo: (coordinates: { lat: number; lng: number }) => void;
   fitBounds: (bounds: [[number, number], [number, number]], options?: { padding?: number }) => void;

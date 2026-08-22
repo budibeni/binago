@@ -1,23 +1,23 @@
-// ─── Vehicle Status ─────────────────────────────────────────────────────────
+// --- Vehicle Status ---------------------------------------------------------
 
 export type VehicleStatus = 'driving' | 'idle' | 'parking' | 'offline';
 
-// ─── Vehicle Category ────────────────────────────────────────────────────────
+// --- Vehicle Category --------------------------------------------------------
 
 export type VehicleCategory = 'truck' | 'minibus' | 'pickup' | 'motorcycle' | 'other';
 
-// ─── Fuel Type ───────────────────────────────────────────────────────────────
+// --- Fuel Type ---------------------------------------------------------------
 
 export type FuelType = 'solar' | 'bensin' | 'listrik';
 
-// ─── Vehicle Group ───────────────────────────────────────────────────────────
+// --- Vehicle Group -----------------------------------------------------------
 
 export interface VehicleGroup {
   id: string;
   name: string;
 }
 
-// ─── Vehicle ─────────────────────────────────────────────────────────────────
+// --- Vehicle -----------------------------------------------------------------
 
 export interface Vehicle {
   id: string;
@@ -41,11 +41,11 @@ export interface Vehicle {
   notes?: string;
 }
 
-// ─── Status Filter ───────────────────────────────────────────────────────────
+// --- Status Filter -----------------------------------------------------------
 
 export type VehicleStatusFilter = 'all' | VehicleStatus;
 
-// ─── Table Filters ───────────────────────────────────────────────────────────
+// --- Table Filters -----------------------------------------------------------
 
 export interface VehicleFilters {
   search: string;

@@ -1,4 +1,4 @@
-# ADATRACK Personal â€” PERSONAL-02
+# ADATRACK Personal - PERSONAL-02
 
 ## Monitoring
 
@@ -24,8 +24,8 @@ Struktur utama:
 
 ```text
 Pemantauan
-â”œâ”€â”€ VehicleList
-â””â”€â”€ LiveMap
+â"œâ"€â"€ VehicleList
+â""â"€â"€ LiveMap
 ```
 
 Tidak membuat Playback atau Heatmap pada task ini.
@@ -98,21 +98,21 @@ Map menggunakan foundation `@adatrack/maps` jika sesuai.
 
 ```text
 Monitoring Page
-      â”‚
-      â”œâ”€â”€ vehicles
-      â”œâ”€â”€ selectedVehicleId
-      â”œâ”€â”€ filter
-      â””â”€â”€ search
-             â”‚
-             â†“
+      â"‚
+      â"œâ"€â"€ vehicles
+      â"œâ"€â"€ selectedVehicleId
+      â"œâ"€â"€ filter
+      â""â"€â"€ search
+             â"‚
+             â†"
         VehicleList
-             â”‚
+             â"‚
        onVehicleSelect()
-             â”‚
-             â†“
+             â"‚
+             â†"
         Monitoring Page
-             â”‚
-             â†“
+             â"‚
+             â†"
           LiveMap
 ```
 
@@ -134,9 +134,9 @@ Bottom Navigation
 Tablet/Desktop dapat menggunakan layout dua area:
 
 ```text
-â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-â”‚ Vehicle List â”‚      Live Map        â”‚
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+â"Œâ"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"¬â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"
+â"‚ Vehicle List â"‚      Live Map        â"‚
+â""â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"´â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"˜
 ```
 
 Composition final mengikuti hasil validasi UX.

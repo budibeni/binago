@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-// ─── Foundation Types ──────────────────────────────
+// --- Foundation Types ------------------------------
 export type Locale = 'id' | 'en';
 
 export interface BaseComponentProps {
@@ -10,7 +10,7 @@ export interface BaseComponentProps {
 
 export type AsyncStatus = 'idle' | 'loading' | 'success' | 'error';
 
-// ─── TASK-02 Shared Types ──────────────────────────
+// --- TASK-02 Shared Types --------------------------
 
 export type Size = 'sm' | 'md' | 'lg';
 
@@ -24,7 +24,7 @@ export type Variant =
 
 export type SemanticVariant = 'info' | 'success' | 'warning' | 'danger';
 
-// ─── DataTable Types ───────────────────────────────
+// --- DataTable Types -------------------------------
 
 export type DataTableMode = 'pagination' | 'infinite';
 
@@ -40,7 +40,7 @@ export interface FetchParams {
   columnFilters: Array<{ id: string; value: unknown }>;
 }
 
-// ─── TASK-03 App Shell Types ───────────────────────
+// --- TASK-03 App Shell Types -----------------------
 
 export interface NavItem {
   id: string;

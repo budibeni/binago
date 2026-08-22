@@ -19,7 +19,7 @@ export interface SearchLocationToolProps {
   locale?: Locale;
 }
 
-/** Mock result untuk development — tidak bergantung pada provider geocoding */
+/** Mock result untuk development - tidak bergantung pada provider geocoding */
 async function mockSearchAddress(query: string): Promise<LocationSearchResult[]> {
   await new Promise((r) => setTimeout(r, 400)); // simulasi latency
   const lower = query.toLowerCase();

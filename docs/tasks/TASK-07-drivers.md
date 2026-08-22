@@ -1,4 +1,4 @@
-# ADATRACK â€” Task 07
+# ADATRACK - Task 07
 ## Drivers
 
 **Scope:** Frontend ADATRACK  

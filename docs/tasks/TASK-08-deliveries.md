@@ -1,4 +1,4 @@
-# ADATRACK â€” Task 08
+# ADATRACK - Task 08
 ## Deliveries
 
 **Scope:** Frontend ADATRACK  

@@ -17,11 +17,11 @@ import { useBusinessLocale } from '../../components/BusinessShellLayout';
 import type { StatusFilter, DateRange, PlaybackState, TrackingView } from './types/tracking';
 import type { Locale } from '@adatrack/types';
 
-// â”€â”€â”€ Mode â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€â"€ Mode â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 type TrackingMode = 'live' | 'playback';
 
-// â”€â”€â”€ TrackingFeature â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€â"€ TrackingFeature â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 interface TrackingFeatureProps {
   locale?: Locale;
@@ -33,18 +33,18 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
   const t = getTranslation(locale);
   const tTracking = t.tracking;
 
-  // â”€â”€ Mode â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // â"€â"€ Mode â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
   const [mode, setMode] = React.useState<TrackingMode>('live');
   const [view, setView] = React.useState<TrackingView>('map');
 
-  // â”€â”€ VehicleList state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // â"€â"€ VehicleList state â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
   const [search, setSearch] = React.useState('');
   const [statusFilter, setStatusFilter] = React.useState<StatusFilter>('all');
   const [selectedVehicleId, setSelectedVehicleId] = React.useState<string | null>(null);
   const [selectedVehicleIds, setSelectedVehicleIds] = React.useState<string[]>(() => mockVehicles.map((v) => v.id));
   const [isVehicleListVisible, setIsVehicleListVisible] = React.useState(true);
 
-  // â”€â”€ Playback state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // â"€â"€ Playback state â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
   const [playbackVehicleId, setPlaybackVehicleId] = React.useState<string | null>(null);
   const [dateRange, setDateRange] = React.useState<DateRange>({
     startDate: new Date().toISOString().slice(0, 10),
@@ -61,7 +61,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
   const [playbackPointIndex, setPlaybackPointIndex] = React.useState(0);
   const [playbackSpeed, setPlaybackSpeed] = React.useState(1);
 
-  // ——— Timer ref ——————————————————————————————————————————————————————————————————————————————
+  // --- Timer ref ------------------------------------------------------------------------------
   const timerRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
   const playbackDataRef = React.useRef<MockPlaybackData | null>(null);
   const playbackSpeedRef = React.useRef(1);
@@ -70,7 +70,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
   React.useEffect(() => { playbackDataRef.current = playbackData; }, [playbackData]);
   React.useEffect(() => { playbackSpeedRef.current = playbackSpeed; }, [playbackSpeed]);
 
-  // ─── Computed ────────────────────────────────────────────────────────────────
+  // --- Computed ----------------------------------------------------------------
   const allVehiclesUnfiltered = React.useMemo(() => {
     const q = search.toLowerCase().trim();
     return mockVehicles.filter((v) => {
@@ -84,7 +84,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
     });
   }, [search, statusFilter]);
 
-  // ── Playback derived state ──────────────────────────────────────────────────
+  // -- Playback derived state --------------------------------------------------
   const playbackTrack = React.useMemo(() => {
     if (!playbackData) return undefined;
     return playbackData.points.map(p => ({ lat: p.lat, lng: p.lng }));
@@ -197,7 +197,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
     return () => stopTimer();
   }, [stopTimer]);
 
-  // ——— VehicleList handlers ——————————————————————————————————————————————————————————————————
+  // --- VehicleList handlers ------------------------------------------------------------------
 
   const handleVehicleSelect = React.useCallback((vehicleId: string) => {
     setSelectedVehicleId((prev) => (prev === vehicleId ? null : vehicleId));
@@ -217,7 +217,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
     setSelectedVehicleIds(checked ? mockVehicles.map((v) => v.id) : []);
   }, []);
 
-  // â”€â”€ Playback handlers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // â"€â"€ Playback handlers â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
   const handlePlaybackVehicleChange = React.useCallback((vehicleId: string) => {
     setPlaybackVehicleId(vehicleId);
@@ -295,7 +295,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
     }));
   }, []);
 
-  // â”€â”€ VehicleList labels â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // â"€â"€ VehicleList labels â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
   const vehicleListLabels = React.useMemo(() => ({
     title: tTracking.title,
     unitCount: tTracking.unitCount,
@@ -318,7 +318,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
     selectAllInGroup: (groupName: string) => `${tTracking.selectAll} - ${groupName}`,
   }), [tTracking]);
 
-  // â”€â”€ Render â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // â"€â"€ Render â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
   return (
     <div className="flex h-full w-full overflow-hidden bg-surface">
 

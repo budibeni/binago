@@ -1,6 +1,6 @@
 import type { Vehicle, VehicleGroup } from '../types/vehicle';
 
-// ─── Groups ──────────────────────────────────────────────────────────────────
+// --- Groups ------------------------------------------------------------------
 
 export const mockVehicleGroups: VehicleGroup[] = [
   { id: 'grp-001', name: 'Hino Dutro' },
@@ -8,10 +8,10 @@ export const mockVehicleGroups: VehicleGroup[] = [
   { id: 'grp-003', name: 'Mitsubishi Colt' },
 ];
 
-// ─── Vehicles ────────────────────────────────────────────────────────────────
+// --- Vehicles ----------------------------------------------------------------
 
 export const mockVehicles: Vehicle[] = [
-  // ── Hino Dutro ────────────────────────────────────────────────────────────
+  // -- Hino Dutro ------------------------------------------------------------
   {
     id: 'veh-001',
     plateNumber: 'B 9027 PU',
@@ -215,7 +215,7 @@ export const mockVehicles: Vehicle[] = [
     registrationExpiry: '2027-02-14',
   },
 
-  // ── Isuzu ELF ─────────────────────────────────────────────────────────────
+  // -- Isuzu ELF -------------------------------------------------------------
   {
     id: 'veh-011',
     plateNumber: 'B 9339 PYX',
@@ -337,7 +337,7 @@ export const mockVehicles: Vehicle[] = [
     registrationExpiry: '2028-07-25',
   },
 
-  // ── Mitsubishi Colt ───────────────────────────────────────────────────────
+  // -- Mitsubishi Colt -------------------------------------------------------
   {
     id: 'veh-017',
     plateNumber: 'B 7701 ZZA',
@@ -521,7 +521,7 @@ export const mockVehicles: Vehicle[] = [
   },
 ];
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+// --- Helpers -----------------------------------------------------------------
 
 export function filterVehicles(
   vehicles: Vehicle[],

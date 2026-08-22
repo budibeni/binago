@@ -2,11 +2,11 @@ import React from 'react';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Berbagi Lokasi — ADATRACK',
+  title: 'Berbagi Lokasi - ADATRACK',
 };
 
 /**
- * Public share layout — intentionally minimal.
+ * Public share layout - intentionally minimal.
  * Does NOT include PersonalShellLayout, navigation, or auth guards.
  * This route is publicly accessible without login.
  */

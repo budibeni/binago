@@ -35,7 +35,7 @@ interface VehiclePopupPanelProps {
   onShareLocation?: () => void;
 }
 
-// ─── Status config ─────────────────────────────────────────────────────────────
+// --- Status config -------------------------------------------------------------
 
 const STATUS_CONFIG = {
   driving: {
@@ -64,7 +64,7 @@ const STATUS_CONFIG = {
   },
 } as const;
 
-// ─── InfoRow ──────────────────────────────────────────────────────────────────
+// --- InfoRow ------------------------------------------------------------------
 
 function InfoRow({
   icon: Icon,
@@ -92,7 +92,7 @@ function InfoRow({
   );
 }
 
-// ─── VehiclePopupPanel ────────────────────────────────────────────────────────
+// --- VehiclePopupPanel --------------------------------------------------------
 
 export function VehiclePopupPanel({
   vehicle,
@@ -129,7 +129,7 @@ export function VehiclePopupPanel({
   return (
     <div className={cn('flex flex-col w-[420px] bg-background rounded-xl overflow-hidden shadow-2xl ring-1 ring-border', className)}>
 
-      {/* ── Header ─────────────────────────────────────────────────────────── */}
+      {/* -- Header ----------------------------------------------------------- */}
       <div className="flex items-center gap-2 px-3 py-1.5 border-b border-border bg-background shrink-0">
 
         {/* Vehicle Icon */}
@@ -170,10 +170,10 @@ export function VehiclePopupPanel({
         </button>
       </div>
 
-      {/* ── Body — 3-column grid ───────────────────────────────────────────── */}
+      {/* -- Body - 3-column grid --------------------------------------------- */}
       <div className="grid grid-cols-3 divide-x divide-border overflow-hidden">
 
-        {/* ── Col 1: Driver, Speed, ACC, Alarm ─────────────────────── */}
+        {/* -- Col 1: Driver, Speed, ACC, Alarm ----------------------- */}
         <div className="flex flex-col gap-2 px-2.5 py-2 overflow-hidden">
           <InfoRow
             icon={User}
@@ -202,7 +202,7 @@ export function VehiclePopupPanel({
           />
         </div>
 
-        {/* ── Col 2: Address, Geofence Location, Geofence Area ─────── */}
+        {/* -- Col 2: Address, Geofence Location, Geofence Area ------- */}
         <div className="flex flex-col gap-2 px-2.5 py-2 overflow-hidden">
           <InfoRow
             icon={MapPin}
@@ -225,7 +225,7 @@ export function VehiclePopupPanel({
           />
         </div>
 
-        {/* ── Col 3: Coordinates, GPS SN, Last Update ───────────────── */}
+        {/* -- Col 3: Coordinates, GPS SN, Last Update ----------------- */}
         <div className="flex flex-col gap-2 px-2.5 py-2 overflow-hidden">
           <InfoRow
             icon={Crosshair}
@@ -245,7 +245,7 @@ export function VehiclePopupPanel({
         </div>
       </div>
 
-      {/* ── Footer ─────────────────────────────────────────────────────────── */}
+      {/* -- Footer ----------------------------------------------------------- */}
       <div className="flex items-center gap-2 px-3 py-2 border-t border-border bg-background">
         <Button
           type="button"

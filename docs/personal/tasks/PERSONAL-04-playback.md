@@ -1,4 +1,4 @@
-# ADATRACK Personal â€” PERSONAL-04
+# ADATRACK Personal - PERSONAL-04
 
 ## Playback
 
@@ -16,11 +16,11 @@ Flow:
 
 ```text
 Vehicle Detail
-    â†“
+    â†"
 Riwayat Perjalanan
-    â†“
+    â†"
 Pilih Perjalanan
-    â†“
+    â†"
 Playback
 ```
 

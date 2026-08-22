@@ -6,7 +6,7 @@ import { BusinessShellLayout } from '../components/BusinessShellLayout';
 
 export const metadata: Metadata = {
   title: 'ADATRACK Business',
-  description: 'ADATRACK Business â€” Platform Manajemen Armada dan Logistik',
+  description: 'ADATRACK Business - Platform Manajemen Armada dan Logistik',
 };
 
 export default function RootLayout({

@@ -103,7 +103,7 @@ export function VehicleList({
               const isMapVisible = !hiddenVehicleIds.has(vehicle.id);
               const statusDisplay = getStatusDisplay(vehicle.status);
               
-              const speedText = (isMapVisible && vehicle.status !== 'offline') ? `${vehicle.speed || 0} ${t.tracking.speedUnit}` : '—';
+              const speedText = (isMapVisible && vehicle.status !== 'offline') ? `${vehicle.speed || 0} ${t.tracking.speedUnit}` : '-';
               const nameClass = isMapVisible ? 'text-foreground' : 'text-neutral-400';
               const plateClass = isMapVisible ? 'text-foreground-muted' : 'text-neutral-400/70';
               const statusText = isMapVisible ? statusDisplay.text : (t.tracking?.hidden || 'Disembunyikan');

@@ -1,4 +1,4 @@
-# ADATRACK â€” Task 13
+# ADATRACK - Task 13
 ## Administration
 
 **Scope:** Frontend ADATRACK  

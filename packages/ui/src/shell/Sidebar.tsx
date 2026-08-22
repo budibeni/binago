@@ -115,7 +115,7 @@ export function Sidebar({
 
   const sidebarContent = (
     <div className="flex h-full flex-col">
-      {/* â”€â”€ Brand Header â”€â”€ */}
+      {/* â"€â"€ Brand Header â"€â"€ */}
       <div
         className={cn(
           'relative flex h-[52px] shrink-0 items-center border-b border-border',
@@ -169,7 +169,7 @@ export function Sidebar({
         )}
       </div>
 
-      {/* â”€â”€ Navigation (scrollable) â”€â”€ */}
+      {/* â"€â"€ Navigation (scrollable) â"€â"€ */}
       <nav
         className="flex-1 min-h-0 overflow-y-auto py-3 px-2.5 space-y-3"
         aria-label="Navigasi utama"
@@ -186,7 +186,7 @@ export function Sidebar({
         ))}
       </nav>
 
-      {/* ── Footer (fixed, not scrollable) ── */}
+      {/* -- Footer (fixed, not scrollable) -- */}
       {bottomNavigation.length > 0 && (
         <div className="shrink-0 flex flex-col justify-center border-t border-border h-[38px]">
           <div className="px-2.5">

@@ -93,7 +93,7 @@ export function AppShell({
           rightSlot={headerRightSlot}
         />
 
-        {/* Content Area â€” pages control their own padding/max-width */}
+        {/* Content Area - pages control their own padding/max-width */}
         <main className="flex-1 overflow-y-auto bg-surface">
           {children}
         </main>

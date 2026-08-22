@@ -261,7 +261,7 @@ const hinoDutroVehicles: TrackingVehicle[] = [
 ];
 
 
-// ─── Dummy Vehicles — Group: Toyota Hiace ─────────────────────────────────────
+// --- Dummy Vehicles - Group: Toyota Hiace -------------------------------------
 
 const toyotaHiaceVehicles: TrackingVehicle[] = [
   {
@@ -402,7 +402,7 @@ const toyotaHiaceVehicles: TrackingVehicle[] = [
   },
 ];
 
-// ─── Groups ────────────────────────────────────────────────────────────────────
+// --- Groups --------------------------------------------------------------------
 
 
 export const mockVehicleGroups: TrackingVehicleGroup[] = [
@@ -418,14 +418,14 @@ export const mockVehicleGroups: TrackingVehicleGroup[] = [
   },
 ];
 
-// ─── Flat vehicle list (all vehicles) ─────────────────────────────────────────
+// --- Flat vehicle list (all vehicles) -----------------------------------------
 
 export const mockVehicles: TrackingVehicle[] = [
   ...hinoDutroVehicles,
   ...toyotaHiaceVehicles,
 ];
 
-// ─── Date helpers ─────────────────────────────────────────────────────────────
+// --- Date helpers -------------------------------------------------------------
 
 const _today = new Date();
 const _getLocalDate = (d: Date) => {
@@ -439,10 +439,10 @@ const _dateToday = _getLocalDate(_today);
 const _dateYesterday = _getLocalDate(new Date(_today.getTime() - 24 * 60 * 60 * 1000));
 const _date2DaysAgo = _getLocalDate(new Date(_today.getTime() - 2 * 24 * 60 * 60 * 1000));
 
-// ─── Mock Trips by Vehicle ID ──────────────────────────────────────────────────
+// --- Mock Trips by Vehicle ID --------------------------------------------------
 
 export const mockTripsByVehicleId: Record<string, Trip[]> = {
-  // ─ veh-001 (B 9027 PU — Alwi — Hino Dutro)
+  // - veh-001 (B 9027 PU - Alwi - Hino Dutro)
   'veh-001': [
     {
       id: 'trip-001-1',
@@ -498,7 +498,7 @@ export const mockTripsByVehicleId: Record<string, Trip[]> = {
     },
   ],
 
-  // ─ veh-002 (B 9329 PYX — Yudi — Hino Dutro)
+  // - veh-002 (B 9329 PYX - Yudi - Hino Dutro)
   'veh-002': [
     {
       id: 'trip-002-1',
@@ -528,7 +528,7 @@ export const mockTripsByVehicleId: Record<string, Trip[]> = {
     },
   ],
 
-  // ─ veh-003 (B 9330 PYX — Agus) — sedang driving, belum ada trip hari ini selesai
+  // - veh-003 (B 9330 PYX - Agus) - sedang driving, belum ada trip hari ini selesai
   'veh-003': [
     {
       id: 'trip-003-1',
@@ -545,7 +545,7 @@ export const mockTripsByVehicleId: Record<string, Trip[]> = {
     },
   ],
 
-  // ─ veh-101 (B 1201 KJA — Lukman — Toyota Hiace)
+  // - veh-101 (B 1201 KJA - Lukman - Toyota Hiace)
   'veh-101': [
     {
       id: 'trip-101-1',
@@ -575,7 +575,7 @@ export const mockTripsByVehicleId: Record<string, Trip[]> = {
     },
   ],
 
-  // ─ veh-102, 103, 104, 105 — kosong (vehicle terbatas trip-nya)
+  // - veh-102, 103, 104, 105 - kosong (vehicle terbatas trip-nya)
   'veh-102': [],
   'veh-103': [],
   'veh-104': [],
@@ -597,7 +597,7 @@ export const mockTripsByVehicleId: Record<string, Trip[]> = {
   ],
 };
 
-// ─── Helper: generate dummy playback points ────────────────────────────────────
+// --- Helper: generate dummy playback points ------------------------------------
 
 function generateDummyPoints(
   startLat: number,
@@ -633,7 +633,7 @@ function generateDummyPoints(
       lat,
       lng,
       timestamp: new Date(baseTime.getTime() + timeStep * i).toISOString(),
-      speed: Math.floor(25 + Math.random() * 45), // 25–70 km/h
+      speed: Math.floor(25 + Math.random() * 45), // 25-70 km/h
       heading: Math.round(heading),
     });
   }
@@ -641,7 +641,7 @@ function generateDummyPoints(
   return points;
 }
 
-// ─── Mock Playback Data ────────────────────────────────────────────────────────
+// --- Mock Playback Data --------------------------------------------------------
 
 export const mockPlaybackData: PlaybackData[] = [
   // veh-001 trips
@@ -755,26 +755,26 @@ export const mockPlaybackData: PlaybackData[] = [
   },
 ];
 
-// ─── Predefined Waypoints Routes per Vehicle ────────────────────────────────────
+// --- Predefined Waypoints Routes per Vehicle ------------------------------------
 // Each route is a realistic road journey in Jakarta.
 // The generator interpolates between waypoints to create smooth GPS tracks.
 
 interface Waypoint { lat: number; lng: number; speedKph: number; address?: string; }
 
 const VEHICLE_ROUTES: Record<string, Waypoint[]> = {
-  // B 9027 PU — Bandung → Jawilan, Kab. Serang, Banten
+  // B 9027 PU - Bandung → Jawilan, Kab. Serang, Banten
   // Rute: Kota Bandung → GT Pasteur → Tol Cipularang → Cikampek →
   //        Tol Jakarta-Merak → Serang Timur → Jawilan (~210 km)
   'veh-001': [
     { lat: -6.9175, lng: 107.6191, speedKph: 0,   address: 'Jl. Soekarno-Hatta No.1, Pasteur, Kec. Sukajadi, Kota Bandung, Jawa Barat, 40161' }, // [00] Gudang Bandung
-    { lat: -6.9050, lng: 107.5950, speedKph: 20  }, // [01] Jl. Pasteur — Keluar Pool
+    { lat: -6.9050, lng: 107.5950, speedKph: 20  }, // [01] Jl. Pasteur - Keluar Pool
     { lat: -6.8960, lng: 107.5640, speedKph: 35  }, // [02] Gerbang Tol Pasteur
     { lat: -6.8700, lng: 107.5200, speedKph: 70  }, // [03] Tol Padalarang
-    { lat: -6.8480, lng: 107.4800, speedKph: 85  }, // [04] Padalarang — Tol Cipularang awal
+    { lat: -6.8480, lng: 107.4800, speedKph: 85  }, // [04] Padalarang - Tol Cipularang awal
     { lat: -6.8100, lng: 107.4500, speedKph: 90  }, // [05] Cianjur junction (km 55)
     { lat: -6.7500, lng: 107.4200, speedKph: 95  }, // [06] Tol Cipularang (km 75)
     { lat: -6.7000, lng: 107.4000, speedKph: 100 }, // [07] Tol Cipularang (km 90)
-    { lat: -6.6500, lng: 107.3950, speedKph: 0,   address: 'Rest Area KM 97 Tol Cipularang, Purwakarta, Jawa Barat, 41181' }, // [08] Rest area km 97 — PARKIR
+    { lat: -6.6500, lng: 107.3950, speedKph: 0,   address: 'Rest Area KM 97 Tol Cipularang, Purwakarta, Jawa Barat, 41181' }, // [08] Rest area km 97 - PARKIR
     { lat: -6.6500, lng: 107.3950, speedKph: 0   }, // [08b] Parkir lanjutan
     { lat: -6.6200, lng: 107.3900, speedKph: 100 }, // [09] Tol Cipularang (km 105)
     { lat: -6.5500, lng: 107.3800, speedKph: 95  }, // [10] Sadang
@@ -790,11 +790,11 @@ const VEHICLE_ROUTES: Record<string, Waypoint[]> = {
     { lat: -6.2100, lng: 106.5500, speedKph: 90  }, // [20] GT Cikupa
     { lat: -6.1900, lng: 106.4200, speedKph: 85  }, // [21] Balaraja
     { lat: -6.1650, lng: 106.3000, speedKph: 80  }, // [22] Kramasan / Serang Timur
-    { lat: -6.1300, lng: 106.2000, speedKph: 70  }, // [23] GT Serang Timur — Keluar tol
+    { lat: -6.1300, lng: 106.2000, speedKph: 70  }, // [23] GT Serang Timur - Keluar tol
     { lat: -6.1200, lng: 106.1600, speedKph: 45  }, // [24] Kota Serang
     { lat: -6.1400, lng: 106.1300, speedKph: 35  }, // [25] Menuju Jawilan
     { lat: -6.1600, lng: 106.1100, speedKph: 20  }, // [26] Masuk Kec. Jawilan
-    { lat: -6.1800, lng: 106.1000, speedKph: 0,   address: 'Jl. Raya Jawilan, Kec. Jawilan, Kab. Serang, Banten, 42177' }, // [27] Jawilan — Tujuan Akhir
+    { lat: -6.1800, lng: 106.1000, speedKph: 0,   address: 'Jl. Raya Jawilan, Kec. Jawilan, Kab. Serang, Banten, 42177' }, // [27] Jawilan - Tujuan Akhir
   ],
   'veh-002': [
     { lat: -6.2000, lng: 106.7900, speedKph: 0 },

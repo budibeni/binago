@@ -5,7 +5,7 @@ import { BasemapId } from './types';
  *
  * Berisi label UI, informasi provider, attribution, dan usage policy untuk setiap basemap.
  *
- * PENTING — Usage Policy:
+ * PENTING - Usage Policy:
  * - Standard (CartoDB Positron): Free/public development provider. License CC BY 3.0.
  *   Attribution wajib ditampilkan.
  * - OpenStreetMap: Free/public development provider.
@@ -114,7 +114,7 @@ const ESRI_SATELLITE_TILE_URL =
   'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
 
 /**
- * getBasemapStyle — resolve MapLibre style untuk basemap yang dipilih.
+ * getBasemapStyle - resolve MapLibre style untuk basemap yang dipilih.
  *
  * Standard: vector style URL string (CartoDB Positron)
  * OSM: raster tile style object
@@ -150,5 +150,5 @@ export const BASEMAP_STYLES: Record<BasemapId, string | object> = {
   satellite: getBasemapStyle('satellite'),
 };
 
-// Legacy — tetap tersedia untuk backward compatibility
+// Legacy - tetap tersedia untuk backward compatibility
 export const BASEMAP_PROVIDERS = BASEMAP_METADATA;

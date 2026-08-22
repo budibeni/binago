@@ -82,7 +82,7 @@ export function ShareLocationDialog({ vehicle, open, onOpenChange }: ShareLocati
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `${vehicle.type} — ADATRACK`,
+          title: `${vehicle.type} - ADATRACK`,
           text: ls.sharedBy,
           url: shareUrl,
         });

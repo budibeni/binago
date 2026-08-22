@@ -1,4 +1,4 @@
-# ADATRACK â€” Task 04
+# ADATRACK - Task 04
 ## Home
 
 **Scope:** Frontend ADATRACK  

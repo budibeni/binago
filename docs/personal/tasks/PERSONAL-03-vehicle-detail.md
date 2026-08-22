@@ -1,4 +1,4 @@
-# ADATRACK Personal â€” PERSONAL-03
+# ADATRACK Personal - PERSONAL-03
 
 ## Vehicle Detail & Trip History
 
@@ -16,11 +16,11 @@ Flow:
 
 ```text
 Pemantauan
-    â†“
+    â†"
 Pilih Kendaraan
-    â†“
+    â†"
 Vehicle Detail
-    â†“
+    â†"
 Riwayat Perjalanan
 ```
 
@@ -74,9 +74,9 @@ Contoh:
 
 ```text
 Riwayat Perjalanan
-      â†“
+      â†"
 Pilih Perjalanan
-      â†“
+      â†"
 Playback
 ```
 

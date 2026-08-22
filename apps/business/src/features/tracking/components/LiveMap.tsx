@@ -19,7 +19,7 @@ import { useBusinessLocale } from '@/components/BusinessShellLayout';
 
 import { Truck, Bus } from 'lucide-react';
 
-// ─── LiveMap Props ─────────────────────────────────────────────────────────────
+// --- LiveMap Props -------------------------------------------------------------
 
 export interface LiveMapProps {
   vehicles: TrackingVehicle[];
@@ -31,7 +31,7 @@ export interface LiveMapProps {
   playbackParkingEvents?: { lat: number; lng: number }[];
 }
 
-// ─── Mock geofence data ────────────────────────────────────────────────────────
+// --- Mock geofence data --------------------------------------------------------
 
 const MOCK_GEOFENCES: MapGeofenceOption[] = [
   { id: 'g-b-001', label: 'Geofence Gudang Utama' },
@@ -40,7 +40,7 @@ const MOCK_GEOFENCES: MapGeofenceOption[] = [
   { id: 'g-b-004', label: 'Geofence Pool Kendaraan Slipi' },
 ];
 
-// ─── Mock geofence check ───────────────────────────────────────────────────────
+// --- Mock geofence check -------------------------------------------------------
 
 async function mockCheckEntityGeofence(req: GeofenceCheckRequest): Promise<GeofenceCheckResult> {
   await new Promise((r) => setTimeout(r, 800));
@@ -54,7 +54,7 @@ async function mockCheckEntityGeofence(req: GeofenceCheckRequest): Promise<Geofe
   };
 }
 
-// ─── Status helpers ────────────────────────────────────────────────────────────
+// --- Status helpers ------------------------------------------------------------
 
 const STATUS_DOT: Record<TrackingVehicle['status'], string> = {
   driving: 'bg-success',
@@ -70,7 +70,7 @@ const STATUS_LABEL: Record<TrackingVehicle['status'], string> = {
   offline: 'Offline',
 };
 
-// ─── LiveMap ───────────────────────────────────────────────────────────────────
+// --- LiveMap -------------------------------------------------------------------
 
 export function LiveMap({ vehicles, selectedVehicleId, visibleVehicleIds = [], onPlaybackRequest, playbackTrack, playbackPassedTrack, playbackParkingEvents }: LiveMapProps) {
   const locale = useBusinessLocale();

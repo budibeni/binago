@@ -6,7 +6,7 @@ import { PersonalShellLayout } from '../components/PersonalShellLayout';
 
 export const metadata: Metadata = {
   title: 'ADATRACK Personal',
-  description: 'ADATRACK Personal â€” Aplikasi Pelacakan Kendaraan Pribadi',
+  description: 'ADATRACK Personal - Aplikasi Pelacakan Kendaraan Pribadi',
 };
 
 export default function RootLayout({

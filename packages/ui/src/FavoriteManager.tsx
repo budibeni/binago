@@ -6,7 +6,7 @@ import { Dialog } from './Dialog';
 import { Checkbox } from './Checkbox';
 import { Button } from './Button';
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// --- Types --------------------------------------------------------------------
 
 export interface FavoriteItem {
   id: string;
@@ -15,10 +15,10 @@ export interface FavoriteItem {
   icon?: React.ElementType;
 }
 
-// ─── FavoriteSectionHeader ────────────────────────────────────────────────────
+// --- FavoriteSectionHeader ----------------------------------------------------
 // Generic header for the "Favorites" section.
 // Renders title, subtitle, and ONE action button ("+ Tambah Shortcut").
-// Completely domain-agnostic — all text and handlers passed via props.
+// Completely domain-agnostic - all text and handlers passed via props.
 
 export interface FavoriteSectionHeaderProps {
   title: string;
@@ -64,7 +64,7 @@ export function FavoriteSectionHeader({
   );
 }
 
-// ─── FavoriteEmptyState ───────────────────────────────────────────────────────
+// --- FavoriteEmptyState -------------------------------------------------------
 // Shown when the favorites list is empty.
 // Displays a centered card with title, description, and a CTA button.
 
@@ -114,7 +114,7 @@ export function FavoriteEmptyState({
   );
 }
 
-// ─── FavoriteManager ──────────────────────────────────────────────────────────
+// --- FavoriteManager ----------------------------------------------------------
 // Generic dialog for managing favorite selections via checkboxes.
 // Domain-agnostic: no knowledge of Business/Personal/localStorage/routes.
 

@@ -1,4 +1,4 @@
-# ADATRACK â€” UI Guidelines
+# ADATRACK - UI Guidelines
 
 ## 1. Karakter Visual
 
@@ -16,9 +16,9 @@ Gunakan struktur:
 
 ```text
 Application Shell
-â”œâ”€â”€ Sidebar
-â”œâ”€â”€ Header
-â””â”€â”€ Content Area
+â"œâ"€â"€ Sidebar
+â"œâ"€â"€ Header
+â""â"€â"€ Content Area
 ```
 
 Detail layout ditentukan pada Task Application Shell.

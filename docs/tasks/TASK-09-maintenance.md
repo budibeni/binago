@@ -1,4 +1,4 @@
-# ADATRACK â€” Task 09
+# ADATRACK - Task 09
 ## Maintenance
 
 **Scope:** Frontend ADATRACK  

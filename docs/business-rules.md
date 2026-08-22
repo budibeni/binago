@@ -1,4 +1,4 @@
-# ADATRACK â€” Business Rules
+# ADATRACK - Business Rules
 
 ## 1. Prinsip
 

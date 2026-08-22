@@ -1,4 +1,4 @@
-# ADATRACK â€” Design System
+# ADATRACK - Design System
 
 ## 1. Tujuan
 

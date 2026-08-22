@@ -36,7 +36,7 @@ export interface MapToolbarProps {
   onFitSelected?: () => void;
   onResetNorth?: () => void;
   /**
-   * Ref ke elemen container map — digunakan untuk Fullscreen API.
+   * Ref ke elemen container map - digunakan untuk Fullscreen API.
    * Jika tidak disediakan, fallback ke document.documentElement.
    */
   mapContainerRef?: React.RefObject<HTMLElement>;
@@ -78,7 +78,7 @@ export function MapToolbar({
     measure: t.measure,
   };
 
-  // ——— Fullscreen ———
+  // --- Fullscreen ---
   useEffect(() => {
     const handleFsChange = () => {
       setIsFullscreen(!!document.fullscreenElement);
@@ -96,12 +96,12 @@ export function MapToolbar({
     }
   }, [mapContainerRef]);
 
-  // ——— Tool toggle — only one active at a time ———
+  // --- Tool toggle - only one active at a time ---
   const toggleTool = (id: ToolId) => {
     setActiveTool((prev) => (prev === id ? null : id));
   };
 
-  // ——— Close panel on Escape ———
+  // --- Close panel on Escape ---
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setActiveTool(null);
@@ -110,7 +110,7 @@ export function MapToolbar({
     return () => document.removeEventListener('keydown', handleKey);
   }, []);
 
-  // ——— Close panel when clicking outside ———
+  // --- Close panel when clicking outside ---
   useEffect(() => {
     if (!activeTool) return;
     // Pengecualian: Tool ukur jarak berinteraksi langsung dengan peta, jangan ditutup saat klik di luar
@@ -127,7 +127,7 @@ export function MapToolbar({
 
   return (
     <div ref={toolbarRef} className={cn('relative inline-flex flex-col items-end', className)}>
-      {/* ——— Toolbar bar ——— */}
+      {/* --- Toolbar bar --- */}
       <div className="inline-flex items-center gap-0.5 bg-background rounded-xl border border-border shadow-lg p-1">
         {/* Fit Selected */}
         <ToolButton
@@ -190,11 +190,11 @@ export function MapToolbar({
         {/* Separator */}
         <div className="w-px h-5 bg-border mx-1" />
 
-        {/* BasemapSwitcher — always visible */}
+        {/* BasemapSwitcher - always visible */}
         <BasemapSwitcher value={basemap} onChange={onBasemapChange} compact={true} locale={locale} />
       </div>
 
-      {/* ——— Tool Panels ——— */}
+      {/* --- Tool Panels --- */}
       {activeTool && (
         <div className="absolute top-full right-0 mt-2 z-[70]">
           <ToolPanel
@@ -228,7 +228,7 @@ export function MapToolbar({
   );
 }
 
-// ——— ToolButton ———
+// --- ToolButton ---
 interface ToolButtonProps {
   id: string;
   icon: React.FC<{ className?: string }>;
@@ -258,7 +258,7 @@ function ToolButton({ id, icon: Icon, label, onClick, active }: ToolButtonProps)
   );
 }
 
-// ——— ToolPanel ———
+// --- ToolPanel ---
 interface ToolPanelProps {
   title: string;
   onClose: () => void;

@@ -1,4 +1,4 @@
-# ADATRACK â€” Architecture
+# ADATRACK - Architecture
 
 ## 1. Prinsip
 
@@ -10,8 +10,8 @@ Jangan membuat abstraction sebelum ada kebutuhan.
 
 ```text
 ADATRACK Platform
-â”œâ”€â”€ Business
-â””â”€â”€ Personal
+â"œâ"€â"€ Business
+â""â"€â"€ Personal
 ```
 
 Application Business dan Personal terpisah.
@@ -22,16 +22,16 @@ Target struktur:
 
 ```text
 apps/
-â”œâ”€â”€ business/
-â””â”€â”€ personal/
+â"œâ"€â"€ business/
+â""â"€â"€ personal/
 
 packages/
-â”œâ”€â”€ ui/
-â”œâ”€â”€ design-system/
-â”œâ”€â”€ maps/
-â”œâ”€â”€ icons/
-â”œâ”€â”€ utils/
-â””â”€â”€ types/
+â"œâ"€â"€ ui/
+â"œâ"€â"€ design-system/
+â"œâ"€â"€ maps/
+â"œâ"€â"€ icons/
+â"œâ"€â"€ utils/
+â""â"€â"€ types/
 ```
 
 ## 4. Frontend Boundary
@@ -40,9 +40,9 @@ Saat ini:
 
 ```text
 UI
-â†“
+â†"
 Feature Logic
-â†“
+â†"
 Dummy / Mock Data
 ```
 

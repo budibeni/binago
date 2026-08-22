@@ -34,7 +34,7 @@ export function MapInfoTool({ basemap, className, locale = 'id' }: MapInfoToolPr
     return () => { map.off('move', handleMove); };
   }, [map]);
 
-  // Track cursor coordinates (internal — not exposed as public API)
+  // Track cursor coordinates (internal - not exposed as public API)
   useEffect(() => {
     if (!map) return;
     const handleMouseMove = (e: maplibregl.MapMouseEvent) => {

@@ -1,4 +1,4 @@
-# ADATRACK Personal â€” PERSONAL-06
+# ADATRACK Personal - PERSONAL-06
 
 ## Settings
 
@@ -26,11 +26,11 @@ Menu:
 
 ```text
 Pengaturan
-â”œâ”€â”€ Kendaraan Saya
-â”œâ”€â”€ Perangkat GPS
-â”œâ”€â”€ Akun
-â”œâ”€â”€ Bantuan
-â””â”€â”€ Tentang Aplikasi
+â"œâ"€â"€ Kendaraan Saya
+â"œâ"€â"€ Perangkat GPS
+â"œâ"€â"€ Akun
+â"œâ"€â"€ Bantuan
+â""â"€â"€ Tentang Aplikasi
 ```
 
 Notifikasi dan Geofence memiliki task khusus dan tidak diimplementasikan sebagai feature penuh pada task ini.

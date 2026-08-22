@@ -39,7 +39,7 @@ export function DataTableSearch({
   disabled = false,
   className,
 }: DataTableSearchProps) {
-  // Local state untuk debounce â€” menghindari trigger server-side fetch tiap keystroke
+  // Local state untuk debounce - menghindari trigger server-side fetch tiap keystroke
   const [localValue, setLocalValue] = React.useState(value);
 
   // Sync local state jika value prop berubah dari luar (controlled reset)

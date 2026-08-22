@@ -1,4 +1,4 @@
-# ADATRACK â€” Task 11
+# ADATRACK - Task 11
 ## Geofences
 
 **Scope:** Frontend ADATRACK  

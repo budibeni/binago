@@ -83,9 +83,9 @@ interface ResolvedData {
 // resolveToken is kept here for future backend integration
 // where token resolution will happen server-side
 
-// ──────────────────────────────────────────────────
+// --------------------------------------------------
 // Sub-components
-// ──────────────────────────────────────────────────
+// --------------------------------------------------
 
 function InactiveState({ reason }: { reason: 'expired' | 'revoked' | 'not_found' }) {
   const msg =
@@ -232,9 +232,9 @@ function LiveTrackingView({ data }: { data: ResolvedData }) {
   );
 }
 
-// ──────────────────────────────────────────────────
+// --------------------------------------------------
 // Main export
-// ──────────────────────────────────────────────────
+// --------------------------------------------------
 
 interface PublicLocationPageProps {
   token: string;

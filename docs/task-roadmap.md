@@ -1,4 +1,4 @@
-# ADATRACK â€” Task Roadmap
+# ADATRACK - Task Roadmap
 
 ## Frontend Roadmap
 
@@ -25,29 +25,29 @@
 
 ```text
 TASK-01 Foundation
-        â†“
+        â†"
 TASK-02 Design System
-        â†“
+        â†"
 TASK-03 Application Shell
-        â†“
+        â†"
 TASK-04 Home
-        â†“
+        â†"
 TASK-05 Tracking
-        â†“
+        â†"
 TASK-06 Vehicles
-        â†“
+        â†"
 TASK-07 Drivers
-        â†“
+        â†"
 TASK-08 Deliveries
-        â†“
+        â†"
 TASK-09 Maintenance
-        â†“
+        â†"
 TASK-10 Devices
-        â†“
+        â†"
 TASK-11 Geofences
-        â†“
+        â†"
 TASK-12 Reports
-        â†“
+        â†"
 TASK-13 Administration
-        â†“
+        â†"
 TASK-14 Production Readiness

@@ -38,7 +38,7 @@ export const mockShareSessions: ShareSession[] = [
   },
 ];
 
-/** Generate a mock random token (frontend mock only — not cryptographic) */
+/** Generate a mock random token (frontend mock only - not cryptographic) */
 export function generateMockToken(): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   return Array.from({ length: 20 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');

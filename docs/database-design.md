@@ -1,4 +1,4 @@
-# ADATRACK â€” Database Design
+# ADATRACK - Database Design
 
 ## Status
 

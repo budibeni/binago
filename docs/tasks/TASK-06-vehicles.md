@@ -1,4 +1,4 @@
-# ADATRACK â€” Task 06
+# ADATRACK - Task 06
 ## Vehicles
 
 **Scope:** Frontend ADATRACK  

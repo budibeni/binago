@@ -8,7 +8,7 @@ import type { TrackingVehicle } from '../types/tracking';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
 import { getTranslation } from '@/i18n';
 
-// ─── Types ─────────────────────────────────────────────────────────────────────
+// --- Types ---------------------------------------------------------------------
 
 export interface ParkingEvent {
   lat: number;
@@ -28,7 +28,7 @@ export interface PlaybackMapProps {
   playbackParkingEvents?: ParkingEvent[];
 }
 
-// ─── Inner: auto-fit bounds when track loads ───────────────────────────────────
+// --- Inner: auto-fit bounds when track loads -----------------------------------
 
 function PlaybackFitBounds({ track }: { track?: { lat: number; lng: number }[] }) {
   const mapActions = useMapActions();
@@ -59,7 +59,7 @@ function PlaybackFitBounds({ track }: { track?: { lat: number; lng: number }[] }
   return null;
 }
 
-// ─── Helpers ───────────────────────────────────────────────────────────────────
+// --- Helpers -------------------------------------------------------------------
 
 function formatDuration(secs: number): string {
   const h = Math.floor(secs / 3600);
@@ -80,7 +80,7 @@ function formatTimestamp(iso: string): string {
   }
 }
 
-// ─── InfoRow ──────────────────────────────────────────────────────────────────
+// --- InfoRow ------------------------------------------------------------------
 
 function InfoRow({
   icon: Icon,
@@ -108,7 +108,7 @@ function InfoRow({
   );
 }
 
-// ─── Parking Marker with Popup ─────────────────────────────────────────────────
+// --- Parking Marker with Popup -------------------------------------------------
 
 function ParkingMarkerWithPopup({ 
   event, 
@@ -160,7 +160,7 @@ function ParkingMarkerWithPopup({
             className="flex flex-col bg-background rounded-xl overflow-hidden shadow-2xl ring-1 ring-border"
             style={{ width: '260px' }}
           >
-            {/* ── Header ── */}
+            {/* -- Header -- */}
             <div className="flex items-center gap-2.5 px-3 py-2 border-b border-border bg-background shrink-0">
               {/* Icon */}
               <div className="flex items-center justify-center shrink-0 drop-shadow-sm">
@@ -194,7 +194,7 @@ function ParkingMarkerWithPopup({
               </button>
             </div>
 
-            {/* ── Body ── */}
+            {/* -- Body -- */}
             <div className="px-3 py-3 flex flex-col gap-3">
               <div className="grid grid-cols-2 gap-x-4 gap-y-3">
                 <InfoRow icon={Clock} label={tTracking.playbackTime} value={formatTimestamp(event.startTimestamp)} />
@@ -221,7 +221,7 @@ function ParkingMarkerWithPopup({
               />
             </div>
 
-            {/* ── Footer ── */}
+            {/* -- Footer -- */}
             <div className="px-3 pb-3 flex justify-end">
               <a
                 href={googleMapsUrl}
@@ -241,7 +241,7 @@ function ParkingMarkerWithPopup({
   );
 }
 
-// ─── PlaybackMap ───────────────────────────────────────────────────────────────
+// --- PlaybackMap ---------------------------------------------------------------
 
 export function PlaybackMap({
   vehicle,

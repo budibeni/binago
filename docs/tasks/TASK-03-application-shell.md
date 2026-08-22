@@ -1,4 +1,4 @@
-# ADATRACK â€” Task 03
+# ADATRACK - Task 03
 ## Application Shell
 
 **Scope:** Frontend ADATRACK  

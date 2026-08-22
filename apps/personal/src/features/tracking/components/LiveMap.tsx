@@ -23,7 +23,7 @@ export interface LiveMapProps {
   visibleVehicleIds?: string[];
 }
 
-// Mock geofence data — business data di apps/personal, bukan di @adatrack/maps
+// Mock geofence data - business data di apps/personal, bukan di @adatrack/maps
 const MOCK_GEOFENCES: MapGeofenceOption[] = [
   { id: 'g-001', label: 'Geofence Rumah Utama' },
   { id: 'g-002', label: 'Geofence Kantor Pusat' },
@@ -31,7 +31,7 @@ const MOCK_GEOFENCES: MapGeofenceOption[] = [
   { id: 'g-004', label: 'Geofence Area Pelabuhan' },
 ];
 
-// Mock geofence check — implementasi spatial sesungguhnya di apps/personal atau backend
+// Mock geofence check - implementasi spatial sesungguhnya di apps/personal atau backend
 async function mockCheckEntityGeofence(req: GeofenceCheckRequest): Promise<GeofenceCheckResult> {
   await new Promise((r) => setTimeout(r, 800));
   

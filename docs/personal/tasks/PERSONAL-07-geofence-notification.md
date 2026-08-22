@@ -1,4 +1,4 @@
-# ADATRACK Personal â€” PERSONAL-07
+# ADATRACK Personal - PERSONAL-07
 
 ## Geofence & Notification
 
@@ -16,8 +16,8 @@ Struktur:
 
 ```text
 Pengaturan
-â”œâ”€â”€ Geofence
-â””â”€â”€ Notifikasi
+â"œâ"€â"€ Geofence
+â""â"€â"€ Notifikasi
 ```
 
 Keduanya bukan primary navigation.

@@ -1,4 +1,4 @@
-# ADATRACK â€” Deployment
+# ADATRACK - Deployment
 
 ## Status
 

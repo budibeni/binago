@@ -1,5 +1,5 @@
 /**
- * @adatrack/maps — tools/types.ts
+ * @adatrack/maps - tools/types.ts
  *
  * Public types untuk abstraction layer tools.
  * Consumer (apps/personal) menggunakan types ini tanpa mengimpor maplibre-gl langsung.

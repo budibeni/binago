@@ -1,4 +1,4 @@
-# ADATRACK â€” Task 10
+# ADATRACK - Task 10
 ## Devices
 
 **Scope:** Frontend ADATRACK  

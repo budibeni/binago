@@ -1,4 +1,4 @@
-# ADATRACK â€” Task 12
+# ADATRACK - Task 12
 ## Reports
 
 **Scope:** Frontend ADATRACK  

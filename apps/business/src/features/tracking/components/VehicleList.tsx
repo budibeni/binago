@@ -25,7 +25,7 @@ import type {
   GroupStatusSummary,
 } from '../types/tracking';
 
-// ─── Helper: compute group status summary ─────────────────────────────────────
+// --- Helper: compute group status summary -------------------------------------
 
 function computeGroupSummary(vehicles: TrackingVehicle[]): GroupStatusSummary {
   return vehicles.reduce(
@@ -37,7 +37,7 @@ function computeGroupSummary(vehicles: TrackingVehicle[]): GroupStatusSummary {
   );
 }
 
-// ─── Helper: filter vehicles ──────────────────────────────────────────────
+// --- Helper: filter vehicles ----------------------------------------------
 
 function filterVehicles(
   vehicles: TrackingVehicle[],
@@ -56,7 +56,7 @@ function filterVehicles(
   });
 }
 
-// ─── Status Config ────────────────────────────────────────────────────────
+// --- Status Config --------------------------------------------------------
 
 const statusConfig = {
   driving: {
@@ -77,7 +77,7 @@ const statusConfig = {
   },
 };
 
-// ─── StatusBadge ──────────────────────────────────────────────────────────
+// --- StatusBadge ----------------------------------------------------------
 
 interface StatusBadgeProps {
   status: TrackingVehicle['status'];
@@ -95,7 +95,7 @@ function StatusBadge({ status, labels }: StatusBadgeProps) {
   );
 }
 
-// ─── VehicleListItem ──────────────────────────────────────────────────────
+// --- VehicleListItem ------------------------------------------------------
 
 interface VehicleListItemProps {
   vehicle: TrackingVehicle;
@@ -164,7 +164,7 @@ function VehicleListItem({
   );
 }
 
-// ─── VehicleGroupHeader ───────────────────────────────────────────────────
+// --- VehicleGroupHeader ---------------------------------------------------
 
 interface VehicleGroupHeaderProps {
   group: TrackingVehicleGroup;
@@ -215,7 +215,7 @@ function VehicleGroupHeader({
   );
 }
 
-// ─── VehicleList Props ────────────────────────────────────────────────────
+// --- VehicleList Props ----------------------------------------------------
 
 export interface VehicleListProps {
   groups: TrackingVehicleGroup[];
@@ -253,7 +253,7 @@ export interface VehicleListProps {
   className?: string;
 }
 
-// ─── VehicleList Component ────────────────────────────────────────────────
+// --- VehicleList Component ------------------------------------------------
 
 export function VehicleList({
   groups,
@@ -323,7 +323,7 @@ export function VehicleList({
       )}
       aria-label={labels.title}
     >
-      {/* ── Header ────────────────────────────────────────────────────────── */}
+      {/* -- Header ---------------------------------------------------------- */}
       <div className="shrink-0 flex items-center justify-between px-3 h-[40px] bg-white dark:bg-neutral-900 border-b border-border">
         <div className="flex items-center gap-2">
           <h2 className="text-[12px] font-bold text-foreground tracking-tight">
@@ -344,7 +344,7 @@ export function VehicleList({
         )}
       </div>
 
-      {/* ── Search ────────────────────────────────────────────────────────── */}
+      {/* -- Search ---------------------------------------------------------- */}
       <div className="shrink-0 px-3 py-2 bg-white dark:bg-neutral-900 border-b border-border flex gap-2">
         <div className="relative flex-1 min-w-0">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-neutral-400 pointer-events-none" />
@@ -364,7 +364,7 @@ export function VehicleList({
         </button>
       </div>
 
-      {/* ── Tabs ──────────────────────────────────────────────────────────── */}
+      {/* -- Tabs ------------------------------------------------------------ */}
       <div className="shrink-0 bg-white dark:bg-neutral-900 border-b border-border px-1">
         <div className="flex items-center justify-between">
           {statusFilters.map(({ key, label, count }) => {
@@ -405,7 +405,7 @@ export function VehicleList({
         </div>
       </div>
 
-      {/* ── Select All ────────────────────────────────────────────────────── */}
+      {/* -- Select All ------------------------------------------------------ */}
       <div className="shrink-0 flex items-center justify-between px-3 py-2 bg-[#fafafa] dark:bg-neutral-900 border-b border-border">
         <div className="flex items-center gap-2.5">
           <Checkbox
@@ -427,7 +427,7 @@ export function VehicleList({
         </span>
       </div>
 
-      {/* ── Scrollable List ───────────────────────────────────────────────── */}
+      {/* -- Scrollable List ------------------------------------------------- */}
       <div className="flex-1 min-h-0 overflow-y-auto px-3 py-3 space-y-2.5 bg-[#fcfcfc] dark:bg-neutral-950" role="list">
         {filteredGroups.length === 0 && (
           <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
@@ -479,7 +479,7 @@ export function VehicleList({
         })}
       </div>
 
-      {/* ── Footer ────────────────────────────────────────────────────────── */}
+      {/* -- Footer ---------------------------------------------------------- */}
       <div className="shrink-0 flex items-center justify-between px-3 h-[34px] border-t border-border bg-[#fafafa] dark:bg-neutral-900">
         <span className="text-[10px] font-semibold text-neutral-400 tracking-tight">
           {labels.groupSummary ? labels.groupSummary(filteredGroups.length) : `${filteredGroups.length} grup`}

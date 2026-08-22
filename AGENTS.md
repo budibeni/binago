@@ -1,4 +1,4 @@
-# ADATRACK â€” AGENTS.md
+# ADATRACK - AGENTS.md
 
 ## AI Development Instructions
 
@@ -24,38 +24,38 @@ Struktur utamanya:
 
 ```text
 ADATRACK/
-â”œâ”€â”€ AGENTS.md
-â”‚
-â””â”€â”€ docs/
-    â”œâ”€â”€ README.md
-    â”œâ”€â”€ project-overview.md
-    â”œâ”€â”€ architecture.md
-    â”œâ”€â”€ folder-structure.md
-    â”œâ”€â”€ development-rules.md
-    â”œâ”€â”€ business-rules.md
-    â”œâ”€â”€ design-system.md
-    â”œâ”€â”€ ui-guidelines.md
-    â”œâ”€â”€ database-design.md
-    â”œâ”€â”€ api-standard.md
-    â”œâ”€â”€ coding-standard.md
-    â”œâ”€â”€ deployment.md
-    â”œâ”€â”€ task-roadmap.md
-    â”‚
-    â””â”€â”€ tasks/
-        â”œâ”€â”€ TASK-01-foundation.md
-        â”œâ”€â”€ TASK-02-design-system.md
-        â”œâ”€â”€ TASK-03-application-shell.md
-        â”œâ”€â”€ TASK-04-home.md
-        â”œâ”€â”€ TASK-05-tracking.md
-        â”œâ”€â”€ TASK-06-vehicles.md
-        â”œâ”€â”€ TASK-07-drivers.md
-        â”œâ”€â”€ TASK-08-deliveries.md
-        â”œâ”€â”€ TASK-09-maintenance.md
-        â”œâ”€â”€ TASK-10-devices.md
-        â”œâ”€â”€ TASK-11-geofences.md
-        â”œâ”€â”€ TASK-12-reports.md
-        â”œâ”€â”€ TASK-13-administration.md
-        â””â”€â”€ TASK-14-production-readiness.md
+â"œâ"€â"€ AGENTS.md
+â"‚
+â""â"€â"€ docs/
+    â"œâ"€â"€ README.md
+    â"œâ"€â"€ project-overview.md
+    â"œâ"€â"€ architecture.md
+    â"œâ"€â"€ folder-structure.md
+    â"œâ"€â"€ development-rules.md
+    â"œâ"€â"€ business-rules.md
+    â"œâ"€â"€ design-system.md
+    â"œâ"€â"€ ui-guidelines.md
+    â"œâ"€â"€ database-design.md
+    â"œâ"€â"€ api-standard.md
+    â"œâ"€â"€ coding-standard.md
+    â"œâ"€â"€ deployment.md
+    â"œâ"€â"€ task-roadmap.md
+    â"‚
+    â""â"€â"€ tasks/
+        â"œâ"€â"€ TASK-01-foundation.md
+        â"œâ"€â"€ TASK-02-design-system.md
+        â"œâ"€â"€ TASK-03-application-shell.md
+        â"œâ"€â"€ TASK-04-home.md
+        â"œâ"€â"€ TASK-05-tracking.md
+        â"œâ"€â"€ TASK-06-vehicles.md
+        â"œâ"€â"€ TASK-07-drivers.md
+        â"œâ"€â"€ TASK-08-deliveries.md
+        â"œâ"€â"€ TASK-09-maintenance.md
+        â"œâ"€â"€ TASK-10-devices.md
+        â"œâ"€â"€ TASK-11-geofences.md
+        â"œâ"€â"€ TASK-12-reports.md
+        â"œâ"€â"€ TASK-13-administration.md
+        â""â"€â"€ TASK-14-production-readiness.md
 ```
 
 ### Aturan lokasi dokumentasi
@@ -129,20 +129,20 @@ Jangan membuat architecture production yang belum diperlukan.
 Istilah resmi adalah **Task**, bukan Fase atau Phase.
 
 ```text
-Task 01 â€” Foundation
-Task 02 â€” Design System
-Task 03 â€” Application Shell
-Task 04 â€” Home
-Task 05 â€” Tracking
-Task 06 â€” Vehicles
-Task 07 â€” Drivers
-Task 08 â€” Deliveries
-Task 09 â€” Maintenance
-Task 10 â€” Devices
-Task 11 â€” Geofences
-Task 12 â€” Reports
-Task 13 â€” Administration
-Task 14 â€” Production Readiness
+Task 01 - Foundation
+Task 02 - Design System
+Task 03 - Application Shell
+Task 04 - Home
+Task 05 - Tracking
+Task 06 - Vehicles
+Task 07 - Drivers
+Task 08 - Deliveries
+Task 09 - Maintenance
+Task 10 - Devices
+Task 11 - Geofences
+Task 12 - Reports
+Task 13 - Administration
+Task 14 - Production Readiness
 ```
 
 Nama Task internal menggunakan English. Label UI menggunakan Bahasa Indonesia.
@@ -191,29 +191,29 @@ Contoh:
 
 ```text
 features/
-â”œâ”€â”€ tracking/
-â”œâ”€â”€ vehicles/
-â”œâ”€â”€ drivers/
-â”œâ”€â”€ deliveries/
-â”œâ”€â”€ maintenance/
-â”œâ”€â”€ devices/
-â”œâ”€â”€ geofences/
-â”œâ”€â”€ reports/
-â””â”€â”€ administration/
+â"œâ"€â"€ tracking/
+â"œâ"€â"€ vehicles/
+â"œâ"€â"€ drivers/
+â"œâ"€â"€ deliveries/
+â"œâ"€â"€ maintenance/
+â"œâ"€â"€ devices/
+â"œâ"€â"€ geofences/
+â"œâ"€â"€ reports/
+â""â"€â"€ administration/
 ```
 
 Label UI:
 
 ```text
-tracking       â†’ Pemantauan
-vehicles       â†’ Armada
-drivers        â†’ Pengemudi
-deliveries     â†’ Pengiriman
-maintenance    â†’ Perawatan
-devices        â†’ Perangkat
-geofences      â†’ Geofence
-reports        â†’ Laporan
-administration â†’ Administrasi
+tracking       â†' Pemantauan
+vehicles       â†' Armada
+drivers        â†' Pengemudi
+deliveries     â†' Pengiriman
+maintenance    â†' Perawatan
+devices        â†' Perangkat
+geofences      â†' Geofence
+reports        â†' Laporan
+administration â†' Administrasi
 ```
 
 Jangan menggunakan Bahasa Indonesia untuk identifier teknis.
@@ -297,25 +297,25 @@ Setiap Task:
 
 ```text
 Baca AGENTS.md
-â†“
+â†"
 Identifikasi Task aktif
-â†“
+â†"
 Baca dokumentasi relevan dari /docs
-â†“
+â†"
 Baca Task aktif dari /docs/tasks/
-â†“
+â†"
 Periksa source code
-â†“
+â†"
 Buat implementation plan
-â†“
+â†"
 Implementasi
-â†“
+â†"
 Validation
-â†“
+â†"
 Periksa Definition of Done
-â†“
+â†"
 Completion Report
-â†“
+â†"
 STOP
 ```
 
@@ -414,9 +414,9 @@ Prioritas:
 
 ```text
 Local state
-â†“
+â†"
 Feature state
-â†“
+â†"
 Shared/global state
 ```
 
@@ -485,9 +485,9 @@ Jika architecture existing benar-benar tidak dapat memenuhi kebutuhan:
 
 ```text
 STOP
-â†’ jelaskan masalah
-â†’ jelaskan opsi
-â†’ minta arahan
+â†' jelaskan masalah
+â†' jelaskan opsi
+â†' minta arahan
 ```
 
 ---

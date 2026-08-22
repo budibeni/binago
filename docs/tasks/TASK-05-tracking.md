@@ -1,4 +1,4 @@
-# ADATRACK â€” Task 05
+# ADATRACK - Task 05
 
 ## Tracking
 
@@ -101,15 +101,15 @@ Tracking menggunakan pendekatan:
 
 ```text
 Page / Feature
-    â”‚
-    â”œâ”€â”€ Data
-    â”œâ”€â”€ State
-    â”œâ”€â”€ Event Handler
-    â””â”€â”€ Component Composition
-             â”‚
-             â”œâ”€â”€ VehicleList
-             â”œâ”€â”€ LiveMap
-             â”œâ”€â”€ PlaybackPanel
+    â"‚
+    â"œâ"€â"€ Data
+    â"œâ"€â"€ State
+    â"œâ"€â"€ Event Handler
+    â""â"€â"€ Component Composition
+             â"‚
+             â"œâ"€â"€ VehicleList
+             â"œâ"€â"€ LiveMap
+             â"œâ"€â"€ PlaybackPanel
 
 > **BERHENTI.**
 

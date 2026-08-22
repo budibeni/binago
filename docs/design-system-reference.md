@@ -1,4 +1,4 @@
-# ADATRACK â€” Design System Reference
+# ADATRACK - Design System Reference
 
 Dokumentasi resmi Design System ADATRACK mencakup design tokens, komponen UI foundation, UI patterns, DataTable foundation, dan Maps foundation.
 
@@ -41,7 +41,7 @@ Menggunakan skala Zinc Tailwind untuk netral, dengan warna brand dan semantik ya
 ### Spacing & Radius
 - **Border Radius**:
   - `sm`: 4px (`rounded-sm`)
-  - `md`: 6px (`rounded-md` â€” default)
+  - `md`: 6px (`rounded-md` - default)
   - `lg`: 8px (`rounded-lg`)
   - `full`: 9999px (`rounded-full`)
 
@@ -111,7 +111,7 @@ Mesin tabel berbasis **TanStack Table v9.1.2** yang fleksibel dan server-side re
 - `DataTableHeader`: Header tabel dengan indikator sorting, sticky header, dan column pinning.
 - `DataTableBody`: Body tabel yang menangani state `idle`, `loading`, `error`, `empty`, dan `no-result`.
 - `DataTableRow`: Baris data dengan dukungan sticky column pinning.
-- `DataTablePagination`: Kontrol navigasi halaman, range data (`1â€“10 dari 120 baris`), dan pemilih `pageSize`.
+- `DataTablePagination`: Kontrol navigasi halaman, range data (`1-10 dari 120 baris`), dan pemilih `pageSize`.
 - `DataTableSearch`: Wrapper SearchBar ter-debounce (300ms) untuk pencarian teks global.
 - `DataTableColumnToggle`: Dropdown pemilih visibilitas kolom dengan counter kolom tersembunyi.
 - `DataTableExport`: Export data ter-filter & ter-lihat ke format CSV (UTF-8 BOM).
