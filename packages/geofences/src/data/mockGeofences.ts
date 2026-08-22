@@ -1,8 +1,14 @@
-import { Geofence } from '../types';
+import { Geofence, GeofenceGroup } from '../types';
+
+export const mockGeofenceGroups: GeofenceGroup[] = [
+  { id: 'group-1', name: 'Cabang Jakarta' },
+  { id: 'group-2', name: 'Cabang Banten' },
+];
 
 export const mockGeofences: Geofence[] = [
   {
     id: 'gf-01',
+    groupId: 'group-1',
     name: 'Gudang Utama Jakarta',
     description: 'Area bongkar muat pusat Jakarta',
     status: 'active',
@@ -21,19 +27,24 @@ export const mockGeofences: Geofence[] = [
   },
   {
     id: 'gf-02',
+    groupId: 'group-2',
     name: 'Pool Kendaraan Tangerang',
     description: 'Pool parkir armada operasional',
     status: 'active',
     geometry: {
-      type: 'circle',
-      center: { lat: -6.2021, lng: 106.6521 },
-      radius: 500
+      type: 'multiline',
+      coordinates: [
+        { lat: -6.2021, lng: 106.6521 },
+        { lat: -6.2051, lng: 106.6541 },
+        { lat: -6.2081, lng: 106.6511 }
+      ]
     },
     createdAt: '2025-02-05T09:15:00Z',
     updatedAt: '2025-02-10T14:20:00Z',
   },
   {
     id: 'gf-03',
+    groupId: 'group-1',
     name: 'Area Terlarang Pelabuhan',
     description: 'Zona merah tidak boleh masuk',
     status: 'inactive',

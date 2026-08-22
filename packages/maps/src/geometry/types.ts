@@ -3,10 +3,14 @@ export type Coordinate = {
   lng: number;
 };
 
-export type CircleGeometry = {
-  type: 'circle';
-  center: Coordinate;
-  radius: number; // in meters
+export type RectangleGeometry = {
+  type: 'rectangle';
+  coordinates: [Coordinate, Coordinate]; // [southWest, northEast]
+};
+
+export type MultilineGeometry = {
+  type: 'multiline';
+  coordinates: Coordinate[]; // line string
 };
 
 export type PolygonGeometry = {
@@ -14,9 +18,9 @@ export type PolygonGeometry = {
   coordinates: Coordinate[]; // outer ring
 };
 
-export type MapGeometry = CircleGeometry | PolygonGeometry;
+export type MapGeometry = RectangleGeometry | PolygonGeometry | MultilineGeometry;
 
 export type GeometryEditorState = {
-  mode: 'idle' | 'draw_polygon' | 'draw_circle' | 'edit';
+  mode: 'idle' | 'draw_polygon' | 'draw_rectangle' | 'draw_multiline' | 'edit';
   geometry: MapGeometry | null;
 };

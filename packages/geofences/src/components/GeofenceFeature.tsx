@@ -1,42 +1,36 @@
 'use client';
 
 import React, { useState } from 'react';
-import { GeofenceList } from './GeofenceList';
-import { GeofenceMap } from './GeofenceMap';
-import { GeofenceEditor } from './GeofenceEditor';
-import { mockGeofences } from '../data/mockGeofences';
+import { GeofenceListView } from './GeofenceListView';
+import { GeofenceEditorView } from './GeofenceEditorView';
+import { mockGeofences, mockGeofenceGroups } from '../data/mockGeofences';
 import type { Geofence } from '../types';
-import type { MapGeometry } from '@adatrack/maps';
+
+type GeofenceView = 'list' | 'create' | 'edit';
 
 export function GeofenceFeature() {
+  const [view, setView] = useState<GeofenceView>('list');
   const [geofences, setGeofences] = useState<Geofence[]>(mockGeofences);
-  const [selectedGeofenceId, setSelectedGeofenceId] = useState<string | undefined>();
-  const [editorOpen, setEditorOpen] = useState(false);
   const [editingGeofence, setEditingGeofence] = useState<Geofence | null>(null);
-  const [editorMode, setEditorMode] = useState<'idle' | 'draw_polygon' | 'draw_circle' | 'edit'>('idle');
-  const [editorGeometry, setEditorGeometry] = useState<MapGeometry | null>(null);
 
   const handleAdd = () => {
     setEditingGeofence(null);
-    setEditorGeometry(null);
-    setEditorOpen(true);
+    setView('create');
   };
 
   const handleEdit = (geofence: Geofence) => {
     setEditingGeofence(geofence);
-    setEditorGeometry(geofence.geometry);
-    setEditorOpen(true);
+    setView('edit');
   };
 
   const handleDelete = (id: string) => {
     if (confirm('Apakah Anda yakin ingin menghapus geofence ini?')) {
       setGeofences((prev) => prev.filter((g) => g.id !== id));
-      if (selectedGeofenceId === id) setSelectedGeofenceId(undefined);
     }
   };
 
   const handleSave = (data: Partial<Geofence>) => {
-    if (editingGeofence) {
+    if (view === 'edit' && editingGeofence) {
       setGeofences((prev) =>
         prev.map((g) =>
           g.id === editingGeofence.id
@@ -54,50 +48,31 @@ export function GeofenceFeature() {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
-      setGeofences((prev) => [...prev, newGeofence]);
+      setGeofences((prev) => [newGeofence, ...prev]);
     }
-    setEditorOpen(false);
-    setEditorMode('idle');
+    setView('list');
   };
 
+  if (view === 'create' || view === 'edit') {
+    return (
+      <div className="relative w-full overflow-hidden" style={{ height: 'calc(100dvh - 52px)' }}>
+        <GeofenceEditorView
+          geofence={editingGeofence}
+          onClose={() => setView('list')}
+          onSave={handleSave}
+        />
+      </div>
+    );
+  }
+
   return (
-    // h-[calc(100dvh-52px)]: 100dvh = viewport height, 52px = tinggi header AppShell
-    // Ini memastikan peta mengisi seluruh area konten tanpa overflow
     <div className="relative w-full overflow-hidden" style={{ height: 'calc(100dvh - 52px)' }}>
-      {/* Full-screen map */}
-      <div className="absolute inset-0 z-0">
-        <GeofenceMap
-          geofences={geofences}
-          selectedGeofenceId={selectedGeofenceId}
-          editorMode={editorMode}
-          editorGeometry={editorGeometry}
-          onEditorGeometryChange={setEditorGeometry}
-        />
-      </div>
-
-      {/* Floating glassmorphic sidebar */}
-      <div className="absolute top-4 left-4 bottom-4 w-[340px] z-10 flex flex-col rounded-2xl border border-white/20 bg-background/80 backdrop-blur-xl shadow-2xl overflow-hidden">
-        <GeofenceList
-          geofences={geofences}
-          selectedId={selectedGeofenceId}
-          onSelect={(gf) => setSelectedGeofenceId(gf.id)}
-          onAdd={handleAdd}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-        />
-      </div>
-
-      {/* Editor Drawer */}
-      <GeofenceEditor
-        open={editorOpen}
-        geofence={editingGeofence}
-        currentGeometry={editorGeometry}
-        onClose={() => {
-          setEditorOpen(false);
-          setEditorMode('idle');
-        }}
-        onSave={handleSave}
-        onDrawModeChange={setEditorMode}
+      <GeofenceListView
+        geofences={geofences}
+        groups={mockGeofenceGroups}
+        onAdd={handleAdd}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
       />
     </div>
   );

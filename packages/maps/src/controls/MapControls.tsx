@@ -12,7 +12,8 @@ export interface MapControlsProps extends React.HTMLAttributes<HTMLDivElement> {
   onResetNorth?: () => void;
   onToggleLayer?: () => void;
   showZoomControls?: boolean;
-  showResetControl?: boolean;
+  showFitControl?: boolean;
+  showResetNorthControl?: boolean;
   showLayerControl?: boolean;
   locale?: Locale;
 }
@@ -27,7 +28,8 @@ export const MapControls = React.forwardRef<HTMLDivElement, MapControlsProps>(
       onResetNorth,
       onToggleLayer,
       showZoomControls = true,
-      showResetControl = true,
+      showFitControl = true,
+      showResetNorthControl = true,
       showLayerControl = true,
       locale = 'id',
       children,
@@ -47,6 +49,48 @@ export const MapControls = React.forwardRef<HTMLDivElement, MapControlsProps>(
         aria-label={t.mapControls}
         {...props}
       >
+        {children}
+
+        {showLayerControl && (
+          <button
+            type="button"
+            onClick={onToggleLayer}
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-foreground-muted hover:bg-surface hover:text-foreground focus:outline-none focus:bg-surface transition-colors"
+            aria-label={t.toggleLayer}
+            title={t.toggleLayer}
+          >
+            <Layers className="h-4 w-4" />
+          </button>
+        )}
+
+        {showFitControl && (
+          <button
+            type="button"
+            onClick={onFitSelected}
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-foreground-muted hover:bg-surface hover:text-foreground focus:outline-none focus:bg-surface transition-colors"
+            aria-label="Tampilkan Pilihan"
+            title="Tampilkan Pilihan"
+          >
+            <Target className="h-4 w-4" />
+          </button>
+        )}
+
+        {showResetNorthControl && (
+          <button
+            type="button"
+            onClick={onResetNorth}
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-foreground-muted hover:bg-surface hover:text-foreground focus:outline-none focus:bg-surface transition-colors"
+            aria-label="Reset Arah Utara"
+            title="Reset Arah Utara"
+          >
+            <Navigation className="h-4 w-4" />
+          </button>
+        )}
+
+        {(showFitControl || showResetNorthControl || showLayerControl || children) && showZoomControls && (
+          <div className="mx-1 my-0.5 border-t border-border" />
+        )}
+
         {showZoomControls && (
           <div className="flex flex-col">
             <button
@@ -70,48 +114,6 @@ export const MapControls = React.forwardRef<HTMLDivElement, MapControlsProps>(
             </button>
           </div>
         )}
-
-        {(showResetControl || showLayerControl) && showZoomControls && (
-          <div className="mx-1 my-0.5 border-t border-border" />
-        )}
-
-        {showResetControl && (
-          <button
-            type="button"
-            onClick={onFitSelected}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-foreground-muted hover:bg-surface hover:text-foreground focus:outline-none focus:bg-surface transition-colors"
-            aria-label="Tampilkan Pilihan"
-            title="Tampilkan Pilihan"
-          >
-            <Target className="h-4 w-4" />
-          </button>
-        )}
-
-        {showResetControl && (
-          <button
-            type="button"
-            onClick={onResetNorth}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-foreground-muted hover:bg-surface hover:text-foreground focus:outline-none focus:bg-surface transition-colors"
-            aria-label="Reset Arah Utara"
-            title="Reset Arah Utara"
-          >
-            <Navigation className="h-4 w-4" />
-          </button>
-        )}
-
-        {showLayerControl && (
-          <button
-            type="button"
-            onClick={onToggleLayer}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-foreground-muted hover:bg-surface hover:text-foreground focus:outline-none focus:bg-surface transition-colors"
-            aria-label={t.toggleLayer}
-            title={t.toggleLayer}
-          >
-            <Layers className="h-4 w-4" />
-          </button>
-        )}
-
-        {children}
       </div>
     );
   },

@@ -6,6 +6,7 @@ import { getTranslation } from '../../../i18n';
 import { useBusinessLocale } from '../../../components/BusinessShellLayout';
 import { DriverForm } from '../../../features/drivers/components/DriverForm';
 
+
 export default function AddDriverPage() {
   const router = useRouter();
   const locale = useBusinessLocale();

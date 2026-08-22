@@ -7,5 +7,6 @@ module.exports = {
     './src/**/*.{js,ts,jsx,tsx}',
     '../../packages/ui/src/**/*.{js,ts,jsx,tsx}',
     '../../packages/maps/src/**/*.{js,ts,jsx,tsx}',
+    '../../packages/geofences/src/**/*.{js,ts,jsx,tsx}',
   ],
 };

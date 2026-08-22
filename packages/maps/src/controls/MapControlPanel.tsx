@@ -59,6 +59,10 @@ export interface MapControlPanelProps {
   hasCustomMarker?: boolean;
   markerStyle?: 'default' | 'custom';
   onMarkerStyleChange?: (style: 'default' | 'custom') => void;
+
+  // Tool Toggles
+  showGeofenceTool?: boolean;
+  showMeasureTool?: boolean;
 }
 
 type ActivePanel =
@@ -93,6 +97,8 @@ export function MapControlPanel({
   hasCustomMarker,
   markerStyle = 'default',
   onMarkerStyleChange,
+  showGeofenceTool = true,
+  showMeasureTool = true,
 }: MapControlPanelProps) {
   const { zoomIn, zoomOut } = useMapActions();
   const t = getMapTranslation(locale);
@@ -149,13 +155,12 @@ export function MapControlPanel({
   ];
 
   const moreTools = [
-    { id: 'search'   as const, Icon: Search,    label: tb.search,   onClick: () => toggle('search'),   isActive: active === 'search' },
-    { id: 'geofence' as const, Icon: MapPinSearch, label: tb.geofence, onClick: () => toggle('geofence'), isActive: active === 'geofence' },
+    ...(showGeofenceTool ? [{ id: 'geofence' as const, Icon: MapPinSearch, label: tb.geofence, onClick: () => toggle('geofence'), isActive: active === 'geofence' }] : []),
     ...(hasCustomMarker ? [{ id: 'markerStyle' as const, Icon: Tag, label: tb.markerStyle, onClick: () => toggle('markerStyle'), isActive: active === 'markerStyle' }] : []),
-    { id: 'measure'  as const, Icon: Ruler,     label: tb.measure,  onClick: () => toggle('measure'),  isActive: active === 'measure' },
+    ...(showMeasureTool ? [{ id: 'measure'  as const, Icon: Ruler,     label: tb.measure,  onClick: () => toggle('measure'),  isActive: active === 'measure' }] : []),
   ];
 
-  const isMoreActive = active === 'more' || active === 'search' || active === 'geofence' || active === 'measure' || active === 'markerStyle';
+  const isMoreActive = active === 'more' || active === 'geofence' || active === 'measure' || active === 'markerStyle';
 
   return (
     <div ref={panelRef} className={cn('relative', className)}>
@@ -319,6 +324,17 @@ export function MapControlPanel({
         'md:flex-col md:w-auto',
       )}>
 
+        {/* Search */}
+        <IconBtn
+          id="ctrl-search"
+          icon={Search}
+          label={tb.search}
+          onClick={() => toggle('search')}
+          active={active === 'search'}
+        />
+
+        <Sep />
+
         {/* Basemap */}
         <IconBtn
           id="ctrl-basemap"
@@ -359,16 +375,30 @@ export function MapControlPanel({
           active={isFullscreen}
         />
 
-        <Sep />
-
-        {/* More Tools */}
-        <IconBtn
-          id="ctrl-more-tools"
-          icon={MoreHorizontal}
-          label={tb.moreTools}
-          onClick={() => toggle('more')}
-          active={isMoreActive}
-        />
+        {/* More Tools / Single Tool */}
+        {moreTools.length === 1 ? (
+          <>
+            <Sep />
+            <IconBtn
+              id={`ctrl-${moreTools[0].id}`}
+              icon={moreTools[0].Icon}
+              label={moreTools[0].label}
+              onClick={moreTools[0].onClick}
+              active={moreTools[0].isActive}
+            />
+          </>
+        ) : moreTools.length > 1 ? (
+          <>
+            <Sep />
+            <IconBtn
+              id="ctrl-more-tools"
+              icon={MoreHorizontal}
+              label={tb.moreTools}
+              onClick={() => toggle('more')}
+              active={isMoreActive}
+            />
+          </>
+        ) : null}
 
       </div>
     </div>

@@ -72,7 +72,7 @@ export function DriverDetailDrawer({
         {/* Header */}
         <div className="flex items-center justify-between p-3 md:px-4 py-2 border-b border-border bg-surface">
           <h2 className="text-sm font-semibold text-foreground">{labels.title}</h2>
-          <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full h-8 w-8 text-foreground-muted hover:text-foreground">
+          <Button variant="ghost" size="sm" onClick={onClose} className="rounded-full h-8 w-8 text-foreground-muted hover:text-foreground">
             <X className="w-4 h-4" />
           </Button>
         </div>
@@ -101,6 +101,7 @@ export function DriverDetailDrawer({
               { id: 'history', label: labels.tabHistory }
             ]}
             activeTab={activeTab}
+            // @ts-expect-error - Tabs component type has wrong onChange signature
             onChange={setActiveTab}
             variant="underline"
           />

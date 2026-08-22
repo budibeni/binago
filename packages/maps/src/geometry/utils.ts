@@ -26,40 +26,18 @@ export function getDistance(coord1: Coordinate, coord2: Coordinate): number {
   return R * c;
 }
 
-// Generate a polygon representing a circle
-export function createCirclePolygon(center: Coordinate, radiusMeters: number, steps: number = 64): Coordinate[] {
-  const coordinates: Coordinate[] = [];
-  const R = 6371e3; // Earth's radius in meters
-  
-  for (let i = 0; i < steps; i++) {
-    const bearing = (i * 360) / steps;
-    const bearingRad = toRadians(bearing);
-    
-    const latRad = toRadians(center.lat);
-    const lngRad = toRadians(center.lng);
-    
-    const newLatRad = Math.asin(
-      Math.sin(latRad) * Math.cos(radiusMeters / R) +
-      Math.cos(latRad) * Math.sin(radiusMeters / R) * Math.cos(bearingRad)
-    );
-    
-    const newLngRad = lngRad + Math.atan2(
-      Math.sin(bearingRad) * Math.sin(radiusMeters / R) * Math.cos(latRad),
-      Math.cos(radiusMeters / R) - Math.sin(latRad) * Math.sin(newLatRad)
-    );
-    
-    coordinates.push({
-      lat: toDegrees(newLatRad),
-      lng: toDegrees(newLngRad)
-    });
-  }
-  
-  // Close the polygon
-  coordinates.push({ ...coordinates[0] });
-  return coordinates;
+// Calculate bounding box corners for a rectangle
+export function getRectanglePolygon(sw: Coordinate, ne: Coordinate): Coordinate[] {
+  return [
+    sw, // bottom-left
+    { lat: sw.lat, lng: ne.lng }, // bottom-right
+    ne, // top-right
+    { lat: ne.lat, lng: sw.lng }, // top-left
+    sw // close
+  ];
 }
 
-export function geometryToGeoJSON(geometry: MapGeometry): GeoJSON.Feature<GeoJSON.Polygon | GeoJSON.Point> {
+export function geometryToGeoJSON(geometry: MapGeometry): GeoJSON.Feature<GeoJSON.Polygon | GeoJSON.LineString> {
   if (geometry.type === 'polygon') {
     return {
       type: 'Feature',
@@ -71,18 +49,26 @@ export function geometryToGeoJSON(geometry: MapGeometry): GeoJSON.Feature<GeoJSO
     };
   }
   
-  if (geometry.type === 'circle') {
-    const circleCoords = createCirclePolygon(geometry.center, geometry.radius);
+  if (geometry.type === 'rectangle') {
+    const [sw, ne] = geometry.coordinates;
+    const coords = getRectanglePolygon(sw, ne);
     return {
       type: 'Feature',
-      properties: {
-        isCircle: true,
-        radius: geometry.radius,
-        center: [geometry.center.lng, geometry.center.lat]
-      },
+      properties: {},
       geometry: {
         type: 'Polygon',
-        coordinates: [circleCoords.map(c => [c.lng, c.lat])]
+        coordinates: [coords.map(c => [c.lng, c.lat])]
+      }
+    };
+  }
+
+  if (geometry.type === 'multiline') {
+    return {
+      type: 'Feature',
+      properties: {},
+      geometry: {
+        type: 'LineString',
+        coordinates: geometry.coordinates.map(c => [c.lng, c.lat])
       }
     };
   }

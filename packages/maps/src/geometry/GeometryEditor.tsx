@@ -4,17 +4,15 @@ import { MapGeometry, Coordinate } from './types';
 import { geometryToGeoJSON } from './utils';
 
 export interface GeometryEditorProps {
-  mode: 'idle' | 'draw_polygon' | 'draw_circle' | 'edit';
+  mode: 'idle' | 'draw_polygon' | 'draw_rectangle' | 'draw_multiline' | 'edit';
   initialGeometry?: MapGeometry | null;
   onChange?: (geometry: MapGeometry | null) => void;
-  circleRadiusMeters?: number; // Default radius for circle drawing
 }
 
 export function GeometryEditor({
   mode,
   initialGeometry = null,
   onChange,
-  circleRadiusMeters = 500
 }: GeometryEditorProps) {
   const map = useInternalMap();
   const [geometry, setGeometry] = useState<MapGeometry | null>(initialGeometry);
@@ -30,8 +28,14 @@ export function GeometryEditor({
   useEffect(() => {
     if (initialGeometry !== undefined) {
       setGeometry(initialGeometry);
+      setDraftCoords([]); // Also clear drafts when initial geometry changes externally
     }
   }, [initialGeometry]);
+  
+  // Clear draft when mode changes
+  useEffect(() => {
+    setDraftCoords([]);
+  }, [mode]);
   
   // Notify parent
   useEffect(() => {
@@ -47,13 +51,32 @@ export function GeometryEditor({
     const handleMapClick = (e: any) => {
       const coord = { lat: e.lngLat.lat, lng: e.lngLat.lng };
       
-      if (mode === 'draw_circle') {
-        setGeometry({
-          type: 'circle',
-          center: coord,
-          radius: circleRadiusMeters
-        });
-      } else if (mode === 'draw_polygon') {
+      if (mode === 'draw_rectangle') {
+        if (draftCoords.length === 0) {
+          setDraftCoords([coord]);
+        } else if (draftCoords.length === 1) {
+          // Finish rectangle on second click
+          // To ensure [sw, ne], we could sort them, but let's just use them as-is
+          // getRectanglePolygon handles it.
+          const p1 = draftCoords[0];
+          const p2 = coord;
+          
+          const sw = {
+            lat: Math.min(p1.lat, p2.lat),
+            lng: Math.min(p1.lng, p2.lng)
+          };
+          const ne = {
+            lat: Math.max(p1.lat, p2.lat),
+            lng: Math.max(p1.lng, p2.lng)
+          };
+          
+          setGeometry({
+            type: 'rectangle',
+            coordinates: [sw, ne]
+          });
+          setDraftCoords([]);
+        }
+      } else if (mode === 'draw_polygon' || mode === 'draw_multiline') {
         setDraftCoords(prev => [...prev, coord]);
       }
     };
@@ -66,6 +89,13 @@ export function GeometryEditor({
           coordinates: [...draftCoords, draftCoords[0]] // Close the loop
         });
         setDraftCoords([]); // clear draft
+      } else if (mode === 'draw_multiline' && draftCoords.length >= 2) {
+        e.preventDefault();
+        setGeometry({
+          type: 'multiline',
+          coordinates: [...draftCoords] // Don't close loop
+        });
+        setDraftCoords([]);
       }
     };
     
@@ -76,7 +106,7 @@ export function GeometryEditor({
       map.off('click', handleMapClick);
       map.off('contextmenu', handleRightClick);
     };
-  }, [map, mode, draftCoords, circleRadiusMeters]);
+  }, [map, mode, draftCoords]);
 
   // Render geometry
   useEffect(() => {

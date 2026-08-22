@@ -19,6 +19,7 @@ export * from './tracking/TrackingMap';
 // Tools & Basemaps (Unchanged structure)
 export * from './basemaps/types';
 export * from './tools/types';
+export * from './tools/SearchLocationTool';
 export * from './i18n';
 export * from './geometry/types';
 export * from './geometry/utils';
