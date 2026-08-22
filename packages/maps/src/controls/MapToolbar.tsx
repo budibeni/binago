@@ -50,6 +50,8 @@ export interface MapToolbarProps {
   onCheckEntityGeofence?: (req: GeofenceCheckRequest) => Promise<GeofenceCheckResult>;
   className?: string;
   locale?: Locale;
+  /** Tampilkan/sembunyikan tombol GeofenceCheckTool. Default: true */
+  showGeofenceTool?: boolean;
 }
 
 type ToolId = 'search' | 'geofence' | 'measure' | null;
@@ -66,6 +68,7 @@ export function MapToolbar({
   onCheckEntityGeofence,
   className,
   locale = 'id',
+  showGeofenceTool = true,
 }: MapToolbarProps) {
   const t = getMapTranslation(locale).toolbar;
   const [activeTool, setActiveTool] = useState<ToolId>(null);
@@ -167,13 +170,15 @@ export function MapToolbar({
         />
 
         {/* Geofence Check */}
-        <ToolButton
-          id="toolbar-geofence"
-          icon={CircleDot}
-          label={t.geofence}
-          onClick={() => toggleTool('geofence')}
-          active={activeTool === 'geofence'}
-        />
+        {showGeofenceTool && (
+          <ToolButton
+            id="toolbar-geofence"
+            icon={CircleDot}
+            label={t.geofence}
+            onClick={() => toggleTool('geofence')}
+            active={activeTool === 'geofence'}
+          />
+        )}
 
         {/* Separator */}
         <div className="w-px h-5 bg-border mx-0.5" />

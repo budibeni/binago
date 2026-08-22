@@ -1,4 +1,3 @@
-import React from 'react';
 import dynamic from 'next/dynamic';
 
 export const metadata = {
@@ -7,8 +6,8 @@ export const metadata = {
 };
 
 // WAJIB ssr:false — @adatrack/maps → maplibre-gl adalah browser-only library
-const GeofenceFeature = dynamic(
-  () => import('@adatrack/geofences').then((mod) => mod.GeofenceFeature),
+const GeofencePage = dynamic(
+  () => import('./GeofencePageClient').then((mod) => mod.GeofencePageClient),
   {
     ssr: false,
     loading: () => (
@@ -23,5 +22,5 @@ const GeofenceFeature = dynamic(
 );
 
 export default function GeofencesPage() {
-  return <GeofenceFeature />;
+  return <GeofencePage />;
 }

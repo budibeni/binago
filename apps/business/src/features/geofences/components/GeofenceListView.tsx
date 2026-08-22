@@ -6,6 +6,7 @@ import { GeofenceMap } from './GeofenceMap';
 import { GeofenceListPanel } from './GeofenceListPanel';
 import { ChevronLeft } from 'lucide-react';
 import type { Geofence, GeofenceGroup } from '../types';
+import { type GeofenceLocale } from '../i18n';
 
 interface GeofenceListViewProps {
   groups: GeofenceGroup[];
@@ -13,6 +14,7 @@ interface GeofenceListViewProps {
   onAdd: () => void;
   onEdit: (geofence: Geofence) => void;
   onDelete: (id: string) => void;
+  locale?: GeofenceLocale;
 }
 
 export function GeofenceListView({
@@ -21,6 +23,7 @@ export function GeofenceListView({
   onAdd,
   onEdit,
   onDelete,
+  locale = 'id',
 }: GeofenceListViewProps) {
   const [selectedId, setSelectedId] = useState<string | undefined>();
   const [visibleIds, setVisibleIds] = useState<string[]>(() => geofences.map(g => g.id));
@@ -81,6 +84,7 @@ export function GeofenceListView({
             onEdit={onEdit}
             onDelete={onDelete}
             onClose={() => setIsPanelVisible(false)}
+            locale={locale}
           />
         ) : (
           <div className="flex flex-col items-center gap-2.5 h-full w-full">
@@ -89,7 +93,7 @@ export function GeofenceListView({
               type="button"
               onClick={() => setIsPanelVisible(true)}
               className="flex h-6 w-6 items-center justify-center text-foreground-muted hover:text-foreground transition-colors focus:outline-none shrink-0"
-              title="Buka Panel Geofence"
+              title={locale === 'en' ? 'Open Geofence Panel' : 'Buka Panel Geofence'}
             >
               <ChevronLeft className="h-3.5 w-3.5" />
             </button>
@@ -99,7 +103,7 @@ export function GeofenceListView({
               type="button"
               onClick={() => setIsPanelVisible(true)}
               className="flex flex-col items-center py-2 px-0.5 text-foreground group shrink-0 transition-opacity hover:opacity-80"
-              title="Buka Geofence"
+              title={locale === 'en' ? 'Open Geofence' : 'Buka Geofence'}
             >
               <div className="font-bold text-[10px] tracking-[0.2em] text-foreground-muted group-hover:text-foreground uppercase select-none mb-4 mt-2 transition-colors [writing-mode:vertical-rl] rotate-180">
                 GEOFENCE

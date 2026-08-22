@@ -3,7 +3,6 @@
 import React from 'react';
 import {
   Search,
-  RefreshCw,
   ChevronDown,
   ChevronRight,
   Folder,
@@ -18,6 +17,7 @@ import {
 import { cn } from '@adatrack/utils';
 import { Checkbox } from '@adatrack/ui';
 import type { Geofence, GeofenceGroup } from '../types';
+import { type GeofenceLocale, getGeofencesTranslation } from '../i18n';
 
 interface GeofenceListPanelProps {
   groups: GeofenceGroup[];
@@ -31,6 +31,7 @@ interface GeofenceListPanelProps {
   onEdit: (geofence: Geofence) => void;
   onDelete: (id: string) => void;
   onClose?: () => void;
+  locale?: GeofenceLocale;
 }
 
 export function GeofenceListPanel({
@@ -45,7 +46,9 @@ export function GeofenceListPanel({
   onEdit,
   onDelete,
   onClose,
+  locale = 'id',
 }: GeofenceListPanelProps) {
+  const t = getGeofencesTranslation(locale);
   const [search, setSearch] = React.useState('');
   const [expandedGroups, setExpandedGroups] = React.useState<Record<string, boolean>>(() =>
     Object.fromEntries(groups.map((g) => [g.id, true])),
@@ -88,7 +91,7 @@ export function GeofenceListPanel({
             onClick={onAdd}
             className="flex h-7 px-3 items-center justify-center gap-1.5 rounded-md bg-red-600 text-[10px] font-bold text-white hover:bg-red-700 transition-colors"
           >
-            <Plus className="h-3.5 w-3.5" /> Tambah Geofence
+            <Plus className="h-3.5 w-3.5" /> {t.addGeofence}
           </button>
         </div>
 
@@ -113,7 +116,7 @@ export function GeofenceListPanel({
             type="search"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Cari geofence..."
+            placeholder={t.searchGeofence}
             className="w-full h-8 rounded-md border border-border bg-[#fafafa] dark:bg-neutral-900 pl-8 pr-3 text-[12px] text-foreground focus:outline-none focus:border-neutral-300 focus:bg-white transition-all placeholder:text-neutral-400"
           />
         </div>
@@ -138,7 +141,7 @@ export function GeofenceListPanel({
               htmlFor="geofence-select-all"
               className="text-[11px] font-bold text-foreground cursor-pointer select-none tracking-tight"
             >
-              Semua Geofence
+              {t.allGeofences}
             </label>
           </div>
           <span className="text-[10px] font-bold text-neutral-500 bg-white dark:bg-neutral-800 px-1.5 py-0.5 border border-border rounded-md leading-none">
@@ -152,7 +155,7 @@ export function GeofenceListPanel({
         {totalFiltered === 0 && (
           <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
             <MapPin className="h-8 w-8 text-neutral-300 mb-3" />
-            <p className="text-[12px] font-medium text-foreground">Tidak ada geofence</p>
+            <p className="text-[12px] font-medium text-foreground">{t.noGeofences}</p>
           </div>
         )}
 
@@ -201,6 +204,7 @@ export function GeofenceListPanel({
                       onSelect={() => onSelect(gf.id)}
                       onEdit={() => onEdit(gf)}
                       onDelete={() => onDelete(gf.id)}
+                      locale={locale}
                     />
                   ))}
                 </div>
@@ -222,7 +226,7 @@ export function GeofenceListPanel({
                    />
                 </div>
                 <span className="text-xs font-semibold text-neutral-500 flex-1 tracking-tight">
-                  Lainnya (Tanpa Grup)
+                  {t.unassigned}
                 </span>
                 <span className="text-[10px] font-bold text-neutral-500 bg-white dark:bg-neutral-800 border border-border px-1.5 py-0.5 rounded-md leading-none">
                   {unassignedGeofences.length}
@@ -239,6 +243,7 @@ export function GeofenceListPanel({
                     onSelect={() => onSelect(gf.id)}
                     onEdit={() => onEdit(gf)}
                     onDelete={() => onDelete(gf.id)}
+                    locale={locale}
                   />
                 ))}
              </div>
@@ -256,7 +261,8 @@ function GeofenceListItem({
   onCheck,
   onSelect,
   onEdit,
-  onDelete
+  onDelete,
+  locale
 }: {
   geofence: Geofence;
   isSelected: boolean;
@@ -265,13 +271,15 @@ function GeofenceListItem({
   onSelect: () => void;
   onEdit: () => void;
   onDelete: () => void;
+  locale: GeofenceLocale;
 }) {
+  const t = getGeofencesTranslation(locale);
   const isRectangle = geofence.geometry.type === 'rectangle';
   const isMultiline = geofence.geometry.type === 'multiline';
   
-  let descText = `${(geofence.geometry as any).coordinates?.length || 0} titik`;
-  if (isRectangle) descText = 'Dimensi Area';
-  if (isMultiline) descText = `${(geofence.geometry as any).coordinates?.length || 0} titik (Rute)`;
+  let descText = `${(geofence.geometry as any).coordinates?.length || 0} ${t.points}`;
+  if (isRectangle) descText = t.areaDimension;
+  if (isMultiline) descText = `${(geofence.geometry as any).coordinates?.length || 0} ${t.routePoints}`;
 
   return (
     <div
@@ -306,7 +314,7 @@ function GeofenceListItem({
           </span>
           <div className="flex items-center gap-1 mt-0.5">
             <span className={cn("text-[9px] font-bold uppercase tracking-wider", geofence.status === 'active' ? "text-emerald-500" : "text-neutral-400")}>
-              {geofence.status === 'active' ? 'Aktif' : 'Nonaktif'}
+              {geofence.status === 'active' ? t.active : t.inactive}
             </span>
             <span className="text-[10px] text-neutral-400 truncate tracking-tight">
               &bull; {descText}
@@ -320,14 +328,14 @@ function GeofenceListItem({
         <button 
           onClick={(e) => { e.stopPropagation(); onEdit(); }} 
           className="p-1 text-neutral-400 hover:text-foreground hover:bg-neutral-200 rounded"
-          title="Edit"
+          title={t.edit}
         >
           <Edit2 className="h-3.5 w-3.5" />
         </button>
         <button 
           onClick={(e) => { e.stopPropagation(); onDelete(); }} 
           className="p-1 text-neutral-400 hover:text-red-500 hover:bg-red-50 rounded"
-          title="Hapus"
+          title={t.delete}
         >
           <Trash2 className="h-3.5 w-3.5" />
         </button>

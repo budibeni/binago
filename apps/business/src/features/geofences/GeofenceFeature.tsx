@@ -1,14 +1,20 @@
 'use client';
 
 import React, { useState } from 'react';
-import { GeofenceListView } from './GeofenceListView';
-import { GeofenceEditorView } from './GeofenceEditorView';
-import { mockGeofences, mockGeofenceGroups } from '../data/mockGeofences';
-import type { Geofence } from '../types';
+import { GeofenceListView } from './components/GeofenceListView';
+import { GeofenceEditorView } from './components/GeofenceEditorView';
+import { mockGeofences, mockGeofenceGroups } from './data/mockGeofences';
+import type { Geofence } from './types';
+import { type GeofenceLocale, getGeofencesTranslation } from './i18n';
 
 type GeofenceView = 'list' | 'create' | 'edit';
 
-export function GeofenceFeature() {
+interface GeofenceFeatureProps {
+  locale?: GeofenceLocale;
+}
+
+export function GeofenceFeature({ locale = 'id' }: GeofenceFeatureProps) {
+  const t = getGeofencesTranslation(locale);
   const [view, setView] = useState<GeofenceView>('list');
   const [geofences, setGeofences] = useState<Geofence[]>(mockGeofences);
   const [editingGeofence, setEditingGeofence] = useState<Geofence | null>(null);
@@ -24,7 +30,7 @@ export function GeofenceFeature() {
   };
 
   const handleDelete = (id: string) => {
-    if (confirm('Apakah Anda yakin ingin menghapus geofence ini?')) {
+    if (confirm(t.confirmDelete)) {
       setGeofences((prev) => prev.filter((g) => g.id !== id));
     }
   };
@@ -58,8 +64,9 @@ export function GeofenceFeature() {
       <div className="relative w-full overflow-hidden" style={{ height: 'calc(100dvh - 52px)' }}>
         <GeofenceEditorView
           geofence={editingGeofence}
-          onClose={() => setView('list')}
+          onCancel={() => setView('list')}
           onSave={handleSave}
+          locale={locale}
         />
       </div>
     );
@@ -73,6 +80,7 @@ export function GeofenceFeature() {
         onAdd={handleAdd}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        locale={locale}
       />
     </div>
   );

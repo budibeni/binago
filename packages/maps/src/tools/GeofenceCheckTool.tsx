@@ -50,12 +50,14 @@ function SearchableSelect({
   options,
   placeholder,
   searchPlaceholder = 'Cari...',
+  noResultText = 'Tidak ada hasil',
 }: {
   value: string;
   onChange: (val: string) => void;
   options: { id: string; label: string }[];
   placeholder: string;
   searchPlaceholder?: string;
+  noResultText?: string;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
@@ -107,7 +109,7 @@ function SearchableSelect({
           <div className="max-h-48 overflow-y-auto p-1">
             {filtered.length === 0 ? (
               <div className="px-3 py-2 text-xs text-neutral-500 dark:text-neutral-400 text-center">
-                {searchPlaceholder === 'Cari...' ? 'Tidak ada hasil' : searchPlaceholder === 'Cari objek...' ? 'Tidak ada hasil' : searchPlaceholder === 'Search entity...' ? 'No result' : searchPlaceholder === 'Cari geofence...' ? 'Tidak ada hasil' : searchPlaceholder === 'Search geofence...' ? 'No result' : 'Tidak ada hasil'}
+                {noResultText}
               </div>
             ) : (
               filtered.map((opt) => (
@@ -187,6 +189,7 @@ export function GeofenceCheckTool({
           options={entities}
           placeholder={t.selectEntity}
           searchPlaceholder={t.searchEntity}
+          noResultText={t.noResult}
         />
       </div>
 
@@ -207,6 +210,7 @@ export function GeofenceCheckTool({
           options={geofences}
           placeholder={t.selectGeofence}
           searchPlaceholder={t.searchGeofence}
+          noResultText={t.noResult}
         />
       </div>
 
