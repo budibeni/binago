@@ -20,3 +20,6 @@ export * from './tracking/TrackingMap';
 export * from './basemaps/types';
 export * from './tools/types';
 export * from './i18n';
+export * from './geometry/types';
+export * from './geometry/utils';
+export * from './geometry/GeometryEditor';

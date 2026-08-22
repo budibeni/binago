@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@adatrack/design-system": "workspace:*",
+    "@adatrack/geofences": "workspace:^",
     "@adatrack/maps": "workspace:*",
     "@adatrack/types": "workspace:*",
     "@adatrack/ui": "workspace:*",

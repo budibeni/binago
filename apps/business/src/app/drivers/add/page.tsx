@@ -19,7 +19,7 @@ export default function AddDriverPage() {
   const handleSubmit = (data: any) => {
     console.log('Submitted driver data:', data);
     // Here we would normally make an API request to save the data
-    alert(tAdd.successMessage);
+    alert("Data pengemudi berhasil disimpan");
     router.push('/drivers');
   };
 
