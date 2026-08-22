@@ -1,0 +1,116 @@
+import { Locale } from '@adatrack/types';
+
+export const routeDictionaries = {
+  id: {
+    title: 'Rute',
+    subtitle: 'Kelola daftar rute untuk perjalanan operasional.',
+    addBtn: 'Tambah Rute',
+    searchPlaceholder: 'Cari rute...',
+    status: {
+      active: 'Aktif',
+      inactive: 'Nonaktif',
+    },
+    list: {
+      empty: 'Tidak ada rute',
+      emptyDesc: 'Klik tombol Tambah Rute untuk membuat rute baru.',
+      origin: 'Asal',
+      destination: 'Tujuan',
+      stops: 'Pemberhentian',
+      stopCount: 'titik',
+    },
+    editor: {
+      createTitle: 'Buat Rute Baru',
+      editTitle: 'Edit Rute',
+      name: 'Nama Rute',
+      namePlaceholder: 'Contoh: Distribusi Jabodetabek',
+      description: 'Deskripsi',
+      descriptionPlaceholder: 'Opsional',
+      origin: 'Lokasi Asal',
+      destination: 'Lokasi Tujuan',
+      stops: 'Titik Pemberhentian (Stops)',
+      addStop: 'Tambah Pemberhentian',
+      locationType: {
+        geofence: 'Geofence',
+        coordinate: 'Koordinat',
+      },
+      geofencePlaceholder: 'Pilih geofence...',
+      addressPlaceholder: 'Alamat atau Label Lokasi',
+      latPlaceholder: 'Latitude (Misal: -6.123)',
+      lngPlaceholder: 'Longitude (Misal: 106.123)',
+      estimatedDistance: 'Estimasi Jarak (km)',
+      estimatedDuration: 'Estimasi Durasi (menit)',
+      drawPath: 'Gambar Jalur Rute (Opsional)',
+      pathInstructions: 'Klik pada peta untuk mulai menggambar garis rute. Tekan Enter untuk selesai.',
+      save: 'Simpan',
+      cancel: 'Batal',
+      validation: {
+        nameRequired: 'Nama rute wajib diisi',
+        locationRequired: 'Lokasi (Geofence atau Koordinat) wajib diisi',
+      },
+    },
+    delete: {
+      title: 'Hapus Rute?',
+      description: 'Apakah Anda yakin ingin menghapus rute ini? Aksi ini tidak dapat dibatalkan.',
+      confirm: 'Hapus',
+      cancel: 'Batal',
+    },
+  },
+  en: {
+    title: 'Routes',
+    subtitle: 'Manage route list for operational trips.',
+    addBtn: 'Add Route',
+    searchPlaceholder: 'Search routes...',
+    status: {
+      active: 'Active',
+      inactive: 'Inactive',
+    },
+    list: {
+      empty: 'No routes found',
+      emptyDesc: 'Click the Add Route button to create a new route.',
+      origin: 'Origin',
+      destination: 'Destination',
+      stops: 'Stops',
+      stopCount: 'stops',
+    },
+    editor: {
+      createTitle: 'Create New Route',
+      editTitle: 'Edit Route',
+      name: 'Route Name',
+      namePlaceholder: 'E.g., Jabodetabek Distribution',
+      description: 'Description',
+      descriptionPlaceholder: 'Optional',
+      origin: 'Origin Location',
+      destination: 'Destination Location',
+      stops: 'Stops',
+      addStop: 'Add Stop',
+      locationType: {
+        geofence: 'Geofence',
+        coordinate: 'Coordinate',
+      },
+      geofencePlaceholder: 'Select geofence...',
+      addressPlaceholder: 'Address or Location Label',
+      latPlaceholder: 'Latitude (E.g., -6.123)',
+      lngPlaceholder: 'Longitude (E.g., 106.123)',
+      estimatedDistance: 'Estimated Distance (km)',
+      estimatedDuration: 'Estimated Duration (minutes)',
+      drawPath: 'Draw Route Path (Optional)',
+      pathInstructions: 'Click on the map to start drawing a path. Press Enter to finish.',
+      save: 'Save',
+      cancel: 'Cancel',
+      validation: {
+        nameRequired: 'Route name is required',
+        locationRequired: 'Location (Geofence or Coordinate) is required',
+      },
+    },
+    delete: {
+      title: 'Delete Route?',
+      description: 'Are you sure you want to delete this route? This action cannot be undone.',
+      confirm: 'Delete',
+      cancel: 'Cancel',
+    },
+  },
+};
+
+export function getRouteTranslation(locale: Locale = 'id') {
+  return routeDictionaries[locale] || routeDictionaries.id;
+}

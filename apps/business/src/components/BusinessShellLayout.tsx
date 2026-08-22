@@ -24,6 +24,8 @@ import {
   Link,
   Settings,
   CircleHelp,
+  Waypoints,
+  Activity,
 } from 'lucide-react';
 import { AppShell } from '@adatrack/ui';
 import type { NavGroup, NavItem, UserInfo, Locale } from '@adatrack/types';
@@ -59,12 +61,12 @@ function buildNavigation(locale: Locale): NavGroup[] {
       ],
     },
     {
-      id: 'transportation',
-      title: t.navGroup.transportation,
+      id: 'operational',
+      title: t.navGroup.operational,
       items: [
+        { id: 'routes', label: t.nav.routes, href: '/routes', icon: Waypoints },
         { id: 'trips', label: t.nav.trips, href: '/trips', icon: Route },
-        { id: 'deliveries', label: t.nav.deliveries, href: '/deliveries', icon: Package },
-        { id: 'fieldServices', label: t.nav.fieldServices, href: '/field-services', icon: Wrench },
+        { id: 'activities', label: t.nav.activities, href: '/activities', icon: Activity },
       ],
     },
     {
@@ -81,13 +83,6 @@ function buildNavigation(locale: Locale): NavGroup[] {
       items: [
         { id: 'safety', label: t.nav.safety, href: '/safety', icon: ShieldCheck },
         { id: 'incidents', label: t.nav.incidents, href: '/incidents', icon: CircleAlert },
-      ],
-    },
-    {
-      id: 'work',
-      title: t.navGroup.work,
-      items: [
-        { id: 'tasks', label: t.nav.tasks, href: '/tasks', icon: ClipboardCheck },
       ],
     },
     {
