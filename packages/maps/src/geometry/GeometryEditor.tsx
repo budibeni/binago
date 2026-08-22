@@ -76,7 +76,25 @@ export function GeometryEditor({
           });
           setDraftCoords([]);
         }
-      } else if (mode === 'draw_polygon' || mode === 'draw_multiline') {
+      } else if (mode === 'draw_polygon') {
+        if (draftCoords.length >= 3) {
+          const firstPoint = map.project([draftCoords[0].lng, draftCoords[0].lat]);
+          const dx = e.point.x - firstPoint.x;
+          const dy = e.point.y - firstPoint.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          
+          if (distance < 15) {
+            // Close polygon
+            setGeometry({
+              type: 'polygon',
+              coordinates: [...draftCoords, draftCoords[0]]
+            });
+            setDraftCoords([]);
+            return;
+          }
+        }
+        setDraftCoords(prev => [...prev, coord]);
+      } else if (mode === 'draw_multiline') {
         setDraftCoords(prev => [...prev, coord]);
       }
     };

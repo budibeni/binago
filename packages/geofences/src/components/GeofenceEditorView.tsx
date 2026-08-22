@@ -28,7 +28,7 @@ export function GeofenceEditorView({
     description: geofence?.description || '',
     status: geofence?.status || 'active',
   });
-  
+
   const [drawMode, setDrawMode] = useState<'polygon' | 'rectangle' | 'multiline'>('polygon');
   const [editorMode, setEditorMode] = useState<'idle' | 'draw_polygon' | 'draw_rectangle' | 'draw_multiline' | 'edit'>('idle');
   const [currentGeometry, setCurrentGeometry] = useState<MapGeometry | null>(geofence?.geometry || null);
@@ -80,7 +80,7 @@ export function GeofenceEditorView({
           isExpanded ? "max-h-[calc(100%-32px)]" : "max-h-[44px]"
         )}>
           {/* Header */}
-          <div 
+          <div
             onClick={() => setIsExpanded(!isExpanded)}
             className="flex items-center justify-between px-3 py-2 border-b border-border bg-surface cursor-pointer hover:bg-surface-hover shrink-0"
           >
@@ -122,7 +122,7 @@ export function GeofenceEditorView({
               <div className="space-y-1.5">
                 <label className="text-[11px] font-semibold text-foreground">Tipe Geofence <span className="text-red-500">*</span></label>
                 <div className="grid grid-cols-2 gap-1.5">
-                  <div 
+                  <div
                     onClick={() => { setDrawMode('polygon'); setEditorMode('draw_polygon'); setCurrentGeometry(null); }}
                     className={cn(
                       "flex flex-col gap-1 rounded-md border p-1.5 cursor-pointer transition-all bg-background",
@@ -134,7 +134,7 @@ export function GeofenceEditorView({
                       Polygon
                     </div>
                   </div>
-                  <div 
+                  <div
                     onClick={() => { setDrawMode('rectangle'); setEditorMode('draw_rectangle'); setCurrentGeometry(null); }}
                     className={cn(
                       "flex flex-col gap-1 rounded-md border p-1.5 cursor-pointer transition-all bg-background",
@@ -148,7 +148,7 @@ export function GeofenceEditorView({
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-1.5 mt-1.5">
-                  <div 
+                  <div
                     onClick={() => { setDrawMode('multiline'); setEditorMode('draw_multiline'); setCurrentGeometry(null); }}
                     className={cn(
                       "flex flex-col gap-1 rounded-md border p-1.5 cursor-pointer transition-all bg-background",
@@ -203,7 +203,7 @@ export function GeofenceEditorView({
               <div className="flex items-center justify-between">
                 <h3 className="text-xs font-bold text-foreground">Informasi Area</h3>
                 {isGeometryValid && (
-                  <button 
+                  <button
                     onClick={() => {
                       setCurrentGeometry(null);
                       setEditorMode(`draw_${drawMode}` as any);
@@ -215,7 +215,7 @@ export function GeofenceEditorView({
                   </button>
                 )}
               </div>
-              
+
               <div className="space-y-2">
                 <div className="flex justify-between items-center text-[11px]">
                   <span className="text-foreground-muted">Jumlah Titik</span>
@@ -229,17 +229,17 @@ export function GeofenceEditorView({
                   <span className="text-foreground-muted">Keliling</span>
                   <span className="font-semibold">{currentGeometry ? '8.2 km' : '-'}</span>
                 </div>
-                
+
                 {isGeometryValid && currentGeometry?.coordinates && currentGeometry.coordinates.length > 0 && (
                   <div className="pt-2 space-y-1.5 border-t border-border/50">
-                    <button 
+                    <button
                       onClick={() => setShowCoordinates(!showCoordinates)}
                       className="flex items-center justify-between w-full text-[11px] font-semibold text-foreground hover:text-foreground-muted transition-colors"
                     >
                       <span>Daftar Titik Koordinat</span>
                       {showCoordinates ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
                     </button>
-                    
+
                     {showCoordinates && (
                       <div className="max-h-32 overflow-y-auto rounded-md border border-border bg-surface p-2 space-y-1">
                         {currentGeometry.coordinates.map((coord, idx) => (
@@ -272,10 +272,10 @@ export function GeofenceEditorView({
           <Button type="button" variant="outline" size="sm" onClick={onClose} className="bg-background">
             Batal
           </Button>
-          <Button 
-            type="button" 
-            variant="primary" 
-            size="sm" 
+          <Button
+            type="button"
+            variant="primary"
+            size="sm"
             onClick={handleSave}
             disabled={!formData.name || !isGeometryValid}
             className="bg-danger hover:bg-danger/90 text-white min-w-[100px]"

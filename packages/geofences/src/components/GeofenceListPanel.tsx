@@ -81,12 +81,12 @@ export function GeofenceListPanel({
   return (
     <aside className="flex flex-col h-full bg-white dark:bg-neutral-950 border-l border-border overflow-hidden w-[320px] shadow-[-4px_0_15px_-3px_rgba(0,0,0,0.05)]">
       {/* -- Header ---------------------------------------------------------- */}
-      <div className="shrink-0 flex items-center justify-between px-3 h-[40px] bg-white dark:bg-neutral-900 border-b border-border">
+      <div className="shrink-0 flex items-center justify-between px-3 h-[44px] bg-white dark:bg-neutral-900 border-b border-border">
         {/* Kiri: Button Tambah Geofence */}
         <div className="flex items-center">
           <button
             onClick={onAdd}
-            className="flex h-6 px-2 items-center justify-center gap-1 rounded bg-red-600 text-[10px] font-bold text-white hover:bg-red-700 transition-colors"
+            className="flex h-7 px-3 items-center justify-center gap-1.5 rounded-md bg-red-600 text-[10px] font-bold text-white hover:bg-red-700 transition-colors"
           >
             <Plus className="h-3.5 w-3.5" /> Tambah Geofence
           </button>
@@ -97,9 +97,9 @@ export function GeofenceListPanel({
           {onClose && (
             <button
               onClick={onClose}
-              className="flex h-6 w-6 items-center justify-center rounded text-neutral-400 hover:bg-neutral-50 hover:text-foreground transition-colors ml-1"
+              className="flex h-6 w-6 items-center justify-center rounded-md text-neutral-400 hover:bg-neutral-50 hover:text-foreground transition-colors ml-1"
             >
-              <ChevronRight className="h-3.5 w-3.5" />
+              <ChevronRight className="h-4 w-4" />
             </button>
           )}
         </div>
