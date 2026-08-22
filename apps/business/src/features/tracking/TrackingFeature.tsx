@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Map, History, ChevronLeft, Filter } from 'lucide-react';
+import { Map, History, ChevronLeft, Filter, AlertTriangle } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import { VehicleList } from './components/VehicleList';
 import { LiveMap } from './components/LiveMap';
@@ -9,6 +9,7 @@ import { PlaybackMap } from './components/PlaybackMap';
 import { PlaybackPanel } from './components/PlaybackPanel';
 import { VehicleOverviewPanel } from './components/VehicleOverviewPanel';
 import { TrackingCustomTable } from './components/TrackingCustomTable';
+import { TrackingNotificationPanel } from './components/TrackingNotificationPanel';
 import { mockVehicleGroups, mockVehicles, generateMockPlaybackData } from './data/mockTrackingData';
 import type { MockPlaybackData } from './data/mockTrackingData';
 import { getTranslation } from '../../i18n';
@@ -335,6 +336,14 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
           />
         )}
 
+        {/* View: Notification */}
+        {view === 'notification' && (
+          <TrackingNotificationPanel 
+            locale={locale} 
+            visibleVehicleIds={selectedVehicleIds}
+          />
+        )}
+
         {/* Mode Toggle (only in map view) */}
         <div className={cn("absolute top-4 left-4 z-20", view !== 'map' && 'hidden')}>
           <div
@@ -470,6 +479,20 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
           >
             <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2" /><path d="M3 9h18" /><path d="M3 15h18" /><path d="M9 3v18" /><path d="M15 3v18" /></svg>
             {locale === 'en' ? 'Table' : 'Tabel'}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setView('notification');
+              setMode('live');
+            }}
+            className={cn(
+              'px-4 h-full text-xs font-semibold border-b-2 transition-colors focus:outline-none flex items-center gap-1.5 pt-[2px]',
+              view === 'notification' ? 'border-b-foreground text-foreground' : 'border-b-transparent text-foreground-muted hover:text-foreground'
+            )}
+          >
+            <AlertTriangle className="h-3.5 w-3.5" />
+            {tTracking.viewNotification || (locale === 'en' ? 'Notification' : 'Notifikasi')}
           </button>
         </div>
       </div>

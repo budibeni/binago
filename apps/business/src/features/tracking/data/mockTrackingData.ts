@@ -19,6 +19,7 @@ const hinoDutroVehicles: TrackingVehicle[] = [
     geofenceArea: 'Area A - Zona Bongkar Muat',
     gpsSerialNumber: '352625691111001',
     alarmEvent: '-',
+    isLocationShared: true,
   },
   {
     id: 'veh-002',

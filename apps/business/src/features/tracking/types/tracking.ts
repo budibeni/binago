@@ -5,7 +5,7 @@ export type VehicleStatus = 'driving' | 'idle' | 'parking' | 'offline';
 // ─── View Mode ─────────────────────────────────────────────────────────────────
 
 export type TrackingViewMode = 'map' | 'video';
-export type TrackingView = 'map' | 'table';
+export type TrackingView = 'map' | 'table' | 'notification';
 
 // ─── Status Filter ─────────────────────────────────────────────────────────────
 
@@ -38,6 +38,7 @@ export interface TrackingVehicle {
   geofenceArea?: string;     // Current geofence area
   gpsSerialNumber?: string;  // GPS device serial number
   alarmEvent?: string;       // Latest alarm/event
+  isLocationShared?: boolean; // Whether the vehicle's location is currently being shared
 }
 
 // ─── Vehicle Group ─────────────────────────────────────────────────────────────
