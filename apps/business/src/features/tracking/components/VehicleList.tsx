@@ -13,7 +13,8 @@ import {
   LayoutGrid,
   Play,
   PauseCircle,
-  CircleDot
+  CircleDot,
+  User
 } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import { Checkbox } from '@adatrack/ui';
@@ -87,7 +88,7 @@ function StatusBadge({ status, labels }: StatusBadgeProps) {
   const c = statusConfig[status];
 
   return (
-    <span className="inline-flex items-center gap-1.5 text-[10px] font-medium text-foreground tracking-tight">
+    <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-foreground tracking-tight">
       <span className={cn('h-1 w-1 rounded-full shrink-0', c.dot)} />
       {labels[status]}
     </span>
@@ -119,7 +120,7 @@ function VehicleListItem({
   return (
     <div
       className={cn(
-        'group flex items-center gap-2 py-1.5 px-2.5 cursor-pointer transition-colors',
+        'group flex items-center gap-2 py-2 px-3 cursor-pointer transition-colors',
         isSelected ? 'bg-neutral-50 dark:bg-neutral-800/80' : 'hover:bg-[#fafafa] dark:hover:bg-neutral-800/40'
       )}
       onClick={() => onSelect(vehicle.id)}
@@ -143,13 +144,17 @@ function VehicleListItem({
         />
       </div>
 
-      <div className="flex-1 min-w-0 flex items-center gap-1.5 ml-0.5">
-        <span className="text-[11px] font-bold text-foreground whitespace-nowrap tracking-tight">
+      <div className="flex-1 min-w-0 flex flex-col justify-center ml-1 space-y-0.5">
+        <span className="text-xs font-semibold text-neutral-800 dark:text-neutral-200 truncate tracking-tight leading-tight">
           {vehicle.plateNumber}
         </span>
-        <span className="text-[10px] font-medium text-neutral-400 whitespace-nowrap truncate tracking-tight">
-          / {vehicle.driverName ?? noDriverLabel}
+        <span className="text-[11px] font-medium text-neutral-600 dark:text-neutral-400 truncate tracking-tight">
+          {vehicle.vehicleType || '-'}
         </span>
+        <div className="flex items-center gap-1 text-[10px] font-medium text-neutral-500 truncate tracking-tight">
+          <User className="h-2.5 w-2.5 shrink-0 opacity-70" />
+          <span className="truncate">{vehicle.driverName ?? noDriverLabel}</span>
+        </div>
       </div>
 
       <div className="flex items-center justify-end shrink-0 mx-1">
@@ -182,7 +187,7 @@ function VehicleGroupHeader({
 }: VehicleGroupHeaderProps) {
   return (
     <div
-      className="flex items-center gap-2 px-2.5 py-2 cursor-pointer bg-white dark:bg-neutral-900 hover:bg-[#fafafa] dark:hover:bg-neutral-800 transition-colors"
+      className="flex items-center gap-2 px-3 py-2.5 cursor-pointer bg-white dark:bg-neutral-900 hover:bg-[#fafafa] dark:hover:bg-neutral-800 transition-colors"
       onClick={onToggle}
     >
       <ChevronDown className={cn("w-3.5 h-3.5 text-neutral-400 transition-transform", !isExpanded && "-rotate-90")} />
@@ -199,7 +204,7 @@ function VehicleGroupHeader({
 
       <Folder className="h-[14px] w-[14px] text-[#e6b941] fill-[#f4cb5d] shrink-0 ml-0.5" />
 
-      <span className="text-[11px] font-bold text-foreground flex-1 truncate ml-0.5 tracking-tight">
+      <span className="text-xs font-semibold text-neutral-800 dark:text-neutral-200 flex-1 truncate ml-0.5 tracking-tight">
         {group.name}
       </span>
 

@@ -338,8 +338,8 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
 
         {/* View: Notification */}
         {view === 'notification' && (
-          <TrackingNotificationPanel 
-            locale={locale} 
+          <TrackingNotificationPanel
+            locale={locale}
             visibleVehicleIds={selectedVehicleIds}
           />
         )}
@@ -543,14 +543,11 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
               >
 
                 {/* Vertical Text */}
-                <div className="flex flex-col items-center gap-1 font-bold text-[8.5px] tracking-widest text-foreground-muted group-hover:text-foreground uppercase select-none mb-2 transition-colors">
-                  {tTracking.title.toUpperCase().split('').map((char, index) => (
-                    <span key={index} className="leading-none">{char}</span>
-                  ))}
+                <div className="font-bold text-[10px] tracking-[0.2em] text-foreground-muted group-hover:text-foreground uppercase select-none mb-4 mt-2 transition-colors [writing-mode:vertical-rl] rotate-180">
+                  {tTracking.title}
                 </div>
 
-                {/* Active Indicator Square */}
-                <div className="h-1 w-1 bg-primary animate-pulse" />
+
               </button>
             </div>
           )}

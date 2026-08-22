@@ -4,8 +4,8 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Plus,
   Minus,
-  Maximize2,
-  Minimize2,
+  Maximize,
+  Minimize,
   MoreHorizontal,
   Search,
   CircleDot,
@@ -144,19 +144,11 @@ export function MapControlPanel({
 
   const basemapOptions: { id: BasemapId; label: string; Icon: React.FC<{ className?: string }> }[] = [
     { id: 'standard',  label: bm.standard,  Icon: BASEMAP_ICONS.standard },
-    { id: 'dark',      label: bm.dark, Icon: BASEMAP_ICONS.dark },
     { id: 'osm',       label: bm.osm,       Icon: BASEMAP_ICONS.osm },
     { id: 'satellite', label: bm.satellite, Icon: BASEMAP_ICONS.satellite },
   ];
 
   const moreTools = [
-    {
-      id: 'fullscreen' as const,
-      Icon: isFullscreen ? Minimize2 : Maximize2,
-      label: isFullscreen ? tb.exitFullscreen : tb.fullscreen,
-      onClick: handleFullscreen,
-      isActive: isFullscreen,
-    },
     { id: 'search'   as const, Icon: Search,    label: tb.search,   onClick: () => toggle('search'),   isActive: active === 'search' },
     { id: 'geofence' as const, Icon: MapPinSearch, label: tb.geofence, onClick: () => toggle('geofence'), isActive: active === 'geofence' },
     ...(hasCustomMarker ? [{ id: 'markerStyle' as const, Icon: Tag, label: tb.markerStyle, onClick: () => toggle('markerStyle'), isActive: active === 'markerStyle' }] : []),
@@ -358,6 +350,17 @@ export function MapControlPanel({
 
         <Sep />
 
+        {/* Fullscreen */}
+        <IconBtn
+          id="ctrl-fullscreen"
+          icon={isFullscreen ? Minimize : Maximize}
+          label={isFullscreen ? tb.exitFullscreen : tb.fullscreen}
+          onClick={handleFullscreen}
+          active={isFullscreen}
+        />
+
+        <Sep />
+
         {/* More Tools */}
         <IconBtn
           id="ctrl-more-tools"
@@ -433,13 +436,13 @@ function IconBtn({ id, icon: Icon, label, onClick, active }: IconBtnProps) {
       aria-label={label}
       aria-pressed={active}
       className={cn(
-        'flex items-center justify-center w-8 h-8 rounded-md transition-all duration-150 shrink-0',
+        'flex items-center justify-center w-[28px] h-[28px] rounded-md transition-all duration-150 shrink-0',
         active
           ? 'bg-accent/10 text-accent ring-1 ring-accent/20'
           : 'text-foreground-muted hover:bg-surface hover:text-foreground',
       )}
     >
-      <Icon className="w-[18px] h-[18px]" />
+      <Icon className="w-4 h-4" />
     </button>
   );
 }
