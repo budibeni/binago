@@ -51,5 +51,89 @@ export const mockRoutes: Route[] = [
     status: 'active',
     createdAt: '2025-02-20T10:00:00Z',
     updatedAt: '2025-02-20T11:00:00Z',
+  },
+  {
+    id: 'rt-004', name: 'Distribusi Selatan', description: '', status: 'active',
+    origin: { type: 'geofence', geofenceId: 'gf-01' }, stops: [], destination: { type: 'geofence', geofenceId: 'gf-01' },
+    plannedDistance: 10, estimatedDuration: 20,
+    plannedPath: { type: 'multiline', coordinates: [{ lat: -6.17, lng: 106.82 }, { lat: -6.20, lng: 106.82 }] },
+    createdAt: '2025-01-20T08:00:00Z', updatedAt: '2025-01-20T08:00:00Z'
+  },
+  {
+    id: 'rt-005', name: 'Distribusi Utara', description: '', status: 'active',
+    origin: { type: 'geofence', geofenceId: 'gf-01' }, stops: [], destination: { type: 'geofence', geofenceId: 'gf-01' },
+    plannedDistance: 10, estimatedDuration: 20,
+    plannedPath: { type: 'multiline', coordinates: [{ lat: -6.17, lng: 106.82 }, { lat: -6.14, lng: 106.82 }] },
+    createdAt: '2025-01-20T08:00:00Z', updatedAt: '2025-01-20T08:00:00Z'
+  },
+  {
+    id: 'rt-006', name: 'Distribusi Barat', description: '', status: 'active',
+    origin: { type: 'geofence', geofenceId: 'gf-01' }, stops: [], destination: { type: 'geofence', geofenceId: 'gf-01' },
+    plannedDistance: 10, estimatedDuration: 20,
+    plannedPath: { type: 'multiline', coordinates: [{ lat: -6.17, lng: 106.82 }, { lat: -6.17, lng: 106.79 }] },
+    createdAt: '2025-01-20T08:00:00Z', updatedAt: '2025-01-20T08:00:00Z'
+  },
+  {
+    id: 'rt-007', name: 'Distribusi Timur', description: '', status: 'active',
+    origin: { type: 'geofence', geofenceId: 'gf-01' }, stops: [], destination: { type: 'geofence', geofenceId: 'gf-01' },
+    plannedDistance: 10, estimatedDuration: 20,
+    plannedPath: { type: 'multiline', coordinates: [{ lat: -6.17, lng: 106.82 }, { lat: -6.17, lng: 106.85 }] },
+    createdAt: '2025-01-20T08:00:00Z', updatedAt: '2025-01-20T08:00:00Z'
+  },
+  {
+    id: 'rt-008', name: 'Jalur Alternatif Barat', description: '', status: 'active',
+    origin: { type: 'geofence', geofenceId: 'gf-01' }, stops: [], destination: { type: 'geofence', geofenceId: 'gf-01' },
+    plannedDistance: 10, estimatedDuration: 20,
+    plannedPath: { type: 'multiline', coordinates: [{ lat: -6.18, lng: 106.80 }, { lat: -6.20, lng: 106.78 }] },
+    createdAt: '2025-01-20T08:00:00Z', updatedAt: '2025-01-20T08:00:00Z'
+  },
+  {
+    id: 'rt-009', name: 'Route Harian Gudang', description: '', status: 'active',
+    origin: { type: 'geofence', geofenceId: 'gf-01' }, stops: [], destination: { type: 'geofence', geofenceId: 'gf-01' },
+    plannedDistance: 10, estimatedDuration: 20,
+    plannedPath: { type: 'multiline', coordinates: [{ lat: -6.19, lng: 106.83 }, { lat: -6.21, lng: 106.83 }] },
+    createdAt: '2025-01-20T08:00:00Z', updatedAt: '2025-01-20T08:00:00Z'
+  },
+  {
+    id: 'rt-010', name: 'Route Antar Cabang', description: '', status: 'active',
+    origin: { type: 'geofence', geofenceId: 'gf-01' }, stops: [], destination: { type: 'geofence', geofenceId: 'gf-01' },
+    plannedDistance: 10, estimatedDuration: 20,
+    plannedPath: { type: 'multiline', coordinates: [{ lat: -6.22, lng: 106.84 }, { lat: -6.25, lng: 106.85 }] },
+    createdAt: '2025-01-20T08:00:00Z', updatedAt: '2025-01-20T08:00:00Z'
+  },
+  {
+    id: 'rt-011', name: 'Route Retail A', description: '', status: 'active',
+    origin: { type: 'geofence', geofenceId: 'gf-01' }, stops: [], destination: { type: 'geofence', geofenceId: 'gf-01' },
+    plannedDistance: 10, estimatedDuration: 20,
+    plannedPath: { type: 'multiline', coordinates: [{ lat: -6.15, lng: 106.85 }, { lat: -6.16, lng: 106.87 }] },
+    createdAt: '2025-01-20T08:00:00Z', updatedAt: '2025-01-20T08:00:00Z'
+  },
+  {
+    id: 'rt-012', name: 'Route Retail B', description: '', status: 'active',
+    origin: { type: 'geofence', geofenceId: 'gf-01' }, stops: [], destination: { type: 'geofence', geofenceId: 'gf-01' },
+    plannedDistance: 10, estimatedDuration: 20,
+    plannedPath: { type: 'multiline', coordinates: [{ lat: -6.15, lng: 106.80 }, { lat: -6.16, lng: 106.78 }] },
+    createdAt: '2025-01-20T08:00:00Z', updatedAt: '2025-01-20T08:00:00Z'
+  },
+  {
+    id: 'rt-013', name: 'Route Maintenance', description: '', status: 'active',
+    origin: { type: 'geofence', geofenceId: 'gf-01' }, stops: [], destination: { type: 'geofence', geofenceId: 'gf-01' },
+    plannedDistance: 10, estimatedDuration: 20,
+    plannedPath: { type: 'multiline', coordinates: [{ lat: -6.20, lng: 106.85 }, { lat: -6.22, lng: 106.88 }] },
+    createdAt: '2025-01-20T08:00:00Z', updatedAt: '2025-01-20T08:00:00Z'
+  },
+  {
+    id: 'rt-014', name: 'Route Proyek X', description: '', status: 'active',
+    origin: { type: 'geofence', geofenceId: 'gf-01' }, stops: [], destination: { type: 'geofence', geofenceId: 'gf-01' },
+    plannedDistance: 10, estimatedDuration: 20,
+    plannedPath: { type: 'multiline', coordinates: [{ lat: -6.12, lng: 106.80 }, { lat: -6.10, lng: 106.82 }] },
+    createdAt: '2025-01-20T08:00:00Z', updatedAt: '2025-01-20T08:00:00Z'
+  },
+  {
+    id: 'rt-015', name: 'Route Proyek Y', description: '', status: 'active',
+    origin: { type: 'geofence', geofenceId: 'gf-01' }, stops: [], destination: { type: 'geofence', geofenceId: 'gf-01' },
+    plannedDistance: 10, estimatedDuration: 20,
+    plannedPath: { type: 'multiline', coordinates: [{ lat: -6.25, lng: 106.80 }, { lat: -6.27, lng: 106.80 }] },
+    createdAt: '2025-01-20T08:00:00Z', updatedAt: '2025-01-20T08:00:00Z'
   }
 ];

@@ -7,6 +7,7 @@ import { VehicleList } from './components/VehicleList';
 import { LiveMap } from './components/LiveMap';
 import { PlaybackMap } from './components/PlaybackMap';
 import { PlaybackPanel } from './components/PlaybackPanel';
+import { PlaybackMapLayerPanel } from './components/PlaybackMapLayerPanel';
 import { VehicleOverviewPanel } from './components/VehicleOverviewPanel';
 import { TrackingCustomTable } from './components/TrackingCustomTable';
 import { TrackingNotificationPanel } from './components/TrackingNotificationPanel';
@@ -43,6 +44,11 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
   const [selectedVehicleId, setSelectedVehicleId] = React.useState<string | null>(null);
   const [selectedVehicleIds, setSelectedVehicleIds] = React.useState<string[]>(() => mockVehicles.map((v) => v.id));
   const [isVehicleListVisible, setIsVehicleListVisible] = React.useState(true);
+
+  // -- Map Layer state --
+  const [selectedGeofenceIds, setSelectedGeofenceIds] = React.useState<string[]>([]);
+  const [selectedRouteIds, setSelectedRouteIds] = React.useState<string[]>([]);
+  const [isMapLayerPanelVisible, setIsMapLayerPanelVisible] = React.useState(true);
 
   // â"€â"€ Playback state â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
   const [playbackVehicleId, setPlaybackVehicleId] = React.useState<string | null>(null);
@@ -391,26 +397,76 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
           </div>
         </div>
 
-        {/* Map Area: Live (always mounted, hidden in playback mode or table view) */}
-        <div className={cn('flex-1 relative', (mode !== 'live' || view !== 'map') && 'hidden')}>
-          <LiveMap
-            vehicles={allVehiclesUnfiltered}
-            selectedVehicleId={selectedVehicleId || undefined}
-            visibleVehicleIds={allVehiclesUnfiltered.map(v => v.id).filter(id => selectedVehicleIds.includes(id))}
-            onPlaybackRequest={handlePlaybackRequest}
-          />
-        </div>
+        {/* Wrapper for Map and Playback Sidebar */}
+        <div className="flex-1 flex min-h-0 relative w-full">
+          {/* Map Area Wrapper */}
+          <div className="flex-1 flex flex-col min-w-0 relative">
+            {/* Map Area: Live (always mounted, hidden in playback mode or table view) */}
+            <div className={cn('flex-1 relative', (mode !== 'live' || view !== 'map') && 'hidden')}>
+              <LiveMap
+                vehicles={allVehiclesUnfiltered}
+                selectedVehicleId={selectedVehicleId || undefined}
+                visibleVehicleIds={allVehiclesUnfiltered.map(v => v.id).filter(id => selectedVehicleIds.includes(id))}
+                onPlaybackRequest={handlePlaybackRequest}
+              />
+            </div>
 
-        {/* Map Area: Playback (always mounted, hidden in live mode or table view) */}
-        <div className={cn('flex-1 relative', (mode !== 'playback' || view !== 'map') && 'hidden')}>
-          <PlaybackMap
-            vehicle={playbackVehicle}
-            playbackTrack={playbackTrack}
-            playbackPassedTrack={playbackPassedTrack}
-            playbackParkingEvents={playbackParkingEvents}
-          />
-        </div>
+            {/* Map Area: Playback (always mounted, hidden in live mode or table view) */}
+            <div className={cn('flex-1 relative', (mode !== 'playback' || view !== 'map') && 'hidden')}>
+              <PlaybackMap
+                vehicle={playbackVehicle}
+                playbackTrack={playbackTrack}
+                playbackPassedTrack={playbackPassedTrack}
+                playbackParkingEvents={playbackParkingEvents}
+                selectedGeofenceIds={selectedGeofenceIds}
+                selectedRouteIds={selectedRouteIds}
+              />
+            </div>
+          </div>
 
+          {/* Right Sidebar: Playback Map Layers */}
+          {mode === 'playback' && (
+            <div
+              className={cn(
+                'shrink-0 h-full z-10 transition-all duration-300 ease-in-out flex flex-col',
+                isMapLayerPanelVisible
+                  ? 'w-[320px] border-l border-neutral-200 dark:border-neutral-800 bg-background shadow-[-4px_0_15px_-3px_rgba(0,0,0,0.05)]'
+                  : 'w-[34px] py-2 items-center bg-transparent border-l border-neutral-200 dark:border-neutral-800'
+              )}
+            >
+              {isMapLayerPanelVisible ? (
+                <PlaybackMapLayerPanel
+                  selectedGeofenceIds={selectedGeofenceIds}
+                  selectedRouteIds={selectedRouteIds}
+                  onGeofenceChange={setSelectedGeofenceIds}
+                  onRouteChange={setSelectedRouteIds}
+                  onClose={() => setIsMapLayerPanelVisible(false)}
+                />
+              ) : (
+                <div className="flex flex-col items-center gap-2.5 h-full w-full">
+                  <button
+                    type="button"
+                    onClick={() => setIsMapLayerPanelVisible(true)}
+                    className="flex h-6 w-6 items-center justify-center text-foreground-muted hover:text-foreground transition-colors focus:outline-none shrink-0"
+                    title="Pilih layer"
+                  >
+                    <ChevronLeft className="h-3.5 w-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsMapLayerPanelVisible(true)}
+                    className="flex flex-col items-center py-2 px-0.5 text-foreground group shrink-0 transition-opacity hover:opacity-80"
+                    title="Pilih layer"
+                  >
+                    <div className="font-bold text-[10px] tracking-[0.2em] text-foreground-muted group-hover:text-foreground uppercase select-none mb-4 mt-2 transition-colors [writing-mode:vertical-rl] rotate-180">
+                      PILIH LAYER
+                    </div>
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
 
         {/* Bottom Playback Panel */}
         <div
@@ -497,7 +553,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
         </div>
       </div>
 
-      {/* Right Sidebar: VehicleList or Collapsed Vertical Tab */}
+      {/* Right Sidebar for Live */}
       {mode === 'live' && (
         <div
           className={cn(
@@ -541,13 +597,10 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
                 className="flex flex-col items-center py-2 px-0.5 text-foreground group shrink-0 transition-opacity hover:opacity-80"
                 title="Buka Pemantauan"
               >
-
                 {/* Vertical Text */}
                 <div className="font-bold text-[10px] tracking-[0.2em] text-foreground-muted group-hover:text-foreground uppercase select-none mb-4 mt-2 transition-colors [writing-mode:vertical-rl] rotate-180">
                   {tTracking.title}
                 </div>
-
-
               </button>
             </div>
           )}

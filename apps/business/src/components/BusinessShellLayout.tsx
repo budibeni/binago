@@ -58,13 +58,13 @@ function buildNavigation(locale: Locale): NavGroup[] {
         { id: 'drivers', label: t.nav.drivers, href: '/drivers', icon: UserRound },
         { id: 'geofences', label: t.nav.geofences, href: '/geofences', icon: MapPinned },
         { id: 'groups', label: t.nav.groups, href: '/groups', icon: Layers },
+        { id: 'routes', label: t.nav.routes, href: '/routes', icon: Waypoints },
       ],
     },
     {
       id: 'operational',
       title: t.navGroup.operational,
       items: [
-        { id: 'routes', label: t.nav.routes, href: '/routes', icon: Waypoints },
         { id: 'trips', label: t.nav.trips, href: '/trips', icon: Route },
         { id: 'activities', label: t.nav.activities, href: '/activities', icon: Activity },
       ],

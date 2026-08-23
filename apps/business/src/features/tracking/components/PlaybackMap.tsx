@@ -7,6 +7,7 @@ import { cn } from '@adatrack/utils';
 import type { TrackingVehicle } from '../types/tracking';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
 import { getTranslation } from '@/i18n';
+import { PlaybackMapLayers } from './PlaybackMapLayers';
 
 // --- Types ---------------------------------------------------------------------
 
@@ -26,6 +27,8 @@ export interface PlaybackMapProps {
   playbackTrack?: { lat: number; lng: number }[];
   playbackPassedTrack?: { lat: number; lng: number }[];
   playbackParkingEvents?: ParkingEvent[];
+  selectedGeofenceIds?: string[];
+  selectedRouteIds?: string[];
 }
 
 // --- Inner: auto-fit bounds when track loads -----------------------------------
@@ -248,6 +251,8 @@ export function PlaybackMap({
   playbackTrack,
   playbackPassedTrack,
   playbackParkingEvents,
+  selectedGeofenceIds = [],
+  selectedRouteIds = [],
 }: PlaybackMapProps) {
   const locale = useBusinessLocale();
   const tTracking = getTranslation(locale).tracking;
@@ -301,6 +306,12 @@ export function PlaybackMap({
       >
         {/* Auto-fit to route bounds on load */}
         <PlaybackFitBounds track={playbackTrack} />
+
+        {/* Map Layers (Geofences and Routes) */}
+        <PlaybackMapLayers 
+          selectedGeofenceIds={selectedGeofenceIds} 
+          selectedRouteIds={selectedRouteIds} 
+        />
 
         {/* Rich parking markers with popup inside MapProvider context */}
         {playbackParkingEvents && playbackParkingEvents.map((event, idx) => (
