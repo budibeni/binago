@@ -238,6 +238,13 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
     stopTimer();
   }, [stopTimer]);
 
+  const handleClearPlayback = React.useCallback(() => {
+    setPlaybackState({ status: 'idle', totalDuration: 0, currentTime: 0 });
+    setPlaybackData(null);
+    setPlaybackPointIndex(0);
+    stopTimer();
+  }, [stopTimer]);
+
   const handleLoadHistory = React.useCallback(() => {
     if (!playbackVehicleId) return;
     stopTimer();
@@ -422,6 +429,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
                 selectedRouteIds={selectedRouteIds}
               />
             </div>
+
           </div>
 
           {/* Right Sidebar: Playback Map Layers */}
@@ -468,11 +476,13 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
           )}
         </div>
 
-        {/* Bottom Playback Panel */}
+        {/* Bottom Playback Panel (Footer) */}
         <div
           className={cn(
-            'shrink-0 border-t border-border bg-background transition-all duration-300 ease-in-out',
-            (mode === 'playback' && view === 'map') ? 'h-[120px] opacity-100 translate-y-0' : 'h-0 opacity-0 translate-y-10 pointer-events-none overflow-hidden'
+            'shrink-0 border-t border-border bg-background transition-all duration-300 ease-in-out relative z-[400]',
+            (mode === 'playback' && view === 'map')
+              ? 'h-[56px] opacity-100 translate-y-0'
+              : 'h-0 opacity-0 translate-y-10 pointer-events-none overflow-hidden'
           )}
           aria-hidden={mode !== 'playback' || view !== 'map'}
         >
@@ -484,6 +494,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
             onVehicleChange={handlePlaybackVehicleChange}
             onDateRangeChange={setDateRange}
             onLoad={handleLoadHistory}
+            onClear={handleClearPlayback}
             onPlay={handlePlay}
             onPause={handlePause}
             onStop={handleStop}
@@ -492,6 +503,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
             onSpeedChange={setPlaybackSpeed}
           />
         </div>
+
 
         {/* Bottom Overview Panel (Live Mode) */}
         <div
