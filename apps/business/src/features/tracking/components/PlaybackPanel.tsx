@@ -169,7 +169,7 @@ export function PlaybackPanel({
             <div className="flex items-center gap-2 pr-2 sm:pr-3 border-r border-border shrink-0">
               <History className="h-4 w-4 text-danger" strokeWidth={2.5} />
               <h2 className="text-[11px] font-bold text-foreground tracking-widest hidden md:block">
-                PLAYBACK
+                {tTracking.playbackTitle}
               </h2>
             </div>
 
@@ -217,7 +217,7 @@ export function PlaybackPanel({
                   </div>
                 </div>
 
-                <span className="text-foreground-muted text-[9px] sm:text-[10px] font-bold mx-0.5 sm:mx-1">TO</span>
+                <span className="text-foreground-muted text-[9px] sm:text-[10px] font-bold mx-0.5 sm:mx-1">{tTracking.playbackTo}</span>
 
                 {/* End */}
                 <div className="flex items-center gap-0.5 sm:gap-1">
@@ -252,7 +252,7 @@ export function PlaybackPanel({
               onClick={onLoad}
             >
               {isLoading ? <Spinner size="sm" className="mr-1 sm:mr-1.5 text-white" /> : <Search className="h-3 w-3 mr-1 sm:mr-1.5" strokeWidth={2.5} />}
-              {isLoading ? 'Mencari...' : 'Cari Riwayat'}
+              {isLoading ? tTracking.playbackSearching : tTracking.playbackSearchHistory}
             </Button>
           </>
         ) : (
@@ -342,7 +342,7 @@ export function PlaybackPanel({
               <button
                 type="button"
                 onClick={onClear}
-                title="Batalkan & Ubah Waktu"
+                title={tTracking.playbackCancelTime}
                 className="flex items-center justify-center h-8 w-8 rounded-full bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-foreground transition-colors"
               >
                 <X className="h-4 w-4" />

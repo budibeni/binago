@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Map, History, ChevronLeft, Filter, AlertTriangle } from 'lucide-react';
+import { Map, History, ChevronLeft, Filter, Activity } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import { VehicleList } from './components/VehicleList';
 import { LiveMap } from './components/LiveMap';
@@ -71,6 +71,42 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
   const timerRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
   const playbackDataRef = React.useRef<MockPlaybackData | null>(null);
   const playbackSpeedRef = React.useRef(1);
+
+  // -- Initialize from URL parameters --
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    const params = new URLSearchParams(window.location.search);
+    const vId = params.get('vehicleId');
+    const startStr = params.get('start');
+    const endStr = params.get('end');
+
+    if (vId && startStr) {
+      setMode('playback');
+      setPlaybackVehicleId(vId);
+      
+      const startDate = new Date(startStr);
+      const endDate = endStr ? new Date(endStr) : new Date();
+      
+      setDateRange({
+        startDate: startDate.toISOString().slice(0, 10),
+        startTime: startDate.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }),
+        endDate: endDate.toISOString().slice(0, 10),
+        endTime: endDate.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }),
+      });
+      
+      // Simulate generating data right away
+      setPlaybackState(prev => ({ ...prev, status: 'playing' }));
+      const pData = generateMockPlaybackData(vId, startDate);
+      setPlaybackData(pData);
+      setPlaybackState({
+        status: 'playing',
+        totalDuration: pData.totalDurationSecs,
+        currentTime: 0,
+      });
+      setPlaybackPointIndex(0);
+    }
+  }, []);
 
   // Keep refs in sync
   React.useEffect(() => { playbackDataRef.current = playbackData; }, [playbackData]);
@@ -456,7 +492,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
                     type="button"
                     onClick={() => setIsMapLayerPanelVisible(true)}
                     className="flex h-6 w-6 items-center justify-center text-foreground-muted hover:text-foreground transition-colors focus:outline-none shrink-0"
-                    title="Pilih layer"
+                    title={tTracking.playbackSelectLayer}
                   >
                     <ChevronLeft className="h-3.5 w-3.5" />
                   </button>
@@ -464,10 +500,10 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
                     type="button"
                     onClick={() => setIsMapLayerPanelVisible(true)}
                     className="flex flex-col items-center py-2 px-0.5 text-foreground group shrink-0 transition-opacity hover:opacity-80"
-                    title="Pilih layer"
+                    title={tTracking.playbackSelectLayer}
                   >
                     <div className="font-bold text-[10px] tracking-[0.2em] text-foreground-muted group-hover:text-foreground uppercase select-none mb-4 mt-2 transition-colors [writing-mode:vertical-rl] rotate-180">
-                      PILIH LAYER
+                      {tTracking.playbackGeofenceRoute}
                     </div>
                   </button>
                 </div>
@@ -559,8 +595,8 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
               view === 'notification' ? 'border-b-foreground text-foreground' : 'border-b-transparent text-foreground-muted hover:text-foreground'
             )}
           >
-            <AlertTriangle className="h-3.5 w-3.5 text-amber-500 dark:text-amber-400" />
-            {tTracking.viewNotification || (locale === 'en' ? 'Notification' : 'Notifikasi')}
+            <Activity className="h-3.5 w-3.5 text-blue-500 dark:text-blue-400" />
+            {tTracking.viewActivity || (locale === 'en' ? 'Activity' : 'Aktivitas')}
           </button>
         </div>
       </div>

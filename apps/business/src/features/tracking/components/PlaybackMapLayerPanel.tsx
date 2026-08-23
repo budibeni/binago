@@ -6,6 +6,8 @@ import { Checkbox } from '@adatrack/ui';
 import { cn } from '@adatrack/utils';
 import { mockGeofences } from '../../geofences/data/mockGeofences';
 import { mockRoutes } from '../../routes/data/mockRoutes';
+import { useBusinessLocale } from '@/components/BusinessShellLayout';
+import { getTranslation } from '@/i18n';
 
 export interface PlaybackMapLayerPanelProps {
   selectedGeofenceIds: string[];
@@ -34,6 +36,9 @@ export function PlaybackMapLayerPanel({
   const [routeSearch, setRouteSearch] = useState('');
   const [routePage, setRoutePage] = useState(1);
   const [routeItemsPerPage, setRouteItemsPerPage] = useState(5);
+
+  const locale = useBusinessLocale() || 'id';
+  const tTracking = getTranslation(locale).tracking;
 
   // --- Geofence Logic ---
   const filteredGeofences = useMemo(() => {
@@ -97,7 +102,7 @@ export function PlaybackMapLayerPanel({
     <div className="flex flex-col h-full w-full bg-background relative">
       {/* Header */}
       <div className="shrink-0 flex items-center justify-between px-3 h-[40px] bg-white dark:bg-neutral-900 border-b border-border">
-        <h2 className="text-[12px] font-bold text-foreground tracking-tight">Pilih layer</h2>
+        <h2 className="text-[12px] font-bold text-foreground tracking-tight">{tTracking.playbackSelectLayer}</h2>
         <button
           onClick={onClose}
           className="flex h-6 w-6 items-center justify-center rounded text-neutral-400 hover:bg-neutral-50 hover:text-foreground transition-colors"
@@ -136,7 +141,7 @@ export function PlaybackMapLayerPanel({
         {/* --- GEOFENCE SECTION --- */}
         <div className="flex flex-col mb-1">
           <div className="px-3 pt-3 pb-1.5 flex items-center justify-between">
-            <h3 className="text-[11px] font-bold text-foreground-muted tracking-wider">GEOFENCE</h3>
+            <h3 className="text-[11px] font-bold text-foreground-muted tracking-wider">{tTracking.playbackGeofences.toUpperCase()}</h3>
             <span className="text-[11px] font-bold text-danger">{selectedGeofenceIds.length}</span>
           </div>
           
@@ -150,7 +155,7 @@ export function PlaybackMapLayerPanel({
                   setGeoSearch(e.target.value);
                   setGeoPage(1);
                 }}
-                placeholder="Cari geofence..."
+                placeholder={tTracking.playbackSearchGeofence}
                 className="w-full pl-8 pr-2 py-1.5 text-[11px] rounded border border-border bg-surface text-foreground placeholder:text-foreground-muted focus:outline-none focus:ring-1 focus:ring-danger focus:border-danger transition-shadow"
               />
             </div>
@@ -176,7 +181,7 @@ export function PlaybackMapLayerPanel({
               </div>
             ) : (
               <div className="text-center text-[12px] text-foreground-muted py-4">
-                Geofence tidak ditemukan
+                {tTracking.playbackNoGeofenceRoute}
               </div>
             )}
           </div>
@@ -239,7 +244,7 @@ export function PlaybackMapLayerPanel({
         {/* --- ROUTE SECTION --- */}
         <div className="flex flex-col mb-1 border-t border-border">
           <div className="px-3 pt-3 pb-1.5 flex items-center justify-between">
-            <h3 className="text-[11px] font-bold text-foreground-muted tracking-wider">ROUTE</h3>
+            <h3 className="text-[11px] font-bold text-foreground-muted tracking-wider">{tTracking.playbackRoutes.toUpperCase()}</h3>
             <span className="text-[11px] font-bold text-danger">{selectedRouteIds.length}</span>
           </div>
           
@@ -253,7 +258,7 @@ export function PlaybackMapLayerPanel({
                   setRouteSearch(e.target.value);
                   setRoutePage(1);
                 }}
-                placeholder="Cari route..."
+                placeholder={tTracking.playbackSearchRoute}
                 className="w-full pl-8 pr-2 py-1.5 text-[11px] rounded border border-border bg-surface text-foreground placeholder:text-foreground-muted focus:outline-none focus:ring-1 focus:ring-danger focus:border-danger transition-shadow"
               />
             </div>
@@ -279,7 +284,7 @@ export function PlaybackMapLayerPanel({
               </div>
             ) : (
               <div className="text-center text-[12px] text-foreground-muted py-4">
-                Route tidak ditemukan
+                {tTracking.playbackNoGeofenceRoute}
               </div>
             )}
           </div>

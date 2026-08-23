@@ -48,6 +48,7 @@ function buildNavigation(locale: Locale): NavGroup[] {
       items: [
         { id: 'home', label: t.nav.home, href: '/', icon: Home },
         { id: 'tracking', label: t.nav.tracking, href: '/tracking', icon: Map },
+        { id: 'trips', label: t.nav.trips, href: '/trips', icon: Route },
       ],
     },
     {
@@ -61,14 +62,7 @@ function buildNavigation(locale: Locale): NavGroup[] {
         { id: 'routes', label: t.nav.routes, href: '/routes', icon: Waypoints },
       ],
     },
-    {
-      id: 'operational',
-      title: t.navGroup.operational,
-      items: [
-        { id: 'trips', label: t.nav.trips, href: '/trips', icon: Route },
-        { id: 'activities', label: t.nav.activities, href: '/activities', icon: Activity },
-      ],
-    },
+
     {
       id: 'asset',
       title: t.navGroup.asset,
