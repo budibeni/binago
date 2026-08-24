@@ -44,7 +44,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
   const [search, setSearch] = React.useState('');
   const [statusFilter, setStatusFilter] = React.useState<StatusFilter>('all');
   const [selectedVehicleId, setSelectedVehicleId] = React.useState<string | null>(null);
-  const [selectedVehicleIds, setSelectedVehicleIds] = React.useState<string[]>(() => trackingService.getLiveVehicles().map((v) => v.id));
+  const [selectedVehicleIds, setSelectedVehicleIds] = React.useState<string[]>([]);
   const [isVehicleListVisible, setIsVehicleListVisible] = React.useState(true);
 
   // -- Map Layer state --
@@ -99,6 +99,18 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
     const vId = params.get('vehicleId');
     const startStr = params.get('start');
     const endStr = params.get('end');
+    const vehiclesStr = params.get('vehicles');
+
+    if (vehiclesStr) {
+      const vIds = vehiclesStr.split(',').filter(Boolean);
+      if (vIds.length > 0) {
+        setSelectedVehicleIds(vIds);
+      } else {
+        setSelectedVehicleIds(trackingService.getLiveVehicles().map((v) => v.id));
+      }
+    } else {
+      setSelectedVehicleIds(trackingService.getLiveVehicles().map((v) => v.id));
+    }
 
     if (vId && startStr) {
       setMode('playback');

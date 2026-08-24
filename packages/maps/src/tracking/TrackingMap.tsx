@@ -183,7 +183,7 @@ function TrackingMapInner<T>({
 
   // Efek: Initial Fit hanya SEKALI saat ada entitas yang dipilih pertama kali
   useEffect(() => {
-    if (visibleEntities.length > 0 && !hasInitializedBounds.current) {
+    if (visibleEntities.length > 0 && !hasInitializedBounds.current && map) {
       const positions = visibleEntities.map(getPosition);
       const boundsObj = calcEntityBounds(positions);
       if (boundsObj) {
@@ -191,7 +191,7 @@ function TrackingMapInner<T>({
         hasInitializedBounds.current = true;
       }
     }
-  }, [visibleEntities, getPosition, fitBounds]);
+  }, [visibleEntities, getPosition, fitBounds, map]);
 
   const markersToRender = enableClustering && bounds ? clusters : points;
 

@@ -36,6 +36,7 @@ export const dictionaries = {
       // Rental
       dashboardRental: 'Dashboard Rental',
       customers: 'Pelanggan',
+      rentalVehicles: 'Armada Rental',
       rentalContracts: 'Kontrak Rental',
       reservations: 'Reservasi',
       handovers: 'Serah Terima',
@@ -546,6 +547,290 @@ export const dictionaries = {
       countdown: 'Berakhir dalam',
       sharedBy: 'Dibagikan oleh ADATRACK',
     },
+
+    // Rental Customers
+    rentalCustomers: {
+      title: 'Pelanggan Rental',
+      pageSubtitle: 'Manajemen data pelanggan perorangan dan perusahaan.',
+      searchPlaceholder: 'Cari nama, kode, no. telepon, NIK, atau NPWP...',
+      addCustomer: 'Tambah',
+      exportFilename: 'pelanggan-rental-adatrack',
+      filterType: 'Tipe',
+      filterStatus: 'Status',
+      filterAll: 'Semua',
+      typeIndividual: 'Perorangan',
+      typeCompany: 'Perusahaan',
+      statusActive: 'Aktif',
+      statusInactive: 'Nonaktif',
+      clearFilters: 'Hapus Filter',
+      
+      // Table Columns
+      colCode: 'Kode',
+      colCustomer: 'Pelanggan',
+      colType: 'Tipe',
+      colContact: 'Kontak',
+      colPic: 'PIC',
+      colActiveVehicles: 'Armada Aktif',
+      colActiveContracts: 'Kontrak Aktif',
+      colStatus: 'Status',
+      colActions: 'Aksi',
+      
+      // Empty state
+      emptyTitle: 'Belum ada pelanggan',
+      emptyDescription: 'Belum ada data pelanggan yang tersedia.',
+      noResultTitle: 'Pelanggan tidak ditemukan',
+      noResultDescription: 'Coba sesuaikan kata kunci atau filter pencarian.',
+      
+      // Drawer / Detail
+      detailTitle: 'Detail Pelanggan',
+      detailClose: 'Tutup',
+      tabPersonalInfo: 'Data Pribadi',
+      tabCompanyInfo: 'Informasi Perusahaan',
+      tabAddress: 'Alamat',
+      tabLegal: 'Legalitas',
+      tabPic: 'PIC',
+      tabSim: 'Data SIM',
+      
+      // Form / Actions
+      actionDetail: 'Lihat Detail',
+      actionEdit: 'Edit Pelanggan',
+      actionDelete: 'Hapus',
+      confirmDelete: 'Hapus Pelanggan',
+      confirmDeleteDesc: 'Apakah Anda yakin ingin menghapus pelanggan ini? Tindakan ini tidak dapat dibatalkan.',
+      cancel: 'Batal',
+      confirm: 'Hapus',
+      save: 'Simpan',
+      createSuccess: 'Pelanggan berhasil ditambahkan.',
+      updateSuccess: 'Data pelanggan berhasil diperbarui.',
+      deleteSuccess: 'Pelanggan berhasil dihapus.',
+      
+      // Form Fields
+      fieldCustomerType: 'Tipe Pelanggan',
+      fieldFullName: 'Nama Lengkap',
+      fieldCompanyName: 'Nama Perusahaan',
+      fieldNik: 'NIK / KTP',
+      fieldNib: 'NIB',
+      fieldNpwp: 'NPWP',
+      fieldPhone: 'No. HP / Telepon',
+      fieldEmail: 'Email',
+      fieldAddress: 'Alamat',
+      fieldCity: 'Kota',
+      fieldProvince: 'Provinsi',
+      fieldPostalCode: 'Kode Pos',
+      fieldBirthPlace: 'Tempat Lahir',
+      fieldBirthDate: 'Tanggal Lahir',
+      fieldSimNumber: 'Nomor SIM',
+      fieldSimType: 'Jenis SIM',
+      fieldSimExpiredAt: 'Masa Berlaku SIM',
+      fieldPicName: 'Nama PIC',
+      fieldPicPosition: 'Jabatan PIC',
+      fieldPicPhone: 'No. HP PIC',
+      fieldPicEmail: 'Email PIC',
+      fieldPicNik: 'NIK PIC',
+      fieldStatus: 'Status',
+      
+      // Placeholders
+      placeholderName: 'Masukkan nama',
+      placeholderNik: 'Masukkan NIK',
+      placeholderPhone: 'Contoh: 081234567890',
+      placeholderEmail: 'contoh@email.com',
+    },
+
+    // Rental Vehicles
+    rentalVehicles: {
+      title: 'Armada Rental',
+      pageSubtitle: 'Kelola ketersediaan dan informasi kendaraan untuk kebutuhan rental.',
+      searchPlaceholder: 'Cari nomor polisi, merk, atau model...',
+      addVehicle: 'Daftarkan Armada',
+      exportFilename: 'armada-rental-adatrack',
+      
+      // Filter & Status
+      filterStatus: 'Status',
+      filterAll: 'Semua',
+      statusReady: 'Ready / Tersedia',
+      statusReserved: 'Reserved / Dipesan',
+      statusRented: 'Disewa',
+      statusMaintenance: 'Maintenance',
+      statusUnavailable: 'Tidak Tersedia',
+      
+      // Data Completeness
+      dataComplete: 'Data Rental Lengkap',
+      dataCompleteShort: 'Lengkap',
+      dataCompleteBadge: 'Data Lengkap',
+      dataCompleteDesc: 'Seluruh data profil rental telah diisi.',
+      dataNotComplete: 'Data Rental Belum Lengkap',
+      dataNotCompleteShort: 'Belum Lengkap',
+      dataNotCompleteBadge: 'Belum Lengkap',
+      dataNotCompleteDesc: 'Harap lengkapi tarif dan dokumen rental.',
+      actionCompleteData: 'Lengkapi Data Rental',
+      
+      // Detail & Form Section
+      detailTitle: 'Detail Armada',
+      tabCoreInfo: 'Data Kendaraan',
+      tabRentalInfo: 'Data Rental',
+      coreInfoNotice: 'Data kendaraan dikelola di Master Data Armada. Tidak boleh diedit dari halaman Rental.',
+      alreadyRegistered: 'Kendaraan sudah terdaftar pada Armada Rental.',
+      noCoreVehicles: 'Tidak ada kendaraan master yang belum didaftarkan ke rental.',
+      
+      // Table Columns
+      colVehicle: 'Armada',
+      colYear: 'Tahun',
+      colStatus: 'Status Rental',
+      colCustomer: 'Pelanggan',
+      colPeriod: 'Periode Rental',
+      colRate: 'Tarif',
+      colCondition: 'Kondisi',
+      colCompleteness: 'Kelengkapan Data',
+      colActions: 'Aksi',
+      
+      // Form fields
+      fieldSelectVehicle: 'Pilih Kendaraan',
+      fieldRentalStatus: 'Status Rental',
+      fieldDailyRate: 'Tarif Harian',
+      fieldWeeklyRate: 'Tarif Mingguan',
+      fieldMonthlyRate: 'Tarif Bulanan',
+      fieldDeposit: 'Deposit',
+      fieldCondition: 'Kondisi',
+      fieldStartOdo: 'Kilometer Saat Tersedia',
+      fieldCurrentOdo: 'Kilometer Terakhir',
+      fieldNotes: 'Catatan',
+      fieldStnkExpiry: 'Masa Berlaku STNK',
+      fieldTaxExpiry: 'Masa Berlaku Pajak',
+      fieldInsuranceExpiry: 'Masa Berlaku Asuransi',
+      fieldEquipment: 'Kelengkapan',
+      
+      // Equipment options
+      equipStnk: 'STNK',
+      equipBpkb: 'BPKB',
+      equipSpareTire: 'Ban Cadangan',
+      equipJack: 'Dongkrak',
+      equipToolkit: 'Toolkit',
+      equipFirstAid: 'P3K',
+      equipFireExtinguisher: 'APAR',
+      equipCarpet: 'Karpet',
+      equipAudio: 'Radio / Audio',
+      
+      // Conditions
+      conditionGood: 'Baik',
+      conditionMinor: 'Kerusakan Ringan',
+      conditionRepair: 'Perlu Perbaikan',
+      
+      // Actions
+      actionDetail: 'Detail',
+      actionEdit: 'Edit Data Rental',
+      actionDisable: 'Nonaktifkan dari Rental',
+      confirmDisable: 'Nonaktifkan Armada Rental',
+      confirmDisableDesc: 'Apakah Anda yakin ingin menonaktifkan kendaraan ini dari Armada Rental? Data master pada CORE Vehicle tidak akan terhapus.',
+      cancel: 'Batal',
+      confirm: 'Nonaktifkan',
+      save: 'Simpan',
+      createSuccess: 'Armada Rental berhasil didaftarkan.',
+      updateSuccess: 'Data Armada Rental berhasil diperbarui.',
+      deleteSuccess: 'Armada berhasil dinonaktifkan dari Rental.',
+      
+      // Empty state
+      emptyTitle: 'Belum ada Armada Rental',
+      emptyDescription: 'Belum ada profil armada rental yang terdaftar.',
+      noResultTitle: 'Armada tidak ditemukan',
+      noResultDescription: 'Coba sesuaikan kata kunci atau filter pencarian.',
+    },
+
+    // Rental Reservations
+    reservation: {
+      title: 'Reservasi Rental',
+      createTitle: 'Buat Reservasi',
+      pageSubtitle: 'Kelola pemesanan kendaraan dan reservasi rental Anda.',
+      searchPlaceholder: 'Cari nomor reservasi, pelanggan, atau plat nomor...',
+      addReservation: 'Buat Reservasi',
+      
+      // Status
+      statusPending: 'Menunggu Konfirmasi',
+      statusConfirmed: 'Dikonfirmasi',
+      statusActive: 'Berjalan',
+      statusCompleted: 'Selesai',
+      statusCancelled: 'Dibatalkan',
+      statusAll: 'Semua Status',
+      
+      // Summary Cards
+      summaryTotal: 'Semua Reservasi',
+      
+      // Filters
+      filterStatus: 'Status',
+      filterReservationDate: 'Tanggal Reservasi',
+      filterRentalDate: 'Tanggal Sewa',
+      selectDate: 'Pilih tanggal',
+      reset: 'Reset',
+      
+      // Table
+      colNo: 'NO. RESERVASI',
+      colCustomer: 'PELANGGAN',
+      colVehicle: 'KENDARAAN',
+      colRentalDate: 'TANGGAL SEWA',
+      colDuration: 'DURASI',
+      colTotal: 'TOTAL',
+      colStatus: 'STATUS',
+      colActions: 'AKSI',
+      
+      // Details
+      dp: 'DP',
+      
+      // Create Form Sections
+      sectionCustomer: '1. INFORMASI PELANGGAN',
+      sectionVehicle: '2. INFORMASI KENDARAAN',
+      sectionPeriod: '3. PERIODE RESERVASI',
+      sectionPricing: '4. INFORMASI HARGA',
+      sectionAdditional: '5. INFORMASI TAMBAHAN',
+      sectionSummary: 'RINGKASAN RESERVASI',
+      
+      // Form Fields
+      fieldCustomer: 'Pelanggan',
+      newCustomer: 'Pelanggan Baru',
+      searchCustomerPlaceholder: 'Cari nama atau nomor telepon pelanggan...',
+      fieldVehicle: 'Kendaraan',
+      selectVehiclePlaceholder: 'Pilih kendaraan rental...',
+      fieldVehicleStatus: 'Status Kendaraan',
+      
+      fieldStartDate: 'Tanggal & Jam Mulai',
+      fieldEndDate: 'Tanggal & Jam Selesai',
+      fieldDuration: 'Durasi',
+      fieldRentalType: 'Tipe Rental',
+      
+      rentalTypeSelfDrive: 'Lepas Kunci',
+      rentalTypeWithDriver: 'Dengan Driver',
+      
+      fieldDailyRate: 'Tarif Harian',
+      fieldWeeklyRate: 'Tarif Mingguan',
+      fieldMonthlyRate: 'Tarif Bulanan',
+      fieldUsedRate: 'Tarif yang Digunakan',
+      fieldTotalEstimate: 'Total Estimasi',
+      fieldDeposit: 'Deposit',
+      depositPlaceholder: 'Opsional jika tidak ada deposit',
+      
+      fieldNotes: 'Catatan',
+      notesPlaceholder: 'Tulis catatan reservasi (opsional)...',
+      fieldAdditionalNeeds: 'Kebutuhan Tambahan',
+      needDriver: 'Butuh Driver',
+      needDelivery: 'Antar - Jemput',
+      needFuel: 'Dilengkapi BBM',
+      needOther: 'Lainnya',
+      
+      remainingEstimate: 'Sisa Pembayaran Estimasi',
+      
+      // Form Actions
+      cancel: 'Batal',
+      save: 'Simpan Reservasi',
+      
+      // Messages
+      createSuccess: 'Reservasi berhasil dibuat.',
+      updateSuccess: 'Reservasi berhasil diperbarui.',
+      overlapError: 'Kendaraan sudah memiliki reservasi pada periode tersebut.',
+      
+      // Empty State
+      emptyTitle: 'Belum ada Reservasi',
+      emptyDesc: 'Belum ada data reservasi kendaraan.',
+      noResultTitle: 'Reservasi tidak ditemukan',
+      noResultDesc: 'Coba sesuaikan kata kunci atau filter pencarian.',
+    },
   },
   en: {
     appName: 'ADATRACK Business',
@@ -582,6 +867,7 @@ export const dictionaries = {
       // Rental
       dashboardRental: 'Rental Dashboard',
       customers: 'Customers',
+      rentalVehicles: 'Rental Fleet',
       rentalContracts: 'Rental Contracts',
       reservations: 'Reservations',
       handovers: 'Handovers',
@@ -1091,6 +1377,290 @@ export const dictionaries = {
       poweredBy: 'Powered by ADATRACK',
       countdown: 'Expires in',
       sharedBy: 'Shared via ADATRACK',
+    },
+
+    // Rental Customers
+    rentalCustomers: {
+      title: 'Rental Customers',
+      pageSubtitle: 'Manage individual and company customer data.',
+      searchPlaceholder: 'Search name, code, phone, NIK, or NPWP...',
+      addCustomer: 'Add Customer',
+      exportFilename: 'rental-customers-adatrack',
+      filterType: 'Type',
+      filterStatus: 'Status',
+      filterAll: 'All',
+      typeIndividual: 'Individual',
+      typeCompany: 'Company',
+      statusActive: 'Active',
+      statusInactive: 'Inactive',
+      clearFilters: 'Clear Filters',
+      
+      // Table Columns
+      colCode: 'Code',
+      colCustomer: 'Customer',
+      colType: 'Type',
+      colContact: 'Contact',
+      colPic: 'PIC',
+      colActiveVehicles: 'Active Vehicles',
+      colActiveContracts: 'Active Contracts',
+      colStatus: 'Status',
+      colActions: 'Actions',
+      
+      // Empty state
+      emptyTitle: 'No customers yet',
+      emptyDescription: 'No customer data available yet.',
+      noResultTitle: 'Customer not found',
+      noResultDescription: 'Try adjusting search keywords or filters.',
+      
+      // Drawer / Detail
+      detailTitle: 'Customer Detail',
+      detailClose: 'Close',
+      tabPersonalInfo: 'Personal Data',
+      tabCompanyInfo: 'Company Info',
+      tabAddress: 'Address',
+      tabLegal: 'Legal',
+      tabPic: 'PIC',
+      tabSim: 'SIM Data',
+      
+      // Form / Actions
+      actionDetail: 'View Detail',
+      actionEdit: 'Edit Customer',
+      actionDelete: 'Delete',
+      confirmDelete: 'Delete Customer',
+      confirmDeleteDesc: 'Are you sure you want to delete this customer? This action cannot be undone.',
+      cancel: 'Cancel',
+      confirm: 'Delete',
+      save: 'Save',
+      createSuccess: 'Customer added successfully.',
+      updateSuccess: 'Customer data updated successfully.',
+      deleteSuccess: 'Customer deleted successfully.',
+      
+      // Form Fields
+      fieldCustomerType: 'Customer Type',
+      fieldFullName: 'Full Name',
+      fieldCompanyName: 'Company Name',
+      fieldNik: 'NIK / KTP',
+      fieldNib: 'NIB',
+      fieldNpwp: 'NPWP',
+      fieldPhone: 'Phone',
+      fieldEmail: 'Email',
+      fieldAddress: 'Address',
+      fieldCity: 'City',
+      fieldProvince: 'Province',
+      fieldPostalCode: 'Postal Code',
+      fieldBirthPlace: 'Birth Place',
+      fieldBirthDate: 'Birth Date',
+      fieldSimNumber: 'SIM Number',
+      fieldSimType: 'SIM Type',
+      fieldSimExpiredAt: 'SIM Expiry Date',
+      fieldPicName: 'PIC Name',
+      fieldPicPosition: 'PIC Position',
+      fieldPicPhone: 'PIC Phone',
+      fieldPicEmail: 'PIC Email',
+      fieldPicNik: 'PIC NIK',
+      fieldStatus: 'Status',
+      
+      // Placeholders
+      placeholderName: 'Enter name',
+      placeholderNik: 'Enter NIK',
+      placeholderPhone: 'e.g., 081234567890',
+      placeholderEmail: 'example@email.com',
+    },
+
+    // Rental Vehicles
+    rentalVehicles: {
+      title: 'Rental Fleet',
+      pageSubtitle: 'Manage availability and vehicle information for rental needs.',
+      searchPlaceholder: 'Search plate number, brand, or model...',
+      addVehicle: 'Register Fleet',
+      exportFilename: 'rental-fleet-adatrack',
+      
+      // Filter & Status
+      filterStatus: 'Status',
+      filterAll: 'All',
+      statusReady: 'Ready',
+      statusReserved: 'Reserved',
+      statusRented: 'Rented',
+      statusMaintenance: 'Maintenance',
+      statusUnavailable: 'Unavailable',
+      
+      // Data Completeness
+      dataComplete: 'Rental Data Complete',
+      dataCompleteShort: 'Complete',
+      dataCompleteBadge: 'Data Complete',
+      dataCompleteDesc: 'All rental profile data has been filled.',
+      dataNotComplete: 'Rental Data Incomplete',
+      dataNotCompleteShort: 'Incomplete',
+      dataNotCompleteBadge: 'Incomplete',
+      dataNotCompleteDesc: 'Please complete the rental rates and documents.',
+      actionCompleteData: 'Complete Rental Data',
+      
+      // Detail & Form Section
+      detailTitle: 'Fleet Detail',
+      tabCoreInfo: 'Vehicle Data',
+      tabRentalInfo: 'Rental Data',
+      coreInfoNotice: 'Vehicle data is managed in Master Data Fleet. Cannot be edited from the Rental page.',
+      alreadyRegistered: 'The vehicle is already registered in Rental Fleet.',
+      noCoreVehicles: 'No master vehicles available to register.',
+      
+      // Table Columns
+      colVehicle: 'Fleet',
+      colYear: 'Year',
+      colStatus: 'Rental Status',
+      colCustomer: 'Customer',
+      colPeriod: 'Rental Period',
+      colRate: 'Rate',
+      colCondition: 'Condition',
+      colCompleteness: 'Completeness',
+      colActions: 'Actions',
+      
+      // Form fields
+      fieldSelectVehicle: 'Select Vehicle',
+      fieldRentalStatus: 'Rental Status',
+      fieldDailyRate: 'Daily Rate',
+      fieldWeeklyRate: 'Weekly Rate',
+      fieldMonthlyRate: 'Monthly Rate',
+      fieldDeposit: 'Deposit',
+      fieldCondition: 'Condition',
+      fieldStartOdo: 'Starting Odometer',
+      fieldCurrentOdo: 'Current Odometer',
+      fieldNotes: 'Notes',
+      fieldStnkExpiry: 'STNK Expiry Date',
+      fieldTaxExpiry: 'Tax Expiry Date',
+      fieldInsuranceExpiry: 'Insurance Expiry Date',
+      fieldEquipment: 'Equipment',
+      
+      // Equipment options
+      equipStnk: 'STNK',
+      equipBpkb: 'BPKB',
+      equipSpareTire: 'Spare Tire',
+      equipJack: 'Car Jack',
+      equipToolkit: 'Toolkit',
+      equipFirstAid: 'First Aid Kit',
+      equipFireExtinguisher: 'Fire Extinguisher',
+      equipCarpet: 'Carpet',
+      equipAudio: 'Audio / Radio',
+      
+      // Conditions
+      conditionGood: 'Good',
+      conditionMinor: 'Minor Damage',
+      conditionRepair: 'Needs Repair',
+      
+      // Actions
+      actionDetail: 'Detail',
+      actionEdit: 'Edit Rental Data',
+      actionDisable: 'Disable from Rental',
+      confirmDisable: 'Disable Rental Fleet',
+      confirmDisableDesc: 'Are you sure you want to disable this vehicle from Rental Fleet? Master data in CORE Vehicle will not be deleted.',
+      cancel: 'Cancel',
+      confirm: 'Disable',
+      save: 'Save',
+      createSuccess: 'Rental Fleet registered successfully.',
+      updateSuccess: 'Rental Fleet data updated successfully.',
+      deleteSuccess: 'Fleet successfully disabled from Rental.',
+      
+      // Empty state
+      emptyTitle: 'No Rental Fleet yet',
+      emptyDescription: 'No rental fleet profiles are registered yet.',
+      noResultTitle: 'Fleet not found',
+      noResultDescription: 'Try adjusting your keywords or search filters.',
+    },
+
+    // Rental Reservations
+    reservation: {
+      title: 'Rental Reservations',
+      createTitle: 'Create Reservation',
+      pageSubtitle: 'Manage your vehicle bookings and rental reservations.',
+      searchPlaceholder: 'Search reservation number, customer, or plate number...',
+      addReservation: 'Create Reservation',
+      
+      // Status
+      statusPending: 'Pending Confirmation',
+      statusConfirmed: 'Confirmed',
+      statusActive: 'Active',
+      statusCompleted: 'Completed',
+      statusCancelled: 'Cancelled',
+      statusAll: 'All Statuses',
+      
+      // Summary Cards
+      summaryTotal: 'All Reservations',
+      
+      // Filters
+      filterStatus: 'Status',
+      filterReservationDate: 'Reservation Date',
+      filterRentalDate: 'Rental Date',
+      selectDate: 'Select date',
+      reset: 'Reset',
+      
+      // Table
+      colNo: 'RESERVATION NO.',
+      colCustomer: 'CUSTOMER',
+      colVehicle: 'VEHICLE',
+      colRentalDate: 'RENTAL DATE',
+      colDuration: 'DURATION',
+      colTotal: 'TOTAL',
+      colStatus: 'STATUS',
+      colActions: 'ACTIONS',
+      
+      // Details
+      dp: 'DP',
+      
+      // Create Form Sections
+      sectionCustomer: '1. CUSTOMER INFORMATION',
+      sectionVehicle: '2. VEHICLE INFORMATION',
+      sectionPeriod: '3. RESERVATION PERIOD',
+      sectionPricing: '4. PRICING INFORMATION',
+      sectionAdditional: '5. ADDITIONAL INFORMATION',
+      sectionSummary: 'RESERVATION SUMMARY',
+      
+      // Form Fields
+      fieldCustomer: 'Customer',
+      newCustomer: 'New Customer',
+      searchCustomerPlaceholder: 'Search customer name or phone number...',
+      fieldVehicle: 'Vehicle',
+      selectVehiclePlaceholder: 'Select rental vehicle...',
+      fieldVehicleStatus: 'Vehicle Status',
+      
+      fieldStartDate: 'Start Date & Time',
+      fieldEndDate: 'End Date & Time',
+      fieldDuration: 'Duration',
+      fieldRentalType: 'Rental Type',
+      
+      rentalTypeSelfDrive: 'Self Drive',
+      rentalTypeWithDriver: 'With Driver',
+      
+      fieldDailyRate: 'Daily Rate',
+      fieldWeeklyRate: 'Weekly Rate',
+      fieldMonthlyRate: 'Monthly Rate',
+      fieldUsedRate: 'Used Rate',
+      fieldTotalEstimate: 'Total Estimate',
+      fieldDeposit: 'Deposit',
+      depositPlaceholder: 'Optional if no deposit',
+      
+      fieldNotes: 'Notes',
+      notesPlaceholder: 'Write reservation notes (optional)...',
+      fieldAdditionalNeeds: 'Additional Needs',
+      needDriver: 'Need Driver',
+      needDelivery: 'Delivery - Pickup',
+      needFuel: 'Include Fuel',
+      needOther: 'Other',
+      
+      remainingEstimate: 'Remaining Estimate',
+      
+      // Form Actions
+      cancel: 'Cancel',
+      save: 'Save Reservation',
+      
+      // Messages
+      createSuccess: 'Reservation created successfully.',
+      updateSuccess: 'Reservation updated successfully.',
+      overlapError: 'Vehicle already has a reservation for the selected period.',
+      
+      // Empty State
+      emptyTitle: 'No Reservations',
+      emptyDesc: 'There are no reservation data yet.',
+      noResultTitle: 'Reservation not found',
+      noResultDesc: 'Try adjusting your keywords or search filters.',
     },
   },
 };
