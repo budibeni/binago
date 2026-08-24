@@ -4,8 +4,8 @@ import React, { useState, useMemo } from 'react';
 import { Search, ChevronRight, ChevronLeft } from 'lucide-react';
 import { Checkbox } from '@adatrack/ui';
 import { cn } from '@adatrack/utils';
-import { mockGeofences } from '../../geofences/data/mockGeofences';
-import { mockRoutes } from '../../routes/data/mockRoutes';
+import { mockGeofences } from '../../../geofences/data/mockGeofences';
+import { mockRoutes } from '../../../routes/data/mockRoutes';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
 import { getTranslation } from '@/i18n';
 

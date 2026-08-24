@@ -2,8 +2,8 @@
 
 import React, { useEffect, useCallback } from 'react';
 import { useInternalMap, useStyleLoadCallback } from '@adatrack/maps';
-import { mockGeofences } from '../../geofences/data/mockGeofences';
-import { mockRoutes } from '../../routes/data/mockRoutes';
+import { mockGeofences } from '../../../geofences/data/mockGeofences';
+import { mockRoutes } from '../../../routes/data/mockRoutes';
 
 export interface PlaybackMapLayersProps {
   selectedGeofenceIds: string[];

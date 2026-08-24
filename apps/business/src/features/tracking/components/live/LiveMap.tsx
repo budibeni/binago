@@ -6,16 +6,20 @@ import {
   TrackingMap,
   MapPopup,
 } from '@adatrack/maps';
-import { VehiclePopupPanel } from './VehiclePopupPanel';
+import { VehiclePopupPanel } from '../shared/VehiclePopupPanel';
 import type {
   MapEntityOption,
   MapGeofenceOption,
   GeofenceCheckRequest,
   GeofenceCheckResult,
 } from '@adatrack/maps';
-import type { TrackingVehicle } from '../types/tracking';
-import { VehicleMarker } from './VehicleMarker';
-import { useBusinessLocale } from '@/components/BusinessShellLayout';
+import type { TrackingVehicle } from '../../types/tracking';
+import { VehicleMarker } from '../shared/VehicleMarker';
+import { useBusinessLocale } from '../../../../components/BusinessShellLayout';
+import { getTranslation } from '../../../../i18n';
+import type { Locale } from '@adatrack/types';
+import { useShareLocation } from '../../../sharing/context/ShareLocationContext';
+import { ShareLocationDialog } from '../../../sharing/components/ShareLocationDialog';
 
 import { Truck, Bus } from 'lucide-react';
 

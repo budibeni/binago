@@ -23,7 +23,7 @@ import type {
   TrackingVehicleGroup,
   StatusFilter,
   GroupStatusSummary,
-} from '../types/tracking';
+} from '../../types/tracking';
 
 // --- Helper: compute group status summary -------------------------------------
 
@@ -106,6 +106,7 @@ interface VehicleListItemProps {
   noDriverLabel: string;
   speedUnit: string;
   statusLabels: { driving: string; idle: string; parking: string; offline: string };
+  hideStatus?: boolean;
 }
 
 function VehicleListItem({
@@ -116,6 +117,7 @@ function VehicleListItem({
   onCheck,
   noDriverLabel,
   statusLabels,
+  hideStatus,
 }: VehicleListItemProps) {
   return (
     <div
@@ -157,9 +159,11 @@ function VehicleListItem({
         </div>
       </div>
 
-      <div className="flex items-center justify-end shrink-0 mx-1">
-        <StatusBadge status={vehicle.status} labels={statusLabels} />
-      </div>
+      {!hideStatus && (
+        <div className="flex items-center justify-end shrink-0 mx-1">
+          <StatusBadge status={vehicle.status} labels={statusLabels} />
+        </div>
+      )}
     </div>
   );
 }
@@ -251,6 +255,8 @@ export interface VehicleListProps {
     selectAllInGroup?: (groupName: string) => string;
   };
   className?: string;
+  hideStatusFilterTabs?: boolean;
+  hideVehicleStatus?: boolean;
 }
 
 // --- VehicleList Component ------------------------------------------------
@@ -269,6 +275,8 @@ export function VehicleList({
   onClose,
   labels,
   className,
+  hideStatusFilterTabs,
+  hideVehicleStatus,
 }: VehicleListProps) {
   const [expandedGroups, setExpandedGroups] = React.useState<Record<string, boolean>>(() =>
     Object.fromEntries(groups.map((g) => [g.id, true])),
@@ -365,45 +373,47 @@ export function VehicleList({
       </div>
 
       {/* -- Tabs ------------------------------------------------------------ */}
-      <div className="shrink-0 bg-white dark:bg-neutral-900 border-b border-border px-1">
-        <div className="flex items-center justify-between">
-          {statusFilters.map(({ key, label, count }) => {
-            const isSelected = statusFilter === key;
+      {!hideStatusFilterTabs && (
+        <div className="shrink-0 bg-white dark:bg-neutral-900 border-b border-border px-1">
+          <div className="flex items-center justify-between">
+            {statusFilters.map(({ key, label, count }) => {
+              const isSelected = statusFilter === key;
 
-            const IconContent = () => {
-              if (key === 'all') return <LayoutGrid className={cn("w-4 h-4 mb-1", isSelected ? 'text-[#de3531]' : 'text-[#de3531]')} />;
-              if (key === 'driving') return <Play className={cn("w-4 h-4 mb-1", isSelected ? 'text-success fill-transparent' : 'text-success fill-transparent')} />;
-              if (key === 'idle') return <PauseCircle className="w-4 h-4 mb-1 text-amber-500" />;
-              if (key === 'parking') return (
-                <div className="w-4 h-4 mb-1 rounded-full border-[1.5px] border-blue-500 flex items-center justify-center">
-                  <span className="text-[9px] font-bold text-blue-500 leading-none">P</span>
-                </div>
+              const IconContent = () => {
+                if (key === 'all') return <LayoutGrid className={cn("w-4 h-4 mb-1", isSelected ? 'text-[#de3531]' : 'text-[#de3531]')} />;
+                if (key === 'driving') return <Play className={cn("w-4 h-4 mb-1", isSelected ? 'text-success fill-transparent' : 'text-success fill-transparent')} />;
+                if (key === 'idle') return <PauseCircle className="w-4 h-4 mb-1 text-amber-500" />;
+                if (key === 'parking') return (
+                  <div className="w-4 h-4 mb-1 rounded-full border-[1.5px] border-blue-500 flex items-center justify-center">
+                    <span className="text-[9px] font-bold text-blue-500 leading-none">P</span>
+                  </div>
+                );
+                if (key === 'offline') return <CircleDot className="w-4 h-4 mb-1 text-neutral-400" />;
+                return null;
+              };
+
+              return (
+                <button
+                  key={key}
+                  onClick={() => onStatusFilterChange(key)}
+                  className={cn(
+                    "flex-1 flex flex-col items-center py-2 border-b-2 transition-colors focus:outline-none",
+                    isSelected ? 'border-[#de3531]' : 'border-transparent hover:border-neutral-100'
+                  )}
+                >
+                  <IconContent />
+                  <span className={cn("text-[10px] font-bold leading-none mb-0.5 tracking-tight", isSelected ? 'text-[#de3531]' : 'text-neutral-500')}>
+                    {key === 'all' ? labels.statusAll : label}
+                  </span>
+                  <span className={cn("text-[10px] font-bold leading-none", isSelected ? 'text-[#de3531]' : 'text-neutral-500')}>
+                    {count}
+                  </span>
+                </button>
               );
-              if (key === 'offline') return <CircleDot className="w-4 h-4 mb-1 text-neutral-400" />;
-              return null;
-            };
-
-            return (
-              <button
-                key={key}
-                onClick={() => onStatusFilterChange(key)}
-                className={cn(
-                  "flex-1 flex flex-col items-center py-2 border-b-2 transition-colors focus:outline-none",
-                  isSelected ? 'border-[#de3531]' : 'border-transparent hover:border-neutral-100'
-                )}
-              >
-                <IconContent />
-                <span className={cn("text-[10px] font-bold leading-none mb-0.5 tracking-tight", isSelected ? 'text-[#de3531]' : 'text-neutral-500')}>
-                  {key === 'all' ? labels.statusAll : label}
-                </span>
-                <span className={cn("text-[10px] font-bold leading-none", isSelected ? 'text-[#de3531]' : 'text-neutral-500')}>
-                  {count}
-                </span>
-              </button>
-            );
-          })}
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* -- Select All ------------------------------------------------------ */}
       <div className="shrink-0 flex items-center justify-between px-3 py-2 bg-[#fafafa] dark:bg-neutral-900 border-b border-border">
@@ -469,6 +479,7 @@ export function VehicleList({
                         noDriverLabel={labels.noDriver}
                         speedUnit={labels.speedUnit}
                         statusLabels={statusLabels}
+                        hideStatus={hideVehicleStatus}
                       />
                     </div>
                   ))}

@@ -25,7 +25,7 @@ import type {
   TrackingVehicle,
   DateRange,
   PlaybackState,
-} from '../types/tracking';
+} from '../../types/tracking';
 
 // â"€â"€â"€ Helper: format seconds to HH:MM:SS â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 function formatDuration(seconds: number): string {

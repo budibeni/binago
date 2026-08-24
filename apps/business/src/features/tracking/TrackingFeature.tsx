@@ -1,16 +1,18 @@
 'use client';
 
 import React from 'react';
-import { Map, History, ChevronLeft, Filter, Activity } from 'lucide-react';
+import { Map, History, ChevronLeft, Filter, Activity, MapPin } from 'lucide-react';
 import { cn } from '@adatrack/utils';
-import { VehicleList } from './components/VehicleList';
-import { LiveMap } from './components/LiveMap';
-import { PlaybackMap } from './components/PlaybackMap';
-import { PlaybackPanel } from './components/PlaybackPanel';
-import { PlaybackMapLayerPanel } from './components/PlaybackMapLayerPanel';
-import { VehicleOverviewPanel } from './components/VehicleOverviewPanel';
-import { TrackingCustomTable } from './components/TrackingCustomTable';
-import { TrackingNotificationPanel } from './components/TrackingNotificationPanel';
+import { VehicleList } from './components/shared/VehicleList';
+import { LiveMap } from './components/live/LiveMap';
+import { PlaybackMap } from './components/playback/PlaybackMap';
+import { PlaybackPanel } from './components/playback/PlaybackPanel';
+import { PlaybackMapLayerPanel } from './components/playback/PlaybackMapLayerPanel';
+import { HeatmapMap } from './components/heatmap/HeatmapMap';
+import { HeatmapPanel } from './components/heatmap/HeatmapPanel';
+import { VehicleOverviewPanel } from './components/shared/VehicleOverviewPanel';
+import { LiveTable } from './components/live/LiveTable';
+import { TrackingNotificationPanel } from './components/activity/TrackingNotificationPanel';
 import { mockVehicleGroups, mockVehicles, generateMockPlaybackData } from './data/mockTrackingData';
 import type { MockPlaybackData } from './data/mockTrackingData';
 import { getTranslation } from '../../i18n';
@@ -20,7 +22,7 @@ import type { Locale } from '@adatrack/types';
 
 // â"€â"€â"€ Mode â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
-type TrackingMode = 'live' | 'playback';
+type TrackingMode = 'live' | 'playback' | 'heatmap';
 
 // â"€â"€â"€ TrackingFeature â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
@@ -71,6 +73,23 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
   const timerRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
   const playbackDataRef = React.useRef<MockPlaybackData | null>(null);
   const playbackSpeedRef = React.useRef(1);
+
+  // ─── Heatmap state ──────────────────────────────────────────────────────────
+  const [heatmapStatusFilter, setHeatmapStatusFilter] = React.useState<'driving' | 'idle' | 'parking'>('driving');
+  const [heatmapDateRange, setHeatmapDateRange] = React.useState<DateRange>({
+    startDate: new Date().toISOString().slice(0, 10),
+    startTime: '00:00',
+    endDate: new Date().toISOString().slice(0, 10),
+    endTime: '23:59',
+  });
+  const [isGeneratingHeatmap, setIsGeneratingHeatmap] = React.useState(false);
+
+  const handleGenerateHeatmap = React.useCallback(() => {
+    setIsGeneratingHeatmap(true);
+    setTimeout(() => {
+      setIsGeneratingHeatmap(false);
+    }, 1200);
+  }, []);
 
   // -- Initialize from URL parameters --
   React.useEffect(() => {
@@ -378,7 +397,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
 
         {/* View: Table */}
         {view === 'table' && (
-          <TrackingCustomTable
+          <LiveTable
             vehicles={allVehiclesUnfiltered.filter(v => selectedVehicleIds.includes(v.id))}
             onVehicleSelect={(id) => setSelectedVehicleId(id)}
             locale={locale}
@@ -394,9 +413,9 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
         )}
 
         {/* Mode Toggle (only in map view) */}
-        <div className={cn("absolute top-4 left-4 z-20", view !== 'map' && 'hidden')}>
+        <div className={cn("absolute top-3 left-3 sm:top-4 sm:left-4 z-20 transition-all duration-500 ease-out", view !== 'map' && 'opacity-0 translate-y-[-10px] pointer-events-none')}>
           <div
-            className="flex items-center rounded-md border border-border bg-neutral-100 dark:bg-neutral-800 p-0.5 shadow-sm gap-0.5"
+            className="flex items-center rounded-lg sm:rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-0.5 shadow-md gap-0.5"
             role="tablist"
             aria-label="Mode Pemantauan"
           >
@@ -407,14 +426,14 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
               aria-selected={mode === 'live'}
               onClick={() => setMode('live')}
               className={cn(
-                'flex items-center gap-1.5 px-3 py-1 text-[12px] font-semibold rounded transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary',
+                'flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 text-[11px] sm:text-[12px] font-semibold rounded-md sm:rounded-lg transition-all duration-300 focus:outline-none',
                 mode === 'live'
-                  ? 'bg-white dark:bg-neutral-700 text-foreground shadow-sm'
-                  : 'text-foreground-muted hover:text-foreground hover:bg-neutral-200/50 dark:hover:bg-neutral-700/40',
+                  ? 'text-foreground bg-neutral-100 dark:bg-neutral-800'
+                  : 'text-neutral-500 hover:text-foreground hover:bg-neutral-50 dark:hover:bg-neutral-800/50',
               )}
             >
               {/* Live Dot Icon */}
-              <svg className={cn("h-3 w-3", mode === 'live' ? "text-danger" : "text-foreground-muted")} viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+              <svg className={cn("h-3.5 w-3.5 shrink-0", mode === 'live' ? "text-danger" : "text-neutral-400")} viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
                 <circle cx="8" cy="8" r="6" fill="currentColor" />
                 <circle cx="8" cy="8" r="2" fill="white" />
               </svg>
@@ -428,14 +447,31 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
               aria-selected={mode === 'playback'}
               onClick={() => setMode('playback')}
               className={cn(
-                'flex items-center gap-1.5 px-3 py-1 text-[12px] font-semibold rounded transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary',
+                'flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 text-[11px] sm:text-[12px] font-semibold rounded-md sm:rounded-lg transition-all duration-300 focus:outline-none',
                 mode === 'playback'
-                  ? 'bg-white dark:bg-neutral-700 text-foreground shadow-sm'
-                  : 'text-foreground-muted hover:text-foreground hover:bg-neutral-200/50 dark:hover:bg-neutral-700/40',
+                  ? 'text-foreground bg-neutral-100 dark:bg-neutral-800'
+                  : 'text-neutral-500 hover:text-foreground hover:bg-neutral-50 dark:hover:bg-neutral-800/50',
               )}
             >
-              <History className="h-3 w-3" aria-hidden="true" strokeWidth={2.5} />
+              <History className={cn("h-3.5 w-3.5 shrink-0", mode === 'playback' ? "text-blue-500" : "text-neutral-400")} aria-hidden="true" strokeWidth={2.5} />
               {tTracking.modePlayback}
+            </button>
+
+            {/* Tab: Heatmap */}
+            <button
+              role="tab"
+              type="button"
+              aria-selected={mode === 'heatmap'}
+              onClick={() => setMode('heatmap')}
+              className={cn(
+                'flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 text-[11px] sm:text-[12px] font-semibold rounded-md sm:rounded-lg transition-all duration-300 focus:outline-none',
+                mode === 'heatmap'
+                  ? 'text-foreground bg-neutral-100 dark:bg-neutral-800'
+                  : 'text-neutral-500 hover:text-foreground hover:bg-neutral-50 dark:hover:bg-neutral-800/50',
+              )}
+            >
+              <MapPin className={cn("h-3.5 w-3.5 shrink-0", mode === 'heatmap' ? "text-orange-500" : "text-neutral-400")} aria-hidden="true" strokeWidth={2.5} />
+              {tTracking.modeHeatmap}
             </button>
           </div>
         </div>
@@ -463,6 +499,18 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
                 playbackParkingEvents={playbackParkingEvents}
                 selectedGeofenceIds={selectedGeofenceIds}
                 selectedRouteIds={selectedRouteIds}
+              />
+            </div>
+
+            {/* Map Area: Heatmap */}
+            <div className={cn('flex-1 relative', (mode !== 'heatmap' || view !== 'map') && 'hidden')}>
+              <HeatmapMap
+                vehicles={allVehiclesUnfiltered}
+                selectedVehicleId={selectedVehicleId}
+                selectedVehicleIds={selectedVehicleIds}
+                dateRange={heatmapDateRange}
+                statusFilter={heatmapStatusFilter}
+                isGenerating={isGeneratingHeatmap}
               />
             </div>
 
@@ -540,6 +588,26 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
           />
         </div>
 
+        {/* Bottom Heatmap Panel (Footer) */}
+        <div
+          className={cn(
+            'shrink-0 border-t border-border bg-background transition-all duration-300 ease-in-out relative z-[400]',
+            (mode === 'heatmap' && view === 'map')
+              ? 'h-[56px] opacity-100 translate-y-0'
+              : 'h-0 opacity-0 translate-y-10 pointer-events-none overflow-hidden'
+          )}
+          aria-hidden={mode !== 'heatmap' || view !== 'map'}
+        >
+          <HeatmapPanel
+            dateRange={heatmapDateRange}
+            statusFilter={heatmapStatusFilter}
+            onDateRangeChange={setHeatmapDateRange}
+            onStatusFilterChange={setHeatmapStatusFilter}
+            onGenerate={handleGenerateHeatmap}
+            isGenerating={isGeneratingHeatmap}
+          />
+        </div>
+
 
         {/* Bottom Overview Panel (Live Mode) */}
         <div
@@ -601,8 +669,8 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
         </div>
       </div>
 
-      {/* Right Sidebar for Live */}
-      {mode === 'live' && (
+      {/* Right Sidebar for Live & Heatmap */}
+      {(mode === 'live' || mode === 'heatmap') && (
         <div
           className={cn(
             'shrink-0 h-full z-10 transition-all duration-300 ease-in-out flex flex-col',
@@ -625,6 +693,8 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
               onSelectAll={handleSelectAll}
               onClose={() => setIsVehicleListVisible(false)}
               labels={vehicleListLabels}
+              hideStatusFilterTabs={mode === 'heatmap'}
+              hideVehicleStatus={mode === 'heatmap'}
             />
           ) : (
             <div className="flex flex-col items-center gap-2.5 h-full w-full">

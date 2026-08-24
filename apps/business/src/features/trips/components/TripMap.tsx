@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { TrackingMap, useMapActions, MapMarker } from '@adatrack/maps';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
-import { PlaybackMapLayers } from '../../tracking/components/PlaybackMapLayers';
+import { PlaybackMapLayers } from '../../tracking/components/playback/PlaybackMapLayers';
 import { Bus, Truck, MapPin } from 'lucide-react';
 import type { Trip } from '../types/trips';
 import type { TrackingVehicle } from '../../tracking/types/tracking';

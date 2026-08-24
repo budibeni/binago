@@ -10,20 +10,26 @@ const locations = [
   'Pelabuhan Tanjung Priok', 'Bandara Soekarno Hatta', 'Cirebon Hub', 'Purwakarta'
 ];
 
+let seed = 12345;
+const random = () => {
+  const x = Math.sin(seed++) * 10000;
+  return x - Math.floor(x);
+};
+
 const generateTrack = (startLat: number, startLng: number, count: number): TripTrackPoint[] => {
   const track: TripTrackPoint[] = [];
   let currentLat = startLat;
   let currentLng = startLng;
-  const startTime = new Date(Date.now() - 24 * 60 * 60 * 1000); // yesterday
+  const startTime = new Date(new Date('2024-03-09T00:00:00Z').getTime() - 24 * 60 * 60 * 1000); // yesterday
   
   for (let i = 0; i < count; i++) {
-    currentLat += (Math.random() - 0.5) * 0.01;
-    currentLng += (Math.random() - 0.5) * 0.01;
+    currentLat += (random() - 0.5) * 0.01;
+    currentLng += (random() - 0.5) * 0.01;
     track.push({
       timestamp: new Date(startTime.getTime() + i * 60000).toISOString(),
       latitude: currentLat,
       longitude: currentLng,
-      speed: Math.floor(Math.random() * 80) + 10,
+      speed: Math.floor(random() * 80) + 10,
     });
   }
   return track;
@@ -34,7 +40,7 @@ const generateEvents = (track: TripTrackPoint[]): TripEvent[] => {
   if (track.length === 0) return events;
   
   events.push({
-    id: `ev-${Math.random().toString(36).substr(2, 9)}`,
+    id: `ev-${random().toString(36).substr(2, 9)}`,
     time: track[0].timestamp,
     type: 'ignition_on',
     title: 'Ignition ON',
@@ -43,7 +49,7 @@ const generateEvents = (track: TripTrackPoint[]): TripEvent[] => {
   
   if (track.length > 5) {
     events.push({
-      id: `ev-${Math.random().toString(36).substr(2, 9)}`,
+      id: `ev-${random().toString(36).substr(2, 9)}`,
       time: track[Math.floor(track.length / 4)].timestamp,
       type: 'overspeed',
       title: 'Overspeed',
@@ -54,7 +60,7 @@ const generateEvents = (track: TripTrackPoint[]): TripEvent[] => {
   
   if (track.length > 10) {
     events.push({
-      id: `ev-${Math.random().toString(36).substr(2, 9)}`,
+      id: `ev-${random().toString(36).substr(2, 9)}`,
       time: track[Math.floor(track.length / 2)].timestamp,
       type: 'geofence_in',
       title: 'Masuk Geofence',
@@ -64,7 +70,7 @@ const generateEvents = (track: TripTrackPoint[]): TripEvent[] => {
   }
   
   events.push({
-    id: `ev-${Math.random().toString(36).substr(2, 9)}`,
+    id: `ev-${random().toString(36).substr(2, 9)}`,
     time: track[track.length - 1].timestamp,
     type: 'ignition_off',
     title: 'Ignition OFF',
@@ -85,11 +91,11 @@ export const mockTrips: Trip[] = Array.from({ length: 30 }).map((_, i) => {
   const isOngoing = i < 3; // First 3 are ongoing
   const status: TripStatus = isOngoing ? 'ongoing' : 'completed';
   
-  const baseDate = new Date();
+  const baseDate = new Date('2024-03-10T00:00:00Z'); // Fixed reference date
   baseDate.setDate(baseDate.getDate() - (i % 7)); // Spread over last 7 days
   baseDate.setHours(6 + (i % 12), (i * 15) % 60, 0, 0); // Random start time
   
-  const durationSec = Math.floor(Math.random() * 14400) + 1800; // 30m to 4h
+  const durationSec = Math.floor(random() * 14400) + 1800; // 30m to 4h
   const endTime = new Date(baseDate.getTime() + durationSec * 1000);
   
   const track = generateTrack(-6.200000, 106.816666, isOngoing ? 15 : 45); // Jakarta center roughly
@@ -108,14 +114,14 @@ export const mockTrips: Trip[] = Array.from({ length: 30 }).map((_, i) => {
     origin: origin,
     destination: destination,
     
-    distance: Math.floor(Math.random() * 200) + 15 + Math.random(),
+    distance: Math.floor(random() * 200) + 15 + random(),
     duration: durationSec,
     movingDuration: Math.floor(durationSec * 0.8),
     stoppedDuration: Math.floor(durationSec * 0.2),
     
-    stopCount: Math.floor(Math.random() * 5),
-    averageSpeed: Math.floor(Math.random() * 40) + 20,
-    maxSpeed: Math.floor(Math.random() * 40) + 60,
+    stopCount: Math.floor(random() * 5),
+    averageSpeed: Math.floor(random() * 40) + 20,
+    maxSpeed: Math.floor(random() * 40) + 60,
     
     status,
     

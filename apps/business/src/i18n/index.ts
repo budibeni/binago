@@ -199,6 +199,12 @@ export const dictionaries = {
       playbackSearchRoute: 'Cari rute...',
       playbackShowing: (start: number, end: number, total: number) => `Menampilkan ${start} - ${end} dari ${total}`,
       playbackNoGeofenceRoute: 'Belum ada geofence / rute yang dipilih',
+      // Heatmap specific
+      heatmapTitle: 'HEATMAP',
+      heatmapDesc: 'Pilih rentang waktu, kendaraan, dan status untuk melihat kepadatan lokasi.',
+      heatmapGenerate: 'Tampilkan Heatmap',
+      heatmapEmpty: 'Pilih filter dan klik Tampilkan Heatmap.',
+      heatmapStatusLabel: 'Status Kendaraan',
     },
 
     // Vehicles
@@ -664,6 +670,12 @@ export const dictionaries = {
       playbackSearchRoute: 'Search route...',
       playbackShowing: (start: number, end: number, total: number) => `Showing ${start} - ${end} of ${total}`,
       playbackNoGeofenceRoute: 'No geofence / route selected',
+      // Heatmap specific
+      heatmapTitle: 'HEATMAP',
+      heatmapDesc: 'Select time range, vehicle, and status to view location density.',
+      heatmapGenerate: 'Show Heatmap',
+      heatmapEmpty: 'Select filters and click Show Heatmap.',
+      heatmapStatusLabel: 'Vehicle Status',
     },
 
     // Vehicles

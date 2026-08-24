@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { cn } from '@adatrack/utils';
-import type { TrackingVehicle, VehicleStatus } from '../types/tracking';
+import type { TrackingVehicle, VehicleStatus } from '../../types/tracking';
 import { getTranslation } from '@/i18n';
 import { MapPin, Search, Link, Download, Maximize, Minimize } from 'lucide-react';
 
-export interface TrackingCustomTableProps {
+export interface LiveTableProps {
   vehicles: TrackingVehicle[];
   onVehicleSelect: (vehicleId: string) => void;
   locale: 'id' | 'en';
@@ -25,7 +25,7 @@ function StatusBadge({ status, label }: { status: VehicleStatus; label: string }
   );
 }
 
-export function TrackingCustomTable({ vehicles, onVehicleSelect, locale }: TrackingCustomTableProps) {
+export function LiveTable({ vehicles, onVehicleSelect, locale }: LiveTableProps) {
   const t = getTranslation(locale);
   const tTracking = t.tracking;
 

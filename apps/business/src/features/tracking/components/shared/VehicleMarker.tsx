@@ -1,6 +1,6 @@
 import React from 'react';
 import { MapMarker } from '@adatrack/maps';
-import { TrackingVehicle } from '../types/tracking';
+import { TrackingVehicle } from '../../types/tracking';
 import { Truck, Bus } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 

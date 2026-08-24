@@ -4,7 +4,7 @@ import React, { useMemo, useEffect, useState } from 'react';
 import { TrackingMap, useMapActions, MapMarker, MapPopup } from '@adatrack/maps';
 import { Truck, Bus, CircleParking, Clock, Navigation, ExternalLink, X, Gauge, Activity, MapPin, Crosshair } from 'lucide-react';
 import { cn } from '@adatrack/utils';
-import type { TrackingVehicle } from '../types/tracking';
+import type { TrackingVehicle } from '../../types/tracking';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
 import { getTranslation } from '@/i18n';
 import { PlaybackMapLayers } from './PlaybackMapLayers';
