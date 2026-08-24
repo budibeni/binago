@@ -89,7 +89,7 @@ function buildColumns(
         const d = row.original;
         return (
           <div className="flex items-center justify-start px-1">
-            <Button variant="ghost" size="icon" onClick={() => onViewDetail(d)} className="h-8 w-8 text-foreground-muted hover:text-foreground" title={labels.actionDetail}>
+            <Button variant="ghost" size="sm" onClick={() => onViewDetail(d)} className="h-8 w-8 p-0 text-foreground-muted hover:text-foreground" title={labels.actionDetail}>
               <IdCard className="h-4 w-4" />
             </Button>
           </div>
@@ -283,7 +283,7 @@ export function DriverTable({
         activeFilterCount={activeFilterCount}
         exportConfig={{ filename: labels.exportFilename, enabled: true }}
         rightSlot={
-          <Button onClick={onAdd} variant="solid" className="bg-danger hover:bg-danger/90 text-white gap-2 h-9">
+          <Button onClick={onAdd} variant="primary" className="bg-danger hover:bg-danger/90 text-white gap-2 h-9">
             <UserRound className="w-4 h-4" />
             <span className="hidden sm:inline-block">{labels.addDriver}</span>
           </Button>

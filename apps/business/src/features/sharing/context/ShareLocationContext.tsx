@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState } from 'react';
 import { ShareSession, ShareSessionStatus } from '../types';
-import { mockShareSessions, generateMockToken } from '../data/mockLocationSharing';
+import { shareService } from '@/data/services/shareService';
 
 interface ShareLocationContextValue {
   sessions: ShareSession[];
@@ -19,7 +19,7 @@ interface ShareLocationContextValue {
 const ShareLocationContext = createContext<ShareLocationContextValue | undefined>(undefined);
 
 export function ShareLocationProvider({ children }: { children: React.ReactNode }) {
-  const [sessions, setSessions] = useState<ShareSession[]>(mockShareSessions);
+  const [sessions, setSessions] = useState<ShareSession[]>(shareService.getInitialSessions());
 
   const getActiveSession = (vehicleId: string): ShareSession | undefined => {
     const now = Date.now();
@@ -37,7 +37,7 @@ export function ShareLocationProvider({ children }: { children: React.ReactNode 
     const newSession: ShareSession = {
       id: `share-${Date.now()}`,
       vehicleId,
-      token: generateMockToken(),
+      token: shareService.generateToken(),
       durationHours,
       createdAt: now.toISOString(),
       expiresAt: expiresAt.toISOString(),

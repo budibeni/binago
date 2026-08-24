@@ -577,6 +577,7 @@ export const dictionaries = {
         geofences: 'Geofences',
       },
       table: {
+        searchPlaceholder: 'Search...',
         name: 'Group Name',
         description: 'Description',
         memberCount: 'Members',

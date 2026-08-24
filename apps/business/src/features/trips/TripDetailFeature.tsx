@@ -5,7 +5,8 @@ import { TripDetailHeader } from './components/TripDetailHeader';
 import { TripDetailSummary } from './components/TripDetailSummary';
 import { TripMap } from './components/TripMap';
 import { TripTimeline } from './components/TripTimeline';
-import { mockTrips } from './data/mockTrips';
+import { tripService, vehicleService, driverService } from '@/data/services';
+import type { Trip } from './types/trips';
 
 export interface TripDetailFeatureProps {
   id: string;
@@ -13,7 +14,36 @@ export interface TripDetailFeatureProps {
 
 export function TripDetailFeature({ id }: TripDetailFeatureProps) {
   const trip = useMemo(() => {
-    return mockTrips.find(t => t.id === id);
+    const r = tripService.getTrips().find(t => t.id === id);
+    if (!r) return undefined;
+    return {
+      id: r.id,
+      vehicleId: r.vehicleId,
+      vehicleName: vehicleService.getVehicles().find(v => v.id === r.vehicleId)?.plateNumber || 'Unknown',
+      driverId: r.driverId || undefined,
+      driverName: driverService.getDrivers().find(d => d.id === r.driverId)?.name,
+      startTime: r.startTime,
+      endTime: r.endTime || null,
+      origin: r.startAddress,
+      destination: r.endAddress,
+      distance: r.distance,
+      duration: r.duration,
+      movingDuration: r.duration,
+      stoppedDuration: 0,
+      stopCount: 0,
+      averageSpeed: r.avgSpeed,
+      maxSpeed: r.maxSpeed,
+      status: r.status === 'completed' ? 'completed' : 'ongoing',
+      routeId: r.routeId || undefined,
+      events: r.events.map(e => ({
+        id: e.id,
+        time: e.timestamp,
+        type: e.type as any,
+        title: e.description,
+        location: [e.longitude, e.latitude] as [number, number],
+      })),
+      track: r.track
+    } as Trip;
   }, [id]);
 
   if (!trip) {

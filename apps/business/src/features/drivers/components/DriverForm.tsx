@@ -4,7 +4,7 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { AlertCircle, ArrowLeft, UserRound, MapPin, Phone, FileText } from 'lucide-react';
 import { Button, Input, Label, Textarea, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@adatrack/ui';
-import { mockDriverGroups } from '../../groups/data/mockGroupsData';
+import { groupService } from '@/data/services';
 import type { Driver } from '../types/driver';
 
 interface DriverFormProps {
@@ -269,7 +269,7 @@ export function DriverForm({ labels, initialData, onCancel, onSubmit }: DriverFo
                       <SelectValue placeholder={labels.groupSelect} />
                     </SelectTrigger>
                     <SelectContent>
-                      {mockDriverGroups.map(group => (
+                      {groupService.getDriverGroups().map(group => (
                         <SelectItem key={group.id} value={group.id} className="text-sm">
                           {group.name}
                         </SelectItem>
@@ -347,7 +347,7 @@ export function DriverForm({ labels, initialData, onCancel, onSubmit }: DriverFo
           <Button type="button" variant="outline" size="sm" onClick={onCancel} disabled={isSubmitting} className="bg-background">
             Batal
           </Button>
-          <Button type="submit" variant="solid" size="sm" className="bg-danger hover:bg-danger/90 text-white min-w-[100px]" disabled={isSubmitting}>
+          <Button type="submit" variant="primary" size="sm" className="bg-danger hover:bg-danger/90 text-white min-w-[100px]" disabled={isSubmitting}>
             Simpan
           </Button>
         </div>

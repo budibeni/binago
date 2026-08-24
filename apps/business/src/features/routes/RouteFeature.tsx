@@ -3,9 +3,7 @@
 import React, { useState } from 'react';
 import type { Locale } from '@adatrack/types';
 import { Route } from './types';
-import { mockRoutes } from './data/mockRoutes';
-// IMPORTANT: We import mockGeofences to reuse Master Data without duplication.
-import { mockGeofences } from '../geofences/data/mockGeofences'; 
+import { routeService, geofenceService } from '@/data/services'; 
 import { RouteListView } from './components/RouteListView';
 import { RouteEditorView } from './components/RouteEditorView';
 import { getRouteTranslation } from './i18n';
@@ -16,7 +14,7 @@ interface RouteFeatureProps {
 
 export function RouteFeature({ locale = 'id' }: RouteFeatureProps) {
   const t = getRouteTranslation(locale);
-  const [routes, setRoutes] = useState<Route[]>(mockRoutes);
+  const [routes, setRoutes] = useState<Route[]>(() => routeService.getRoutes());
   const [selectedRouteId, setSelectedRouteId] = useState<string | undefined>(undefined);
   const [isEditing, setIsEditing] = useState(false);
 
@@ -73,7 +71,7 @@ export function RouteFeature({ locale = 'id' }: RouteFeatureProps) {
       <div className="relative w-full overflow-hidden" style={{ height: 'calc(100dvh - 52px)' }}>
         <RouteEditorView
           initialData={selectedRoute}
-          geofences={mockGeofences}
+          geofences={geofenceService.getGeofences()}
           onSave={handleSave}
           onCancel={handleCancelEdit}
           locale={locale}
@@ -86,7 +84,7 @@ export function RouteFeature({ locale = 'id' }: RouteFeatureProps) {
     <div className="relative w-full overflow-hidden" style={{ height: 'calc(100dvh - 52px)' }}>
       <RouteListView
         routes={routes}
-        geofences={mockGeofences}
+        geofences={geofenceService.getGeofences()}
         selectedRouteId={selectedRouteId}
         onSelectRoute={handleSelectRoute}
         onCreateNew={handleCreateNew}

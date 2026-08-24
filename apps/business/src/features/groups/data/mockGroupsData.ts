@@ -1,4 +1,10 @@
-import { mockGroups } from '../../../data/mock';
+/**
+ * Proxy: features/groups/data/mockGroupsData.ts
+ *
+ * Backward-compatible adapter. All data comes from groupService.
+ */
+
+import { groupService } from '@/data/services/groupService';
 
 export interface GroupData {
   id: string;
@@ -8,16 +14,6 @@ export interface GroupData {
   type: 'vehicle' | 'driver' | 'geofence';
 }
 
-export const mockVehicleGroups: GroupData[] = mockGroups;
-
-export const mockDriverGroups: GroupData[] = mockGroups.map(g => ({
-  ...g,
-  id: g.id.replace('grp', 'dg'),
-  type: 'driver' as const
-}));
-
-export const mockGeofenceGroups: GroupData[] = mockGroups.map(g => ({
-  ...g,
-  id: g.id.replace('grp', 'gg'),
-  type: 'geofence' as const
-}));
+export const mockVehicleGroups: GroupData[] = groupService.getVehicleGroups();
+export const mockDriverGroups: GroupData[] = groupService.getDriverGroups();
+export const mockGeofenceGroups: GroupData[] = groupService.getGeofenceGroups();

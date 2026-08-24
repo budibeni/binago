@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { cn } from '@adatrack/utils';
 import { Truck, UserRound, MapPinned } from 'lucide-react';
 import { getTranslation } from '../../i18n';
-import { mockVehicleGroups, mockDriverGroups, mockGeofenceGroups } from './data/mockGroupsData';
+import { groupService } from '@/data/services';
 import { GroupDataTable } from './components/GroupDataTable';
 
 export interface GroupsFeatureProps {
@@ -17,9 +17,9 @@ export function GroupsFeature({ locale }: GroupsFeatureProps) {
   const tGroups = t.groups;
 
   const tabs = [
-    { id: 'vehicles' as const, label: tGroups.tabs.vehicles, icon: Truck, data: mockVehicleGroups },
-    { id: 'drivers' as const, label: tGroups.tabs.drivers, icon: UserRound, data: mockDriverGroups },
-    { id: 'geofences' as const, label: tGroups.tabs.geofences, icon: MapPinned, data: mockGeofenceGroups },
+    { id: 'vehicles' as const, label: tGroups.tabs.vehicles, icon: Truck, data: groupService.getVehicleGroups() },
+    { id: 'drivers' as const, label: tGroups.tabs.drivers, icon: UserRound, data: groupService.getDriverGroups() },
+    { id: 'geofences' as const, label: tGroups.tabs.geofences, icon: MapPinned, data: groupService.getGeofenceGroups() },
   ];
 
   const currentTabData = tabs.find(t => t.id === activeTab)?.data || [];

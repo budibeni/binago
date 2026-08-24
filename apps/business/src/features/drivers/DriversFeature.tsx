@@ -3,9 +3,7 @@
 import React from 'react';
 import { getTranslation } from '../../i18n';
 import { useBusinessLocale } from '../../components/BusinessShellLayout';
-import { mockDrivers, filterDrivers } from './data/mockDrivers';
-import { mockVehicles } from '../vehicles/data/mockVehicles';
-import { mockDriverGroups } from '../groups/data/mockGroupsData';
+import { driverService, vehicleService, groupService } from '@/data/services';
 import { DriverTable } from './components/DriverTable';
 import { DriverDetailDrawer } from './components/DriverDetailDrawer';
 import type { Driver, DriverStatusFilter } from './types/driver';
@@ -33,20 +31,20 @@ export function DriversFeature() {
 
   // --- Filtered Data -----------------------------------------------------------
   const filteredDrivers = React.useMemo(() => {
-    const filtered = filterDrivers(mockDrivers, search, statusFilter, selectedGroupIds);
+    const filtered = driverService.getDrivers(search, statusFilter, selectedGroupIds);
     // Enrich with plate number & group name
     return filtered.map(driver => {
       let enriched = { ...driver };
       
       if (driver.assignedVehicleId) {
-        const vehicle = mockVehicles.find(v => v.id === driver.assignedVehicleId);
+        const vehicle = vehicleService.getVehicles().find(v => v.id === driver.assignedVehicleId);
         if (vehicle) {
           enriched.assignedVehiclePlate = vehicle.plateNumber;
         }
       }
       
       if (driver.groupId) {
-        const group = mockDriverGroups.find(g => g.id === driver.groupId);
+        const group = groupService.getDriverGroups().find(g => g.id === driver.groupId);
         if (group) {
           enriched.groupName = group.name;
         }
@@ -125,7 +123,7 @@ export function DriversFeature() {
       {
         id: 'status',
         label: tD.filterStatus,
-        type: 'select' as const,
+        type: 'pills-single' as const,
         options: [
           { value: 'all', label: tD.tabs.all },
           { value: 'active', label: tD.status.active },
@@ -137,8 +135,8 @@ export function DriversFeature() {
       {
         id: 'groupIds',
         label: tD.filterGroup,
-        type: 'multiselect' as const,
-        options: mockDriverGroups.map(g => ({
+        type: 'pills-multi' as const,
+        options: groupService.getDriverGroups().map(g => ({
           value: g.id,
           label: g.name
         }))
@@ -146,8 +144,8 @@ export function DriversFeature() {
     ],
     state: filterState,
     onStateChange: setFilterState,
-    onClear: () => setFilterState({ status: 'all', groupIds: [] }),
-    labels: { clear: tD.clearFilters }
+    onClearAll: () => setFilterState({ status: 'all', groupIds: [] }),
+    labels: { clearAll: tD.clearFilters }
   }), [tD, filterState]);
 
   return (

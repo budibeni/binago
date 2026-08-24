@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Truck, TrendingUp, AlertTriangle, Route } from 'lucide-react';
-import { mockMetricSummary } from '../data/mockHomeData';
+import { homeService } from '@/data/services';
 import { useBusinessLocale } from '../../../components/BusinessShellLayout';
 import { getTranslation } from '../../../i18n';
 
@@ -72,24 +72,24 @@ export function BusinessHeroSection() {
       <div className="relative z-10 mt-6 grid grid-cols-2 lg:grid-cols-4 gap-3">
         <MetricCard
           icon={Truck}
-          value={mockMetricSummary.totalVehicles.toLocaleString('id-ID')}
+          value={homeService.getMetricSummary().totalVehicles.toLocaleString('id-ID')}
           label={h.metrics.totalVehicles}
         />
         <MetricCard
           icon={TrendingUp}
-          value={mockMetricSummary.movingVehicles.toLocaleString('id-ID')}
+          value={homeService.getMetricSummary().movingVehicles.toLocaleString('id-ID')}
           label={h.metrics.movingVehicles}
           iconBg="bg-emerald-500/20"
         />
         <MetricCard
           icon={AlertTriangle}
-          value={mockMetricSummary.activeAlerts.toLocaleString('id-ID')}
+          value={homeService.getMetricSummary().activeAlerts.toLocaleString('id-ID')}
           label={h.metrics.activeAlerts}
           iconBg="bg-amber-500/20"
         />
         <MetricCard
           icon={Route}
-          value={mockMetricSummary.tripsToday.toLocaleString('id-ID')}
+          value={homeService.getMetricSummary().tripsToday.toLocaleString('id-ID')}
           label={h.metrics.tripsToday}
           iconBg="bg-blue-500/20"
         />

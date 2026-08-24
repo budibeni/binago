@@ -13,7 +13,7 @@ import { HeatmapPanel } from './components/heatmap/HeatmapPanel';
 import { VehicleOverviewPanel } from './components/shared/VehicleOverviewPanel';
 import { LiveTable } from './components/live/LiveTable';
 import { TrackingNotificationPanel } from './components/activity/TrackingNotificationPanel';
-import { mockVehicleGroups, mockVehicles, generateMockPlaybackData } from './data/mockTrackingData';
+import { trackingService } from '@/data/services/trackingService';
 import type { MockPlaybackData } from './data/mockTrackingData';
 import { getTranslation } from '../../i18n';
 import { useBusinessLocale } from '../../components/BusinessShellLayout';
@@ -44,7 +44,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
   const [search, setSearch] = React.useState('');
   const [statusFilter, setStatusFilter] = React.useState<StatusFilter>('all');
   const [selectedVehicleId, setSelectedVehicleId] = React.useState<string | null>(null);
-  const [selectedVehicleIds, setSelectedVehicleIds] = React.useState<string[]>(() => mockVehicles.map((v) => v.id));
+  const [selectedVehicleIds, setSelectedVehicleIds] = React.useState<string[]>(() => trackingService.getLiveVehicles().map((v) => v.id));
   const [isVehicleListVisible, setIsVehicleListVisible] = React.useState(true);
 
   // -- Map Layer state --
@@ -116,7 +116,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
       
       // Simulate generating data right away
       setPlaybackState(prev => ({ ...prev, status: 'playing' }));
-      const pData = generateMockPlaybackData(vId, startDate);
+      const pData = trackingService.getPlaybackData(vId, startDate);
       setPlaybackData(pData);
       setPlaybackState({
         status: 'playing',
@@ -134,7 +134,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
   // --- Computed ----------------------------------------------------------------
   const allVehiclesUnfiltered = React.useMemo(() => {
     const q = search.toLowerCase().trim();
-    return mockVehicles.filter((v) => {
+    return trackingService.getLiveVehicles().filter((v) => {
       const matchStatus = statusFilter === 'all' || v.status === statusFilter;
       const matchSearch =
         !q ||
@@ -275,7 +275,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
   }, []);
 
   const handleSelectAll = React.useCallback((checked: boolean) => {
-    setSelectedVehicleIds(checked ? mockVehicles.map((v) => v.id) : []);
+    setSelectedVehicleIds(checked ? trackingService.getLiveVehicles().map((v) => v.id) : []);
   }, []);
 
   // â"€â"€ Playback handlers â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
@@ -308,7 +308,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
     setPlaybackPointIndex(0);
     setTimeout(() => {
       const startDatetime = new Date(`${dateRange.startDate}T${dateRange.startTime}:00`);
-      const data = generateMockPlaybackData(playbackVehicleId, startDatetime);
+      const data = trackingService.getPlaybackData(playbackVehicleId, startDatetime);
       setPlaybackData(data);
       playbackDataRef.current = data;
       setPlaybackState({ status: 'ready', totalDuration: data.totalDurationSecs, currentTime: 0 });
@@ -571,7 +571,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
           aria-hidden={mode !== 'playback' || view !== 'map'}
         >
           <PlaybackPanel
-            vehicles={mockVehicles}
+            vehicles={trackingService.getLiveVehicles()}
             selectedVehicleId={playbackVehicleId}
             dateRange={dateRange}
             playbackState={playbackState}
@@ -618,7 +618,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
           aria-hidden={mode !== 'live' || !selectedVehicleId}
         >
           <VehicleOverviewPanel
-            vehicle={mockVehicles.find(v => v.id === selectedVehicleId) || null}
+            vehicle={trackingService.getLiveVehicles().find(v => v.id === selectedVehicleId) || null}
             onClose={() => setSelectedVehicleId(null)}
             locale={locale}
             onShareLocation={() => console.log('Share clicked', selectedVehicleId)}
@@ -681,7 +681,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
         >
           {isVehicleListVisible ? (
             <VehicleList
-              groups={mockVehicleGroups}
+              groups={trackingService.getLiveVehicleGroups()}
               selectedVehicleId={selectedVehicleId}
               selectedVehicleIds={selectedVehicleIds}
               search={search}

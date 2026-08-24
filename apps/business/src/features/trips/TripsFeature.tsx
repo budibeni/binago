@@ -7,9 +7,7 @@ import { getTranslation } from '@/i18n';
 import { TripFilter, type TripFilterState } from './components/TripFilter';
 import { TripSummary } from './components/TripSummary';
 import { TripTable } from './components/TripTable';
-import { mockTrips } from './data/mockTrips';
-import { mockVehicles } from '../vehicles/data/mockVehicles';
-import { mockDrivers } from '../drivers/data/mockDrivers';
+import { tripService, vehicleService, driverService } from '@/data/services';
 import type { Trip } from './types/trips';
 
 export function TripsFeature() {
@@ -38,7 +36,37 @@ export function TripsFeature() {
   };
 
   const filteredTrips = useMemo(() => {
-    return mockTrips.filter(t => {
+    const rawTrips = tripService.getTrips();
+    const enrichedTrips: Trip[] = rawTrips.map(r => ({
+      id: r.id,
+      vehicleId: r.vehicleId,
+      vehicleName: vehicleService.getVehicles().find(v => v.id === r.vehicleId)?.plateNumber || 'Unknown',
+      driverId: r.driverId || undefined,
+      driverName: driverService.getDrivers().find(d => d.id === r.driverId)?.name,
+      startTime: r.startTime,
+      endTime: r.endTime || null,
+      origin: r.startAddress,
+      destination: r.endAddress,
+      distance: r.distance,
+      duration: r.duration,
+      movingDuration: r.duration,
+      stoppedDuration: 0,
+      stopCount: 0,
+      averageSpeed: r.avgSpeed,
+      maxSpeed: r.maxSpeed,
+      status: r.status === 'completed' ? 'completed' : 'ongoing',
+      routeId: r.routeId || undefined,
+      events: r.events.map(e => ({
+        id: e.id,
+        time: e.timestamp,
+        type: e.type as any,
+        title: e.description,
+        location: [e.longitude, e.latitude] as [number, number],
+      })),
+      track: r.track
+    }));
+
+    return enrichedTrips.filter(t => {
       // Date filtering
       if (filter.startDate) {
         const tDate = new Date(t.startTime).toISOString().split('T')[0];
@@ -98,8 +126,8 @@ export function TripsFeature() {
           filter={filter}
           onFilterChange={setFilter}
           onReset={handleReset}
-          vehicles={mockVehicles}
-          drivers={mockDrivers}
+          vehicles={vehicleService.getVehicles()}
+          drivers={driverService.getDrivers()}
         />
 
         {/* Summary */}

@@ -2,8 +2,7 @@
 
 import React, { useEffect, useCallback } from 'react';
 import { useInternalMap, useStyleLoadCallback } from '@adatrack/maps';
-import { mockGeofences } from '../../../geofences/data/mockGeofences';
-import { mockRoutes } from '../../../routes/data/mockRoutes';
+import { geofenceService, routeService } from '@/data/services';
 
 export interface PlaybackMapLayersProps {
   selectedGeofenceIds: string[];
@@ -29,7 +28,7 @@ export function PlaybackMapLayers({ selectedGeofenceIds, selectedRouteIds }: Pla
     // --- Update Geofence Source ---
     const geofenceSource = map.getSource(GEOFENCE_SOURCE) as any;
     if (geofenceSource) {
-      const activeGeofences = mockGeofences.filter(gf => selectedGeofenceIds.includes(gf.id));
+      const activeGeofences = geofenceService.getGeofences().filter(gf => selectedGeofenceIds.includes(gf.id));
       const geofenceFeatures: any[] = activeGeofences.map(gf => {
         let geometry: GeoJSON.Geometry;
         if (gf.geometry.type === 'polygon') {
@@ -63,7 +62,7 @@ export function PlaybackMapLayers({ selectedGeofenceIds, selectedRouteIds }: Pla
     // --- Update Route Source ---
     const routeSource = map.getSource(ROUTE_SOURCE) as any;
     if (routeSource) {
-      const activeRoutes = mockRoutes.filter(rt => selectedRouteIds.includes(rt.id) && rt.plannedPath);
+      const activeRoutes = routeService.getRoutes().filter(rt => selectedRouteIds.includes(rt.id) && rt.plannedPath);
       const routeFeatures: any[] = activeRoutes.map(rt => {
         let geometry: GeoJSON.Geometry = { type: 'Point', coordinates: [0,0] };
         if (rt.plannedPath?.type === 'multiline') {

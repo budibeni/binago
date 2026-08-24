@@ -1,4 +1,10 @@
-import { Trip } from '../types/trips';
-import { mockTrips as centralTrips } from '../../../data/mock';
+/**
+ * Proxy: features/trips/data/mockTrips.ts
+ *
+ * Backward-compatible adapter. All data comes from tripService.
+ */
 
-export const mockTrips: Trip[] = centralTrips as unknown as Trip[];
+import type { Trip } from '../types/trips';
+import { tripService } from '@/data/services/tripService';
+
+export const mockTrips: Trip[] = tripService.getTrips() as unknown as Trip[];

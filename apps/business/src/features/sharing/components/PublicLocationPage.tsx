@@ -5,9 +5,12 @@ import { MapPin, Car, Clock, WifiOff, Lock, Share2 } from 'lucide-react';
 import { MapContainer } from '@adatrack/maps';
 import { AdatrackLogo } from '@adatrack/ui';
 import { ShareSession } from '@/features/sharing/types';
-import { mockShareSessions } from '@/features/sharing/data/mockLocationSharing';
-import { mockVehicles } from '@/features/tracking/data/mockTrackingData';
+import { shareService } from '@/data/services/shareService';
+import { trackingService } from '@/data/services/trackingService';
 import type { TrackingVehicle as Vehicle } from '@/features/tracking/types/tracking';
+
+const mockShareSessions = shareService.getInitialSessions();
+const mockVehicles = trackingService.getLiveVehicles();
 
 // Inline mini-dictionary for public page (no shell locale context available)
 const translations = {

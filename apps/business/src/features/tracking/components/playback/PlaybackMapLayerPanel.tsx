@@ -4,8 +4,7 @@ import React, { useState, useMemo } from 'react';
 import { Search, ChevronRight, ChevronLeft } from 'lucide-react';
 import { Checkbox } from '@adatrack/ui';
 import { cn } from '@adatrack/utils';
-import { mockGeofences } from '../../../geofences/data/mockGeofences';
-import { mockRoutes } from '../../../routes/data/mockRoutes';
+import { geofenceService, routeService } from '@/data/services';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
 import { getTranslation } from '@/i18n';
 
@@ -43,8 +42,8 @@ export function PlaybackMapLayerPanel({
   // --- Geofence Logic ---
   const filteredGeofences = useMemo(() => {
     const q = geoSearch.toLowerCase().trim();
-    if (!q) return mockGeofences;
-    return mockGeofences.filter(gf => gf.name.toLowerCase().includes(q));
+    if (!q) return geofenceService.getGeofences();
+    return geofenceService.getGeofences().filter(gf => gf.name.toLowerCase().includes(q));
   }, [geoSearch]);
 
   const geoTotalPages = Math.max(1, Math.ceil(filteredGeofences.length / geoItemsPerPage));
@@ -58,8 +57,8 @@ export function PlaybackMapLayerPanel({
   // --- Route Logic ---
   const filteredRoutes = useMemo(() => {
     const q = routeSearch.toLowerCase().trim();
-    if (!q) return mockRoutes;
-    return mockRoutes.filter(rt => rt.name.toLowerCase().includes(q));
+    if (!q) return routeService.getRoutes();
+    return routeService.getRoutes().filter(rt => rt.name.toLowerCase().includes(q));
   }, [routeSearch]);
 
   const routeTotalPages = Math.max(1, Math.ceil(filteredRoutes.length / routeItemsPerPage));

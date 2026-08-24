@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { GeofenceListView } from './components/GeofenceListView';
 import { GeofenceEditorView } from './components/GeofenceEditorView';
-import { mockGeofences, mockGeofenceGroups } from './data/mockGeofences';
+import { geofenceService } from '@/data/services';
 import type { Geofence } from './types';
 import { type GeofenceLocale, getGeofencesTranslation } from './i18n';
 
@@ -16,7 +16,7 @@ interface GeofenceFeatureProps {
 export function GeofenceFeature({ locale = 'id' }: GeofenceFeatureProps) {
   const t = getGeofencesTranslation(locale);
   const [view, setView] = useState<GeofenceView>('list');
-  const [geofences, setGeofences] = useState<Geofence[]>(mockGeofences);
+  const [geofences, setGeofences] = useState<Geofence[]>(() => geofenceService.getGeofences());
   const [editingGeofence, setEditingGeofence] = useState<Geofence | null>(null);
 
   const handleAdd = () => {
@@ -76,7 +76,7 @@ export function GeofenceFeature({ locale = 'id' }: GeofenceFeatureProps) {
     <div className="relative w-full overflow-hidden" style={{ height: 'calc(100dvh - 52px)' }}>
       <GeofenceListView
         geofences={geofences}
-        groups={mockGeofenceGroups}
+        groups={geofenceService.getGeofenceGroups()}
         onAdd={handleAdd}
         onEdit={handleEdit}
         onDelete={handleDelete}

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Car } from 'lucide-react';
 import { getTranslation } from '../../i18n';
 import { useBusinessLocale } from '../../components/BusinessShellLayout';
-import { mockVehicles, mockVehicleGroups, filterVehicles } from './data/mockVehicles';
+import { vehicleService } from '@/data/services';
 import { VehicleTable } from './components/VehicleTable';
 import { VehicleDetailDrawer } from './components/VehicleDetailDrawer';
 import type { Vehicle, VehicleStatusFilter } from './types/vehicle';
@@ -13,8 +13,8 @@ import type { DataTableFilterConfig } from '@adatrack/ui';
 
 // â"€â"€â"€ Helpers â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
-function computeStatusCounts(vehicles: Vehicle[], search: string, groupIds: string[]) {
-  const base = filterVehicles(vehicles, search, 'all', groupIds);
+function computeStatusCounts(search: string, groupIds: string[]) {
+  const base = vehicleService.getVehicles({ search, groupIds });
   return {
     all: base.length,
     driving: base.filter((v) => v.status === 'driving').length,
@@ -49,12 +49,12 @@ export function VehiclesFeature() {
 
   // â"€â"€ Filtered data â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
   const filteredVehicles = React.useMemo(
-    () => filterVehicles(mockVehicles, search, statusFilter, selectedGroupIds),
+    () => vehicleService.getVehicles({ search, status: statusFilter, groupIds: selectedGroupIds }),
     [search, statusFilter, selectedGroupIds],
   );
 
   const statusCounts = React.useMemo(
-    () => computeStatusCounts(mockVehicles, search, selectedGroupIds),
+    () => computeStatusCounts(search, selectedGroupIds),
     [search, selectedGroupIds],
   );
 
@@ -201,7 +201,7 @@ export function VehiclesFeature() {
         id: 'groupIds',
         label: filterLabels.filterGroup,
         type: 'pills-multi',
-        options: mockVehicleGroups.map((g) => ({
+        options: vehicleService.getVehicleGroups().map(g => ({
           value: g.id,
           label: g.name,
           colorClass: 'bg-info',

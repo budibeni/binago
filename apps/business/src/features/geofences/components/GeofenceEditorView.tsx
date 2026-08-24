@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Hexagon, Square, Waypoints, MapPin, ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import { Button, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@adatrack/ui';
-import { mockGeofenceGroups } from '../data/mockGeofences';
+import { geofenceService } from '@/data/services';
 import { GeofenceMap } from './GeofenceMap';
 import type { Geofence } from '../types';
 import type { MapGeometry } from '@adatrack/maps';
@@ -108,7 +108,7 @@ export function GeofenceEditorView({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none" className="text-xs text-foreground-muted italic">-- {t.unassigned} --</SelectItem>
-                    {mockGeofenceGroups.map(group => (
+                    {geofenceService.getGeofenceGroups().map(group => (
                       <SelectItem key={group.id} value={group.id} className="text-xs">
                         {group.name}
                       </SelectItem>
