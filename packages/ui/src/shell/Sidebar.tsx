@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ChevronDown, X } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import { Badge } from '../Badge';
 import { AdatrackLogo } from '../patterns';
@@ -34,6 +34,59 @@ export function Sidebar({
   onMobileOpenChange,
   className,
 }: SidebarProps) {
+  const [openSections, setOpenSections] = React.useState<Record<string, boolean>>({});
+
+  React.useEffect(() => {
+    try {
+      const stored = localStorage.getItem('adatrack-sidebar-sections');
+      if (stored) {
+        setOpenSections(JSON.parse(stored));
+      }
+    } catch (e) {
+      console.warn('localStorage error', e);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    setOpenSections(prev => {
+      let changed = false;
+      const next = { ...prev };
+      
+      navigation.forEach(group => {
+        if (group.id === 'main') return;
+        const groupId = group.id || '';
+        if (!groupId) return;
+        
+        const hasActive = group.items.some(
+          item => currentPath === item.href || (item.href !== '/' && currentPath.startsWith(item.href))
+        );
+        if (hasActive && !next[groupId]) {
+          next[groupId] = true;
+          changed = true;
+        }
+      });
+      
+      if (changed) {
+        try {
+          localStorage.setItem('adatrack-sidebar-sections', JSON.stringify(next));
+        } catch(e) {}
+        return next;
+      }
+      return prev;
+    });
+  }, [currentPath, navigation]);
+
+  const toggleSection = (groupId: string) => {
+    if (!groupId || groupId === 'main') return;
+    setOpenSections(prev => {
+      const next = { ...prev, [groupId]: !prev[groupId] };
+      try {
+        localStorage.setItem('adatrack-sidebar-sections', JSON.stringify(next));
+      } catch(e) {}
+      return next;
+    });
+  };
+
   // Handle keyboard Escape to close mobile drawer
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -174,16 +227,53 @@ export function Sidebar({
         className="flex-1 min-h-0 overflow-y-auto py-3 px-2.5 space-y-3"
         aria-label="Navigasi utama"
       >
-        {navigation.map((group, idx) => (
-          <div key={group.id || idx} className="space-y-0.5">
-            {group.title && !collapsed && (
-              <div className="px-2.5 pb-1 pt-0.5 text-[10.5px] font-semibold uppercase tracking-widest text-foreground-muted select-none">
-                {group.title}
-              </div>
-            )}
-            <div className="space-y-0.5">{renderNavItems(group.items)}</div>
-          </div>
-        ))}
+        {navigation.map((group, idx) => {
+          const isMain = group.id === 'main';
+          const groupId = group.id || idx.toString();
+          const isOpen = isMain || !!openSections[groupId];
+
+          return (
+            <div key={groupId} className="space-y-0.5">
+              {group.title && !collapsed && !isMain && (
+                <div
+                  className={cn(
+                    "flex items-center justify-between px-2.5 pb-1 pt-0.5 select-none",
+                    !isMain && "cursor-pointer group/section"
+                  )}
+                  onClick={() => {
+                    if (!isMain) toggleSection(groupId);
+                  }}
+                >
+                  <div
+                    className={cn(
+                      "flex items-center gap-1.5 text-[10.5px] font-semibold uppercase tracking-widest",
+                      !isMain ? "text-foreground-muted group-hover/section:text-foreground transition-colors duration-200" : "text-foreground-muted"
+                    )}
+                  >
+                    {group.icon && (
+                      <group.icon className="h-3.5 w-3.5" />
+                    )}
+                    {group.title}
+                  </div>
+                  {!isMain && (
+                    <div className="text-foreground-muted group-hover/section:text-foreground transition-colors duration-200">
+                      {isOpen ? (
+                        <ChevronDown className="h-3.5 w-3.5" />
+                      ) : (
+                        <ChevronRight className="h-3.5 w-3.5" />
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+              {isOpen && (
+                <div className={cn("space-y-0.5", !isMain && !collapsed && "mt-1")}>
+                  {renderNavItems(group.items)}
+                </div>
+              )}
+            </div>
+          );
+        })}
       </nav>
 
       {/* -- Footer (fixed, not scrollable) -- */}

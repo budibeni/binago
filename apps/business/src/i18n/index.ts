@@ -32,6 +32,73 @@ export const dictionaries = {
       settings: 'Pengaturan',
       helpCenter: 'Pusat Bantuan',
       alerts: 'Peringatan',
+
+      // Rental
+      dashboardRental: 'Dashboard Rental',
+      customers: 'Pelanggan',
+      rentalContracts: 'Kontrak Rental',
+      reservations: 'Reservasi',
+      handovers: 'Serah Terima',
+      returns: 'Pengembalian',
+      rentalReports: 'Laporan Rental',
+
+      // Transport
+      dashboardTransport: 'Dashboard Transport',
+      operationalSchedules: 'Jadwal Operasional',
+      routesTransport: 'Trayek',
+      stops: 'Halte',
+      departures: 'Keberangkatan',
+      passengerManifests: 'Manifest Penumpang',
+      transportReports: 'Laporan Transport',
+
+      // Logistics
+      dashboardLogistics: 'Dashboard Logistics',
+      logisticsCustomers: 'Customer',
+      shippingOrders: 'Order Pengiriman',
+      shipments: 'Pengiriman',
+      manifests: 'Manifest',
+      deliveriesLogistics: 'Delivery',
+      proofOfDelivery: 'Proof of Delivery',
+      logisticsReports: 'Laporan Logistics',
+
+      // Sales
+      dashboardSales: 'Dashboard Sales',
+      salesCustomers: 'Customer',
+      salesVisits: 'Sales Visit',
+      prospects: 'Prospek',
+      quotes: 'Penawaran',
+      orders: 'Order',
+      salesReports: 'Laporan Sales',
+
+      // Field Service
+      dashboardFieldService: 'Dashboard Field Service',
+      fieldServiceCustomers: 'Customer',
+      workOrders: 'Work Order',
+      assignments: 'Penugasan',
+      schedules: 'Jadwal',
+      technicians: 'Teknisi',
+      completions: 'Penyelesaian',
+      fieldServiceReports: 'Laporan Field Service',
+
+      // Patrol
+      dashboardPatrol: 'Dashboard Patrol',
+      patrolSchedules: 'Jadwal Patrol',
+      patrolAssignments: 'Penugasan',
+      checkpoints: 'Checkpoint',
+      inspections: 'Inspeksi',
+      patrolIncidents: 'Insiden',
+      patrolReports: 'Laporan Patrol',
+      patrolHistory: 'Riwayat Patrol',
+
+      // Project / Site
+      dashboardProject: 'Dashboard Project',
+      projects: 'Project',
+      sites: 'Site',
+      projectAssignments: 'Penugasan',
+      projectSchedules: 'Jadwal',
+      projectActivities: 'Aktivitas',
+      projectIncidents: 'Insiden',
+      projectReports: 'Laporan Project',
     },
 
     // Nav Group Titles
@@ -45,6 +112,13 @@ export const dictionaries = {
       work: 'Pekerjaan',
       analysis: 'Analisis',
       administration: 'Administrasi',
+      rental: 'Rental',
+      transport: 'Transport',
+      logistics: 'Logistics',
+      sales: 'Sales',
+      fieldService: 'Field Service',
+      patrol: 'Patrol',
+      projectSite: 'Project / Site',
     },
 
     // User Menu
@@ -504,6 +578,73 @@ export const dictionaries = {
       settings: 'Settings',
       helpCenter: 'Help Center',
       alerts: 'Alerts',
+
+      // Rental
+      dashboardRental: 'Rental Dashboard',
+      customers: 'Customers',
+      rentalContracts: 'Rental Contracts',
+      reservations: 'Reservations',
+      handovers: 'Handovers',
+      returns: 'Returns',
+      rentalReports: 'Rental Reports',
+
+      // Transport
+      dashboardTransport: 'Transport Dashboard',
+      operationalSchedules: 'Operational Schedules',
+      routesTransport: 'Routes',
+      stops: 'Stops',
+      departures: 'Departures',
+      passengerManifests: 'Passenger Manifests',
+      transportReports: 'Transport Reports',
+
+      // Logistics
+      dashboardLogistics: 'Logistics Dashboard',
+      logisticsCustomers: 'Customers',
+      shippingOrders: 'Shipping Orders',
+      shipments: 'Shipments',
+      manifests: 'Manifests',
+      deliveriesLogistics: 'Deliveries',
+      proofOfDelivery: 'Proof of Delivery',
+      logisticsReports: 'Logistics Reports',
+
+      // Sales
+      dashboardSales: 'Sales Dashboard',
+      salesCustomers: 'Customers',
+      salesVisits: 'Sales Visits',
+      prospects: 'Prospects',
+      quotes: 'Quotes',
+      orders: 'Orders',
+      salesReports: 'Sales Reports',
+
+      // Field Service
+      dashboardFieldService: 'Field Service Dashboard',
+      fieldServiceCustomers: 'Customers',
+      workOrders: 'Work Orders',
+      assignments: 'Assignments',
+      schedules: 'Schedules',
+      technicians: 'Technicians',
+      completions: 'Completions',
+      fieldServiceReports: 'Field Service Reports',
+
+      // Patrol
+      dashboardPatrol: 'Patrol Dashboard',
+      patrolSchedules: 'Patrol Schedules',
+      patrolAssignments: 'Assignments',
+      checkpoints: 'Checkpoints',
+      inspections: 'Inspections',
+      patrolIncidents: 'Incidents',
+      patrolReports: 'Patrol Reports',
+      patrolHistory: 'Patrol History',
+
+      // Project / Site
+      dashboardProject: 'Project Dashboard',
+      projects: 'Projects',
+      sites: 'Sites',
+      projectAssignments: 'Assignments',
+      projectSchedules: 'Schedules',
+      projectActivities: 'Activities',
+      projectIncidents: 'Incidents',
+      projectReports: 'Project Reports',
     },
 
     // Nav Group Titles
@@ -517,6 +658,13 @@ export const dictionaries = {
       work: 'Work',
       analysis: 'Analysis',
       administration: 'Administration',
+      rental: 'Rental',
+      transport: 'Transport',
+      logistics: 'Logistics',
+      sales: 'Sales',
+      fieldService: 'Field Service',
+      patrol: 'Patrol',
+      projectSite: 'Project / Site',
     },
 
     // User Menu

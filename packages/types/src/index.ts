@@ -55,6 +55,7 @@ export interface NavItem {
 export interface NavGroup {
   id?: string;
   title?: string;
+  icon?: any;
   items: NavItem[];
 }
 
