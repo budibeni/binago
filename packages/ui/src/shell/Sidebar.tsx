@@ -51,12 +51,12 @@ export function Sidebar({
     setOpenSections(prev => {
       let changed = false;
       const next = { ...prev };
-      
+
       navigation.forEach(group => {
         if (group.id === 'main') return;
         const groupId = group.id || '';
         if (!groupId) return;
-        
+
         const hasActive = group.items.some(
           item => currentPath === item.href || (item.href !== '/' && currentPath.startsWith(item.href))
         );
@@ -65,11 +65,11 @@ export function Sidebar({
           changed = true;
         }
       });
-      
+
       if (changed) {
         try {
           localStorage.setItem('adatrack-sidebar-sections', JSON.stringify(next));
-        } catch(e) {}
+        } catch (e) { }
         return next;
       }
       return prev;
@@ -82,7 +82,7 @@ export function Sidebar({
       const next = { ...prev, [groupId]: !prev[groupId] };
       try {
         localStorage.setItem('adatrack-sidebar-sections', JSON.stringify(next));
-      } catch(e) {}
+      } catch (e) { }
       return next;
     });
   };
@@ -125,11 +125,11 @@ export function Sidebar({
           href={item.href}
           onClick={(e) => handleItemClick(e, item)}
           className={cn(
-            'group flex items-center gap-2.5 rounded-md px-3 py-[7px] text-[13px] font-medium transition-colors duration-100',
-            'focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400',
+            'group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-300 ease-out',
+            'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50',
             isActive
-              ? 'bg-primary text-primary-foreground dark:bg-surface-elevated dark:text-foreground shadow-sm'
-              : 'text-foreground-muted hover:bg-surface-elevated hover:text-foreground',
+              ? 'bg-black text-white dark:bg-black dark:text-white shadow-sm'
+              : 'text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 hover:bg-surface-elevated dark:hover:text-zinc-100 hover:shadow-sm',
             item.disabled && 'pointer-events-none opacity-40',
             collapsed && 'justify-center px-2',
           )}
@@ -140,8 +140,8 @@ export function Sidebar({
           {Icon && (
             <Icon
               className={cn(
-                'h-[17px] w-[17px] shrink-0 transition-colors',
-                isActive ? 'text-red-500' : 'text-foreground-muted group-hover:text-foreground',
+                'h-4 w-4 shrink-0 transition-colors duration-300',
+                isActive ? 'text-red-500' : 'text-zinc-400 group-hover:text-zinc-700 dark:text-zinc-500 dark:group-hover:text-zinc-300',
               )}
             />
           )}
@@ -237,7 +237,7 @@ export function Sidebar({
               {group.title && !collapsed && !isMain && (
                 <div
                   className={cn(
-                    "flex items-center justify-between px-2.5 pb-1 pt-0.5 select-none",
+                    "flex items-center justify-between px-2 pb-1.5 pt-1 select-none",
                     !isMain && "cursor-pointer group/section"
                   )}
                   onClick={() => {
@@ -246,12 +246,12 @@ export function Sidebar({
                 >
                   <div
                     className={cn(
-                      "flex items-center gap-1.5 text-[10.5px] font-semibold uppercase tracking-widest",
-                      !isMain ? "text-foreground-muted group-hover/section:text-foreground transition-colors duration-200" : "text-foreground-muted"
+                      "flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider",
+                      !isMain ? "text-zinc-500/90 group-hover/section:text-zinc-900 dark:text-zinc-400/90 dark:group-hover/section:text-zinc-200 transition-colors duration-300" : "text-zinc-500/90"
                     )}
                   >
                     {group.icon && (
-                      <group.icon className="h-3.5 w-3.5" />
+                      <group.icon className="h-4 w-4" />
                     )}
                     {group.title}
                   </div>
