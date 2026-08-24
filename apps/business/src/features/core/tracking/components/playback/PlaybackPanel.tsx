@@ -158,7 +158,7 @@ export function PlaybackPanel({
 
   return (
     <>
-      <div className={cn('flex items-center w-full h-full px-2 sm:px-4 bg-white dark:bg-surface shadow-[0_-4px_20px_-5px_rgba(0,0,0,0.05)] transition-all duration-300 overflow-x-auto overflow-y-hidden', className)}>
+      <div className={cn('flex items-center w-full h-full px-2 sm:px-4 bg-background shadow-[0_-4px_20px_-5px_rgba(0,0,0,0.05)] transition-all duration-300 overflow-x-auto overflow-y-hidden', className)}>
 
         {!hasData ? (
           /* ==========================================
@@ -179,7 +179,7 @@ export function PlaybackPanel({
                 {/* Vehicle */}
                 <button
                   type="button"
-                  className="flex items-center justify-between w-[110px] sm:w-[140px] h-8 rounded-md bg-neutral-50 dark:bg-neutral-800/80 border border-border px-2 sm:px-2.5 text-[10px] sm:text-[11px] text-foreground focus:outline-none focus:ring-1 focus:ring-danger focus:border-danger disabled:opacity-50 shadow-sm transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-800 shrink-0"
+                  className="flex items-center justify-between w-[110px] sm:w-[140px] h-8 rounded-md bg-background border border-border px-2 sm:px-2.5 text-[11px] text-foreground focus:outline-none focus:ring-1 focus:ring-danger focus:border-danger disabled:opacity-50 shadow-sm transition-colors hover:bg-surface-elevated shrink-0"
                   disabled={isLoading}
                   onClick={() => setIsVehicleDialogOpen(true)}
                 >
@@ -198,7 +198,7 @@ export function PlaybackPanel({
                   <div className="relative w-[90px] sm:w-[110px] shrink-0">
                     <input
                       type="date"
-                      className="w-full h-8 rounded-md bg-neutral-50 dark:bg-neutral-800/80 border border-border hover:border-neutral-400 dark:hover:border-neutral-500 px-1.5 sm:px-2 pr-6 sm:pr-7 text-[10px] sm:text-[11px] font-medium text-foreground shadow-sm focus:outline-none focus:border-danger focus:ring-1 focus:ring-danger disabled:opacity-50 transition-all [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:w-full cursor-pointer"
+                      className="w-full h-8 rounded-md bg-background border border-border hover:border-foreground-muted px-1.5 sm:px-2 pr-6 sm:pr-7 text-[11px] font-medium text-foreground shadow-sm focus:outline-none focus:border-danger focus:ring-1 focus:ring-danger disabled:opacity-50 transition-all [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:w-full cursor-pointer"
                       value={dateRange.startDate}
                       onChange={(e) => onDateRangeChange({ ...dateRange, startDate: e.target.value })}
                       disabled={isLoading}
@@ -208,7 +208,7 @@ export function PlaybackPanel({
                   <div className="relative w-[60px] sm:w-[75px] shrink-0">
                     <input
                       type="time"
-                      className="w-full h-8 rounded-md bg-neutral-50 dark:bg-neutral-800/80 border border-border hover:border-neutral-400 dark:hover:border-neutral-500 px-1.5 sm:px-2 pr-6 sm:pr-7 text-[10px] sm:text-[11px] font-medium text-foreground shadow-sm focus:outline-none focus:border-danger focus:ring-1 focus:ring-danger disabled:opacity-50 transition-all [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:w-full cursor-pointer"
+                      className="w-full h-8 rounded-md bg-background border border-border hover:border-foreground-muted px-1.5 sm:px-2 pr-6 sm:pr-7 text-[11px] font-medium text-foreground shadow-sm focus:outline-none focus:border-danger focus:ring-1 focus:ring-danger disabled:opacity-50 transition-all [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:w-full cursor-pointer"
                       value={dateRange.startTime}
                       onChange={(e) => onDateRangeChange({ ...dateRange, startTime: e.target.value })}
                       disabled={isLoading}
@@ -224,7 +224,7 @@ export function PlaybackPanel({
                   <div className="relative w-[90px] sm:w-[110px] shrink-0">
                     <input
                       type="date"
-                      className="w-full h-8 rounded-md bg-neutral-50 dark:bg-neutral-800/80 border border-border hover:border-neutral-400 dark:hover:border-neutral-500 px-1.5 sm:px-2 pr-6 sm:pr-7 text-[10px] sm:text-[11px] font-medium text-foreground shadow-sm focus:outline-none focus:border-danger focus:ring-1 focus:ring-danger disabled:opacity-50 transition-all [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:w-full cursor-pointer"
+                      className="w-full h-8 rounded-md bg-background border border-border hover:border-foreground-muted px-1.5 sm:px-2 pr-6 sm:pr-7 text-[11px] font-medium text-foreground shadow-sm focus:outline-none focus:border-danger focus:ring-1 focus:ring-danger disabled:opacity-50 transition-all [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:w-full cursor-pointer"
                       value={dateRange.endDate}
                       onChange={(e) => onDateRangeChange({ ...dateRange, endDate: e.target.value })}
                       disabled={isLoading}
@@ -234,7 +234,7 @@ export function PlaybackPanel({
                   <div className="relative w-[60px] sm:w-[75px] shrink-0">
                     <input
                       type="time"
-                      className="w-full h-8 rounded-md bg-neutral-50 dark:bg-neutral-800/80 border border-border hover:border-neutral-400 dark:hover:border-neutral-500 px-1.5 sm:px-2 pr-6 sm:pr-7 text-[10px] sm:text-[11px] font-medium text-foreground shadow-sm focus:outline-none focus:border-danger focus:ring-1 focus:ring-danger disabled:opacity-50 transition-all [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:w-full cursor-pointer"
+                      className="w-full h-8 rounded-md bg-background border border-border hover:border-foreground-muted px-1.5 sm:px-2 pr-6 sm:pr-7 text-[11px] font-medium text-foreground shadow-sm focus:outline-none focus:border-danger focus:ring-1 focus:ring-danger disabled:opacity-50 transition-all [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:w-full cursor-pointer"
                       value={dateRange.endTime}
                       onChange={(e) => onDateRangeChange({ ...dateRange, endTime: e.target.value })}
                       disabled={isLoading}
@@ -247,7 +247,7 @@ export function PlaybackPanel({
 
             {/* Load Button */}
             <Button
-              className="bg-danger hover:bg-danger/90 text-white font-semibold h-8 px-3 sm:px-4 text-[10px] sm:text-[11px] rounded-lg shadow-sm shadow-danger/20 transition-all shrink-0"
+              className="bg-danger hover:bg-danger/90 text-white font-semibold h-8 px-3 sm:px-4 text-[11px] rounded-lg shadow-sm shadow-danger/20 transition-all shrink-0"
               disabled={!canLoad || isLoading}
               onClick={onLoad}
             >
@@ -277,7 +277,7 @@ export function PlaybackPanel({
             <div className="flex items-center gap-1.5 pl-3 shrink-0">
               <button
                 onClick={onStop}
-                className="flex items-center justify-center h-8 w-8 rounded-full text-foreground-muted hover:text-foreground hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+                className="flex items-center justify-center h-8 w-8 rounded-full text-foreground-muted hover:text-foreground hover:bg-surface-elevated transition-colors"
               >
                 <SkipBack className="h-3.5 w-3.5" fill="currentColor" />
               </button>
@@ -301,7 +301,7 @@ export function PlaybackPanel({
             <div className="flex-1 relative mx-5 h-full flex flex-col justify-center">
               {/* Tooltip (Current Time) */}
               <div
-                className="absolute top-1 -translate-x-1/2 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 text-[9px] font-bold px-1.5 py-0.5 rounded shadow-sm z-10 transition-all duration-100 ease-linear whitespace-nowrap"
+                className="absolute top-1 -translate-x-1/2 bg-foreground text-background text-[9px] font-bold px-1.5 py-0.5 rounded shadow-sm z-10 transition-all duration-100 ease-linear whitespace-nowrap"
                 style={{ left: `${progress}%` }}
               >
                 {formatAbsoluteTime(dateRange.startDate, dateRange.startTime, currentTime, false)}
@@ -311,7 +311,7 @@ export function PlaybackPanel({
               {/* Track */}
               <div
                 ref={trackRef}
-                className="relative w-full h-1.5 bg-neutral-200 dark:bg-neutral-700/50 rounded-full cursor-pointer group hover:h-2 transition-all mt-3"
+                className="relative w-full h-1.5 bg-border rounded-full cursor-pointer group hover:h-2 transition-all mt-3"
                 onClick={handleTimelineClick}
               >
                 <div className="absolute top-0 left-0 h-full bg-danger rounded-full transition-all duration-100 ease-linear" style={{ width: `${progress}%` }} />
@@ -328,7 +328,7 @@ export function PlaybackPanel({
                 <select
                   value={speed}
                   onChange={(e) => onSpeedChange?.(Number(e.target.value))}
-                  className="w-full h-8 rounded-lg bg-[#f7f7f7] dark:bg-neutral-800/80 px-2 text-[11px] text-foreground font-bold appearance-none focus:outline-none focus:ring-1 focus:ring-danger transition-colors cursor-pointer"
+                  className="w-full h-8 rounded-lg bg-background px-2 text-[11px] text-foreground font-bold appearance-none focus:outline-none focus:ring-1 focus:ring-danger transition-colors cursor-pointer"
                 >
                   <option value={1}>1x</option>
                   <option value={2}>2x</option>
@@ -343,7 +343,7 @@ export function PlaybackPanel({
                 type="button"
                 onClick={onClear}
                 title={tTracking.playbackCancelTime}
-                className="flex items-center justify-center h-8 w-8 rounded-full bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-foreground transition-colors"
+                className="flex items-center justify-center h-8 w-8 rounded-full bg-surface-elevated hover:bg-surface-elevated/80 text-foreground transition-colors"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -371,10 +371,10 @@ export function PlaybackPanel({
               value={vehicleSearch}
               onChange={(e) => setVehicleSearch(e.target.value)}
               placeholder={tTracking.playbackSearchPlaceholder}
-              className="w-full h-10 rounded-md border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 pl-9 pr-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-primary transition-colors"
+              className="w-full h-10 rounded-md border border-border bg-surface pl-9 pr-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-primary transition-colors "
             />
           </div>
-          <div className="flex flex-col max-h-[300px] overflow-y-auto border border-neutral-100 rounded-md">
+          <div className="flex flex-col max-h-[300px] overflow-y-auto border border-border rounded-md">
             {vehicles.filter(v =>
               v.plateNumber.toLowerCase().includes(vehicleSearch.toLowerCase()) ||
               (v.driverName?.toLowerCase() || '').includes(vehicleSearch.toLowerCase())
@@ -396,7 +396,7 @@ export function PlaybackPanel({
                     setVehicleSearch('');
                   }}
                   className={cn(
-                    "flex flex-col items-start px-4 py-2.5 text-left border-b border-neutral-100 hover:bg-neutral-50 dark:hover:bg-neutral-800 last:border-b-0 transition-colors focus:outline-none focus:bg-neutral-50",
+                    "flex flex-col items-start px-4 py-2.5 text-left border-b border-border hover:bg-surface-elevated last:border-b-0 transition-colors focus:outline-none focus:bg-surface-elevated",
                     v.id === selectedVehicleId && "bg-primary/5 hover:bg-primary/10"
                   )}
                 >

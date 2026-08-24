@@ -14,7 +14,8 @@ import {
   Play,
   PauseCircle,
   CircleDot,
-  User
+  User,
+  Tag
 } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import { Checkbox } from '@adatrack/ui';
@@ -72,7 +73,7 @@ const statusConfig = {
     dot: 'bg-blue-500',
   },
   offline: {
-    color: 'text-neutral-500 dark:text-neutral-400',
+    color: 'text-foreground-muted',
     dot: 'bg-neutral-400',
   },
 };
@@ -88,7 +89,7 @@ function StatusBadge({ status, labels }: StatusBadgeProps) {
   const c = statusConfig[status];
 
   return (
-    <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-foreground tracking-tight">
+    <span className="inline-flex items-center gap-1.5 text-[11.5px] font-normal text-foreground-muted group-hover:text-danger transition-colors tracking-tight">
       <span className={cn('h-1 w-1 rounded-full shrink-0', c.dot)} />
       {labels[status]}
     </span>
@@ -123,7 +124,7 @@ function VehicleListItem({
     <div
       className={cn(
         'group flex items-center gap-2 py-2 px-3 cursor-pointer transition-colors',
-        isSelected ? 'bg-neutral-50 dark:bg-neutral-800/80' : 'hover:bg-[#fafafa] dark:hover:bg-neutral-800/40'
+        isSelected ? 'bg-surface-elevated' : 'hover:bg-surface-elevated/50'
       )}
       onClick={() => onSelect(vehicle.id)}
       role="button"
@@ -146,15 +147,16 @@ function VehicleListItem({
         />
       </div>
 
-      <div className="flex-1 min-w-0 flex flex-col justify-center ml-1 space-y-0.5">
-        <span className="text-xs font-semibold text-neutral-800 dark:text-neutral-200 truncate tracking-tight leading-tight">
+      <div className="flex-1 min-w-0 flex flex-col justify-center ml-1 space-y-0.1">
+        <span className="text-[12px] mb-0.5 font-semibold text-primary group-hover:text-danger transition-colors truncate leading-none pt-px">
           {vehicle.plateNumber}
         </span>
-        <span className="text-[11px] font-medium text-neutral-600 dark:text-neutral-400 truncate tracking-tight">
-          {vehicle.vehicleType || '-'}
-        </span>
-        <div className="flex items-center gap-1 text-[10px] font-medium text-neutral-500 truncate tracking-tight">
-          <User className="h-2.5 w-2.5 shrink-0 opacity-70" />
+        <div className="flex items-center gap-1.5 text-[11px] font-normal text-foreground-muted group-hover:text-danger transition-colors truncate tracking-tight">
+          <Tag className="h-3 w-3 shrink-0 opacity-70" />
+          <span className="truncate">{vehicle.vehicleType || '-'}</span>
+        </div>
+        <div className="flex items-center gap-1.5 text-[11px] font-normal text-foreground-muted group-hover:text-danger transition-colors truncate tracking-tight">
+          <User className="h-3 w-3 shrink-0 opacity-70" />
           <span className="truncate">{vehicle.driverName ?? noDriverLabel}</span>
         </div>
       </div>
@@ -191,10 +193,10 @@ function VehicleGroupHeader({
 }: VehicleGroupHeaderProps) {
   return (
     <div
-      className="flex items-center gap-2 px-3 py-2.5 cursor-pointer bg-white dark:bg-neutral-900 hover:bg-[#fafafa] dark:hover:bg-neutral-800 transition-colors"
+      className="flex items-center gap-2 px-3 py-2.5 cursor-pointer bg-background hover:bg-surface-elevated transition-colors"
       onClick={onToggle}
     >
-      <ChevronDown className={cn("w-3.5 h-3.5 text-neutral-400 transition-transform", !isExpanded && "-rotate-90")} />
+      <ChevronDown className={cn("w-3.5 h-3.5 text-foreground-muted transition-transform", !isExpanded && "-rotate-90")} />
 
       <div onClick={(e) => e.stopPropagation()} className="shrink-0 flex items-center bg-transparent">
         <Checkbox
@@ -208,11 +210,11 @@ function VehicleGroupHeader({
 
       <Folder className="h-[14px] w-[14px] text-[#e6b941] fill-[#f4cb5d] shrink-0 ml-0.5" />
 
-      <span className="text-xs font-semibold text-neutral-800 dark:text-neutral-200 flex-1 truncate ml-0.5 tracking-tight">
+      <span className="text-[11px] font-bold text-foreground-muted flex-1 truncate ml-0.5 tracking-wider uppercase">
         {group.name}
       </span>
 
-      <span className="text-[10px] font-bold text-neutral-500 bg-[#fafafa] dark:bg-neutral-800 border border-border px-1.5 py-0.5 rounded-md leading-none">
+      <span className="text-[10px] font-bold text-foreground-muted bg-surface-elevated border border-border px-1.5 py-0.5 rounded-md leading-none">
         {totalCount}
       </span>
     </div>
@@ -279,7 +281,7 @@ export function VehicleList({
   hideVehicleStatus,
 }: VehicleListProps) {
   const [expandedGroups, setExpandedGroups] = React.useState<Record<string, boolean>>(() =>
-    Object.fromEntries(groups.map((g) => [g.id, true])),
+    Object.fromEntries(groups.map((g) => [g.id, false])),
   );
 
   const toggleGroup = (groupId: string) => {
@@ -326,18 +328,18 @@ export function VehicleList({
   return (
     <aside
       className={cn(
-        'flex flex-col h-full bg-white dark:bg-neutral-950 border-r border-border overflow-hidden',
+        'flex flex-col h-full bg-background border-r border-border overflow-hidden',
         className,
       )}
       aria-label={labels.title}
     >
       {/* -- Header ---------------------------------------------------------- */}
-      <div className="shrink-0 flex items-center justify-between px-3 h-[40px] bg-white dark:bg-neutral-900 border-b border-border">
+      <div className="shrink-0 flex items-center justify-between px-3 h-[40px] bg-background border-b border-border">
         <div className="flex items-center gap-2">
           <h2 className="text-[12px] font-bold text-foreground tracking-tight">
             {labels.title}
           </h2>
-          <span className="text-[10px] font-bold text-[#de3531] bg-red-50 dark:bg-red-900/20 px-1.5 py-0.5 rounded-md leading-none">
+          <span className="text-[10px] font-bold text-danger bg-danger/10 px-1.5 py-0.5 rounded-md leading-none">
             {totalAllUnfiltered}
           </span>
         </div>
@@ -345,7 +347,7 @@ export function VehicleList({
           <button
             type="button"
             onClick={onClose}
-            className="flex h-6 w-6 items-center justify-center rounded text-neutral-400 hover:bg-neutral-50 hover:text-foreground transition-colors"
+            className="flex h-6 w-6 items-center justify-center rounded text-foreground-muted hover:bg-surface hover:text-foreground transition-colors"
           >
             <ChevronRight className="h-3.5 w-3.5" />
           </button>
@@ -353,20 +355,20 @@ export function VehicleList({
       </div>
 
       {/* -- Search ---------------------------------------------------------- */}
-      <div className="shrink-0 px-3 py-2 bg-white dark:bg-neutral-900 border-b border-border flex gap-2">
+      <div className="shrink-0 px-3 py-2 bg-background border-b border-border flex gap-2 items-center">
         <div className="relative flex-1 min-w-0">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-neutral-400 pointer-events-none" />
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-foreground-muted pointer-events-none" />
           <input
-            type="search"
+            type="text"
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder={labels.searchPlaceholder}
-            className="w-full h-8 rounded-md border border-border bg-[#fafafa] dark:bg-neutral-900 pl-8 pr-3 text-[12px] text-foreground focus:outline-none focus:border-neutral-300 focus:bg-white transition-all placeholder:text-neutral-400"
+            className="w-full pl-8 pr-2 py-1.5 text-[11px] rounded border border-border bg-surface text-foreground placeholder:text-foreground-muted focus:outline-none focus:ring-1 focus:ring-danger focus:border-danger transition-shadow"
           />
         </div>
         <button
           type="button"
-          className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-[#fafafa] dark:bg-neutral-900 text-neutral-500 hover:bg-white dark:hover:bg-neutral-800 transition-colors shrink-0"
+          className="flex h-[30px] w-[30px] items-center justify-center rounded border border-border bg-surface text-foreground-muted hover:bg-surface-elevated transition-colors shrink-0"
         >
           <RefreshCw className="h-3.5 w-3.5" />
         </button>
@@ -374,13 +376,13 @@ export function VehicleList({
 
       {/* -- Tabs ------------------------------------------------------------ */}
       {!hideStatusFilterTabs && (
-        <div className="shrink-0 bg-white dark:bg-neutral-900 border-b border-border px-1">
+        <div className="shrink-0 bg-background border-b border-border px-1">
           <div className="flex items-center justify-between">
             {statusFilters.map(({ key, label, count }) => {
               const isSelected = statusFilter === key;
 
               const IconContent = () => {
-                if (key === 'all') return <LayoutGrid className={cn("w-4 h-4 mb-1", isSelected ? 'text-[#de3531]' : 'text-[#de3531]')} />;
+                if (key === 'all') return <LayoutGrid className={cn("w-4 h-4 mb-1", isSelected ? 'text-danger' : 'text-danger')} />;
                 if (key === 'driving') return <Play className={cn("w-4 h-4 mb-1", isSelected ? 'text-success fill-transparent' : 'text-success fill-transparent')} />;
                 if (key === 'idle') return <PauseCircle className="w-4 h-4 mb-1 text-amber-500" />;
                 if (key === 'parking') return (
@@ -388,7 +390,7 @@ export function VehicleList({
                     <span className="text-[9px] font-bold text-blue-500 leading-none">P</span>
                   </div>
                 );
-                if (key === 'offline') return <CircleDot className="w-4 h-4 mb-1 text-neutral-400" />;
+                if (key === 'offline') return <CircleDot className="w-4 h-4 mb-1 text-foreground-muted" />;
                 return null;
               };
 
@@ -402,10 +404,10 @@ export function VehicleList({
                   )}
                 >
                   <IconContent />
-                  <span className={cn("text-[10px] font-bold leading-none mb-0.5 tracking-tight", isSelected ? 'text-[#de3531]' : 'text-neutral-500')}>
+                  <span className={cn("text-[10px] font-bold leading-none mb-0.5 tracking-tight", isSelected ? 'text-danger' : 'text-foreground-muted')}>
                     {key === 'all' ? labels.statusAll : label}
                   </span>
-                  <span className={cn("text-[10px] font-bold leading-none", isSelected ? 'text-[#de3531]' : 'text-neutral-500')}>
+                  <span className={cn("text-[10px] font-bold leading-none", isSelected ? 'text-danger' : 'text-foreground-muted')}>
                     {count}
                   </span>
                 </button>
@@ -416,38 +418,38 @@ export function VehicleList({
       )}
 
       {/* -- Select All ------------------------------------------------------ */}
-      <div className="shrink-0 flex items-center justify-between px-3 py-2 bg-[#fafafa] dark:bg-neutral-900 border-b border-border">
+      <div className="shrink-0 flex items-center justify-between px-3 py-2 bg-surface border-b border-border">
         <div className="flex items-center gap-2.5">
           <Checkbox
             id="vehicle-list-select-all"
             checked={someChecked ? 'indeterminate' : allChecked}
             onCheckedChange={(checked) => onSelectAll(!!checked)}
             aria-label="Semua"
-            className="h-3.5 w-3.5 data-[state=checked]:bg-neutral-700 data-[state=checked]:border-neutral-700 data-[state=checked]:text-white data-[state=indeterminate]:bg-neutral-700 data-[state=indeterminate]:border-neutral-700 data-[state=indeterminate]:text-white rounded-sm"
+            className="h-3.5 w-3.5 data-[state=checked]:bg-neutral-400 data-[state=checked]:border-neutral-400 data-[state=checked]:text-white data-[state=indeterminate]:bg-neutral-400 data-[state=indeterminate]:border-neutral-400 data-[state=indeterminate]:text-white rounded-sm"
           />
           <label
             htmlFor="vehicle-list-select-all"
-            className="text-[11px] font-bold text-foreground cursor-pointer select-none tracking-tight"
+            className="text-[11.5px] font-normal text-foreground-muted hover:text-danger transition-colors cursor-pointer select-none leading-none"
           >
             {labels.statusAll}
           </label>
         </div>
-        <span className="text-[10px] font-bold text-neutral-500 bg-white dark:bg-neutral-800 px-1.5 py-0.5 border border-border rounded-md leading-none">
+        <span className="text-[10px] font-bold text-foreground-muted bg-surface-elevated px-1.5 py-0.5 border border-border rounded-md leading-none">
           {totalAllUnfiltered}
         </span>
       </div>
 
       {/* -- Scrollable List ------------------------------------------------- */}
-      <div className="flex-1 min-h-0 overflow-y-auto px-3 py-3 space-y-2.5 bg-[#fcfcfc] dark:bg-neutral-950" role="list">
+      <div className="flex-1 min-h-0 overflow-y-auto  px-2 py-2 space-y-2" role="list">
         {filteredGroups.length === 0 && (
           <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-            <MapPin className="h-8 w-8 text-neutral-300 mb-3" />
+            <MapPin className="h-8 w-8 text-foreground-disabled mb-3" />
             <p className="text-[12px] font-medium text-foreground">{labels.emptyTitle || 'Tidak ada kendaraan'}</p>
           </div>
         )}
 
         {filteredGroups.map((group) => {
-          const isExpanded = expandedGroups[group.id] ?? true;
+          const isExpanded = expandedGroups[group.id] ?? false;
           const groupVisibleIds = group.filteredVehicles.map(v => v.id);
 
           const isGroupChecked = groupVisibleIds.length > 0 && groupVisibleIds.every(id => selectedVehicleIds.includes(id));
@@ -455,7 +457,7 @@ export function VehicleList({
           const groupCheckState = isGroupIndeterminate ? 'indeterminate' : isGroupChecked;
 
           return (
-            <div key={group.id} role="listitem" className="bg-white dark:bg-neutral-900 border border-border rounded-md shadow-[0_2px_8px_-4px_rgba(0,0,0,0.03)] overflow-hidden">
+            <div key={group.id} role="listitem" className="bg-background border border-border rounded-md shadow-[0_2px_8px_-4px_rgba(0,0,0,0.03)] overflow-hidden">
               <VehicleGroupHeader
                 group={group}
                 isExpanded={isExpanded}
@@ -491,11 +493,11 @@ export function VehicleList({
       </div>
 
       {/* -- Footer ---------------------------------------------------------- */}
-      <div className="shrink-0 flex items-center justify-between px-3 h-[34px] border-t border-border bg-[#fafafa] dark:bg-neutral-900">
-        <span className="text-[10px] font-semibold text-neutral-400 tracking-tight">
+      <div className="shrink-0 flex items-center justify-between px-3 h-[34px] border-t border-border bg-surface">
+        <span className="text-[10px] font-semibold text-foreground-muted tracking-tight">
           {labels.groupSummary ? labels.groupSummary(filteredGroups.length) : `${filteredGroups.length} grup`}
         </span>
-        <div className="flex items-center gap-1.5 text-[10px] font-medium text-neutral-400 tracking-tight">
+        <div className="flex items-center gap-1.5 text-[10px] font-medium text-foreground-muted tracking-tight">
           <RefreshCw className="w-3 h-3" />
           <span>{labels.lastUpdated || 'Terakhir diperbarui'} 10:45:23</span>
         </div>

@@ -44,8 +44,8 @@
   --color-foreground-subtle: #94A3B8;
 
   /* Primary (Brand Black based) */
-  --color-primary: #0F0F0F;
-  --color-primary-hover: #27272A;
+  --color-primary: #374151;
+  --color-primary-hover: #4B5563;
   --color-primary-foreground: #FFFFFF;
 
   /* Accent (Brand Red based) */
@@ -98,7 +98,10 @@
 
 /* ─── Base Styles ─────────────────────────────────── */
 @layer base {
-  *, *::before, *::after {
+
+  *,
+  *::before,
+  *::after {
     box-sizing: border-box;
   }
 
@@ -118,7 +121,7 @@
     box-shadow: none !important;
     border-radius: 0 !important;
   }
-  
+
   /* Parking popup — same transparent treatment */
   .custom-parking-popup .maplibregl-popup-content {
     padding: 0 !important;
@@ -131,12 +134,15 @@
   .custom-vehicle-popup.maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
     border-top-color: var(--color-background);
   }
+
   .custom-vehicle-popup.maplibregl-popup-anchor-top .maplibregl-popup-tip {
     border-bottom-color: var(--color-background);
   }
+
   .custom-vehicle-popup.maplibregl-popup-anchor-left .maplibregl-popup-tip {
     border-right-color: var(--color-background);
   }
+
   .custom-vehicle-popup.maplibregl-popup-anchor-right .maplibregl-popup-tip {
     border-left-color: var(--color-background);
   }
@@ -145,6 +151,7 @@
   .custom-parking-popup.maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
     border-top-color: var(--color-background);
   }
+
   .custom-parking-popup.maplibregl-popup-anchor-top .maplibregl-popup-tip {
     border-bottom-color: var(--color-background);
   }

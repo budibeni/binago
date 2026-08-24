@@ -39,7 +39,7 @@ export function HeatmapPanel({
 
   return (
     <>
-      <div className={cn('flex items-center w-full h-full px-2 sm:px-4 bg-white dark:bg-surface shadow-[0_-4px_20px_-5px_rgba(0,0,0,0.05)] transition-all duration-300 overflow-x-auto overflow-y-hidden', className)}>
+      <div className={cn('flex items-center w-full h-full px-2 sm:px-4 bg-background shadow-[0_-4px_20px_-5px_rgba(0,0,0,0.05)] transition-all duration-300 overflow-x-auto overflow-y-hidden', className)}>
         {/* Logo */}
         <div className="flex items-center gap-2 pr-2 sm:pr-3 border-r border-border shrink-0">
           <MapPin className="h-4 w-4 text-danger" strokeWidth={2.5} />
@@ -56,7 +56,7 @@ export function HeatmapPanel({
             <div className="relative w-[110px] sm:w-[130px] shrink-0">
               <input
                 type="date"
-                className="w-full h-8 rounded-md bg-neutral-50 dark:bg-neutral-800/80 border border-border hover:border-neutral-400 dark:hover:border-neutral-500 px-1.5 sm:px-2 pr-6 sm:pr-7 text-[10px] sm:text-[11px] font-medium text-foreground shadow-sm focus:outline-none focus:border-danger focus:ring-1 focus:ring-danger disabled:opacity-50 transition-all [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:w-full cursor-pointer"
+                className="w-full h-8 rounded-md bg-background border border-border hover:border-foreground-muted px-1.5 sm:px-2 pr-6 sm:pr-7 text-[11px] font-medium text-foreground shadow-sm focus:outline-none focus:border-danger focus:ring-1 focus:ring-danger disabled:opacity-50 transition-all [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:w-full cursor-pointer"
                 value={dateRange.startDate}
                 onChange={(e) => onDateRangeChange({ ...dateRange, startDate: e.target.value })}
                 disabled={isGenerating}
@@ -70,7 +70,7 @@ export function HeatmapPanel({
             <div className="relative w-[110px] sm:w-[130px] shrink-0">
               <input
                 type="date"
-                className="w-full h-8 rounded-md bg-neutral-50 dark:bg-neutral-800/80 border border-border hover:border-neutral-400 dark:hover:border-neutral-500 px-1.5 sm:px-2 pr-6 sm:pr-7 text-[10px] sm:text-[11px] font-medium text-foreground shadow-sm focus:outline-none focus:border-danger focus:ring-1 focus:ring-danger disabled:opacity-50 transition-all [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:w-full cursor-pointer"
+                className="w-full h-8 rounded-md bg-background border border-border hover:border-foreground-muted px-1.5 sm:px-2 pr-6 sm:pr-7 text-[11px] font-medium text-foreground shadow-sm focus:outline-none focus:border-danger focus:ring-1 focus:ring-danger disabled:opacity-50 transition-all [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:w-full cursor-pointer"
                 value={dateRange.endDate}
                 onChange={(e) => onDateRangeChange({ ...dateRange, endDate: e.target.value })}
                 disabled={isGenerating}
@@ -86,7 +86,7 @@ export function HeatmapPanel({
                 value={statusFilter}
                 onChange={(e) => onStatusFilterChange(e.target.value as any)}
                 disabled={isGenerating}
-                className="w-full h-8 rounded-md bg-neutral-50 dark:bg-neutral-800/80 border border-border hover:border-neutral-400 dark:hover:border-neutral-500 px-1.5 sm:px-2 text-[10px] sm:text-[11px] font-medium text-foreground shadow-sm focus:outline-none focus:border-danger focus:ring-1 focus:ring-danger disabled:opacity-50 transition-all appearance-none cursor-pointer"
+                className="w-full h-8 rounded-md bg-background border border-border hover:border-foreground-muted px-1.5 sm:px-2 text-[11px] font-medium text-foreground shadow-sm focus:outline-none focus:border-danger focus:ring-1 focus:ring-danger disabled:opacity-50 transition-all appearance-none cursor-pointer"
               >
                 <option value="driving">{tTracking.statusDriving}</option>
                 <option value="idle">{tTracking.statusIdle}</option>
@@ -100,7 +100,7 @@ export function HeatmapPanel({
 
         {/* Generate Button */}
         <Button
-          className="bg-danger hover:bg-danger/90 text-white font-semibold h-8 px-3 sm:px-4 text-[10px] sm:text-[11px] rounded-lg shadow-sm shadow-danger/20 transition-all shrink-0"
+          className="bg-danger hover:bg-danger/90 text-white font-semibold h-8 px-3 sm:px-4 text-[11px] rounded-lg shadow-sm shadow-danger/20 transition-all shrink-0"
           disabled={!canGenerate || isGenerating}
           onClick={onGenerate}
         >
