@@ -9,7 +9,7 @@ import type {
   TrackingVehicle,
   TrackingVehicleGroup,
   Trip,
-} from '@/features/tracking/types/tracking';
+} from '@/features/core/tracking/types/tracking';
 import {
   trackingRepository,
   type MockPlaybackData,

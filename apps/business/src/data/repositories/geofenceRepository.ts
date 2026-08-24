@@ -2,7 +2,7 @@
  * Geofence Repository
  */
 
-import type { Geofence, GeofenceGroup } from '@/features/geofences/types';
+import type { Geofence, GeofenceGroup } from '@/features/core/geofences/types';
 import { mockGeofences as centralGeofences, mockGroups } from '../mock';
 
 // --- Repository Interface ------------------------------------------------------

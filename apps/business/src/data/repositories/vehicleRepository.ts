@@ -5,7 +5,7 @@
  * Swap MockVehicleRepository for ApiVehicleRepository when backend is ready.
  */
 
-import type { Vehicle, VehicleGroup } from '@/features/vehicles/types/vehicle';
+import type { Vehicle, VehicleGroup } from '@/features/core/vehicles/types/vehicle';
 import { mockVehicles as centralVehicles, mockGroups, mockTrackingState } from '../mock';
 
 // --- Repository Interface ------------------------------------------------------

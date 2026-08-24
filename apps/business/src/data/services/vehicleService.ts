@@ -5,7 +5,7 @@
  * Features call this service — not the repository directly.
  */
 
-import type { Vehicle, VehicleGroup, VehicleFilters } from '@/features/vehicles/types/vehicle';
+import type { Vehicle, VehicleGroup, VehicleFilters } from '@/features/core/vehicles/types/vehicle';
 import { vehicleRepository } from '../repositories/vehicleRepository';
 
 export const vehicleService = {

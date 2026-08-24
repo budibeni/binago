@@ -2,7 +2,7 @@
  * Driver Service
  */
 
-import type { Driver, DriverStatusFilter } from '@/features/drivers/types/driver';
+import type { Driver, DriverStatusFilter } from '@/features/core/drivers/types/driver';
 import { driverRepository } from '../repositories/driverRepository';
 
 export const driverService = {

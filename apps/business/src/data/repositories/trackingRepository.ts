@@ -14,7 +14,7 @@ import type {
   TrackingVehicleGroup,
   Trip,
   PlaybackData,
-} from '@/features/tracking/types/tracking';
+} from '@/features/core/tracking/types/tracking';
 import { mockGroups, mockVehicles as centralVehicles, mockTrackingState, mockTrips } from '../mock';
 
 // --- Waypoint type (simulation only, not a Route master entity) ----------------

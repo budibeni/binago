@@ -2,7 +2,7 @@
  * Group Repository
  */
 
-import type { GroupData } from '@/features/groups/data/mockGroupsData';
+import type { GroupData } from '@/features/core/groups/data/mockGroupsData';
 import { mockGroups } from '../mock';
 
 // --- Repository Interface ------------------------------------------------------

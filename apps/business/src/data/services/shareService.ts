@@ -5,7 +5,7 @@
  * Uses unified vehicle data — no separate vehicle/driver dataset.
  */
 
-import type { ShareSession } from '@/features/sharing/types';
+import type { ShareSession } from '@/features/core/sharing/types';
 import { shareRepository, generateToken } from '../repositories/shareRepository';
 import { trackingService } from './trackingService';
 

@@ -2,7 +2,7 @@
  * Route Service
  */
 
-import type { Route } from '@/features/routes/types';
+import type { Route } from '@/features/core/routes/types';
 import { routeRepository } from '../repositories/routeRepository';
 
 export const routeService = {

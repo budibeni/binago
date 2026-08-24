@@ -5,7 +5,7 @@
  * No separate vehicle/driver dataset — uses the same source as all other features.
  */
 
-import type { MetricSummary, FleetAttentionItem } from '@/features/home/data/mockHomeData';
+import type { MetricSummary, FleetAttentionItem } from '@/features/core/home/data/mockHomeData';
 import { vehicleService } from './vehicleService';
 import { driverService } from './driverService';
 import { tripService } from './tripService';

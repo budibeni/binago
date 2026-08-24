@@ -30,7 +30,7 @@ import {
 import { AppShell } from '@adatrack/ui';
 import type { NavGroup, NavItem, UserInfo, Locale } from '@adatrack/types';
 import { getTranslation } from '../i18n';
-import { ShareLocationProvider } from '../features/sharing/context/ShareLocationContext';
+import { ShareLocationProvider } from '../features/core/sharing/context/ShareLocationContext';
 
 const DUMMY_USER: UserInfo = {
   name: 'Budi Setiawan',

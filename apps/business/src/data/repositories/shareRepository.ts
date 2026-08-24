@@ -2,8 +2,8 @@
  * Share Repository
  */
 
-import type { ShareSession } from '@/features/sharing/types';
-import { mockShareSessions } from '@/features/sharing/data/mockLocationSharing';
+import type { ShareSession } from '@/features/core/sharing/types';
+import { mockShareSessions } from '@/features/core/sharing/data/mockLocationSharing';
 
 // --- Helpers -------------------------------------------------------------------
 

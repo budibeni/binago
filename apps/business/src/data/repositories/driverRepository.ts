@@ -2,7 +2,7 @@
  * Driver Repository
  */
 
-import type { Driver } from '@/features/drivers/types/driver';
+import type { Driver } from '@/features/core/drivers/types/driver';
 import { mockDrivers as centralDrivers } from '../mock';
 
 // --- Repository Interface ------------------------------------------------------

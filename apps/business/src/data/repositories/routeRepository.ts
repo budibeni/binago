@@ -2,7 +2,7 @@
  * Route Repository
  */
 
-import type { Route } from '@/features/routes/types';
+import type { Route } from '@/features/core/routes/types';
 import { mockRoutes as centralRoutes } from '../mock';
 
 // --- Repository Interface ------------------------------------------------------

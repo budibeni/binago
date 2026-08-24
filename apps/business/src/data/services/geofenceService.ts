@@ -2,7 +2,7 @@
  * Geofence Service
  */
 
-import type { Geofence, GeofenceGroup } from '@/features/geofences/types';
+import type { Geofence, GeofenceGroup } from '@/features/core/geofences/types';
 import { geofenceRepository } from '../repositories/geofenceRepository';
 
 export const geofenceService = {
