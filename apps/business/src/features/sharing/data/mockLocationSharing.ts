@@ -11,7 +11,7 @@ const nowMs = Date.now();
 export const mockShareSessions: ShareSession[] = [
   {
     id: 'share-001',
-    vehicleId: 'v-002',
+    vehicleId: 'veh-002',
     token: 'valid-token',
     durationHours: 4,
     createdAt: new Date(nowMs - 1000 * 60 * 15).toISOString(), // 15 min ago
@@ -20,7 +20,7 @@ export const mockShareSessions: ShareSession[] = [
   },
   {
     id: 'share-002',
-    vehicleId: 'v-003',
+    vehicleId: 'veh-003',
     token: 'expired-token',
     durationHours: 1,
     createdAt: new Date(nowMs - 1000 * 60 * 90).toISOString(), // 1.5h ago
@@ -29,7 +29,7 @@ export const mockShareSessions: ShareSession[] = [
   },
   {
     id: 'share-003',
-    vehicleId: 'v-004',
+    vehicleId: 'veh-004',
     token: 'revoked-token',
     durationHours: 2,
     createdAt: new Date(nowMs - 1000 * 60 * 60).toISOString(),

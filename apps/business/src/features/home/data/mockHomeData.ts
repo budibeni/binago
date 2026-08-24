@@ -1,3 +1,5 @@
+import { mockVehicles, mockTrackingState, mockDrivers, mockTrips, mockDevices } from '../../../data/mock';
+
 export interface MetricSummary {
   totalVehicles: number;
   movingVehicles: number;
@@ -12,18 +14,17 @@ export interface MetricSummary {
 }
 
 export const mockMetricSummary: MetricSummary = {
-  totalVehicles: 1250,
-  movingVehicles: 840,
-  activeAlerts: 15,
-  tripsToday: 320,
+  totalVehicles: mockVehicles.length,
+  movingVehicles: mockTrackingState.filter(t => t.status === 'driving').length,
+  activeAlerts: 15, // mock constant
+  tripsToday: mockTrips.length,
   // legacy fields
-  activeVehicles: 840,
-  idleVehicles: 410,
-  activeDrivers: 620,
-  ongoingDeliveries: 186,
-  onlineDevices: 1180,
+  activeVehicles: mockTrackingState.filter(t => t.status === 'driving' || t.status === 'idle').length,
+  idleVehicles: mockTrackingState.filter(t => t.status === 'parking' || t.status === 'offline').length,
+  activeDrivers: mockDrivers.filter(d => d.status === 'active').length,
+  ongoingDeliveries: mockTrips.filter(t => t.status === 'in_progress').length,
+  onlineDevices: mockDevices.filter(d => d.status === 'online').length,
 };
-
 export interface FleetAttentionItem {
   id: string;
   type: 'maintenance' | 'offline' | 'alert';
@@ -55,3 +56,4 @@ export const mockFleetAttention: FleetAttentionItem[] = [
     time: '15 mnt lalu',
   },
 ];
+
