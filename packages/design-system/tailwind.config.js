@@ -10,7 +10,13 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter Variable', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-sans)', 'Roboto', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+      },
+      fontWeight: {
+        semibold: '500',
+        bold: '500',
+        extrabold: '500',
+        black: '500',
       },
       colors: {
         /* Brand */

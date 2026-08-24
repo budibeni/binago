@@ -1,8 +1,16 @@
 import React from 'react';
 import type { Metadata } from 'next';
+import { Roboto } from 'next/font/google';
 import './globals.css';
 import '@adatrack/maps/styles.css';
 import { BusinessShellLayout } from '../components/BusinessShellLayout';
+
+const roboto = Roboto({
+  weight: ['400', '500'],
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-sans',
+});
 
 export const metadata: Metadata = {
   title: 'ADATRACK Business',
@@ -15,7 +23,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="id" suppressHydrationWarning>
+    <html lang="id" suppressHydrationWarning className={roboto.variable}>
       <body className="min-h-screen bg-surface text-foreground font-sans antialiased">
         <script
           dangerouslySetInnerHTML={{

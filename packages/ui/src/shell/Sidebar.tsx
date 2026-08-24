@@ -129,7 +129,7 @@ export function Sidebar({
             'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50',
             isActive
               ? 'bg-black text-white dark:bg-black dark:text-white shadow-sm'
-              : 'text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 hover:bg-surface-elevated dark:hover:text-zinc-100 hover:shadow-sm',
+              : 'text-foreground-muted hover:text-foreground hover:bg-surface-elevated hover:shadow-sm',
             item.disabled && 'pointer-events-none opacity-40',
             collapsed && 'justify-center px-2',
           )}
@@ -141,7 +141,7 @@ export function Sidebar({
             <Icon
               className={cn(
                 'h-4 w-4 shrink-0 transition-colors duration-300',
-                isActive ? 'text-red-500' : 'text-zinc-400 group-hover:text-zinc-700 dark:text-zinc-500 dark:group-hover:text-zinc-300',
+                isActive ? 'text-red-500' : 'text-foreground-muted group-hover:text-foreground',
               )}
             />
           )}
@@ -247,7 +247,7 @@ export function Sidebar({
                   <div
                     className={cn(
                       "flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider",
-                      !isMain ? "text-zinc-500/90 group-hover/section:text-zinc-900 dark:text-zinc-400/90 dark:group-hover/section:text-zinc-200 transition-colors duration-300" : "text-zinc-500/90"
+                      !isMain ? "text-foreground-muted group-hover/section:text-foreground transition-colors duration-300" : "text-foreground-muted"
                     )}
                   >
                     {group.icon && (
