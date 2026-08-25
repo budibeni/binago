@@ -1,10 +1,8 @@
 import React from 'react';
-import { MoreHorizontal, Eye, Edit2, Ban, CheckCircle2, AlertCircle, Plus } from 'lucide-react';
+import { CheckCircle2, AlertCircle, Plus, FileText } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import {
   Button,
-  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent,
-  DropdownMenuItem, DropdownMenuSeparator,
   Checkbox,
 } from '@adatrack/ui';
 import {
@@ -39,9 +37,7 @@ const DEFAULT_COLUMN_VISIBILITY = {};
 function buildColumns(
   labels: Record<string, string>,
   onView: (v: RentalVehicle) => void,
-  onEdit: (v: RentalVehicle) => void,
   onComplete: (v: RentalVehicle) => void,
-  onDisable: (v: RentalVehicle) => void,
   selectedIds: string[],
   onSelectionChange: (ids: string[]) => void,
   dataList: RentalVehicle[]
@@ -97,13 +93,24 @@ function buildColumns(
       accessorKey: 'vehicle',
       header: labels.colVehicle,
       enableSorting: true,
-      size: 200,
+      size: 240,
       cell: ({ row }) => {
         const v = row.original.coreVehicle;
         return (
-          <div className="flex flex-col">
-            <span className="font-bold text-[13px] text-foreground">{v.brand} {v.vehicleName}</span>
-            <span className="text-[11px] font-medium text-muted-foreground mt-0.5">{v.plateNumber}</span>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-8 h-8 shrink-0 text-muted-foreground hover:text-foreground"
+              onClick={() => onView(row.original)}
+              title="Detail Armada"
+            >
+              <FileText className="w-4 h-4" />
+            </Button>
+            <div className="flex flex-col min-w-0">
+              <span className="font-bold text-[13px] text-foreground truncate">{v.brand} {v.vehicleName}</span>
+              <span className="text-[11px] font-medium text-muted-foreground mt-0.5 truncate">{v.plateNumber}</span>
+            </div>
           </div>
         );
       },
@@ -230,43 +237,7 @@ function buildColumns(
         );
       },
     },
-    {
-      id: 'actions',
-      header: '',
-      enableSorting: false,
-      size: 52,
-      cell: ({ row }) => {
-        const v = row.original;
-        return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 w-7 p-0 flex items-center justify-center focus-visible:ring-1 focus-visible:ring-primary focus:outline-none"
-              >
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => onView(v)}>
-                <Eye className="mr-2 h-4 w-4" />
-                {labels.actionDetail}
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onEdit(v)}>
-                <Edit2 className="mr-2 h-4 w-4" />
-                {labels.actionEdit}
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => onDisable(v)} className="text-red-600">
-                <Ban className="mr-2 h-4 w-4" />
-                {labels.actionDisable}
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        );
-      },
-    },
+    // Actions removed
   ];
 }
 
@@ -291,8 +262,8 @@ export function RentalVehicleTable({
   React.useEffect(() => { setPageIndex(0); }, [data]);
 
   const columns = React.useMemo(
-    () => buildColumns(labels, onView, onEdit, onComplete, onDisable, selectedIds, onSelectionChange, data),
-    [labels, onView, onEdit, onComplete, onDisable, selectedIds, onSelectionChange, data],
+    () => buildColumns(labels, onView, onComplete, selectedIds, onSelectionChange, data),
+    [labels, onView, onComplete, selectedIds, onSelectionChange, data],
   );
 
   const processedData = React.useMemo(() => {
@@ -339,7 +310,7 @@ export function RentalVehicleTable({
     mode: 'pagination',
     columnVisibility,
     onColumnVisibilityChange: setColumnVisibility,
-    freezeConfig: { left: ['select', 'vehicle'], right: ['actions'] },
+    freezeConfig: { left: ['select', 'vehicle'] },
     paginationConfig,
   });
 

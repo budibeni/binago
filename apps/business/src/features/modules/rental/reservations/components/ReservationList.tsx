@@ -1,13 +1,10 @@
 'use client';
 
 import React from 'react';
-import { Eye, Edit2, MapPin, MoreHorizontal, Plus } from 'lucide-react';
+import { MapPin, Plus, MessageCircle, FileText } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import {
   Button,
-  Checkbox,
-  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent,
-  DropdownMenuItem,
   Badge,
 } from '@adatrack/ui';
 import {
@@ -29,8 +26,6 @@ interface ReservationListProps {
   searchValue: string;
   onSearchChange: (value: string) => void;
   onAdd: () => void;
-  selectedIds: string[];
-  onSelectionChange: (ids: string[]) => void;
   onOpenMap: (vehicleId: string) => void;
 }
 
@@ -86,64 +81,31 @@ const formatShortDate = (dateStr: string) => {
 function buildColumns(
   labels: Record<string, string>,
   onView: (r: Reservation) => void,
-  onEdit: (r: Reservation) => void,
   onOpenMap: (vehicleId: string) => void,
-  selectedIds: string[],
-  onSelectionChange: (ids: string[]) => void,
   dataList: Reservation[],
 ): DataTableColumnDef<Reservation>[] {
-  const handleSelectAll = (checked: boolean) => {
-    if (checked) {
-      onSelectionChange(dataList.map(r => r.vehicleId).filter(Boolean));
-    } else {
-      onSelectionChange([]);
-    }
-  };
-
-  const handleSelectRow = (checked: boolean, vehicleId: string) => {
-    if (checked) {
-      onSelectionChange([...selectedIds, vehicleId]);
-    } else {
-      onSelectionChange(selectedIds.filter(id => id !== vehicleId));
-    }
-  };
-
   return [
-    // --- Checkbox ---
-    {
-      id: 'select',
-      header: () => (
-        <Checkbox
-          checked={dataList.length > 0 && selectedIds.length === dataList.length}
-          onCheckedChange={handleSelectAll}
-          aria-label="Select all"
-          className="ml-2"
-        />
-      ),
-      cell: ({ row }) => {
-        const vid = row.original.vehicleId;
-        return (
-          <Checkbox
-            checked={selectedIds.includes(vid)}
-            onCheckedChange={(checked) => handleSelectRow(!!checked, vid)}
-            aria-label={`Select ${row.original.reservationNumber}`}
-            className="ml-2 data-[state=checked]:bg-danger data-[state=checked]:border-danger"
-          />
-        );
-      },
-      enableSorting: false,
-      size: 40,
-    },
     // --- Nomor Reservasi ---
     {
       id: 'no',
       accessorKey: 'reservationNumber',
       header: labels.colNo,
-      size: 160,
+      size: 200,
       cell: ({ row }) => (
-        <div className="flex flex-col">
-          <span className="font-bold text-sm">{row.original.reservationNumber}</span>
-          <span className="text-[11px] text-muted-foreground">{formatDate(row.original.createdAt)}</span>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="w-8 h-8 shrink-0 text-muted-foreground hover:text-foreground"
+            onClick={() => onView(row.original)}
+            title="Buka Detail"
+          >
+            <FileText className="w-4 h-4" />
+          </Button>
+          <div className="flex flex-col min-w-0">
+            <span className="font-bold text-sm truncate">{row.original.reservationNumber}</span>
+            <span className="text-[11px] text-muted-foreground truncate">{formatDate(row.original.createdAt)}</span>
+          </div>
         </div>
       ),
     },
@@ -153,12 +115,35 @@ function buildColumns(
       accessorKey: 'customer.name',
       header: labels.colCustomer,
       size: 190,
-      cell: ({ row }) => (
-        <div className="flex flex-col">
-          <span className="font-semibold text-sm text-foreground">{row.original.customer?.name || '-'}</span>
-          <span className="text-[11px] text-muted-foreground">{row.original.customer?.phone || '-'}</span>
-        </div>
-      ),
+      cell: ({ row }) => {
+        const phone = row.original.customer?.phone;
+        let waLink = '#';
+        if (phone) {
+          let cleanPhone = phone.replace(/\D/g, '');
+          if (cleanPhone.startsWith('0')) cleanPhone = '62' + cleanPhone.slice(1);
+          waLink = `https://wa.me/${cleanPhone}`;
+        }
+        
+        return (
+          <div className="flex flex-col">
+            <span className="font-semibold text-sm text-foreground">{row.original.customer?.name || '-'}</span>
+            <div className="flex items-center gap-1.5 mt-0.5">
+              {phone && (
+                <a
+                  href={waLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-5 h-5 flex items-center justify-center rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 transition-colors shrink-0"
+                  title="Hubungi via WhatsApp"
+                >
+                  <MessageCircle className="w-3 h-3" />
+                </a>
+              )}
+              <span className="text-[11px] text-muted-foreground">{phone || '-'}</span>
+            </div>
+          </div>
+        );
+      },
     },
     // --- Kendaraan (diperluas) ---
     {
@@ -169,24 +154,25 @@ function buildColumns(
       cell: ({ row }) => {
         const v  = row.original.vehicle;
         const cv = v?.coreVehicle;
+        const vid = v?.vehicleId ?? '';
         if (!cv) return <span className="text-muted-foreground text-sm">-</span>;
         return (
-          <div className="flex items-start gap-2.5">
-            {/* Icon */}
-            <div className="mt-0.5 w-7 h-7 rounded-md bg-primary/10 flex items-center justify-center shrink-0">
-              <svg className="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M8 7h8M3 12h18M4 16l1 3h14l1-3M5 12V9l2-4h10l2 4v3" />
-              </svg>
-            </div>
-            <div className="min-w-0">
+          <div className="flex flex-col min-w-0 justify-center">
+            <p className="text-[11px] text-muted-foreground truncate mb-1">
+              {cv.brand} · {cv.vehicleName} · {cv.year}
+            </p>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                title="Buka Pemantauan"
+                onClick={() => vid && onOpenMap(vid)}
+                disabled={!vid}
+                className="w-6 h-6 rounded-md bg-primary/10 hover:bg-primary/20 text-primary shrink-0"
+              >
+                <MapPin className="w-3 h-3" />
+              </Button>
               <p className="font-bold text-sm leading-none">{cv.plateNumber}</p>
-              <p className="text-[11px] text-muted-foreground truncate mt-0.5">{cv.brand} · {cv.vehicleName} · {cv.year}</p>
-              <div className="flex items-center gap-1.5 mt-1">
-                <Badge className={cn('text-[10px] px-1.5 py-0 border-0 rounded-full', getRentalStatusColor(v?.status ?? ''))}>
-                  {v?.status ?? '-'}
-                </Badge>
-                <span className="text-[10px] text-muted-foreground">{cv.odometer?.toLocaleString('id-ID') ?? '-'} km</span>
-              </div>
             </div>
           </div>
         );
@@ -197,13 +183,13 @@ function buildColumns(
       id: 'rentalDate',
       accessorKey: 'startDate',
       header: labels.colRentalDate,
-      size: 170,
+      size: 180,
       cell: ({ row }) => (
         <div className="flex flex-col text-[12px]">
-          <span className="font-medium">{formatShortDate(row.original.startDate)}</span>
-          <span className="text-muted-foreground text-[10px] leading-none my-0.5">s/d</span>
-          <span className="font-medium">{formatShortDate(row.original.endDate)}</span>
-          <span className="text-[10px] text-muted-foreground mt-0.5">{row.original.duration} hari</span>
+          <span className="font-medium">
+            {formatShortDate(row.original.startDate)} <span className="text-muted-foreground font-normal mx-1">s/d</span> {formatShortDate(row.original.endDate)}
+          </span>
+          <span className="text-[11px] text-muted-foreground mt-0.5">{row.original.duration} hari</span>
         </div>
       ),
     },
@@ -235,69 +221,7 @@ function buildColumns(
         );
       },
     },
-    // --- Actions ---
-    {
-      id: 'actions',
-      header: '',
-      size: 96,
-      cell: ({ row }) => {
-        const r  = row.original;
-        const vid = r.vehicle?.vehicleId ?? '';
-        return (
-          <div className="flex items-center gap-1">
-            {/* Map button */}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 w-8 p-0 text-primary hover:text-primary hover:bg-primary/10"
-              title="Buka di Pemantauan"
-              onClick={() => vid && onOpenMap(vid)}
-              disabled={!vid}
-            >
-              <MapPin className="w-4 h-4" />
-            </Button>
-            {/* Detail */}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
-              title="Detail"
-              onClick={() => onView(r)}
-            >
-              <Eye className="w-4 h-4" />
-            </Button>
-            {/* More */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground">
-                  <MoreHorizontal className="w-4 h-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem onClick={() => onView(r)}>
-                  <Eye className="w-4 h-4 mr-2" />
-                  Detail
-                </DropdownMenuItem>
-                {r.status === 'PENDING' && (
-                  <DropdownMenuItem onClick={() => onEdit(r)}>
-                    <Edit2 className="w-4 h-4 mr-2" />
-                    Edit
-                  </DropdownMenuItem>
-                )}
-                <DropdownMenuItem
-                  className="text-primary focus:text-primary"
-                  onClick={() => vid && onOpenMap(vid)}
-                  disabled={!vid}
-                >
-                  <MapPin className="w-4 h-4 mr-2" />
-                  Buka Pemantauan
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        );
-      },
-    },
+    // Column removed
   ];
 }
 
@@ -309,8 +233,6 @@ export function ReservationList({
   searchValue,
   onSearchChange,
   onAdd,
-  selectedIds,
-  onSelectionChange,
   onOpenMap,
 }: ReservationListProps) {
 
@@ -334,9 +256,9 @@ export function ReservationList({
   };
 
   const columns = React.useMemo(
-    () => buildColumns(labels, onView, onEdit, onOpenMap, selectedIds, onSelectionChange, data),
+    () => buildColumns(labels, onView, onOpenMap, data),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [labels, onView, onEdit, onOpenMap, selectedIds, onSelectionChange, data],
+    [labels, onView, onOpenMap, data],
   );
 
   const table = useDataTable<Reservation>({
@@ -344,7 +266,7 @@ export function ReservationList({
     columns,
     mode: 'pagination',
     paginationConfig,
-    freezeConfig: { left: ['select', 'no'], right: ['actions'] },
+    freezeConfig: { left: ['no'] },
   });
 
   return (

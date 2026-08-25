@@ -261,6 +261,7 @@ export function RentalVehiclesFeature() {
         onEdit={(v) => {
           router.push(`/rental/vehicles/${v.id}/edit`);
         }}
+        onDelete={handleDisableClick}
       />
 
       <RentalVehicleDisableDialog

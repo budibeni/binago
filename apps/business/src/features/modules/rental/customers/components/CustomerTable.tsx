@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { MoreHorizontal, Eye, Edit2, Trash2 } from 'lucide-react';
+import { MoreHorizontal, Edit2, Trash2, FileText, Plus } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import {
   Badge, Button,
@@ -61,6 +61,7 @@ interface CustomerTableProps {
   filterConfig: DataTableFilterConfig;
   isFilterOpen: boolean;
   onFilterOpenChange: (open: boolean) => void;
+  onAdd?: () => void;
   className?: string;
 }
 
@@ -81,36 +82,26 @@ function buildColumns(
 ): DataTableColumnDef<Customer>[] {
   return [
     {
-      id: 'code',
-      accessorKey: 'code',
-      header: labels.colCode,
-      enableSorting: true,
-      size: 130,
-      cell: ({ row }) => (
-        <button
-          type="button"
-          className="font-bold text-primary hover:underline underline-offset-2 text-[13px] tracking-wider uppercase focus:outline-none"
-          onClick={() => onViewDetail(row.original)}
-        >
-          {row.original.code}
-        </button>
-      ),
-    },
-    {
       id: 'customerName',
       accessorKey: 'name',
       header: labels.colCustomer,
       enableSorting: true,
-      size: 220,
+      size: 260,
       cell: ({ row }) => (
-        <div className="flex flex-col">
-          <span className="text-[13px] font-medium text-foreground">{row.original.name}</span>
-          <span className="text-[12px] text-foreground-muted">
-            {row.original.type === 'INDIVIDUAL' 
-              ? `NIK: ${(row.original as IndividualCustomer).nik.replace(/^(\d{4})(\d{8})(\d{4})$/, '$1-XXXX-XXXX-$3')}` 
-              : `NPWP: ${(row.original as CompanyCustomer).npwp}`
-            }
-          </span>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="w-8 h-8 shrink-0 text-muted-foreground hover:text-foreground"
+            onClick={() => onViewDetail(row.original)}
+            title="Buka Detail"
+          >
+            <FileText className="w-4 h-4" />
+          </Button>
+          <div className="flex flex-col">
+            <span className="text-[13px] font-medium text-foreground">{row.original.name}</span>
+            <span className="text-[12px] text-foreground-muted">{row.original.code}</span>
+          </div>
         </div>
       ),
     },
@@ -176,41 +167,6 @@ function buildColumns(
       size: 120,
       cell: ({ row }) => getStatusBadge(row.original.status, labels),
     },
-    {
-      id: 'actions',
-      header: '',
-      enableSorting: false,
-      size: 52,
-      cell: ({ row }) => (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 w-7 p-0 flex items-center justify-center focus-visible:ring-1 focus-visible:ring-primary focus:outline-none data-[state=open]:bg-neutral-200/50 dark:data-[state=open]:bg-neutral-800"
-              aria-label="Aksi pelanggan"
-            >
-              <MoreHorizontal className="h-4 w-4 text-foreground-muted" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuItem onClick={() => onViewDetail(row.original)}>
-              <Eye className="mr-2 h-4 w-4 text-foreground-muted" />
-              <span>{labels.actionDetail}</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onEdit(row.original)}>
-              <Edit2 className="mr-2 h-4 w-4 text-foreground-muted" />
-              <span>{labels.actionEdit}</span>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem destructive onClick={() => onDelete(row.original)}>
-              <Trash2 className="mr-2 h-4 w-4 text-danger" />
-              <span>{labels.actionDelete}</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      ),
-    },
   ];
 }
 
@@ -230,6 +186,7 @@ export function CustomerTable({
   filterConfig,
   isFilterOpen,
   onFilterOpenChange,
+  onAdd,
   className,
 }: CustomerTableProps) {
   const [pageIndex, setPageIndex] = React.useState(0);
@@ -283,7 +240,7 @@ export function CustomerTable({
     mode: 'pagination',
     columnVisibility,
     onColumnVisibilityChange: setColumnVisibility,
-    freezeConfig: { left: ['code'], right: ['actions'] },
+    freezeConfig: { left: ['customerName'] },
     paginationConfig,
   });
 
@@ -303,6 +260,12 @@ export function CustomerTable({
         onFilterOpenChange={onFilterOpenChange}
         activeFilterCount={activeFilterCount}
         exportConfig={{ filename: labels.exportFilename, enabled: true }}
+        rightSlot={onAdd && (
+          <Button variant="destructive" onClick={onAdd} className="h-9">
+            <Plus className="w-4 h-4 mr-2" />
+            <span className="hidden sm:inline-block">Tambah</span>
+          </Button>
+        )}
       />
 
       <div className={cn('flex items-stretch gap-4', isFilterOpen ? 'flex-col lg:flex-row' : '')}>

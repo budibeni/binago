@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '@adatrack/ui';
 import type { RentalVehicle } from '../types/rentalVehicle';
-import { Edit2, CheckCircle2, AlertCircle, X, Car, Tag, Calendar, User, MapPin, FileText, CreditCard } from 'lucide-react';
+import { Edit2, CheckCircle2, AlertCircle, X, Car, Tag, Calendar, User, MapPin, FileText, CreditCard, Trash2 } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 
 interface RentalVehicleDetailDrawerProps {
@@ -10,6 +10,7 @@ interface RentalVehicleDetailDrawerProps {
   data: RentalVehicle | null;
   labels: Record<string, string>;
   onEdit: (v: RentalVehicle) => void;
+  onDelete?: (v: RentalVehicle) => void;
 }
 
 export function RentalVehicleDetailDrawer({
@@ -18,6 +19,7 @@ export function RentalVehicleDetailDrawer({
   data,
   labels,
   onEdit,
+  onDelete,
 }: RentalVehicleDetailDrawerProps) {
   if (!data) return null;
 
@@ -244,14 +246,27 @@ export function RentalVehicleDetailDrawer({
         </div>
         
         {/* Footer */}
-        <div className="p-3.5 border-t border-border/40 flex justify-between gap-2.5 bg-background">
-          <Button variant="outline" size="sm" onClick={() => onOpenChange(false)} className="flex-1 bg-white text-foreground">
-            Batal
-          </Button>
-          <Button variant="primary" size="sm" className="flex-1 bg-danger hover:bg-danger/90 text-white" onClick={() => { onOpenChange(false); onEdit(data); }}>
-            <Edit2 className="w-3 h-3 mr-2" />
-            Edit Data Rental
-          </Button>
+        <div className="p-3.5 border-t border-border/40 flex justify-between items-center bg-background">
+          <div className="flex items-center gap-2.5">
+            <Button variant="outline" size="sm" onClick={() => onOpenChange(false)} className="bg-white text-foreground">
+              Batal
+            </Button>
+            <Button variant="primary" size="sm" className="bg-danger hover:bg-danger/90 text-white" onClick={() => { onOpenChange(false); onEdit(data); }}>
+              <Edit2 className="w-3.5 h-3.5 mr-1.5" />
+              Edit
+            </Button>
+          </div>
+          {onDelete && (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              title="Hapus"
+              className="text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300 w-8 h-8 shrink-0" 
+              onClick={() => { onOpenChange(false); onDelete(data); }}
+            >
+              <Trash2 className="w-4 h-4" />
+            </Button>
+          )}
         </div>
       </aside>
     </>

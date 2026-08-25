@@ -7,12 +7,12 @@ import { useBusinessLocale } from '@/components/BusinessShellLayout';
 import { rentalCustomerService } from '@/data/modules/rental';
 import { CustomerTable } from './components/CustomerTable';
 import { CustomerDetailDrawer } from './components/CustomerDetailDrawer';
-import { CustomerForm } from './components/CustomerForm';
 import { CustomerDeleteDialog } from './components/CustomerDeleteDialog';
 import type { Customer, CustomerStatusFilter, CustomerTypeFilter } from './types/customer';
 import type { DataTableFilterConfig } from '@adatrack/ui';
 import { Button } from '@adatrack/ui';
-import { Plus } from 'lucide-react';
+import { Plus, List, Building, User } from 'lucide-react';
+import { cn } from '@adatrack/utils';
 
 function computeCounts(search: string) {
   const base = rentalCustomerService.getCustomers({ search });
@@ -46,9 +46,6 @@ export function CustomersFeature() {
   const [detailCustomer, setDetailCustomer] = React.useState<Customer | null>(null);
   const [drawerOpen, setDrawerOpen] = React.useState(false);
 
-  const [formCustomer, setFormCustomer] = React.useState<Customer | null>(null);
-  const [formOpen, setFormOpen] = React.useState(false);
-
   const [deleteCustomer, setDeleteCustomer] = React.useState<Customer | null>(null);
   const [deleteOpen, setDeleteOpen] = React.useState(false);
 
@@ -72,9 +69,8 @@ export function CustomersFeature() {
   }, []);
 
   const handleEdit = React.useCallback((customer: Customer) => {
-    setFormCustomer(customer);
-    setFormOpen(true);
-  }, []);
+    router.push(`/rental/customers/${customer.id}/edit`);
+  }, [router]);
 
   const handleDelete = React.useCallback((customer: Customer) => {
     setDeleteCustomer(customer);
@@ -82,19 +78,10 @@ export function CustomersFeature() {
   }, []);
 
   const handleCreateNew = () => {
-    setFormCustomer(null);
-    setFormOpen(true);
+    router.push('/rental/customers/create');
   };
 
-  const handleSaveForm = (data: any) => {
-    if (formCustomer) {
-      rentalCustomerService.updateCustomer(formCustomer.id, data);
-    } else {
-      rentalCustomerService.createCustomer(data);
-    }
-    setFormOpen(false);
-    refreshData();
-  };
+
 
   const handleConfirmDelete = (id: string) => {
     rentalCustomerService.deleteCustomer(id);
@@ -160,35 +147,60 @@ export function CustomersFeature() {
   }), [filterState, tC, counts]);
 
   return (
-    <div className="flex flex-col h-full w-full">
-      {/* Header */}
-      <div className="flex-none px-6 py-4 border-b border-border bg-background">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-[20px] font-bold text-foreground">{tC.title}</h1>
-            <p className="text-[13px] text-foreground-muted mt-1">{tC.pageSubtitle}</p>
-          </div>
-          <Button variant="primary" onClick={handleCreateNew}>
-            <Plus className="mr-2 h-4 w-4" />
-            {tC.addCustomer}
-          </Button>
+    <div className="flex flex-col h-full w-full bg-background p-4 md:p-6 items-center overflow-hidden relative">
+      <div className="w-full h-full flex flex-col min-h-0 space-y-4 pb-4">
+        {/* Summary Cards */}
+        <div className="grid grid-cols-3 gap-3">
+          <button onClick={() => setFilterState(prev => ({ ...prev, type: 'all' }))} className={cn("p-3 flex gap-2.5 items-center text-left bg-card rounded-lg border transition-all hover:shadow-md", typeFilter === 'all' ? "border-b-4 border-b-danger border-x-border border-t-border" : "border-border shadow-sm")}>
+            <div className="w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-600 dark:text-neutral-400 shrink-0">
+               <List className="w-4 h-4" />
+            </div>
+            <div className="min-w-0">
+               <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider truncate">Semua Pelanggan</p>
+               <p className="text-lg font-bold leading-none my-0.5">{counts.all}</p>
+               <p className="text-[9px] text-muted-foreground truncate">Total Pelanggan</p>
+            </div>
+          </button>
+          
+          <button onClick={() => setFilterState(prev => ({ ...prev, type: 'COMPANY' }))} className={cn("p-3 flex gap-2.5 items-center text-left bg-card rounded-lg border transition-all hover:shadow-md", typeFilter === 'COMPANY' ? "border-b-4 border-b-info border-x-border border-t-border" : "border-border shadow-sm")}>
+            <div className="w-8 h-8 rounded-full bg-info/10 flex items-center justify-center text-info shrink-0">
+               <Building className="w-4 h-4" />
+            </div>
+            <div className="min-w-0">
+               <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider truncate">{tC.typeCompany}</p>
+               <p className="text-lg font-bold leading-none my-0.5">{counts.company}</p>
+               <p className="text-[9px] text-muted-foreground truncate">Perusahaan</p>
+            </div>
+          </button>
+          
+          <button onClick={() => setFilterState(prev => ({ ...prev, type: 'INDIVIDUAL' }))} className={cn("p-3 flex gap-2.5 items-center text-left bg-card rounded-lg border transition-all hover:shadow-md", typeFilter === 'INDIVIDUAL' ? "border-b-4 border-b-secondary-foreground border-x-border border-t-border" : "border-border shadow-sm")}>
+            <div className="w-8 h-8 rounded-full bg-secondary/15 flex items-center justify-center text-secondary-foreground shrink-0">
+               <User className="w-4 h-4" />
+            </div>
+            <div className="min-w-0">
+               <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider truncate">{tC.typeIndividual}</p>
+               <p className="text-lg font-bold leading-none my-0.5">{counts.individual}</p>
+               <p className="text-[9px] text-muted-foreground truncate">Perorangan</p>
+            </div>
+          </button>
         </div>
-      </div>
 
-      {/* Content */}
-      <div className="flex-1 min-h-0 overflow-y-auto px-6 py-4">
-        <CustomerTable
-          data={filteredCustomers}
-          labels={tableLabels}
-          onViewDetail={handleViewDetail}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          searchValue={search}
-          onSearchChange={setSearch}
-          filterConfig={filterConfig}
-          isFilterOpen={isFilterOpen}
-          onFilterOpenChange={setIsFilterOpen}
-        />
+        {/* Content */}
+        <div className="flex-1 min-h-0 w-full relative">
+          <CustomerTable
+            data={filteredCustomers}
+            labels={tableLabels}
+            onViewDetail={handleViewDetail}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            searchValue={search}
+            onSearchChange={setSearch}
+            filterConfig={filterConfig}
+            isFilterOpen={isFilterOpen}
+            onFilterOpenChange={setIsFilterOpen}
+            onAdd={handleCreateNew}
+          />
+        </div>
       </div>
 
       {/* Modals & Drawers */}
@@ -197,14 +209,8 @@ export function CustomersFeature() {
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         labels={tC}
-      />
-
-      <CustomerForm
-        customer={formCustomer}
-        open={formOpen}
-        onOpenChange={setFormOpen}
-        onSave={handleSaveForm}
-        labels={tC}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
       />
 
       <CustomerDeleteDialog

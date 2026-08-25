@@ -8,8 +8,8 @@ import { useBusinessLocale } from '@/components/BusinessShellLayout';
 import { reservationService } from '@/data/modules/rental/services/reservationService';
 import type { Reservation, ReservationStatusFilter } from './types/reservation';
 import { ReservationList } from './components/ReservationList';
+import { ReservationDetailDrawer } from './components/ReservationDetailDrawer';
 import { cn } from '@adatrack/utils';
-import { Button, Checkbox } from '@adatrack/ui';
 
 export function ReservationsFeature() {
   const router = useRouter();
@@ -24,8 +24,9 @@ export function ReservationsFeature() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<ReservationStatusFilter>('all');
 
-  // Selection (keyed on vehicleId agar link ke /tracking konsisten dengan halaman Armada)
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  // Modals
+  const [detailReservation, setDetailReservation] = useState<Reservation | null>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -67,21 +68,27 @@ export function ReservationsFeature() {
     });
   }, [reservations, statusFilter, search]);
 
-  // Buka tracking untuk kendaraan yang dipilih (sama persis dengan halaman Armada)
-  const handleOpenTracking = () => {
-    if (selectedIds.length > 0) {
-      router.push(`/tracking?vehicles=${selectedIds.join(',')}`);
-    }
-  };
-
   // Buka tracking untuk satu kendaraan dari tombol Map per baris
   const handleOpenMap = (vehicleId: string) => {
     router.push(`/tracking?vehicles=${vehicleId}`);
   };
 
+  const handleView = (reservation: Reservation) => {
+    setDetailReservation(reservation);
+    setDrawerOpen(true);
+  };
+
+  const handleEdit = (reservation: Reservation) => {
+    console.log('Edit', reservation.id);
+  };
+
+  const handleDelete = (reservation: Reservation) => {
+    console.log('Delete', reservation.id);
+  };
+
   return (
     <div className="flex flex-col h-full w-full bg-background p-4 md:p-6 items-center overflow-hidden relative">
-      <div className="w-full h-full flex flex-col min-h-0 space-y-4 pb-16">
+      <div className="w-full h-full flex flex-col min-h-0 space-y-4">
 
         {/* Summary Cards — identik dengan Armada Rental */}
         <div className="grid grid-cols-6 gap-3">
@@ -210,48 +217,22 @@ export function ReservationsFeature() {
             searchValue={search}
             onSearchChange={setSearch}
             onAdd={() => router.push('/rental/reservations/create')}
-            onView={(r) => console.log('View', r.id)}
-            onEdit={(r) => console.log('Edit', r.id)}
-            selectedIds={selectedIds}
-            onSelectionChange={setSelectedIds}
+            onView={handleView}
+            onEdit={handleEdit}
             onOpenMap={handleOpenMap}
           />
         </div>
 
       </div>
 
-      {/* Floating Bottom Action Bar — identik dengan Armada Rental */}
-      <div className="absolute bottom-0 left-0 right-0 z-50 bg-card border-t border-border py-3 px-6 flex items-center justify-between shadow-[0_-10px_30px_-10px_rgba(0,0,0,0.1)]">
-        <div className="flex items-center gap-4">
-          <Checkbox
-            checked={selectedIds.length > 0}
-            onCheckedChange={() => setSelectedIds([])}
-            className="w-4 h-4 data-[state=checked]:bg-danger data-[state=checked]:border-danger"
-          />
-          <div className="flex items-center gap-4 border-l border-border pl-4">
-            <span className="text-sm font-semibold">{selectedIds.length} kendaraan dipilih</span>
-            {selectedIds.length > 0 && (
-              <button
-                onClick={() => setSelectedIds([])}
-                className="text-xs font-semibold text-danger hover:underline"
-              >
-                Batal Pilih
-              </button>
-            )}
-          </div>
-        </div>
-        <Button
-          variant="destructive"
-          size="sm"
-          onClick={handleOpenTracking}
-          disabled={selectedIds.length === 0}
-          className="px-5 rounded-md h-9 font-semibold shadow-sm shadow-danger/20 hover:shadow-md hover:shadow-danger/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <MapPin className="w-3.5 h-3.5 mr-2" />
-          Buka Lokasi ({selectedIds.length})
-          <ChevronRight className="w-3.5 h-3.5 ml-1" />
-        </Button>
-      </div>
+      <ReservationDetailDrawer
+        reservation={detailReservation}
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        labels={labels}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+      />
     </div>
   );
 }

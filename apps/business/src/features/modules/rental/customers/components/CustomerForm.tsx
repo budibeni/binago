@@ -1,21 +1,40 @@
 'use client';
 
 import React from 'react';
-import { Dialog, Button, Input, Label, Select } from '@adatrack/ui';
+import { Button, Input, Label } from '@adatrack/ui';
+import { User, Phone, MapPin, Building, FileText, Briefcase, Settings } from 'lucide-react';
+import { cn } from '@adatrack/utils';
 import type { Customer, IndividualCustomer, CompanyCustomer } from '../types/customer';
 
 interface CustomerFormProps {
   customer: Customer | null;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  onCancel: () => void;
   onSave: (data: any) => void;
   labels: Record<string, string>;
 }
 
+function SectionCard({ title, description, icon: Icon, children, className }: any) {
+  return (
+    <div className={cn("bg-white dark:bg-neutral-900 border border-border rounded-xl p-5 shadow-sm h-fit", className)}>
+      <div className="flex items-start gap-3 mb-6">
+        <div className="w-10 h-10 rounded-full bg-danger/10 text-danger flex items-center justify-center shrink-0">
+          <Icon className="w-5 h-5" />
+        </div>
+        <div className="flex flex-col gap-0.5 mt-0.5">
+          <h3 className="text-[14px] font-bold text-foreground">{title}</h3>
+          <p className="text-[11px] text-muted-foreground">{description}</p>
+        </div>
+      </div>
+      <div className="space-y-4">
+        {children}
+      </div>
+    </div>
+  );
+}
+
 export function CustomerForm({
   customer,
-  open,
-  onOpenChange,
+  onCancel,
   onSave,
   labels,
 }: CustomerFormProps) {
@@ -52,71 +71,67 @@ export function CustomerForm({
   const [errors, setErrors] = React.useState<Record<string, string>>({});
 
   React.useEffect(() => {
-    if (open) {
-      if (customer) {
-        setType(customer.type);
-        setStatus(customer.status);
-        setName(customer.name);
-        setPhone(customer.phone);
-        setEmail(customer.email);
-        setAddress(customer.address);
-        setCity(customer.city);
-        setProvince(customer.province);
-        setPostalCode(customer.postalCode);
+    if (customer) {
+      setType(customer.type);
+      setStatus(customer.status);
+      setName(customer.name);
+      setPhone(customer.phone);
+      setEmail(customer.email || '');
+      setAddress(customer.address);
+      setCity(customer.city);
+      setProvince(customer.province);
+      setPostalCode(customer.postalCode);
 
-        if (customer.type === 'INDIVIDUAL') {
-          const ind = customer as IndividualCustomer;
-          setNik(ind.nik);
-          setBirthPlace(ind.birthPlace);
-          setBirthDate(ind.birthDate);
-          setSimNumber(ind.simNumber);
-          setSimType(ind.simType);
-          setSimExpiredAt(ind.simExpiredAt);
-        } else {
-          const comp = customer as CompanyCustomer;
-          setNib(comp.nib);
-          setNpwp(comp.npwp);
-          setPicName(comp.picName);
-          setPicPosition(comp.picPosition);
-          setPicPhone(comp.picPhone);
-          setPicEmail(comp.picEmail);
-          setPicNik(comp.picNik);
-        }
+      if (customer.type === 'INDIVIDUAL') {
+        const ind = customer as IndividualCustomer;
+        setNik(ind.nik);
+        setBirthPlace(ind.birthPlace);
+        setBirthDate(ind.birthDate);
+        setSimNumber(ind.simNumber);
+        setSimType(ind.simType);
+        setSimExpiredAt(ind.simExpiredAt);
       } else {
-        // Reset form
-        setType('INDIVIDUAL');
-        setStatus('ACTIVE');
-        setName('');
-        setPhone('');
-        setEmail('');
-        setAddress('');
-        setCity('');
-        setProvince('');
-        setPostalCode('');
-        
-        setNik('');
-        setBirthPlace('');
-        setBirthDate('');
-        setSimNumber('');
-        setSimType('');
-        setSimExpiredAt('');
-
-        setNib('');
-        setNpwp('');
-        setPicName('');
-        setPicPosition('');
-        setPicPhone('');
-        setPicEmail('');
-        setPicNik('');
+        const comp = customer as CompanyCustomer;
+        setNib(comp.nib);
+        setNpwp(comp.npwp);
+        setPicName(comp.picName);
+        setPicPosition(comp.picPosition);
+        setPicPhone(comp.picPhone);
+        setPicEmail(comp.picEmail || '');
+        setPicNik(comp.picNik);
       }
-      setErrors({});
+    } else {
+      setType('INDIVIDUAL');
+      setStatus('ACTIVE');
+      setName('');
+      setPhone('');
+      setEmail('');
+      setAddress('');
+      setCity('');
+      setProvince('');
+      setPostalCode('');
+      
+      setNik('');
+      setBirthPlace('');
+      setBirthDate('');
+      setSimNumber('');
+      setSimType('');
+      setSimExpiredAt('');
+
+      setNib('');
+      setNpwp('');
+      setPicName('');
+      setPicPosition('');
+      setPicPhone('');
+      setPicEmail('');
+      setPicNik('');
     }
-  }, [open, customer]);
+    setErrors({});
+  }, [customer]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Basic validation
     const newErrors: Record<string, string> = {};
     if (!name.trim()) newErrors.name = 'Wajib diisi';
     if (!phone.trim()) newErrors.phone = 'Wajib diisi';
@@ -129,6 +144,8 @@ export function CustomerForm({
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
+      // Scroll to top to see errors if needed
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
@@ -172,195 +189,216 @@ export function CustomerForm({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange} title={isEditing ? labels.actionEdit : labels.addCustomer} className="max-w-2xl">
-      <form onSubmit={handleSubmit}>
-        <div className="py-2 max-h-[70vh] overflow-y-auto pr-2 space-y-6">
-            {/* Tipe & Status */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>{labels.fieldCustomerType}</Label>
-                <select
-                  className="w-full px-3 py-2 border rounded-md text-[13px] bg-background border-border text-foreground focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50"
-                  value={type}
-                  onChange={(e) => setType(e.target.value as any)}
-                  disabled={isEditing}
-                >
-                  <option value="INDIVIDUAL">{labels.typeIndividual}</option>
-                  <option value="COMPANY">{labels.typeCompany}</option>
-                </select>
+    <div className="flex flex-col h-full w-full relative bg-transparent">
+      <div className="flex-1 overflow-y-auto px-4 md:px-8 py-8 pb-28">
+        <form id="customer-form" onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-6xl mx-auto">
+          
+          <div className="flex flex-col gap-6">
+            <SectionCard
+              title={labels.fieldCustomerType || "Tipe & Status"}
+              description="Pilih tipe pelanggan dan status keaktifannya."
+              icon={Settings}
+            >
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-xs font-semibold">{labels.fieldCustomerType} *</Label>
+                  <select
+                    className="w-full px-3 py-2 border rounded-md text-[13px] bg-background border-border text-foreground focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50"
+                    value={type}
+                    onChange={(e) => setType(e.target.value as any)}
+                    disabled={isEditing}
+                  >
+                    <option value="INDIVIDUAL">{labels.typeIndividual}</option>
+                    <option value="COMPANY">{labels.typeCompany}</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-xs font-semibold">{labels.fieldStatus} *</Label>
+                  <select
+                    className="w-full px-3 py-2 border rounded-md text-[13px] bg-background border-border text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                    value={status}
+                    onChange={(e) => setStatus(e.target.value as any)}
+                  >
+                    <option value="ACTIVE">{labels.statusActive}</option>
+                    <option value="INACTIVE">{labels.statusInactive}</option>
+                  </select>
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label>{labels.fieldStatus}</Label>
-                <select
-                  className="w-full px-3 py-2 border rounded-md text-[13px] bg-background border-border text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-                  value={status}
-                  onChange={(e) => setStatus(e.target.value as any)}
-                >
-                  <option value="ACTIVE">{labels.statusActive}</option>
-                  <option value="INACTIVE">{labels.statusInactive}</option>
-                </select>
-              </div>
-            </div>
+            </SectionCard>
 
-            {type === 'INDIVIDUAL' && (
-              <div className="space-y-4">
-                <h4 className="font-semibold text-[14px] text-foreground border-b border-border/60 pb-1">{labels.tabPersonalInfo}</h4>
-                <div className="grid grid-cols-2 gap-4">
+            <SectionCard
+              title={type === 'INDIVIDUAL' ? "Informasi Identitas" : "Informasi Perusahaan"}
+              description={type === 'INDIVIDUAL' ? "Data diri resmi sesuai KTP." : "Informasi legal entitas perusahaan."}
+              icon={type === 'INDIVIDUAL' ? User : Building}
+            >
+              <div className="space-y-2">
+                <Label className="text-xs font-semibold">{type === 'INDIVIDUAL' ? labels.fieldFullName : labels.fieldCompanyName} <span className="text-danger">*</span></Label>
+                <Input 
+                  placeholder={labels.placeholderName} 
+                  value={name} onChange={(e) => setName(e.target.value)} 
+                />
+                {errors.name && <p className="text-[11px] text-danger">{errors.name}</p>}
+              </div>
+
+              {type === 'INDIVIDUAL' ? (
+                <>
                   <div className="space-y-2">
-                    <Label>{labels.fieldFullName} *</Label>
-                    <Input 
-                      placeholder={labels.placeholderName} 
-                      value={name} onChange={(e) => setName(e.target.value)} 
-                    />
-                    {errors.name && <p className="text-[11px] text-danger">{errors.name}</p>}
-                  </div>
-                  <div className="space-y-2">
-                    <Label>{labels.fieldNik} *</Label>
+                    <Label className="text-xs font-semibold">{labels.fieldNik} <span className="text-danger">*</span></Label>
                     <Input 
                       placeholder={labels.placeholderNik} 
                       value={nik} onChange={(e) => setNik(e.target.value)} 
                     />
                     {errors.nik && <p className="text-[11px] text-danger">{errors.nik}</p>}
                   </div>
-                  <div className="space-y-2">
-                    <Label>{labels.fieldBirthPlace}</Label>
-                    <Input value={birthPlace} onChange={(e) => setBirthPlace(e.target.value)} />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="text-xs font-semibold">{labels.fieldBirthPlace}</Label>
+                      <Input placeholder="Tempat Lahir" value={birthPlace} onChange={(e) => setBirthPlace(e.target.value)} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs font-semibold">{labels.fieldBirthDate}</Label>
+                      <Input type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} />
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label>{labels.fieldBirthDate}</Label>
-                    <Input type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>{labels.fieldPhone} *</Label>
-                    <Input 
-                      placeholder={labels.placeholderPhone} 
-                      value={phone} onChange={(e) => setPhone(e.target.value)} 
-                    />
-                    {errors.phone && <p className="text-[11px] text-danger">{errors.phone}</p>}
-                  </div>
-                  <div className="space-y-2">
-                    <Label>{labels.fieldEmail}</Label>
-                    <Input 
-                      type="email" placeholder={labels.placeholderEmail} 
-                      value={email} onChange={(e) => setEmail(e.target.value)} 
-                    />
-                  </div>
-                </div>
-
-                <h4 className="font-semibold text-[14px] text-foreground border-b border-border/60 pb-1 pt-2">{labels.tabSim}</h4>
+                </>
+              ) : (
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>{labels.fieldSimNumber}</Label>
-                    <Input value={simNumber} onChange={(e) => setSimNumber(e.target.value)} />
+                    <Label className="text-xs font-semibold">{labels.fieldNib}</Label>
+                    <Input placeholder="Nomor Induk Berusaha" value={nib} onChange={(e) => setNib(e.target.value)} />
                   </div>
                   <div className="space-y-2">
-                    <Label>{labels.fieldSimType}</Label>
-                    <Input value={simType} onChange={(e) => setSimType(e.target.value)} />
+                    <Label className="text-xs font-semibold">{labels.fieldNpwp}</Label>
+                    <Input placeholder="Nomor Pokok Wajib Pajak" value={npwp} onChange={(e) => setNpwp(e.target.value)} />
+                  </div>
+                </div>
+              )}
+            </SectionCard>
+
+            <SectionCard
+              title="Informasi Alamat"
+              description="Alamat domisili atau alamat operasional perusahaan."
+              icon={MapPin}
+            >
+              <div className="space-y-2">
+                <Label className="text-xs font-semibold">{labels.fieldAddress}</Label>
+                <Input placeholder="Alamat lengkap" value={address} onChange={(e) => setAddress(e.target.value)} />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-xs font-semibold">{labels.fieldCity}</Label>
+                  <Input placeholder="Kota" value={city} onChange={(e) => setCity(e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-xs font-semibold">{labels.fieldProvince}</Label>
+                  <Input placeholder="Provinsi" value={province} onChange={(e) => setProvince(e.target.value)} />
+                </div>
+              </div>
+              <div className="w-1/2 pr-2 space-y-2">
+                <Label className="text-xs font-semibold">{labels.fieldPostalCode}</Label>
+                <Input placeholder="Kode Pos" value={postalCode} onChange={(e) => setPostalCode(e.target.value)} />
+              </div>
+            </SectionCard>
+          </div>
+
+          <div className="flex flex-col gap-6">
+            <SectionCard
+              title="Informasi Kontak"
+              description="Nomor telepon dan email untuk keperluan komunikasi."
+              icon={Phone}
+            >
+              <div className="space-y-2">
+                <Label className="text-xs font-semibold">{labels.fieldPhone} <span className="text-danger">*</span></Label>
+                <Input 
+                  placeholder={labels.placeholderPhone} 
+                  value={phone} onChange={(e) => setPhone(e.target.value)} 
+                />
+                {errors.phone && <p className="text-[11px] text-danger">{errors.phone}</p>}
+              </div>
+              <div className="space-y-2">
+                <Label className="text-xs font-semibold">{labels.fieldEmail}</Label>
+                <Input 
+                  type="email" placeholder={labels.placeholderEmail} 
+                  value={email} onChange={(e) => setEmail(e.target.value)} 
+                />
+              </div>
+            </SectionCard>
+
+            {type === 'INDIVIDUAL' ? (
+              <SectionCard
+                title={labels.tabSim || "Lisensi & Pekerjaan"}
+                description="Detail lisensi berkendara."
+                icon={FileText}
+              >
+                <div className="space-y-2">
+                  <Label className="text-xs font-semibold">{labels.fieldSimNumber}</Label>
+                  <Input placeholder="Nomor SIM" value={simNumber} onChange={(e) => setSimNumber(e.target.value)} />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-xs font-semibold">{labels.fieldSimType}</Label>
+                    <Input placeholder="Contoh: A, B1" value={simType} onChange={(e) => setSimType(e.target.value)} />
                   </div>
                   <div className="space-y-2">
-                    <Label>{labels.fieldSimExpiredAt}</Label>
+                    <Label className="text-xs font-semibold">{labels.fieldSimExpiredAt}</Label>
                     <Input type="date" value={simExpiredAt} onChange={(e) => setSimExpiredAt(e.target.value)} />
                   </div>
                 </div>
-              </div>
-            )}
-
-            {type === 'COMPANY' && (
-              <div className="space-y-4">
-                <h4 className="font-semibold text-[14px] text-foreground border-b border-border/60 pb-1">{labels.tabCompanyInfo}</h4>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2 col-span-2">
-                    <Label>{labels.fieldCompanyName} *</Label>
-                    <Input 
-                      placeholder={labels.placeholderName} 
-                      value={name} onChange={(e) => setName(e.target.value)} 
-                    />
-                    {errors.name && <p className="text-[11px] text-danger">{errors.name}</p>}
-                  </div>
-                  <div className="space-y-2">
-                    <Label>{labels.fieldNib}</Label>
-                    <Input value={nib} onChange={(e) => setNib(e.target.value)} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>{labels.fieldNpwp}</Label>
-                    <Input value={npwp} onChange={(e) => setNpwp(e.target.value)} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>{labels.fieldPhone} *</Label>
-                    <Input 
-                      placeholder={labels.placeholderPhone} 
-                      value={phone} onChange={(e) => setPhone(e.target.value)} 
-                    />
-                    {errors.phone && <p className="text-[11px] text-danger">{errors.phone}</p>}
-                  </div>
-                  <div className="space-y-2">
-                    <Label>{labels.fieldEmail}</Label>
-                    <Input 
-                      type="email" placeholder={labels.placeholderEmail} 
-                      value={email} onChange={(e) => setEmail(e.target.value)} 
-                    />
-                  </div>
+              </SectionCard>
+            ) : (
+              <SectionCard
+                title={labels.tabPic || "Informasi PIC"}
+                description="Penanggung jawab atau representatif dari perusahaan."
+                icon={Briefcase}
+              >
+                <div className="space-y-2">
+                  <Label className="text-xs font-semibold">{labels.fieldPicName} <span className="text-danger">*</span></Label>
+                  <Input placeholder="Nama PIC" value={picName} onChange={(e) => setPicName(e.target.value)} />
+                  {errors.picName && <p className="text-[11px] text-danger">{errors.picName}</p>}
                 </div>
-
-                <h4 className="font-semibold text-[14px] text-foreground border-b border-border/60 pb-1 pt-2">{labels.tabPic}</h4>
+                <div className="space-y-2">
+                  <Label className="text-xs font-semibold">{labels.fieldPicPosition}</Label>
+                  <Input placeholder="Jabatan PIC" value={picPosition} onChange={(e) => setPicPosition(e.target.value)} />
+                </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>{labels.fieldPicName} *</Label>
-                    <Input value={picName} onChange={(e) => setPicName(e.target.value)} />
-                    {errors.picName && <p className="text-[11px] text-danger">{errors.picName}</p>}
+                    <Label className="text-xs font-semibold">{labels.fieldPicPhone}</Label>
+                    <Input placeholder="No HP PIC" value={picPhone} onChange={(e) => setPicPhone(e.target.value)} />
                   </div>
                   <div className="space-y-2">
-                    <Label>{labels.fieldPicPosition}</Label>
-                    <Input value={picPosition} onChange={(e) => setPicPosition(e.target.value)} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>{labels.fieldPicPhone}</Label>
-                    <Input value={picPhone} onChange={(e) => setPicPhone(e.target.value)} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>{labels.fieldPicEmail}</Label>
-                    <Input type="email" value={picEmail} onChange={(e) => setPicEmail(e.target.value)} />
-                  </div>
-                  <div className="space-y-2 col-span-2">
-                    <Label>{labels.fieldPicNik}</Label>
-                    <Input value={picNik} onChange={(e) => setPicNik(e.target.value)} />
+                    <Label className="text-xs font-semibold">{labels.fieldPicEmail}</Label>
+                    <Input type="email" placeholder="Email PIC" value={picEmail} onChange={(e) => setPicEmail(e.target.value)} />
                   </div>
                 </div>
-              </div>
+                <div className="space-y-2">
+                  <Label className="text-xs font-semibold">{labels.fieldPicNik}</Label>
+                  <Input placeholder="NIK PIC" value={picNik} onChange={(e) => setPicNik(e.target.value)} />
+                </div>
+              </SectionCard>
             )}
+          </div>
+        </form>
+      </div>
 
-            <div className="space-y-4 pt-2">
-              <h4 className="font-semibold text-[14px] text-foreground border-b border-border/60 pb-1">{labels.tabAddress}</h4>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2 col-span-2">
-                  <Label>{labels.fieldAddress}</Label>
-                  <Input value={address} onChange={(e) => setAddress(e.target.value)} />
-                </div>
-                <div className="space-y-2">
-                  <Label>{labels.fieldCity}</Label>
-                  <Input value={city} onChange={(e) => setCity(e.target.value)} />
-                </div>
-                <div className="space-y-2">
-                  <Label>{labels.fieldProvince}</Label>
-                  <Input value={province} onChange={(e) => setProvince(e.target.value)} />
-                </div>
-                <div className="space-y-2">
-                  <Label>{labels.fieldPostalCode}</Label>
-                  <Input value={postalCode} onChange={(e) => setPostalCode(e.target.value)} />
-                </div>
-              </div>
-            </div>
+      {/* Fixed Footer */}
+      <div className="absolute bottom-0 left-0 right-0 p-4 px-4 md:px-8 bg-white dark:bg-neutral-950 border-t border-border shadow-[0_-4px_12px_rgba(0,0,0,0.05)] z-10 flex items-center justify-between">
+        <div className="flex flex-col">
+          <h2 className="text-[14px] font-bold text-foreground">
+            {isEditing ? labels.actionEdit : labels.addCustomer}
+          </h2>
+          <p className="text-[11px] text-muted-foreground mt-0.5">
+            {isEditing ? 'Perbarui informasi detail pelanggan.' : 'Masukkan informasi detail pelanggan baru.'}
+          </p>
         </div>
-        
-        <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-border">
-          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-            {labels.cancel}
+        <div className="flex gap-3">
+          <Button type="button" variant="outline" className="bg-white dark:bg-neutral-900" onClick={onCancel}>
+            {labels.cancel || 'Batal'}
           </Button>
-          <Button type="submit" variant="primary">
-            {labels.save}
+          <Button type="submit" variant="primary" className="bg-danger hover:bg-danger/90 text-white" form="customer-form">
+            {labels.save || 'Simpan'}
           </Button>
         </div>
-      </form>
-    </Dialog>
+      </div>
+    </div>
   );
 }

@@ -51,13 +51,20 @@ export function ReservationCreateForm({
     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(value);
   };
 
-  const SectionCard = ({ title, icon: Icon, children, className }: any) => (
-    <div className={cn("bg-white dark:bg-neutral-900 border border-border/50 shadow-sm rounded-xl p-5", className)}>
-      <div className="flex items-center gap-2.5 mb-5 border-b border-border/40 pb-3">
-        <Icon className="w-4 h-4 text-danger" />
-        <h3 className="font-bold text-sm tracking-tight">{title}</h3>
+  const SectionCard = ({ title, description, icon: Icon, children, className }: any) => (
+    <div className={cn("bg-white dark:bg-neutral-900 border border-border rounded-xl p-5 shadow-sm h-fit", className)}>
+      <div className="flex items-start gap-3 mb-6">
+        <div className="w-10 h-10 rounded-full bg-danger/10 text-danger flex items-center justify-center shrink-0">
+          <Icon className="w-5 h-5" />
+        </div>
+        <div className="flex flex-col gap-0.5 mt-0.5">
+          <h3 className="text-[14px] font-bold text-foreground">{title}</h3>
+          {description && <p className="text-[11px] text-muted-foreground">{description}</p>}
+        </div>
       </div>
-      {children}
+      <div className="space-y-4">
+        {children}
+      </div>
     </div>
   );
 
@@ -67,7 +74,7 @@ export function ReservationCreateForm({
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
           
           {/* 1. INFORMASI PELANGGAN */}
-          <SectionCard title={labels.sectionCustomer} icon={User}>
+          <SectionCard title={labels.sectionCustomer} description="Pilih atau tambahkan pelanggan baru yang akan melakukan reservasi." icon={User}>
             <div className="flex flex-col gap-4">
               <div className="flex items-end gap-3">
                 <div className="flex-1">
@@ -108,7 +115,7 @@ export function ReservationCreateForm({
           </SectionCard>
 
           {/* 2. INFORMASI KENDARAAN */}
-          <SectionCard title={labels.sectionVehicle} icon={Car}>
+          <SectionCard title={labels.sectionVehicle} description="Pilih kendaraan yang akan disewa." icon={Car}>
              <div className="flex flex-col gap-4">
               <div className="flex gap-4">
                 <div className="flex-1">
@@ -152,7 +159,7 @@ export function ReservationCreateForm({
           </SectionCard>
 
           {/* 3. PERIODE RESERVASI */}
-          <SectionCard title={labels.sectionPeriod} icon={Calendar}>
+          <SectionCard title={labels.sectionPeriod} description="Tentukan tanggal mulai dan selesai serta durasi sewa." icon={Calendar}>
              <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs font-bold text-foreground mb-1.5 block">{labels.fieldStartDate} <span className="text-danger">*</span></label>
@@ -193,7 +200,7 @@ export function ReservationCreateForm({
           </SectionCard>
 
           {/* 4. INFORMASI HARGA */}
-          <SectionCard title={labels.sectionPricing} icon={DollarSign}>
+          <SectionCard title={labels.sectionPricing} description="Detail tarif sewa dan total biaya." icon={DollarSign}>
              <div className="grid grid-cols-3 gap-4 mb-4">
                 <div>
                   <label className="text-xs font-bold text-foreground mb-1.5 block">{labels.fieldDailyRate}</label>
@@ -261,7 +268,7 @@ export function ReservationCreateForm({
           </SectionCard>
 
           {/* 5. INFORMASI TAMBAHAN */}
-          <SectionCard title={labels.sectionAdditional} icon={FileText}>
+          <SectionCard title={labels.sectionAdditional} description="Kebutuhan tambahan dan catatan." icon={FileText}>
              <div className="flex gap-6 h-full">
                <div className="flex-1 flex flex-col">
                   <label className="text-xs font-bold text-foreground mb-1.5 block">{labels.fieldNotes}</label>
@@ -303,7 +310,7 @@ export function ReservationCreateForm({
           </SectionCard>
 
           {/* RINGKASAN RESERVASI */}
-          <SectionCard title={labels.sectionSummary} icon={ClipboardList} className="bg-neutral-50/50 dark:bg-neutral-900/30">
+          <SectionCard title={labels.sectionSummary} description="Cek kembali detail reservasi sebelum menyimpan." icon={ClipboardList} className="bg-neutral-50/50 dark:bg-neutral-900/30">
             <div className="flex gap-6">
               <div className="flex-1 flex flex-col gap-2">
                 <div className="grid grid-cols-[100px_1fr] gap-2">
@@ -353,18 +360,24 @@ export function ReservationCreateForm({
         </div>
       </div>
 
-      {/* Floating Action Bar */}
-      <div className="absolute bottom-0 left-0 right-0 z-10 bg-card border-t border-border py-4 px-6 flex justify-end gap-3 shadow-[0_-10px_30px_-10px_rgba(0,0,0,0.1)]">
-        <Button variant="outline" className="px-8 font-semibold shadow-sm" onClick={onCancel} disabled={isSubmitting}>
-          {labels.cancel}
-        </Button>
-        <Button 
-          className="px-8 font-semibold bg-danger hover:bg-danger/90 text-white shadow-sm" 
-          onClick={onSubmit}
-          disabled={isSubmitting}
-        >
-          {labels.save}
-        </Button>
+      {/* Fixed Footer */}
+      <div className="absolute bottom-0 left-0 right-0 p-4 px-4 md:px-8 bg-white dark:bg-neutral-950 border-t border-border shadow-[0_-4px_12px_rgba(0,0,0,0.05)] z-10 flex items-center justify-between">
+        <div className="flex flex-col">
+          <h2 className="text-[14px] font-bold text-foreground">
+            {labels.addReservation || 'Buat Reservasi Baru'}
+          </h2>
+          <p className="text-[11px] text-muted-foreground mt-0.5">
+            Masukkan informasi detail untuk membuat reservasi baru.
+          </p>
+        </div>
+        <div className="flex gap-3">
+          <Button type="button" variant="outline" className="bg-white dark:bg-neutral-900" onClick={onCancel} disabled={isSubmitting}>
+            {labels.cancel || 'Batal'}
+          </Button>
+          <Button type="button" variant="primary" className="bg-danger hover:bg-danger/90 text-white" onClick={onSubmit} disabled={isSubmitting}>
+            {labels.save || 'Simpan'}
+          </Button>
+        </div>
       </div>
     </div>
   );
