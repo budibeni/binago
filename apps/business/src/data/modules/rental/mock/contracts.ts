@@ -95,5 +95,29 @@ export const mockContracts: RentalContract[] = [
     status: 'COMPLETED',
     createdAt: new Date(today.getTime() - 12 * 24 * 60 * 60 * 1000).toISOString(),
     updatedAt: new Date(today.getTime() - 8 * 24 * 60 * 60 * 1000).toISOString(),
-  }
+  },
+  {
+    id: 'ctr-101', contractNumber: 'KTR-260825-101', reservationId: 'res-101', customerId: 'cust-ind-003', vehicleId: 'veh-006',
+    contractDate: '2026-08-19T04:42:26.960Z', startDate: '2026-08-20T04:42:26.960Z', endDate: '2026-08-30T04:42:26.960Z', duration: 10, rentalType: 'SELF_DRIVE', rateType: 'DAILY',
+    rate: 350000, subtotal: 3500000, totalAmount: 3500000, deposit: 500000, remainingAmount: 3000000,
+    notes: '-', terms: '-', status: 'ACTIVE', createdAt: '2026-08-19T04:42:26.960Z', updatedAt: '2026-08-19T04:42:26.960Z',
+  },
+  {
+    id: 'ctr-102', contractNumber: 'KTR-260825-102', reservationId: 'res-102', customerId: 'cust-comp-003', vehicleId: 'veh-007',
+    contractDate: '2026-08-20T04:42:26.960Z', startDate: '2026-08-21T04:42:26.960Z', endDate: '2026-08-31T04:42:26.960Z', duration: 10, rentalType: 'WITH_DRIVER', rateType: 'DAILY',
+    rate: 250000, subtotal: 2500000, totalAmount: 2500000, deposit: 500000, remainingAmount: 2000000,
+    notes: '-', terms: '-', status: 'ACTIVE', createdAt: '2026-08-20T04:42:26.960Z', updatedAt: '2026-08-20T04:42:26.960Z',
+  },
+  {
+    id: 'ctr-103', contractNumber: 'KTR-260825-103', reservationId: 'res-103', customerId: 'cust-ind-004', vehicleId: 'veh-009',
+    contractDate: '2026-08-21T04:42:26.960Z', startDate: '2026-08-22T04:42:26.960Z', endDate: '2026-09-01T04:42:26.960Z', duration: 10, rentalType: 'SELF_DRIVE', rateType: 'DAILY',
+    rate: 550000, subtotal: 5500000, totalAmount: 5500000, deposit: 1000000, remainingAmount: 4500000,
+    notes: '-', terms: '-', status: 'ACTIVE', createdAt: '2026-08-21T04:42:26.960Z', updatedAt: '2026-08-21T04:42:26.960Z',
+  },
+  {
+    id: 'ctr-104', contractNumber: 'KTR-260825-104', reservationId: 'res-104', customerId: 'cust-comp-004', vehicleId: 'veh-010',
+    contractDate: '2026-08-22T04:42:26.960Z', startDate: '2026-08-23T04:42:26.960Z', endDate: '2026-09-02T04:42:26.960Z', duration: 10, rentalType: 'SELF_DRIVE', rateType: 'DAILY',
+    rate: 480000, subtotal: 4800000, totalAmount: 4800000, deposit: 1000000, remainingAmount: 3800000,
+    notes: '-', terms: '-', status: 'ACTIVE', createdAt: '2026-08-22T04:42:26.960Z', updatedAt: '2026-08-22T04:42:26.960Z',
+  },
 ];

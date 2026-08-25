@@ -52,7 +52,7 @@ export const mockRentalVehicles: RentalVehicleProfile[] = [
 
   // 6-10: READY (Lengkap)
   {
-    id: 'rveh-006', vehicleId: 'veh-006', status: 'READY',
+    id: 'rveh-006', vehicleId: 'veh-006', status: 'RENTED',
     dailyRate: 350000, weeklyRate: 2000000, monthlyRate: 5500000, deposit: 1000000,
     condition: 'GOOD', currentOdometer: 45000,
     stnkExpiredAt: '2027-08-20', taxExpiredAt: '2027-08-20', insuranceExpiredAt: '2028-01-15',
@@ -60,7 +60,7 @@ export const mockRentalVehicles: RentalVehicleProfile[] = [
     createdAt: '2024-06-10T10:00:00Z', updatedAt: '2026-08-20T10:00:00Z',
   },
   {
-    id: 'rveh-007', vehicleId: 'veh-007', status: 'READY',
+    id: 'rveh-007', vehicleId: 'veh-007', status: 'RENTED',
     dailyRate: 250000, weeklyRate: 1500000, monthlyRate: 4500000, deposit: 500000,
     condition: 'GOOD', currentOdometer: 10500,
     stnkExpiredAt: '2028-09-10', taxExpiredAt: '2028-09-10', insuranceExpiredAt: '2029-02-28',
@@ -77,7 +77,7 @@ export const mockRentalVehicles: RentalVehicleProfile[] = [
     createdAt: '2024-08-11T10:00:00Z', updatedAt: '2026-08-22T10:00:00Z',
   },
   {
-    id: 'rveh-009', vehicleId: 'veh-009', status: 'READY',
+    id: 'rveh-009', vehicleId: 'veh-009', status: 'RENTED',
     dailyRate: 550000, weeklyRate: 3200000, monthlyRate: 9500000, deposit: 2500000,
     condition: 'GOOD', currentOdometer: 32000,
     stnkExpiredAt: '2027-02-18', taxExpiredAt: '2027-02-18', insuranceExpiredAt: '2027-11-11',
@@ -85,7 +85,7 @@ export const mockRentalVehicles: RentalVehicleProfile[] = [
     createdAt: '2024-09-05T10:00:00Z', updatedAt: '2026-08-23T10:00:00Z',
   },
   {
-    id: 'rveh-010', vehicleId: 'veh-010', status: 'READY',
+    id: 'rveh-010', vehicleId: 'veh-010', status: 'RENTED',
     dailyRate: 480000, weeklyRate: 2900000, monthlyRate: 8800000, deposit: 2000000,
     condition: 'GOOD', currentOdometer: 41000,
     stnkExpiredAt: '2027-04-25', taxExpiredAt: '2027-04-25', insuranceExpiredAt: '2028-05-15',

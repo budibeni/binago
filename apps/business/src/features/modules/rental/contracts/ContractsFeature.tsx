@@ -97,7 +97,7 @@ export function ContractsFeature() {
   };
 
   const handleHandover = (c: RentalContract) => {
-    alert('Navigasi ke modul Serah Terima...');
+    router.push(`/rental/contracts/${c.id}/handover`);
   };
 
   return (

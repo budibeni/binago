@@ -21,6 +21,7 @@ interface ContractListProps {
   onView: (c: RentalContract) => void;
   onEdit?: (c: RentalContract) => void;
   onPrint?: (c: RentalContract) => void;
+  onHandover?: (c: RentalContract) => void;
   searchValue: string;
   onSearchChange: (value: string) => void;
   onAdd: () => void;
@@ -62,6 +63,7 @@ function buildColumns(
   onView: (c: RentalContract) => void,
   onEdit: ((c: RentalContract) => void) | undefined,
   onPrint: ((c: RentalContract) => void) | undefined,
+  onHandover: ((c: RentalContract) => void) | undefined,
   dataList: RentalContract[],
 ): DataTableColumnDef<RentalContract>[] {
   return [
@@ -177,6 +179,11 @@ function buildColumns(
                 <Edit className="w-4 h-4" /> 
               </Button>
             )}
+            {c.status === 'CONFIRMED' && onHandover && (
+              <Button variant="ghost" size="sm" onClick={() => onHandover(c)} title="Serah Terima" className="text-success hover:text-success/90">
+                <Car className="w-4 h-4" />
+              </Button>
+            )}
             {onPrint && (
               <Button variant="ghost" size="sm" onClick={() => onPrint(c)} title="Print Kontrak" className="text-muted-foreground hover:text-foreground">
                 <Printer className="w-4 h-4" /> 
@@ -195,6 +202,7 @@ export function ContractList({
   onView,
   onEdit,
   onPrint,
+  onHandover,
   searchValue,
   onSearchChange,
   onAdd,
@@ -220,9 +228,9 @@ export function ContractList({
   };
 
   const columns = React.useMemo(
-    () => buildColumns(labels, onView, onEdit, onPrint, data),
+    () => buildColumns(labels, onView, onEdit, onPrint, onHandover, data),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [labels, onView, onEdit, onPrint, data],
+    [labels, onView, onEdit, onPrint, onHandover, data],
   );
 
   const table = useDataTable<RentalContract>({

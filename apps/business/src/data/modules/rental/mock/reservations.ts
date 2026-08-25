@@ -144,5 +144,29 @@ export const mockReservations: Reservation[] = [
     status: 'CONFIRMED',
     createdAt: new Date(today.getTime() - 2 * 24 * 60 * 60 * 1000).toISOString(),
     updatedAt: new Date(today.getTime() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-  }
+  },
+  {
+    id: 'res-101', reservationNumber: 'RES-260825-101', customerId: 'cust-ind-003', vehicleId: 'veh-006',
+    startDate: '2026-08-20T04:42:26.960Z', endDate: '2026-08-30T04:42:26.960Z', status: 'ACTIVE',
+    duration: 10, rentalType: 'SELF_DRIVE', rateType: 'DAILY', dailyRate: 350000, weeklyRate: 0, monthlyRate: 0, totalAmount: 3500000, deposit: 500000, remainingAmount: 3000000,
+    createdAt: '2026-08-15T04:42:26.960Z', updatedAt: '2026-08-20T04:42:26.960Z',
+  },
+  {
+    id: 'res-102', reservationNumber: 'RES-260825-102', customerId: 'cust-comp-003', vehicleId: 'veh-007',
+    startDate: '2026-08-21T04:42:26.960Z', endDate: '2026-08-31T04:42:26.960Z', status: 'ACTIVE',
+    duration: 10, rentalType: 'SELF_DRIVE', rateType: 'DAILY', dailyRate: 350000, weeklyRate: 0, monthlyRate: 0, totalAmount: 3500000, deposit: 500000, remainingAmount: 3000000,
+    createdAt: '2026-08-16T04:42:26.960Z', updatedAt: '2026-08-21T04:42:26.960Z',
+  },
+  {
+    id: 'res-103', reservationNumber: 'RES-260825-103', customerId: 'cust-ind-004', vehicleId: 'veh-009',
+    startDate: '2026-08-22T04:42:26.960Z', endDate: '2026-09-01T04:42:26.960Z', status: 'ACTIVE',
+    duration: 10, rentalType: 'SELF_DRIVE', rateType: 'DAILY', dailyRate: 350000, weeklyRate: 0, monthlyRate: 0, totalAmount: 3500000, deposit: 500000, remainingAmount: 3000000,
+    createdAt: '2026-08-17T04:42:26.960Z', updatedAt: '2026-08-22T04:42:26.960Z',
+  },
+  {
+    id: 'res-104', reservationNumber: 'RES-260825-104', customerId: 'cust-comp-004', vehicleId: 'veh-010',
+    startDate: '2026-08-23T04:42:26.960Z', endDate: '2026-09-02T04:42:26.960Z', status: 'ACTIVE',
+    duration: 10, rentalType: 'SELF_DRIVE', rateType: 'DAILY', dailyRate: 350000, weeklyRate: 0, monthlyRate: 0, totalAmount: 3500000, deposit: 500000, remainingAmount: 3000000,
+    createdAt: '2026-08-18T04:42:26.960Z', updatedAt: '2026-08-23T04:42:26.960Z',
+  },
 ];

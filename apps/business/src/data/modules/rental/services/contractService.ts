@@ -109,6 +109,10 @@ export const contractService = {
       throw new Error('Hanya kontrak DRAFT yang dapat dikonfirmasi');
     }
     
+    if (status === 'ACTIVE' && contract.status !== 'CONFIRMED') {
+      throw new Error('Hanya kontrak CONFIRMED yang dapat diaktifkan (via Serah Terima)');
+    }
+    
     // Transition
     const updated = await contractRepository.updateContract(id, { status });
     return populateRelations(updated);
