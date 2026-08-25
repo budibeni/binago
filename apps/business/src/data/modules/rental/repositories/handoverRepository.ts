@@ -13,7 +13,7 @@ class HandoverRepository {
   }
 
   async getHandoverByContractId(contractId: string): Promise<RentalHandover | undefined> {
-    return this.handovers.find(h => h.contractId === contractId && h.status !== 'CANCELLED');
+    return this.handovers.find(h => h.contractId === contractId);
   }
 
   async createHandover(data: Omit<RentalHandover, 'id' | 'createdAt' | 'updatedAt'>): Promise<RentalHandover> {

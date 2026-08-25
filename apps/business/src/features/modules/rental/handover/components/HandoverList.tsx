@@ -1,7 +1,8 @@
 'use client';
 
 import React from 'react';
-import { FileText, Car, MoreVertical } from 'lucide-react';
+import { FileText, Eye, MapPin } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { cn } from '@adatrack/utils';
 import { Button, Badge } from '@adatrack/ui';
 import {
@@ -22,23 +23,7 @@ interface HandoverListProps {
   onViewDetail: (handover: RentalHandover) => void;
 }
 
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case 'DRAFT':     return 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400';
-    case 'COMPLETED': return 'bg-success/10 text-success';
-    case 'CANCELLED': return 'bg-danger/10 text-danger';
-    default:          return 'bg-neutral-100 text-neutral-600';
-  }
-};
 
-const getStatusLabel = (status: string) => {
-  switch (status) {
-    case 'DRAFT': return 'Draft';
-    case 'COMPLETED': return 'Selesai';
-    case 'CANCELLED': return 'Dibatalkan';
-    default: return status;
-  }
-};
 
 const getConditionLabel = (condition: string) => {
   switch (condition) {
@@ -62,9 +47,46 @@ const formatTime = (dateStr: string) => {
 };
 
 function buildColumns(
-  onViewDetail: (h: RentalHandover) => void
+  onViewDetail: (h: RentalHandover) => void,
+  onViewMap: (h: RentalHandover) => void
 ): DataTableColumnDef<RentalHandover>[] {
   return [
+    {
+      id: 'detail',
+      header: 'DETAIL',
+      size: 70,
+      enableHiding: false,
+      meta: { exportable: false },
+      cell: ({ row }) => (
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={() => onViewDetail(row.original)} 
+          title="Detail Serah Terima" 
+          className="text-muted-foreground hover:text-foreground hover:bg-neutral-100 dark:hover:bg-neutral-800"
+        >
+          <Eye className="w-4 h-4" /> 
+        </Button>
+      ),
+    },
+    {
+      id: 'map',
+      header: 'MAP',
+      size: 70,
+      enableHiding: false,
+      meta: { exportable: false },
+      cell: ({ row }) => (
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={() => onViewMap(row.original)} 
+          title="Lihat Histori Map" 
+          className="text-muted-foreground hover:text-foreground hover:bg-neutral-100 dark:hover:bg-neutral-800"
+        >
+          <MapPin className="w-4 h-4" /> 
+        </Button>
+      ),
+    },
     {
       id: 'handoverInfo',
       accessorKey: 'id',
@@ -167,39 +189,7 @@ function buildColumns(
         </div>
       )
     },
-    {
-      id: 'status',
-      accessorKey: 'status',
-      header: 'STATUS',
-      size: 120,
-      cell: ({ row }) => {
-        const s = row.original.status;
-        return (
-          <Badge className={cn('px-2.5 py-0.5 rounded-full font-semibold border-0', getStatusColor(s))}>
-            {getStatusLabel(s)}
-          </Badge>
-        );
-      },
-    },
-    {
-      id: 'actions',
-      accessorKey: 'actions',
-      header: 'AKSI',
-      size: 70,
-      cell: ({ row }) => (
-        <div className="flex justify-end">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => onViewDetail(row.original)} 
-            title="Lihat Detail" 
-            className="text-muted-foreground hover:text-foreground"
-          >
-            <MoreVertical className="w-4 h-4" /> 
-          </Button>
-        </div>
-      ),
-    },
+
   ];
 }
 
@@ -209,9 +199,17 @@ export function HandoverList({
   onSearchChange,
   onViewDetail,
 }: HandoverListProps) {
-
+  const router = useRouter();
   const [pageIndex, setPageIndex] = React.useState(0);
   const [pageSize,  setPageSize]  = React.useState(10);
+
+  const handleViewMap = React.useCallback((h: RentalHandover) => {
+    const coreVehicleId = h.vehicleId;
+    if (!coreVehicleId || !h.handoverAt) return;
+    const startDate = new Date(h.handoverAt).toISOString();
+    const endDate = new Date().toISOString();
+    router.push(`/tracking?vehicleId=${encodeURIComponent(coreVehicleId)}&start=${encodeURIComponent(startDate)}&end=${encodeURIComponent(endDate)}`);
+  }, [router]);
 
   React.useEffect(() => { setPageIndex(0); }, [data]);
 
@@ -230,8 +228,8 @@ export function HandoverList({
   };
 
   const columns = React.useMemo(
-    () => buildColumns(onViewDetail),
-    [onViewDetail],
+    () => buildColumns(onViewDetail, handleViewMap),
+    [onViewDetail, handleViewMap],
   );
 
   const table = useDataTable<RentalHandover>({
@@ -239,7 +237,7 @@ export function HandoverList({
     columns,
     mode: 'pagination',
     paginationConfig,
-    freezeConfig: { left: ['handoverInfo'] },
+    freezeConfig: { left: ['detail', 'map', 'handoverInfo'] },
   });
 
   return (

@@ -2,10 +2,6 @@ import type { Customer } from '../../customers/types/customer';
 import type { RentalVehicle } from '../../vehicles/types/rentalVehicle';
 import type { RentalContract } from '../../contracts/types/contract';
 
-export type HandoverStatus =
-  | 'DRAFT'
-  | 'COMPLETED'
-  | 'CANCELLED';
 
 export interface RentalHandover {
   id: string;
@@ -54,7 +50,6 @@ export interface RentalHandover {
   staffId?: string;
   staffName?: string;
 
-  status: HandoverStatus;
 
   createdAt: string;
   updatedAt: string;

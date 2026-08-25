@@ -33,23 +33,7 @@ export function HandoverDetailDrawer({
     });
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'DRAFT': return 'bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300 border-neutral-200 dark:border-neutral-700';
-      case 'COMPLETED': return 'bg-success/15 text-success border-success/30';
-      case 'CANCELLED': return 'bg-danger/10 text-danger border-danger/20';
-      default: return 'bg-neutral-100 text-neutral-700 border-neutral-200';
-    }
-  };
 
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case 'DRAFT': return 'Draft';
-      case 'COMPLETED': return 'Selesai';
-      case 'CANCELLED': return 'Dibatalkan';
-      default: return status;
-    }
-  };
 
   const getConditionLabel = (condition: string) => {
     switch (condition) {
@@ -85,9 +69,7 @@ export function HandoverDetailDrawer({
             <p className="text-sm text-muted-foreground">{c.id}</p>
           </div>
           <div className="flex items-center gap-3">
-            <span className={cn("px-2.5 py-0.5 text-xs font-semibold rounded-full border", getStatusColor(c.status))}>
-              {getStatusLabel(c.status)}
-            </span>
+
             <span className="text-sm font-medium text-foreground">{formatDate(c.handoverAt)}</span>
           </div>
         </div>

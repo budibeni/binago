@@ -1,4 +1,4 @@
-export const mockDevices = Array.from({ length: 20 }, (_, i) => {
+export const mockDevices = Array.from({ length: 50 }, (_, i) => {
   const models = ['Teltonika FMC130', 'Teltonika FMB920', 'Teltonika FMB125', 'GT06N', 'TK905'];
   const num = (i + 1).toString().padStart(3, '0');
   return {
@@ -8,8 +8,8 @@ export const mockDevices = Array.from({ length: 20 }, (_, i) => {
     firmware: `v${(Math.random() * 2 + 1).toFixed(1)}.${Math.floor(Math.random() * 10)}`,
     status: 'online' as const,
     lastCommunication: new Date().toISOString(),
-    signal: Math.floor(Math.random() * 40 + 60), // 60-100
-    battery: Math.floor(Math.random() * 30 + 70), // 70-100
+    signal: Math.floor(Math.random() * 40 + 60),
+    battery: Math.floor(Math.random() * 30 + 70),
     assignedVehicleId: `veh-${num}`
   };
 });

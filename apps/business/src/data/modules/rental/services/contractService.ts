@@ -20,7 +20,7 @@ const populateRelations = async (contract: RentalContract): Promise<RentalContra
       result.customer = customer;
     }
 
-    const vehicleProfile = rentalVehicleRepository.getById(contract.vehicleId);
+    const vehicleProfile = rentalVehicleRepository.getByVehicleId(contract.vehicleId);
     if (vehicleProfile) {
       const coreVehicles = coreVehicleRepository.getAll();
       const core = coreVehicles.find((v: any) => v.id === vehicleProfile.vehicleId);

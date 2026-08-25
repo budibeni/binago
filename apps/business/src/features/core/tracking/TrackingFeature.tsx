@@ -91,6 +91,9 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
     }, 1200);
   }, []);
 
+  // -- Ref to track pending URL-param auto-load (vehicle id + start datetime) --
+  const pendingAutoLoadRef = React.useRef<{ vehicleId: string; startDate: Date } | null>(null);
+
   // -- Initialize from URL parameters --
   React.useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -113,29 +116,20 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
     }
 
     if (vId && startStr) {
-      setMode('playback');
-      setPlaybackVehicleId(vId);
-      
       const startDate = new Date(startStr);
       const endDate = endStr ? new Date(endStr) : new Date();
-      
+
+      setMode('playback');
+      setPlaybackVehicleId(vId);
       setDateRange({
         startDate: startDate.toISOString().slice(0, 10),
         startTime: startDate.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }),
         endDate: endDate.toISOString().slice(0, 10),
         endTime: endDate.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }),
       });
-      
-      // Simulate generating data right away
-      setPlaybackState(prev => ({ ...prev, status: 'playing' }));
-      const pData = trackingService.getPlaybackData(vId, startDate);
-      setPlaybackData(pData);
-      setPlaybackState({
-        status: 'playing',
-        totalDuration: pData.totalDurationSecs,
-        currentTime: 0,
-      });
-      setPlaybackPointIndex(0);
+
+      // Store pending auto-load so handleLoadHistory can pick it up after vehicleId state is set
+      pendingAutoLoadRef.current = { vehicleId: vId, startDate };
     }
   }, []);
 
@@ -326,6 +320,25 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
       setPlaybackState({ status: 'ready', totalDuration: data.totalDurationSecs, currentTime: 0 });
     }, 1200);
   }, [playbackVehicleId, dateRange, stopTimer]);
+
+  // -- Auto-load history when navigated from Handover Map button --
+  React.useEffect(() => {
+    const pending = pendingAutoLoadRef.current;
+    if (!pending || !playbackVehicleId || playbackVehicleId !== pending.vehicleId) return;
+    // Clear the pending ref so it only fires once
+    pendingAutoLoadRef.current = null;
+    // Trigger the proper loading sequence
+    stopTimer();
+    setPlaybackState({ status: 'loading', totalDuration: 0, currentTime: 0 });
+    setPlaybackData(null);
+    setPlaybackPointIndex(0);
+    setTimeout(() => {
+      const data = trackingService.getPlaybackData(pending.vehicleId, pending.startDate);
+      setPlaybackData(data);
+      playbackDataRef.current = data;
+      setPlaybackState({ status: 'ready', totalDuration: data.totalDurationSecs, currentTime: 0 });
+    }, 1200);
+  }, [playbackVehicleId, stopTimer]);
 
   const handlePlay = React.useCallback(() => {
     setPlaybackState((prev: PlaybackState) => {

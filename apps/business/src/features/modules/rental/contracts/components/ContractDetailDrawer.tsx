@@ -16,6 +16,7 @@ interface ContractDetailDrawerProps {
   onConfirm?: (c: RentalContract) => void;
   onCancel?: (c: RentalContract) => void;
   onHandover?: (c: RentalContract) => void;
+  onReturn?: (c: RentalContract) => void;
 }
 
 export function ContractDetailDrawer({
@@ -28,6 +29,7 @@ export function ContractDetailDrawer({
   onConfirm,
   onCancel,
   onHandover,
+  onReturn,
 }: ContractDetailDrawerProps) {
   React.useEffect(() => {
     if (!open) return;
@@ -319,6 +321,12 @@ export function ContractDetailDrawer({
             {contract.status === 'CONFIRMED' && onCancel && (
               <Button variant="outline" className="flex-1 sm:flex-none text-danger border-danger/30 hover:bg-danger/10" onClick={() => onCancel(contract)}>
                 Batalkan
+              </Button>
+            )}
+
+            {contract.status === 'ACTIVE' && onReturn && (
+              <Button variant="primary" className="flex-1 sm:flex-none bg-primary hover:bg-primary/90 text-white" onClick={() => onReturn(contract)}>
+                Pengembalian
               </Button>
             )}
           </div>

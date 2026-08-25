@@ -12,7 +12,7 @@ class ReservationService {
     const populated = await Promise.all(
       reservations.map(async (res) => {
         const customer = await customerService.getCustomerById(res.customerId);
-        const vehicle = await rentalVehicleService.getRentalVehicleById(res.vehicleId);
+        const vehicle = await rentalVehicleService.getRentalVehicleByVehicleId(res.vehicleId);
         return {
           ...res,
           customer: customer || undefined,
@@ -28,7 +28,7 @@ class ReservationService {
     if (!res) return undefined;
 
     const customer = await customerService.getCustomerById(res.customerId);
-    const vehicle = await rentalVehicleService.getRentalVehicleById(res.vehicleId);
+    const vehicle = await rentalVehicleService.getRentalVehicleByVehicleId(res.vehicleId);
     
     return {
       ...res,

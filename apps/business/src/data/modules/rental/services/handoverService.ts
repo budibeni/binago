@@ -2,6 +2,7 @@ import { handoverRepository } from '../repositories/handoverRepository';
 import { contractService } from './contractService';
 import { rentalVehicleService } from './vehicleService';
 import type { RentalHandover } from '@/features/modules/rental/handover/types/handover';
+import type { RentalContract } from '@/features/modules/rental/contracts/types/contract';
 import { customerRepository } from '../repositories/customerRepository';
 import { rentalVehicleRepository } from '../repositories/vehicleRepository';
 import { vehicleRepository as coreVehicleRepository } from '@/data/repositories/vehicleRepository';
@@ -20,7 +21,7 @@ const populateRelations = async (handover: RentalHandover): Promise<RentalHandov
       result.customer = customer;
     }
 
-    const vehicleProfile = rentalVehicleRepository.getById(handover.vehicleId);
+    const vehicleProfile = rentalVehicleRepository.getByVehicleId(handover.vehicleId);
     if (vehicleProfile) {
       const coreVehicles = coreVehicleRepository.getAll();
       const core = coreVehicles.find((v: any) => v.id === vehicleProfile.vehicleId);
@@ -52,6 +53,21 @@ export const handoverService = {
     const handover = await handoverRepository.getHandoverByContractId(contractId);
     if (!handover) return undefined;
     return populateRelations(handover);
+  },
+
+  getEligibleContracts: async (): Promise<RentalContract[]> => {
+    const allContracts = await contractService.getContracts();
+    const confirmedContracts = allContracts.filter(c => c.status === 'CONFIRMED');
+    
+    const eligibleContracts: RentalContract[] = [];
+    for (const contract of confirmedContracts) {
+      const existing = await handoverRepository.getHandoverByContractId(contract.id);
+      if (!existing) {
+        eligibleContracts.push(contract);
+      }
+    }
+    
+    return eligibleContracts;
   },
 
   createHandover: async (data: Omit<RentalHandover, 'id' | 'createdAt' | 'updatedAt'>): Promise<RentalHandover> => {

@@ -100,6 +100,10 @@ export function ContractsFeature() {
     router.push(`/rental/contracts/${c.id}/handover`);
   };
 
+  const handleReturn = (c: RentalContract) => {
+    router.push(`/rental/contracts/${c.id}/return`);
+  };
+
   return (
     <div className="flex flex-col h-full w-full bg-background p-4 md:p-6 items-center overflow-hidden relative">
       <div className="w-full h-full flex flex-col min-h-0 space-y-4">
@@ -243,6 +247,7 @@ export function ContractsFeature() {
         onConfirm={handleConfirm}
         onCancel={handleCancel}
         onHandover={handleHandover}
+        onReturn={handleReturn}
       />
     </div>
     </div>
