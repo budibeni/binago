@@ -14,7 +14,7 @@ export interface RentalContract {
   contractNumber: string;
   reservationId: string;
   customerId: string;
-  vehicleId: string;
+  vehicleId: string; // CORE Vehicle ID (e.g. 'veh-001')
 
   contractDate: string;
 

@@ -19,6 +19,23 @@ export interface VehicleLocation {
   address?: string;
 }
 
+// --- Vehicle Context -----------------------------------------------------------
+
+export interface VehicleContextField {
+  label: string;
+  value: string;
+  type?: 'text' | 'status' | 'currency' | 'date' | 'number';
+}
+
+export interface VehicleContext {
+  vehicleId: string;
+  module: string;
+  entityType: string;
+  entityId: string;
+  label: string;
+  data: VehicleContextField[];
+}
+
 // --- Vehicle -------------------------------------------------------------------
 
 export interface TrackingVehicle {
@@ -115,3 +132,16 @@ export interface PlaybackData {
   tripId: string;
   points: PlaybackPoint[];
 }
+
+// --- Navigation State ----------------------------------------------------------
+
+export type TrackingNavigationMode = 'live' | 'playback' | 'heatmap';
+
+export interface TrackingNavigationState {
+  mode: TrackingNavigationMode;
+  vehicleIds?: string[];
+  vehicleId?: string;
+  start?: string;
+  end?: string;
+}
+

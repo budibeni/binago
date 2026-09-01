@@ -3,8 +3,7 @@ import type { Reservation } from '@/features/modules/rental/reservations/types/r
 import { contractRepository } from '../repositories/contractRepository';
 import { reservationService } from './reservationService';
 import { customerRepository } from '../repositories/customerRepository';
-import { rentalVehicleRepository } from '../repositories/vehicleRepository';
-import { vehicleRepository as coreVehicleRepository } from '@/data/repositories/vehicleRepository';
+import { rentalVehicleService } from './vehicleService';
 
 const populateRelations = async (contract: RentalContract): Promise<RentalContract> => {
   const result = { ...contract };
@@ -20,13 +19,9 @@ const populateRelations = async (contract: RentalContract): Promise<RentalContra
       result.customer = customer;
     }
 
-    const vehicleProfile = rentalVehicleRepository.getByVehicleId(contract.vehicleId);
-    if (vehicleProfile) {
-      const coreVehicles = coreVehicleRepository.getAll();
-      const core = coreVehicles.find((v: any) => v.id === vehicleProfile.vehicleId);
-      if (core) {
-        result.vehicle = { ...vehicleProfile, coreVehicle: core, isComplete: true };
-      }
+    const enrichedVehicle = rentalVehicleService.getRentalVehicleByVehicleId(contract.vehicleId);
+    if (enrichedVehicle) {
+      result.vehicle = enrichedVehicle;
     }
   } catch (error) {
     console.error('Error populating relations for contract', error);
@@ -111,6 +106,10 @@ export const contractService = {
     
     if (status === 'ACTIVE' && contract.status !== 'CONFIRMED') {
       throw new Error('Hanya kontrak CONFIRMED yang dapat diaktifkan (via Serah Terima)');
+    }
+    
+    if (status === 'COMPLETED' && contract.status !== 'ACTIVE') {
+      throw new Error('Hanya kontrak ACTIVE yang dapat diselesaikan (via Pengembalian)');
     }
     
     // Transition

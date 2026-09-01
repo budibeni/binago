@@ -4,7 +4,6 @@ import { handoverRepository } from '../repositories/handoverRepository';
 import { rentalVehicleService } from './vehicleService';
 import { rentalVehicleRepository } from '../repositories/vehicleRepository';
 import { customerRepository } from '../repositories/customerRepository';
-import { vehicleRepository as coreVehicleRepository } from '@/data/repositories/vehicleRepository';
 import type { RentalReturn } from '@/features/modules/rental/returns/types/return';
 import type { RentalContract } from '@/features/modules/rental/contracts/types/contract';
 
@@ -18,11 +17,9 @@ const populateRelations = async (ret: RentalReturn): Promise<RentalReturn> => {
     const customer = customerRepository.getById(ret.customerId);
     if (customer) result.customer = customer;
 
-    const vehicleProfile = rentalVehicleRepository.getByVehicleId(ret.vehicleId);
-    if (vehicleProfile) {
-      const coreVehicles = coreVehicleRepository.getAll();
-      const core = coreVehicles.find((v: any) => v.id === vehicleProfile.vehicleId);
-      if (core) result.vehicle = { ...vehicleProfile, coreVehicle: core, isComplete: true };
+    const enrichedVehicle = rentalVehicleService.getRentalVehicleByVehicleId(ret.vehicleId);
+    if (enrichedVehicle) {
+      result.vehicle = enrichedVehicle;
     }
 
     const handover = await handoverRepository.getHandoverByContractId(ret.contractId);
@@ -95,9 +92,8 @@ export const returnService = {
     // 6. Create Return record
     const newReturn = await returnRepository.createReturn(data);
 
-    // 7. Contract ACTIVE → COMPLETED (bypass the normal CONFIRMED check via direct repo call)
-    const { contractRepository } = await import('../repositories/contractRepository');
-    await contractRepository.updateContract(data.contractId, { status: 'COMPLETED' });
+    // 7. Contract ACTIVE → COMPLETED
+    await contractService.updateContractStatus(data.contractId, 'COMPLETED');
 
     // 8. Rental Vehicle RENTED → READY
     const vehicleProfile = rentalVehicleRepository.getByVehicleId(data.vehicleId);

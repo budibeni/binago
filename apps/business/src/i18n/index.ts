@@ -230,6 +230,7 @@ export const dictionaries = {
       overviewClose: 'Tutup Panel Overview',
       overviewNoDriver: 'Tanpa Pengemudi',
       // Popup
+      popupGeneral: 'Umum',
       popupDriver: 'Pengemudi',
       popupSpeed: 'Kecepatan',
       popupAcc: 'ACC',
@@ -1120,6 +1121,7 @@ export const dictionaries = {
       overviewClose: 'Close Overview Panel',
       overviewNoDriver: 'No Driver',
       // Popup
+      popupGeneral: 'General',
       popupDriver: 'Driver',
       popupSpeed: 'Speed',
       popupAcc: 'ACC',

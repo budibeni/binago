@@ -10,6 +10,7 @@ import type { Reservation, ReservationStatusFilter } from './types/reservation';
 import { ReservationList } from './components/ReservationList';
 import { ReservationDetailDrawer } from './components/ReservationDetailDrawer';
 import { cn } from '@adatrack/utils';
+import { trackingNavigationService } from '@/features/core/tracking/services/trackingNavigationService';
 
 export function ReservationsFeature() {
   const router = useRouter();
@@ -70,7 +71,10 @@ export function ReservationsFeature() {
 
   // Buka tracking untuk satu kendaraan dari tombol Map per baris
   const handleOpenMap = (vehicleId: string) => {
-    router.push(`/tracking?vehicles=${vehicleId}`);
+    trackingNavigationService.navigateToTracking(router, {
+      mode: 'live',
+      vehicleId: vehicleId
+    });
   };
 
   const handleView = (reservation: Reservation) => {
@@ -84,6 +88,20 @@ export function ReservationsFeature() {
 
   const handleDelete = (reservation: Reservation) => {
     console.log('Delete', reservation.id);
+  };
+
+  const handleConfirm = async (reservation: Reservation) => {
+    try {
+      await reservationService.updateReservationStatus(reservation.id, 'CONFIRMED');
+      const data = await reservationService.getReservations();
+      setReservations(data);
+      if (detailReservation?.id === reservation.id) {
+        setDetailReservation({ ...reservation, status: 'CONFIRMED' });
+      }
+      alert('Reservasi berhasil dikonfirmasi');
+    } catch (error: any) {
+      alert(error.message || 'Gagal mengonfirmasi reservasi');
+    }
   };
 
   return (
@@ -232,6 +250,7 @@ export function ReservationsFeature() {
         labels={labels}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        onConfirm={handleConfirm}
       />
     </div>
   );

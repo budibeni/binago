@@ -127,7 +127,7 @@ export function ReservationCreateForm({
                   >
                     <option value="">{labels.selectVehiclePlaceholder}</option>
                     {vehicles.filter(v => v.status === 'READY' || v.status === 'RESERVED').map(v => (
-                      <option key={v.id} value={v.id}>{v.coreVehicle.plateNumber} - {v.coreVehicle.brand} {v.coreVehicle.vehicleName}</option>
+                      <option key={v.id} value={v.vehicleId}>{v.coreVehicle.plateNumber} - {v.coreVehicle.brand} {v.coreVehicle.vehicleName}</option>
                     ))}
                   </select>
                 </div>

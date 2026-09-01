@@ -4,13 +4,16 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { RotateCcw, FileText, ArrowRight, MapPin } from 'lucide-react';
 import { Button } from '@adatrack/ui';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { returnService } from '@/data/modules/rental/services/returnService';
+import { trackingNavigationService } from '@/features/core/tracking/services/trackingNavigationService';
 import type { RentalReturn } from './types/return';
 import type { RentalContract } from '../contracts/types/contract';
 import { ReturnList } from './components/ReturnList';
 import { ReturnDetailDrawer } from './components/ReturnDetailDrawer';
 
 export function ReturnsFeature() {
+  const router = useRouter();
   const [returns, setReturns] = useState<RentalReturn[]>([]);
   const [eligibleContracts, setEligibleContracts] = useState<RentalContract[]>([]);
   const [loading, setLoading] = useState(true);
@@ -95,8 +98,15 @@ export function ReturnsFeature() {
                         </span>
                       </div>
                       <p className="text-sm font-medium mb-1 truncate">{contract.customer?.name}</p>
-                      <Link
-                        href={`/tracking?vehicles=${contract.vehicle?.coreVehicle?.id}`}
+                      <button
+                        onClick={() => {
+                          if (contract.vehicle?.coreVehicle?.id) {
+                            trackingNavigationService.navigateToTracking(router, {
+                              mode: 'live',
+                              vehicleId: contract.vehicle.coreVehicle.id
+                            });
+                          }
+                        }}
                         className="group flex items-center gap-1.5 text-xs text-muted-foreground hover:text-danger transition-colors mb-1 w-fit"
                         title="Lihat Lokasi Terkini"
                       >
@@ -104,7 +114,7 @@ export function ReturnsFeature() {
                         <span className="group-hover:underline truncate">
                           {contract.vehicle?.coreVehicle?.brand} {contract.vehicle?.coreVehicle?.vehicleName} &bull; {contract.vehicle?.coreVehicle?.plateNumber}
                         </span>
-                      </Link>
+                      </button>
                       <p className="text-xs text-muted-foreground mb-1">
                         Odometer: {contract.vehicle?.currentOdometer?.toLocaleString('id-ID') || '-'} KM
                       </p>

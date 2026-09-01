@@ -13,6 +13,7 @@ import {
   type DataTableColumnDef,
   type DataTablePaginationConfig,
 } from '@adatrack/ui';
+import { trackingNavigationService } from '@/features/core/tracking/services/trackingNavigationService';
 import type { RentalReturn } from '../types/return';
 
 interface ReturnListProps {
@@ -206,9 +207,12 @@ export function ReturnList({ data, searchValue, onSearchChange, onViewDetail }: 
     if (!handover || !ret.vehicleId) return;
     const startDate = new Date(handover.handoverAt).toISOString();
     const endDate = new Date(ret.returnedAt).toISOString();
-    router.push(
-      `/tracking?vehicleId=${encodeURIComponent(ret.vehicleId)}&start=${encodeURIComponent(startDate)}&end=${encodeURIComponent(endDate)}`
-    );
+    trackingNavigationService.navigateToTracking(router, {
+      mode: 'playback',
+      vehicleId: ret.vehicleId,
+      start: startDate,
+      end: endDate
+    });
   }, [router]);
 
   React.useEffect(() => { setPageIndex(0); }, [data]);

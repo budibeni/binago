@@ -17,7 +17,7 @@ export interface RentalEquipment {
 
 export interface RentalVehicleProfile {
   id: string;
-  vehicleId: string;
+  vehicleId: string; // CORE Vehicle ID (e.g. 'veh-001')
   status: RentalStatus;
   dailyRate: number;
   weeklyRate: number;

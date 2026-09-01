@@ -4,8 +4,6 @@ import { rentalVehicleService } from './vehicleService';
 import type { RentalHandover } from '@/features/modules/rental/handover/types/handover';
 import type { RentalContract } from '@/features/modules/rental/contracts/types/contract';
 import { customerRepository } from '../repositories/customerRepository';
-import { rentalVehicleRepository } from '../repositories/vehicleRepository';
-import { vehicleRepository as coreVehicleRepository } from '@/data/repositories/vehicleRepository';
 
 const populateRelations = async (handover: RentalHandover): Promise<RentalHandover> => {
   const result = { ...handover };
@@ -21,13 +19,9 @@ const populateRelations = async (handover: RentalHandover): Promise<RentalHandov
       result.customer = customer;
     }
 
-    const vehicleProfile = rentalVehicleRepository.getByVehicleId(handover.vehicleId);
-    if (vehicleProfile) {
-      const coreVehicles = coreVehicleRepository.getAll();
-      const core = coreVehicles.find((v: any) => v.id === vehicleProfile.vehicleId);
-      if (core) {
-        result.vehicle = { ...vehicleProfile, coreVehicle: core, isComplete: true };
-      }
+    const enrichedVehicle = rentalVehicleService.getRentalVehicleByVehicleId(handover.vehicleId);
+    if (enrichedVehicle) {
+      result.vehicle = enrichedVehicle;
     }
   } catch (error) {
     console.error('Error populating relations for handover', error);

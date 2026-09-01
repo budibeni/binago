@@ -13,6 +13,7 @@ interface ReservationDetailDrawerProps {
   labels: Record<string, string>;
   onEdit: (reservation: Reservation) => void;
   onDelete: (reservation: Reservation) => void;
+  onConfirm: (reservation: Reservation) => void;
 }
 
 export function ReservationDetailDrawer({
@@ -22,6 +23,7 @@ export function ReservationDetailDrawer({
   labels,
   onEdit,
   onDelete,
+  onConfirm,
 }: ReservationDetailDrawerProps) {
   React.useEffect(() => {
     if (!open) return;
@@ -263,6 +265,12 @@ export function ReservationDetailDrawer({
               <Edit2 className="w-4 h-4" />
               Edit
             </Button>
+            {reservation.status === 'PENDING' && (
+              <Button variant="primary" className="bg-success hover:bg-success/90 text-white gap-2" onClick={() => onConfirm(reservation)}>
+                <ClipboardList className="w-4 h-4" />
+                Konfirmasi
+              </Button>
+            )}
           </div>
           <Button variant="outline" className="text-danger border-danger/30 hover:bg-danger/10 gap-2" onClick={() => onDelete(reservation)}>
             <Trash2 className="w-4 h-4" />

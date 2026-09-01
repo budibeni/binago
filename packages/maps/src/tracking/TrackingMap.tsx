@@ -73,6 +73,8 @@ export interface TrackingMapProps<T> {
   playbackParkingEvents?: { lat: number; lng: number }[];
   /** Optional children rendered inside MapProvider for accessing map context */
   children?: React.ReactNode;
+  /** ID entitas yang langsung difokuskan (popup terbuka) saat map pertama kali dimount */
+  initialFocusedId?: string;
 }
 
 function TrackingMapInner<T>({
@@ -98,6 +100,7 @@ function TrackingMapInner<T>({
   playbackPassedTrack,
   playbackParkingEvents,
   children,
+  initialFocusedId,
 }: TrackingMapProps<T>) {
   const [basemap, setBasemap] = useState<BasemapId>('standard');
   const [viewport, setViewport] = useState({ center: { lat: -6.2, lng: 106.816667 }, zoom: 12 });
@@ -107,7 +110,18 @@ function TrackingMapInner<T>({
   const map = useInternalMap();
 
   // Internal state: entitas mana yang sedang diklik (ditampilkan popup)
-  const [focusedEntityId, setFocusedEntityId] = useState<string | null>(null);
+  const [focusedEntityId, setFocusedEntityId] = useState<string | null>(initialFocusedId || null);
+
+  // Sync focusedEntityId with initialFocusedId and fly to it
+  useEffect(() => {
+    if (!initialFocusedId || !map) return;
+    setFocusedEntityId(initialFocusedId);
+    const entity = entities.find((e) => getId(e) === initialFocusedId);
+    if (entity) {
+      const pos = getPosition(entity);
+      panTo({ lat: pos.lat, lng: pos.lng });
+    }
+  }, [initialFocusedId, map, entities, getId, panTo]);
 
   // Marker style state
   const [markerStyle, setMarkerStyle] = useState<'default' | 'custom'>('default');

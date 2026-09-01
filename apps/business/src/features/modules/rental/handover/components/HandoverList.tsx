@@ -14,6 +14,7 @@ import {
   type DataTableColumnDef,
   type DataTablePaginationConfig,
 } from '@adatrack/ui';
+import { trackingNavigationService } from '@/features/core/tracking/services/trackingNavigationService';
 import type { RentalHandover } from '../types/handover';
 
 interface HandoverListProps {
@@ -208,7 +209,12 @@ export function HandoverList({
     if (!coreVehicleId || !h.handoverAt) return;
     const startDate = new Date(h.handoverAt).toISOString();
     const endDate = new Date().toISOString();
-    router.push(`/tracking?vehicleId=${encodeURIComponent(coreVehicleId)}&start=${encodeURIComponent(startDate)}&end=${encodeURIComponent(endDate)}`);
+    trackingNavigationService.navigateToTracking(router, {
+      mode: 'playback',
+      vehicleId: coreVehicleId,
+      start: startDate,
+      end: endDate
+    });
   }, [router]);
 
   React.useEffect(() => { setPageIndex(0); }, [data]);

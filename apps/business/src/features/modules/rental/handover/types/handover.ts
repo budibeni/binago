@@ -8,7 +8,7 @@ export interface RentalHandover {
 
   contractId: string;
   customerId: string;
-  vehicleId: string;
+  vehicleId: string; // CORE Vehicle ID (e.g. 'veh-001')
 
   contract?: RentalContract;
   customer?: Customer;

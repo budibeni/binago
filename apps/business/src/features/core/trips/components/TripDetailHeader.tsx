@@ -7,6 +7,7 @@ import { useBusinessLocale } from '@/components/BusinessShellLayout';
 import { getTranslation } from '@/i18n';
 import type { Trip } from '../types/trips';
 import { useRouter } from 'next/navigation';
+import { trackingNavigationService } from '@/features/core/tracking/services/trackingNavigationService';
 
 export interface TripDetailHeaderProps {
   trip: Trip;
@@ -23,17 +24,13 @@ export function TripDetailHeader({ trip }: TripDetailHeaderProps) {
   const timeEnd = trip.endTime ? new Date(trip.endTime).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '...';
 
   const handlePlayback = () => {
-    // Navigate to playback with parameters
-    const searchParams = new URLSearchParams();
-    searchParams.set('vehicleId', trip.vehicleId);
-    searchParams.set('start', trip.startTime);
-    if (trip.endTime) {
-      searchParams.set('end', trip.endTime);
-    } else {
-      // If ongoing, set end to now
-      searchParams.set('end', new Date().toISOString());
-    }
-    router.push(`/tracking?${searchParams.toString()}`);
+    const endStr = trip.endTime || new Date().toISOString();
+    trackingNavigationService.navigateToTracking(router, {
+      mode: 'playback',
+      vehicleId: trip.vehicleId,
+      start: trip.startTime,
+      end: endStr
+    });
   };
 
   return (

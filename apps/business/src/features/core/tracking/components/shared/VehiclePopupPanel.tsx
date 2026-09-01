@@ -22,7 +22,7 @@ import { cn } from '@adatrack/utils';
 import { Button } from '@adatrack/ui';
 import type { Locale } from '@adatrack/types';
 import { getTranslation } from '../../../../../i18n';
-import type { TrackingVehicle } from '../../types/tracking';
+import type { TrackingVehicle, VehicleContext } from '../../types/tracking';
 import { ShareLocationDialog } from '../../../sharing/components/ShareLocationDialog';
 import { useShareLocation } from '../../../sharing/context/ShareLocationContext';
 
@@ -72,14 +72,14 @@ function InfoRow({
   value,
   valueClassName,
 }: {
-  icon: React.FC<{ className?: string }>;
+  icon?: React.FC<{ className?: string }>;
   label: string;
   value: React.ReactNode;
   valueClassName?: string;
 }) {
   return (
     <div className="flex items-start gap-1.5">
-      <Icon className="h-3 w-3 text-foreground-subtle mt-[1px] shrink-0" />
+      {Icon && <Icon className="h-3 w-3 text-foreground-subtle mt-[1px] shrink-0" />}
       <div className="min-w-0 flex-1">
         <p className="text-[9px] font-semibold uppercase tracking-wider text-foreground-muted mb-px">
           {label}
@@ -112,6 +112,40 @@ export function VehiclePopupPanel({
   const shareContext = useShareLocation();
   // Safe check if context is available (in case provider is missing)
   const activeShare = shareContext?.getActiveSession(vehicle.id);
+
+  const [activeTab, setActiveTab] = useState<'umum' | 'context'>('umum');
+  const [vehicleContext, setVehicleContext] = useState<VehicleContext | null>(null);
+
+  React.useEffect(() => {
+    let mounted = true;
+    
+    // 1. Coba baca dari sessionStorage untuk load instan (jika tersedia dari navigasi)
+    try {
+      const stored = sessionStorage.getItem(`adatrack_vehicle_context_${locale}_${vehicle.id}`);
+      if (stored) {
+        const parsed = JSON.parse(stored) as VehicleContext;
+        if (parsed.vehicleId === vehicle.id) {
+          setVehicleContext(parsed);
+        }
+      }
+    } catch (e: any) {
+      console.error('Failed to parse vehicle context', e);
+    }
+
+    // 2. Fetch data context terbaru secara asinkron (agar selalu update dan bekerja untuk multi-select)
+    import('@/data/modules/rental/services/vehicleContextBuilder')
+      .then((m) => m.buildRentalVehicleContext(vehicle.id, locale))
+      .then((ctx) => {
+         if (mounted && ctx) {
+            setVehicleContext(ctx);
+            // Update cache session storage
+            sessionStorage.setItem(`adatrack_vehicle_context_${locale}_${vehicle.id}`, JSON.stringify(ctx));
+         }
+      })
+      .catch((e) => console.error('Failed to dynamically fetch vehicle context', e));
+
+    return () => { mounted = false; };
+  }, [vehicle.id, locale]);
 
   const dateObj = new Date(vehicle.lastUpdate);
   const formattedDate = [
@@ -170,79 +204,137 @@ export function VehiclePopupPanel({
         </button>
       </div>
 
-      {/* -- Body - 3-column grid --------------------------------------------- */}
+      {/* -- Tabs ------------------------------------------------------------- */}
+      {vehicleContext && (
+        <div className="flex px-3 border-b border-border bg-neutral-50/50 dark:bg-neutral-900/50">
+          <button
+            onClick={() => setActiveTab('umum')}
+            className={cn(
+              "px-4 py-1.5 text-[11px] font-bold uppercase tracking-wider transition-colors border-b-2",
+              activeTab === 'umum' 
+                ? "border-danger text-foreground" 
+                : "border-transparent text-muted-foreground hover:text-foreground"
+            )}
+          >
+            {tTracking.popupGeneral}
+          </button>
+          <button
+            onClick={() => setActiveTab('context')}
+            className={cn(
+              "px-4 py-1.5 text-[11px] font-bold uppercase tracking-wider transition-colors border-b-2",
+              activeTab === 'context' 
+                ? "border-danger text-foreground" 
+                : "border-transparent text-muted-foreground hover:text-foreground"
+            )}
+          >
+            {vehicleContext.label}
+          </button>
+        </div>
+      )}
+
+      {/* -- Body ----------------------------------------------------------- */}
       <div className="grid grid-cols-3 divide-x divide-border overflow-hidden">
+        {activeTab === 'umum' ? (
+          <>
+            {/* -- Col 1: Driver, Speed, ACC, Alarm ----------------------- */}
+            <div className="flex flex-col gap-2 px-2.5 py-2 overflow-hidden">
+              <InfoRow
+                icon={User}
+                label={tTracking.popupDriver}
+                value={vehicle.driverName || '-'}
+              />
+              <InfoRow
+                icon={Gauge}
+                label={tTracking.popupSpeed}
+                value={`${vehicle.speed} km/h`}
+              />
+              <InfoRow
+                icon={KeyRound}
+                label={tTracking.popupAcc}
+                value={
+                  vehicle.acc !== undefined
+                    ? <span className={vehicle.acc ? 'text-emerald-600 dark:text-emerald-400' : 'text-danger font-bold'}>{vehicle.acc ? 'ON' : 'OFF'}</span>
+                    : '-'
+                }
+              />
+              <InfoRow
+                icon={Bell}
+                label={tTracking.popupAlarm}
+                value={vehicle.alarmEvent || '-'}
+                valueClassName={vehicle.alarmEvent && vehicle.alarmEvent !== '-' ? 'text-danger' : undefined}
+              />
+            </div>
 
-        {/* -- Col 1: Driver, Speed, ACC, Alarm ----------------------- */}
-        <div className="flex flex-col gap-2 px-2.5 py-2 overflow-hidden">
-          <InfoRow
-            icon={User}
-            label={tTracking.popupDriver}
-            value={vehicle.driverName || '-'}
-          />
-          <InfoRow
-            icon={Gauge}
-            label={tTracking.popupSpeed}
-            value={`${vehicle.speed} km/h`}
-          />
-          <InfoRow
-            icon={KeyRound}
-            label={tTracking.popupAcc}
-            value={
-              vehicle.acc !== undefined
-                ? <span className={vehicle.acc ? 'text-emerald-600 dark:text-emerald-400' : 'text-danger font-bold'}>{vehicle.acc ? 'ON' : 'OFF'}</span>
-                : '-'
-            }
-          />
-          <InfoRow
-            icon={Bell}
-            label={tTracking.popupAlarm}
-            value={vehicle.alarmEvent || '-'}
-            valueClassName={vehicle.alarmEvent && vehicle.alarmEvent !== '-' ? 'text-danger' : undefined}
-          />
-        </div>
+            {/* -- Col 2: Address, Geofence Location, Geofence Area ------- */}
+            <div className="flex flex-col gap-2 px-2.5 py-2 overflow-hidden">
+              <InfoRow
+                icon={MapPin}
+                label={tTracking.popupAddress}
+                value={
+                  <span className="text-accent">
+                    {vehicle.location.address || '-'}
+                  </span>
+                }
+              />
+              <InfoRow
+                icon={SquareDashedBottom}
+                label={tTracking.popupGeofenceLocation}
+                value={vehicle.geofenceName && vehicle.geofenceName !== '-' ? vehicle.geofenceName : '-'}
+              />
+              <InfoRow
+                icon={Layers}
+                label={tTracking.popupGeofenceArea}
+                value={vehicle.geofenceArea && vehicle.geofenceArea !== '-' ? vehicle.geofenceArea : '-'}
+              />
+            </div>
 
-        {/* -- Col 2: Address, Geofence Location, Geofence Area ------- */}
-        <div className="flex flex-col gap-2 px-2.5 py-2 overflow-hidden">
-          <InfoRow
-            icon={MapPin}
-            label={tTracking.popupAddress}
-            value={
-              <span className="text-accent">
-                {vehicle.location.address || '-'}
-              </span>
-            }
-          />
-          <InfoRow
-            icon={SquareDashedBottom}
-            label={tTracking.popupGeofenceLocation}
-            value={vehicle.geofenceName && vehicle.geofenceName !== '-' ? vehicle.geofenceName : '-'}
-          />
-          <InfoRow
-            icon={Layers}
-            label={tTracking.popupGeofenceArea}
-            value={vehicle.geofenceArea && vehicle.geofenceArea !== '-' ? vehicle.geofenceArea : '-'}
-          />
-        </div>
-
-        {/* -- Col 3: Coordinates, GPS SN, Last Update ----------------- */}
-        <div className="flex flex-col gap-2 px-2.5 py-2 overflow-hidden">
-          <InfoRow
-            icon={Crosshair}
-            label={tTracking.popupCoordinates}
-            value={coords}
-          />
-          <InfoRow
-            icon={Wifi}
-            label={tTracking.popupGpsSn}
-            value={vehicle.gpsSerialNumber || '-'}
-          />
-          <InfoRow
-            icon={Clock}
-            label={tTracking.popupLastUpdate}
-            value={formattedDate}
-          />
-        </div>
+            {/* -- Col 3: Coordinates, GPS SN, Last Update ----------------- */}
+            <div className="flex flex-col gap-2 px-2.5 py-2 overflow-hidden">
+              <InfoRow
+                icon={Crosshair}
+                label={tTracking.popupCoordinates}
+                value={coords}
+              />
+              <InfoRow
+                icon={Wifi}
+                label={tTracking.popupGpsSn}
+                value={vehicle.gpsSerialNumber || '-'}
+              />
+              <InfoRow
+                icon={Clock}
+                label={tTracking.popupLastUpdate}
+                value={formattedDate}
+              />
+            </div>
+          </>
+        ) : (
+          <>
+            {(() => {
+              const items = vehicleContext?.data || [];
+              const perCol = Math.ceil(items.length / 3);
+              return Array.from({ length: 3 }).map((_, colIndex) => {
+                const chunk = items.slice(colIndex * perCol, (colIndex + 1) * perCol);
+                return (
+                  <div key={colIndex} className="flex flex-col gap-2 px-2.5 py-2 overflow-hidden">
+                    {chunk.map((field, idx) => (
+                      <InfoRow
+                        key={idx}
+                        label={field.label}
+                        value={field.value}
+                        valueClassName={cn(
+                          field.type === 'status' && field.value === 'RENTED' && 'text-primary font-bold',
+                          field.type === 'status' && field.value === 'READY' && 'text-success font-bold',
+                          field.type === 'status' && field.value === 'RESERVED' && 'text-warning font-bold',
+                          field.type === 'currency' && 'font-bold text-accent'
+                        )}
+                      />
+                    ))}
+                  </div>
+                );
+              });
+            })()}
+          </>
+        )}
       </div>
 
       {/* -- Footer ----------------------------------------------------------- */}

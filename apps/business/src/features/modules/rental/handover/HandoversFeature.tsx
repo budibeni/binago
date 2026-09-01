@@ -4,6 +4,8 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { Key, FileText, ArrowRight, MapPin } from 'lucide-react';
 import { getTranslation } from '@/i18n';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
+import { trackingNavigationService } from '@/features/core/tracking/services/trackingNavigationService';
+import { useRouter } from 'next/navigation';
 import { handoverService } from '@/data/modules/rental/services/handoverService';
 import type { RentalHandover } from './types/handover';
 import type { RentalContract } from '../contracts/types/contract';
@@ -13,6 +15,7 @@ import { Button } from '@adatrack/ui';
 import Link from 'next/link';
 
 export function HandoversFeature() {
+  const router = useRouter();
   const locale = useBusinessLocale();
   const t = getTranslation(locale);
   const [handovers, setHandovers] = useState<RentalHandover[]>([]);
@@ -100,12 +103,23 @@ export function HandoversFeature() {
                         </span>
                       </div>
                       <p className="text-sm font-medium mb-1 truncate">{contract.customer?.name}</p>
-                      <Link href={`/tracking?vehicles=${contract.vehicle?.coreVehicle?.id}`} className="group flex items-center gap-1.5 text-xs text-muted-foreground hover:text-danger transition-colors mb-4 w-fit" title="Lihat Lokasi Terkini di Pemantauan">
+                      <button
+                        onClick={() => {
+                          if (contract.vehicle?.coreVehicle?.id) {
+                            trackingNavigationService.navigateToTracking(router, {
+                              mode: 'live',
+                              vehicleId: contract.vehicle.coreVehicle.id
+                            });
+                          }
+                        }}
+                        className="group flex items-center gap-1.5 text-xs text-muted-foreground hover:text-danger transition-colors mb-4 w-fit"
+                        title="Lihat Lokasi Terkini di Pemantauan"
+                      >
                         <MapPin className="w-3.5 h-3.5 shrink-0" />
                         <span className="group-hover:underline truncate">
                           {contract.vehicle?.coreVehicle?.brand} {contract.vehicle?.coreVehicle?.vehicleName} &bull; {contract.vehicle?.coreVehicle?.plateNumber}
                         </span>
-                      </Link>
+                      </button>
                     </div>
                     <Link href={`/rental/contracts/${contract.id}/handover`} className="w-full">
                       <Button variant="outline" className="w-full justify-between">

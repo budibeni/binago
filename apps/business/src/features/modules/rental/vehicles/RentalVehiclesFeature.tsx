@@ -4,6 +4,9 @@ import React from 'react';
 import { getTranslation } from '@/i18n';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
 import { rentalVehicleService } from '@/data/modules/rental/services/vehicleService';
+
+import { buildRentalVehicleContext } from '@/data/modules/rental/services/vehicleContextBuilder';
+import { trackingNavigationService } from '@/features/core/tracking/services/trackingNavigationService';
 import type { RentalVehicle, RentalStatusFilter } from './types/rentalVehicle';
 import { RentalVehicleTable } from './components/RentalVehicleTable';
 import { RentalVehicleSelectionDialog } from './components/RentalVehicleSelectionDialog';
@@ -110,18 +113,36 @@ export function RentalVehiclesFeature() {
     if (selectedVehicle) {
       try {
         rentalVehicleService.removeFromRental(selectedVehicle.id);
-        showToast(labels.deleteSuccess, '');
+        alert(labels.deleteSuccess);
         setDataVersion(prev => prev + 1);
       } catch (e: any) {
-        showToast('Error', e.message, 'error');
+        alert(`Error: ${e.message}`);
       }
     }
   };
 
-  const handleOpenTracking = () => {
+  const handleOpenTracking = async () => {
     if (selectedIds.length > 0) {
-      const url = `/tracking?vehicles=${selectedIds.join(',')}`;
-      router.push(url);
+      if (selectedIds.length === 1) {
+        const vehicleId = selectedIds[0];
+        try {
+          const ctx = await buildRentalVehicleContext(vehicleId, locale);
+          if (ctx) {
+            sessionStorage.setItem(`adatrack_vehicle_context_${locale}_${vehicleId}`, JSON.stringify(ctx));
+          }
+        } catch (e) {
+          console.error('Failed to build context', e);
+        }
+        trackingNavigationService.navigateToTracking(router, {
+          mode: 'live',
+          vehicleId: vehicleId
+        });
+      } else {
+        trackingNavigationService.navigateToTracking(router, {
+          mode: 'live',
+          vehicleIds: selectedIds
+        });
+      }
     }
   };
 

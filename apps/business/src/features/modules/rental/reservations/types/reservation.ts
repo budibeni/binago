@@ -11,7 +11,7 @@ export interface Reservation {
   id: string;
   reservationNumber: string;
   customerId: string;
-  vehicleId: string;
+  vehicleId: string; // CORE Vehicle ID (e.g. 'veh-001')
   startDate: string; // ISO String
   endDate: string; // ISO String
   duration: number; // in days

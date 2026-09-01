@@ -33,6 +33,8 @@ export interface LiveMapProps {
   playbackTrack?: { lat: number; lng: number }[];
   playbackPassedTrack?: { lat: number; lng: number }[];
   playbackParkingEvents?: { lat: number; lng: number }[];
+  /** Kendaraan yang langsung dibuka popupnya saat map mount (dari navigasi modul) */
+  initialFocusedVehicleId?: string;
 }
 
 // --- Mock geofence data --------------------------------------------------------
@@ -76,7 +78,7 @@ const STATUS_LABEL: Record<TrackingVehicle['status'], string> = {
 
 // --- LiveMap -------------------------------------------------------------------
 
-export function LiveMap({ vehicles, selectedVehicleId, visibleVehicleIds = [], onPlaybackRequest, playbackTrack, playbackPassedTrack, playbackParkingEvents }: LiveMapProps) {
+export function LiveMap({ vehicles, selectedVehicleId, visibleVehicleIds = [], onPlaybackRequest, playbackTrack, playbackPassedTrack, playbackParkingEvents, initialFocusedVehicleId }: LiveMapProps) {
   const locale = useBusinessLocale();
   const [internalSelectedId, setInternalSelectedId] = React.useState<string | null>(selectedVehicleId || null);
 
@@ -98,6 +100,7 @@ export function LiveMap({ vehicles, selectedVehicleId, visibleVehicleIds = [], o
       <TrackingMap<TrackingVehicle>
         entities={vehicles}
         selectedIds={visibleVehicleIds}
+        initialFocusedId={initialFocusedVehicleId}
 
         // Resolvers
         getId={(v) => v.id}

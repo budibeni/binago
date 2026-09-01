@@ -193,11 +193,22 @@ export function HandoverDetailDrawer({
                   <p className="font-medium text-sm font-mono">{c.handoverLongitude}</p>
                 </div>
               </div>
-              {/* Mini map placeholder */}
-              <div className="h-32 bg-neutral-100 dark:bg-neutral-900 border border-border rounded-lg flex flex-col items-center justify-center text-muted-foreground gap-2">
-                <Navigation className="w-6 h-6" />
-                <span className="text-xs font-medium">Mini Map</span>
-              </div>
+              {c.handoverLatitude && c.handoverLongitude ? (
+                <div className="h-40 bg-neutral-100 dark:bg-neutral-900 border border-border rounded-lg overflow-hidden relative">
+                  <iframe
+                    title="Mini Map"
+                    width="100%"
+                    height="100%"
+                    className="border-0"
+                    src={`https://www.openstreetmap.org/export/embed.html?bbox=${c.handoverLongitude - 0.005},${c.handoverLatitude - 0.005},${c.handoverLongitude + 0.005},${c.handoverLatitude + 0.005}&layer=mapnik&marker=${c.handoverLatitude},${c.handoverLongitude}`}
+                  />
+                </div>
+              ) : (
+                <div className="h-24 bg-neutral-100 dark:bg-neutral-900 border border-border rounded-lg flex flex-col items-center justify-center text-muted-foreground gap-1">
+                  <Navigation className="w-5 h-5" />
+                  <span className="text-xs">Lokasi Tidak Tersedia</span>
+                </div>
+              )}
             </div>
           </section>
 

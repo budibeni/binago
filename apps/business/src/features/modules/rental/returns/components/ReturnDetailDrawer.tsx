@@ -214,10 +214,22 @@ export function ReturnDetailDrawer({ ret, open, onClose }: ReturnDetailDrawerPro
                   </div>
                 </div>
               )}
-              <div className="h-24 bg-neutral-100 dark:bg-neutral-900 border border-border rounded-lg flex flex-col items-center justify-center text-muted-foreground gap-1">
-                <Navigation className="w-5 h-5" />
-                <span className="text-xs">Mini Map</span>
-              </div>
+              {ret.returnLatitude && ret.returnLongitude ? (
+                <div className="h-40 bg-neutral-100 dark:bg-neutral-900 border border-border rounded-lg overflow-hidden relative">
+                  <iframe
+                    title="Mini Map"
+                    width="100%"
+                    height="100%"
+                    className="border-0"
+                    src={`https://www.openstreetmap.org/export/embed.html?bbox=${ret.returnLongitude - 0.005},${ret.returnLatitude - 0.005},${ret.returnLongitude + 0.005},${ret.returnLatitude + 0.005}&layer=mapnik&marker=${ret.returnLatitude},${ret.returnLongitude}`}
+                  />
+                </div>
+              ) : (
+                <div className="h-24 bg-neutral-100 dark:bg-neutral-900 border border-border rounded-lg flex flex-col items-center justify-center text-muted-foreground gap-1">
+                  <Navigation className="w-5 h-5" />
+                  <span className="text-xs">Lokasi Tidak Tersedia</span>
+                </div>
+              )}
             </div>
           </section>
 

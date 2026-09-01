@@ -53,7 +53,7 @@ export function ReservationCreateFeature() {
   // Sync vehicle defaults when selected
   useEffect(() => {
     if (formData.vehicleId) {
-      const v = vehicles.find(v => v.id === formData.vehicleId);
+      const v = vehicles.find(v => v.vehicleId === formData.vehicleId);
       if (v) {
         setFormData(prev => ({
           ...prev,
@@ -69,7 +69,7 @@ export function ReservationCreateFeature() {
     setFormData(prev => ({ ...prev, duration: dur }));
   }, [formData.startDate, formData.endDate]);
 
-  const selectedVehicle = useMemo(() => vehicles.find(v => v.id === formData.vehicleId), [vehicles, formData.vehicleId]);
+  const selectedVehicle = useMemo(() => vehicles.find(v => v.vehicleId === formData.vehicleId), [vehicles, formData.vehicleId]);
 
   const totalAmount = useMemo(() => {
     if (!selectedVehicle) return 0;

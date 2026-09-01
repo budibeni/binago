@@ -7,7 +7,7 @@ export interface RentalReturn {
   id: string;
   contractId: string;
   customerId: string;
-  vehicleId: string;
+  vehicleId: string; // CORE Vehicle ID (e.g. 'veh-001')
   
   returnedAt: string;
   

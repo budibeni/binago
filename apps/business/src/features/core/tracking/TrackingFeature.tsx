@@ -14,6 +14,7 @@ import { VehicleOverviewPanel } from './components/shared/VehicleOverviewPanel';
 import { LiveTable } from './components/live/LiveTable';
 import { TrackingNotificationPanel } from './components/activity/TrackingNotificationPanel';
 import { trackingService } from '@/data/services/trackingService';
+import { trackingNavigationService } from './services/trackingNavigationService';
 import type { MockPlaybackData } from './data/mockTrackingData';
 import { getTranslation } from '../../../i18n';
 import { useBusinessLocale } from '../../../components/BusinessShellLayout';
@@ -93,33 +94,40 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
 
   // -- Ref to track pending URL-param auto-load (vehicle id + start datetime) --
   const pendingAutoLoadRef = React.useRef<{ vehicleId: string; startDate: Date } | null>(null);
+  const initializedRef = React.useRef(false);
 
-  // -- Initialize from URL parameters --
+  // -- Initialize from Navigation State (sessionStorage) --
   React.useEffect(() => {
     if (typeof window === 'undefined') return;
+    if (initializedRef.current) return;
     
-    const params = new URLSearchParams(window.location.search);
-    const vId = params.get('vehicleId');
-    const startStr = params.get('start');
-    const endStr = params.get('end');
-    const vehiclesStr = params.get('vehicles');
-
-    if (vehiclesStr) {
-      const vIds = vehiclesStr.split(',').filter(Boolean);
-      if (vIds.length > 0) {
-        setSelectedVehicleIds(vIds);
-      } else {
+    const navState = trackingNavigationService.getState();
+    if (!navState) {
+      // Default: no state, show all live vehicles
+      if (selectedVehicleIds.length === 0) {
         setSelectedVehicleIds(trackingService.getLiveVehicles().map((v) => v.id));
       }
+      return;
+    }
+
+    initializedRef.current = true;
+
+    setMode(navState.mode || 'live');
+
+    if (navState.vehicleIds && navState.vehicleIds.length > 0) {
+      setSelectedVehicleIds(navState.vehicleIds);
     } else {
       setSelectedVehicleIds(trackingService.getLiveVehicles().map((v) => v.id));
     }
 
-    if (vId && startStr) {
+    const vId = navState.vehicleId;
+    const startStr = navState.start;
+    const endStr = navState.end;
+
+    if (navState.mode === 'playback' && vId && startStr) {
       const startDate = new Date(startStr);
       const endDate = endStr ? new Date(endStr) : new Date();
 
-      setMode('playback');
       setPlaybackVehicleId(vId);
       setDateRange({
         startDate: startDate.toISOString().slice(0, 10),
@@ -130,7 +138,18 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
 
       // Store pending auto-load so handleLoadHistory can pick it up after vehicleId state is set
       pendingAutoLoadRef.current = { vehicleId: vId, startDate };
+    } else if (navState.mode === 'live' && vId) {
+      // Live mode single vehicle auto-select
+      setSelectedVehicleIds([vId]);
+      setSelectedVehicleId(vId);
+    } else if (navState.mode === 'heatmap') {
+      // Heatmap defaults if needed
     }
+
+    // Clear state so hard reloads revert to default, but use timeout to avoid Strict Mode double-effect bugs
+    setTimeout(() => {
+      trackingNavigationService.clearState();
+    }, 100);
   }, []);
 
   // Keep refs in sync
@@ -512,6 +531,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
                 selectedVehicleId={selectedVehicleId || undefined}
                 visibleVehicleIds={allVehiclesUnfiltered.map(v => v.id).filter(id => selectedVehicleIds.includes(id))}
                 onPlaybackRequest={handlePlaybackRequest}
+                initialFocusedVehicleId={selectedVehicleId || undefined}
               />
             </div>
 
