@@ -23,6 +23,9 @@ export const mockRoutes = Array.from({ length: 20 }, (_, i) => {
     { o: 'geo-001', d: 'geo-017', name: 'Gudang JKT - Gudang Serang' },
     { o: 'geo-017', d: 'geo-018', name: 'Gudang Serang - Pelabuhan Merak' },
     { o: 'geo-017', d: 'geo-019', name: 'Gudang Serang - KI Cilegon' },
+    // Transport Routes
+    { o: 'geo-001', d: 'geo-011', name: 'Terminal Kp. Rambutan - Terminal Leuwipanjang' },
+    { o: 'geo-001', d: 'geo-014', name: 'Terminal Pulo Gebang - Terminal Bungurasih' },
   ];
 
   const pair = routePairs[i % routePairs.length];

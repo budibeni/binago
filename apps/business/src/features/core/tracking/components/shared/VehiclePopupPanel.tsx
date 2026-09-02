@@ -132,17 +132,8 @@ export function VehiclePopupPanel({
       console.error('Failed to parse vehicle context', e);
     }
 
-    // 2. Fetch data context terbaru secara asinkron (agar selalu update dan bekerja untuk multi-select)
-    import('@/data/modules/rental/services/vehicleContextBuilder')
-      .then((m) => m.buildRentalVehicleContext(vehicle.id, locale))
-      .then((ctx) => {
-         if (mounted && ctx) {
-            setVehicleContext(ctx);
-            // Update cache session storage
-            sessionStorage.setItem(`adatrack_vehicle_context_${locale}_${vehicle.id}`, JSON.stringify(ctx));
-         }
-      })
-      .catch((e) => console.error('Failed to dynamically fetch vehicle context', e));
+    // Pola baru: MODULE PUSHES CONTEXT. CORE hanya baca dari sessionStorage.
+    // Tidak ada lagi hardcode import module business (misal: Rental atau Transport) di dalam CORE.
 
     return () => { mounted = false; };
   }, [vehicle.id, locale]);
