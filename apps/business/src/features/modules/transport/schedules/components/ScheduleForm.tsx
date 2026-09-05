@@ -1,11 +1,12 @@
 'use client';
 
-import React from 'react';
-import { Button, Input, Label, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Checkbox } from '@adatrack/ui';
-import { Clock, Plus, Trash2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Button, Input, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Checkbox } from '@adatrack/ui';
+import { Clock, Plus, Trash2, Calendar, Bus, Info, ExternalLink } from 'lucide-react';
 import type { OperationalSchedule, ScheduleStatus, DayOfWeek, ScheduleTime } from '../types/schedule';
 import type { Route } from '@/features/core/routes/types';
 import type { Vehicle } from '@/features/core/vehicles/types/vehicle';
+import { cn } from '@adatrack/utils';
 
 interface ScheduleFormProps {
   initialData?: OperationalSchedule;
@@ -35,17 +36,28 @@ export function ScheduleForm({
   error
 }: ScheduleFormProps) {
   const isEdit = !!initialData;
-  const [name, setName] = React.useState(initialData?.name || '');
-  const [routeId, setRouteId] = React.useState(initialData?.routeId || '');
-  const [status, setStatus] = React.useState<ScheduleStatus>(initialData?.status || 'ACTIVE');
-  const [activeDays, setActiveDays] = React.useState<DayOfWeek[]>(initialData?.activeDays || []);
+  const [name, setName] = useState(initialData?.name || '');
+  const [routeId, setRouteId] = useState(initialData?.routeId || '');
+  const [status, setStatus] = useState<ScheduleStatus>(initialData?.status || 'ACTIVE');
+  const [activeDays, setActiveDays] = useState<DayOfWeek[]>(initialData?.activeDays || []);
   
-  // Manage schedule times
-  const [times, setTimes] = React.useState<ScheduleTime[]>(initialData?.times || [
+  const [times, setTimes] = useState<ScheduleTime[]>(initialData?.times || [
     { id: `st-${Date.now()}`, departureTime: '06:00', vehicleIds: [] }
   ]);
+  const [activeTimeId, setActiveTimeId] = useState<string>('');
+  const [isVehicleModalOpen, setIsVehicleModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const activeTime = times.find(t => t.id === activeTimeId);
+
+  const openVehicleModal = (timeId: string) => {
+    setActiveTimeId(timeId);
+    setIsVehicleModalOpen(true);
+  };
+
+  const closeVehicleModal = () => {
+    setIsVehicleModalOpen(false);
+  };
 
   const toggleDay = (dayId: DayOfWeek) => {
     setActiveDays(prev => 
@@ -54,10 +66,12 @@ export function ScheduleForm({
   };
 
   const handleAddTime = () => {
-    setTimes(prev => [...prev, { id: `st-${Date.now()}`, departureTime: '08:00', vehicleIds: [] }]);
+    const newId = `st-${Date.now()}`;
+    setTimes(prev => [...prev, { id: newId, departureTime: '08:00', vehicleIds: [] }]);
   };
 
-  const handleRemoveTime = (id: string) => {
+  const handleRemoveTime = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
     if (times.length <= 1) return;
     setTimes(prev => prev.filter(t => t.id !== id));
   };
@@ -82,12 +96,9 @@ export function ScheduleForm({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !routeId || activeDays.length === 0 || times.length === 0) return;
-    
-    // Validate each time has at least one vehicle (optional based on business rule, but good practice)
     for (const time of times) {
       if (!time.departureTime) return;
     }
-
     setIsSubmitting(true);
     setTimeout(() => {
       onSave({
@@ -103,175 +114,300 @@ export function ScheduleForm({
     }, 500);
   };
 
-  return (
-    <form onSubmit={handleSubmit} className="flex flex-col w-full h-full relative">
-      <div className="w-full max-w-2xl mx-auto p-4 lg:p-6 pb-24 flex flex-col gap-4">
-        {error && (
-          <div className="p-3 bg-danger/10 text-danger rounded-xl text-sm border border-danger/20 font-medium">
-            {error}
-          </div>
-        )}
-        
-        <div className="bg-background border border-border/60 rounded-2xl p-4 lg:p-5 flex flex-col gap-4">
-          <div className="flex flex-col gap-1.5">
-            <Label className="text-xs font-semibold text-foreground-subtle">Nama Jadwal <span className="text-danger">*</span></Label>
-            <Input 
-              value={name} 
-              onChange={e => setName(e.target.value)} 
-              placeholder="Cth: Pagi Bekasi-Jakarta" 
-              required 
-            />
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="flex flex-col gap-1.5">
-              <Label className="text-xs font-semibold text-foreground-subtle">Rute (CORE) <span className="text-danger">*</span></Label>
-              <Select value={routeId} onValueChange={setRouteId} required>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Pilih Rute" />
-                </SelectTrigger>
-                <SelectContent>
-                  {availableRoutes.map(r => (
-                    <SelectItem key={r.id} value={r.id}>
-                      {r.name} ({r.origin?.address || '-'} - {r.destination?.address || '-'})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <Label className="text-xs font-semibold text-foreground-subtle">Status <span className="text-danger">*</span></Label>
-              <Select value={status} onValueChange={(v: ScheduleStatus) => setStatus(v)}>
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ACTIVE">ACTIVE</SelectItem>
-                  <SelectItem value="INACTIVE">INACTIVE</SelectItem>
-                  <SelectItem value="SUSPENDED">SUSPENDED</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <Label className="text-xs font-semibold text-foreground-subtle">Hari Operasional <span className="text-danger">*</span></Label>
-            <div className="flex flex-wrap gap-2">
-              {WEEKDAYS.map(day => {
-                const isSelected = activeDays.includes(day.id);
-                return (
-                  <button
-                    key={day.id}
-                    type="button"
-                    onClick={() => toggleDay(day.id)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors border ${
-                      isSelected 
-                        ? 'bg-primary text-primary-foreground border-primary' 
-                        : 'bg-neutral-50 dark:bg-neutral-900 border-border/60 text-muted-foreground hover:border-primary/50'
-                    }`}
-                  >
-                    {day.label}
-                  </button>
-                );
-              })}
-            </div>
-            {activeDays.length === 0 && (
-              <p className="text-[10px] text-danger">Pilih minimal 1 hari operasional</p>
-            )}
-          </div>
+  const SectionCard = ({ title, description, icon: Icon, children, className }: any) => (
+    <div className={cn("bg-white dark:bg-neutral-900 border border-border rounded-xl p-5 shadow-sm h-fit", className)}>
+      <div className="flex items-start gap-3 mb-6">
+        <div className="w-10 h-10 rounded-full bg-danger/10 text-danger flex items-center justify-center shrink-0">
+          <Icon className="w-5 h-5" />
         </div>
+        <div className="flex flex-col gap-0.5 mt-0.5">
+          <h3 className="text-[14px] font-bold text-foreground">{title}</h3>
+          {description && <p className="text-[11px] text-muted-foreground">{description}</p>}
+        </div>
+      </div>
+      <div className="space-y-4">
+        {children}
+      </div>
+    </div>
+  );
 
-        <div className="bg-background border border-border/60 rounded-2xl p-4 lg:p-5 flex flex-col gap-4">
-          <div className="flex justify-between items-center mb-2">
-            <div>
-              <h3 className="text-sm font-bold">Waktu & Armada Keberangkatan</h3>
-              <p className="text-xs text-muted-foreground">Tentukan jam keberangkatan dan tugaskan kendaraan.</p>
+  return (
+    <>
+      <form onSubmit={handleSubmit} className="flex flex-col h-full relative">
+        <div className="flex-1 overflow-auto p-4 md:p-6 pb-28">
+          {error && (
+            <div className="max-w-7xl mx-auto mb-6 p-3 bg-danger/10 text-danger rounded-xl text-sm border border-danger/20 font-medium">
+              {error}
             </div>
-            <Button variant="outline" size="sm" type="button" onClick={handleAddTime} className="h-8">
-              <Plus className="w-3.5 h-3.5 mr-1" /> Tambah Jam
-            </Button>
-          </div>
+          )}
 
-          <div className="flex flex-col gap-4">
-            {times.map((time, idx) => (
-              <div key={time.id} className="p-4 border border-border/60 rounded-xl bg-neutral-50/30 dark:bg-neutral-900/30 relative group">
-                <div className="flex items-start gap-4 flex-col sm:flex-row">
-                  <div className="flex flex-col gap-1.5 w-full sm:w-48 shrink-0">
-                    <Label className="text-[11px] font-semibold text-foreground-subtle uppercase tracking-wider">Jam Keberangkatan</Label>
-                    <div className="relative">
-                      <Input 
-                        type="time" 
-                        value={time.departureTime} 
-                        onChange={e => handleTimeChange(time.id, e.target.value)} 
-                        required 
-                        className="pl-8"
-                      />
-                      <Clock className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                    </div>
+          <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            {/* KOLOM KIRI: Informasi Jadwal */}
+            <div className="lg:col-span-4 flex flex-col gap-6">
+              <SectionCard title="Informasi Jadwal" description="Lengkapi detail identitas jadwal dan rute perjalanan." icon={Calendar}>
+                <div className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-bold text-foreground mb-1 block">Nama Jadwal <span className="text-danger">*</span></label>
+                    <Input 
+                      value={name} 
+                      onChange={e => setName(e.target.value)} 
+                      placeholder="Cth: Jadwal Pagi Bekasi-Jakarta" 
+                      required 
+                      className="h-10 bg-transparent focus-visible:ring-danger"
+                    />
                   </div>
 
-                  <div className="flex flex-col gap-1.5 w-full">
-                    <Label className="text-[11px] font-semibold text-foreground-subtle uppercase tracking-wider">Penugasan Armada (Pilih lebih dari satu)</Label>
-                    <div className="bg-white dark:bg-neutral-950 border border-border rounded-lg p-2 max-h-40 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      {availableVehicles.map(vehicle => {
-                        const isSelected = time.vehicleIds.includes(vehicle.id);
-                        return (
-                          <div 
-                            key={vehicle.id} 
-                            onClick={() => toggleVehicleInTime(time.id, vehicle.id)}
-                            className={`flex items-center gap-2 p-2 rounded-md cursor-pointer text-sm transition-colors border ${
-                              isSelected 
-                                ? 'bg-primary/5 border-primary/20 text-primary-600 dark:text-primary-400 font-medium' 
-                                : 'hover:bg-neutral-50 dark:hover:bg-neutral-800 border-transparent text-neutral-600 dark:text-neutral-400'
-                            }`}
-                          >
-                            <Checkbox 
-                              checked={isSelected}
-                              // Checked event is handled by parent div onClick
-                              onCheckedChange={() => {}}
-                            />
-                            <div className="flex flex-col">
-                              <span>{vehicle.plateNumber}</span>
-                              <span className="text-[10px] text-muted-foreground -mt-0.5">{vehicle.vehicleName || vehicle.vehicleCategory}</span>
-                            </div>
-                          </div>
-                        )
-                      })}
-                      {availableVehicles.length === 0 && (
-                        <div className="col-span-full p-2 text-xs text-muted-foreground text-center">
-                          Tidak ada armada aktif (CORE Vehicle).
-                        </div>
+                  <div className="flex flex-col gap-1.5">
+                    <div className="flex items-center justify-between mb-0.5">
+                      <label className="text-xs font-bold text-foreground block">Rute Perjalanan <span className="text-danger">*</span></label>
+                      {routeId ? (
+                        <a href={`/core/routes?routeId=${routeId}`} className="text-[10px] font-bold text-danger hover:underline flex items-center gap-1" target="_blank" rel="noopener noreferrer">
+                          Lihat Rute <ExternalLink className="w-2.5 h-2.5" />
+                        </a>
+                      ) : (
+                        <a href="/core/routes" className="text-[10px] font-bold text-danger hover:underline flex items-center gap-1" target="_blank" rel="noopener noreferrer">
+                          Kelola Rute <ExternalLink className="w-2.5 h-2.5" />
+                        </a>
                       )}
                     </div>
-                    {time.vehicleIds.length === 0 && (
-                      <p className="text-[10px] text-warning text-amber-600">Jam ini tidak memiliki penugasan kendaraan.</p>
+                    <Select value={routeId} onValueChange={setRouteId} required>
+                      <SelectTrigger className="w-full h-10 bg-transparent focus:ring-danger">
+                        <SelectValue placeholder="Pilih Rute" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {availableRoutes.map(r => (
+                          <SelectItem key={r.id} value={r.id}>
+                            {r.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-bold text-foreground mb-1 block">Status Operasional <span className="text-danger">*</span></label>
+                    <Select value={status} onValueChange={(v: ScheduleStatus) => setStatus(v)}>
+                      <SelectTrigger className="w-full h-10 bg-transparent focus:ring-danger">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="ACTIVE">Aktif (ACTIVE)</SelectItem>
+                        <SelectItem value="INACTIVE">Nonaktif (INACTIVE)</SelectItem>
+                        <SelectItem value="SUSPENDED">Ditangguhkan (SUSPENDED)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="flex flex-col gap-1.5 mt-2">
+                    <label className="text-xs font-bold text-foreground mb-1 block">Hari Operasional <span className="text-danger">*</span></label>
+                    <div className="flex flex-wrap gap-2">
+                      {WEEKDAYS.map(day => {
+                        const isSelected = activeDays.includes(day.id);
+                        return (
+                          <button
+                            key={day.id}
+                            type="button"
+                            onClick={() => toggleDay(day.id)}
+                            className={cn(
+                              "px-4 py-2 rounded-lg text-[11px] font-bold transition-colors border",
+                              isSelected 
+                                ? "bg-danger text-white border-danger shadow-sm" 
+                                : "bg-neutral-50 dark:bg-neutral-800 border-border text-muted-foreground hover:border-danger/50 hover:text-danger"
+                            )}
+                          >
+                            {day.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    {activeDays.length === 0 && (
+                      <p className="text-[10px] text-danger mt-1 font-medium flex items-center gap-1">
+                        <Info className="w-3 h-3" /> Pilih minimal 1 hari operasional
+                      </p>
                     )}
                   </div>
                 </div>
+              </SectionCard>
+            </div>
 
-                {times.length > 1 && (
-                  <button 
-                    type="button"
-                    onClick={() => handleRemoveTime(time.id)}
-                    className="absolute top-2 right-2 p-1.5 text-neutral-400 hover:text-danger hover:bg-danger/10 rounded-md transition-colors"
-                    title="Hapus Waktu Keberangkatan"
+            {/* KOLOM KANAN: Waktu Keberangkatan & Penugasan Armada */}
+            <div className="lg:col-span-8 flex flex-col gap-6">
+              <SectionCard title="Waktu Keberangkatan" description="Tentukan jam-jam keberangkatan dan tugaskan armada untuk setiap jamnya." icon={Clock}>
+                <div className="flex flex-col gap-4">
+                  {times.map((time) => {
+                    const hasVehicles = time.vehicleIds.length > 0;
+                    const assignedVehicles = availableVehicles.filter(v => time.vehicleIds.includes(v.id));
+                    
+                    return (
+                      <div 
+                        key={time.id} 
+                        className="p-4 rounded-xl border border-border bg-neutral-50/50 dark:bg-neutral-900/30 flex flex-col sm:flex-row sm:items-start gap-4 transition-colors hover:border-danger/20 relative"
+                      >
+                        <div className="flex items-center gap-3 shrink-0">
+                          <div className="w-10 h-10 rounded-lg flex items-center justify-center border bg-white dark:bg-neutral-950 border-border text-muted-foreground">
+                            <Clock className="w-4 h-4" />
+                          </div>
+                          <div className="flex flex-col">
+                            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">
+                              Jam Berangkat
+                            </label>
+                            <Input 
+                              type="time" 
+                              value={time.departureTime} 
+                              onChange={e => handleTimeChange(time.id, e.target.value)} 
+                              required 
+                              className="h-8 text-sm font-bold w-28 bg-white dark:bg-neutral-950 focus-visible:ring-danger"
+                            />
+                          </div>
+                        </div>
+                        
+                        <div className="flex-1 flex flex-col gap-2 min-w-0 pt-1">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Armada Ditugaskan</span>
+                            <Button 
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="h-7 text-[11px] px-2.5 bg-white dark:bg-neutral-950 border-danger/30 text-danger hover:bg-danger hover:text-white transition-colors"
+                              onClick={() => openVehicleModal(time.id)}
+                            >
+                              <Bus className="w-3 h-3 mr-1.5" /> Pilih Armada ({time.vehicleIds.length})
+                            </Button>
+                          </div>
+                          
+                          {hasVehicles ? (
+                            <div className="flex flex-wrap gap-1.5 mt-1">
+                              {assignedVehicles.map(v => (
+                                <div key={v.id} className="flex items-center gap-1.5 px-2 py-1 rounded bg-white dark:bg-neutral-950 border border-border text-[11px] font-medium text-foreground">
+                                  <Bus className="w-3 h-3 text-muted-foreground" />
+                                  {v.plateNumber}
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-2 p-2 rounded bg-danger/5 border border-danger/10 text-danger mt-1">
+                              <Info className="w-3.5 h-3.5 shrink-0" />
+                              <span className="text-[11px] font-medium">Belum ada armada ditugaskan untuk jam ini.</span>
+                            </div>
+                          )}
+                        </div>
+
+                        {times.length > 1 && (
+                          <button 
+                            type="button"
+                            onClick={(e) => handleRemoveTime(time.id, e)}
+                            className="absolute top-4 right-4 w-6 h-6 flex items-center justify-center text-neutral-400 hover:text-danger hover:bg-danger/10 rounded-md transition-colors"
+                            title="Hapus Waktu"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
+
+                  <Button 
+                    variant="outline" 
+                    type="button" 
+                    onClick={handleAddTime} 
+                    className="w-full h-12 border-dashed border-2 hover:border-danger/50 hover:bg-danger/5 hover:text-danger mt-1"
                   >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                )}
-              </div>
-            ))}
+                    <Plus className="w-4 h-4 mr-2" /> Tambah Waktu Keberangkatan
+                  </Button>
+                </div>
+              </SectionCard>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-md border-t border-border flex items-center justify-end gap-3 z-50 md:pl-[256px]">
-        <Button variant="outline" onClick={onCancel} type="button" disabled={isSubmitting}>Batal</Button>
-        <Button variant="primary" type="submit" disabled={isSubmitting || activeDays.length === 0 || times.length === 0}>
-          {isSubmitting ? 'Menyimpan...' : (isEdit ? 'Simpan Perubahan' : 'Buat Jadwal')}
-        </Button>
-      </div>
-    </form>
+        {/* Fixed Footer */}
+        <div className="absolute bottom-0 left-0 right-0 p-4 px-4 md:px-8 bg-white dark:bg-neutral-950 border-t border-border shadow-[0_-4px_12px_rgba(0,0,0,0.05)] z-10 flex items-center justify-between">
+          <div className="flex flex-col">
+            <h2 className="text-[14px] font-bold text-foreground">
+              {isEdit ? 'Simpan Perubahan Jadwal' : 'Simpan Jadwal Baru'}
+            </h2>
+            <p className="text-[11px] text-muted-foreground mt-0.5">
+              Pastikan nama, rute, hari, dan penugasan armada sudah benar.
+            </p>
+          </div>
+          <div className="flex gap-3">
+            <Button type="button" variant="outline" className="bg-white dark:bg-neutral-900" onClick={onCancel} disabled={isSubmitting}>
+              Batal
+            </Button>
+            <Button type="button" variant="primary" className="bg-danger hover:bg-danger/90 text-white" onClick={handleSubmit} disabled={isSubmitting || activeDays.length === 0 || times.length === 0}>
+              {isSubmitting ? 'Menyimpan...' : (isEdit ? 'Simpan Perubahan' : 'Buat Jadwal')}
+            </Button>
+          </div>
+        </div>
+      </form>
+
+      {/* Vehicle Selection Modal */}
+      {isVehicleModalOpen && activeTime && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={closeVehicleModal} />
+          <div className="bg-white dark:bg-neutral-900 w-full max-w-lg rounded-2xl shadow-xl flex flex-col relative overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="p-4 md:p-5 border-b border-border flex items-center justify-between bg-neutral-50/50 dark:bg-neutral-950/50">
+              <div className="flex flex-col">
+                <h3 className="text-base font-bold text-foreground flex items-center gap-2">
+                  <Bus className="w-4 h-4 text-danger" /> Penugasan Armada
+                </h3>
+                <p className="text-xs text-muted-foreground mt-1">Pilih armada yang bertugas pada jam <b>{activeTime.departureTime}</b>.</p>
+              </div>
+            </div>
+            
+            <div className="p-4 md:p-5 max-h-[60vh] overflow-y-auto space-y-2 custom-scrollbar">
+              {availableVehicles.map(vehicle => {
+                const isSelected = activeTime.vehicleIds.includes(vehicle.id);
+                return (
+                  <div 
+                    key={vehicle.id} 
+                    onClick={() => toggleVehicleInTime(activeTime.id, vehicle.id)}
+                    className={cn(
+                      "flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all border",
+                      isSelected 
+                        ? "bg-danger/10 border-danger/50 shadow-sm" 
+                        : "bg-white dark:bg-neutral-950 border-border hover:border-danger/30 hover:shadow-sm"
+                    )}
+                  >
+                    <Checkbox 
+                      checked={isSelected}
+                      onCheckedChange={() => {}}
+                      className={isSelected ? "data-[state=checked]:bg-danger data-[state=checked]:border-danger" : ""}
+                    />
+                    <div className="flex flex-col flex-1">
+                      <span className={cn("text-sm font-bold", isSelected ? "text-danger" : "text-foreground")}>
+                        {vehicle.plateNumber}
+                      </span>
+                      <span className="text-[11px] text-muted-foreground font-medium">
+                        {vehicle.brand} {vehicle.vehicleName || vehicle.vehicleCategory}
+                      </span>
+                    </div>
+                    <div className={cn(
+                      "w-8 h-8 rounded-full flex items-center justify-center shrink-0",
+                      isSelected ? "bg-danger/20 text-danger" : "bg-neutral-50 text-neutral-400 dark:bg-neutral-800"
+                    )}>
+                      <Bus className="w-4 h-4" />
+                    </div>
+                  </div>
+                )
+              })}
+              {availableVehicles.length === 0 && (
+                <div className="flex flex-col items-center justify-center py-8 text-center">
+                  <Bus className="w-8 h-8 text-neutral-300 mb-3" />
+                  <p className="text-sm font-medium text-neutral-500">Belum ada armada terdaftar.</p>
+                </div>
+              )}
+            </div>
+
+            <div className="p-4 border-t border-border bg-neutral-50 dark:bg-neutral-950 flex items-center justify-end">
+              <Button type="button" variant="primary" className="bg-danger hover:bg-danger/90 text-white w-full sm:w-auto" onClick={closeVehicleModal}>
+                Selesai Memilih
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

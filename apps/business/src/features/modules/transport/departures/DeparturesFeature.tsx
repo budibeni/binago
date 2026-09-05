@@ -50,7 +50,7 @@ export function DeparturesFeature() {
   };
 
   const handleViewEvents = (id: string) => {
-    router.push(`/modules/transport/checker`);
+    router.push(`/transport/checker`);
   };
 
   const formatTime = (isoStr?: string) => {
@@ -222,7 +222,16 @@ export function DeparturesFeature() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="font-medium text-neutral-900 dark:text-neutral-100">{d.schedule?.name || '-'}</div>
-                      <div className="text-xs text-neutral-500 truncate max-w-[200px]" title={d.route?.name}>{d.route?.name || '-'}</div>
+                      <div 
+                        className="text-xs text-blue-600 dark:text-blue-400 hover:underline cursor-pointer truncate max-w-[200px]" 
+                        title={d.route?.name}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (d.routeId) router.push(`/routes?routeId=${d.routeId}`);
+                        }}
+                      >
+                        {d.route?.name || '-'}
+                      </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="font-mono text-xs">{formatTime(d.scheduledDepartureAt)}</div>

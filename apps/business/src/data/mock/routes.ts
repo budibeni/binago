@@ -1,4 +1,4 @@
-export const mockRoutes = Array.from({ length: 20 }, (_, i) => {
+export const mockRoutes = Array.from({ length: 27 }, (_, i) => {
   const num = (i + 1).toString().padStart(3, '0');
   
   // Create logical pairs of geofences to route between
@@ -23,9 +23,14 @@ export const mockRoutes = Array.from({ length: 20 }, (_, i) => {
     { o: 'geo-001', d: 'geo-017', name: 'Gudang JKT - Gudang Serang' },
     { o: 'geo-017', d: 'geo-018', name: 'Gudang Serang - Pelabuhan Merak' },
     { o: 'geo-017', d: 'geo-019', name: 'Gudang Serang - KI Cilegon' },
-    // Transport Routes
+    // Transport Routes (Passenger Bus)
     { o: 'geo-001', d: 'geo-011', name: 'Terminal Kp. Rambutan - Terminal Leuwipanjang' },
     { o: 'geo-001', d: 'geo-014', name: 'Terminal Pulo Gebang - Terminal Bungurasih' },
+    { o: 'geo-001', d: 'geo-006', name: 'Terminal Blok M - Bandara Soetta' },
+    { o: 'geo-008', d: 'geo-005', name: 'Terminal Bekasi - Terminal Poris Plawad' },
+    { o: 'geo-011', d: 'geo-017', name: 'Terminal Leuwipanjang - Terminal Pakupatan' },
+    { o: 'geo-014', d: 'geo-011', name: 'Terminal Bungurasih - Terminal Cicaheum' },
+    { o: 'geo-017', d: 'geo-006', name: 'Terminal Pakupatan - Bandara Soetta' },
   ];
 
   const pair = routePairs[i % routePairs.length];

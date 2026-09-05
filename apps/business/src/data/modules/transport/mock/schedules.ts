@@ -3,8 +3,8 @@ import type { OperationalSchedule } from '@/features/modules/transport/schedules
 export const mockOperationalSchedules: OperationalSchedule[] = [
   {
     id: 'sch-001',
-    name: 'Jadwal Pagi - Rute Tanjung Priok',
-    routeId: 'route-001',
+    name: 'Jadwal Pagi - Kp. Rambutan ke Leuwipanjang',
+    routeId: 'route-021',
     activeDays: ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY'],
     times: [
       { id: 'st-001-1', departureTime: '06:00', vehicleIds: ['veh-001', 'veh-002'] },
@@ -16,8 +16,8 @@ export const mockOperationalSchedules: OperationalSchedule[] = [
   },
   {
     id: 'sch-002',
-    name: 'Jadwal Sore - Rute Tanjung Priok',
-    routeId: 'route-004',
+    name: 'Jadwal Sore - Kp. Rambutan ke Leuwipanjang',
+    routeId: 'route-021',
     activeDays: ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY'],
     times: [
       { id: 'st-002-1', departureTime: '16:00', vehicleIds: ['veh-005', 'veh-006'] },
@@ -29,8 +29,8 @@ export const mockOperationalSchedules: OperationalSchedule[] = [
   },
   {
     id: 'sch-003',
-    name: 'Shuttle JKT-TGR Pagi',
-    routeId: 'route-005',
+    name: 'Pulo Gebang - Bungurasih Pagi',
+    routeId: 'route-022',
     activeDays: ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'],
     times: [
       { id: 'st-003-1', departureTime: '07:30', vehicleIds: ['veh-008'] }
@@ -41,8 +41,8 @@ export const mockOperationalSchedules: OperationalSchedule[] = [
   },
   {
     id: 'sch-004',
-    name: 'Shuttle JKT-TGR Siang',
-    routeId: 'route-005',
+    name: 'Blok M - Bandara Soetta Siang',
+    routeId: 'route-023',
     activeDays: ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY'],
     times: [
       { id: 'st-004-1', departureTime: '12:00', vehicleIds: ['veh-009'] }
@@ -53,8 +53,8 @@ export const mockOperationalSchedules: OperationalSchedule[] = [
   },
   {
     id: 'sch-005',
-    name: 'Shuttle Bandara',
-    routeId: 'route-006',
+    name: 'Shuttle Bandara (Bekasi - Poris)',
+    routeId: 'route-024',
     activeDays: ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'],
     times: [
       { id: 'st-005-1', departureTime: '05:00', vehicleIds: ['veh-010', 'veh-011'] },
@@ -66,8 +66,8 @@ export const mockOperationalSchedules: OperationalSchedule[] = [
   },
   {
     id: 'sch-006',
-    name: 'Jadwal Malam - BKS',
-    routeId: 'route-009',
+    name: 'Jadwal Malam - Leuwipanjang Pakupatan',
+    routeId: 'route-025',
     activeDays: ['FRIDAY', 'SATURDAY', 'SUNDAY'],
     times: [
       { id: 'st-006-1', departureTime: '20:00', vehicleIds: ['veh-014'] }
@@ -78,8 +78,8 @@ export const mockOperationalSchedules: OperationalSchedule[] = [
   },
   {
     id: 'sch-007',
-    name: 'Charter Weekend BDG',
-    routeId: 'route-012',
+    name: 'Charter Weekend - Pakupatan Soetta',
+    routeId: 'route-027',
     activeDays: ['SATURDAY', 'SUNDAY'],
     times: [
       { id: 'st-007-1', departureTime: '08:00', vehicleIds: ['veh-015'] }

@@ -8,14 +8,19 @@ import { RouteListView } from './components/RouteListView';
 import { RouteEditorView } from './components/RouteEditorView';
 import { getRouteTranslation } from './i18n';
 
+import { useSearchParams } from 'next/navigation';
+
 interface RouteFeatureProps {
   locale?: Locale;
 }
 
 export function RouteFeature({ locale = 'id' }: RouteFeatureProps) {
   const t = getRouteTranslation(locale);
+  const searchParams = useSearchParams();
+  const initialRouteId = searchParams?.get('routeId') || undefined;
+  
   const [routes, setRoutes] = useState<Route[]>(() => routeService.getRoutes());
-  const [selectedRouteId, setSelectedRouteId] = useState<string | undefined>(undefined);
+  const [selectedRouteId, setSelectedRouteId] = useState<string | undefined>(initialRouteId);
   const [isEditing, setIsEditing] = useState(false);
 
   const handleSelectRoute = (id: string | undefined) => {

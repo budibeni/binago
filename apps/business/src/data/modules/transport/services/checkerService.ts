@@ -23,10 +23,10 @@ export const checkerService = {
     // Buses currently at geofence
     const vehiclesAtGeofence = allTracking.filter(t => t.geofenceName === geofence.name);
     
-    // Map to Transport Vehicles and find their active departure
+    // Map to CORE Vehicles and find their active departure
     const result = vehiclesAtGeofence.map(t => {
-      const transportVehicle = vehicleService.getVehicleById(t.id);
-      if (!transportVehicle) return null;
+      const coreVehicle = vehicleService.getVehicleById(t.id);
+      if (!coreVehicle) return null;
 
       const allDepartures = departureService.getDepartures();
       const activeDeparture = allDepartures.find(
@@ -35,7 +35,7 @@ export const checkerService = {
 
       return {
         tracking: t,
-        transportVehicle,
+        coreVehicle,
         activeDeparture
       };
     }).filter(v => v !== null && v.activeDeparture !== undefined);

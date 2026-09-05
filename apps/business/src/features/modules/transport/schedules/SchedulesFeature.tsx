@@ -10,19 +10,19 @@ import { ScheduleForm } from './components/ScheduleForm';
 import { ScheduleDetailDrawer } from './components/ScheduleDetailDrawer';
 import { routeService, vehicleService } from '@/data/services';
 
+import { useRouter } from 'next/navigation';
+
 export function SchedulesFeature() {
   const locale = useBusinessLocale();
+  const router = useRouter();
 
   const [search, setSearch] = React.useState('');
   const [statusFilter, setStatusFilter] = React.useState<ScheduleFilterStatus>('all');
   const [schedules, setSchedules] = React.useState<OperationalSchedule[]>([]);
 
   // Drawer states
-  const [isFormOpen, setIsFormOpen] = React.useState(false);
   const [isDetailOpen, setIsDetailOpen] = React.useState(false);
-  const [editingSchedule, setEditingSchedule] = React.useState<OperationalSchedule | undefined>(undefined);
   const [selectedSchedule, setSelectedSchedule] = React.useState<OperationalSchedule | null>(null);
-  const [formError, setFormError] = React.useState('');
 
   const [availableRoutes, setAvailableRoutes] = React.useState(routeService.getRoutes());
   const [availableVehicles, setAvailableVehicles] = React.useState(vehicleService.getVehicles());
@@ -48,16 +48,12 @@ export function SchedulesFeature() {
   };
 
   const handleCreateNew = () => {
-    setEditingSchedule(undefined);
-    setFormError('');
-    setIsFormOpen(true);
+    router.push('/transport/schedules/create');
   };
 
   const handleEdit = (s: OperationalSchedule) => {
-    setEditingSchedule(s);
-    setFormError('');
     setIsDetailOpen(false);
-    setIsFormOpen(true);
+    router.push(`/transport/schedules/${s.id}/edit`);
   };
 
   const handleDetail = (s: OperationalSchedule) => {
@@ -65,19 +61,7 @@ export function SchedulesFeature() {
     setIsDetailOpen(true);
   };
 
-  const handleSave = (data: any) => {
-    try {
-      if (editingSchedule) {
-        operationalScheduleService.updateSchedule(editingSchedule.id, data);
-      } else {
-        operationalScheduleService.createSchedule(data);
-      }
-      setIsFormOpen(false);
-      setSchedules(operationalScheduleService.getSchedules({ search, status: statusFilter }));
-    } catch (e: any) {
-      setFormError(e.message || 'Terjadi kesalahan saat menyimpan jadwal');
-    }
-  };
+
 
   return (
     <div className="flex h-full flex-col bg-surface overflow-hidden">
@@ -159,7 +143,15 @@ export function SchedulesFeature() {
                   <tr key={s.id} onClick={() => handleDetail(s)} className="border-b border-border hover:bg-neutral-50 dark:hover:bg-neutral-800/50 cursor-pointer">
                     <td className="px-6 py-4 font-medium text-neutral-900 dark:text-neutral-100">{s.name}</td>
                     <td className="px-6 py-4 truncate max-w-[200px]" title={s.route?.name}>
-                      {s.route?.name || <span className="text-red-500 italic">Route tidak ditemukan</span>}
+                      <span 
+                        className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (s.routeId) router.push(`/routes?routeId=${s.routeId}`);
+                        }}
+                      >
+                        {s.route?.name || <span className="text-red-500 italic">Route tidak ditemukan</span>}
+                      </span>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex flex-wrap gap-1">
@@ -196,23 +188,6 @@ export function SchedulesFeature() {
       </div>
 
       {/* Drawers */}
-      {isFormOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white dark:bg-neutral-900 w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-xl shadow-xl flex flex-col">
-            <div className="p-4 border-b border-border sticky top-0 bg-white dark:bg-neutral-900 z-10 flex justify-between items-center">
-              <h2 className="text-lg font-bold">{editingSchedule ? 'Edit Jadwal' : 'Buat Jadwal Baru'}</h2>
-            </div>
-            <ScheduleForm 
-              initialData={editingSchedule}
-              availableRoutes={availableRoutes}
-              availableVehicles={availableVehicles}
-              onCancel={() => setIsFormOpen(false)}
-              onSave={handleSave}
-              error={formError}
-            />
-          </div>
-        </div>
-      )}
 
       <ScheduleDetailDrawer 
         open={isDetailOpen}
