@@ -457,7 +457,7 @@ export function VehicleList({
           const groupCheckState = isGroupIndeterminate ? 'indeterminate' : isGroupChecked;
 
           return (
-            <div key={group.id} role="listitem" className="bg-background border border-border rounded-md shadow-[0_2px_8px_-4px_rgba(0,0,0,0.03)] overflow-hidden">
+            <div key={group.id} role="listitem" className="bg-background border border-border rounded-md overflow-hidden">
               <VehicleGroupHeader
                 group={group}
                 isExpanded={isExpanded}

@@ -158,7 +158,7 @@ export function PlaybackPanel({
 
   return (
     <>
-      <div className={cn('flex items-center w-full h-full px-2 sm:px-4 bg-background shadow-[0_-4px_20px_-5px_rgba(0,0,0,0.05)] transition-all duration-300 overflow-x-auto overflow-y-hidden', className)}>
+      <div className={cn('flex items-center w-full h-full px-2 sm:px-4 bg-background border-t border-border transition-all duration-300 overflow-x-auto overflow-y-hidden', className)}>
 
         {!hasData ? (
           /* ==========================================
@@ -179,7 +179,7 @@ export function PlaybackPanel({
                 {/* Vehicle */}
                 <button
                   type="button"
-                  className="flex items-center justify-between w-[110px] sm:w-[140px] h-8 rounded-md bg-background border border-border px-2 sm:px-2.5 text-[11px] text-foreground focus:outline-none focus:ring-1 focus:ring-danger focus:border-danger disabled:opacity-50 shadow-sm transition-colors hover:bg-surface-elevated shrink-0"
+                  className="flex items-center justify-between w-[110px] sm:w-[140px] h-8 rounded-md bg-background border border-border px-2 sm:px-2.5 text-[11px] text-foreground focus:outline-none focus:ring-1 focus:ring-danger focus:border-danger disabled:opacity-50 transition-colors hover:bg-surface-elevated shrink-0"
                   disabled={isLoading}
                   onClick={() => setIsVehicleDialogOpen(true)}
                 >
@@ -247,7 +247,7 @@ export function PlaybackPanel({
 
             {/* Load Button */}
             <Button
-              className="bg-danger hover:bg-danger/90 text-white font-semibold h-8 px-3 sm:px-4 text-[11px] rounded-lg shadow-sm shadow-danger/20 transition-all shrink-0"
+              className="bg-danger hover:bg-danger/90 text-white font-semibold h-8 px-3 sm:px-4 text-[11px] rounded-lg transition-all shrink-0"
               disabled={!canLoad || isLoading}
               onClick={onLoad}
             >
@@ -284,7 +284,7 @@ export function PlaybackPanel({
 
               <button
                 onClick={isPlaying ? onPause : onPlay}
-                className="flex items-center justify-center h-9 w-9 rounded-full bg-danger hover:bg-red-600 text-white shadow-md shadow-danger/30 hover:scale-105 active:scale-95 transition-all"
+                className="flex items-center justify-center h-9 w-9 rounded-full bg-danger hover:bg-red-600 text-white hover:scale-105 active:scale-95 transition-all"
               >
                 {isPlaying ? <Pause className="h-4 w-4" fill="currentColor" /> : <Play className="h-4 w-4 ml-0.5" fill="currentColor" />}
               </button>

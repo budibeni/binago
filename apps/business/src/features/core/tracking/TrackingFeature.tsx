@@ -8,9 +8,15 @@ import { LiveMap } from './components/live/LiveMap';
 import { PlaybackMap } from './components/playback/PlaybackMap';
 import { PlaybackPanel } from './components/playback/PlaybackPanel';
 import { PlaybackMapLayerPanel } from './components/playback/PlaybackMapLayerPanel';
+import { PlaybackTable } from './components/playback/PlaybackTable';
 import { HeatmapMap } from './components/heatmap/HeatmapMap';
 import { HeatmapPanel } from './components/heatmap/HeatmapPanel';
+import { HeatmapTable } from './components/heatmap/HeatmapTable';
+import { ParkingTable } from './components/parking/ParkingTable';
+import { MileageTable } from './components/mileage/MileageTable';
+import { SpeedTable } from './components/speed/SpeedTable';
 import { VehicleOverviewPanel } from './components/shared/VehicleOverviewPanel';
+import { TableModeSelector } from './components/shared/TableModeSelector';
 import { LiveTable } from './components/live/LiveTable';
 import { TrackingNotificationPanel } from './components/activity/TrackingNotificationPanel';
 import { trackingService } from '@/data/services/trackingService';
@@ -23,7 +29,7 @@ import type { Locale } from '@adatrack/types';
 
 // â"€â"€â"€ Mode â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
-type TrackingMode = 'live' | 'playback' | 'heatmap';
+type TrackingMode = 'live' | 'playback' | 'heatmap' | 'parking' | 'mileage' | 'speed';
 
 // â"€â"€â"€ TrackingFeature â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
@@ -90,6 +96,55 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
     setTimeout(() => {
       setIsGeneratingHeatmap(false);
     }, 1200);
+  }, []);
+
+  // ─── Parking state ──────────────────────────────────────────────────────────
+  const [parkingMinDuration, setParkingMinDuration] = React.useState<number>(15);
+  const [parkingDateRange, setParkingDateRange] = React.useState<DateRange>({
+    startDate: new Date().toISOString().slice(0, 10),
+    startTime: '00:00',
+    endDate: new Date().toISOString().slice(0, 10),
+    endTime: '23:59',
+  });
+  const [isGeneratingParking, setIsGeneratingParking] = React.useState(false);
+
+  const handleGenerateParking = React.useCallback(() => {
+    setIsGeneratingParking(true);
+    setTimeout(() => {
+      setIsGeneratingParking(false);
+    }, 1000);
+  }, []);
+
+  // ─── Mileage state ──────────────────────────────────────────────────────────
+  const [mileageDateRange, setMileageDateRange] = React.useState<DateRange>({
+    startDate: new Date().toISOString().slice(0, 10),
+    startTime: '00:00',
+    endDate: new Date().toISOString().slice(0, 10),
+    endTime: '23:59',
+  });
+  const [isGeneratingMileage, setIsGeneratingMileage] = React.useState(false);
+
+  const handleGenerateMileage = React.useCallback(() => {
+    setIsGeneratingMileage(true);
+    setTimeout(() => {
+      setIsGeneratingMileage(false);
+    }, 1000);
+  }, []);
+
+  // ─── Speed state ────────────────────────────────────────────────────────────
+  const [speedDateRange, setSpeedDateRange] = React.useState<DateRange>({
+    startDate: new Date().toISOString().slice(0, 10),
+    startTime: '00:00',
+    endDate: new Date().toISOString().slice(0, 10),
+    endTime: '23:59',
+  });
+  const [isGeneratingSpeed, setIsGeneratingSpeed] = React.useState(false);
+
+  const handleGenerateSpeed = React.useCallback(() => {
+    setIsGeneratingSpeed(true);
+    setTimeout(() => {
+      setIsGeneratingSpeed(false);
+    }, 1000);
   }, []);
 
   // -- Ref to track pending URL-param auto-load (vehicle id + start datetime) --
@@ -441,11 +496,78 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
 
         {/* View: Table */}
         {view === 'table' && (
-          <LiveTable
-            vehicles={allVehiclesUnfiltered.filter(v => selectedVehicleIds.includes(v.id))}
-            onVehicleSelect={(id) => setSelectedVehicleId(id)}
-            locale={locale}
-          />
+          <div className="flex flex-col flex-1 min-h-0 w-full bg-surface">
+            {mode === 'live' && (
+              <LiveTable
+                modeSelector={<TableModeSelector mode={mode} onModeChange={setMode} locale={locale} />}
+                vehicles={allVehiclesUnfiltered.filter(v => selectedVehicleIds.includes(v.id))}
+                onVehicleSelect={(id) => setSelectedVehicleId(id)}
+                locale={locale}
+              />
+            )}
+            {mode === 'playback' && (
+              <PlaybackTable
+                modeSelector={<TableModeSelector mode={mode} onModeChange={setMode} locale={locale} />}
+                playbackData={playbackData}
+                locale={locale}
+                dateRange={dateRange}
+                onDateRangeChange={setDateRange}
+                selectedVehicleId={playbackVehicleId}
+                onVehicleChange={handlePlaybackVehicleChange}
+                vehicles={trackingService.getLiveVehicles()}
+                onLoad={handleLoadHistory}
+                isLoading={playbackState.status === 'loading'}
+              />
+            )}
+            {mode === 'heatmap' && (
+              <HeatmapTable
+                modeSelector={<TableModeSelector mode={mode} onModeChange={setMode} locale={locale} />}
+                vehicles={allVehiclesUnfiltered.filter(v => selectedVehicleIds.includes(v.id))}
+                locale={locale}
+                dateRange={heatmapDateRange}
+                onDateRangeChange={setHeatmapDateRange}
+                statusFilter={heatmapStatusFilter}
+                onStatusFilterChange={setHeatmapStatusFilter}
+                onGenerate={handleGenerateHeatmap}
+                isGenerating={isGeneratingHeatmap}
+              />
+            )}
+            {mode === 'parking' && (
+              <ParkingTable
+                modeSelector={<TableModeSelector mode={mode} onModeChange={setMode} locale={locale} />}
+                vehicles={allVehiclesUnfiltered.filter(v => selectedVehicleIds.includes(v.id))}
+                locale={locale}
+                dateRange={parkingDateRange}
+                onDateRangeChange={setParkingDateRange}
+                minDuration={parkingMinDuration}
+                onMinDurationChange={setParkingMinDuration}
+                onGenerate={handleGenerateParking}
+                isGenerating={isGeneratingParking}
+              />
+            )}
+            {mode === 'mileage' && (
+              <MileageTable
+                modeSelector={<TableModeSelector mode={mode} onModeChange={setMode} locale={locale} />}
+                vehicles={allVehiclesUnfiltered.filter(v => selectedVehicleIds.includes(v.id))}
+                locale={locale}
+                dateRange={mileageDateRange}
+                onDateRangeChange={setMileageDateRange}
+                onGenerate={handleGenerateMileage}
+                isGenerating={isGeneratingMileage}
+              />
+            )}
+            {mode === 'speed' && (
+              <SpeedTable
+                modeSelector={<TableModeSelector mode={mode} onModeChange={setMode} locale={locale} />}
+                vehicles={allVehiclesUnfiltered.filter(v => selectedVehicleIds.includes(v.id))}
+                locale={locale}
+                dateRange={speedDateRange}
+                onDateRangeChange={setSpeedDateRange}
+                onGenerate={handleGenerateSpeed}
+                isGenerating={isGeneratingSpeed}
+              />
+            )}
+          </div>
         )}
 
         {/* View: Notification */}
@@ -456,10 +578,10 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
           />
         )}
 
-        {/* Mode Toggle (only in map view) */}
+        {/* Mode Toggle (hidden in non-map views) */}
         <div className={cn("absolute top-3 left-3 sm:top-4 sm:left-4 z-20 transition-all duration-500 ease-out", view !== 'map' && 'opacity-0 translate-y-[-10px] pointer-events-none')}>
           <div
-            className="flex items-center rounded-lg sm:rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-0.5 shadow-md gap-0.5"
+            className="flex items-center bg-background rounded-lg border border-border shadow-lg p-0.5 gap-0.5"
             role="tablist"
             aria-label="Mode Pemantauan"
           >
@@ -470,14 +592,14 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
               aria-selected={mode === 'live'}
               onClick={() => setMode('live')}
               className={cn(
-                'flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 text-[11px] sm:text-[12px] font-semibold rounded-md sm:rounded-lg transition-all duration-300 focus:outline-none',
+                'flex items-center justify-center h-7 px-2.5 rounded-md text-[12px] font-medium transition-all gap-1.5',
                 mode === 'live'
-                  ? 'text-foreground bg-neutral-100 dark:bg-neutral-800'
-                  : 'text-neutral-500 hover:text-foreground hover:bg-neutral-50 dark:hover:bg-neutral-800/50',
+                  ? 'bg-accent/10 text-accent'
+                  : 'text-foreground-muted hover:bg-surface hover:text-foreground'
               )}
             >
               {/* Live Dot Icon */}
-              <svg className={cn("h-3.5 w-3.5 shrink-0", mode === 'live' ? "text-danger" : "text-neutral-400")} viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+              <svg className={cn("h-3.5 w-3.5 shrink-0", mode === 'live' ? "text-accent" : "text-foreground-muted")} viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
                 <circle cx="8" cy="8" r="6" fill="currentColor" />
                 <circle cx="8" cy="8" r="2" fill="white" />
               </svg>
@@ -491,13 +613,13 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
               aria-selected={mode === 'playback'}
               onClick={() => setMode('playback')}
               className={cn(
-                'flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 text-[11px] sm:text-[12px] font-semibold rounded-md sm:rounded-lg transition-all duration-300 focus:outline-none',
+                'flex items-center justify-center h-7 px-2.5 rounded-md text-[12px] font-medium transition-all gap-1.5',
                 mode === 'playback'
-                  ? 'text-foreground bg-neutral-100 dark:bg-neutral-800'
-                  : 'text-neutral-500 hover:text-foreground hover:bg-neutral-50 dark:hover:bg-neutral-800/50',
+                  ? 'bg-accent/10 text-accent'
+                  : 'text-foreground-muted hover:bg-surface hover:text-foreground'
               )}
             >
-              <History className={cn("h-3.5 w-3.5 shrink-0", mode === 'playback' ? "text-blue-500" : "text-neutral-400")} aria-hidden="true" strokeWidth={2.5} />
+              <History className={cn("h-3.5 w-3.5 shrink-0", mode === 'playback' ? "text-accent" : "text-foreground-muted")} aria-hidden="true" strokeWidth={2.5} />
               {tTracking.modePlayback}
             </button>
 
@@ -508,20 +630,20 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
               aria-selected={mode === 'heatmap'}
               onClick={() => setMode('heatmap')}
               className={cn(
-                'flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 text-[11px] sm:text-[12px] font-semibold rounded-md sm:rounded-lg transition-all duration-300 focus:outline-none',
+                'flex items-center justify-center h-7 px-2.5 rounded-md text-[12px] font-medium transition-all gap-1.5',
                 mode === 'heatmap'
-                  ? 'text-foreground bg-neutral-100 dark:bg-neutral-800'
-                  : 'text-neutral-500 hover:text-foreground hover:bg-neutral-50 dark:hover:bg-neutral-800/50',
+                  ? 'bg-accent/10 text-accent'
+                  : 'text-foreground-muted hover:bg-surface hover:text-foreground'
               )}
             >
-              <MapPin className={cn("h-3.5 w-3.5 shrink-0", mode === 'heatmap' ? "text-orange-500" : "text-neutral-400")} aria-hidden="true" strokeWidth={2.5} />
+              <MapPin className={cn("h-3.5 w-3.5 shrink-0", mode === 'heatmap' ? "text-accent" : "text-foreground-muted")} aria-hidden="true" strokeWidth={2.5} />
               {tTracking.modeHeatmap}
             </button>
           </div>
         </div>
 
         {/* Wrapper for Map and Playback Sidebar */}
-        <div className="flex-1 flex min-h-0 relative w-full">
+        <div className={cn("flex-1 flex min-h-0 relative w-full", view !== 'map' && 'hidden')}>
           {/* Map Area Wrapper */}
           <div className="flex-1 flex flex-col min-w-0 relative">
             {/* Map Area: Live (always mounted, hidden in playback mode or table view) */}
@@ -561,48 +683,6 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
 
           </div>
 
-          {/* Right Sidebar: Playback Map Layers */}
-          {mode === 'playback' && (
-            <div
-              className={cn(
-                'shrink-0 h-full z-10 transition-all duration-300 ease-in-out flex flex-col',
-                isMapLayerPanelVisible
-                  ? 'w-[320px] border-l border-neutral-200 dark:border-neutral-800 bg-background shadow-[-4px_0_15px_-3px_rgba(0,0,0,0.05)]'
-                  : 'w-[34px] py-2 items-center bg-transparent border-l border-neutral-200 dark:border-neutral-800'
-              )}
-            >
-              {isMapLayerPanelVisible ? (
-                <PlaybackMapLayerPanel
-                  selectedGeofenceIds={selectedGeofenceIds}
-                  selectedRouteIds={selectedRouteIds}
-                  onGeofenceChange={setSelectedGeofenceIds}
-                  onRouteChange={setSelectedRouteIds}
-                  onClose={() => setIsMapLayerPanelVisible(false)}
-                />
-              ) : (
-                <div className="flex flex-col items-center gap-2.5 h-full w-full">
-                  <button
-                    type="button"
-                    onClick={() => setIsMapLayerPanelVisible(true)}
-                    className="flex h-6 w-6 items-center justify-center text-foreground-muted hover:text-foreground transition-colors focus:outline-none shrink-0"
-                    title={tTracking.playbackSelectLayer}
-                  >
-                    <ChevronLeft className="h-3.5 w-3.5" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setIsMapLayerPanelVisible(true)}
-                    className="flex flex-col items-center py-2 px-0.5 text-foreground group shrink-0 transition-opacity hover:opacity-80"
-                    title={tTracking.playbackSelectLayer}
-                  >
-                    <div className="font-bold text-[10px] tracking-[0.2em] text-foreground-muted group-hover:text-foreground uppercase select-none mb-4 mt-2 transition-colors [writing-mode:vertical-rl] rotate-180">
-                      {tTracking.playbackGeofenceRoute}
-                    </div>
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
         </div>
 
         {/* Bottom Playback Panel (Footer) */}
@@ -674,7 +754,12 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
         <div className="shrink-0 flex items-center justify-start border-t border-border bg-surface w-full px-4 h-[34px] z-10">
           <button
             type="button"
-            onClick={() => setView('map')}
+            onClick={() => {
+              setView('map');
+              if (mode === 'parking' || mode === 'mileage' || mode === 'speed') {
+                setMode('live');
+              }
+            }}
             className={cn(
               'px-4 h-full text-xs font-semibold border-b-2 transition-colors focus:outline-none flex items-center gap-1.5 pt-[2px]',
               view === 'map' ? 'border-b-foreground text-foreground' : 'border-b-transparent text-foreground-muted hover:text-foreground'
@@ -685,10 +770,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
           </button>
           <button
             type="button"
-            onClick={() => {
-              setView('table');
-              setMode('live'); // Tabel hanya untuk Live
-            }}
+            onClick={() => setView('table')}
             className={cn(
               'px-4 h-full text-xs font-semibold border-b-2 transition-colors focus:outline-none flex items-center gap-1.5 pt-[2px]',
               view === 'table' ? 'border-b-foreground text-foreground' : 'border-b-transparent text-foreground-muted hover:text-foreground'
@@ -699,10 +781,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
           </button>
           <button
             type="button"
-            onClick={() => {
-              setView('notification');
-              setMode('live');
-            }}
+            onClick={() => setView('notification')}
             className={cn(
               'px-4 h-full text-xs font-semibold border-b-2 transition-colors focus:outline-none flex items-center gap-1.5 pt-[2px]',
               view === 'notification' ? 'border-b-foreground text-foreground' : 'border-b-transparent text-foreground-muted hover:text-foreground'
@@ -714,13 +793,13 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
         </div>
       </div>
 
-      {/* Right Sidebar for Live & Heatmap */}
-      {(mode === 'live' || mode === 'heatmap') && (
+      {/* Right Sidebar for Live, Heatmap, Parking, Mileage & Speed */}
+      {(mode === 'live' || mode === 'heatmap' || mode === 'parking' || mode === 'mileage' || mode === 'speed') && (
         <div
           className={cn(
             'shrink-0 h-full z-10 transition-all duration-300 ease-in-out flex flex-col',
             isVehicleListVisible
-              ? 'w-[320px] border-l border-neutral-200 dark:border-neutral-800 bg-background shadow-[-4px_0_15px_-3px_rgba(0,0,0,0.05)]'
+              ? 'w-[320px] border-l border-neutral-200 dark:border-neutral-800 bg-background'
               : 'w-[34px] py-2 items-center bg-transparent border-l border-neutral-200 dark:border-neutral-800'
           )}
         >
@@ -738,8 +817,8 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
               onSelectAll={handleSelectAll}
               onClose={() => setIsVehicleListVisible(false)}
               labels={vehicleListLabels}
-              hideStatusFilterTabs={mode === 'heatmap'}
-              hideVehicleStatus={mode === 'heatmap'}
+              hideStatusFilterTabs={mode === 'heatmap' || mode === 'parking' || mode === 'mileage' || mode === 'speed'}
+              hideVehicleStatus={mode === 'heatmap' || mode === 'parking' || mode === 'mileage' || mode === 'speed'}
             />
           ) : (
             <div className="flex flex-col items-center gap-2.5 h-full w-full">
@@ -763,6 +842,49 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
                 {/* Vertical Text */}
                 <div className="font-bold text-[10px] tracking-[0.2em] text-foreground-muted group-hover:text-foreground uppercase select-none mb-4 mt-2 transition-colors [writing-mode:vertical-rl] rotate-180">
                   {tTracking.title}
+                </div>
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Right Sidebar for Playback (Geofence & Route) */}
+      {mode === 'playback' && (
+        <div
+          className={cn(
+            'shrink-0 h-full z-10 transition-all duration-300 ease-in-out flex flex-col',
+            isMapLayerPanelVisible
+              ? 'w-[320px] border-l border-neutral-200 dark:border-neutral-800 bg-background shadow-[-4px_0_15px_-3px_rgba(0,0,0,0.05)]'
+              : 'w-[34px] py-2 items-center bg-background border-l border-neutral-200 dark:border-neutral-800'
+          )}
+        >
+          {isMapLayerPanelVisible ? (
+            <PlaybackMapLayerPanel
+              selectedGeofenceIds={selectedGeofenceIds}
+              selectedRouteIds={selectedRouteIds}
+              onGeofenceChange={setSelectedGeofenceIds}
+              onRouteChange={setSelectedRouteIds}
+              onClose={() => setIsMapLayerPanelVisible(false)}
+            />
+          ) : (
+            <div className="flex flex-col items-center gap-2.5 h-full w-full">
+              <button
+                type="button"
+                onClick={() => setIsMapLayerPanelVisible(true)}
+                className="flex h-6 w-6 items-center justify-center text-foreground-muted hover:text-foreground transition-colors focus:outline-none shrink-0"
+                title={tTracking.playbackSelectLayer}
+              >
+                <ChevronLeft className="h-3.5 w-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsMapLayerPanelVisible(true)}
+                className="flex flex-col items-center py-2 px-0.5 text-foreground group shrink-0 transition-opacity hover:opacity-80"
+                title={tTracking.playbackSelectLayer}
+              >
+                <div className="font-bold text-[10px] tracking-[0.2em] text-foreground-muted group-hover:text-foreground uppercase select-none mb-4 mt-2 transition-colors [writing-mode:vertical-rl] rotate-180">
+                  {tTracking.playbackGeofenceRoute}
                 </div>
               </button>
             </div>

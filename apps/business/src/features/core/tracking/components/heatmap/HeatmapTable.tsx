@@ -1,63 +1,36 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { cn } from '@adatrack/utils';
-import type { TrackingVehicle, VehicleStatus } from '../../types/tracking';
 import { getTranslation } from '@/i18n';
-import { MapPin, Search, Link, Download, Maximize, Minimize, RefreshCw } from 'lucide-react';
+import { Search, Download, Maximize, Minimize, Calendar, ChevronDown, RefreshCw } from 'lucide-react';
+import type { TrackingVehicle, DateRange } from '../../types/tracking';
 
-export interface LiveTableProps {
+export interface HeatmapTableProps {
   modeSelector?: React.ReactNode;
   vehicles: TrackingVehicle[];
-  onVehicleSelect: (vehicleId: string) => void;
   locale: 'id' | 'en';
+  dateRange: DateRange;
+  onDateRangeChange: (range: DateRange) => void;
+  statusFilter: 'driving' | 'idle' | 'parking';
+  onStatusFilterChange: (status: 'driving' | 'idle' | 'parking') => void;
+  onGenerate: () => void;
+  isGenerating?: boolean;
 }
 
-function StatusBadge({ status, label }: { status: VehicleStatus; label: string }) {
-  const colorClass =
-    status === 'driving' ? 'bg-emerald-500' :
-      status === 'parking' ? 'bg-blue-500' :
-        status === 'idle' ? 'bg-amber-500' :
-          'bg-neutral-400 dark:bg-neutral-500';
-
-  return (
-    <div className="flex items-center gap-2">
-      <div className={cn("h-2 w-2 rounded-full", colorClass)} />
-      <span className="text-sm font-medium">{label}</span>
-    </div>
-  );
-}
-
-export function LiveTable({ modeSelector, vehicles, onVehicleSelect, locale }: LiveTableProps) {
+export function HeatmapTable({
+  modeSelector,
+  vehicles,
+  locale,
+  dateRange,
+  onDateRangeChange,
+  statusFilter,
+  onStatusFilterChange,
+  onGenerate,
+  isGenerating
+}: HeatmapTableProps) {
   const t = getTranslation(locale);
   const tTracking = t.tracking;
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [isRefreshing, setIsRefreshing] = useState(false);
-
-  const handleRefresh = () => {
-    setIsRefreshing(true);
-    setTimeout(() => setIsRefreshing(false), 500);
-  };
-
-  const getStatusLabel = (status: VehicleStatus) => {
-    switch (status) {
-      case 'driving': return tTracking.statusDriving;
-      case 'idle': return tTracking.statusIdle;
-      case 'parking': return tTracking.statusParking;
-      case 'offline': return tTracking.statusOffline;
-      default: return status;
-    }
-  };
-
-  const formatDate = (isoString: string) => {
-    try {
-      const d = new Date(isoString);
-      return d.toLocaleString(locale === 'id' ? 'id-ID' : 'en-US', {
-        month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit'
-      });
-    } catch {
-      return isoString;
-    }
-  };
 
   const filteredVehicles = vehicles.filter((v) => {
     if (!searchQuery) return true;
@@ -92,14 +65,11 @@ export function LiveTable({ modeSelector, vehicles, onVehicleSelect, locale }: L
 
   const handleExportExcel = () => {
     const headers = [
-      'ID',
+      'No',
+      'Plat Nomor',
       locale === 'en' ? 'Driver' : 'Pengemudi',
-      'Status',
-      locale === 'en' ? 'Share Location' : 'Bagikan Lokasi',
       locale === 'en' ? 'Group' : 'Grup',
-      locale === 'en' ? 'Speed (km/h)' : 'Kecepatan (km/j)',
-      locale === 'en' ? 'Location' : 'Lokasi',
-      tTracking.overviewLastUpdate || (locale === 'en' ? 'Last Update' : 'Update Terakhir')
+      'Tipe Kendaraan',
     ];
 
     const toCsvCell = (val: string | number | boolean) => {
@@ -110,16 +80,13 @@ export function LiveTable({ modeSelector, vehicles, onVehicleSelect, locale }: L
       return str;
     };
 
-    const dataRows = filteredVehicles.map(v => {
+    const dataRows = filteredVehicles.map((v, idx) => {
       return [
+        idx + 1,
         toCsvCell(v.plateNumber),
         toCsvCell(v.driverName || '-'),
-        toCsvCell(getStatusLabel(v.status)),
-        toCsvCell(v.isLocationShared ? (locale === 'en' ? 'Active' : 'Aktif') : '-'),
         toCsvCell(v.groupName),
-        toCsvCell(v.speed),
-        toCsvCell(v.location.address || `${v.location.lat}, ${v.location.lng}`),
-        toCsvCell(formatDate(v.lastUpdate))
+        toCsvCell(v.vehicleType || '-'),
       ].join(',');
     });
 
@@ -128,7 +95,7 @@ export function LiveTable({ modeSelector, vehicles, onVehicleSelect, locale }: L
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `Realtime_Tracking_${new Date().toISOString().slice(0,10)}.csv`;
+    link.download = `Heatmap_Summary_${new Date().toISOString().slice(0,10)}.csv`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -147,18 +114,62 @@ export function LiveTable({ modeSelector, vehicles, onVehicleSelect, locale }: L
             </div>
           )}
 
-          {/* Posisi Kanan: Action Buttons */}
-          <div className="flex flex-wrap items-center justify-start xl:justify-end gap-2 w-full xl:w-auto">
+          {/* Posisi Kanan: Search, Filters & Action Buttons */}
+          <div className="flex flex-wrap items-center justify-start xl:justify-end gap-3 w-full xl:w-auto">
+             {/* Start Date */}
+             <div className="relative w-[120px] shrink-0">
+               <input
+                 type="date"
+                 className="w-full h-8 rounded-md bg-background border border-border hover:border-foreground-muted px-2.5 pr-7 text-[12px] font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50 transition-all [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:w-full cursor-pointer"
+                 value={dateRange.startDate}
+                 onChange={(e) => onDateRangeChange({ ...dateRange, startDate: e.target.value })}
+                 disabled={isGenerating}
+               />
+               <Calendar className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-foreground-muted" />
+             </div>
+
+             <span className="text-foreground-muted text-[11px] font-bold mx-1">-</span>
+
+             {/* End Date */}
+             <div className="relative w-[120px] shrink-0">
+               <input
+                 type="date"
+                 className="w-full h-8 rounded-md bg-background border border-border hover:border-foreground-muted px-2.5 pr-7 text-[12px] font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50 transition-all [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:w-full cursor-pointer"
+                 value={dateRange.endDate}
+                 onChange={(e) => onDateRangeChange({ ...dateRange, endDate: e.target.value })}
+                 disabled={isGenerating}
+               />
+               <Calendar className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-foreground-muted" />
+             </div>
+
+             {/* Status Filter */}
+             <div className="relative w-[100px] shrink-0">
+               <select
+                 value={statusFilter}
+                 onChange={(e) => onStatusFilterChange(e.target.value as any)}
+                 disabled={isGenerating}
+                 className="w-full h-8 rounded-md bg-background border border-border hover:border-foreground-muted px-2.5 text-[12px] font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50 transition-all appearance-none cursor-pointer"
+               >
+                 <option value="driving">{tTracking.statusDriving}</option>
+                 <option value="idle">{tTracking.statusIdle}</option>
+                 <option value="parking">{tTracking.statusParking}</option>
+               </select>
+               <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-foreground-muted" />
+             </div>
+
+             {/* Generate Button */}
              <button
                type="button"
-               onClick={handleRefresh}
-               className="flex items-center justify-center h-8 w-8 shrink-0 rounded-md bg-emerald-500 hover:bg-emerald-600 text-white transition-colors focus:outline-none focus:ring-1 focus:ring-emerald-500"
-               title={locale === 'en' ? 'Refresh Live Data' : 'Perbarui Data Live'}
+               onClick={onGenerate}
+               disabled={!dateRange.startDate || !dateRange.endDate || isGenerating}
+               className="flex items-center justify-center h-8 w-8 shrink-0 rounded-md bg-orange-500 hover:bg-orange-600 text-white disabled:opacity-50 transition-colors focus:outline-none focus:ring-1 focus:ring-orange-500"
+               title={tTracking.heatmapGenerate}
              >
-               <RefreshCw className={cn("h-4 w-4", isRefreshing && "animate-spin")} />
+               <RefreshCw className={cn("h-4 w-4", isGenerating && "animate-spin")} />
              </button>
-          </div>
-      </div>
+
+           </div>
+        </div>
 
       {/* Card 2: Table, Search & Actions */}
       <div className="flex flex-col flex-1 min-h-0 bg-background border border-border rounded-lg overflow-hidden">
@@ -206,75 +217,46 @@ export function LiveTable({ modeSelector, vehicles, onVehicleSelect, locale }: L
           <table className="w-full text-left border-collapse min-w-[900px]">
             <thead className="sticky top-0 bg-neutral-100 dark:bg-neutral-800/80 backdrop-blur-sm border-b border-border z-10">
               <tr>
+                <th className="px-2.5 py-2 text-[12px] font-semibold text-foreground-muted whitespace-nowrap w-16">
+                  No
+                </th>
                 <th className="px-2.5 py-2 text-[12px] font-semibold text-foreground-muted whitespace-nowrap">
                   {locale === 'en' ? 'Vehicle' : 'Armada'}
-                </th>
-                <th className="px-2.5 py-2 text-[12px] font-semibold text-foreground-muted whitespace-nowrap">
-                  Status
-                </th>
-                <th className="px-2.5 py-2 text-[12px] font-semibold text-foreground-muted whitespace-nowrap">
-                  {locale === 'en' ? 'Share Location' : 'Bagikan Lokasi'}
                 </th>
                 <th className="px-2.5 py-2 text-[12px] font-semibold text-foreground-muted whitespace-nowrap">
                   {locale === 'en' ? 'Group' : 'Grup'}
                 </th>
                 <th className="px-2.5 py-2 text-[12px] font-semibold text-foreground-muted whitespace-nowrap">
-                  {locale === 'en' ? 'Speed (km/h)' : 'Kecepatan (km/j)'}
-                </th>
-                <th className="px-2.5 py-2 text-[12px] font-semibold text-foreground-muted whitespace-nowrap">
-                  {locale === 'en' ? 'Location' : 'Lokasi'}
-                </th>
-                <th className="px-2.5 py-2 text-[12px] font-semibold text-foreground-muted whitespace-nowrap">
-                  {tTracking.overviewLastUpdate || (locale === 'en' ? 'Last Update' : 'Update Terakhir')}
+                  {locale === 'en' ? 'Vehicle Type' : 'Tipe Kendaraan'}
                 </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border bg-background">
               {filteredVehicles.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-12 text-center text-foreground-muted text-sm">
+                  <td colSpan={5} className="px-4 py-12 text-center text-foreground-muted text-sm">
                     {searchQuery
                       ? (locale === 'en' ? 'No vehicles match your search.' : 'Tidak ada kendaraan yang cocok dengan pencarian.')
                       : (tTracking.emptyDescription || 'Tidak ada kendaraan.')}
                   </td>
                 </tr>
               ) : (
-                filteredVehicles.map((v) => (
+                filteredVehicles.map((v, idx) => (
                   <tr
                     key={v.id}
-                    onClick={() => onVehicleSelect(v.id)}
-                    className="group hover:bg-neutral-50 dark:hover:bg-neutral-800/50 cursor-pointer transition-colors"
+                    className="group hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors"
                   >
+                    <td className="px-2.5 py-1.5 text-[13px] text-foreground-muted">
+                      {idx + 1}
+                    </td>
                     <td className="px-2.5 py-1.5 text-[13px]">
                       <div className="font-semibold text-foreground">{v.plateNumber}</div>
-                    </td>
-                    <td className="px-2.5 py-1.5 text-[13px]">
-                      <StatusBadge status={v.status} label={getStatusLabel(v.status)} />
-                    </td>
-                    <td className="px-2.5 py-1.5 text-[13px]">
-                      {v.isLocationShared ? (
-                        <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-primary/10 text-primary text-[11px] font-medium border border-primary/20">
-                          <Link className="h-3 w-3" />
-                          <span>{locale === 'en' ? 'Active' : 'Aktif'}</span>
-                        </div>
-                      ) : (
-                        <span className="text-[11px] text-foreground-muted/50">-</span>
-                      )}
                     </td>
                     <td className="px-2.5 py-1.5 text-[13px] text-foreground-muted">
                       {v.groupName}
                     </td>
-                    <td className="px-2.5 py-1.5 text-[13px]">
-                      <div className="font-medium text-foreground">{v.speed}</div>
-                    </td>
-                    <td className="px-2.5 py-1.5 text-[13px] max-w-[200px] truncate" title={v.location.address}>
-                      <div className="flex items-center gap-1.5 text-foreground-muted group-hover:text-foreground transition-colors">
-                        <MapPin className="h-3.5 w-3.5 shrink-0 opacity-70" />
-                        <span className="truncate">{v.location.address || `${v.location.lat.toFixed(4)}, ${v.location.lng.toFixed(4)}`}</span>
-                      </div>
-                    </td>
-                    <td className="px-2.5 py-1.5 text-[12px] text-foreground-muted whitespace-nowrap">
-                      {formatDate(v.lastUpdate)}
+                    <td className="px-2.5 py-1.5 text-[13px] text-foreground-muted">
+                      {v.vehicleType || '-'}
                     </td>
                   </tr>
                 ))

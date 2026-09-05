@@ -39,7 +39,7 @@ export function HeatmapPanel({
 
   return (
     <>
-      <div className={cn('flex items-center w-full h-full px-2 sm:px-4 bg-background shadow-[0_-4px_20px_-5px_rgba(0,0,0,0.05)] transition-all duration-300 overflow-x-auto overflow-y-hidden', className)}>
+      <div className={cn('flex items-center w-full h-full px-2 sm:px-4 bg-background transition-all duration-300 overflow-x-auto overflow-y-hidden border-t border-border', className)}>
         {/* Logo */}
         <div className="flex items-center gap-2 pr-2 sm:pr-3 border-r border-border shrink-0">
           <MapPin className="h-4 w-4 text-danger" strokeWidth={2.5} />
@@ -100,7 +100,7 @@ export function HeatmapPanel({
 
         {/* Generate Button */}
         <Button
-          className="bg-danger hover:bg-danger/90 text-white font-semibold h-8 px-3 sm:px-4 text-[11px] rounded-lg shadow-sm shadow-danger/20 transition-all shrink-0"
+          className="bg-danger hover:bg-danger/90 text-white font-semibold h-8 px-3 sm:px-4 text-[11px] rounded-lg transition-all shrink-0"
           disabled={!canGenerate || isGenerating}
           onClick={onGenerate}
         >
