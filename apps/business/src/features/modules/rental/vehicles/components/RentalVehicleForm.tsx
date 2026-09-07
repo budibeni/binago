@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Button, Input, Label, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Textarea } from '@adatrack/ui';
+import { Button, Input, Label, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Textarea, FormShell } from '@adatrack/ui';
 import { CarFront, FileText, Settings, ShieldCheck, FileSpreadsheet } from 'lucide-react';
 import type { RentalVehicle, RentalVehicleProfile, RentalEquipment, RentalStatus, RentalCondition } from '../types/rentalVehicle';
 import type { Vehicle } from '@/features/core/vehicles/types/vehicle';
@@ -13,6 +13,9 @@ interface RentalVehicleFormProps {
   availableCoreVehicles?: Vehicle[];
   onCancel: () => void;
   onSave: (data: Omit<RentalVehicleProfile, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  mode?: 'page' | 'drawer' | 'dialog';
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 export function RentalVehicleForm({
@@ -22,6 +25,9 @@ export function RentalVehicleForm({
   availableCoreVehicles = [],
   onCancel,
   onSave,
+  mode = 'drawer',
+  open,
+  onOpenChange,
 }: RentalVehicleFormProps) {
   
   const isEdit = !!initialData;
@@ -77,7 +83,19 @@ export function RentalVehicleForm({
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col w-full h-full relative">
-      <div className="w-full max-w-6xl mx-auto p-4 lg:p-6 pb-24 flex flex-col gap-4 lg:gap-5">
+      <FormShell
+        mode={mode}
+        open={open}
+        onOpenChange={onOpenChange}
+        title={title}
+        subtitle="Lengkapi data armada rental Anda"
+        onCancel={onCancel}
+        cancelProps={{ disabled: isSubmitting }}
+        saveText={isSubmitting ? 'Menyimpan...' : 'Simpan'}
+        saveProps={{ disabled: isSubmitting || !vehicleId }}
+        isSubmitting={isSubmitting}
+      >
+        <div className="w-full max-w-6xl mx-auto p-4 lg:p-6 flex flex-col gap-4 lg:gap-5">
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-5 items-start">
           {/* Kolom Kiri */}
@@ -314,23 +332,8 @@ export function RentalVehicleForm({
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Fixed Full-Width Footer */}
-      <div className="fixed bottom-0 left-0 right-0 lg:left-64 z-40 flex items-center justify-between px-4 md:px-6 lg:px-8 py-3.5 bg-background border-t border-border/40 shadow-[0_-4px_12px_rgba(0,0,0,0.02)]">
-        <div className="flex flex-col">
-          <span className="text-sm font-semibold text-foreground">{title}</span>
-          <span className="text-xs text-foreground-subtle mt-0.5">Lengkapi data armada rental Anda</span>
         </div>
-        <div className="flex items-center gap-2">
-          <Button type="button" variant="outline" size="sm" onClick={onCancel} disabled={isSubmitting} className="bg-background">
-            Batal
-          </Button>
-          <Button type="submit" variant="primary" size="sm" className="bg-danger hover:bg-danger/90 text-white min-w-[100px]" disabled={isSubmitting || !vehicleId}>
-            {isSubmitting ? 'Menyimpan...' : 'Simpan'}
-          </Button>
-        </div>
-      </div>
+      </FormShell>
     </form>
   );
 }

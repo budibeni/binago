@@ -283,21 +283,15 @@ export function DeparturesFeature() {
         </div>
       </div>
 
-      {/* Drawers */}
-      {isFormOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white dark:bg-neutral-900 w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl shadow-xl flex flex-col">
-            <div className="p-4 border-b border-border sticky top-0 bg-white dark:bg-neutral-900 z-10 flex justify-between items-center">
-              <h2 className="text-lg font-bold">Generate Keberangkatan Harian</h2>
-            </div>
-            <DepartureForm 
-              onCancel={() => setIsFormOpen(false)}
-              onSave={handleGenerate}
-              error={formError}
-            />
-          </div>
-        </div>
-      )}
+      {/* Form Dialog */}
+      <DepartureForm
+        mode="dialog"
+        open={isFormOpen}
+        onOpenChange={setIsFormOpen}
+        onCancel={() => setIsFormOpen(false)}
+        onSave={handleGenerate}
+        error={formError}
+      />
 
       <DepartureDetailDrawer 
         open={isDetailOpen}

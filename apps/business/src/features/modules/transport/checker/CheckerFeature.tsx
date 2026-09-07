@@ -28,7 +28,7 @@ export function CheckerFeature() {
   
   // Data State
   const [allGeofences, setAllGeofences] = useState<Record<string, any>[]>([]);
-  const [busesAtGeofence, setBusesAtGeofence] = useState<Record<string, any>[]>([]);
+  const [busesAtGeofence, setBusesAtGeofence] = useState<any[]>([]);
   const [activeDepartures, setActiveDepartures] = useState<Departure[]>([]);
   
   // Search State
@@ -254,7 +254,7 @@ export function CheckerFeature() {
                 <h3 className="font-bold text-foreground text-lg mb-1">Keberangkatan di Lokasi</h3>
                 <p className="text-xs text-foreground-muted">Pilih keberangkatan (departure) yang akan Anda periksa.</p>
               </div>
-              {selectedGeofenceId && <Badge variant="secondary">{busesAtGeofence.length} Keberangkatan</Badge>}
+              {selectedGeofenceId && <Badge variant="default">{busesAtGeofence.length} Keberangkatan</Badge>}
             </div>
             
             {!selectedGeofenceId ? (
@@ -276,9 +276,9 @@ export function CheckerFeature() {
                       <div className="flex justify-between items-center mb-3">
                         <div className="flex items-center gap-2">
                           <div className={`w-2 h-2 rounded-full ${isSelected ? 'bg-danger animate-pulse' : 'bg-transparent'}`}></div>
-                          <span className="font-black text-foreground">{bus.coreVehicle?.plateNumber}</span>
+                          <span className="font-black text-foreground">{bus.plateNumber}</span>
                         </div>
-                        <Badge variant="default" className="bg-emerald-500 hover:bg-emerald-600 text-white border-0 shadow-sm text-[10px]">ONGOING</Badge>
+                        <Badge className="bg-emerald-500 hover:bg-emerald-600 text-white border-0 shadow-sm text-[10px]">ONGOING</Badge>
                       </div>
                       
                       <div className="grid grid-cols-2 gap-4 mb-3">
@@ -295,7 +295,7 @@ export function CheckerFeature() {
                       <div className="flex justify-between items-center pt-3 border-t border-border/50">
                         <div className="flex items-baseline gap-1">
                           <span className="text-sm font-bold text-danger">{currentOnboard}</span>
-                          <span className="text-xs text-foreground-muted font-medium">/ {bus.coreVehicle?.passengerCapacity} pnp</span>
+                          <span className="text-xs text-foreground-muted font-medium">/ {bus.passengerCapacity} pnp</span>
                         </div>
                         <ChevronRight className={`w-4 h-4 ${isSelected ? 'text-danger' : 'text-muted-foreground'}`} />
                       </div>
@@ -347,7 +347,7 @@ export function CheckerFeature() {
                     <p className="text-[11px] font-bold text-foreground-muted uppercase tracking-wider mb-2">Departure Dipilih</p>
                     <div className="bg-background border border-border p-4 rounded-xl">
                       <div className="flex justify-between items-center mb-2">
-                        <span className="font-black text-lg text-foreground">{selectedDeparture.vehicle?.coreVehicle?.plateNumber}</span>
+                        <span className="font-black text-lg text-foreground">{selectedDeparture.vehicle?.plateNumber}</span>
                         <Badge className="bg-emerald-500/10 text-emerald-600 border-0">ONGOING</Badge>
                       </div>
                       <p className="text-xs font-medium text-foreground-muted mb-4">{selectedDeparture.route?.name}</p>
@@ -355,7 +355,7 @@ export function CheckerFeature() {
                       <div className="flex items-center gap-3 text-sm">
                         <div className="flex items-center gap-1.5">
                           <Users className="w-4 h-4 text-foreground-muted"/>
-                          <span className="font-bold text-foreground">{passengerEventService.getCurrentOnboard(selectedDeparture.id)} <span className="font-normal text-foreground-muted">/ {selectedDeparture.vehicle?.coreVehicle?.passengerCapacity}</span></span>
+                          <span className="font-bold text-foreground">{passengerEventService.getCurrentOnboard(selectedDeparture.id)} <span className="font-normal text-foreground-muted">/ {selectedDeparture.vehicle?.passengerCapacity}</span></span>
                         </div>
                       </div>
                     </div>
@@ -427,13 +427,13 @@ export function CheckerFeature() {
                     onClick={() => handleSelectDeparture(bus.activeDeparture)}
                   >
                     <div className="flex justify-between items-start mb-2">
-                      <div className="font-black text-base text-foreground">{bus.coreVehicle?.plateNumber}</div>
+                      <div className="font-black text-base text-foreground">{bus.plateNumber}</div>
                       <Badge className="bg-emerald-500/10 text-emerald-600 border-0 text-[10px]">ONGOING</Badge>
                     </div>
                     <div className="text-xs font-medium text-foreground-muted truncate mb-3">{bus.activeDeparture.route?.name}</div>
                     <div className="flex justify-between items-center text-xs">
                       <span className="text-foreground-muted">Onboard:</span>
-                      <span className="font-bold text-foreground">{currentOnboard} <span className="text-foreground-muted font-normal">/ {bus.coreVehicle?.passengerCapacity}</span></span>
+                      <span className="font-bold text-foreground">{currentOnboard} <span className="text-foreground-muted font-normal">/ {bus.passengerCapacity}</span></span>
                     </div>
                   </div>
                 );
@@ -452,7 +452,7 @@ export function CheckerFeature() {
               <div className="grid grid-cols-2 gap-y-6 gap-x-4 mb-6">
                 <div>
                   <p className="text-[11px] font-bold text-foreground-muted uppercase mb-1">Vehicle</p>
-                  <p className="font-black text-foreground">{selectedDeparture?.vehicle?.coreVehicle?.plateNumber}</p>
+                  <p className="font-black text-foreground">{selectedDeparture?.vehicle?.plateNumber}</p>
                 </div>
                 <div>
                   <p className="text-[11px] font-bold text-foreground-muted uppercase mb-1">Route</p>
@@ -464,14 +464,14 @@ export function CheckerFeature() {
                 </div>
                 <div>
                   <p className="text-[11px] font-bold text-foreground-muted uppercase mb-1">Kapasitas</p>
-                  <p className="font-bold text-sm text-foreground"><span className="text-lg">{selectedDeparture?.vehicle?.coreVehicle?.passengerCapacity}</span> penumpang</p>
+                  <p className="font-bold text-sm text-foreground"><span className="text-lg">{selectedDeparture?.vehicle?.passengerCapacity}</span> penumpang</p>
                 </div>
               </div>
 
               <div className="pt-6 border-t border-border">
                 <p className="text-[11px] font-bold text-foreground-muted uppercase mb-2">Onboard Saat Ini</p>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-4xl font-black text-foreground">{passengerEventService.getCurrentOnboard(selectedDeparture?.id)}</span>
+                  <span className="text-4xl font-black text-foreground">{passengerEventService.getCurrentOnboard(selectedDeparture?.id ?? '')}</span>
                   <span className="text-sm font-bold text-foreground-muted">penumpang</span>
                 </div>
               </div>
@@ -667,13 +667,13 @@ export function CheckerFeature() {
                     }}
                   >
                     <div className="flex justify-between items-center mb-1">
-                      <span className="font-black text-sm text-foreground">{dep.vehicle?.coreVehicle?.plateNumber}</span>
+                      <span className="font-black text-sm text-foreground">{dep.vehicle?.plateNumber}</span>
                       {isSelected && <CheckCircle2 className="w-4 h-4 text-emerald-600" />}
                     </div>
                     <p className="text-[11px] font-bold text-foreground-muted mb-3 truncate">{dep.route?.name}</p>
                     <div className="flex justify-between items-center text-xs pt-3 border-t border-border/50">
                       <span className="text-foreground-muted font-medium">Onboard:</span>
-                      <span className="font-bold text-foreground">{currentOnboard} <span className="font-normal text-foreground-muted">/ {dep.vehicle?.coreVehicle?.passengerCapacity}</span></span>
+                      <span className="font-bold text-foreground">{currentOnboard} <span className="font-normal text-foreground-muted">/ {dep.vehicle?.passengerCapacity}</span></span>
                     </div>
                   </div>
                 )
@@ -707,14 +707,14 @@ export function CheckerFeature() {
                   <div>
                     <p className="text-[10px] font-bold text-foreground-muted uppercase tracking-wider mb-1">Departure</p>
                     <div className="flex items-center gap-2 mb-1">
-                       <p className="font-black text-sm text-foreground">{new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})} - {selectedDeparture.vehicle?.coreVehicle?.plateNumber}</p>
+                       <p className="font-black text-sm text-foreground">{new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})} - {selectedDeparture.vehicle?.plateNumber}</p>
                        <Badge className="bg-emerald-500/10 text-emerald-600 border-0 text-[10px]">ONGOING</Badge>
                     </div>
                     
                     <div className="flex gap-6 mt-4">
                       <div>
                         <p className="text-[10px] font-bold text-foreground-muted uppercase tracking-wider mb-1">Vehicle</p>
-                        <p className="font-bold text-sm text-foreground">{selectedDeparture.vehicle?.coreVehicle?.plateNumber}</p>
+                        <p className="font-bold text-sm text-foreground">{selectedDeparture.vehicle?.plateNumber}</p>
                       </div>
                       <div>
                         <p className="text-[10px] font-bold text-foreground-muted uppercase tracking-wider mb-1">Route</p>
@@ -725,7 +725,7 @@ export function CheckerFeature() {
                   
                   <div className="text-right">
                     <p className="text-[10px] font-bold text-foreground-muted uppercase tracking-wider mb-1">Onboard Saat Ini</p>
-                    <p className="text-3xl font-black text-foreground">{passengerEventService.getCurrentOnboard(selectedDeparture.id)} <span className="text-sm text-foreground-muted font-bold">/ {selectedDeparture.vehicle?.coreVehicle?.passengerCapacity}</span></p>
+                    <p className="text-3xl font-black text-foreground">{passengerEventService.getCurrentOnboard(selectedDeparture.id)} <span className="text-sm text-foreground-muted font-bold">/ {selectedDeparture.vehicle?.passengerCapacity}</span></p>
                   </div>
                 </div>
 
@@ -749,8 +749,8 @@ export function CheckerFeature() {
                             <div className={`flex flex-col ${isSelected ? '' : ''}`}>
                               <div className="flex justify-between items-center mb-1">
                                 <span className={`font-bold text-sm ${isSelected ? 'text-emerald-600' : 'text-foreground'}`}>{geo.name}</span>
-                                {isOrigin && <Badge variant="secondary" className="text-[9px] bg-purple-100 text-purple-700 hover:bg-purple-100 border-0">ORIGIN</Badge>}
-                                {isDest && <Badge variant="secondary" className="text-[9px] bg-purple-100 text-purple-700 hover:bg-purple-100 border-0">DESTINATION</Badge>}
+                                {isOrigin && <Badge className="text-[9px] bg-purple-100 text-purple-700 hover:bg-purple-100 border-0">ORIGIN</Badge>}
+                                {isDest && <Badge className="text-[9px] bg-purple-100 text-purple-700 hover:bg-purple-100 border-0">DESTINATION</Badge>}
                                 {isSelected && !isOrigin && !isDest && <MapPin className="w-3.5 h-3.5 text-emerald-500" />}
                               </div>
                               <span className="text-[10px] font-bold text-foreground-muted">Est: 08:{(idx * 15).toString().padStart(2, '0')}</span>

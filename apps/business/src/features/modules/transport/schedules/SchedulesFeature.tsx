@@ -23,6 +23,9 @@ export function SchedulesFeature() {
   // Drawer states
   const [isDetailOpen, setIsDetailOpen] = React.useState(false);
   const [selectedSchedule, setSelectedSchedule] = React.useState<OperationalSchedule | null>(null);
+  
+  const [isCreateOpen, setIsCreateOpen] = React.useState(false);
+  const [editId, setEditId] = React.useState<string | null>(null);
 
   const [availableRoutes, setAvailableRoutes] = React.useState(routeService.getRoutes());
   const [availableVehicles, setAvailableVehicles] = React.useState(vehicleService.getVehicles());
@@ -48,12 +51,12 @@ export function SchedulesFeature() {
   };
 
   const handleCreateNew = () => {
-    router.push('/transport/schedules/create');
+    setIsCreateOpen(true);
   };
 
   const handleEdit = (s: OperationalSchedule) => {
     setIsDetailOpen(false);
-    router.push(`/transport/schedules/${s.id}/edit`);
+    setEditId(s.id);
   };
 
   const handleDetail = (s: OperationalSchedule) => {
@@ -195,6 +198,32 @@ export function SchedulesFeature() {
         data={selectedSchedule}
         onEdit={handleEdit}
       />
+
+      {(isCreateOpen || editId) && (
+        <ScheduleForm
+          open={isCreateOpen || !!editId}
+          onOpenChange={(open) => {
+            if (!open) {
+              setIsCreateOpen(false);
+              setEditId(null);
+            }
+          }}
+          initialData={editId ? baseData.find((s) => s.id === editId) : undefined}
+          availableRoutes={availableRoutes}
+          availableVehicles={availableVehicles}
+          onCancel={() => {
+            setIsCreateOpen(false);
+            setEditId(null);
+          }}
+          onSave={(data) => {
+            // TODO: call service to save
+            setIsCreateOpen(false);
+            setEditId(null);
+            // Refresh data
+            setSchedules(operationalScheduleService.getSchedules({ search, status: statusFilter }));
+          }}
+        />
+      )}
     </div>
   );
 }

@@ -11,7 +11,13 @@ import { rentalCustomerService as customerService } from '@/data/modules/rental/
 import type { Customer } from '@/features/modules/rental/customers/types/customer';
 import type { RentalVehicle } from '@/features/modules/rental/vehicles/types/rentalVehicle';
 
-export function ReservationCreateFeature() {
+interface ReservationCreateFeatureProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSuccess: () => void;
+}
+
+export function ReservationCreateFeature({ open, onOpenChange, onSuccess }: ReservationCreateFeatureProps) {
   const router = useRouter();
   const locale = useBusinessLocale();
   const t = getTranslation(locale);
@@ -112,9 +118,7 @@ export function ReservationCreateFeature() {
       });
 
       alert(labels.createSuccess);
-
-      router.push('/rental/reservations');
-      router.refresh();
+      onSuccess();
 
     } catch (err: any) {
       alert(err.message || 'Terjadi kesalahan saat menyimpan reservasi');
@@ -131,7 +135,10 @@ export function ReservationCreateFeature() {
       vehicles={vehicles}
       labels={labels}
       onSubmit={handleSubmit}
-      onCancel={() => router.push('/rental/reservations')}
+      onCancel={() => onOpenChange(false)}
+      mode="drawer"
+      open={open}
+      onOpenChange={onOpenChange}
       isSubmitting={isSubmitting}
       totalAmount={totalAmount}
       remainingAmount={remainingAmount}

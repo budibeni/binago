@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Button, Input, Label } from '@adatrack/ui';
+import { Button, Input, Label, FormShell } from '@adatrack/ui';
 import { User, Phone, MapPin, Building, FileText, Briefcase, Settings } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import type { Customer, IndividualCustomer, CompanyCustomer } from '../types/customer';
@@ -11,6 +11,9 @@ interface CustomerFormProps {
   onCancel: () => void;
   onSave: (data: any) => void;
   labels: Record<string, string>;
+  mode?: 'page' | 'drawer' | 'dialog';
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 function SectionCard({ title, description, icon: Icon, children, className }: any) {
@@ -37,6 +40,9 @@ export function CustomerForm({
   onCancel,
   onSave,
   labels,
+  mode = 'drawer',
+  open,
+  onOpenChange,
 }: CustomerFormProps) {
   const isEditing = !!customer;
   const [type, setType] = React.useState<'INDIVIDUAL' | 'COMPANY'>('INDIVIDUAL');
@@ -189,8 +195,18 @@ export function CustomerForm({
   };
 
   return (
-    <div className="flex flex-col h-full w-full relative bg-transparent">
-      <div className="flex-1 overflow-y-auto px-4 md:px-8 py-8 pb-28">
+    <FormShell
+      mode={mode}
+      open={open}
+      onOpenChange={onOpenChange}
+      title={isEditing ? labels.actionEdit : labels.addCustomer}
+      subtitle={isEditing ? 'Perbarui informasi detail pelanggan.' : 'Masukkan informasi detail pelanggan baru.'}
+      onCancel={onCancel}
+      cancelText={labels.cancel || 'Batal'}
+      saveText={labels.save || 'Simpan'}
+      saveProps={{ form: 'customer-form' }}
+    >
+      <div className="px-4 md:px-8 py-8">
         <form id="customer-form" onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-6xl mx-auto">
           
           <div className="flex flex-col gap-6">
@@ -379,26 +395,6 @@ export function CustomerForm({
           </div>
         </form>
       </div>
-
-      {/* Fixed Footer */}
-      <div className="absolute bottom-0 left-0 right-0 p-4 px-4 md:px-8 bg-white dark:bg-neutral-950 border-t border-border shadow-[0_-4px_12px_rgba(0,0,0,0.05)] z-10 flex items-center justify-between">
-        <div className="flex flex-col">
-          <h2 className="text-[14px] font-bold text-foreground">
-            {isEditing ? labels.actionEdit : labels.addCustomer}
-          </h2>
-          <p className="text-[11px] text-muted-foreground mt-0.5">
-            {isEditing ? 'Perbarui informasi detail pelanggan.' : 'Masukkan informasi detail pelanggan baru.'}
-          </p>
-        </div>
-        <div className="flex gap-3">
-          <Button type="button" variant="outline" className="bg-white dark:bg-neutral-900" onClick={onCancel}>
-            {labels.cancel || 'Batal'}
-          </Button>
-          <Button type="submit" variant="primary" className="bg-danger hover:bg-danger/90 text-white" form="customer-form">
-            {labels.save || 'Simpan'}
-          </Button>
-        </div>
-      </div>
-    </div>
+    </FormShell>
   );
 }

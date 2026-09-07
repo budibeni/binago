@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { User, Car, Calendar, DollarSign, FileText, ClipboardList } from 'lucide-react';
 import { cn } from '@adatrack/utils';
-import { Button } from '@adatrack/ui';
+import { Button, FormShell } from '@adatrack/ui';
 import type { Customer } from '@/features/modules/rental/customers/types/customer';
 import type { RentalVehicle } from '@/features/modules/rental/vehicles/types/rentalVehicle';
 import type { RateType, RentalType } from '../types/reservation';
@@ -29,6 +29,9 @@ interface ReservationCreateFormProps {
   isSubmitting: boolean;
   totalAmount: number;
   remainingAmount: number;
+  mode?: 'page' | 'drawer' | 'dialog';
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 export function ReservationCreateForm({
@@ -42,6 +45,9 @@ export function ReservationCreateForm({
   isSubmitting,
   totalAmount,
   remainingAmount,
+  mode = 'drawer',
+  open,
+  onOpenChange,
 }: ReservationCreateFormProps) {
 
   const selectedCustomer = useMemo(() => customers.find(c => c.id === formData.customerId), [customers, formData.customerId]);
@@ -69,8 +75,21 @@ export function ReservationCreateForm({
   );
 
   return (
-    <div className="flex flex-col h-full relative">
-      <div className="flex-1 overflow-auto p-6 pb-24">
+    <FormShell
+      mode={mode}
+      open={open}
+      onOpenChange={onOpenChange}
+      title={labels.addReservation || 'Buat Reservasi Baru'}
+      subtitle="Masukkan informasi detail untuk membuat reservasi baru."
+      onCancel={onCancel}
+      cancelProps={{ disabled: isSubmitting }}
+      cancelText={labels.cancel || 'Batal'}
+      onSave={onSubmit}
+      saveText={labels.save || 'Simpan'}
+      saveProps={{ disabled: isSubmitting }}
+      isSubmitting={isSubmitting}
+    >
+      <div className="p-6">
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
           
           {/* 1. INFORMASI PELANGGAN */}
@@ -359,26 +378,6 @@ export function ReservationCreateForm({
 
         </div>
       </div>
-
-      {/* Fixed Footer */}
-      <div className="absolute bottom-0 left-0 right-0 p-4 px-4 md:px-8 bg-white dark:bg-neutral-950 border-t border-border shadow-[0_-4px_12px_rgba(0,0,0,0.05)] z-10 flex items-center justify-between">
-        <div className="flex flex-col">
-          <h2 className="text-[14px] font-bold text-foreground">
-            {labels.addReservation || 'Buat Reservasi Baru'}
-          </h2>
-          <p className="text-[11px] text-muted-foreground mt-0.5">
-            Masukkan informasi detail untuk membuat reservasi baru.
-          </p>
-        </div>
-        <div className="flex gap-3">
-          <Button type="button" variant="outline" className="bg-white dark:bg-neutral-900" onClick={onCancel} disabled={isSubmitting}>
-            {labels.cancel || 'Batal'}
-          </Button>
-          <Button type="button" variant="primary" className="bg-danger hover:bg-danger/90 text-white" onClick={onSubmit} disabled={isSubmitting}>
-            {labels.save || 'Simpan'}
-          </Button>
-        </div>
-      </div>
-    </div>
+    </FormShell>
   );
 }

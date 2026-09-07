@@ -12,6 +12,7 @@ export interface DialogProps {
   description?: string;
   children: React.ReactNode;
   className?: string;
+  hideCloseButton?: boolean;
 }
 
 export const Dialog: React.FC<DialogProps> = ({
@@ -21,6 +22,7 @@ export const Dialog: React.FC<DialogProps> = ({
   description,
   children,
   className,
+  hideCloseButton = false,
 }) => {
   return (
     <RadixDialog.Root open={open} onOpenChange={onOpenChange}>
@@ -50,12 +52,14 @@ export const Dialog: React.FC<DialogProps> = ({
                 </RadixDialog.Description>
               )}
             </div>
-            <RadixDialog.Close
-              className="shrink-0 rounded-md p-1 text-foreground-muted hover:text-foreground hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors focus:outline-none focus:ring-2 focus:ring-neutral-400"
-              aria-label="Tutup dialog"
-            >
-              <X className="h-4 w-4" />
-            </RadixDialog.Close>
+            {!hideCloseButton && (
+              <RadixDialog.Close
+                className="shrink-0 rounded-md p-1 text-foreground-muted hover:text-foreground hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors focus:outline-none focus:ring-2 focus:ring-neutral-400"
+                aria-label="Tutup dialog"
+              >
+                <X className="h-4 w-4" />
+              </RadixDialog.Close>
+            )}
           </div>
           {children}
         </RadixDialog.Content>

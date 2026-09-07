@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Button, Input, Textarea, Label, Checkbox } from '@adatrack/ui';
+import { Button, Input, Textarea, Label, Checkbox, FormShell } from '@adatrack/ui';
 import { Search, User, Car, Calendar, DollarSign, Info } from 'lucide-react';
 import type { Reservation } from '@/features/modules/rental/reservations/types/reservation';
 import type { RentalContract } from '../types/contract';
@@ -13,6 +13,9 @@ interface ContractCreateFormProps {
   onSubmit: (data: Partial<RentalContract>) => Promise<void>;
   onCancel: () => void;
   isSubmitting?: boolean;
+  mode?: 'page' | 'drawer' | 'dialog';
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 export function ContractCreateForm({
@@ -21,6 +24,9 @@ export function ContractCreateForm({
   onSubmit,
   onCancel,
   isSubmitting,
+  mode = 'drawer',
+  open,
+  onOpenChange,
 }: ContractCreateFormProps) {
   const [modalOpen, setModalOpen] = React.useState(false);
   const [selectedRes, setSelectedRes] = React.useState<Reservation | null>(null);
@@ -72,10 +78,21 @@ export function ContractCreateForm({
   };
 
   return (
-    <div className="max-w-5xl mx-auto pb-10">
-      <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-        
-        {/* Reservation Selection Section */}
+    <div className="w-full h-full relative flex flex-col">
+      <form onSubmit={handleSubmit} className="flex-1 min-h-0 flex flex-col">
+        <FormShell
+          mode={mode}
+          open={open}
+          onOpenChange={onOpenChange}
+          title={labels.actionCreate || 'Buat Kontrak Baru'}
+          onCancel={onCancel}
+          cancelProps={{ disabled: isSubmitting }}
+          cancelText={labels.btnCancel || 'Batal'}
+          saveText={isSubmitting ? 'Menyimpan...' : (labels.btnSaveDraft || 'Simpan Draft Kontrak')}
+          saveProps={{ disabled: !agreed || isSubmitting }}
+          isSubmitting={isSubmitting}
+        >
+          <div className="max-w-5xl mx-auto flex flex-col gap-6 p-4 lg:p-6">
         <div className="bg-white dark:bg-neutral-900 border border-border shadow-sm rounded-xl overflow-hidden p-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
@@ -247,18 +264,11 @@ export function ContractCreateForm({
                   </p>
                 </div>
               </div>
-              
-              <div className="flex items-center gap-3 w-full sm:w-auto">
-                <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting} className="flex-1 sm:flex-none">
-                  {labels.btnCancel || 'Batal'}
-                </Button>
-                <Button type="submit" disabled={!agreed || isSubmitting} className="flex-1 sm:flex-none">
-                  {isSubmitting ? 'Menyimpan...' : (labels.btnSaveDraft || 'Simpan Draft Kontrak')}
-                </Button>
-              </div>
             </div>
           </>
         )}
+          </div>
+        </FormShell>
       </form>
 
       <ReservationSelectModal

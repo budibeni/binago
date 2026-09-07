@@ -8,6 +8,7 @@ import { rentalCustomerService } from '@/data/modules/rental';
 import { CustomerTable } from './components/CustomerTable';
 import { CustomerDetailDrawer } from './components/CustomerDetailDrawer';
 import { CustomerDeleteDialog } from './components/CustomerDeleteDialog';
+import { CustomerForm } from './components/CustomerForm';
 import type { Customer, CustomerStatusFilter, CustomerTypeFilter } from './types/customer';
 import type { DataTableFilterConfig } from '@adatrack/ui';
 import { Button } from '@adatrack/ui';
@@ -49,6 +50,9 @@ export function CustomersFeature() {
   const [deleteCustomer, setDeleteCustomer] = React.useState<Customer | null>(null);
   const [deleteOpen, setDeleteOpen] = React.useState(false);
 
+  const [isCreateOpen, setIsCreateOpen] = React.useState(false);
+  const [editId, setEditId] = React.useState<string | null>(null);
+
   // Force re-render on data change
   const [dataVersion, setDataVersion] = React.useState(0);
   const refreshData = () => setDataVersion(v => v + 1);
@@ -69,8 +73,9 @@ export function CustomersFeature() {
   }, []);
 
   const handleEdit = React.useCallback((customer: Customer) => {
-    router.push(`/rental/customers/${customer.id}/edit`);
-  }, [router]);
+    setDrawerOpen(false);
+    setEditId(customer.id);
+  }, []);
 
   const handleDelete = React.useCallback((customer: Customer) => {
     setDeleteCustomer(customer);
@@ -78,7 +83,7 @@ export function CustomersFeature() {
   }, []);
 
   const handleCreateNew = () => {
-    router.push('/rental/customers/create');
+    setIsCreateOpen(true);
   };
 
 
@@ -220,6 +225,31 @@ export function CustomersFeature() {
         onConfirm={handleConfirmDelete}
         labels={tC}
       />
+
+      {(isCreateOpen || editId) && (
+        <CustomerForm
+          mode="drawer"
+          open={isCreateOpen || !!editId}
+          onOpenChange={(open) => {
+            if (!open) {
+              setIsCreateOpen(false);
+              setEditId(null);
+            }
+          }}
+          customer={editId ? filteredCustomers.find((c: any) => c.id === editId) || null : null}
+          labels={tC}
+          onCancel={() => {
+            setIsCreateOpen(false);
+            setEditId(null);
+          }}
+          onSave={(data) => {
+            // TODO: dispatch save logic
+            setIsCreateOpen(false);
+            setEditId(null);
+            refreshData();
+          }}
+        />
+      )}
     </div>
   );
 }

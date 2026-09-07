@@ -6,6 +6,7 @@ import { useBusinessLocale } from '../../../components/BusinessShellLayout';
 import { driverService, vehicleService, groupService } from '@/data/services';
 import { DriverTable } from './components/DriverTable';
 import { DriverDetailDrawer } from './components/DriverDetailDrawer';
+import { DriverForm } from './components/DriverForm';
 import type { Driver, DriverStatusFilter } from './types/driver';
 import { useRouter } from 'next/navigation';
 
@@ -28,6 +29,9 @@ export function DriversFeature() {
 
   const [detailDriver, setDetailDriver] = React.useState<Driver | null>(null);
   const [drawerOpen, setDrawerOpen] = React.useState(false);
+
+  const [isCreateOpen, setIsCreateOpen] = React.useState(false);
+  const [editId, setEditId] = React.useState<string | null>(null);
 
   // --- Filtered Data -----------------------------------------------------------
   const filteredDrivers = React.useMemo(() => {
@@ -61,16 +65,17 @@ export function DriversFeature() {
   }, []);
 
   const handleEdit = React.useCallback((driver: Driver) => {
-    router.push(`/drivers/${driver.id}/edit`);
-  }, [router]);
+    setDrawerOpen(false);
+    setEditId(driver.id);
+  }, []);
 
   const handleDelete = React.useCallback((driver: Driver) => {
     console.log('Delete driver:', driver.id);
   }, []);
 
   const handleAdd = React.useCallback(() => {
-    router.push('/drivers/add');
-  }, [router]);
+    setIsCreateOpen(true);
+  }, []);
 
   // --- Configs -----------------------------------------------------------------
   const tableLabels = React.useMemo(() => ({
@@ -173,6 +178,30 @@ export function DriversFeature() {
         onDelete={() => detailDriver && handleDelete(detailDriver)}
         labels={drawerLabels}
       />
+
+      {(isCreateOpen || editId) && (
+        <DriverForm
+          mode="drawer"
+          open={isCreateOpen || !!editId}
+          onOpenChange={(open) => {
+            if (!open) {
+              setIsCreateOpen(false);
+              setEditId(null);
+            }
+          }}
+          labels={t.drivers[editId ? 'editPage' : 'addPage']}
+          initialData={editId ? driverService.getDriverById(editId) || undefined : undefined}
+          onCancel={() => {
+            setIsCreateOpen(false);
+            setEditId(null);
+          }}
+          onSubmit={(data) => {
+            setIsCreateOpen(false);
+            setEditId(null);
+            // reload data or optimistic update
+          }}
+        />
+      )}
     </div>
   );
 }

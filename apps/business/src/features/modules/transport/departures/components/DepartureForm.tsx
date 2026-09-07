@@ -1,19 +1,25 @@
 'use client';
 
 import React from 'react';
-import { Button, Input, Label } from '@adatrack/ui';
+import { Button, Input, Label, FormShell } from '@adatrack/ui';
 import { Calendar } from 'lucide-react';
 
 interface DepartureFormProps {
   onCancel: () => void;
   onSave: (date: string) => void;
   error?: string;
+  mode?: 'page' | 'drawer' | 'dialog';
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 export function DepartureForm({
   onCancel,
   onSave,
-  error
+  error,
+  mode = 'dialog',
+  open,
+  onOpenChange
 }: DepartureFormProps) {
   const [date, setDate] = React.useState('');
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -31,7 +37,18 @@ export function DepartureForm({
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col w-full h-full relative">
-      <div className="w-full mx-auto p-4 lg:p-6 pb-24 flex flex-col gap-4">
+      <FormShell
+        mode={mode}
+        open={open}
+        onOpenChange={onOpenChange}
+        title="Generate Keberangkatan Harian"
+        onCancel={onCancel}
+        cancelProps={{ disabled: isSubmitting }}
+        saveText={isSubmitting ? 'Memproses...' : 'Generate Keberangkatan'}
+        saveProps={{ disabled: isSubmitting || !date }}
+        isSubmitting={isSubmitting}
+      >
+        <div className="w-full mx-auto p-4 lg:p-6 flex flex-col gap-4">
         {error && (
           <div className="p-3 bg-danger/10 text-danger rounded-xl text-sm border border-danger/20 font-medium">
             {error}
@@ -53,14 +70,8 @@ export function DepartureForm({
             />
           </div>
         </div>
-      </div>
-
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-md border-t border-border flex items-center justify-end gap-3 z-50 md:pl-[256px]">
-        <Button variant="outline" onClick={onCancel} type="button" disabled={isSubmitting}>Batal</Button>
-        <Button variant="primary" type="submit" disabled={isSubmitting || !date}>
-          {isSubmitting ? 'Memproses...' : 'Generate Keberangkatan'}
-        </Button>
-      </div>
+        </div>
+      </FormShell>
     </form>
   );
 }

@@ -12,6 +12,7 @@ import { RentalVehicleTable } from './components/RentalVehicleTable';
 import { RentalVehicleSelectionDialog } from './components/RentalVehicleSelectionDialog';
 import { RentalVehicleDetailDrawer } from './components/RentalVehicleDetailDrawer';
 import { RentalVehicleDisableDialog } from './components/RentalVehicleDisableDialog';
+import { RentalVehicleForm } from './components/RentalVehicleForm';
 import { useRouter } from 'next/navigation';
 import { Card, Input, Button, Checkbox } from '@adatrack/ui';
 import { CarFront, Plus, Search, MapPin, List, CheckCircle2, Calendar, User, Wrench, Ban, RotateCcw, ChevronRight } from 'lucide-react';
@@ -35,6 +36,8 @@ export function RentalVehiclesFeature() {
   const [selectionDialogOpen, setSelectionDialogOpen] = React.useState(false);
   const [detailOpen, setDetailOpen] = React.useState(false);
   const [disableOpen, setDisableOpen] = React.useState(false);
+  
+  const [editId, setEditId] = React.useState<string | null>(null);
   
   const [selectedVehicle, setSelectedVehicle] = React.useState<RentalVehicle | null>(null);
 
@@ -90,11 +93,11 @@ export function RentalVehiclesFeature() {
   };
 
   const handleEditClick = (v: RentalVehicle) => {
-    router.push(`/rental/vehicles/${v.id}/edit`);
+    setEditId(v.id);
   };
 
   const handleCompleteClick = (v: RentalVehicle) => {
-    router.push(`/rental/vehicles/${v.id}/edit`);
+    setEditId(v.id);
   };
 
   const handleViewClick = (v: RentalVehicle) => {
@@ -280,7 +283,8 @@ export function RentalVehiclesFeature() {
         data={selectedVehicle}
         labels={labels}
         onEdit={(v) => {
-          router.push(`/rental/vehicles/${v.id}/edit`);
+          setDetailOpen(false);
+          setEditId(v.id);
         }}
         onDelete={handleDisableClick}
       />
@@ -292,6 +296,25 @@ export function RentalVehiclesFeature() {
         labels={labels}
         onConfirm={handleConfirmDisable}
       />
+
+      {editId && (
+        <RentalVehicleForm
+          mode="drawer"
+          open={!!editId}
+          onOpenChange={(open) => {
+            if (!open) setEditId(null);
+          }}
+          title={labels.actionEdit || 'Edit Armada Rental'}
+          labels={labels}
+          initialData={vehicles.find(v => v.id === editId)}
+          onCancel={() => setEditId(null)}
+          onSave={(data) => {
+            // TODO: dispatch edit save
+            setEditId(null);
+            setDataVersion(prev => prev + 1);
+          }}
+        />
+      )}
     </div>
   );
 }

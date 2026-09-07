@@ -23,3 +23,4 @@ export * from './DataTable';
 export * from './shell';
 export * from './patterns';
 export * from './FavoriteManager';
+export * from './form';

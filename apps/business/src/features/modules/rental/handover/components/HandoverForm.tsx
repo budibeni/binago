@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Input, Button, Checkbox, Textarea, Label } from '@adatrack/ui';
+import { Card, Input, Button, Checkbox, Textarea, Label, FormShell } from '@adatrack/ui';
 import { MapPin, Car, Fuel, Wrench, CheckSquare, Clock } from 'lucide-react';
 import type { RentalContract } from '../../contracts/types/contract';
 import type { RentalHandover } from '../types/handover';
@@ -10,9 +10,12 @@ interface HandoverFormProps {
   onSubmit: (data: Omit<RentalHandover, 'id' | 'createdAt' | 'updatedAt'>) => void;
   onCancel: () => void;
   isSubmitting: boolean;
+  mode?: 'page' | 'drawer' | 'dialog';
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export function HandoverForm({ contract, labels, onSubmit, onCancel, isSubmitting }: HandoverFormProps) {
+export function HandoverForm({ contract, labels, onSubmit, onCancel, isSubmitting, mode = 'drawer', open, onOpenChange }: HandoverFormProps) {
   const [latitude, setLatitude] = React.useState<number | null>(null);
   const [longitude, setLongitude] = React.useState<number | null>(null);
   const [address, setAddress] = React.useState('');
@@ -83,7 +86,19 @@ export function HandoverForm({ contract, labels, onSubmit, onCancel, isSubmittin
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 pb-20">
+    <form onSubmit={handleSubmit} className="w-full h-full relative">
+      <FormShell
+        mode={mode}
+        open={open}
+        onOpenChange={onOpenChange}
+        onCancel={onCancel}
+        cancelProps={{ disabled: isSubmitting }}
+        cancelText={labels.btnCancel}
+        saveText={isSubmitting ? 'Menyimpan...' : labels.btnSave}
+        saveProps={{ disabled: isSubmitting }}
+        isSubmitting={isSubmitting}
+      >
+        <div className="space-y-6">
       
       {/* Contract & Vehicle Info */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -291,14 +306,8 @@ export function HandoverForm({ contract, labels, onSubmit, onCancel, isSubmittin
         </div>
       </Card>
 
-      <div className="flex items-center justify-end gap-3 pt-4 border-t border-border">
-        <Button type="button" variant="outline" onClick={onCancel}>
-          {labels.btnCancel}
-        </Button>
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? 'Menyimpan...' : labels.btnSave}
-        </Button>
-      </div>
+        </div>
+      </FormShell>
     </form>
   );
 }

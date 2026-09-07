@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Button, Input, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Checkbox } from '@adatrack/ui';
+import { Button, Input, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Checkbox, FormShell } from '@adatrack/ui';
 import { Clock, Plus, Trash2, Calendar, Bus, Info, ExternalLink } from 'lucide-react';
 import type { OperationalSchedule, ScheduleStatus, DayOfWeek, ScheduleTime } from '../types/schedule';
 import type { Route } from '@/features/core/routes/types';
@@ -15,6 +15,9 @@ interface ScheduleFormProps {
   onCancel: () => void;
   onSave: (data: Omit<OperationalSchedule, 'id' | 'route'>) => void;
   error?: string;
+  mode?: 'page' | 'drawer' | 'dialog';
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 const WEEKDAYS: { id: DayOfWeek; label: string }[] = [
@@ -33,7 +36,10 @@ export function ScheduleForm({
   availableVehicles,
   onCancel,
   onSave,
-  error
+  error,
+  mode = 'drawer',
+  open,
+  onOpenChange,
 }: ScheduleFormProps) {
   const isEdit = !!initialData;
   const [name, setName] = useState(initialData?.name || '');
@@ -93,8 +99,8 @@ export function ScheduleForm({
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (!name || !routeId || activeDays.length === 0 || times.length === 0) return;
     for (const time of times) {
       if (!time.departureTime) return;
@@ -133,8 +139,21 @@ export function ScheduleForm({
 
   return (
     <>
-      <form onSubmit={handleSubmit} className="flex flex-col h-full relative">
-        <div className="flex-1 overflow-auto p-4 md:p-6 pb-28">
+      <FormShell
+        mode={mode}
+        open={open}
+        onOpenChange={onOpenChange}
+        title={isEdit ? 'Simpan Perubahan Jadwal' : 'Simpan Jadwal Baru'}
+        subtitle="Pastikan nama, rute, hari, dan penugasan armada sudah benar."
+        onCancel={onCancel}
+        cancelProps={{ disabled: isSubmitting }}
+        onSave={() => handleSubmit()}
+        saveText={isSubmitting ? 'Menyimpan...' : (isEdit ? 'Simpan Perubahan' : 'Buat Jadwal')}
+        saveProps={{ disabled: isSubmitting || activeDays.length === 0 || times.length === 0, form: 'schedule-form' }}
+        isSubmitting={isSubmitting}
+      >
+        <div className="p-4 md:p-6">
+          <form id="schedule-form" onSubmit={handleSubmit} className="flex flex-col relative">
           {error && (
             <div className="max-w-7xl mx-auto mb-6 p-3 bg-danger/10 text-danger rounded-xl text-sm border border-danger/20 font-medium">
               {error}
@@ -319,28 +338,9 @@ export function ScheduleForm({
               </SectionCard>
             </div>
           </div>
+          </form>
         </div>
-
-        {/* Fixed Footer */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 px-4 md:px-8 bg-white dark:bg-neutral-950 border-t border-border shadow-[0_-4px_12px_rgba(0,0,0,0.05)] z-10 flex items-center justify-between">
-          <div className="flex flex-col">
-            <h2 className="text-[14px] font-bold text-foreground">
-              {isEdit ? 'Simpan Perubahan Jadwal' : 'Simpan Jadwal Baru'}
-            </h2>
-            <p className="text-[11px] text-muted-foreground mt-0.5">
-              Pastikan nama, rute, hari, dan penugasan armada sudah benar.
-            </p>
-          </div>
-          <div className="flex gap-3">
-            <Button type="button" variant="outline" className="bg-white dark:bg-neutral-900" onClick={onCancel} disabled={isSubmitting}>
-              Batal
-            </Button>
-            <Button type="button" variant="primary" className="bg-danger hover:bg-danger/90 text-white" onClick={handleSubmit} disabled={isSubmitting || activeDays.length === 0 || times.length === 0}>
-              {isSubmitting ? 'Menyimpan...' : (isEdit ? 'Simpan Perubahan' : 'Buat Jadwal')}
-            </Button>
-          </div>
-        </div>
-      </form>
+      </FormShell>
 
       {/* Vehicle Selection Modal */}
       {isVehicleModalOpen && activeTime && (

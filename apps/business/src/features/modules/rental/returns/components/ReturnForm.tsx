@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Card, Input, Button, Checkbox, Textarea, Label } from '@adatrack/ui';
+import { Card, Input, Button, Checkbox, Textarea, Label, FormShell } from '@adatrack/ui';
 import { MapPin, Car, Gauge, Fuel, CheckSquare, AlertTriangle, DollarSign, Clock } from 'lucide-react';
 import type { RentalContract } from '../../contracts/types/contract';
 import type { RentalHandover } from '../../handover/types/handover';
@@ -13,6 +13,9 @@ interface ReturnFormProps {
   onSubmit: (data: Omit<RentalReturn, 'id' | 'createdAt' | 'updatedAt'>) => void;
   onCancel: () => void;
   isSubmitting: boolean;
+  mode?: 'page' | 'drawer' | 'dialog';
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 const FUEL_LEVELS: RentalHandover['fuelLevel'][] = ['EMPTY', 'QUARTER', 'HALF', 'THREE_QUARTER', 'FULL'];
@@ -34,7 +37,7 @@ const getConditionLabel = (c: string) => {
 const formatDate = (d: string) =>
   new Date(d).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
 
-export function ReturnForm({ contract, handover, onSubmit, onCancel, isSubmitting }: ReturnFormProps) {
+export function ReturnForm({ contract, handover, onSubmit, onCancel, isSubmitting, mode = 'drawer', open, onOpenChange }: ReturnFormProps) {
   const [returnedAt, setReturnedAt] = React.useState(
     new Date().toISOString().slice(0, 16)
   );
@@ -137,7 +140,18 @@ export function ReturnForm({ contract, handover, onSubmit, onCancel, isSubmittin
   const coreVehicle = contract.vehicle?.coreVehicle;
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 pb-20">
+    <form onSubmit={handleSubmit} className="w-full h-full relative">
+      <FormShell
+        mode={mode}
+        open={open}
+        onOpenChange={onOpenChange}
+        onCancel={onCancel}
+        cancelProps={{ disabled: isSubmitting }}
+        saveText={isSubmitting ? 'Menyimpan...' : 'Simpan Pengembalian'}
+        saveProps={{ disabled: isSubmitting || !!odometerError }}
+        isSubmitting={isSubmitting}
+      >
+        <div className="space-y-6">
 
       {/* SECTION 1: Contract Info */}
       <Card className="bg-white dark:bg-neutral-900 border-border shadow-sm">
@@ -515,16 +529,8 @@ export function ReturnForm({ contract, handover, onSubmit, onCancel, isSubmittin
           />
         </div>
       </Card>
-
-      {/* Actions */}
-      <div className="flex items-center justify-end gap-3 pt-4 border-t border-border">
-        <Button type="button" variant="outline" onClick={onCancel}>
-          Batal
-        </Button>
-        <Button type="submit" disabled={isSubmitting || !!odometerError}>
-          {isSubmitting ? 'Menyimpan...' : 'Simpan Pengembalian'}
-        </Button>
-      </div>
+        </div>
+      </FormShell>
     </form>
   );
 }

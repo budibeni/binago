@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Button, Input, Textarea, Label } from '@adatrack/ui';
+import { Button, Input, Textarea, Label, FormShell } from '@adatrack/ui';
 import { User, Car, Calendar, DollarSign, Info } from 'lucide-react';
 import type { RentalContract } from '../types/contract';
 
@@ -11,6 +11,9 @@ interface ContractEditFormProps {
   onSubmit: (data: Partial<RentalContract>) => Promise<void>;
   onCancel: () => void;
   isSubmitting?: boolean;
+  mode?: 'page' | 'drawer' | 'dialog';
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 export function ContractEditForm({
@@ -19,6 +22,9 @@ export function ContractEditForm({
   onSubmit,
   onCancel,
   isSubmitting,
+  mode = 'drawer',
+  open,
+  onOpenChange,
 }: ContractEditFormProps) {
   // Editable fields
   const [contractDate, setContractDate] = React.useState<string>(contract.contractDate.slice(0, 16));
@@ -49,7 +55,18 @@ export function ContractEditForm({
   const res = contract.reservation;
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 pb-20">
+    <form onSubmit={handleSubmit} className="w-full h-full flex flex-col relative">
+      <FormShell
+        mode={mode}
+        open={open}
+        onOpenChange={onOpenChange}
+        onCancel={onCancel}
+        cancelProps={{ disabled: isSubmitting }}
+        saveText={isSubmitting ? 'Menyimpan...' : 'Simpan Perubahan'}
+        saveProps={{ disabled: isSubmitting }}
+        isSubmitting={isSubmitting}
+      >
+        <div className="space-y-6">
       
       {/* 1. INFORMASI RESERVASI & PELANGGAN (READONLY) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -204,20 +221,10 @@ export function ContractEditForm({
               Syarat dan ketentuan ini akan dicetak pada dokumen kontrak.
             </p>
           </div>
+          </div>
         </div>
-      </div>
-
-      {/* Sticky Action Bar */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t border-border shadow-lg flex justify-end gap-3 z-40">
-        <div className="max-w-5xl mx-auto w-full flex justify-end gap-3">
-          <Button type="button" variant="outline" onClick={onCancel}>
-            Batal
-          </Button>
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? 'Menyimpan...' : 'Simpan Perubahan'}
-          </Button>
         </div>
-      </div>
+      </FormShell>
     </form>
   );
 }

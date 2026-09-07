@@ -9,6 +9,7 @@ import { reservationService } from '@/data/modules/rental/services/reservationSe
 import type { Reservation, ReservationStatusFilter } from './types/reservation';
 import { ReservationList } from './components/ReservationList';
 import { ReservationDetailDrawer } from './components/ReservationDetailDrawer';
+import { ReservationCreateFeature } from './ReservationCreateFeature';
 import { cn } from '@adatrack/utils';
 import { trackingNavigationService } from '@/features/core/tracking/services/trackingNavigationService';
 
@@ -28,6 +29,8 @@ export function ReservationsFeature() {
   // Modals
   const [detailReservation, setDetailReservation] = useState<Reservation | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -234,7 +237,7 @@ export function ReservationsFeature() {
             labels={labels}
             searchValue={search}
             onSearchChange={setSearch}
-            onAdd={() => router.push('/rental/reservations/create')}
+            onAdd={() => setIsCreateOpen(true)}
             onView={handleView}
             onEdit={handleEdit}
             onOpenMap={handleOpenMap}
@@ -251,6 +254,16 @@ export function ReservationsFeature() {
         onEdit={handleEdit}
         onDelete={handleDelete}
         onConfirm={handleConfirm}
+      />
+
+      <ReservationCreateFeature
+        open={isCreateOpen}
+        onOpenChange={setIsCreateOpen}
+        onSuccess={async () => {
+          setIsCreateOpen(false);
+          const newData = await reservationService.getReservations();
+          setReservations(newData);
+        }}
       />
     </div>
   );

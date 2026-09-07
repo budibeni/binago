@@ -9,6 +9,10 @@ import { contractService } from '@/data/modules/rental/services/contractService'
 import type { RentalContract, ContractStatusFilter } from './types/contract';
 import { ContractList } from './components/ContractList';
 import { ContractDetailDrawer } from './components/ContractDetailDrawer';
+import { ContractCreateFeature } from './ContractCreateFeature';
+import { ContractEditFeature } from './ContractEditFeature';
+import { HandoverFeature } from '../handover/HandoverFeature';
+import { ReturnFeature } from '../returns/ReturnFeature';
 import { cn } from '@adatrack/utils';
 
 export function ContractsFeature() {
@@ -23,8 +27,13 @@ export function ContractsFeature() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<ContractStatusFilter>('all');
   
-  const [selectedContract, setSelectedContract] = useState<RentalContract | null>(null);
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [selectedContract, setSelectedContract] = React.useState<RentalContract | null>(null);
+  const [drawerOpen, setDrawerOpen] = React.useState(false);
+
+  const [isCreateOpen, setIsCreateOpen] = React.useState(false);
+  const [editId, setEditId] = React.useState<string | null>(null);
+  const [handoverId, setHandoverId] = React.useState<string | null>(null);
+  const [returnId, setReturnId] = React.useState<string | null>(null);
 
   const fetchContracts = React.useCallback(async () => {
     setLoading(true);
@@ -63,11 +72,12 @@ export function ContractsFeature() {
   };
 
   const handleAdd = () => {
-    router.push('/rental/contracts/create');
+    setIsCreateOpen(true);
   };
 
   const handleEdit = (c: RentalContract) => {
-    router.push(`/rental/contracts/${c.id}/edit`);
+    setDrawerOpen(false);
+    setEditId(c.id);
   };
 
   const handlePrint = (c: RentalContract) => {
@@ -97,11 +107,13 @@ export function ContractsFeature() {
   };
 
   const handleHandover = (c: RentalContract) => {
-    router.push(`/rental/contracts/${c.id}/handover`);
+    setDrawerOpen(false);
+    setHandoverId(c.id);
   };
 
   const handleReturn = (c: RentalContract) => {
-    router.push(`/rental/contracts/${c.id}/return`);
+    setDrawerOpen(false);
+    setReturnId(c.id);
   };
 
   return (
@@ -248,6 +260,51 @@ export function ContractsFeature() {
         onCancel={handleCancel}
         onHandover={handleHandover}
         onReturn={handleReturn}
+      />
+
+      <ContractCreateFeature
+        open={isCreateOpen}
+        onOpenChange={setIsCreateOpen}
+        onSuccess={() => {
+          setIsCreateOpen(false);
+          fetchContracts();
+        }}
+      />
+
+      <ContractEditFeature
+        contractId={editId}
+        open={!!editId}
+        onOpenChange={(open) => {
+          if (!open) setEditId(null);
+        }}
+        onSuccess={() => {
+          setEditId(null);
+          fetchContracts();
+        }}
+      />
+
+      <HandoverFeature
+        contractId={handoverId}
+        open={!!handoverId}
+        onOpenChange={(open) => {
+          if (!open) setHandoverId(null);
+        }}
+        onSuccess={() => {
+          setHandoverId(null);
+          fetchContracts();
+        }}
+      />
+
+      <ReturnFeature
+        contractId={returnId}
+        open={!!returnId}
+        onOpenChange={(open) => {
+          if (!open) setReturnId(null);
+        }}
+        onSuccess={() => {
+          setReturnId(null);
+          fetchContracts();
+        }}
       />
     </div>
     </div>

@@ -38,6 +38,7 @@ export interface Vehicle {
   nextServiceKm: number;      // km servis berikutnya
   lastUpdate: string;         // ISO 8601
   registrationExpiry: string; // ISO date YYYY-MM-DD
+  passengerCapacity?: number;
   notes?: string;
 }
 
