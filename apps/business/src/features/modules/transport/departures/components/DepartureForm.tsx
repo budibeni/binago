@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Button, Input, Label, FormShell, FormCard } from '@adatrack/ui';
+import { Button, FormShell, FormCard, InputDate } from '@adatrack/ui';
 import { Calendar } from 'lucide-react';
 
 interface DepartureFormProps {
@@ -62,11 +62,11 @@ export function DepartureForm({
         >
 
           <div className="flex flex-col gap-1.5">
-            <Label className="text-xs font-semibold text-foreground-subtle">Pilih Tanggal <span className="text-danger">*</span></Label>
-            <Input 
-              type="date" 
+            <InputDate 
+              id="date"
+              label="Pilih Tanggal"
               value={date} 
-              onChange={e => setDate(e.target.value)} 
+              onChange={setDate} 
               required 
             />
           </div>

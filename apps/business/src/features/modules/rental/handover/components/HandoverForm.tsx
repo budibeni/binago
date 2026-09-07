@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Input, Button, Checkbox, Textarea, Label, FormShell, FormCard } from '@adatrack/ui';
+import { Card, Button, Checkbox, FormShell, FormCard, InputString, InputNumber, InputTextarea, Label } from '@adatrack/ui';
 import { MapPin, Car, Fuel, Wrench, CheckSquare, Clock } from 'lucide-react';
 import type { RentalContract } from '../../contracts/types/contract';
 import type { RentalHandover } from '../types/handover';
@@ -139,22 +139,26 @@ export function HandoverForm({ contract, labels, onSubmit, onCancel, isSubmittin
           </Button>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <Label className="text-[11px] uppercase font-semibold text-muted-foreground">{labels.latitude}</Label>
-              <Input 
-                value={latitude || ''} 
-                readOnly 
-                className="bg-neutral-100" 
-                placeholder="-" 
+            <div>
+              <InputString
+                id="latitude"
+                label={labels.latitude}
+                value={latitude !== null ? String(latitude) : ''}
+                onChange={() => {}}
+                readOnly
+                placeholder="-"
+                className="bg-neutral-100"
               />
             </div>
-            <div className="space-y-1">
-              <Label className="text-[11px] uppercase font-semibold text-muted-foreground">{labels.longitude}</Label>
-              <Input 
-                value={longitude || ''} 
-                readOnly 
-                className="bg-neutral-100" 
-                placeholder="-" 
+            <div>
+              <InputString
+                id="longitude"
+                label={labels.longitude}
+                value={longitude !== null ? String(longitude) : ''}
+                onChange={() => {}}
+                readOnly
+                placeholder="-"
+                className="bg-neutral-100"
               />
             </div>
           </div>
@@ -168,24 +172,17 @@ export function HandoverForm({ contract, labels, onSubmit, onCancel, isSubmittin
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             
             {/* Odometer */}
-            <div className="space-y-3">
-              <Label className="text-[11px] uppercase font-semibold text-muted-foreground">{labels.startOdometer} (KM)</Label>
-              <Input 
-                type="number"
-                min={defaultOdometer}
+            <div>
+              <InputNumber
+                id="odometer"
+                label={`${labels.startOdometer} (KM)`}
                 value={odometer}
-                onChange={(e) => {
-                  setOdometer(Number(e.target.value));
-                  setOdometerSource('MANUAL');
-                }}
-                className={odometerSource === 'VEHICLE' ? "bg-neutral-100" : ""}
+                onChange={(val) => { setOdometer(val || 0); setOdometerSource('MANUAL'); }}
+                min={defaultOdometer}
                 required
+                className={odometerSource === 'VEHICLE' ? "bg-neutral-100" : ""}
+                helpText={odometerSource === 'VEHICLE' ? 'Odometer dibaca otomatis dari data kendaraan terakhir. Anda dapat menyesuaikannya jika diperlukan.' : undefined}
               />
-              {odometerSource === 'VEHICLE' && (
-                <p className="text-xs text-muted-foreground">
-                  Odometer dibaca otomatis dari data kendaraan terakhir. Anda dapat menyesuaikannya jika diperlukan.
-                </p>
-              )}
             </div>
 
             {/* BBM */}
@@ -262,9 +259,10 @@ export function HandoverForm({ contract, labels, onSubmit, onCancel, isSubmittin
 
       {/* Notes */}
       <FormCard title={labels.sectionNotes}>
-          <Textarea 
+          <InputTextarea
+            id="notes"
             value={notes}
-            onChange={(e) => setNotes(e.target.value)}
+            onChange={setNotes}
             placeholder="Catatan tambahan terkait serah terima (Opsional)"
             className="min-h-[100px]"
           />

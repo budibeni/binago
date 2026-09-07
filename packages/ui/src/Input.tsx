@@ -31,9 +31,9 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
                 ? 'border-danger focus:ring-danger'
                 : 'border-border hover:border-border-strong focus:ring-neutral-400',
               disabled && 'cursor-not-allowed opacity-50 bg-neutral-50',
+              className,
               prefixIcon && 'pl-9',
               suffixIcon && 'pr-9',
-              className,
             )}
             aria-invalid={error}
             aria-describedby={helperText && id ? `${id}-helper` : undefined}

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Button, Input, Label, FormShell, FormCard } from '@adatrack/ui';
+import { FormShell, FormCard, InputString, InputDate, InputPhone, InputEmail, InputSelect } from '@adatrack/ui';
 import { User, Phone, MapPin, Building, FileText, Briefcase, Settings } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import type { Customer, IndividualCustomer, CompanyCustomer } from '../types/customer';
@@ -69,6 +69,16 @@ export function CustomerForm({
   const [picNik, setPicNik] = React.useState('');
 
   const [errors, setErrors] = React.useState<Record<string, string>>({});
+  const clearError = (field: string) => {
+    if (errors[field]) {
+      setErrors(prev => {
+        const next = { ...prev };
+        delete next[field];
+        return next;
+      });
+    }
+  };
+
 
   React.useEffect(() => {
     if (customer) {
@@ -210,28 +220,32 @@ export function CustomerForm({
               icon={Settings}
             >
               <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label className="text-xs font-semibold">{labels.fieldCustomerType} *</Label>
-                  <select
-                    className="w-full px-3 py-2 border rounded-md text-[13px] bg-background border-border text-foreground focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50"
+                <div>
+                  <InputSelect
+                    id="type"
+                    label={labels.fieldCustomerType}
                     value={type}
-                    onChange={(e) => setType(e.target.value as any)}
+                    onChange={(v) => { setType(v as any); clearError('type'); }}
                     disabled={isEditing}
-                  >
-                    <option value="INDIVIDUAL">{labels.typeIndividual}</option>
-                    <option value="COMPANY">{labels.typeCompany}</option>
-                  </select>
+                    options={[
+                      { value: 'INDIVIDUAL', label: labels.typeIndividual },
+                      { value: 'COMPANY', label: labels.typeCompany }
+                    ]}
+                    required
+                  />
                 </div>
-                <div className="space-y-2">
-                  <Label className="text-xs font-semibold">{labels.fieldStatus} *</Label>
-                  <select
-                    className="w-full px-3 py-2 border rounded-md text-[13px] bg-background border-border text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                <div>
+                  <InputSelect
+                    id="status"
+                    label={labels.fieldStatus}
                     value={status}
-                    onChange={(e) => setStatus(e.target.value as any)}
-                  >
-                    <option value="ACTIVE">{labels.statusActive}</option>
-                    <option value="INACTIVE">{labels.statusInactive}</option>
-                  </select>
+                    onChange={(v) => { setStatus(v as any); clearError('status'); }}
+                    options={[
+                      { value: 'ACTIVE', label: labels.statusActive },
+                      { value: 'INACTIVE', label: labels.statusInactive }
+                    ]}
+                    required
+                  />
                 </div>
               </div>
             </SectionCard>
@@ -241,46 +255,61 @@ export function CustomerForm({
               description={type === 'INDIVIDUAL' ? "Data diri resmi sesuai KTP." : "Informasi legal entitas perusahaan."}
               icon={type === 'INDIVIDUAL' ? User : Building}
             >
-              <div className="space-y-2">
-                <Label className="text-xs font-semibold">{type === 'INDIVIDUAL' ? labels.fieldFullName : labels.fieldCompanyName} <span className="text-danger">*</span></Label>
-                <Input 
-                  placeholder={labels.placeholderName} 
-                  value={name} onChange={(e) => setName(e.target.value)} 
+                              <InputString
+                  id="name"
+                  label={type === 'INDIVIDUAL' ? labels.fieldFullName : labels.fieldCompanyName}
+                  value={name}
+                  onChange={(v) => { setName(v); clearError('name'); }}
+                   error={errors.name} required
+                  placeholder={labels.placeholderName}
                 />
-                {errors.name && <p className="text-[11px] text-danger">{errors.name}</p>}
-              </div>
 
               {type === 'INDIVIDUAL' ? (
                 <>
-                  <div className="space-y-2">
-                    <Label className="text-xs font-semibold">{labels.fieldNik} <span className="text-danger">*</span></Label>
-                    <Input 
-                      placeholder={labels.placeholderNik} 
-                      value={nik} onChange={(e) => setNik(e.target.value)} 
-                    />
-                    {errors.nik && <p className="text-[11px] text-danger">{errors.nik}</p>}
-                  </div>
+                                  <InputString
+                  id="nik"
+                  label={labels.fieldNik}
+                  value={nik}
+                  onChange={(v) => { setNik(v); clearError('nik'); }}
+                   error={errors.nik} required
+                      placeholder={labels.placeholderNik}
+                />
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label className="text-xs font-semibold">{labels.fieldBirthPlace}</Label>
-                      <Input placeholder="Tempat Lahir" value={birthPlace} onChange={(e) => setBirthPlace(e.target.value)} />
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="text-xs font-semibold">{labels.fieldBirthDate}</Label>
-                      <Input type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} />
-                    </div>
+                                    <InputString
+                  id="birthPlace"
+                  label={labels.fieldBirthPlace}
+                  value={birthPlace}
+                  onChange={(v) => { setBirthPlace(v); clearError('birthPlace'); }}
+                   error={errors.birthPlace}
+                      placeholder="Tempat Lahir"
+                />
+                                    <InputDate
+                  id="birthDate"
+                  label={labels.fieldBirthDate}
+                  value={birthDate}
+                  onChange={(v) => { setBirthDate(v); clearError('birthDate'); }}
+                   error={errors.birthDate}
+                />
                   </div>
                 </>
               ) : (
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-xs font-semibold">{labels.fieldNib}</Label>
-                    <Input placeholder="Nomor Induk Berusaha" value={nib} onChange={(e) => setNib(e.target.value)} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-xs font-semibold">{labels.fieldNpwp}</Label>
-                    <Input placeholder="Nomor Pokok Wajib Pajak" value={npwp} onChange={(e) => setNpwp(e.target.value)} />
-                  </div>
+                                  <InputString
+                  id="nib"
+                  label={labels.fieldNib}
+                  value={nib}
+                  onChange={(v) => { setNib(v); clearError('nib'); }}
+                   error={errors.nib}
+                    placeholder="Nomor Induk Berusaha"
+                />
+                                  <InputString
+                  id="npwp"
+                  label={labels.fieldNpwp}
+                  value={npwp}
+                  onChange={(v) => { setNpwp(v); clearError('npwp'); }}
+                   error={errors.npwp}
+                    placeholder="Nomor Pokok Wajib Pajak"
+                />
                 </div>
               )}
             </SectionCard>
@@ -290,24 +319,40 @@ export function CustomerForm({
               description="Alamat domisili atau alamat operasional perusahaan."
               icon={MapPin}
             >
-              <div className="space-y-2">
-                <Label className="text-xs font-semibold">{labels.fieldAddress}</Label>
-                <Input placeholder="Alamat lengkap" value={address} onChange={(e) => setAddress(e.target.value)} />
-              </div>
+                              <InputString
+                  id="address"
+                  label={labels.fieldAddress}
+                  value={address}
+                  onChange={(v) => { setAddress(v); clearError('address'); }}
+                   error={errors.address}
+                placeholder="Alamat lengkap"
+                />
               <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label className="text-xs font-semibold">{labels.fieldCity}</Label>
-                  <Input placeholder="Kota" value={city} onChange={(e) => setCity(e.target.value)} />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-xs font-semibold">{labels.fieldProvince}</Label>
-                  <Input placeholder="Provinsi" value={province} onChange={(e) => setProvince(e.target.value)} />
-                </div>
+                                <InputString
+                  id="city"
+                  label={labels.fieldCity}
+                  value={city}
+                  onChange={(v) => { setCity(v); clearError('city'); }}
+                   error={errors.city}
+                  placeholder="Kota"
+                />
+                                <InputString
+                  id="province"
+                  label={labels.fieldProvince}
+                  value={province}
+                  onChange={(v) => { setProvince(v); clearError('province'); }}
+                   error={errors.province}
+                  placeholder="Provinsi"
+                />
               </div>
-              <div className="w-1/2 pr-2 space-y-2">
-                <Label className="text-xs font-semibold">{labels.fieldPostalCode}</Label>
-                <Input placeholder="Kode Pos" value={postalCode} onChange={(e) => setPostalCode(e.target.value)} />
-              </div>
+                              <InputString
+                  id="postalCode"
+                  label={labels.fieldPostalCode}
+                  value={postalCode}
+                  onChange={(v) => { setPostalCode(v); clearError('postalCode'); }}
+                   error={errors.postalCode}
+                  placeholder="Kode Pos"
+                />
             </SectionCard>
           </div>
 
@@ -317,21 +362,22 @@ export function CustomerForm({
               description="Nomor telepon dan email untuk keperluan komunikasi."
               icon={Phone}
             >
-              <div className="space-y-2">
-                <Label className="text-xs font-semibold">{labels.fieldPhone} <span className="text-danger">*</span></Label>
-                <Input 
-                  placeholder={labels.placeholderPhone} 
-                  value={phone} onChange={(e) => setPhone(e.target.value)} 
+                              <InputPhone
+                  id="phone"
+                  label={labels.fieldPhone}
+                  value={phone}
+                  onChange={(v) => { setPhone(v); clearError('phone'); }}
+                   error={errors.phone} required
+                  placeholder={labels.placeholderPhone}
                 />
-                {errors.phone && <p className="text-[11px] text-danger">{errors.phone}</p>}
-              </div>
-              <div className="space-y-2">
-                <Label className="text-xs font-semibold">{labels.fieldEmail}</Label>
-                <Input 
-                  type="email" placeholder={labels.placeholderEmail} 
-                  value={email} onChange={(e) => setEmail(e.target.value)} 
+                              <InputEmail
+                  id="email"
+                  label={labels.fieldEmail}
+                  value={email}
+                  onChange={(v) => { setEmail(v); clearError('email'); }}
+                   error={errors.email}
+                  placeholder={labels.placeholderEmail}
                 />
-              </div>
             </SectionCard>
 
             {type === 'INDIVIDUAL' ? (
@@ -340,19 +386,30 @@ export function CustomerForm({
                 description="Detail lisensi berkendara."
                 icon={FileText}
               >
-                <div className="space-y-2">
-                  <Label className="text-xs font-semibold">{labels.fieldSimNumber}</Label>
-                  <Input placeholder="Nomor SIM" value={simNumber} onChange={(e) => setSimNumber(e.target.value)} />
-                </div>
+                                <InputString
+                  id="simNumber"
+                  label={labels.fieldSimNumber}
+                  value={simNumber}
+                  onChange={(v) => { setSimNumber(v); clearError('simNumber'); }}
+                   error={errors.simNumber}
+                  placeholder="Nomor SIM"
+                />
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-xs font-semibold">{labels.fieldSimType}</Label>
-                    <Input placeholder="Contoh: A, B1" value={simType} onChange={(e) => setSimType(e.target.value)} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-xs font-semibold">{labels.fieldSimExpiredAt}</Label>
-                    <Input type="date" value={simExpiredAt} onChange={(e) => setSimExpiredAt(e.target.value)} />
-                  </div>
+                                  <InputString
+                  id="simType"
+                  label={labels.fieldSimType}
+                  value={simType}
+                  onChange={(v) => { setSimType(v); clearError('simType'); }}
+                   error={errors.simType}
+                    placeholder="Contoh: A, B1"
+                />
+                                  <InputDate
+                  id="simExpiredAt"
+                  label={labels.fieldSimExpiredAt}
+                  value={simExpiredAt}
+                  onChange={(v) => { setSimExpiredAt(v); clearError('simExpiredAt'); }}
+                   error={errors.simExpiredAt}
+                />
                 </div>
               </SectionCard>
             ) : (
@@ -361,29 +418,48 @@ export function CustomerForm({
                 description="Penanggung jawab atau representatif dari perusahaan."
                 icon={Briefcase}
               >
-                <div className="space-y-2">
-                  <Label className="text-xs font-semibold">{labels.fieldPicName} <span className="text-danger">*</span></Label>
-                  <Input placeholder="Nama PIC" value={picName} onChange={(e) => setPicName(e.target.value)} />
-                  {errors.picName && <p className="text-[11px] text-danger">{errors.picName}</p>}
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-xs font-semibold">{labels.fieldPicPosition}</Label>
-                  <Input placeholder="Jabatan PIC" value={picPosition} onChange={(e) => setPicPosition(e.target.value)} />
-                </div>
+                                <InputString
+                  id="picName"
+                  label={labels.fieldPicName}
+                  value={picName}
+                  onChange={(v) => { setPicName(v); clearError('picName'); }}
+                   error={errors.picName} required
+                    placeholder={labels.placeholderPicName}
+                />
+                                <InputString
+                  id="picPosition"
+                  label={labels.fieldPicPosition}
+                  value={picPosition}
+                  onChange={(v) => { setPicPosition(v); clearError('picPosition'); }}
+                   error={errors.picPosition}
+                    placeholder="Jabatan PIC"
+                />
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-xs font-semibold">{labels.fieldPicPhone}</Label>
-                    <Input placeholder="No HP PIC" value={picPhone} onChange={(e) => setPicPhone(e.target.value)} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-xs font-semibold">{labels.fieldPicEmail}</Label>
-                    <Input type="email" placeholder="Email PIC" value={picEmail} onChange={(e) => setPicEmail(e.target.value)} />
-                  </div>
+                                  <InputPhone
+                  id="picPhone"
+                  label={labels.fieldPicPhone}
+                  value={picPhone}
+                  onChange={(v) => { setPicPhone(v); clearError('picPhone'); }}
+                   error={errors.picPhone}
+                    placeholder="No HP PIC"
+                />
+                                  <InputEmail
+                  id="picEmail"
+                  label={labels.fieldPicEmail}
+                  value={picEmail}
+                  onChange={(v) => { setPicEmail(v); clearError('picEmail'); }}
+                   error={errors.picEmail}
+                    placeholder="Email PIC"
+                />
                 </div>
-                <div className="space-y-2">
-                  <Label className="text-xs font-semibold">{labels.fieldPicNik}</Label>
-                  <Input placeholder="NIK PIC" value={picNik} onChange={(e) => setPicNik(e.target.value)} />
-                </div>
+                                <InputString
+                  id="picNik"
+                  label={labels.fieldPicNik}
+                  value={picNik}
+                  onChange={(v) => { setPicNik(v); clearError('picNik'); }}
+                   error={errors.picNik}
+                  placeholder="NIK PIC"
+                />
               </SectionCard>
             )}
           </div>

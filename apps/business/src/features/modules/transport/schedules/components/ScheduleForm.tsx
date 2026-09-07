@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Button, Input, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Checkbox, FormShell, FormCard } from '@adatrack/ui';
+import { Button, Checkbox, FormShell, FormCard, InputString, InputSelect, InputTime } from '@adatrack/ui';
 import { Clock, Plus, Trash2, Calendar, Bus, Info, ExternalLink } from 'lucide-react';
 import type { OperationalSchedule, ScheduleStatus, DayOfWeek, ScheduleTime } from '../types/schedule';
 import type { Route } from '@/features/core/routes/types';
@@ -160,14 +160,14 @@ export function ScheduleForm({
             <div className="lg:col-span-4 flex flex-col gap-6">
               <SectionCard title="Informasi Jadwal" description="Lengkapi detail identitas jadwal dan rute perjalanan." icon={Calendar}>
                 <div className="flex flex-col gap-4">
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-bold text-foreground mb-1 block">Nama Jadwal <span className="text-danger">*</span></label>
-                    <Input 
-                      value={name} 
-                      onChange={e => setName(e.target.value)} 
-                      placeholder="Cth: Jadwal Pagi Bekasi-Jakarta" 
-                      required 
-                      className="h-10 bg-transparent focus-visible:ring-danger"
+                  <div>
+                    <InputString
+                      id="name"
+                      label="Nama Jadwal"
+                      value={name}
+                      onChange={setName}
+                      placeholder="Cth: Jadwal Pagi Bekasi-Jakarta"
+                      required
                     />
                   </div>
 
@@ -184,32 +184,29 @@ export function ScheduleForm({
                         </a>
                       )}
                     </div>
-                    <Select value={routeId} onValueChange={setRouteId} required>
-                      <SelectTrigger className="w-full h-10 bg-transparent focus:ring-danger">
-                        <SelectValue placeholder="Pilih Rute" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {availableRoutes.map(r => (
-                          <SelectItem key={r.id} value={r.id}>
-                            {r.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <InputSelect
+                      id="routeId"
+                      value={routeId}
+                      onChange={setRouteId}
+                      placeholder="Pilih Rute"
+                      options={availableRoutes.map(r => ({ value: r.id, label: r.name }))}
+                      required
+                    />
                   </div>
 
                   <div className="flex flex-col gap-1.5">
                     <label className="text-xs font-bold text-foreground mb-1 block">Status Operasional <span className="text-danger">*</span></label>
-                    <Select value={status} onValueChange={(v: ScheduleStatus) => setStatus(v)}>
-                      <SelectTrigger className="w-full h-10 bg-transparent focus:ring-danger">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="ACTIVE">Aktif (ACTIVE)</SelectItem>
-                        <SelectItem value="INACTIVE">Nonaktif (INACTIVE)</SelectItem>
-                        <SelectItem value="SUSPENDED">Ditangguhkan (SUSPENDED)</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <InputSelect
+                      id="status"
+                      value={status}
+                      onChange={(v) => setStatus(v as ScheduleStatus)}
+                      options={[
+                        { value: 'ACTIVE', label: 'Aktif (ACTIVE)' },
+                        { value: 'INACTIVE', label: 'Nonaktif (INACTIVE)' },
+                        { value: 'SUSPENDED', label: 'Ditangguhkan (SUSPENDED)' }
+                      ]}
+                      required
+                    />
                   </div>
 
                   <div className="flex flex-col gap-1.5 mt-2">
@@ -261,16 +258,13 @@ export function ScheduleForm({
                           <div className="w-10 h-10 rounded-lg flex items-center justify-center border bg-white dark:bg-neutral-950 border-border text-muted-foreground">
                             <Clock className="w-4 h-4" />
                           </div>
-                          <div className="flex flex-col">
-                            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">
-                              Jam Berangkat
-                            </label>
-                            <Input 
-                              type="time" 
-                              value={time.departureTime} 
-                              onChange={e => handleTimeChange(time.id, e.target.value)} 
-                              required 
-                              className="h-8 text-sm font-bold w-28 bg-white dark:bg-neutral-950 focus-visible:ring-danger"
+                          <div className="flex flex-col w-28">
+                            <InputTime
+                              id={`time-${time.id}`}
+                              label="Jam Berangkat"
+                              value={time.departureTime}
+                              onChange={(val) => handleTimeChange(time.id, val)}
+                              required
                             />
                           </div>
                         </div>

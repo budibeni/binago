@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { User, Car, Calendar, DollarSign, FileText, ClipboardList } from 'lucide-react';
 import { cn } from '@adatrack/utils';
-import { Button, FormShell, FormCard } from '@adatrack/ui';
+import { Button, FormShell, FormCard, InputSelect, InputDateTime, InputDecimal, InputString } from '@adatrack/ui';
 import type { Customer } from '@/features/modules/rental/customers/types/customer';
 import type { RentalVehicle } from '@/features/modules/rental/vehicles/types/rentalVehicle';
 import type { RateType, RentalType } from '../types/reservation';
@@ -91,17 +91,15 @@ export function ReservationCreateForm({
             <div className="flex flex-col gap-4">
               <div className="flex items-end gap-3">
                 <div className="flex-1">
-                  <label className="text-xs font-bold text-foreground mb-1.5 block">{labels.fieldCustomer} <span className="text-danger">*</span></label>
-                  <select 
-                    className="w-full h-10 px-3 rounded-lg border bg-transparent text-sm outline-none focus:border-danger focus:ring-1 focus:ring-danger"
+                  <InputSelect
+                    id="customerId"
+                    label={labels.fieldCustomer}
                     value={formData.customerId}
-                    onChange={e => setFormData(prev => ({ ...prev, customerId: e.target.value }))}
-                  >
-                    <option value="">{labels.searchCustomerPlaceholder}</option>
-                    {customers.map(c => (
-                      <option key={c.id} value={c.id}>{c.name} - {c.phone}</option>
-                    ))}
-                  </select>
+                    onChange={(val) => setFormData(prev => ({ ...prev, customerId: val }))}
+                    placeholder={labels.searchCustomerPlaceholder}
+                    options={customers.map(c => ({ value: c.id, label: `${c.name} - ${c.phone}` }))}
+                    required
+                  />
                 </div>
                 <Button variant="outline" className="h-10 text-danger border-danger/30 hover:bg-danger/5 shrink-0">
                   <span className="font-bold mr-1">+</span> {labels.newCustomer}
@@ -132,17 +130,15 @@ export function ReservationCreateForm({
              <div className="flex flex-col gap-4">
               <div className="flex gap-4">
                 <div className="flex-1">
-                  <label className="text-xs font-bold text-foreground mb-1.5 block">{labels.fieldVehicle} <span className="text-danger">*</span></label>
-                  <select 
-                    className="w-full h-10 px-3 rounded-lg border bg-transparent text-sm outline-none focus:border-danger focus:ring-1 focus:ring-danger"
+                  <InputSelect
+                    id="vehicleId"
+                    label={labels.fieldVehicle}
                     value={formData.vehicleId}
-                    onChange={e => setFormData(prev => ({ ...prev, vehicleId: e.target.value }))}
-                  >
-                    <option value="">{labels.selectVehiclePlaceholder}</option>
-                    {vehicles.filter(v => v.status === 'READY' || v.status === 'RESERVED').map(v => (
-                      <option key={v.id} value={v.vehicleId}>{v.coreVehicle.plateNumber} - {v.coreVehicle.brand} {v.coreVehicle.vehicleName}</option>
-                    ))}
-                  </select>
+                    onChange={(val) => setFormData(prev => ({ ...prev, vehicleId: val }))}
+                    placeholder={labels.selectVehiclePlaceholder}
+                    options={vehicles.filter(v => v.status === 'READY' || v.status === 'RESERVED').map(v => ({ value: v.vehicleId, label: `${v.coreVehicle.plateNumber} - ${v.coreVehicle.brand} ${v.coreVehicle.vehicleName}` }))}
+                    required
+                  />
                 </div>
                 <div className="w-1/3">
                   <label className="text-xs font-bold text-foreground mb-1.5 block">{labels.fieldVehicleStatus}</label>
@@ -175,21 +171,21 @@ export function ReservationCreateForm({
           <SectionCard title={labels.sectionPeriod} description="Tentukan tanggal mulai dan selesai serta durasi sewa." icon={Calendar}>
              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-bold text-foreground mb-1.5 block">{labels.fieldStartDate} <span className="text-danger">*</span></label>
-                  <input 
-                    type="datetime-local" 
-                    className="w-full h-10 px-3 rounded-lg border bg-transparent text-sm outline-none focus:border-danger focus:ring-1 focus:ring-danger"
-                    value={formData.startDate.slice(0, 16)}
-                    onChange={e => setFormData(prev => ({ ...prev, startDate: new Date(e.target.value).toISOString() }))}
+                  <InputDateTime
+                    id="startDate"
+                    label={labels.fieldStartDate}
+                    value={formData.startDate}
+                    onChange={(val) => setFormData(prev => ({ ...prev, startDate: val ? new Date(val).toISOString() : '' }))}
+                    required
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-foreground mb-1.5 block">{labels.fieldEndDate} <span className="text-danger">*</span></label>
-                  <input 
-                    type="datetime-local" 
-                    className="w-full h-10 px-3 rounded-lg border bg-transparent text-sm outline-none focus:border-danger focus:ring-1 focus:ring-danger"
-                    value={formData.endDate.slice(0, 16)}
-                    onChange={e => setFormData(prev => ({ ...prev, endDate: new Date(e.target.value).toISOString() }))}
+                  <InputDateTime
+                    id="endDate"
+                    label={labels.fieldEndDate}
+                    value={formData.endDate}
+                    onChange={(val) => setFormData(prev => ({ ...prev, endDate: val ? new Date(val).toISOString() : '' }))}
+                    required
                   />
                 </div>
                 <div>
@@ -199,15 +195,17 @@ export function ReservationCreateForm({
                   </div>
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-foreground mb-1.5 block">{labels.fieldRentalType} <span className="text-danger">*</span></label>
-                  <select 
-                    className="w-full h-10 px-3 rounded-lg border bg-transparent text-sm outline-none focus:border-danger focus:ring-1 focus:ring-danger"
+                  <InputSelect
+                    id="rentalType"
+                    label={labels.fieldRentalType}
                     value={formData.rentalType}
-                    onChange={e => setFormData(prev => ({ ...prev, rentalType: e.target.value as RentalType }))}
-                  >
-                    <option value="SELF_DRIVE">{labels.rentalTypeSelfDrive}</option>
-                    <option value="WITH_DRIVER">{labels.rentalTypeWithDriver}</option>
-                  </select>
+                    onChange={(val) => setFormData(prev => ({ ...prev, rentalType: val as RentalType }))}
+                    options={[
+                      { value: 'SELF_DRIVE', label: labels.rentalTypeSelfDrive },
+                      { value: 'WITH_DRIVER', label: labels.rentalTypeWithDriver }
+                    ]}
+                    required
+                  />
                 </div>
              </div>
           </SectionCard>
@@ -246,16 +244,17 @@ export function ReservationCreateForm({
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-foreground mb-1.5 block">{labels.fieldUsedRate}</label>
-                  <select 
-                    className="w-full h-10 px-3 rounded-lg border bg-transparent text-sm outline-none focus:border-danger focus:ring-1 focus:ring-danger"
+                  <InputSelect
+                    id="rateType"
+                    label={labels.fieldUsedRate}
                     value={formData.rateType}
-                    onChange={e => setFormData(prev => ({ ...prev, rateType: e.target.value as RateType }))}
-                  >
-                    <option value="DAILY">Tarif Harian</option>
-                    <option value="WEEKLY">Tarif Mingguan</option>
-                    <option value="MONTHLY">Tarif Bulanan</option>
-                  </select>
+                    onChange={(val) => setFormData(prev => ({ ...prev, rateType: val as RateType }))}
+                    options={[
+                      { value: 'DAILY', label: 'Tarif Harian' },
+                      { value: 'WEEKLY', label: 'Tarif Mingguan' },
+                      { value: 'MONTHLY', label: 'Tarif Bulanan' }
+                    ]}
+                  />
                 </div>
                 <div>
                   <label className="text-xs font-bold text-foreground mb-1.5 block">{labels.fieldTotalEstimate}</label>
@@ -266,37 +265,30 @@ export function ReservationCreateForm({
              </div>
 
              <div className="w-1/3 pr-2">
-                <label className="text-xs font-bold text-foreground mb-1.5 block">{labels.fieldDeposit}</label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">Rp</span>
-                  <input 
-                    type="number" 
-                    className="w-full h-10 pl-9 pr-3 rounded-lg border bg-transparent text-sm outline-none focus:border-danger focus:ring-1 focus:ring-danger"
-                    placeholder="0"
-                    value={formData.deposit || ''}
-                    onChange={e => setFormData(prev => ({ ...prev, deposit: Number(e.target.value) }))}
-                  />
-                </div>
+                <InputDecimal
+                  id="deposit"
+                  label={labels.fieldDeposit}
+                  value={formData.deposit}
+                  onChange={(val) => setFormData(prev => ({ ...prev, deposit: val !== null ? val : 0 }))}
+                  prefixIcon={<span className="text-muted-foreground text-sm font-medium">Rp</span>}
+                  placeholder="0"
+                />
              </div>
           </SectionCard>
 
           {/* 5. INFORMASI TAMBAHAN */}
           <SectionCard title={labels.sectionAdditional} description="Kebutuhan tambahan dan catatan." icon={FileText}>
              <div className="flex gap-6 h-full">
-               <div className="flex-1 flex flex-col">
-                  <label className="text-xs font-bold text-foreground mb-1.5 block">{labels.fieldNotes}</label>
-                  <div className="relative flex-1">
-                    <textarea 
-                      className="w-full h-[120px] p-3 rounded-lg border bg-transparent text-sm outline-none focus:border-danger focus:ring-1 focus:ring-danger resize-none"
-                      placeholder={labels.notesPlaceholder}
-                      value={formData.notes}
-                      maxLength={500}
-                      onChange={e => setFormData(prev => ({ ...prev, notes: e.target.value }))}
-                    />
-                    <div className="absolute bottom-2 right-3 text-[10px] text-muted-foreground">
-                      {formData.notes.length} / 500
-                    </div>
-                  </div>
+               <div className="flex-1">
+                  <InputString
+                    id="notes"
+                    label={labels.fieldNotes}
+                    value={formData.notes}
+                    onChange={(val) => setFormData(prev => ({ ...prev, notes: val }))}
+                    placeholder={labels.notesPlaceholder}
+                    maxLength={500}
+                    helpText={`${formData.notes.length} / 500`}
+                  />
                </div>
                <div className="w-48 shrink-0">
                   <label className="text-xs font-bold text-foreground mb-2.5 block">{labels.fieldAdditionalNeeds}</label>

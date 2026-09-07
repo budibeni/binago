@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Card, Input, Button, Checkbox, Textarea, Label, FormShell, FormCard } from '@adatrack/ui';
+import { Button, Checkbox, Label, FormShell, FormCard, InputString, InputNumber, InputDecimal, InputDateTime, InputTextarea } from '@adatrack/ui';
 import { MapPin, Car, Gauge, Fuel, CheckSquare, AlertTriangle, DollarSign, Clock } from 'lucide-react';
 import type { RentalContract } from '../../contracts/types/contract';
 import type { RentalHandover } from '../../handover/types/handover';
@@ -221,19 +221,33 @@ export function ReturnForm({ contract, handover, onSubmit, onCancel, isSubmittin
           {(latitude || longitude) && (
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label className="text-[10px] uppercase font-bold text-muted-foreground mb-1 block">Latitude</Label>
-                <Input value={latitude ?? ''} readOnly className="bg-neutral-50 dark:bg-neutral-900/50" />
+                <InputString
+                  id="latitude"
+                  label="Latitude"
+                  value={latitude !== null ? String(latitude) : ''}
+                  onChange={() => {}}
+                  readOnly
+                  className="bg-neutral-50 dark:bg-neutral-900/50"
+                />
               </div>
               <div>
-                <Label className="text-[10px] uppercase font-bold text-muted-foreground mb-1 block">Longitude</Label>
-                <Input value={longitude ?? ''} readOnly className="bg-neutral-50 dark:bg-neutral-900/50" />
+                <InputString
+                  id="longitude"
+                  label="Longitude"
+                  value={longitude !== null ? String(longitude) : ''}
+                  onChange={() => {}}
+                  readOnly
+                  className="bg-neutral-50 dark:bg-neutral-900/50"
+                />
               </div>
               <div className="col-span-2">
-                <Label className="text-[10px] uppercase font-bold text-muted-foreground mb-1 block">Alamat (Opsional)</Label>
-                <Input
+                <InputTextarea
+                  id="address"
+                  label="Alamat (Opsional)"
                   value={address}
-                  onChange={(e) => setAddress(e.target.value)}
+                  onChange={setAddress}
                   placeholder="Masukkan alamat pengembalian"
+                  rows={2}
                 />
               </div>
             </div>
@@ -250,18 +264,15 @@ export function ReturnForm({ contract, handover, onSubmit, onCancel, isSubmittin
             <p className="text-xs text-muted-foreground">KM</p>
           </div>
           <div>
-            <Label className="text-[10px] uppercase font-bold text-muted-foreground mb-2 block">Odometer Akhir (KM) *</Label>
-            <Input
-              type="number"
-              min={handover.odometerStart}
+            <InputNumber
+              id="odometerEnd"
+              label="Odometer Akhir (KM)"
               value={odometerEnd}
-              onChange={(e) => handleOdometerChange(Number(e.target.value))}
-              className={odometerError ? 'border-danger' : ''}
+              onChange={(val) => handleOdometerChange(val || 0)}
+              min={handover.odometerStart}
+              error={odometerError}
               required
             />
-            {odometerError && (
-              <p className="text-xs text-danger mt-1">{odometerError}</p>
-            )}
           </div>
           <div className="p-4 bg-primary/5 dark:bg-primary/10 rounded-xl border border-primary/20">
             <p className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Jarak Tempuh</p>
@@ -378,12 +389,11 @@ export function ReturnForm({ contract, handover, onSubmit, onCancel, isSubmittin
           </div>
           {hasDamage && (
             <div>
-              <Label className="text-[10px] uppercase font-bold text-muted-foreground mb-2 block">
-                Deskripsi Kerusakan
-              </Label>
-              <Textarea
+              <InputTextarea
+                id="damageNotes"
+                label="Deskripsi Kerusakan"
                 value={damageNotes}
-                onChange={(e) => setDamageNotes(e.target.value)}
+                onChange={setDamageNotes}
                 placeholder="Contoh: Bemper depan sebelah kanan tergores."
                 className="min-h-[80px]"
               />
@@ -402,30 +412,33 @@ export function ReturnForm({ contract, handover, onSubmit, onCancel, isSubmittin
           )}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <Label className="text-[10px] uppercase font-bold text-muted-foreground mb-1 block">Biaya Keterlambatan (Rp)</Label>
-              <Input
-                type="number"
-                min={0}
+              <InputDecimal
+                id="lateFee"
+                label="Biaya Keterlambatan (Rp)"
                 value={lateFee}
-                onChange={(e) => setLateFee(Number(e.target.value))}
+                onChange={(val) => setLateFee(val !== null ? val : 0)}
+                prefixIcon={<span className="text-muted-foreground text-sm font-medium">Rp</span>}
+                min={0}
               />
             </div>
             <div>
-              <Label className="text-[10px] uppercase font-bold text-muted-foreground mb-1 block">Biaya Kerusakan (Rp)</Label>
-              <Input
-                type="number"
-                min={0}
+              <InputDecimal
+                id="damageFee"
+                label="Biaya Kerusakan (Rp)"
                 value={damageFee}
-                onChange={(e) => setDamageFee(Number(e.target.value))}
+                onChange={(val) => setDamageFee(val !== null ? val : 0)}
+                prefixIcon={<span className="text-muted-foreground text-sm font-medium">Rp</span>}
+                min={0}
               />
             </div>
             <div>
-              <Label className="text-[10px] uppercase font-bold text-muted-foreground mb-1 block">Biaya Lainnya (Rp)</Label>
-              <Input
-                type="number"
-                min={0}
+              <InputDecimal
+                id="additionalCharges"
+                label="Biaya Lainnya (Rp)"
                 value={additionalCharges}
-                onChange={(e) => setAdditionalCharges(Number(e.target.value))}
+                onChange={(val) => setAdditionalCharges(val !== null ? val : 0)}
+                prefixIcon={<span className="text-muted-foreground text-sm font-medium">Rp</span>}
+                min={0}
               />
             </div>
           </div>
@@ -467,9 +480,10 @@ export function ReturnForm({ contract, handover, onSubmit, onCancel, isSubmittin
       {/* Notes */}
       <FormCard title="Catatan">
         <div className="p-4">
-          <Textarea
+          <InputTextarea
+            id="notes"
             value={notes}
-            onChange={(e) => setNotes(e.target.value)}
+            onChange={setNotes}
             placeholder="Catatan tambahan terkait pengembalian (opsional)"
             className="min-h-[80px]"
           />

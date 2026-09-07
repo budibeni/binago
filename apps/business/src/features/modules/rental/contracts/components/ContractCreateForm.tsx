@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Button, Input, Textarea, Label, Checkbox, FormShell, FormCard } from '@adatrack/ui';
+import { Button, Checkbox, Label, FormShell, FormCard, InputDateTime, InputTextarea } from '@adatrack/ui';
 import { Search, User, Car, Calendar, DollarSign, Info } from 'lucide-react';
 import type { Reservation } from '@/features/modules/rental/reservations/types/reservation';
 import type { RentalContract } from '../types/contract';
@@ -203,35 +203,34 @@ export function ContractCreateForm({
                 <FormCard title="Informasi Kontrak">
                   
                   <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="contractDate">{labels.fieldContractDate || 'Tanggal Kontrak'}</Label>
-                      <Input
+                    <div>
+                      <InputDateTime
                         id="contractDate"
-                        type="datetime-local"
+                        label={labels.fieldContractDate || 'Tanggal Kontrak'}
                         value={contractDate}
-                        onChange={(e) => setContractDate(e.target.value)}
+                        onChange={(val) => setContractDate(val || '')}
                         required
                       />
                     </div>
                     
-                    <div className="space-y-2">
-                      <Label htmlFor="notes">{labels.fieldContractNotes || 'Catatan Kontrak'}</Label>
-                      <Textarea
+                    <div>
+                      <InputTextarea
                         id="notes"
+                        label={labels.fieldContractNotes || 'Catatan Kontrak'}
                         placeholder="Tambahkan catatan khusus untuk kontrak ini..."
                         rows={3}
                         value={notes}
-                        onChange={(e) => setNotes(e.target.value)}
+                        onChange={setNotes}
                       />
                     </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="terms">{labels.fieldTerms || 'Syarat & Ketentuan'}</Label>
-                      <Textarea
+                    <div>
+                      <InputTextarea
                         id="terms"
+                        label={labels.fieldTerms || 'Syarat & Ketentuan'}
                         rows={5}
                         value={terms}
-                        onChange={(e) => setTerms(e.target.value)}
+                        onChange={setTerms}
                         className="font-mono text-xs leading-relaxed"
                       />
                     </div>

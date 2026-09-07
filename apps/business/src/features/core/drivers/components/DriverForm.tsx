@@ -3,7 +3,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { AlertCircle, ArrowLeft, UserRound, MapPin, Phone, FileText } from 'lucide-react';
-import { Button, Input, Label, Textarea, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, FormShell, FormCard } from '@adatrack/ui';
+import { FormShell, FormCard, InputString, InputDate, InputTextarea, InputPhone, InputEmail, InputSelect } from '@adatrack/ui';
 import { groupService } from '@/data/services';
 import type { Driver } from '../types/driver';
 
@@ -62,20 +62,14 @@ export function DriverForm({ labels, initialData, onCancel, onSubmit, layout = '
   const [errors, setErrors] = React.useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
+    const handleValueChange = <K extends keyof typeof formData>(name: K, value: typeof formData[K]) => {
     setFormData(prev => ({ ...prev, [name]: value }));
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
+    if (errors[name as string]) {
+      setErrors(prev => ({ ...prev, [name as string]: '' }));
     }
   };
 
-  const handleSelectChange = (name: string, value: string) => {
-    setFormData(prev => ({ ...prev, [name]: value }));
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
-    }
-  };
+  
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
@@ -126,57 +120,50 @@ export function DriverForm({ labels, initialData, onCancel, onSubmit, layout = '
             >
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-4">
-                <div className="flex flex-col gap-1.5 sm:col-span-2">
-                  <Label htmlFor="name" className="text-xs font-semibold">{labels.fullName} <span className="text-danger">*</span></Label>
-                  <Input
+                <div className="sm:col-span-2">
+                  <InputString
                     id="name"
-                    name="name"
+                    label={labels.fullName}
                     placeholder={labels.fullNamePlaceholder}
                     value={formData.name}
-                    onChange={handleChange}
-                    error={!!errors.name}
-                    className="h-10 text-sm"
+                    onChange={(v) => handleValueChange('name', v)}
+                    error={errors.name}
+                    required
                   />
-                  {errors.name && <span className="text-[10px] text-danger flex items-center gap-1"><AlertCircle className="w-3 h-3" /> {errors.name}</span>}
                 </div>
 
-                <div className="flex flex-col gap-1.5 sm:col-span-2">
-                  <Label htmlFor="ktpNumber" className="text-xs font-semibold">No. KTP <span className="text-danger">*</span></Label>
-                  <Input
+                <div className="sm:col-span-2">
+                  <InputString
                     id="ktpNumber"
-                    name="ktpNumber"
+                    label="No. KTP"
                     placeholder={labels.ktpPlaceholder}
                     value={formData.ktpNumber}
-                    onChange={handleChange}
-                    error={!!errors.ktpNumber}
+                    onChange={(v) => handleValueChange('ktpNumber', v)}
+                    error={errors.ktpNumber}
                     maxLength={16}
-                    className="h-10 text-sm"
+                    required
                   />
-                  {errors.ktpNumber && <span className="text-[10px] text-danger flex items-center gap-1"><AlertCircle className="w-3 h-3" /> {errors.ktpNumber}</span>}
                 </div>
 
-                <div className="flex flex-col gap-1.5">
-                  <Label htmlFor="placeOfBirth" className="text-xs font-semibold">Tempat Lahir</Label>
-                  <Input
+                <div>
+                  <InputString
                     id="placeOfBirth"
-                    name="placeOfBirth"
+                    label="Tempat Lahir"
                     placeholder={labels.pobPlaceholder}
                     value={formData.placeOfBirth}
-                    onChange={handleChange}
-                    className="h-10 text-sm"
+                    onChange={(v) => handleValueChange('placeOfBirth', v)}
+                    error={errors.placeOfBirth}
                   />
                 </div>
 
-                <div className="flex flex-col gap-1.5">
-                  <Label htmlFor="dateOfBirth" className="text-xs font-semibold">Tanggal Lahir <span className="text-danger">*</span></Label>
-                  <Input
+                <div>
+                  <InputDate
                     id="dateOfBirth"
-                    name="dateOfBirth"
-                    type="date"
-                    placeholder={labels.dobPlaceholder}
+                    label="Tanggal Lahir"
                     value={formData.dateOfBirth}
-                    onChange={handleChange}
-                    className="h-10 text-sm"
+                    onChange={(v) => handleValueChange('dateOfBirth', v)}
+                    error={errors.dateOfBirth}
+                    required
                   />
                 </div>
               </div>
@@ -189,16 +176,15 @@ export function DriverForm({ labels, initialData, onCancel, onSubmit, layout = '
               icon={<MapPin className="w-5 h-5 text-blue-500" />}
             >
 
-              <div className="flex flex-col gap-1.5">
-                <Label htmlFor="address" className="text-xs font-semibold">Alamat Lengkap</Label>
-                <Textarea
+              <div>
+                <InputTextarea
                   id="address"
-                  name="address"
+                  label="Alamat Lengkap"
                   placeholder={labels.addressPlaceholder}
                   value={formData.address}
-                  onChange={handleChange}
+                  onChange={(v) => handleValueChange('address', v)}
+                  error={errors.address}
                   rows={4}
-                  className="resize-none text-sm"
                 />
               </div>
             </FormCard>
@@ -216,31 +202,26 @@ export function DriverForm({ labels, initialData, onCancel, onSubmit, layout = '
             >
 
               <div className="grid grid-cols-1 gap-y-4">
-                <div className="flex flex-col gap-1.5">
-                  <Label htmlFor="phone" className="text-xs font-semibold">Nomor Telepon <span className="text-danger">*</span></Label>
-                  <Input
+                <div>
+                  <InputPhone
                     id="phone"
-                    name="phone"
-                    type="tel"
+                    label="Nomor Telepon"
                     placeholder={labels.phonePlaceholder}
                     value={formData.phone}
-                    onChange={handleChange}
-                    error={!!errors.phone}
-                    className="h-10 text-sm"
+                    onChange={(v) => handleValueChange('phone', v)}
+                    error={errors.phone}
+                    required
                   />
-                  {errors.phone && <span className="text-[10px] text-danger flex items-center gap-1"><AlertCircle className="w-3 h-3" /> {errors.phone}</span>}
                 </div>
 
-                <div className="flex flex-col gap-1.5">
-                  <Label htmlFor="email" className="text-xs font-semibold">Email</Label>
-                  <Input
+                <div>
+                  <InputEmail
                     id="email"
-                    name="email"
-                    type="email"
+                    label="Email"
                     placeholder={labels.emailPlaceholder}
                     value={formData.email}
-                    onChange={handleChange}
-                    className="h-10 text-sm"
+                    onChange={(v) => handleValueChange('email', v)}
+                    error={errors.email}
                   />
                 </div>
               </div>
@@ -254,72 +235,60 @@ export function DriverForm({ labels, initialData, onCancel, onSubmit, layout = '
             >
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-4">
-                <div className="flex flex-col gap-1.5 sm:col-span-2">
-                  <Label className="text-xs font-semibold">Grup <span className="text-danger">*</span></Label>
-                  <Select value={formData.groupId} onValueChange={(val) => handleSelectChange('groupId', val)}>
-                    <SelectTrigger error={!!errors.groupId} className="h-10 text-sm">
-                      <SelectValue placeholder={labels.groupSelect} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {groupService.getDriverGroups().map(group => (
-                        <SelectItem key={group.id} value={group.id} className="text-sm">
-                          {group.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {errors.groupId && <span className="text-[10px] text-danger flex items-center gap-1"><AlertCircle className="w-3 h-3" /> {errors.groupId}</span>}
+                <div className="sm:col-span-2">
+                  <InputSelect
+                    id="groupId"
+                    label="Grup"
+                    placeholder={labels.groupSelect}
+                    value={formData.groupId}
+                    onChange={(v) => handleValueChange('groupId', v)}
+                    error={errors.groupId}
+                    options={groupService.getDriverGroups().map(group => ({ value: group.id, label: group.name }))}
+                    required
+                  />
                 </div>
 
-                <div className="flex flex-col gap-1.5 sm:col-span-2">
-                  <Label htmlFor="placement" className="text-xs font-semibold">{labels.placement} <span className="text-danger">*</span></Label>
-                  <Input
+                <div className="sm:col-span-2">
+                  <InputString
                     id="placement"
-                    name="placement"
+                    label={labels.placement}
                     placeholder={labels.placementPlaceholder}
                     value={formData.placement}
-                    onChange={handleChange}
-                    error={!!errors.placement}
-                    className="h-10 text-sm"
+                    onChange={(v) => handleValueChange('placement', v)}
+                    error={errors.placement}
+                    required
                   />
-                  {errors.placement && <span className="text-[10px] text-danger flex items-center gap-1"><AlertCircle className="w-3 h-3" /> {errors.placement}</span>}
                 </div>
 
-                <div className="flex flex-col gap-1.5">
-                  <Label htmlFor="licenseNumber" className="text-xs font-semibold">Nomor SIM <span className="text-danger">*</span></Label>
-                  <Input
+                <div>
+                  <InputString
                     id="licenseNumber"
-                    name="licenseNumber"
+                    label="No. SIM"
                     placeholder={labels.licensePlaceholder}
                     value={formData.licenseNumber}
-                    onChange={handleChange}
-                    error={!!errors.licenseNumber}
-                    className="h-10 text-sm"
+                    onChange={(v) => handleValueChange('licenseNumber', v)}
+                    error={errors.licenseNumber}
+                    required
                   />
-                  {errors.licenseNumber && <span className="text-[10px] text-danger flex items-center gap-1"><AlertCircle className="w-3 h-3" /> {errors.licenseNumber}</span>}
                 </div>
 
-                <div className="flex flex-col gap-1.5">
-                  <Label htmlFor="licenseExpiry" className="text-xs font-semibold">Masa Berlaku SIM</Label>
-                  <Input
+                <div>
+                  <InputDate
                     id="licenseExpiry"
-                    name="licenseExpiry"
-                    type="date"
+                    label="Masa Berlaku SIM"
                     value={formData.licenseExpiry}
-                    onChange={handleChange}
-                    className="h-10 text-sm"
+                    onChange={(v) => handleValueChange('licenseExpiry', v)}
+                    error={errors.licenseExpiry}
                   />
                 </div>
 
-                <div className="flex flex-col gap-1.5 sm:col-span-2 mt-2">
-                  <Label htmlFor="joinDate" className="text-xs font-semibold">Tanggal Bergabung</Label>
-                  <Input
+                <div className="sm:col-span-2 mt-2">
+                  <InputDate
                     id="joinDate"
-                    name="joinDate"
-                    type="date"
+                    label="Tanggal Bergabung"
                     value={formData.joinDate}
-                    onChange={handleChange}
-                    className="h-10 text-sm"
+                    onChange={(v) => handleValueChange('joinDate', v)}
+                    error={errors.joinDate}
                   />
                 </div>
               </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Button, Input, Label, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Textarea, FormShell, FormCard } from '@adatrack/ui';
+import { Button, Input, Label, FormShell, FormCard, InputSelect, InputDate, InputDecimal, InputString } from '@adatrack/ui';
 import { CarFront, FileText, Settings, ShieldCheck, FileSpreadsheet } from 'lucide-react';
 import type { RentalVehicle, RentalVehicleProfile, RentalEquipment, RentalStatus, RentalCondition } from '../types/rentalVehicle';
 import type { Vehicle } from '@/features/core/vehicles/types/vehicle';
@@ -109,15 +109,15 @@ export function RentalVehicleForm({
             >
 
               {!isEdit && (
-                <div className="flex flex-col gap-1.5">
-                  <Select value={vehicleId} onValueChange={setVehicleId} required>
-                    <SelectTrigger className="h-9 text-sm text-muted-foreground"><SelectValue placeholder={labels.fieldSelectVehicle} /></SelectTrigger>
-                    <SelectContent>
-                    {availableCoreVehicles.map(v => (
-                      <SelectItem key={v.id} value={v.id}>{v.plateNumber} - {v.brand} {v.vehicleName}</SelectItem>
-                    ))}
-                    </SelectContent>
-                  </Select>
+                <div>
+                  <InputSelect
+                    id="vehicleId"
+                    label={labels.fieldSelectVehicle}
+                    value={vehicleId}
+                    onChange={(v) => setVehicleId(v)}
+                    options={availableCoreVehicles.map(v => ({ value: v.id, label: `${v.plateNumber} - ${v.brand} ${v.vehicleName}` }))}
+                    required
+                  />
                   {availableCoreVehicles.length === 0 && (
                     <p className="text-[11px] text-warning mt-1">{labels.noCoreVehicles}</p>
                   )}
@@ -154,17 +154,29 @@ export function RentalVehicleForm({
             >
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3.5">
-                <div className="flex flex-col gap-1.5 sm:col-span-2">
-                  <Label className="text-xs font-semibold">Masa Berlaku STNK</Label>
-                  <Input type="date" value={stnkExpiry} onChange={e => setStnkExpiry(e.target.value)} className="h-9 text-sm" />
+                <div className="sm:col-span-2">
+                  <InputDate
+                    id="stnkExpiry"
+                    label="Masa Berlaku STNK"
+                    value={stnkExpiry}
+                    onChange={(v) => setStnkExpiry(v)}
+                  />
                 </div>
-                <div className="flex flex-col gap-1.5">
-                  <Label className="text-xs font-semibold">Masa Berlaku Pajak</Label>
-                  <Input type="date" value={taxExpiry} onChange={e => setTaxExpiry(e.target.value)} className="h-9 text-sm" />
+                <div>
+                  <InputDate
+                    id="taxExpiry"
+                    label="Masa Berlaku Pajak"
+                    value={taxExpiry}
+                    onChange={(v) => setTaxExpiry(v)}
+                  />
                 </div>
-                <div className="flex flex-col gap-1.5">
-                  <Label className="text-xs font-semibold">Masa Berlaku Asuransi</Label>
-                  <Input type="date" value={insuranceExpiry} onChange={e => setInsuranceExpiry(e.target.value)} className="h-9 text-sm" />
+                <div>
+                  <InputDate
+                    id="insuranceExpiry"
+                    label="Masa Berlaku Asuransi"
+                    value={insuranceExpiry}
+                    onChange={(v) => setInsuranceExpiry(v)}
+                  />
                 </div>
               </div>
             </FormCard>
@@ -183,60 +195,76 @@ export function RentalVehicleForm({
             >
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
-                <div className="flex flex-col gap-1.5 sm:col-span-2">
-                  <Label className="text-xs font-semibold">Status Rental</Label>
-                  <Select value={status} onValueChange={(v) => setStatus(v as RentalStatus)}>
-                    <SelectTrigger className="h-9 text-sm border-danger text-danger"><SelectValue placeholder="Pilih status" /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="READY">Ready / Tersedia</SelectItem>
-                      <SelectItem value="RESERVED">Reserved / Dipesan</SelectItem>
-                      <SelectItem value="RENTED">Disewa</SelectItem>
-                      <SelectItem value="MAINTENANCE">Maintenance</SelectItem>
-                      <SelectItem value="UNAVAILABLE">Tidak Tersedia</SelectItem>
-                    </SelectContent>
-                  </Select>
+                <div className="sm:col-span-2">
+                  <InputSelect
+                    id="status"
+                    label="Status Rental"
+                    value={status}
+                    onChange={(v) => setStatus(v as RentalStatus)}
+                    options={[
+                      { value: 'READY', label: 'Ready / Tersedia' },
+                      { value: 'RESERVED', label: 'Reserved / Dipesan' },
+                      { value: 'RENTED', label: 'Disewa' },
+                      { value: 'MAINTENANCE', label: 'Maintenance' },
+                      { value: 'UNAVAILABLE', label: 'Tidak Tersedia' }
+                    ]}
+                  />
                 </div>
 
-                <div className="flex flex-col gap-1.5">
-                  <Label className="text-xs font-semibold">Tarif Harian</Label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">Rp</span>
-                    <Input type="number" min="0" value={dailyRate} onChange={e => setDailyRate(e.target.value)} className="h-9 text-sm pl-9" placeholder="0" />
-                  </div>
+                <div>
+                  <InputDecimal
+                    id="dailyRate"
+                    label="Tarif Harian"
+                    value={dailyRate ? Number(dailyRate) : null}
+                    onChange={(v) => setDailyRate(v !== null ? String(v) : '')}
+                    prefixIcon={<span className="text-muted-foreground text-sm font-medium">Rp</span>}
+                    placeholder="0"
+                  />
                 </div>
-                <div className="flex flex-col gap-1.5">
-                  <Label className="text-xs font-semibold">Deposit</Label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">Rp</span>
-                    <Input type="number" min="0" value={deposit} onChange={e => setDeposit(e.target.value)} className="h-9 text-sm pl-9" placeholder="0" />
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                  <Label className="text-xs font-semibold">Tarif Mingguan</Label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">Rp</span>
-                    <Input type="number" min="0" value={weeklyRate} onChange={e => setWeeklyRate(e.target.value)} className="h-9 text-sm pl-9" placeholder="0" />
-                  </div>
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <Label className="text-xs font-semibold">Tarif Bulanan</Label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">Rp</span>
-                    <Input type="number" min="0" value={monthlyRate} onChange={e => setMonthlyRate(e.target.value)} className="h-9 text-sm pl-9" placeholder="0" />
-                  </div>
+                <div>
+                  <InputDecimal
+                    id="deposit"
+                    label="Deposit"
+                    value={deposit ? Number(deposit) : null}
+                    onChange={(v) => setDeposit(v !== null ? String(v) : '')}
+                    prefixIcon={<span className="text-muted-foreground text-sm font-medium">Rp</span>}
+                    placeholder="0"
+                  />
                 </div>
 
-                <div className="flex flex-col gap-1.5 sm:col-span-2">
-                  <Label className="text-xs font-semibold">Kondisi</Label>
-                  <Select value={condition} onValueChange={(v) => setCondition(v as RentalCondition)}>
-                    <SelectTrigger className="h-9 text-sm border-danger text-danger"><SelectValue placeholder="Pilih kondisi" /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="GOOD">Baik</SelectItem>
-                      <SelectItem value="MINOR_DAMAGE">Kerusakan Ringan</SelectItem>
-                      <SelectItem value="NEEDS_REPAIR">Perlu Perbaikan</SelectItem>
-                    </SelectContent>
-                  </Select>
+                <div>
+                  <InputDecimal
+                    id="weeklyRate"
+                    label="Tarif Mingguan"
+                    value={weeklyRate ? Number(weeklyRate) : null}
+                    onChange={(v) => setWeeklyRate(v !== null ? String(v) : '')}
+                    prefixIcon={<span className="text-muted-foreground text-sm font-medium">Rp</span>}
+                    placeholder="0"
+                  />
+                </div>
+                <div>
+                  <InputDecimal
+                    id="monthlyRate"
+                    label="Tarif Bulanan"
+                    value={monthlyRate ? Number(monthlyRate) : null}
+                    onChange={(v) => setMonthlyRate(v !== null ? String(v) : '')}
+                    prefixIcon={<span className="text-muted-foreground text-sm font-medium">Rp</span>}
+                    placeholder="0"
+                  />
+                </div>
+
+                <div className="sm:col-span-2">
+                  <InputSelect
+                    id="condition"
+                    label="Kondisi"
+                    value={condition}
+                    onChange={(v) => setCondition(v as RentalCondition)}
+                    options={[
+                      { value: 'GOOD', label: 'Baik' },
+                      { value: 'MINOR_DAMAGE', label: 'Kerusakan Ringan' },
+                      { value: 'NEEDS_REPAIR', label: 'Perlu Perbaikan' }
+                    ]}
+                  />
                 </div>
 
                 <div className="flex flex-col gap-1.5 sm:col-span-2">
@@ -247,12 +275,16 @@ export function RentalVehicleForm({
                   </div>
                 </div>
                 
-                <div className="flex flex-col gap-1.5 sm:col-span-2">
-                  <Label className="text-xs font-semibold">Catatan</Label>
-                  <div className="relative">
-                    <Input value={notes} onChange={e => setNotes(e.target.value)} className="h-10 text-sm pr-14" placeholder="Tulis catatan (opsional)" />
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground">{notes.length} / 500</span>
-                  </div>
+                <div className="sm:col-span-2">
+                  <InputString
+                    id="notes"
+                    label="Catatan"
+                    value={notes}
+                    onChange={(v) => setNotes(v)}
+                    placeholder="Tulis catatan (opsional)"
+                    maxLength={500}
+                    helpText={`${notes.length} / 500 karakter`}
+                  />
                 </div>
               </div>
             </FormCard>

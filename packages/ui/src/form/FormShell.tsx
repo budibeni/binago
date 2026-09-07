@@ -29,7 +29,7 @@ export interface FormShellProps extends Omit<FormFooterProps, 'isSticky'> {
 }
 
 export function FormShell({
-  layout = 'drawer',
+  layout = 'default',
   open,
   onOpenChange,
   children,

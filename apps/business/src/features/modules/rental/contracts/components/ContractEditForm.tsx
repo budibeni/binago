@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Button, Input, Textarea, Label, FormShell, FormCard } from '@adatrack/ui';
+import { Button, FormShell, FormCard, InputDateTime, InputTextarea, Label } from '@adatrack/ui';
 import { User, Car, Calendar, DollarSign, Info } from 'lucide-react';
 import type { RentalContract } from '../types/contract';
 
@@ -179,38 +179,38 @@ export function ContractEditForm({
       <FormCard title="Informasi Kontrak (Edit)">
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <Label>Tanggal Kontrak</Label>
-              <Input 
-                type="datetime-local" 
+            <div>
+              <InputDateTime
+                id="contractDate"
+                label="Tanggal Kontrak"
                 value={contractDate}
-                onChange={(e) => setContractDate(e.target.value)}
+                onChange={(val) => setContractDate(val || '')}
                 required
               />
             </div>
           </div>
 
-          <div className="space-y-1.5">
-            <Label>Catatan (Opsional)</Label>
-            <Textarea 
+          <div>
+            <InputTextarea
+              id="notes"
+              label="Catatan (Opsional)"
               placeholder="Tambahkan catatan khusus untuk kontrak ini..."
               rows={3}
               value={notes}
-              onChange={(e) => setNotes(e.target.value)}
+              onChange={setNotes}
             />
           </div>
 
-          <div className="space-y-1.5">
-            <Label>Syarat & Ketentuan</Label>
-            <Textarea 
+          <div>
+            <InputTextarea
+              id="terms"
+              label="Syarat & Ketentuan"
               rows={6}
               value={terms}
-              onChange={(e) => setTerms(e.target.value)}
+              onChange={setTerms}
               required
+              helpText="Syarat dan ketentuan ini akan dicetak pada dokumen kontrak."
             />
-            <p className="text-xs text-muted-foreground">
-              Syarat dan ketentuan ini akan dicetak pada dokumen kontrak.
-            </p>
           </div>
           </div>
         </FormCard>
