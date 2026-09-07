@@ -3,7 +3,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { AlertCircle, ArrowLeft, UserRound, MapPin, Phone, FileText } from 'lucide-react';
-import { Button, Input, Label, Textarea, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, FormShell } from '@adatrack/ui';
+import { Button, Input, Label, Textarea, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, FormShell, FormCard } from '@adatrack/ui';
 import { groupService } from '@/data/services';
 import type { Driver } from '../types/driver';
 
@@ -37,12 +37,12 @@ interface DriverFormProps {
   initialData?: Partial<Driver>;
   onCancel: () => void;
   onSubmit: (data: Partial<Driver>) => void;
-  mode?: 'page' | 'drawer' | 'dialog';
+  layout?: 'default' | 'drawer' | 'dialog' | 'fullscreen';
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }
 
-export function DriverForm({ labels, initialData, onCancel, onSubmit, mode = 'drawer', open, onOpenChange }: DriverFormProps) {
+export function DriverForm({ labels, initialData, onCancel, onSubmit, layout = 'drawer', open, onOpenChange }: DriverFormProps) {
   const router = useRouter();
   const [formData, setFormData] = React.useState({
     name: initialData?.name || '',
@@ -103,7 +103,7 @@ export function DriverForm({ labels, initialData, onCancel, onSubmit, mode = 'dr
   return (
     <form onSubmit={handleSubmit} className="w-full h-full relative">
       <FormShell
-        mode={mode}
+        layout={layout}
         open={open}
         onOpenChange={onOpenChange}
         title={labels.title}
@@ -119,16 +119,11 @@ export function DriverForm({ labels, initialData, onCancel, onSubmit, mode = 'dr
           <div className="flex flex-col gap-6">
 
             {/* Identitas Card */}
-            <div className="bg-background border border-border/60 rounded-2xl p-6 flex flex-col gap-6">
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-xl bg-danger/10 text-danger flex items-center justify-center shrink-0">
-                  <UserRound className="w-5 h-5" />
-                </div>
-                <div>
-                  <h2 className="text-sm font-semibold text-foreground">{labels.sectionIdentity}</h2>
-                  <p className="text-xs text-foreground-subtle mt-0.5 leading-relaxed">{labels.descIdentity}</p>
-                </div>
-              </div>
+            <FormCard
+              title={labels.sectionIdentity}
+              description={labels.descIdentity}
+              icon={<UserRound className="w-5 h-5 text-danger" />}
+            >
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-4">
                 <div className="flex flex-col gap-1.5 sm:col-span-2">
@@ -185,19 +180,14 @@ export function DriverForm({ labels, initialData, onCancel, onSubmit, mode = 'dr
                   />
                 </div>
               </div>
-            </div>
+            </FormCard>
 
             {/* Alamat Card */}
-            <div className="bg-background border border-border/60 rounded-2xl p-6 flex flex-col gap-6">
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center shrink-0">
-                  <MapPin className="w-5 h-5" />
-                </div>
-                <div>
-                  <h2 className="text-sm font-semibold text-foreground">{labels.sectionAddress}</h2>
-                  <p className="text-xs text-foreground-subtle mt-0.5 leading-relaxed">{labels.descAddress}</p>
-                </div>
-              </div>
+            <FormCard
+              title={labels.sectionAddress}
+              description={labels.descAddress}
+              icon={<MapPin className="w-5 h-5 text-blue-500" />}
+            >
 
               <div className="flex flex-col gap-1.5">
                 <Label htmlFor="address" className="text-xs font-semibold">Alamat Lengkap</Label>
@@ -211,7 +201,7 @@ export function DriverForm({ labels, initialData, onCancel, onSubmit, mode = 'dr
                   className="resize-none text-sm"
                 />
               </div>
-            </div>
+            </FormCard>
 
           </div>
 
@@ -219,16 +209,11 @@ export function DriverForm({ labels, initialData, onCancel, onSubmit, mode = 'dr
           <div className="flex flex-col gap-6">
 
             {/* Kontak Card */}
-            <div className="bg-background border border-border/60 rounded-2xl p-6 flex flex-col gap-6">
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-xl bg-green-500/10 text-green-500 flex items-center justify-center shrink-0">
-                  <Phone className="w-5 h-5" />
-                </div>
-                <div>
-                  <h2 className="text-sm font-semibold text-foreground">{labels.sectionContact}</h2>
-                  <p className="text-xs text-foreground-subtle mt-0.5 leading-relaxed">{labels.descContact}</p>
-                </div>
-              </div>
+            <FormCard
+              title={labels.sectionContact}
+              description={labels.descContact}
+              icon={<Phone className="w-5 h-5 text-green-500" />}
+            >
 
               <div className="grid grid-cols-1 gap-y-4">
                 <div className="flex flex-col gap-1.5">
@@ -259,19 +244,14 @@ export function DriverForm({ labels, initialData, onCancel, onSubmit, mode = 'dr
                   />
                 </div>
               </div>
-            </div>
+            </FormCard>
 
             {/* Lisensi & Pekerjaan Card */}
-            <div className="bg-background border border-border/60 rounded-2xl p-6 flex flex-col gap-6">
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-500 flex items-center justify-center shrink-0">
-                  <FileText className="w-5 h-5" />
-                </div>
-                <div>
-                  <h2 className="text-sm font-semibold text-foreground">{labels.sectionWork}</h2>
-                  <p className="text-xs text-foreground-subtle mt-0.5 leading-relaxed">{labels.descWork}</p>
-                </div>
-              </div>
+            <FormCard
+              title={labels.sectionWork}
+              description={labels.descWork}
+              icon={<FileText className="w-5 h-5 text-purple-500" />}
+            >
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-4">
                 <div className="flex flex-col gap-1.5 sm:col-span-2">
@@ -343,7 +323,7 @@ export function DriverForm({ labels, initialData, onCancel, onSubmit, mode = 'dr
                   />
                 </div>
               </div>
-            </div>
+            </FormCard>
 
           </div>
         </div>

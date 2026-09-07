@@ -82,7 +82,7 @@ export function HandoverFeature({ contractId, open, onOpenChange, onSuccess }: H
       onSubmit={handleSubmit}
       onCancel={handleCancel}
       isSubmitting={isSubmitting}
-      mode="drawer"
+      layout="drawer"
       open={open}
       onOpenChange={onOpenChange}
     />

@@ -299,7 +299,7 @@ export function RentalVehiclesFeature() {
 
       {editId && (
         <RentalVehicleForm
-          mode="drawer"
+          layout="drawer"
           open={!!editId}
           onOpenChange={(open) => {
             if (!open) setEditId(null);

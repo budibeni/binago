@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Button, Input, Textarea, Label, FormShell } from '@adatrack/ui';
+import { Button, Input, Textarea, Label, FormShell, FormCard } from '@adatrack/ui';
 import { User, Car, Calendar, DollarSign, Info } from 'lucide-react';
 import type { RentalContract } from '../types/contract';
 
@@ -11,7 +11,7 @@ interface ContractEditFormProps {
   onSubmit: (data: Partial<RentalContract>) => Promise<void>;
   onCancel: () => void;
   isSubmitting?: boolean;
-  mode?: 'page' | 'drawer' | 'dialog';
+  layout?: 'default' | 'drawer' | 'dialog' | 'fullscreen';
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }
@@ -22,7 +22,7 @@ export function ContractEditForm({
   onSubmit,
   onCancel,
   isSubmitting,
-  mode = 'drawer',
+  layout = 'drawer',
   open,
   onOpenChange,
 }: ContractEditFormProps) {
@@ -57,7 +57,7 @@ export function ContractEditForm({
   return (
     <form onSubmit={handleSubmit} className="w-full h-full flex flex-col relative">
       <FormShell
-        mode={mode}
+        layout={layout}
         open={open}
         onOpenChange={onOpenChange}
         onCancel={onCancel}
@@ -70,12 +70,10 @@ export function ContractEditForm({
       
       {/* 1. INFORMASI RESERVASI & PELANGGAN (READONLY) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-card border border-border rounded-xl p-5 shadow-sm">
-          <div className="flex items-center gap-2 mb-4 pb-3 border-b border-border">
-            <Info className="w-5 h-5 text-primary" />
-            <h3 className="font-semibold text-lg">Informasi Reservasi</h3>
-          </div>
-          
+        <FormCard
+          title="Informasi Reservasi"
+          icon={<Info className="w-5 h-5 text-primary" />}
+        >
           <div className="space-y-4">
             <div>
               <p className="text-xs text-muted-foreground font-semibold mb-1">No. Reservasi</p>
@@ -94,15 +92,13 @@ export function ContractEditForm({
               <p className="text-xs text-muted-foreground">{contract.customer?.phone}</p>
             </div>
           </div>
-        </div>
+        </FormCard>
 
         {/* 2. KENDARAAN (READONLY) */}
-        <div className="bg-card border border-border rounded-xl p-5 shadow-sm">
-          <div className="flex items-center gap-2 mb-4 pb-3 border-b border-border">
-            <Car className="w-5 h-5 text-primary" />
-            <h3 className="font-semibold text-lg">Kendaraan</h3>
-          </div>
-          
+        <FormCard
+          title="Kendaraan"
+          icon={<Car className="w-5 h-5 text-primary" />}
+        >
           <div className="flex gap-4 items-start">
             <div className="w-24 h-24 bg-neutral-100 dark:bg-neutral-800 rounded-lg border border-border shrink-0 flex items-center justify-center">
               <Car className="w-8 h-8 text-neutral-400" />
@@ -124,17 +120,15 @@ export function ContractEditForm({
               </div>
             </div>
           </div>
-        </div>
+        </FormCard>
       </div>
 
       {/* 3. PERIODE & NILAI (READONLY) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-card border border-border rounded-xl p-5 shadow-sm">
-          <div className="flex items-center gap-2 mb-4 pb-3 border-b border-border">
-            <Calendar className="w-5 h-5 text-primary" />
-            <h3 className="font-semibold text-lg">Periode Rental</h3>
-          </div>
-          
+        <FormCard
+          title="Periode Rental"
+          icon={<Calendar className="w-5 h-5 text-primary" />}
+        >
           <div className="grid grid-cols-2 gap-4">
             <div>
               <p className="text-[11px] text-muted-foreground font-semibold">Tipe Sewa</p>
@@ -153,13 +147,12 @@ export function ContractEditForm({
               <p className="text-sm font-medium">{formatDate(contract.endDate)}</p>
             </div>
           </div>
-        </div>
+        </FormCard>
 
-        <div className="bg-card border border-border rounded-xl p-5 shadow-sm">
-          <div className="flex items-center gap-2 mb-4 pb-3 border-b border-border">
-            <DollarSign className="w-5 h-5 text-primary" />
-            <h3 className="font-semibold text-lg">Nilai Kontrak</h3>
-          </div>
+        <FormCard 
+          title="Nilai Kontrak"
+          icon={<DollarSign className="w-5 h-5 text-primary" />}
+        >
           
           <div className="space-y-3">
             <div className="flex justify-between items-center text-sm">
@@ -179,13 +172,11 @@ export function ContractEditForm({
               <span className="font-bold text-lg text-primary">{formatCurrency(contract.totalAmount)}</span>
             </div>
           </div>
-        </div>
+        </FormCard>
       </div>
 
       {/* 4. INFORMASI KONTRAK (EDITABLE) */}
-      <div className="bg-card border border-border rounded-xl p-5 shadow-sm">
-        <h3 className="font-semibold text-lg mb-4 pb-3 border-b border-border">Informasi Kontrak (Edit)</h3>
-        
+      <FormCard title="Informasi Kontrak (Edit)">
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1.5">
@@ -222,7 +213,7 @@ export function ContractEditForm({
             </p>
           </div>
           </div>
-        </div>
+        </FormCard>
         </div>
       </FormShell>
     </form>

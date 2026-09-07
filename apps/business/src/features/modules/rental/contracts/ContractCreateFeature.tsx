@@ -67,7 +67,7 @@ export function ContractCreateFeature({ open, onOpenChange, onSuccess }: Contrac
       onSubmit={handleSubmit}
       onCancel={handleCancel}
       isSubmitting={isSubmitting}
-      mode="drawer"
+      layout="drawer"
       open={open}
       onOpenChange={onOpenChange}
     />

@@ -1,14 +1,14 @@
 'use client';
 
 import React from 'react';
-import { Button, Input, Label, FormShell } from '@adatrack/ui';
+import { Button, Input, Label, FormShell, FormCard } from '@adatrack/ui';
 import { Calendar } from 'lucide-react';
 
 interface DepartureFormProps {
   onCancel: () => void;
   onSave: (date: string) => void;
   error?: string;
-  mode?: 'page' | 'drawer' | 'dialog';
+  layout?: 'default' | 'drawer' | 'dialog' | 'fullscreen';
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }
@@ -17,7 +17,7 @@ export function DepartureForm({
   onCancel,
   onSave,
   error,
-  mode = 'dialog',
+  layout = 'dialog',
   open,
   onOpenChange
 }: DepartureFormProps) {
@@ -38,7 +38,7 @@ export function DepartureForm({
   return (
     <form onSubmit={handleSubmit} className="flex flex-col w-full h-full relative">
       <FormShell
-        mode={mode}
+        layout={layout}
         open={open}
         onOpenChange={onOpenChange}
         title="Generate Keberangkatan Harian"
@@ -55,10 +55,11 @@ export function DepartureForm({
           </div>
         )}
         
-        <div className="bg-background border border-border/60 rounded-2xl p-4 lg:p-5 flex flex-col gap-4">
-          <p className="text-sm text-muted-foreground mb-2">
-            Sistem akan secara otomatis memeriksa semua jadwal operasional (ACTIVE) yang memiliki hari sesuai dengan tanggal yang dipilih. Keberangkatan akan di-generate untuk masing-masing kendaraan pada jadwal tersebut. Data yang sudah di-generate sebelumnya tidak akan diduplikasi.
-          </p>
+        <FormCard 
+          title="Keberangkatan" 
+          description="Sistem akan secara otomatis memeriksa semua jadwal operasional (ACTIVE) yang memiliki hari sesuai dengan tanggal yang dipilih. Keberangkatan akan di-generate untuk masing-masing kendaraan pada jadwal tersebut. Data yang sudah di-generate sebelumnya tidak akan diduplikasi."
+          icon={<Calendar className="w-5 h-5 text-primary" />}
+        >
 
           <div className="flex flex-col gap-1.5">
             <Label className="text-xs font-semibold text-foreground-subtle">Pilih Tanggal <span className="text-danger">*</span></Label>
@@ -69,7 +70,7 @@ export function DepartureForm({
               required 
             />
           </div>
-        </div>
+        </FormCard>
         </div>
       </FormShell>
     </form>

@@ -285,7 +285,7 @@ export function DeparturesFeature() {
 
       {/* Form Dialog */}
       <DepartureForm
-        mode="dialog"
+        layout="dialog"
         open={isFormOpen}
         onOpenChange={setIsFormOpen}
         onCancel={() => setIsFormOpen(false)}

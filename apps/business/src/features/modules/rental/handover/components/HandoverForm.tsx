@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Input, Button, Checkbox, Textarea, Label, FormShell } from '@adatrack/ui';
+import { Card, Input, Button, Checkbox, Textarea, Label, FormShell, FormCard } from '@adatrack/ui';
 import { MapPin, Car, Fuel, Wrench, CheckSquare, Clock } from 'lucide-react';
 import type { RentalContract } from '../../contracts/types/contract';
 import type { RentalHandover } from '../types/handover';
@@ -10,12 +10,12 @@ interface HandoverFormProps {
   onSubmit: (data: Omit<RentalHandover, 'id' | 'createdAt' | 'updatedAt'>) => void;
   onCancel: () => void;
   isSubmitting: boolean;
-  mode?: 'page' | 'drawer' | 'dialog';
+  layout?: 'default' | 'drawer' | 'dialog' | 'fullscreen';
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }
 
-export function HandoverForm({ contract, labels, onSubmit, onCancel, isSubmitting, mode = 'drawer', open, onOpenChange }: HandoverFormProps) {
+export function HandoverForm({ contract, labels, onSubmit, onCancel, isSubmitting, layout = 'drawer', open, onOpenChange }: HandoverFormProps) {
   const [latitude, setLatitude] = React.useState<number | null>(null);
   const [longitude, setLongitude] = React.useState<number | null>(null);
   const [address, setAddress] = React.useState('');
@@ -88,7 +88,7 @@ export function HandoverForm({ contract, labels, onSubmit, onCancel, isSubmittin
   return (
     <form onSubmit={handleSubmit} className="w-full h-full relative">
       <FormShell
-        mode={mode}
+        layout={layout}
         open={open}
         onOpenChange={onOpenChange}
         onCancel={onCancel}
@@ -102,13 +102,7 @@ export function HandoverForm({ contract, labels, onSubmit, onCancel, isSubmittin
       
       {/* Contract & Vehicle Info */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="bg-white dark:bg-neutral-900 border-border shadow-sm">
-          <div className="bg-neutral-50 dark:bg-neutral-900/50 border-b border-border py-4 px-4">
-            <h3 className="text-sm font-bold flex items-center gap-2">
-              {labels.sectionContract}
-            </h3>
-          </div>
-          <div className="p-4 space-y-4">
+        <FormCard title={labels.sectionContract}>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-[11px] font-semibold text-muted-foreground uppercase mb-1">Nomor Kontrak</p>
@@ -119,16 +113,9 @@ export function HandoverForm({ contract, labels, onSubmit, onCancel, isSubmittin
                 <p className="text-sm font-bold">{contract.customer?.name}</p>
               </div>
             </div>
-          </div>
-        </Card>
+        </FormCard>
 
-        <Card className="bg-white dark:bg-neutral-900 border-border shadow-sm">
-          <div className="bg-neutral-50 dark:bg-neutral-900/50 border-b border-border py-4 px-4">
-            <h3 className="text-sm font-bold flex items-center gap-2">
-              {labels.sectionVehicleInfo}
-            </h3>
-          </div>
-          <div className="p-4 space-y-4">
+        <FormCard title={labels.sectionVehicleInfo}>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-[11px] font-semibold text-muted-foreground uppercase mb-1">Nomor Polisi</p>
@@ -139,19 +126,14 @@ export function HandoverForm({ contract, labels, onSubmit, onCancel, isSubmittin
                 <p className="text-sm font-bold">{contract.vehicle?.coreVehicle?.brand} {contract.vehicle?.coreVehicle?.vehicleName}</p>
               </div>
             </div>
-          </div>
-        </Card>
+        </FormCard>
       </div>
 
       {/* Location */}
-      <Card className="bg-white dark:bg-neutral-900 border-border shadow-sm">
-        <div className="bg-neutral-50 dark:bg-neutral-900/50 border-b border-border py-4 px-4">
-          <h3 className="text-sm font-bold flex items-center gap-2">
-            <MapPin className="w-4 h-4 text-primary" />
-            {labels.sectionLocation}
-          </h3>
-        </div>
-        <div className="p-4 space-y-4">
+      <FormCard
+        title={labels.sectionLocation}
+        icon={<MapPin className="w-5 h-5 text-primary" />}
+      >
           <Button type="button" variant="outline" onClick={handleGetLocation} className="w-full sm:w-auto">
             {labels.btnGetLocation}
           </Button>
@@ -176,18 +158,13 @@ export function HandoverForm({ contract, labels, onSubmit, onCancel, isSubmittin
               />
             </div>
           </div>
-        </div>
-      </Card>
+      </FormCard>
 
       {/* Vehicle Condition */}
-      <Card className="bg-white dark:bg-neutral-900 border-border shadow-sm">
-        <div className="bg-neutral-50 dark:bg-neutral-900/50 border-b border-border py-4 px-4">
-          <h3 className="text-sm font-bold flex items-center gap-2">
-            <Car className="w-4 h-4 text-primary" />
-            {labels.sectionVehicleCondition}
-          </h3>
-        </div>
-        <div className="p-4 space-y-6">
+      <FormCard
+        title={labels.sectionVehicleCondition}
+        icon={<Car className="w-5 h-5 text-primary" />}
+      >
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             
             {/* Odometer */}
@@ -257,18 +234,13 @@ export function HandoverForm({ contract, labels, onSubmit, onCancel, isSubmittin
             </div>
 
           </div>
-        </div>
-      </Card>
+      </FormCard>
 
       {/* Equipment Checklist */}
-      <Card className="bg-white dark:bg-neutral-900 border-border shadow-sm">
-        <div className="bg-neutral-50 dark:bg-neutral-900/50 border-b border-border py-4 px-4">
-          <h3 className="text-sm font-bold flex items-center gap-2">
-            <CheckSquare className="w-4 h-4 text-primary" />
-            {labels.sectionEquipment}
-          </h3>
-        </div>
-        <div className="p-4 space-y-4">
+      <FormCard
+        title={labels.sectionEquipment}
+        icon={<CheckSquare className="w-5 h-5 text-primary" />}
+      >
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
             {Object.keys(equipment).map((key) => {
               if (key === 'other') return null;
@@ -286,25 +258,17 @@ export function HandoverForm({ contract, labels, onSubmit, onCancel, isSubmittin
               );
             })}
           </div>
-        </div>
-      </Card>
+      </FormCard>
 
       {/* Notes */}
-      <Card className="bg-white dark:bg-neutral-900 border-border shadow-sm">
-        <div className="bg-neutral-50 dark:bg-neutral-900/50 border-b border-border py-4 px-4">
-          <h3 className="text-sm font-bold flex items-center gap-2">
-            {labels.sectionNotes}
-          </h3>
-        </div>
-        <div className="p-4">
+      <FormCard title={labels.sectionNotes}>
           <Textarea 
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Catatan tambahan terkait serah terima (Opsional)"
             className="min-h-[100px]"
           />
-        </div>
-      </Card>
+      </FormCard>
 
         </div>
       </FormShell>

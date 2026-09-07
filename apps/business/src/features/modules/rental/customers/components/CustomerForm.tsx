@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Button, Input, Label, FormShell } from '@adatrack/ui';
+import { Button, Input, Label, FormShell, FormCard } from '@adatrack/ui';
 import { User, Phone, MapPin, Building, FileText, Briefcase, Settings } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import type { Customer, IndividualCustomer, CompanyCustomer } from '../types/customer';
@@ -11,27 +11,21 @@ interface CustomerFormProps {
   onCancel: () => void;
   onSave: (data: any) => void;
   labels: Record<string, string>;
-  mode?: 'page' | 'drawer' | 'dialog';
+  layout?: 'default' | 'drawer' | 'dialog' | 'fullscreen';
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }
 
 function SectionCard({ title, description, icon: Icon, children, className }: any) {
   return (
-    <div className={cn("bg-white dark:bg-neutral-900 border border-border rounded-xl p-5 shadow-sm h-fit", className)}>
-      <div className="flex items-start gap-3 mb-6">
-        <div className="w-10 h-10 rounded-full bg-danger/10 text-danger flex items-center justify-center shrink-0">
-          <Icon className="w-5 h-5" />
-        </div>
-        <div className="flex flex-col gap-0.5 mt-0.5">
-          <h3 className="text-[14px] font-bold text-foreground">{title}</h3>
-          <p className="text-[11px] text-muted-foreground">{description}</p>
-        </div>
-      </div>
-      <div className="space-y-4">
-        {children}
-      </div>
-    </div>
+    <FormCard
+      title={title}
+      description={description}
+      icon={<Icon className="w-5 h-5 text-muted-foreground" />}
+      className={className}
+    >
+      {children}
+    </FormCard>
   );
 }
 
@@ -40,7 +34,7 @@ export function CustomerForm({
   onCancel,
   onSave,
   labels,
-  mode = 'drawer',
+  layout = 'drawer',
   open,
   onOpenChange,
 }: CustomerFormProps) {
@@ -196,7 +190,7 @@ export function CustomerForm({
 
   return (
     <FormShell
-      mode={mode}
+      layout={layout}
       open={open}
       onOpenChange={onOpenChange}
       title={isEditing ? labels.actionEdit : labels.addCustomer}

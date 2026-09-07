@@ -181,7 +181,7 @@ export function DriversFeature() {
 
       {(isCreateOpen || editId) && (
         <DriverForm
-          mode="drawer"
+          layout="drawer"
           open={isCreateOpen || !!editId}
           onOpenChange={(open) => {
             if (!open) {

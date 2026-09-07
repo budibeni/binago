@@ -1,4 +1,5 @@
 import React from 'react';
+import { Save } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import { Button, type ButtonProps } from '../Button';
 
@@ -88,7 +89,7 @@ export const FormFooter = React.forwardRef<HTMLDivElement, FormFooterProps>(
       <div
         ref={ref}
         className={cn(
-          'flex items-center justify-between px-4 md:px-6 lg:px-8 py-3 bg-background border-t border-border/40 shadow-sm',
+          'flex items-center justify-between px-4 md:px-6 py-2 bg-background border-t border-border shadow-sm',
           isSticky ? 'fixed bottom-0 left-0 right-0 lg:left-64 z-40' : 'w-full mt-auto shrink-0',
           className
         )}
@@ -116,7 +117,7 @@ export const FormFooter = React.forwardRef<HTMLDivElement, FormFooterProps>(
                   size="sm"
                   onClick={onCancel}
                   disabled={isSubmitting || cancelProps?.disabled}
-                  className={cn('bg-background', cancelProps?.className)}
+                  className={cn('h-7 text-xs px-3 bg-background', cancelProps?.className)}
                   {...cancelProps}
                 >
                   {cancelText}
@@ -128,7 +129,8 @@ export const FormFooter = React.forwardRef<HTMLDivElement, FormFooterProps>(
                 size="sm"
                 onClick={onSave}
                 disabled={isSubmitting || saveProps?.disabled}
-                className={cn('min-w-[100px] bg-danger hover:bg-danger/90 text-white border-transparent', saveProps?.className)}
+                className={cn('h-7 text-xs px-4 min-w-[100px] bg-danger hover:bg-danger/90 text-white border-transparent', saveProps?.className)}
+                leftIcon={<Save className="w-3.5 h-3.5" />}
                 {...saveProps}
               >
                 {saveText}

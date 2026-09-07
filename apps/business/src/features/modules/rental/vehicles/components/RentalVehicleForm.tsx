@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Button, Input, Label, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Textarea, FormShell } from '@adatrack/ui';
+import { Button, Input, Label, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Textarea, FormShell, FormCard } from '@adatrack/ui';
 import { CarFront, FileText, Settings, ShieldCheck, FileSpreadsheet } from 'lucide-react';
 import type { RentalVehicle, RentalVehicleProfile, RentalEquipment, RentalStatus, RentalCondition } from '../types/rentalVehicle';
 import type { Vehicle } from '@/features/core/vehicles/types/vehicle';
@@ -13,7 +13,7 @@ interface RentalVehicleFormProps {
   availableCoreVehicles?: Vehicle[];
   onCancel: () => void;
   onSave: (data: Omit<RentalVehicleProfile, 'id' | 'createdAt' | 'updatedAt'>) => void;
-  mode?: 'page' | 'drawer' | 'dialog';
+  layout?: 'default' | 'drawer' | 'dialog' | 'fullscreen';
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }
@@ -25,7 +25,7 @@ export function RentalVehicleForm({
   availableCoreVehicles = [],
   onCancel,
   onSave,
-  mode = 'drawer',
+  layout = 'drawer',
   open,
   onOpenChange,
 }: RentalVehicleFormProps) {
@@ -84,7 +84,7 @@ export function RentalVehicleForm({
   return (
     <form onSubmit={handleSubmit} className="flex flex-col w-full h-full relative">
       <FormShell
-        mode={mode}
+        layout={layout}
         open={open}
         onOpenChange={onOpenChange}
         title={title}
@@ -102,16 +102,11 @@ export function RentalVehicleForm({
           <div className="flex flex-col gap-4 lg:gap-5">
 
             {/* Core Info Card */}
-            <div className="bg-background border border-border/60 rounded-2xl p-4 lg:p-5 flex flex-col gap-4">
-              <div className="flex items-start gap-4">
-                <div className="w-9 h-9 rounded-xl bg-danger/10 text-danger flex items-center justify-center shrink-0">
-                  <CarFront className="w-4 h-4" />
-                </div>
-                <div>
-                  <h2 className="text-sm font-semibold text-foreground">Data Kendaraan</h2>
-                  <p className="text-[11px] text-foreground-subtle mt-0.5 leading-relaxed">Data kendaraan dikelola di Master Data Armada. Informasi berikut bersifat read-only.</p>
-                </div>
-              </div>
+            <FormCard
+              title="Data Kendaraan"
+              description="Data kendaraan dikelola di Master Data Armada. Informasi berikut bersifat read-only."
+              icon={<CarFront className="w-5 h-5 text-danger" />}
+            >
 
               {!isEdit && (
                 <div className="flex flex-col gap-1.5">
@@ -149,19 +144,14 @@ export function RentalVehicleForm({
                   </div>
                 </div>
               )}
-            </div>
+            </FormCard>
 
             {/* Document Expire Card */}
-            <div className="bg-background border border-border/60 rounded-2xl p-4 lg:p-5 flex flex-col gap-4">
-              <div className="flex items-start gap-4">
-                <div className="w-9 h-9 rounded-xl bg-danger/10 text-danger flex items-center justify-center shrink-0">
-                  <FileSpreadsheet className="w-4 h-4" />
-                </div>
-                <div>
-                  <h2 className="text-sm font-semibold text-foreground">Dokumen Kendaraan</h2>
-                  <p className="text-[11px] text-foreground-subtle mt-0.5 leading-relaxed">Masa berlaku dokumen legal kendaraan.</p>
-                </div>
-              </div>
+            <FormCard
+              title="Dokumen Kendaraan"
+              description="Masa berlaku dokumen legal kendaraan."
+              icon={<FileSpreadsheet className="w-5 h-5 text-danger" />}
+            >
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3.5">
                 <div className="flex flex-col gap-1.5 sm:col-span-2">
@@ -177,7 +167,7 @@ export function RentalVehicleForm({
                   <Input type="date" value={insuranceExpiry} onChange={e => setInsuranceExpiry(e.target.value)} className="h-9 text-sm" />
                 </div>
               </div>
-            </div>
+            </FormCard>
 
           </div>
 
@@ -185,16 +175,12 @@ export function RentalVehicleForm({
           <div className="flex flex-col gap-4 lg:gap-5">
 
             {/* Rental Config Card */}
-            <div className="bg-background border border-border/60 rounded-2xl p-4 lg:p-5 flex flex-col gap-4 h-full">
-              <div className="flex items-start gap-4">
-                <div className="w-9 h-9 rounded-xl bg-danger/10 text-danger flex items-center justify-center shrink-0">
-                  <Settings className="w-4 h-4" />
-                </div>
-                <div>
-                  <h2 className="text-sm font-semibold text-foreground">Data Rental</h2>
-                  <p className="text-[11px] text-foreground-subtle mt-0.5 leading-relaxed">Pengaturan tarif, status, kondisi, dan kilometer.</p>
-                </div>
-              </div>
+            <FormCard
+              title="Data Rental"
+              description="Pengaturan tarif, status, kondisi, dan kilometer."
+              icon={<Settings className="w-5 h-5 text-danger" />}
+              className="h-full"
+            >
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
                 <div className="flex flex-col gap-1.5 sm:col-span-2">
@@ -269,24 +255,18 @@ export function RentalVehicleForm({
                   </div>
                 </div>
               </div>
-            </div>
+            </FormCard>
 
           </div>
         </div>
 
         {/* Equipment Card (Full Width at Bottom) */}
-        <div className="bg-background border border-border/60 rounded-2xl p-4 lg:p-5 flex flex-col gap-4">
-          <div className="flex items-start gap-4">
-            <div className="w-9 h-9 rounded-xl bg-danger/10 text-danger flex items-center justify-center shrink-0">
-              <ShieldCheck className="w-4 h-4" />
-            </div>
-            <div>
-              <h2 className="text-sm font-semibold text-foreground">Kelengkapan</h2>
-              <p className="text-[11px] text-foreground-subtle mt-0.5 leading-relaxed">Checklist perlengkapan yang ada pada kendaraan.</p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-3 gap-x-4 text-sm mt-1 ml-[52px]">
+        <FormCard
+          title="Kelengkapan"
+          description="Checklist perlengkapan yang ada pada kendaraan."
+          icon={<ShieldCheck className="w-5 h-5 text-danger" />}
+        >
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-3 gap-x-4 text-sm mt-1">
             {/* Col 1 */}
             <div className="flex flex-col gap-3">
               <label className="flex items-center gap-2 cursor-pointer group">
@@ -331,7 +311,7 @@ export function RentalVehicleForm({
               </label>
             </div>
           </div>
-        </div>
+        </FormCard>
         </div>
       </FormShell>
     </form>

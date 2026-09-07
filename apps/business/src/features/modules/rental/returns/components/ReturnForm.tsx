@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Card, Input, Button, Checkbox, Textarea, Label, FormShell } from '@adatrack/ui';
+import { Card, Input, Button, Checkbox, Textarea, Label, FormShell, FormCard } from '@adatrack/ui';
 import { MapPin, Car, Gauge, Fuel, CheckSquare, AlertTriangle, DollarSign, Clock } from 'lucide-react';
 import type { RentalContract } from '../../contracts/types/contract';
 import type { RentalHandover } from '../../handover/types/handover';
@@ -13,7 +13,7 @@ interface ReturnFormProps {
   onSubmit: (data: Omit<RentalReturn, 'id' | 'createdAt' | 'updatedAt'>) => void;
   onCancel: () => void;
   isSubmitting: boolean;
-  mode?: 'page' | 'drawer' | 'dialog';
+  layout?: 'default' | 'drawer' | 'dialog' | 'fullscreen';
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }
@@ -37,7 +37,7 @@ const getConditionLabel = (c: string) => {
 const formatDate = (d: string) =>
   new Date(d).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
 
-export function ReturnForm({ contract, handover, onSubmit, onCancel, isSubmitting, mode = 'drawer', open, onOpenChange }: ReturnFormProps) {
+export function ReturnForm({ contract, handover, onSubmit, onCancel, isSubmitting, layout = 'drawer', open, onOpenChange }: ReturnFormProps) {
   const [returnedAt, setReturnedAt] = React.useState(
     new Date().toISOString().slice(0, 16)
   );
@@ -142,7 +142,7 @@ export function ReturnForm({ contract, handover, onSubmit, onCancel, isSubmittin
   return (
     <form onSubmit={handleSubmit} className="w-full h-full relative">
       <FormShell
-        mode={mode}
+        layout={layout}
         open={open}
         onOpenChange={onOpenChange}
         onCancel={onCancel}
@@ -154,13 +154,7 @@ export function ReturnForm({ contract, handover, onSubmit, onCancel, isSubmittin
         <div className="space-y-6">
 
       {/* SECTION 1: Contract Info */}
-      <Card className="bg-white dark:bg-neutral-900 border-border shadow-sm">
-        <div className="bg-neutral-50 dark:bg-neutral-900/50 border-b border-border py-3 px-4">
-          <h3 className="text-sm font-bold flex items-center gap-2">
-            <Car className="w-4 h-4 text-primary" />
-            Informasi Kontrak
-          </h3>
-        </div>
+      <FormCard title="Informasi Kontrak" icon={<Car className="w-5 h-5 text-primary" />}>
         <div className="p-4 grid grid-cols-2 md:grid-cols-3 gap-4">
           <div>
             <p className="text-[10px] uppercase font-bold text-muted-foreground mb-1">No. Kontrak</p>
@@ -187,16 +181,10 @@ export function ReturnForm({ contract, handover, onSubmit, onCancel, isSubmittin
             <p className="text-sm font-bold text-danger">{formatDate(contract.endDate)}</p>
           </div>
         </div>
-      </Card>
+      </FormCard>
 
       {/* SECTION 2: Waktu & Lokasi */}
-      <Card className="bg-white dark:bg-neutral-900 border-border shadow-sm">
-        <div className="bg-neutral-50 dark:bg-neutral-900/50 border-b border-border py-3 px-4">
-          <h3 className="text-sm font-bold flex items-center gap-2">
-            <MapPin className="w-4 h-4 text-primary" />
-            Waktu & Lokasi Pengembalian
-          </h3>
-        </div>
+      <FormCard title="Waktu & Lokasi Pengembalian" icon={<MapPin className="w-5 h-5 text-primary" />}>
         <div className="p-4 space-y-4">
           <div>
             <Label className="text-[10px] uppercase font-bold text-muted-foreground mb-1 block">
@@ -251,16 +239,10 @@ export function ReturnForm({ contract, handover, onSubmit, onCancel, isSubmittin
             </div>
           )}
         </div>
-      </Card>
+      </FormCard>
 
       {/* SECTION 3: Odometer */}
-      <Card className="bg-white dark:bg-neutral-900 border-border shadow-sm">
-        <div className="bg-neutral-50 dark:bg-neutral-900/50 border-b border-border py-3 px-4">
-          <h3 className="text-sm font-bold flex items-center gap-2">
-            <Gauge className="w-4 h-4 text-primary" />
-            Odometer
-          </h3>
-        </div>
+      <FormCard title="Odometer" icon={<Gauge className="w-5 h-5 text-primary" />}>
         <div className="p-4 grid grid-cols-1 sm:grid-cols-3 gap-6">
           <div className="p-4 bg-neutral-50 dark:bg-neutral-900/50 rounded-xl border border-border">
             <p className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Odometer Awal (Serah Terima)</p>
@@ -287,16 +269,10 @@ export function ReturnForm({ contract, handover, onSubmit, onCancel, isSubmittin
             <p className="text-xs text-muted-foreground">KM</p>
           </div>
         </div>
-      </Card>
+      </FormCard>
 
       {/* SECTION 4: BBM */}
-      <Card className="bg-white dark:bg-neutral-900 border-border shadow-sm">
-        <div className="bg-neutral-50 dark:bg-neutral-900/50 border-b border-border py-3 px-4">
-          <h3 className="text-sm font-bold flex items-center gap-2">
-            <Fuel className="w-4 h-4 text-primary" />
-            Bahan Bakar
-          </h3>
-        </div>
+      <FormCard title="Bahan Bakar" icon={<Fuel className="w-5 h-5 text-primary" />}>
         <div className="p-4 space-y-4">
           <div className="flex items-center gap-3 p-3 bg-neutral-50 dark:bg-neutral-900/50 rounded-lg border border-border">
             <span className="text-[10px] uppercase font-bold text-muted-foreground w-32 shrink-0">BBM Saat Serah Terima:</span>
@@ -318,16 +294,10 @@ export function ReturnForm({ contract, handover, onSubmit, onCancel, isSubmittin
             </div>
           </div>
         </div>
-      </Card>
+      </FormCard>
 
       {/* SECTION 5: Kondisi */}
-      <Card className="bg-white dark:bg-neutral-900 border-border shadow-sm">
-        <div className="bg-neutral-50 dark:bg-neutral-900/50 border-b border-border py-3 px-4">
-          <h3 className="text-sm font-bold flex items-center gap-2">
-            <Car className="w-4 h-4 text-primary" />
-            Kondisi Kendaraan
-          </h3>
-        </div>
+      <FormCard title="Kondisi Kendaraan" icon={<Car className="w-5 h-5 text-primary" />}>
         <div className="p-4 space-y-4">
           <div className="flex items-center gap-3 p-3 bg-neutral-50 dark:bg-neutral-900/50 rounded-lg border border-border">
             <span className="text-[10px] uppercase font-bold text-muted-foreground w-32 shrink-0">Kondisi Awal:</span>
@@ -354,16 +324,10 @@ export function ReturnForm({ contract, handover, onSubmit, onCancel, isSubmittin
             </div>
           </div>
         </div>
-      </Card>
+      </FormCard>
 
       {/* SECTION 6: Checklist */}
-      <Card className="bg-white dark:bg-neutral-900 border-border shadow-sm">
-        <div className="bg-neutral-50 dark:bg-neutral-900/50 border-b border-border py-3 px-4">
-          <h3 className="text-sm font-bold flex items-center gap-2">
-            <CheckSquare className="w-4 h-4 text-primary" />
-            Kelengkapan Kendaraan
-          </h3>
-        </div>
+      <FormCard title="Kelengkapan Kendaraan" icon={<CheckSquare className="w-5 h-5 text-primary" />}>
         <div className="p-4">
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
             {Object.keys(equipmentEnd).map((key) => {
@@ -387,16 +351,10 @@ export function ReturnForm({ contract, handover, onSubmit, onCancel, isSubmittin
             })}
           </div>
         </div>
-      </Card>
+      </FormCard>
 
       {/* SECTION 7: Kerusakan */}
-      <Card className="bg-white dark:bg-neutral-900 border-border shadow-sm">
-        <div className="bg-neutral-50 dark:bg-neutral-900/50 border-b border-border py-3 px-4">
-          <h3 className="text-sm font-bold flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-amber-500" />
-            Kerusakan
-          </h3>
-        </div>
+      <FormCard title="Kerusakan" icon={<AlertTriangle className="w-5 h-5 text-primary" />}>
         <div className="p-4 space-y-4">
           <div className="flex gap-3">
             <Label className="text-sm font-medium">Ada kerusakan baru?</Label>
@@ -432,16 +390,10 @@ export function ReturnForm({ contract, handover, onSubmit, onCancel, isSubmittin
             </div>
           )}
         </div>
-      </Card>
+      </FormCard>
 
       {/* SECTION 8: Biaya Tambahan */}
-      <Card className="bg-white dark:bg-neutral-900 border-border shadow-sm">
-        <div className="bg-neutral-50 dark:bg-neutral-900/50 border-b border-border py-3 px-4">
-          <h3 className="text-sm font-bold flex items-center gap-2">
-            <DollarSign className="w-4 h-4 text-primary" />
-            Biaya Tambahan
-          </h3>
-        </div>
+      <FormCard title="Biaya Tambahan" icon={<DollarSign className="w-5 h-5 text-primary" />}>
         <div className="p-4 space-y-4">
           {lateHours > 0 && (
             <div className="p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800 text-sm text-amber-700 dark:text-amber-400">
@@ -484,13 +436,10 @@ export function ReturnForm({ contract, handover, onSubmit, onCancel, isSubmittin
             </span>
           </div>
         </div>
-      </Card>
+      </FormCard>
 
       {/* Summary Card */}
-      <Card className="bg-primary/5 dark:bg-primary/10 border-primary/20 shadow-sm">
-        <div className="bg-primary/10 dark:bg-primary/20 border-b border-primary/20 py-3 px-4">
-          <h3 className="text-sm font-bold text-primary">Ringkasan Pengembalian</h3>
-        </div>
+      <FormCard title="Ringkasan Pengembalian" className="bg-primary/5 dark:bg-primary/10 border-primary/20 shadow-sm">
         <div className="p-4 grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
           <div className="flex justify-between">
             <span className="text-muted-foreground">Odometer Awal</span>
@@ -513,13 +462,10 @@ export function ReturnForm({ contract, handover, onSubmit, onCancel, isSubmittin
             <span className="font-bold text-danger">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(totalCharges)}</span>
           </div>
         </div>
-      </Card>
+      </FormCard>
 
       {/* Notes */}
-      <Card className="bg-white dark:bg-neutral-900 border-border shadow-sm">
-        <div className="bg-neutral-50 dark:bg-neutral-900/50 border-b border-border py-3 px-4">
-          <h3 className="text-sm font-bold">Catatan</h3>
-        </div>
+      <FormCard title="Catatan">
         <div className="p-4">
           <Textarea
             value={notes}
@@ -528,7 +474,7 @@ export function ReturnForm({ contract, handover, onSubmit, onCancel, isSubmittin
             className="min-h-[80px]"
           />
         </div>
-      </Card>
+      </FormCard>
         </div>
       </FormShell>
     </form>

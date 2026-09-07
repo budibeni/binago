@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Button, Input, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Checkbox, FormShell } from '@adatrack/ui';
+import { Button, Input, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Checkbox, FormShell, FormCard } from '@adatrack/ui';
 import { Clock, Plus, Trash2, Calendar, Bus, Info, ExternalLink } from 'lucide-react';
 import type { OperationalSchedule, ScheduleStatus, DayOfWeek, ScheduleTime } from '../types/schedule';
 import type { Route } from '@/features/core/routes/types';
@@ -15,7 +15,7 @@ interface ScheduleFormProps {
   onCancel: () => void;
   onSave: (data: Omit<OperationalSchedule, 'id' | 'route'>) => void;
   error?: string;
-  mode?: 'page' | 'drawer' | 'dialog';
+  layout?: 'default' | 'drawer' | 'dialog' | 'fullscreen';
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }
@@ -37,7 +37,7 @@ export function ScheduleForm({
   onCancel,
   onSave,
   error,
-  mode = 'drawer',
+  layout = 'drawer',
   open,
   onOpenChange,
 }: ScheduleFormProps) {
@@ -121,26 +121,20 @@ export function ScheduleForm({
   };
 
   const SectionCard = ({ title, description, icon: Icon, children, className }: any) => (
-    <div className={cn("bg-white dark:bg-neutral-900 border border-border rounded-xl p-5 shadow-sm h-fit", className)}>
-      <div className="flex items-start gap-3 mb-6">
-        <div className="w-10 h-10 rounded-full bg-danger/10 text-danger flex items-center justify-center shrink-0">
-          <Icon className="w-5 h-5" />
-        </div>
-        <div className="flex flex-col gap-0.5 mt-0.5">
-          <h3 className="text-[14px] font-bold text-foreground">{title}</h3>
-          {description && <p className="text-[11px] text-muted-foreground">{description}</p>}
-        </div>
-      </div>
-      <div className="space-y-4">
-        {children}
-      </div>
-    </div>
+    <FormCard
+      title={title}
+      description={description}
+      icon={<Icon className="w-5 h-5 text-muted-foreground" />}
+      className={className}
+    >
+      {children}
+    </FormCard>
   );
 
   return (
     <>
       <FormShell
-        mode={mode}
+        layout={layout}
         open={open}
         onOpenChange={onOpenChange}
         title={isEdit ? 'Simpan Perubahan Jadwal' : 'Simpan Jadwal Baru'}

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Button, Input, Textarea, Label, Checkbox, FormShell } from '@adatrack/ui';
+import { Button, Input, Textarea, Label, Checkbox, FormShell, FormCard } from '@adatrack/ui';
 import { Search, User, Car, Calendar, DollarSign, Info } from 'lucide-react';
 import type { Reservation } from '@/features/modules/rental/reservations/types/reservation';
 import type { RentalContract } from '../types/contract';
@@ -13,7 +13,7 @@ interface ContractCreateFormProps {
   onSubmit: (data: Partial<RentalContract>) => Promise<void>;
   onCancel: () => void;
   isSubmitting?: boolean;
-  mode?: 'page' | 'drawer' | 'dialog';
+  layout?: 'default' | 'drawer' | 'dialog' | 'fullscreen';
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }
@@ -24,7 +24,7 @@ export function ContractCreateForm({
   onSubmit,
   onCancel,
   isSubmitting,
-  mode = 'drawer',
+  layout = 'drawer',
   open,
   onOpenChange,
 }: ContractCreateFormProps) {
@@ -81,7 +81,7 @@ export function ContractCreateForm({
     <div className="w-full h-full relative flex flex-col">
       <form onSubmit={handleSubmit} className="flex-1 min-h-0 flex flex-col">
         <FormShell
-          mode={mode}
+          layout={layout}
           open={open}
           onOpenChange={onOpenChange}
           title={labels.actionCreate || 'Buat Kontrak Baru'}
@@ -93,12 +93,10 @@ export function ContractCreateForm({
           isSubmitting={isSubmitting}
         >
           <div className="max-w-5xl mx-auto flex flex-col gap-6 p-4 lg:p-6">
-        <div className="bg-white dark:bg-neutral-900 border border-border shadow-sm rounded-xl overflow-hidden p-6">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div>
-              <h2 className="text-lg font-bold text-foreground">Pilih Reservasi</h2>
-              <p className="text-sm text-muted-foreground mt-1">Pilih reservasi yang sudah dikonfirmasi untuk dibuatkan kontrak rental.</p>
-            </div>
+        <FormCard 
+          title="Pilih Reservasi" 
+          description="Pilih reservasi yang sudah dikonfirmasi untuk dibuatkan kontrak rental."
+          action={
             <Button 
               type="button" 
               variant="outline" 
@@ -108,7 +106,8 @@ export function ContractCreateForm({
               <Search className="w-4 h-4 mr-2" />
               {selectedRes ? 'Ganti Reservasi' : 'Cari Reservasi'}
             </Button>
-          </div>
+          }
+        >
 
           {selectedRes && (
             <div className="mt-6 border border-border rounded-lg p-4 bg-neutral-50/50 dark:bg-neutral-900/30">
@@ -135,7 +134,7 @@ export function ContractCreateForm({
               </div>
             </div>
           )}
-        </div>
+        </FormCard>
 
         {selectedRes && (
           <>
@@ -153,11 +152,10 @@ export function ContractCreateForm({
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Left Column - Snapshot Info */}
               <div className="space-y-6">
-                <div className="bg-white dark:bg-neutral-900 border border-border shadow-sm rounded-xl overflow-hidden p-6">
-                  <h3 className="text-sm font-bold text-foreground flex items-center gap-2 mb-4">
-                    <Calendar className="w-4 h-4 text-muted-foreground" />
-                    Detail Waktu & Tarif
-                  </h3>
+                <FormCard 
+                  title="Detail Waktu & Tarif"
+                  icon={<Calendar className="w-5 h-5 text-muted-foreground" />}
+                >
                   
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4 bg-neutral-50 dark:bg-neutral-900/50 p-3 rounded-lg border border-border">
@@ -197,13 +195,12 @@ export function ContractCreateForm({
                       </div>
                     </div>
                   </div>
-                </div>
+                </FormCard>
               </div>
 
               {/* Right Column - Contract Inputs */}
               <div className="space-y-6">
-                <div className="bg-white dark:bg-neutral-900 border border-border shadow-sm rounded-xl overflow-hidden p-6">
-                  <h3 className="text-sm font-bold text-foreground mb-4">Informasi Kontrak</h3>
+                <FormCard title="Informasi Kontrak">
                   
                   <div className="space-y-4">
                     <div className="space-y-2">
@@ -239,7 +236,7 @@ export function ContractCreateForm({
                       />
                     </div>
                   </div>
-                </div>
+                </FormCard>
               </div>
             </div>
 

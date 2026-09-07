@@ -228,7 +228,7 @@ export function CustomersFeature() {
 
       {(isCreateOpen || editId) && (
         <CustomerForm
-          mode="drawer"
+          layout="drawer"
           open={isCreateOpen || !!editId}
           onOpenChange={(open) => {
             if (!open) {
