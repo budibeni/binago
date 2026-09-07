@@ -174,7 +174,7 @@ function buildColumns(
       enableSorting: true,
       size: 160,
       cell: ({ row }) => (
-        <span className="text-[12px] text-foreground-muted tabular-nums">
+        <span suppressHydrationWarning className="text-[12px] text-foreground-muted tabular-nums">
           {new Date(row.original.lastUpdate).toLocaleString('id-ID', {
             day: '2-digit', month: 'short', year: 'numeric',
             hour: '2-digit', minute: '2-digit',
@@ -266,7 +266,7 @@ function buildColumns(
         const diff = (new Date(row.original.registrationExpiry).getTime() - Date.now()) / (1000 * 60 * 60 * 24);
         const isExpiring = diff < 60;
         return (
-          <span className={cn(
+          <span suppressHydrationWarning className={cn(
             'text-[13px]',
             isExpiring ? 'text-warning-600 dark:text-warning-400 font-semibold' : 'text-foreground-muted',
           )}>

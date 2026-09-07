@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Button, Checkbox, FormShell, FormCard, InputString, InputSelect, InputTime } from '@adatrack/ui';
+import { Button, Checkbox, FormShell, FormCard, InputString, InputSelect, InputTime, InputMultiCheckbox } from '@adatrack/ui';
 import { Clock, Plus, Trash2, Calendar, Bus, Info, ExternalLink } from 'lucide-react';
 import type { OperationalSchedule, ScheduleStatus, DayOfWeek, ScheduleTime } from '../types/schedule';
 import type { Route } from '@/features/core/routes/types';
@@ -120,17 +120,6 @@ export function ScheduleForm({
     }, 500);
   };
 
-  const SectionCard = ({ title, description, icon: Icon, children, className }: any) => (
-    <FormCard
-      title={title}
-      description={description}
-      icon={<Icon className="w-5 h-5 text-muted-foreground" />}
-      className={className}
-    >
-      {children}
-    </FormCard>
-  );
-
   return (
     <>
       <FormShell
@@ -142,34 +131,29 @@ export function ScheduleForm({
         onCancel={onCancel}
         cancelProps={{ disabled: isSubmitting }}
         onSave={() => handleSubmit()}
+        onSubmit={handleSubmit}
         saveText={isSubmitting ? 'Menyimpan...' : (isEdit ? 'Simpan Perubahan' : 'Buat Jadwal')}
-        saveProps={{ disabled: isSubmitting || activeDays.length === 0 || times.length === 0, form: 'schedule-form' }}
+        saveProps={{ disabled: isSubmitting || activeDays.length === 0 || times.length === 0 }}
         isSubmitting={isSubmitting}
+        columns={2}
       >
-        <div className="p-4 md:p-6">
-          <form id="schedule-form" onSubmit={handleSubmit} className="flex flex-col relative">
-          {error && (
-            <div className="max-w-7xl mx-auto mb-6 p-3 bg-danger/10 text-danger rounded-xl text-sm border border-danger/20 font-medium">
-              {error}
-            </div>
-          )}
+        {error && (
+          <div className="mb-6 p-3 bg-danger/10 text-danger rounded-xl text-sm border border-danger/20 font-medium lg:col-span-2">
+            {error}
+          </div>
+        )}
 
-          <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
-            
-            {/* KOLOM KIRI: Informasi Jadwal */}
-            <div className="lg:col-span-4 flex flex-col gap-6">
-              <SectionCard title="Informasi Jadwal" description="Lengkapi detail identitas jadwal dan rute perjalanan." icon={Calendar}>
-                <div className="flex flex-col gap-4">
-                  <div>
-                    <InputString
-                      id="name"
-                      label="Nama Jadwal"
-                      value={name}
-                      onChange={setName}
-                      placeholder="Cth: Jadwal Pagi Bekasi-Jakarta"
-                      required
-                    />
-                  </div>
+        <div className="flex flex-col gap-6">
+          <FormCard title="Informasi Jadwal" description="Lengkapi detail identitas jadwal dan rute perjalanan." icon={<Calendar className="w-5 h-5 text-muted-foreground" />}>
+            <div className="flex flex-col gap-4">
+              <InputString
+                id="name"
+                label="Nama Jadwal"
+                value={name}
+                onChange={setName}
+                placeholder="Cth: Jadwal Pagi Bekasi-Jakarta"
+                required
+              />
 
                   <div className="flex flex-col gap-1.5">
                     <div className="flex items-center justify-between mb-0.5">
@@ -209,41 +193,26 @@ export function ScheduleForm({
                     />
                   </div>
 
-                  <div className="flex flex-col gap-1.5 mt-2">
-                    <label className="text-xs font-bold text-foreground mb-1 block">Hari Operasional <span className="text-danger">*</span></label>
-                    <div className="flex flex-wrap gap-2">
-                      {WEEKDAYS.map(day => {
-                        const isSelected = activeDays.includes(day.id);
-                        return (
-                          <button
-                            key={day.id}
-                            type="button"
-                            onClick={() => toggleDay(day.id)}
-                            className={cn(
-                              "px-4 py-2 rounded-lg text-[11px] font-bold transition-colors border",
-                              isSelected 
-                                ? "bg-danger text-white border-danger shadow-sm" 
-                                : "bg-neutral-50 dark:bg-neutral-800 border-border text-muted-foreground hover:border-danger/50 hover:text-danger"
-                            )}
-                          >
-                            {day.label}
-                          </button>
-                        );
-                      })}
-                    </div>
-                    {activeDays.length === 0 && (
-                      <p className="text-[10px] text-danger mt-1 font-medium flex items-center gap-1">
-                        <Info className="w-3 h-3" /> Pilih minimal 1 hari operasional
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </SectionCard>
+              <div className="flex flex-col gap-1.5 mt-2">
+                <InputMultiCheckbox
+                  label="Hari Operasional *"
+                  value={activeDays}
+                  onChange={(val) => setActiveDays(val as DayOfWeek[])}
+                  options={WEEKDAYS.map(day => ({ value: day.id, label: day.label }))}
+                />
+                {activeDays.length === 0 && (
+                  <p className="text-[10px] text-danger mt-1 font-medium flex items-center gap-1">
+                    <Info className="w-3 h-3" /> Pilih minimal 1 hari operasional
+                  </p>
+                )}
+              </div>
             </div>
+          </FormCard>
+        </div>
 
-            {/* KOLOM KANAN: Waktu Keberangkatan & Penugasan Armada */}
-            <div className="lg:col-span-8 flex flex-col gap-6">
-              <SectionCard title="Waktu Keberangkatan" description="Tentukan jam-jam keberangkatan dan tugaskan armada untuk setiap jamnya." icon={Clock}>
+        {/* KOLOM KANAN: Waktu Keberangkatan & Penugasan Armada */}
+        <div className="flex flex-col gap-6">
+          <FormCard title="Waktu Keberangkatan" description="Tentukan jam-jam keberangkatan dan tugaskan armada untuk setiap jamnya." icon={<Clock className="w-5 h-5 text-muted-foreground" />}>
                 <div className="flex flex-col gap-4">
                   {times.map((time) => {
                     const hasVehicles = time.vehicleIds.length > 0;
@@ -252,39 +221,52 @@ export function ScheduleForm({
                     return (
                       <div 
                         key={time.id} 
-                        className="p-4 rounded-xl border border-border bg-neutral-50/50 dark:bg-neutral-900/30 flex flex-col sm:flex-row sm:items-start gap-4 transition-colors hover:border-danger/20 relative"
+                        className="p-4 rounded-xl border border-border bg-neutral-50/50 dark:bg-neutral-900/30 flex flex-col sm:flex-row sm:items-start gap-5 transition-colors hover:border-danger/20"
                       >
-                        <div className="flex items-center gap-3 shrink-0">
-                          <div className="w-10 h-10 rounded-lg flex items-center justify-center border bg-white dark:bg-neutral-950 border-border text-muted-foreground">
-                            <Clock className="w-4 h-4" />
-                          </div>
-                          <div className="flex flex-col w-28">
-                            <InputTime
-                              id={`time-${time.id}`}
-                              label="Jam Berangkat"
-                              value={time.departureTime}
-                              onChange={(val) => handleTimeChange(time.id, val)}
-                              required
-                            />
-                          </div>
+                        {/* Waktu Keberangkatan */}
+                        <div className="w-[140px] shrink-0">
+                          <InputTime
+                            id={`time-${time.id}`}
+                            label="Jam Berangkat"
+                            value={time.departureTime}
+                            onChange={(val) => handleTimeChange(time.id, val)}
+                            required
+                          />
                         </div>
                         
-                        <div className="flex-1 flex flex-col gap-2 min-w-0 pt-1">
-                          <div className="flex items-center justify-between">
-                            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Armada Ditugaskan</span>
-                            <Button 
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              className="h-7 text-[11px] px-2.5 bg-white dark:bg-neutral-950 border-danger/30 text-danger hover:bg-danger hover:text-white transition-colors"
-                              onClick={() => openVehicleModal(time.id)}
-                            >
-                              <Bus className="w-3 h-3 mr-1.5" /> Pilih Armada ({time.vehicleIds.length})
-                            </Button>
+                        {/* Divider */}
+                        <div className="hidden sm:block w-px bg-border/50 self-stretch my-1" />
+                        
+                        {/* Armada */}
+                        <div className="flex-1 flex flex-col min-w-0">
+                          <div className="flex items-center justify-between mb-3">
+                            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mt-1">Armada Ditugaskan</span>
+                            <div className="flex items-center gap-2">
+                              <Button 
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                className="h-7 text-[11px] px-2.5 bg-white dark:bg-neutral-950 border-danger/30 text-danger hover:bg-danger hover:text-white transition-colors"
+                                onClick={() => openVehicleModal(time.id)}
+                              >
+                                <Bus className="w-3 h-3 mr-1.5" /> Pilih Armada ({time.vehicleIds.length})
+                              </Button>
+                              
+                              {times.length > 1 && (
+                                <button 
+                                  type="button"
+                                  onClick={(e) => handleRemoveTime(time.id, e)}
+                                  className="w-7 h-7 flex items-center justify-center text-neutral-400 border border-transparent hover:border-danger/30 hover:text-danger hover:bg-danger/10 rounded-md transition-colors"
+                                  title="Hapus Waktu"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              )}
+                            </div>
                           </div>
                           
                           {hasVehicles ? (
-                            <div className="flex flex-wrap gap-1.5 mt-1">
+                            <div className="flex flex-wrap gap-1.5">
                               {assignedVehicles.map(v => (
                                 <div key={v.id} className="flex items-center gap-1.5 px-2 py-1 rounded bg-white dark:bg-neutral-950 border border-border text-[11px] font-medium text-foreground">
                                   <Bus className="w-3 h-3 text-muted-foreground" />
@@ -293,23 +275,12 @@ export function ScheduleForm({
                               ))}
                             </div>
                           ) : (
-                            <div className="flex items-center gap-2 p-2 rounded bg-danger/5 border border-danger/10 text-danger mt-1">
+                            <div className="flex items-center gap-1.5 text-muted-foreground pt-1">
                               <Info className="w-3.5 h-3.5 shrink-0" />
                               <span className="text-[11px] font-medium">Belum ada armada ditugaskan untuk jam ini.</span>
                             </div>
                           )}
                         </div>
-
-                        {times.length > 1 && (
-                          <button 
-                            type="button"
-                            onClick={(e) => handleRemoveTime(time.id, e)}
-                            className="absolute top-4 right-4 w-6 h-6 flex items-center justify-center text-neutral-400 hover:text-danger hover:bg-danger/10 rounded-md transition-colors"
-                            title="Hapus Waktu"
-                          >
-                            <Trash2 className="w-3 h-3" />
-                          </button>
-                        )}
                       </div>
                     );
                   })}
@@ -322,13 +293,10 @@ export function ScheduleForm({
                   >
                     <Plus className="w-4 h-4 mr-2" /> Tambah Waktu Keberangkatan
                   </Button>
-                </div>
-              </SectionCard>
-            </div>
+              </div>
+            </FormCard>
           </div>
-          </form>
-        </div>
-      </FormShell>
+        </FormShell>
 
       {/* Vehicle Selection Modal */}
       {isVehicleModalOpen && activeTime && (
