@@ -19,7 +19,7 @@ import { cn } from '@adatrack/utils';
 import { Button } from '@adatrack/ui';
 import type { Customer, IndividualCustomer, CompanyCustomer } from '../types/customer';
 
-interface CustomerDetailDrawerProps {
+interface CustomerViewProps {
   customer: Customer | null;
   open: boolean;
   onClose: () => void;
@@ -41,7 +41,14 @@ interface CustomerDetailDrawerProps {
   };
 }
 
-export function CustomerDetailDrawer({ customer, open, onClose, onEdit, onDelete, labels }: CustomerDetailDrawerProps) {
+export function CustomerView({
+  customer,
+  open,
+  onClose,
+  onEdit,
+  onDelete,
+  labels,
+}: CustomerViewProps) {
   React.useEffect(() => {
     if (!open) return;
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };

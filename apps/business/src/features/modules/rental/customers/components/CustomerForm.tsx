@@ -1,469 +1,375 @@
 'use client';
 
 import React from 'react';
-import { FormShell, FormCard, InputString, InputDate, InputPhone, InputEmail, InputSelect } from '@adatrack/ui';
+import { FormShell, FormCard, InputString, InputDate, InputPhone, InputEmail, InputSelect, useForm } from '@adatrack/ui';
 import { User, Phone, MapPin, Building, FileText, Briefcase, Settings } from 'lucide-react';
-import { cn } from '@adatrack/utils';
 import type { Customer, IndividualCustomer, CompanyCustomer } from '../types/customer';
+import { getCustomerFormSchema } from '../types/customer';
+import { useBusinessLocale } from '@/components/BusinessShellLayout';
+import { getRentalCustomersTranslation } from '../i18n';
 
 interface CustomerFormProps {
   customer: Customer | null;
   onCancel: () => void;
-  onSave: (data: any) => void;
-  labels: Record<string, string>;
+  onSave: (data: Partial<Customer>) => void;
   layout?: 'default' | 'drawer' | 'dialog' | 'fullscreen';
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }
 
-function SectionCard({ title, description, icon: Icon, children, className }: any) {
-  return (
-    <FormCard
-      title={title}
-      description={description}
-      icon={<Icon className="w-5 h-5 text-muted-foreground" />}
-      className={className}
-    >
-      {children}
-    </FormCard>
-  );
-}
+const DEFAULT_CUSTOMER = {
+  type: 'INDIVIDUAL',
+  status: 'ACTIVE',
+  name: '',
+  phone: '',
+  email: '',
+  address: '',
+  city: '',
+  province: '',
+  postalCode: '',
+  
+  // Individual
+  nik: '',
+  birthPlace: '',
+  birthDate: '',
+  simNumber: '',
+  simType: '',
+  simExpiredAt: '',
+
+  // Company
+  nib: '',
+  npwp: '',
+  picName: '',
+  picPosition: '',
+  picPhone: '',
+  picEmail: '',
+  picNik: '',
+} as unknown as Customer;
 
 export function CustomerForm({
   customer,
   onCancel,
   onSave,
-  labels,
-  layout = 'drawer',
+  layout = 'default',
   open,
   onOpenChange,
 }: CustomerFormProps) {
   const isEditing = !!customer;
-  const [type, setType] = React.useState<'INDIVIDUAL' | 'COMPANY'>('INDIVIDUAL');
-  
-  // Shared fields
-  const [status, setStatus] = React.useState<'ACTIVE' | 'INACTIVE'>('ACTIVE');
-  const [name, setName] = React.useState('');
-  const [phone, setPhone] = React.useState('');
-  const [email, setEmail] = React.useState('');
-  const [address, setAddress] = React.useState('');
-  const [city, setCity] = React.useState('');
-  const [province, setProvince] = React.useState('');
-  const [postalCode, setPostalCode] = React.useState('');
+  const locale = useBusinessLocale();
+  const t = getRentalCustomersTranslation(locale);
 
-  // Individual fields
-  const [nik, setNik] = React.useState('');
-  const [birthPlace, setBirthPlace] = React.useState('');
-  const [birthDate, setBirthDate] = React.useState('');
-  const [simNumber, setSimNumber] = React.useState('');
-  const [simType, setSimType] = React.useState('');
-  const [simExpiredAt, setSimExpiredAt] = React.useState('');
-
-  // Company fields
-  const [nib, setNib] = React.useState('');
-  const [npwp, setNpwp] = React.useState('');
-  const [picName, setPicName] = React.useState('');
-  const [picPosition, setPicPosition] = React.useState('');
-  const [picPhone, setPicPhone] = React.useState('');
-  const [picEmail, setPicEmail] = React.useState('');
-  const [picNik, setPicNik] = React.useState('');
-
-  const [errors, setErrors] = React.useState<Record<string, string>>({});
-  const clearError = (field: string) => {
-    if (errors[field]) {
-      setErrors(prev => {
-        const next = { ...prev };
-        delete next[field];
-        return next;
-      });
-    }
-  };
-
-
-  React.useEffect(() => {
-    if (customer) {
-      setType(customer.type);
-      setStatus(customer.status);
-      setName(customer.name);
-      setPhone(customer.phone);
-      setEmail(customer.email || '');
-      setAddress(customer.address);
-      setCity(customer.city);
-      setProvince(customer.province);
-      setPostalCode(customer.postalCode);
-
-      if (customer.type === 'INDIVIDUAL') {
-        const ind = customer as IndividualCustomer;
-        setNik(ind.nik);
-        setBirthPlace(ind.birthPlace);
-        setBirthDate(ind.birthDate);
-        setSimNumber(ind.simNumber);
-        setSimType(ind.simType);
-        setSimExpiredAt(ind.simExpiredAt);
-      } else {
-        const comp = customer as CompanyCustomer;
-        setNib(comp.nib);
-        setNpwp(comp.npwp);
-        setPicName(comp.picName);
-        setPicPosition(comp.picPosition);
-        setPicPhone(comp.picPhone);
-        setPicEmail(comp.picEmail || '');
-        setPicNik(comp.picNik);
-      }
-    } else {
-      setType('INDIVIDUAL');
-      setStatus('ACTIVE');
-      setName('');
-      setPhone('');
-      setEmail('');
-      setAddress('');
-      setCity('');
-      setProvince('');
-      setPostalCode('');
-      
-      setNik('');
-      setBirthPlace('');
-      setBirthDate('');
-      setSimNumber('');
-      setSimType('');
-      setSimExpiredAt('');
-
-      setNib('');
-      setNpwp('');
-      setPicName('');
-      setPicPosition('');
-      setPicPhone('');
-      setPicEmail('');
-      setPicNik('');
-    }
-    setErrors({});
+  // Initialize data bridging the Individual/Company difference
+  const initialData = React.useMemo(() => {
+    if (!customer) return DEFAULT_CUSTOMER;
+    return { ...customer } as unknown as Customer;
   }, [customer]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    const newErrors: Record<string, string> = {};
-    if (!name.trim()) newErrors.name = 'Wajib diisi';
-    if (!phone.trim()) newErrors.phone = 'Wajib diisi';
+  const { formData, errors, isSubmitting, handleChange, handleSubmit, setFormData } = useForm<Customer>({
+    initialData,
+    resetOn: [open, customer],
+    schema: getCustomerFormSchema(t.validation || {}),
+    onSubmit: async (data) => {
+      await new Promise(r => setTimeout(r, 800)); // simulate API call
+      
+      const baseData = {
+        type: data.type,
+        status: data.status,
+        name: data.name,
+        phone: data.phone,
+        email: data.email,
+        address: data.address,
+        city: data.city,
+        province: data.province,
+        postalCode: data.postalCode,
+      };
 
-    if (type === 'INDIVIDUAL') {
-      if (!nik.trim()) newErrors.nik = 'Wajib diisi';
-    } else {
-      if (!picName.trim()) newErrors.picName = 'Wajib diisi';
-    }
+      if (data.type === 'INDIVIDUAL') {
+        onSave({
+          ...baseData,
+          nik: (data as any).nik,
+          birthPlace: (data as any).birthPlace,
+          birthDate: (data as any).birthDate,
+          simNumber: (data as any).simNumber,
+          simType: (data as any).simType,
+          simExpiredAt: (data as any).simExpiredAt,
+          ktpPhoto: '/images/dummy-ktp.jpg',
+          simPhoto: '/images/dummy-sim.jpg',
+        } as IndividualCustomer);
+      } else {
+        onSave({
+          ...baseData,
+          nib: (data as any).nib,
+          npwp: (data as any).npwp,
+          picName: (data as any).picName,
+          picPosition: (data as any).picPosition,
+          picPhone: (data as any).picPhone,
+          picEmail: (data as any).picEmail,
+          picNik: (data as any).picNik,
+          picKtpPhoto: '/images/dummy-ktp.jpg',
+        } as CompanyCustomer);
+      }
+    },
+  });
 
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      // Scroll to top to see errors if needed
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      return;
-    }
-
-    const baseData = {
-      type,
-      status,
-      name,
-      phone,
-      email,
-      address,
-      city,
-      province,
-      postalCode,
-    };
-
-    if (type === 'INDIVIDUAL') {
-      onSave({
-        ...baseData,
-        nik,
-        ktpPhoto: '/images/dummy-ktp.jpg',
-        birthPlace,
-        birthDate,
-        simNumber,
-        simType,
-        simExpiredAt,
-        simPhoto: '/images/dummy-sim.jpg',
-      });
-    } else {
-      onSave({
-        ...baseData,
-        nib,
-        npwp,
-        picName,
-        picPosition,
-        picPhone,
-        picEmail,
-        picNik,
-        picKtpPhoto: '/images/dummy-ktp.jpg',
-      });
-    }
-  };
+  const type = formData.type || 'INDIVIDUAL';
 
   return (
     <FormShell
       layout={layout}
       open={open}
       onOpenChange={onOpenChange}
-      title={isEditing ? labels.actionEdit : labels.addCustomer}
+      title={isEditing ? t.actionEdit : t.addCustomer}
       subtitle={isEditing ? 'Perbarui informasi detail pelanggan.' : 'Masukkan informasi detail pelanggan baru.'}
       onCancel={onCancel}
-      cancelText={labels.cancel || 'Batal'}
-      saveText={labels.save || 'Simpan'}
-      saveProps={{ form: 'customer-form' }}
+      cancelText={t.cancel || 'Batal'}
+      saveText={t.save || 'Simpan'}
+      onSave={() => handleSubmit()}
+      onSubmit={handleSubmit}
+      isSubmitting={isSubmitting}
+      columns={2}
     >
-      <div className="px-4 md:px-8 py-8">
-        <form id="customer-form" onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-6xl mx-auto">
-          
-          <div className="flex flex-col gap-6">
-            <SectionCard
-              title={labels.fieldCustomerType || "Tipe & Status"}
-              description="Pilih tipe pelanggan dan status keaktifannya."
-              icon={Settings}
-            >
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <InputSelect
-                    id="type"
-                    label={labels.fieldCustomerType}
-                    value={type}
-                    onChange={(v) => { setType(v as any); clearError('type'); }}
-                    disabled={isEditing}
-                    options={[
-                      { value: 'INDIVIDUAL', label: labels.typeIndividual },
-                      { value: 'COMPANY', label: labels.typeCompany }
-                    ]}
-                    required
-                  />
-                </div>
-                <div>
-                  <InputSelect
-                    id="status"
-                    label={labels.fieldStatus}
-                    value={status}
-                    onChange={(v) => { setStatus(v as any); clearError('status'); }}
-                    options={[
-                      { value: 'ACTIVE', label: labels.statusActive },
-                      { value: 'INACTIVE', label: labels.statusInactive }
-                    ]}
-                    required
-                  />
-                </div>
-              </div>
-            </SectionCard>
+      {/* Kolom Kiri */}
+      <div className="flex flex-col gap-6">
+        <FormCard
+          title={t.fieldCustomerType || "Tipe & Status"}
+          description="Pilih tipe pelanggan dan status keaktifannya."
+          icon={<Settings className="w-5 h-5 text-muted-foreground" />}
+          columns={2}
+        >
+          <InputSelect
+            label={t.fieldCustomerType}
+            value={type}
+            onChange={(v) => {
+              handleChange('type', v as any);
+            }}
+            disabled={isEditing}
+            options={[
+              { value: 'INDIVIDUAL', label: t.typeIndividual },
+              { value: 'COMPANY', label: t.typeCompany }
+            ]}
+            required
+          />
+          <InputSelect
+            label={t.fieldStatus}
+            value={formData.status || 'ACTIVE'}
+            onChange={(v) => handleChange('status', v as any)}
+            options={[
+              { value: 'ACTIVE', label: t.statusActive },
+              { value: 'INACTIVE', label: t.statusInactive }
+            ]}
+            required
+          />
+        </FormCard>
 
-            <SectionCard
-              title={type === 'INDIVIDUAL' ? "Informasi Identitas" : "Informasi Perusahaan"}
-              description={type === 'INDIVIDUAL' ? "Data diri resmi sesuai KTP." : "Informasi legal entitas perusahaan."}
-              icon={type === 'INDIVIDUAL' ? User : Building}
-            >
-                              <InputString
-                  id="name"
-                  label={type === 'INDIVIDUAL' ? labels.fieldFullName : labels.fieldCompanyName}
-                  value={name}
-                  onChange={(v) => { setName(v); clearError('name'); }}
-                   error={errors.name} required
-                  placeholder={labels.placeholderName}
-                />
-
-              {type === 'INDIVIDUAL' ? (
-                <>
-                                  <InputString
-                  id="nik"
-                  label={labels.fieldNik}
-                  value={nik}
-                  onChange={(v) => { setNik(v); clearError('nik'); }}
-                   error={errors.nik} required
-                      placeholder={labels.placeholderNik}
-                />
-                  <div className="grid grid-cols-2 gap-4">
-                                    <InputString
-                  id="birthPlace"
-                  label={labels.fieldBirthPlace}
-                  value={birthPlace}
-                  onChange={(v) => { setBirthPlace(v); clearError('birthPlace'); }}
-                   error={errors.birthPlace}
-                      placeholder="Tempat Lahir"
-                />
-                                    <InputDate
-                  id="birthDate"
-                  label={labels.fieldBirthDate}
-                  value={birthDate}
-                  onChange={(v) => { setBirthDate(v); clearError('birthDate'); }}
-                   error={errors.birthDate}
-                />
-                  </div>
-                </>
-              ) : (
-                <div className="grid grid-cols-2 gap-4">
-                                  <InputString
-                  id="nib"
-                  label={labels.fieldNib}
-                  value={nib}
-                  onChange={(v) => { setNib(v); clearError('nib'); }}
-                   error={errors.nib}
-                    placeholder="Nomor Induk Berusaha"
-                />
-                                  <InputString
-                  id="npwp"
-                  label={labels.fieldNpwp}
-                  value={npwp}
-                  onChange={(v) => { setNpwp(v); clearError('npwp'); }}
-                   error={errors.npwp}
-                    placeholder="Nomor Pokok Wajib Pajak"
-                />
-                </div>
-              )}
-            </SectionCard>
-
-            <SectionCard
-              title="Informasi Alamat"
-              description="Alamat domisili atau alamat operasional perusahaan."
-              icon={MapPin}
-            >
-                              <InputString
-                  id="address"
-                  label={labels.fieldAddress}
-                  value={address}
-                  onChange={(v) => { setAddress(v); clearError('address'); }}
-                   error={errors.address}
-                placeholder="Alamat lengkap"
-                />
-              <div className="grid grid-cols-2 gap-4">
-                                <InputString
-                  id="city"
-                  label={labels.fieldCity}
-                  value={city}
-                  onChange={(v) => { setCity(v); clearError('city'); }}
-                   error={errors.city}
-                  placeholder="Kota"
-                />
-                                <InputString
-                  id="province"
-                  label={labels.fieldProvince}
-                  value={province}
-                  onChange={(v) => { setProvince(v); clearError('province'); }}
-                   error={errors.province}
-                  placeholder="Provinsi"
-                />
-              </div>
-                              <InputString
-                  id="postalCode"
-                  label={labels.fieldPostalCode}
-                  value={postalCode}
-                  onChange={(v) => { setPostalCode(v); clearError('postalCode'); }}
-                   error={errors.postalCode}
-                  placeholder="Kode Pos"
-                />
-            </SectionCard>
+        <FormCard
+          title={type === 'INDIVIDUAL' ? "Informasi Identitas" : "Informasi Perusahaan"}
+          description={type === 'INDIVIDUAL' ? "Data diri resmi sesuai KTP." : "Informasi legal entitas perusahaan."}
+          icon={type === 'INDIVIDUAL' ? <User className="w-5 h-5 text-muted-foreground" /> : <Building className="w-5 h-5 text-muted-foreground" />}
+          columns={2}
+        >
+          <div className="col-span-1 group-data-[layout=default]/form:md:col-span-2 group-data-[layout=fullscreen]/form:md:col-span-2">
+            <InputString
+              label={type === 'INDIVIDUAL' ? t.fieldFullName : t.fieldCompanyName}
+              value={formData.name || ''}
+              onChange={(v) => handleChange('name', v)}
+              error={errors.name} 
+              required
+              placeholder={t.placeholderName}
+            />
           </div>
 
-          <div className="flex flex-col gap-6">
-            <SectionCard
-              title="Informasi Kontak"
-              description="Nomor telepon dan email untuk keperluan komunikasi."
-              icon={Phone}
-            >
-                              <InputPhone
-                  id="phone"
-                  label={labels.fieldPhone}
-                  value={phone}
-                  onChange={(v) => { setPhone(v); clearError('phone'); }}
-                   error={errors.phone} required
-                  placeholder={labels.placeholderPhone}
+          {type === 'INDIVIDUAL' ? (
+            <>
+              <div className="col-span-1 group-data-[layout=default]/form:md:col-span-2 group-data-[layout=fullscreen]/form:md:col-span-2">
+                <InputString
+                  label={t.fieldNik}
+                  value={(formData as any).nik || ''}
+                  onChange={(v) => handleChange('nik', v)}
+                  error={errors.nik} 
+                  required
+                  placeholder={t.placeholderNik}
                 />
-                              <InputEmail
-                  id="email"
-                  label={labels.fieldEmail}
-                  value={email}
-                  onChange={(v) => { setEmail(v); clearError('email'); }}
-                   error={errors.email}
-                  placeholder={labels.placeholderEmail}
-                />
-            </SectionCard>
+              </div>
+              <InputString
+                label={t.fieldBirthPlace}
+                value={(formData as any).birthPlace || ''}
+                onChange={(v) => handleChange('birthPlace', v)}
+                error={errors.birthPlace}
+                placeholder="Tempat Lahir"
+              />
+              <InputDate
+                label={t.fieldBirthDate}
+                value={(formData as any).birthDate || ''}
+                onChange={(v) => handleChange('birthDate', v)}
+                error={errors.birthDate}
+              />
+            </>
+          ) : (
+            <>
+              <InputString
+                label={t.fieldNib}
+                value={(formData as any).nib || ''}
+                onChange={(v) => handleChange('nib', v)}
+                error={errors.nib}
+                placeholder="Nomor Induk Berusaha"
+              />
+              <InputString
+                label={t.fieldNpwp}
+                value={(formData as any).npwp || ''}
+                onChange={(v) => handleChange('npwp', v)}
+                error={errors.npwp}
+                placeholder="Nomor Pokok Wajib Pajak"
+              />
+            </>
+          )}
+        </FormCard>
 
-            {type === 'INDIVIDUAL' ? (
-              <SectionCard
-                title={labels.tabSim || "Lisensi & Pekerjaan"}
-                description="Detail lisensi berkendara."
-                icon={FileText}
-              >
-                                <InputString
-                  id="simNumber"
-                  label={labels.fieldSimNumber}
-                  value={simNumber}
-                  onChange={(v) => { setSimNumber(v); clearError('simNumber'); }}
-                   error={errors.simNumber}
-                  placeholder="Nomor SIM"
-                />
-                <div className="grid grid-cols-2 gap-4">
-                                  <InputString
-                  id="simType"
-                  label={labels.fieldSimType}
-                  value={simType}
-                  onChange={(v) => { setSimType(v); clearError('simType'); }}
-                   error={errors.simType}
-                    placeholder="Contoh: A, B1"
-                />
-                                  <InputDate
-                  id="simExpiredAt"
-                  label={labels.fieldSimExpiredAt}
-                  value={simExpiredAt}
-                  onChange={(v) => { setSimExpiredAt(v); clearError('simExpiredAt'); }}
-                   error={errors.simExpiredAt}
-                />
-                </div>
-              </SectionCard>
-            ) : (
-              <SectionCard
-                title={labels.tabPic || "Informasi PIC"}
-                description="Penanggung jawab atau representatif dari perusahaan."
-                icon={Briefcase}
-              >
-                                <InputString
-                  id="picName"
-                  label={labels.fieldPicName}
-                  value={picName}
-                  onChange={(v) => { setPicName(v); clearError('picName'); }}
-                   error={errors.picName} required
-                    placeholder={labels.placeholderPicName}
-                />
-                                <InputString
-                  id="picPosition"
-                  label={labels.fieldPicPosition}
-                  value={picPosition}
-                  onChange={(v) => { setPicPosition(v); clearError('picPosition'); }}
-                   error={errors.picPosition}
-                    placeholder="Jabatan PIC"
-                />
-                <div className="grid grid-cols-2 gap-4">
-                                  <InputPhone
-                  id="picPhone"
-                  label={labels.fieldPicPhone}
-                  value={picPhone}
-                  onChange={(v) => { setPicPhone(v); clearError('picPhone'); }}
-                   error={errors.picPhone}
-                    placeholder="No HP PIC"
-                />
-                                  <InputEmail
-                  id="picEmail"
-                  label={labels.fieldPicEmail}
-                  value={picEmail}
-                  onChange={(v) => { setPicEmail(v); clearError('picEmail'); }}
-                   error={errors.picEmail}
-                    placeholder="Email PIC"
-                />
-                </div>
-                                <InputString
-                  id="picNik"
-                  label={labels.fieldPicNik}
-                  value={picNik}
-                  onChange={(v) => { setPicNik(v); clearError('picNik'); }}
-                   error={errors.picNik}
-                  placeholder="NIK PIC"
-                />
-              </SectionCard>
-            )}
+        <FormCard
+          title="Informasi Alamat"
+          description="Alamat domisili atau alamat operasional perusahaan."
+          icon={<MapPin className="w-5 h-5 text-muted-foreground" />}
+          columns={2}
+        >
+          <div className="col-span-1 group-data-[layout=default]/form:md:col-span-2 group-data-[layout=fullscreen]/form:md:col-span-2">
+            <InputString
+              label={t.fieldAddress}
+              value={formData.address || ''}
+              onChange={(v) => handleChange('address', v)}
+              error={errors.address}
+              placeholder="Alamat lengkap"
+            />
           </div>
-        </form>
+          <InputString
+            label={t.fieldCity}
+            value={formData.city || ''}
+            onChange={(v) => handleChange('city', v)}
+            error={errors.city}
+            placeholder="Kota"
+          />
+          <InputString
+            label={t.fieldProvince}
+            value={formData.province || ''}
+            onChange={(v) => handleChange('province', v)}
+            error={errors.province}
+            placeholder="Provinsi"
+          />
+          <div className="col-span-1 group-data-[layout=default]/form:md:col-span-2 group-data-[layout=fullscreen]/form:md:col-span-2">
+            <InputString
+              label={t.fieldPostalCode}
+              value={formData.postalCode || ''}
+              onChange={(v) => handleChange('postalCode', v)}
+              error={errors.postalCode}
+              placeholder="Kode Pos"
+            />
+          </div>
+        </FormCard>
+      </div>
+
+      {/* Kolom Kanan */}
+      <div className="flex flex-col gap-6">
+        <FormCard
+          title="Informasi Kontak"
+          description="Nomor telepon dan email untuk keperluan komunikasi."
+          icon={<Phone className="w-5 h-5 text-muted-foreground" />}
+        >
+          <InputPhone
+            label={t.fieldPhone}
+            value={formData.phone || ''}
+            onChange={(v) => handleChange('phone', v)}
+            error={errors.phone} 
+            required
+            placeholder={t.placeholderPhone}
+          />
+          <InputEmail
+            label={t.fieldEmail}
+            value={formData.email || ''}
+            onChange={(v) => handleChange('email', v)}
+            error={errors.email}
+            placeholder={t.placeholderEmail}
+          />
+        </FormCard>
+
+        {type === 'INDIVIDUAL' ? (
+          <FormCard
+            title={t.tabSim || "Lisensi & Pekerjaan"}
+            description="Detail lisensi berkendara."
+            icon={<FileText className="w-5 h-5 text-muted-foreground" />}
+            columns={2}
+          >
+            <div className="col-span-1 group-data-[layout=default]/form:md:col-span-2 group-data-[layout=fullscreen]/form:md:col-span-2">
+              <InputString
+                label={t.fieldSimNumber}
+                value={(formData as any).simNumber || ''}
+                onChange={(v) => handleChange('simNumber', v)}
+                error={errors.simNumber}
+                placeholder="Nomor SIM"
+              />
+            </div>
+            <InputString
+              label={t.fieldSimType}
+              value={(formData as any).simType || ''}
+              onChange={(v) => handleChange('simType', v)}
+              error={errors.simType}
+              placeholder="Contoh: A, B1"
+            />
+            <InputDate
+              label={t.fieldSimExpiredAt}
+              value={(formData as any).simExpiredAt || ''}
+              onChange={(v) => handleChange('simExpiredAt', v)}
+              error={errors.simExpiredAt}
+            />
+          </FormCard>
+        ) : (
+          <FormCard
+            title={t.tabPic || "Informasi PIC"}
+            description="Penanggung jawab atau representatif dari perusahaan."
+            icon={<Briefcase className="w-5 h-5 text-muted-foreground" />}
+            columns={2}
+          >
+            <div className="col-span-1 group-data-[layout=default]/form:md:col-span-2 group-data-[layout=fullscreen]/form:md:col-span-2">
+              <InputString
+                label={t.fieldPicName}
+                value={(formData as any).picName || ''}
+                onChange={(v) => handleChange('picName', v)}
+                error={errors.picName} 
+                required
+                placeholder={t.placeholderName}
+              />
+            </div>
+            <div className="col-span-1 group-data-[layout=default]/form:md:col-span-2 group-data-[layout=fullscreen]/form:md:col-span-2">
+              <InputString
+                label={t.fieldPicPosition}
+                value={(formData as any).picPosition || ''}
+                onChange={(v) => handleChange('picPosition', v)}
+                error={errors.picPosition}
+                placeholder="Jabatan PIC"
+              />
+            </div>
+            <InputPhone
+              label={t.fieldPicPhone}
+              value={(formData as any).picPhone || ''}
+              onChange={(v) => handleChange('picPhone', v)}
+              error={errors.picPhone}
+              placeholder="No HP PIC"
+            />
+            <InputEmail
+              label={t.fieldPicEmail}
+              value={(formData as any).picEmail || ''}
+              onChange={(v) => handleChange('picEmail', v)}
+              error={errors.picEmail}
+              placeholder="Email PIC"
+            />
+            <div className="col-span-1 group-data-[layout=default]/form:md:col-span-2 group-data-[layout=fullscreen]/form:md:col-span-2">
+              <InputString
+                label={t.fieldPicNik}
+                value={(formData as any).picNik || ''}
+                onChange={(v) => handleChange('picNik', v)}
+                error={errors.picNik}
+                placeholder="NIK PIC"
+              />
+            </div>
+          </FormCard>
+        )}
       </div>
     </FormShell>
   );

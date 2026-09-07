@@ -41,7 +41,7 @@ export function DataTableBody<TData extends RowData = RowData>({
 
   if (fetchState === 'loading') {
     return (
-      <tbody>
+      <tbody suppressHydrationWarning>
         {Array.from({ length: 5 }).map((_, idx) => (
           <tr key={idx} className="border-b border-border">
             <td colSpan={columnCount} className="p-4">
@@ -55,7 +55,7 @@ export function DataTableBody<TData extends RowData = RowData>({
 
   if (fetchState === 'error') {
     return (
-      <tbody>
+      <tbody suppressHydrationWarning>
         <tr>
           <td colSpan={columnCount} className="p-4">
             <EmptyState
@@ -78,7 +78,7 @@ export function DataTableBody<TData extends RowData = RowData>({
 
   if (rows.length === 0) {
     return (
-      <tbody>
+      <tbody suppressHydrationWarning>
         <tr>
           <td colSpan={columnCount} className="p-4">
             {isFiltered ? (
@@ -101,7 +101,7 @@ export function DataTableBody<TData extends RowData = RowData>({
   }
 
   return (
-    <tbody>
+    <tbody suppressHydrationWarning>
       {rows.map((row) => (
         <DataTableRow key={row.id} row={row} />
       ))}

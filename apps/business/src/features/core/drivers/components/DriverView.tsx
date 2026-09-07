@@ -6,7 +6,7 @@ import { cn } from '@adatrack/utils';
 import { Button, Avatar, Tabs, Badge } from '@adatrack/ui';
 import type { Driver, DriverHistory } from '../types/driver';
 
-interface DriverDetailDrawerProps {
+interface DriverViewProps {
   driver: Driver | null;
   isOpen: boolean;
   onClose: () => void;
@@ -33,14 +33,14 @@ interface DriverDetailDrawerProps {
   };
 }
 
-export function DriverDetailDrawer({
+export function DriverView({
   driver,
   isOpen,
   onClose,
   onEdit,
   onDelete,
   labels,
-}: DriverDetailDrawerProps) {
+}: DriverViewProps) {
   const [activeTab, setActiveTab] = React.useState('info');
 
   if (!isOpen || !driver) return null;

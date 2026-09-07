@@ -22,7 +22,7 @@ import type { Vehicle } from '../types/vehicle';
 
 // â"€â"€â"€ Types â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
-interface VehicleDetailDrawerProps {
+interface VehicleViewProps {
   vehicle: Vehicle | null;
   open: boolean;
   onClose: () => void;
@@ -43,7 +43,7 @@ interface VehicleDetailDrawerProps {
 
 // â"€â"€â"€ Status Config â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
-function getStatusConfig(status: Vehicle['status'], labels: VehicleDetailDrawerProps['labels']) {
+function getStatusConfig(status: Vehicle['status'], labels: VehicleViewProps['labels']) {
   const map = {
     driving: { label: labels.statusDriving, variant: 'success' as const },
     idle: { label: labels.statusIdle, variant: 'warning' as const },
@@ -125,7 +125,7 @@ function SectionHeader({ icon: Icon, title }: { icon: React.ElementType; title: 
 
 // â"€â"€â"€ Component â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
-export function VehicleDetailDrawer({ vehicle, open, onClose, labels }: VehicleDetailDrawerProps) {
+export function VehicleView({ vehicle, open, onClose, labels }: VehicleViewProps) {
   // Close on Escape
   React.useEffect(() => {
     if (!open) return;

@@ -2,20 +2,19 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { getTranslation } from '@/i18n';
+import { getRentalCustomersTranslation } from './i18n';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
 import { CustomerForm } from './components/CustomerForm';
 
 export function CustomerCreateFeature() {
   const router = useRouter();
   const locale = useBusinessLocale();
-  const t = getTranslation(locale);
-  const labels = t.rentalCustomers;
+  const t = getRentalCustomersTranslation(locale);
 
   const handleSave = (data: any) => {
     // Implement API call to save customer here
     console.log('Saved new customer:', data);
-    alert(labels.createSuccess || 'Pelanggan berhasil ditambahkan');
+        alert(t.createSuccess || 'Pelanggan berhasil ditambahkan');
     router.push('/rental/customers');
     router.refresh();
   };
@@ -30,7 +29,6 @@ export function CustomerCreateFeature() {
         customer={null}
         onCancel={handleCancel}
         onSave={handleSave}
-        labels={labels}
       />
     </div>
   );

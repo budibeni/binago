@@ -22,7 +22,7 @@ export function ContractEditForm({
   onSubmit,
   onCancel,
   isSubmitting,
-  layout = 'drawer',
+  layout = 'default',
   open,
   onOpenChange,
 }: ContractEditFormProps) {

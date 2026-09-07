@@ -94,7 +94,7 @@ export function AppShell({
         />
 
         {/* Content Area - pages control their own padding/max-width */}
-        <main className="flex-1 overflow-y-auto bg-surface">
+        <main className="flex-1 overflow-y-auto bg-surface relative">
           {children}
         </main>
 

@@ -37,7 +37,7 @@ export function ScheduleForm({
   onCancel,
   onSave,
   error,
-  layout = 'drawer',
+  layout = 'default',
   open,
   onOpenChange,
 }: ScheduleFormProps) {

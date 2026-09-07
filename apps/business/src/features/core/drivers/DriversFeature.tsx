@@ -1,11 +1,11 @@
 'use client';
 
 import React from 'react';
-import { getTranslation } from '../../../i18n';
+import { getDriversTranslation } from './i18n';
 import { useBusinessLocale } from '../../../components/BusinessShellLayout';
 import { driverService, vehicleService, groupService } from '@/data/services';
 import { DriverTable } from './components/DriverTable';
-import { DriverDetailDrawer } from './components/DriverDetailDrawer';
+import { DriverView } from './components/DriverView';
 import { DriverForm } from './components/DriverForm';
 import type { Driver, DriverStatusFilter } from './types/driver';
 import { useRouter } from 'next/navigation';
@@ -13,8 +13,7 @@ import { useRouter } from 'next/navigation';
 export function DriversFeature() {
   const locale = useBusinessLocale();
   const router = useRouter();
-  const t = getTranslation(locale);
-  const tD = t.drivers;
+  const tD = getDriversTranslation(locale);
 
   // --- State -------------------------------------------------------------------
   const [search, setSearch] = React.useState('');
@@ -30,8 +29,8 @@ export function DriversFeature() {
   const [detailDriver, setDetailDriver] = React.useState<Driver | null>(null);
   const [drawerOpen, setDrawerOpen] = React.useState(false);
 
-  const [isCreateOpen, setIsCreateOpen] = React.useState(false);
-  const [editId, setEditId] = React.useState<string | null>(null);
+  const [isFormOpen, setIsFormOpen] = React.useState(false);
+  const [editDriver, setEditDriver] = React.useState<Driver | null>(null);
 
   // --- Filtered Data -----------------------------------------------------------
   const filteredDrivers = React.useMemo(() => {
@@ -66,7 +65,7 @@ export function DriversFeature() {
 
   const handleEdit = React.useCallback((driver: Driver) => {
     setDrawerOpen(false);
-    setEditId(driver.id);
+    setEditDriver(driver);
   }, []);
 
   const handleDelete = React.useCallback((driver: Driver) => {
@@ -74,7 +73,7 @@ export function DriversFeature() {
   }, []);
 
   const handleAdd = React.useCallback(() => {
-    setIsCreateOpen(true);
+    setIsFormOpen(true);
   }, []);
 
   // --- Configs -----------------------------------------------------------------
@@ -170,35 +169,34 @@ export function DriversFeature() {
         />
       </div>
 
-      <DriverDetailDrawer
+      <DriverView
         driver={detailDriver}
-        isOpen={drawerOpen}
+        open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         onEdit={() => detailDriver && handleEdit(detailDriver)}
         onDelete={() => detailDriver && handleDelete(detailDriver)}
         labels={drawerLabels}
       />
 
-      {(isCreateOpen || editId) && (
+      {(isFormOpen || !!editDriver) && (
         <DriverForm
-          layout="drawer"
-          open={isCreateOpen || !!editId}
+          layout="default"
+          open={isFormOpen || !!editDriver}
           onOpenChange={(open) => {
             if (!open) {
-              setIsCreateOpen(false);
-              setEditId(null);
+              setIsFormOpen(false);
+              setEditDriver(null);
             }
           }}
-          labels={t.drivers[editId ? 'editPage' : 'addPage']}
-          initialData={editId ? driverService.getDriverById(editId) || undefined : undefined}
+          driver={editDriver}
           onCancel={() => {
-            setIsCreateOpen(false);
-            setEditId(null);
+            setIsFormOpen(false);
+            setEditDriver(null);
           }}
-          onSubmit={(data) => {
-            setIsCreateOpen(false);
-            setEditId(null);
-            // reload data or optimistic update
+          onSave={(data) => {
+            console.log('Saved driver:', data);
+            setIsFormOpen(false);
+            setEditDriver(null);
           }}
         />
       )}

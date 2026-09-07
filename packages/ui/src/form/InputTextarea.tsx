@@ -1,6 +1,6 @@
 import React, { useId } from 'react';
 import { Textarea } from '../Textarea';
-import { BaseField, BaseInputProps, formInputClass } from './BaseField';
+import { BaseField, BaseInputProps, formTextareaClass } from './BaseField';
 
 export interface InputTextareaProps extends BaseInputProps {
   value: string;
@@ -40,7 +40,7 @@ export function InputTextarea({
         placeholder={placeholder}
         rows={rows}
         maxLength={maxLength}
-        className={formInputClass.replace('h-10', 'min-h-[80px] py-2')}
+        className={formTextareaClass}
       />
     </BaseField>
   );

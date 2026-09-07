@@ -136,7 +136,7 @@ export function ReservationCreateFeature({ open, onOpenChange, onSuccess }: Rese
       labels={labels}
       onSubmit={handleSubmit}
       onCancel={() => onOpenChange(false)}
-      layout="drawer"
+      layout="default"
       open={open}
       onOpenChange={onOpenChange}
       isSubmitting={isSubmitting}

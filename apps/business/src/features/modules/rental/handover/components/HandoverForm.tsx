@@ -15,7 +15,7 @@ interface HandoverFormProps {
   onOpenChange?: (open: boolean) => void;
 }
 
-export function HandoverForm({ contract, labels, onSubmit, onCancel, isSubmitting, layout = 'drawer', open, onOpenChange }: HandoverFormProps) {
+export function HandoverForm({ contract, labels, onSubmit, onCancel, isSubmitting, layout = 'default', open, onOpenChange }: HandoverFormProps) {
   const [latitude, setLatitude] = React.useState<number | null>(null);
   const [longitude, setLongitude] = React.useState<number | null>(null);
   const [address, setAddress] = React.useState('');

@@ -71,6 +71,7 @@ interface VehicleTableProps {
   filterConfig: DataTableFilterConfig;
   isFilterOpen: boolean;
   onFilterOpenChange: (open: boolean) => void;
+  onAdd?: () => void;
   className?: string;
 }
 
@@ -345,6 +346,7 @@ export function VehicleTable({
   filterConfig,
   isFilterOpen,
   onFilterOpenChange,
+  onAdd,
   className,
 }: VehicleTableProps) {
   const [pageIndex, setPageIndex] = React.useState(0);
@@ -427,6 +429,11 @@ export function VehicleTable({
         onFilterOpenChange={onFilterOpenChange}
         activeFilterCount={activeFilterCount}
         exportConfig={{ filename: labels.exportFilename, enabled: true }}
+        rightSlot={onAdd && (
+          <Button variant="destructive" onClick={onAdd} className="h-9">
+            <span className="hidden sm:inline-block">Tambah Armada</span>
+          </Button>
+        )}
       />
 
       {/* Table + Filter panel */}

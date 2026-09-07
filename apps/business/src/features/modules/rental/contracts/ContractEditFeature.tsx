@@ -84,7 +84,7 @@ export function ContractEditFeature({ contractId, open, onOpenChange, onSuccess 
       onSubmit={handleSubmit}
       onCancel={handleCancel}
       isSubmitting={isSubmitting}
-      layout="drawer"
+      layout="default"
       open={open}
       onOpenChange={onOpenChange}
     />

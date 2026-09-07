@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 export type DriverStatus = 'active' | 'inactive' | 'on_leave';
 export type DriverStatusFilter = 'all' | DriverStatus;
 
@@ -44,3 +46,18 @@ export interface Driver {
   
   history: DriverHistory[];
 }
+
+export const getDriverFormSchema = (t: Record<string, string>) => z.object({
+  name: z.string().min(1, t.nameRequired || 'Nama lengkap wajib diisi'),
+  ktpNumber: z.string().min(1, t.ktpRequired || 'Nomor KTP wajib diisi'),
+  placeOfBirth: z.string().optional(),
+  dateOfBirth: z.string().optional(),
+  email: z.string().optional(),
+  phone: z.string().min(1, t.phoneRequired || 'Nomor telepon wajib diisi'),
+  address: z.string().optional(),
+  placement: z.string().min(1, t.placementRequired || 'Penempatan wajib diisi'),
+  groupId: z.string().min(1, t.groupRequired || 'Grup armada wajib dipilih'),
+  licenseNumber: z.string().min(1, t.licenseRequired || 'Nomor SIM wajib diisi'),
+  licenseExpiry: z.string().optional(),
+  joinDate: z.string().optional(),
+});

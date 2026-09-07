@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { getTranslation } from '@/i18n';
+import { getRentalCustomersTranslation } from './i18n';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
 import { CustomerForm } from './components/CustomerForm';
 import { rentalCustomerService } from '@/data/modules/rental/services/customerService';
@@ -11,8 +11,7 @@ import type { Customer } from './types/customer';
 export function CustomerEditFeature({ id }: { id: string }) {
   const router = useRouter();
   const locale = useBusinessLocale();
-  const t = getTranslation(locale);
-  const labels = t.rentalCustomers;
+  const t = getRentalCustomersTranslation(locale);
   
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [loading, setLoading] = useState(true);
@@ -40,7 +39,7 @@ export function CustomerEditFeature({ id }: { id: string }) {
   const handleSave = (data: any) => {
     // Implement API call to save customer here
     console.log('Saved edited customer:', data);
-    alert(labels.updateSuccess || 'Pelanggan berhasil diperbarui');
+    alert(t.updateSuccess || 'Pelanggan berhasil diperbarui');
     router.push('/rental/customers');
     router.refresh();
   };
@@ -63,7 +62,6 @@ export function CustomerEditFeature({ id }: { id: string }) {
         customer={customer}
         onCancel={handleCancel}
         onSave={handleSave}
-        labels={labels}
       />
     </div>
   );

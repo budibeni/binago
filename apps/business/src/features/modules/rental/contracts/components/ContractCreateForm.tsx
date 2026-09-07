@@ -24,7 +24,7 @@ export function ContractCreateForm({
   onSubmit,
   onCancel,
   isSubmitting,
-  layout = 'drawer',
+  layout = 'default',
   open,
   onOpenChange,
 }: ContractCreateFormProps) {

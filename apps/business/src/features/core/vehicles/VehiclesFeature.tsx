@@ -7,11 +7,12 @@ import { getTranslation } from '../../../i18n';
 import { useBusinessLocale } from '../../../components/BusinessShellLayout';
 import { vehicleService } from '@/data/services';
 import { VehicleTable } from './components/VehicleTable';
-import { VehicleDetailDrawer } from './components/VehicleDetailDrawer';
+import { VehicleView } from './components/VehicleView';
+import { VehicleForm } from './components/VehicleForm';
 import type { Vehicle, VehicleStatusFilter } from './types/vehicle';
 import type { DataTableFilterConfig } from '@adatrack/ui';
 
-// â"€â"€â"€ Helpers â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ===========================================================================
 
 function computeStatusCounts(search: string, groupIds: string[]) {
   const base = vehicleService.getVehicles({ search, groupIds });
@@ -24,7 +25,7 @@ function computeStatusCounts(search: string, groupIds: string[]) {
   };
 }
 
-// â"€â"€â"€ Component â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ===========================================================================
 
 export function VehiclesFeature() {
   const locale = useBusinessLocale();
@@ -33,7 +34,7 @@ export function VehiclesFeature() {
   const t = getTranslation(locale);
   const tV = t.vehicles;
 
-  // â"€â"€ State â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+  // ===========================================================================
   const [search, setSearch] = React.useState('');
   const [filterState, setFilterState] = React.useState<Record<string, string | string[]>>({
     status: 'all',
@@ -47,7 +48,10 @@ export function VehiclesFeature() {
   const [detailVehicle, setDetailVehicle] = React.useState<Vehicle | null>(null);
   const [drawerOpen, setDrawerOpen] = React.useState(false);
 
-  // â"€â"€ Filtered data â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+  const [isFormOpen, setIsFormOpen] = React.useState(false);
+  const [editVehicle, setEditVehicle] = React.useState<Vehicle | null>(null);
+
+  // ===========================================================================
   const filteredVehicles = React.useMemo(
     () => vehicleService.getVehicles({ search, status: statusFilter, groupIds: selectedGroupIds }),
     [search, statusFilter, selectedGroupIds],
@@ -58,7 +62,7 @@ export function VehiclesFeature() {
     [search, selectedGroupIds],
   );
 
-  // â"€â"€ Handlers â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+  // ===========================================================================
   const handleViewDetail = React.useCallback((vehicle: Vehicle) => {
     setDetailVehicle(vehicle);
     setDrawerOpen(true);
@@ -69,8 +73,14 @@ export function VehiclesFeature() {
   }, []);
 
   const handleEdit = React.useCallback((vehicle: Vehicle) => {
-    // TODO: open edit modal (Task 06 scope terbatas - hanya placeholder)
-    console.log('Edit vehicle:', vehicle.id);
+    setDrawerOpen(false);
+    setEditVehicle(vehicle);
+    setIsFormOpen(true);
+  }, []);
+
+  const handleCreate = React.useCallback(() => {
+    setEditVehicle(null);
+    setIsFormOpen(true);
   }, []);
 
   const handleTrack = React.useCallback((vehicle: Vehicle) => {
@@ -86,7 +96,7 @@ export function VehiclesFeature() {
 
   // Filter toggle/clear logic is now handled by DataTableFilterPanel internally via onStateChange
 
-  // â"€â"€ Labels â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+  // ===========================================================================
   const tableLabels = React.useMemo(() => ({
     colPlateNumber: tV.colPlateNumber,
     colVehicle: tV.colVehicle,
@@ -146,7 +156,7 @@ export function VehiclesFeature() {
     statusOffline: tV.statusOffline,
   }), [tV]);
 
-  // â"€â"€ Filter Config â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+  // ===========================================================================
   const filterConfig: DataTableFilterConfig = React.useMemo(() => ({
     state: filterState,
     onStateChange: setFilterState,
@@ -211,7 +221,7 @@ export function VehiclesFeature() {
     ],
   }), [filterState, filterLabels, statusCounts]);
 
-  // â"€â"€ Render â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+  // ===========================================================================
   return (
     <div className="flex flex-col h-full w-full">
 
@@ -230,16 +240,39 @@ export function VehiclesFeature() {
           filterConfig={filterConfig}
           isFilterOpen={isFilterOpen}
           onFilterOpenChange={setIsFilterOpen}
+          onAdd={handleCreate}
         />
       </div>
 
-      {/* Detail Drawer */}
-      <VehicleDetailDrawer
+      {/* Detail View */}
+      <VehicleView
         vehicle={detailVehicle}
         open={drawerOpen}
         onClose={handleCloseDrawer}
         labels={drawerLabels}
       />
+
+      {(isFormOpen || !!editVehicle) && (
+        <VehicleForm
+          vehicle={editVehicle}
+          open={isFormOpen || !!editVehicle}
+          onOpenChange={(open) => {
+            if (!open) {
+              setIsFormOpen(false);
+              setEditVehicle(null);
+            }
+          }}
+          onSave={(data) => {
+            console.log('Saved vehicle:', data);
+            setIsFormOpen(false);
+            setEditVehicle(null);
+          }}
+          onCancel={() => {
+            setIsFormOpen(false);
+            setEditVehicle(null);
+          }}
+        />
+      )}
     </div>
   );
 }

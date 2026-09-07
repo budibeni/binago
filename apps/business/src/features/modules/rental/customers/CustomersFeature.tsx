@@ -2,11 +2,11 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { getTranslation } from '@/i18n';
+import { getRentalCustomersTranslation } from './i18n';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
 import { rentalCustomerService } from '@/data/modules/rental';
 import { CustomerTable } from './components/CustomerTable';
-import { CustomerDetailDrawer } from './components/CustomerDetailDrawer';
+import { CustomerView } from './components/CustomerView';
 import { CustomerDeleteDialog } from './components/CustomerDeleteDialog';
 import { CustomerForm } from './components/CustomerForm';
 import type { Customer, CustomerStatusFilter, CustomerTypeFilter } from './types/customer';
@@ -30,8 +30,7 @@ export function CustomersFeature() {
   const locale = useBusinessLocale();
   const router = useRouter();
 
-  const t = getTranslation(locale);
-  const tC = t.rentalCustomers;
+  const tC = getRentalCustomersTranslation(locale);
 
   const [search, setSearch] = React.useState('');
   const [filterState, setFilterState] = React.useState<Record<string, string | string[]>>({
@@ -209,7 +208,7 @@ export function CustomersFeature() {
       </div>
 
       {/* Modals & Drawers */}
-      <CustomerDetailDrawer
+      <CustomerView
         customer={detailCustomer}
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
@@ -228,7 +227,7 @@ export function CustomersFeature() {
 
       {(isCreateOpen || editId) && (
         <CustomerForm
-          layout="drawer"
+          layout="default"
           open={isCreateOpen || !!editId}
           onOpenChange={(open) => {
             if (!open) {
@@ -237,7 +236,6 @@ export function CustomersFeature() {
             }
           }}
           customer={editId ? filteredCustomers.find((c: any) => c.id === editId) || null : null}
-          labels={tC}
           onCancel={() => {
             setIsCreateOpen(false);
             setEditId(null);

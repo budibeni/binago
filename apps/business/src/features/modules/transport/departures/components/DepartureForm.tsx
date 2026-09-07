@@ -17,7 +17,7 @@ export function DepartureForm({
   onCancel,
   onSave,
   error,
-  layout = 'dialog',
+  layout = 'default',
   open,
   onOpenChange
 }: DepartureFormProps) {

@@ -6,6 +6,12 @@ import { Dialog } from '../Dialog';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '../Dropdown';
 import { FormFooter, type FormFooterProps } from './FormFooter';
 
+export const FormShellContext = React.createContext<{ layout: string }>({ layout: 'default' });
+
+export function useFormShell() {
+  return React.useContext(FormShellContext);
+}
+
 export interface FormShellProps extends Omit<FormFooterProps, 'isSticky'> {
   /**
    * Presentation layout of the form.
@@ -26,6 +32,16 @@ export interface FormShellProps extends Omit<FormFooterProps, 'isSticky'> {
    * The form content.
    */
   children: React.ReactNode;
+  
+  /**
+   * Optional onSubmit handler for the form wrapper.
+   */
+  onSubmit?: (e: React.FormEvent) => void;
+  
+  /**
+   * Number of columns for the outer grid layout (1 or 2). Defaults to 1.
+   */
+  columns?: 1 | 2;
 }
 
 export function FormShell({
@@ -36,15 +52,12 @@ export function FormShell({
   title,
   subtitle,
   leftContent,
-  onCancel,
-  cancelText,
-  cancelProps,
-  onSave,
-  saveText,
-  saveProps,
   isSubmitting,
   actions,
   className,
+  onSubmit,
+  columns = 1,
+  onCancel,
   ...footerProps
 }: FormShellProps) {
   
@@ -127,14 +140,31 @@ export function FormShell({
     subtitle,
     leftContent,
     onCancel: handleCancel,
-    cancelText,
-    cancelProps,
-    onSave,
-    saveText,
-    saveProps,
     isSubmitting,
     actions,
     ...footerProps,
+  };
+
+  const renderContent = () => {
+    const gridClass = columns === 1 
+      ? "flex flex-col gap-6" 
+      : "grid grid-cols-1 gap-6 items-start group-data-[layout=default]/form:lg:grid-cols-2 group-data-[layout=fullscreen]/form:lg:grid-cols-2 group-data-[layout=dialog]/form:lg:grid-cols-2";
+
+    const content = onSubmit ? (
+      <form onSubmit={onSubmit} className={gridClass}>
+        {children}
+      </form>
+    ) : (
+      <div className={gridClass}>
+        {children}
+      </div>
+    );
+
+    return (
+      <FormShellContext.Provider value={{ layout: internalLayout }}>
+        {content}
+      </FormShellContext.Provider>
+    );
   };
 
   if (internalLayout === 'dialog') {
@@ -145,17 +175,20 @@ export function FormShell({
         title={typeof title === 'string' ? title : undefined}
         description={typeof subtitle === 'string' ? subtitle : undefined}
         hideCloseButton={true}
+        className="max-w-2xl p-4 md:p-5"
       >
-        <div className={cn("flex flex-col max-h-[75vh] relative", className)}>
-          <LayoutToggleBtn className="absolute -top-12 right-[50px]" />
+        <div className={cn("flex flex-col max-h-[80vh] relative group/form", className)} data-layout={internalLayout}>
+          <LayoutToggleBtn className="absolute -top-10 md:-top-12 right-0" />
           <div className="flex-1 overflow-y-auto pr-1 -mr-1 pb-4">
-            {children}
+            {renderContent()}
           </div>
-          <div className="-mx-6 -mb-6 mt-2">
+          <div className="-mx-4 md:-mx-5 -mb-4 md:-mb-5 mt-2">
             <FormFooter 
-              {...formFooterProps} 
+              {...formFooterProps}
+              title={undefined}
+              subtitle={undefined}
               isSticky={false} 
-              className="border-t border-border/40 px-6"
+              className="border-t border-border/40 px-4 md:px-5"
             />
           </div>
         </div>
@@ -166,8 +199,10 @@ export function FormShell({
   if (internalLayout === 'fullscreen' || internalLayout === 'default') {
     if (!internalOpen) return null;
     return (
-      <div className={cn(
-        "flex flex-col w-full bg-neutral-50 dark:bg-neutral-950 duration-200 animate-in fade-in",
+      <div 
+        data-layout={internalLayout}
+        className={cn(
+        "flex flex-col w-full bg-neutral-50 dark:bg-neutral-950 duration-200 animate-in fade-in group/form",
         internalLayout === 'fullscreen' 
           ? "fixed inset-0 z-[9999] h-[100dvh]" 
           : "absolute inset-0 z-[999] h-full",
@@ -195,7 +230,7 @@ export function FormShell({
         {/* Scrollable content */}
         <div className="flex-1 overflow-y-auto p-5 md:p-6">
           <div className="max-w-5xl mx-auto w-full">
-            {children}
+            {renderContent()}
           </div>
         </div>
 
@@ -216,8 +251,9 @@ export function FormShell({
       <RadixDialog.Portal>
         <RadixDialog.Overlay className="fixed inset-0 z-[999] bg-black/50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
         <RadixDialog.Content
+          data-layout={internalLayout}
           className={cn(
-            'fixed right-0 top-0 bottom-0 z-[999] bg-neutral-50 dark:bg-neutral-950 shadow-xl flex flex-col',
+            'fixed right-0 top-0 bottom-0 z-[999] bg-neutral-50 dark:bg-neutral-950 shadow-xl flex flex-col group/form',
             'focus:outline-none w-full max-w-md',
             'data-[state=open]:animate-in data-[state=closed]:animate-out',
             'data-[state=closed]:slide-out-to-right-full data-[state=open]:slide-in-from-right',
@@ -225,7 +261,7 @@ export function FormShell({
           )}
         >
           {/* Header */}
-          <div className="flex items-center justify-between gap-2 px-3 py-1 md:px-4 md:py-1 border-b border-border bg-neutral-100 dark:bg-neutral-800 shrink-0 min-h-[32px]">
+          <div className="flex items-center justify-between gap-2 px-3 py-1.5 md:px-4 md:py-2 border-b border-border bg-neutral-100 dark:bg-neutral-800 shrink-0 min-h-[40px]">
             {title ? (
               <RadixDialog.Title className="text-[13px] font-bold text-foreground leading-none truncate flex-1 pr-2">
                 {title}
@@ -244,8 +280,8 @@ export function FormShell({
           </div>
 
           {/* Scrollable content */}
-          <div className="flex-1 overflow-y-auto p-5 md:p-6">
-            {children}
+          <div className="flex-1 overflow-y-auto p-4 md:p-5">
+            {renderContent()}
           </div>
 
           {/* Footer */}
@@ -253,7 +289,7 @@ export function FormShell({
             {...formFooterProps} 
             title={undefined}
             isSticky={false} 
-            className="border-t border-border/40 px-5 md:px-6 shrink-0 shadow-[0_-4px_12px_rgba(0,0,0,0.02)]"
+            className="border-t border-border/40 px-4 md:px-5 shrink-0 shadow-[0_-4px_12px_rgba(0,0,0,0.02)]"
           />
         </RadixDialog.Content>
       </RadixDialog.Portal>

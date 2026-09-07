@@ -88,7 +88,7 @@ export function ReturnFeature({ contractId, open, onOpenChange, onSuccess }: Ret
       onSubmit={handleSubmit}
       onCancel={handleCancel}
       isSubmitting={isSubmitting}
-      layout="drawer"
+      layout="default"
       open={open}
       onOpenChange={onOpenChange}
     />

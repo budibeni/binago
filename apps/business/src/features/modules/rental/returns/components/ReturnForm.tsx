@@ -37,7 +37,7 @@ const getConditionLabel = (c: string) => {
 const formatDate = (d: string) =>
   new Date(d).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
 
-export function ReturnForm({ contract, handover, onSubmit, onCancel, isSubmitting, layout = 'drawer', open, onOpenChange }: ReturnFormProps) {
+export function ReturnForm({ contract, handover, onSubmit, onCancel, isSubmitting, layout = 'default', open, onOpenChange }: ReturnFormProps) {
   const [returnedAt, setReturnedAt] = React.useState(
     new Date().toISOString().slice(0, 16)
   );

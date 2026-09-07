@@ -45,7 +45,7 @@ export function ReservationCreateForm({
   isSubmitting,
   totalAmount,
   remainingAmount,
-  layout = 'drawer',
+  layout = 'default',
   open,
   onOpenChange,
 }: ReservationCreateFormProps) {

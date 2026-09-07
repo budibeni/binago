@@ -25,7 +25,7 @@ export function RentalVehicleForm({
   availableCoreVehicles = [],
   onCancel,
   onSave,
-  layout = 'drawer',
+  layout = 'default',
   open,
   onOpenChange,
 }: RentalVehicleFormProps) {
