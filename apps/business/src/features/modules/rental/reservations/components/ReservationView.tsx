@@ -6,7 +6,7 @@ import { User, Car, Calendar, DollarSign, FileText, Trash2, Edit2, ClipboardList
 import { cn } from '@adatrack/utils';
 import type { Reservation } from '../types/reservation';
 
-interface ReservationDetailDrawerProps {
+interface ReservationViewProps {
   reservation: Reservation | null;
   open: boolean;
   onClose: () => void;
@@ -16,7 +16,7 @@ interface ReservationDetailDrawerProps {
   onConfirm: (reservation: Reservation) => void;
 }
 
-export function ReservationDetailDrawer({
+export function ReservationView({
   reservation,
   open,
   onClose,
@@ -24,7 +24,7 @@ export function ReservationDetailDrawer({
   onEdit,
   onDelete,
   onConfirm,
-}: ReservationDetailDrawerProps) {
+}: ReservationViewProps) {
   React.useEffect(() => {
     if (!open) return;
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };

@@ -10,6 +10,8 @@ export * from './InputDateTime';
 export * from './InputSelect';
 export * from './InputMultiSelect';
 export * from './InputTextarea';
+export * from './InputCheckbox';
+export * from './InputMultiCheckbox';
 export * from './InputPhone';
 export * from './InputEmail';
 export * from './InputPassword';

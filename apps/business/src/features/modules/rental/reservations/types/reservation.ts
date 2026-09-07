@@ -1,5 +1,6 @@
 import type { Customer } from '@/features/modules/rental/customers/types/customer';
 import type { RentalVehicle } from '@/features/modules/rental/vehicles/types/rentalVehicle';
+import { z } from 'zod';
 
 export type ReservationStatus = 'PENDING' | 'CONFIRMED' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
 
@@ -41,3 +42,29 @@ export interface ReservationFilters {
   startDate?: string;
   endDate?: string;
 }
+
+export const getReservationFormSchema = (t: Record<string, string>) => z.object({
+  customerId: z.string().min(1, t.customerRequired || 'Pelanggan wajib dipilih'),
+  vehicleId: z.string().min(1, t.vehicleRequired || 'Kendaraan wajib dipilih'),
+  startDate: z.string().min(1, t.startDateRequired || 'Tanggal mulai wajib diisi'),
+  endDate: z.string().min(1, t.endDateRequired || 'Tanggal selesai wajib diisi'),
+  rentalType: z.enum(['SELF_DRIVE', 'WITH_DRIVER'], { required_error: t.rentalTypeRequired || 'Tipe rental wajib dipilih' }),
+  pickupLocation: z.string().optional(),
+  dropoffLocation: z.string().optional(),
+  paymentMethod: z.string().optional(),
+  rateType: z.enum(['DAILY', 'WEEKLY', 'MONTHLY']).optional(),
+  deposit: z.number().optional(),
+  needDriver: z.boolean().optional(),
+  needDelivery: z.boolean().optional(),
+  needFuel: z.boolean().optional(),
+  needInsurance: z.boolean().optional(),
+  notes: z.string().optional(),
+}).refine(data => {
+  if (data.startDate && data.endDate) {
+    return new Date(data.endDate) > new Date(data.startDate);
+  }
+  return true;
+}, {
+  message: t.dateRangeInvalid || 'Tanggal selesai harus setelah tanggal mulai',
+  path: ['endDate'],
+});

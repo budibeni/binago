@@ -3,21 +3,21 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Calendar, Clock, CheckCircle2, Car, XCircle, List, MapPin, ChevronRight } from 'lucide-react';
-import { getTranslation } from '@/i18n';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
 import { reservationService } from '@/data/modules/rental/services/reservationService';
 import type { Reservation, ReservationStatusFilter } from './types/reservation';
 import { ReservationList } from './components/ReservationList';
-import { ReservationDetailDrawer } from './components/ReservationDetailDrawer';
+import { ReservationView } from './components/ReservationView';
 import { ReservationCreateFeature } from './ReservationCreateFeature';
+import { getReservationTranslation } from './i18n';
 import { cn } from '@adatrack/utils';
 import { trackingNavigationService } from '@/features/core/tracking/services/trackingNavigationService';
 
 export function ReservationsFeature() {
   const router = useRouter();
   const locale = useBusinessLocale();
-  const t = getTranslation(locale);
-  const labels = t.reservation;
+  const t = getReservationTranslation(locale);
+  const labels = t;
 
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -102,8 +102,8 @@ export function ReservationsFeature() {
         setDetailReservation({ ...reservation, status: 'CONFIRMED' });
       }
       alert('Reservasi berhasil dikonfirmasi');
-    } catch (error: any) {
-      alert(error.message || 'Gagal mengonfirmasi reservasi');
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Gagal mengonfirmasi reservasi');
     }
   };
 
@@ -246,7 +246,7 @@ export function ReservationsFeature() {
 
       </div>
 
-      <ReservationDetailDrawer
+      <ReservationView
         reservation={detailReservation}
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
