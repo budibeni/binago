@@ -12,24 +12,9 @@ import {
   useForm,
 } from '@adatrack/ui';
 import { AccessCredential, CredentialType, CredentialStatus } from '../types/credential';
+import type { getCardTranslation } from '../i18n';
 
-// ─── Statics ─────────────────────────────────────────────────────────────────
-
-const CARD_TYPE_OPTIONS = [
-  { value: 'RFID', label: 'RFID' },
-  { value: 'NFC', label: 'NFC' },
-];
-
-const STATUS_OPTIONS = [
-  { value: 'ACTIVE', label: 'Aktif' },
-  { value: 'INACTIVE', label: 'Tidak Aktif' },
-];
-
-const PURPOSE_OPTIONS = [
-  { value: 'ATTENDANCE',  label: 'Absensi' },
-  { value: 'CHECKER',     label: 'Checker' },
-  { value: 'ENGINE_AUTH', label: 'Menghidupkan Mesin' },
-];
+type CardTranslation = ReturnType<typeof getCardTranslation>;
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
@@ -40,11 +25,12 @@ interface CardFormProps {
   onOpenChange: (open: boolean) => void;
   onSave: (data: Partial<AccessCredential>) => void;
   onCancel: () => void;
+  t: CardTranslation;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export function CardForm({ card, open, onOpenChange, onSave, onCancel }: CardFormProps) {
+export function CardForm({ card, open, onOpenChange, onSave, onCancel, t }: CardFormProps) {
   const { formData, errors, isSubmitting, handleChange, handleSubmit } = useForm<AccessCredential>({
     initialData: card,
     resetOn: [open, card],
@@ -59,7 +45,7 @@ export function CardForm({ card, open, onOpenChange, onSave, onCancel }: CardFor
       layout="drawer"
       open={open}
       onOpenChange={onOpenChange}
-      title="Edit Card"
+      title={t.form.title}
       subtitle={`${formData.name ?? ''} · ${formData.uid ?? ''}`}
       onCancel={onCancel}
       onSave={() => handleSubmit()}
@@ -68,70 +54,70 @@ export function CardForm({ card, open, onOpenChange, onSave, onCancel }: CardFor
     >
       <div className="flex flex-col gap-6">
 
-        {/* ── Informasi Card ────────────────────────────────────── */}
+        {/* ── Informasi Card ───────────────────────────────────────────── */}
         <FormCard
-          title="Informasi Card"
-          description="Identitas dan nomor kartu."
+          title={t.form.sectionInfo}
+          description={t.form.descInfo}
           icon={<CreditCard className="w-5 h-5 text-blue-500" />}
           columns={2}
         >
 
           <InputString
-            label="UID / Card Number"
+            label={t.form.labelUid}
             value={formData.uid || ''}
             onChange={(val) => handleChange('uid', val as any)}
             error={errors.uid}
             required
             placeholder="04:XX:XX:XX:XX:XX"
             disabled
-            helpText="UID hanya dapat diubah melalui aplikasi Admin."
+            helpText={t.form.helpUid}
           />
           <InputSelect
-            label="Jenis Card"
+            label={t.form.labelType}
             value={formData.type || ''}
             onChange={(val) => handleChange('type', val as any)}
-            options={CARD_TYPE_OPTIONS}
+            options={t.form.typeOptions}
             error={errors.type}
             required
             disabled
-            helpText="Jenis card hanya dapat diubah melalui aplikasi Admin."
+            helpText={t.form.helpType}
           />
           <InputString
-            label="Nama Card"
+            label={t.form.labelName}
             value={formData.name || ''}
             onChange={(val) => handleChange('name', val as any)}
             error={errors.name}
             required
-            placeholder="Contoh: CARD-DRV-001"
+            placeholder={t.form.placeholderName}
           />
         </FormCard>
 
-        {/* ── Penggunaan & Status ───────────────────────────────── */}
+        {/* ── Penggunaan & Status ───────────────────────────────────────────── */}
         <FormCard
-          title="Penggunaan & Status"
-          description="Fungsi dan status aktif kartu."
+          title={t.form.sectionUsage}
+          description={t.form.descUsage}
           icon={<ToggleRight className="w-5 h-5 text-green-500" />}
           columns={1}
         >
           <InputMultiCheckbox
-            label="Penggunaan Kartu"
+            label={t.form.labelPurposes}
             value={(formData.purposes as string[]) || []}
             onChange={(val) => handleChange('purposes', val as any)}
-            options={PURPOSE_OPTIONS}
+            options={t.form.purposeOptions}
           />
           <InputSelect
-            label="Status"
+            label={t.form.labelStatus}
             value={formData.status || ''}
             onChange={(val) => handleChange('status', val as any)}
-            options={STATUS_OPTIONS}
+            options={t.form.statusOptions}
             error={errors.status}
             required
           />
           <InputTextarea
-            label="Catatan"
+            label={t.form.labelNotes}
             value={formData.notes || ''}
             onChange={(val) => handleChange('notes', val as any)}
-            placeholder="Tambahkan catatan (opsional)"
+            placeholder={t.form.placeholderNotes}
           />
         </FormCard>
 

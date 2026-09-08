@@ -37,7 +37,6 @@ export function InputPhone({
         error={!!error}
         className={formInputClass}
         placeholder={placeholder}
-        prefixIcon={<Phone className="w-4 h-4" />}
       />
     </BaseField>
   );

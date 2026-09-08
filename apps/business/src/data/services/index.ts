@@ -16,3 +16,4 @@ export { trackingService } from './trackingService';
 export { tripService } from './tripService';
 export { homeService } from './homeService';
 export { shareService } from './shareService';
+export { personelService } from './personelService';

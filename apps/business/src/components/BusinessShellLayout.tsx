@@ -2,7 +2,8 @@
 
 import React from 'react';
 import { usePathname } from 'next/navigation';
-import { Home,
+import {
+  Home,
   Map,
   Truck,
   UserRound,
@@ -23,7 +24,8 @@ import { Home,
   Link,
   Settings,
   CircleHelp,
-  Waypoints,
+  Contact,
+  Bell, Waypoints,
   Activity,
   CarFront, FileSignature, CalendarClock, Key, Undo2,
   Bus, Calendar, MapPin, Clock, CreditCard,
@@ -65,6 +67,7 @@ function buildNavigation(locale: Locale): NavGroup[] {
       items: [
         { id: 'vehicles', label: t.nav.vehicles, href: '/vehicles', icon: Truck },
         { id: 'drivers', label: t.nav.drivers, href: '/drivers', icon: UserRound },
+        { id: 'personel', label: (t.nav as any).personel, href: '/personel', icon: Contact },
         { id: 'geofences', label: t.nav.geofences, href: '/geofences', icon: MapPinned },
         { id: 'groups', label: t.nav.groups, href: '/groups', icon: Layers },
         { id: 'routes', label: t.nav.routes, href: '/routes', icon: Waypoints },

@@ -52,7 +52,38 @@ reports
 administration
 ```
 
-## 4. UI Label
+## 4. Feature Structure
+
+Setiap feature mengikuti struktur standar berikut:
+
+```text
+features/[domain]/
+├── [Domain]Feature.tsx     ← Orchestrator utama
+├── i18n.ts                 ← Dictionary terjemahan ID + EN
+├── types/
+│   └── [model].ts          ← Type/interface domain
+└── components/
+    ├── [Domain]Table.tsx   ← Tabel data (DataTable Foundation)
+    ├── [Domain]Form.tsx    ← Form add/edit (drawer atau halaman)
+    └── [Domain]View.tsx    ← Detail read-only (opsional)
+```
+
+Jika feature memiliki halaman create/edit terpisah (bukan drawer):
+
+```text
+features/[domain]/
+├── [Domain]sFeature.tsx        ← Halaman list utama
+├── [Domain]CreateFeature.tsx   ← Halaman tambah baru
+├── [Domain]EditFeature.tsx     ← Halaman edit
+├── i18n.ts
+├── types/
+└── components/
+```
+
+Gunakan pola drawer (`[Domain]Form.tsx`) jika form cukup sederhana.
+Gunakan pola halaman terpisah jika form kompleks atau membutuhkan navigasi sendiri.
+
+## 5. UI Label
 
 Gunakan translation key:
 
@@ -68,6 +99,6 @@ reports â†' Laporan
 administration â†' Administrasi
 ```
 
-## 5. Prinsip
+## 6. Prinsip
 
 Jangan membuat folder Bahasa Indonesia untuk source code.

@@ -37,7 +37,6 @@ export function InputEmail({
         error={!!error}
         className={formInputClass}
         placeholder={placeholder}
-        prefixIcon={<Mail className="w-4 h-4" />}
       />
     </BaseField>
   );

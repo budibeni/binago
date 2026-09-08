@@ -17,24 +17,41 @@ Component harus memiliki API yang jelas dan tidak memiliki business logic jika b
 ## 4. Naming
 
 ```text
-PascalCase â†' component/type
-camelCase â†' variable/function
-UPPER_SNAKE_CASE â†' constant tertentu jika sesuai kebutuhan
-kebab-case â†' file/route yang memang mengikuti convention
+PascalCase → component/type
+camelCase → variable/function
+UPPER_SNAKE_CASE → constant tertentu jika sesuai kebutuhan
+kebab-case → file/route yang memang mengikuti convention
 ```
 
-## 5. Styling
+## 5. Feature File Naming
+
+Gunakan suffix yang konsisten untuk file feature:
+
+```text
+[Domain]Feature.tsx         ← Orchestrator halaman/feature
+[Domain]CreateFeature.tsx   ← Halaman tambah (jika halaman terpisah)
+[Domain]EditFeature.tsx     ← Halaman edit (jika halaman terpisah)
+[Domain]Table.tsx           ← Komponen tabel data
+[Domain]Form.tsx            ← Komponen form add/edit (drawer)
+[Domain]View.tsx            ← Komponen detail read-only (drawer)
+i18n.ts                     ← Dictionary terjemahan (nama tetap lowercase)
+```
+
+`[Domain]` menggunakan PascalCase sesuai nama feature (contoh: `Driver`, `Vehicle`, `Card`).
+
+
+## 6. Styling
 
 Gunakan Tailwind CSS.
 
-## 6. State
+## 7. State
 
 Jangan membuat global state tanpa kebutuhan.
 
-## 7. Error
+## 8. Error
 
 Jangan menelan error tanpa alasan.
 
-## 8. Maintainability
+## 9. Maintainability
 
 Utamakan code yang mudah dibaca dibanding abstraction yang terlalu kompleks.

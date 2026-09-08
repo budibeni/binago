@@ -22,6 +22,9 @@ import {
   type SortingState,
 } from '@adatrack/ui';
 import type { AccessCredential } from '../types/credential';
+import type { getCardTranslation } from '../i18n';
+
+type CardTranslation = ReturnType<typeof getCardTranslation>;
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -33,6 +36,7 @@ interface CardTableProps {
   filterConfig: DataTableFilterConfig;
   isFilterOpen: boolean;
   onFilterOpenChange: (open: boolean) => void;
+  t: CardTranslation;
   className?: string;
 }
 
@@ -48,11 +52,12 @@ const PURPOSE_LABEL: Record<string, string> = {
 
 function buildColumns(
   onEdit: (v: AccessCredential) => void,
+  t: CardTranslation,
 ): DataTableColumnDef<AccessCredential>[] {
   return [
     {
       id: 'name',
-      header: 'Card',
+      header: t.table.colCard,
       accessorKey: 'name',
       enableSorting: true,
       size: 200,
@@ -67,7 +72,7 @@ function buildColumns(
     },
     {
       id: 'type',
-      header: 'Type',
+      header: t.table.colType,
       accessorKey: 'type',
       enableSorting: true,
       size: 90,
@@ -82,7 +87,7 @@ function buildColumns(
     },
     {
       id: 'uid',
-      header: 'UID / Card Number',
+      header: t.table.colUid,
       accessorKey: 'uid',
       enableSorting: true,
       size: 200,
@@ -95,7 +100,7 @@ function buildColumns(
     // -- tidak ada kolom holderType / holderId
     {
       id: 'purposes',
-      header: 'Purpose',
+      header: t.table.colPurpose,
       accessorKey: 'purposes',
       enableSorting: false,
       size: 240,
@@ -106,7 +111,7 @@ function buildColumns(
           <div className="flex flex-wrap gap-1">
             {purposes.map(p => (
               <Badge key={p} variant="outline" className="text-[10px] py-0">
-                {PURPOSE_LABEL[p] ?? p}
+                {t.purpose[p as keyof typeof t.purpose] ?? p}
               </Badge>
             ))}
           </div>
@@ -115,7 +120,7 @@ function buildColumns(
     },
     {
       id: 'status',
-      header: 'Status',
+      header: t.table.colStatus,
       accessorKey: 'status',
       enableSorting: true,
       size: 110,
@@ -123,14 +128,14 @@ function buildColumns(
         const status = row.original.status;
         return (
           <Badge variant={status === 'ACTIVE' ? 'success' : 'default'} dot>
-            {status === 'ACTIVE' ? 'Aktif' : 'Tidak Aktif'}
+            {t.status[status as keyof typeof t.status] ?? status}
           </Badge>
         );
       },
     },
     {
       id: 'updatedAt',
-      header: 'Diperbarui',
+      header: t.table.colUpdatedAt,
       accessorKey: 'updatedAt',
       enableSorting: true,
       size: 160,
@@ -144,7 +149,7 @@ function buildColumns(
     },
     {
       id: 'actions',
-      header: 'Aksi',
+      header: t.table.colActions,
       enableSorting: false,
       size: 60,
       cell: ({ row }) => {
@@ -154,12 +159,12 @@ function buildColumns(
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="h-8 w-8">
                 <MoreHorizontal className="h-4 w-4" />
-                <span className="sr-only">Aksi</span>
+                <span className="sr-only">{t.table.colActions}</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-36">
               <DropdownMenuItem onClick={() => onEdit(card)}>
-                <Edit2 className="mr-2 h-4 w-4 text-slate-500" /> Edit Card
+                <Edit2 className="mr-2 h-4 w-4 text-slate-500" /> {t.actions.editCard}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -179,6 +184,7 @@ export function CardTable({
   filterConfig,
   isFilterOpen,
   onFilterOpenChange,
+  t,
   className,
 }: CardTableProps) {
   const [pageIndex, setPageIndex] = React.useState(0);
@@ -189,8 +195,8 @@ export function CardTable({
   React.useEffect(() => { setPageIndex(0); }, [data]);
 
   const columns = React.useMemo(
-    () => buildColumns(onEdit),
-    [onEdit],
+    () => buildColumns(onEdit, t),
+    [onEdit, t],
   );
 
   const processedData = React.useMemo(() => {
@@ -240,7 +246,7 @@ export function CardTable({
         table={table}
         searchValue={searchValue}
         onSearchChange={onSearchChange}
-        searchPlaceholder="Cari card..."
+        searchPlaceholder={t.searchPlaceholder}
         showColumnToggle
         showFilter
         isFilterOpen={isFilterOpen}
@@ -256,10 +262,10 @@ export function CardTable({
               <DataTableHeader table={table} />
               <DataTableBody
                 table={table}
-                emptyTitle="Belum ada card"
-                emptyDescription="Belum ada card yang terdaftar. Registrasi card dilakukan melalui aplikasi Admin."
-                noResultTitle="Tidak ada hasil"
-                noResultDescription="Coba ubah kata kunci atau filter."
+                emptyTitle={t.table.emptyTitle}
+                emptyDescription={t.table.emptyDescription}
+                noResultTitle={t.table.noResultTitle}
+                noResultDescription={t.table.noResultDescription}
               />
             </table>
           </div>

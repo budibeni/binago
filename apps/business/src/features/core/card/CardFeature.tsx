@@ -5,9 +5,13 @@ import { credentialService } from '@/data/core/card/services/credentialService';
 import { AccessCredential } from './types/credential';
 import { CardTable } from './components/CardTable';
 import { CardForm } from './components/CardForm';
+import { useBusinessLocale } from '../../../components/BusinessShellLayout';
+import { getCardTranslation } from './i18n';
 import type { DataTableFilterConfig } from '@adatrack/ui';
 
 export function CardFeature() {
+  const locale = useBusinessLocale();
+  const t = getCardTranslation(locale);
   const [data, setData] = React.useState<AccessCredential[]>([]);
 
   // Table state
@@ -57,30 +61,30 @@ export function CardFeature() {
     state: filterState,
     onStateChange: setFilterState,
     onClearAll: () => setFilterState({ status: 'ALL', type: 'ALL' }),
-    labels: { title: 'Filter Card', clearAll: 'Reset' },
+    labels: { title: t.filter.title, clearAll: t.filter.clearAll },
     fields: [
       {
         id: 'status',
-        label: 'Status',
+        label: t.filter.status,
         type: 'pills-single',
         options: [
-          { value: 'ALL', label: 'Semua Status' },
-          { value: 'ACTIVE', label: 'Aktif', colorClass: 'bg-success', activeClass: 'bg-success/15 border-success/40 text-success' },
-          { value: 'INACTIVE', label: 'Tidak Aktif', colorClass: 'bg-neutral-400', activeClass: 'bg-neutral-100 dark:bg-neutral-800 border-neutral-400 text-foreground' },
+          { value: 'ALL', label: t.filter.allStatus },
+          { value: 'ACTIVE', label: t.filter.active, colorClass: 'bg-success', activeClass: 'bg-success/15 border-success/40 text-success' },
+          { value: 'INACTIVE', label: t.filter.inactive, colorClass: 'bg-neutral-400', activeClass: 'bg-neutral-100 dark:bg-neutral-800 border-neutral-400 text-foreground' },
         ],
       },
       {
         id: 'type',
-        label: 'Jenis',
+        label: t.filter.type,
         type: 'pills-single',
         options: [
-          { value: 'ALL', label: 'Semua Jenis' },
+          { value: 'ALL', label: t.filter.allType },
           { value: 'RFID', label: 'RFID', colorClass: 'bg-info', activeClass: 'bg-info/15 border-info/40 text-info' },
           { value: 'NFC', label: 'NFC', colorClass: 'bg-primary', activeClass: 'bg-primary/15 border-primary/40 text-primary' },
         ],
       },
     ],
-  }), [filterState]);
+  }), [filterState, t]);
 
   return (
     <div className="flex flex-col h-full w-full">
@@ -95,6 +99,7 @@ export function CardFeature() {
           filterConfig={filterConfig}
           isFilterOpen={isFilterOpen}
           onFilterOpenChange={setIsFilterOpen}
+          t={t}
         />
       </div>
 
@@ -111,6 +116,7 @@ export function CardFeature() {
           }}
           onSave={handleSave}
           onCancel={handleCancel}
+          t={t}
         />
       )}
 
