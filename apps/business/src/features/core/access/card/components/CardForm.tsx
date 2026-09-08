@@ -14,7 +14,7 @@ import {
 import { CardModel, CardType, CardStatus } from '../types/card';
 import type { getCardTranslation } from '../i18n';
 import { driverService } from '@/data/services/driverService';
-import { personelService } from '@/data/services/personelService';
+import { personelService } from '@/data/core/access/personel/services/personelService';
 
 type CardTranslation = ReturnType<typeof getCardTranslation>;
 

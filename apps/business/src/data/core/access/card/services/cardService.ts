@@ -1,4 +1,4 @@
-import { CardModel, CardStatus, CardType } from '@/features/core/card/types/card';
+import { CardModel, CardStatus, CardType } from '@/features/core/access/card/types/card';
 import { cardRepository } from '../repositories/cardRepository';
 
 export interface CardFilter {

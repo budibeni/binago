@@ -1,13 +1,13 @@
 'use client';
 
 import React from 'react';
-import { cardService } from '@/data/core/card/services/cardService';
+import { cardService } from '@/data/core/access/card/services/cardService';
 import { driverService } from '@/data/services/driverService';
-import { personelService } from '@/data/services/personelService';
+import { personelService } from '@/data/core/access/personel/services/personelService';
 import { CardModel } from './types/card';
 import { CardTable } from './components/CardTable';
 import { CardForm } from './components/CardForm';
-import { useBusinessLocale } from '../../../components/BusinessShellLayout';
+import { useBusinessLocale } from '@/components/BusinessShellLayout';
 import { getCardTranslation } from './i18n';
 import type { DataTableFilterConfig } from '@adatrack/ui';
 

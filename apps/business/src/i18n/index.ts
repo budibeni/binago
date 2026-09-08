@@ -7,15 +7,16 @@ export const dictionaries = {
 
     // Navigation Labels
     nav: {
+      log: 'Log',
+      personel: 'Personel',
+      card: 'Kartu',
       home: 'Beranda',
       tracking: 'Pemantauan',
       groups: 'Grup',
       vehicles: 'Armada',
       drivers: 'Pengemudi',
-      personel: 'Personel',
       geofences: 'Geofence',
       routes: 'Rute',
-      card: 'Card',
       checker: 'Checker Penumpang',
       trips: 'Perjalanan',
       activities: 'Aktivitas',
@@ -107,8 +108,41 @@ export const dictionaries = {
       projectReports: 'Laporan Project',
     },
 
+    log: {
+      title: 'Log Card',
+      subtitle: 'Riwayat penggunaan Card dan aktivitas akses.',
+      columns: {
+        time: 'Waktu',
+        card: 'Card',
+        holder: 'Pemegang',
+        activity: 'Aktivitas',
+        vehicle: 'Kendaraan',
+        status: 'Status',
+      },
+      status: {
+        all: 'Semua Status',
+        success: 'Berhasil',
+        failed: 'Gagal',
+      },
+      activity: {
+        all: 'Semua Aktivitas',
+        attendance: 'Absensi',
+        checker: 'Checker',
+        engineAuth: 'Menghidupkan Mesin',
+      },
+      holder: {
+        all: 'Semua Pemegang',
+        driver: 'Driver',
+        personel: 'Personel',
+        unknown: 'Belum diketahui',
+      },
+      none: '-',
+      searchPlaceholder: 'Cari berdasarkan UID, nama pemegang, atau nopol...',
+    },
+
     // Nav Group Titles
     navGroup: {
+      access: 'KARTU AKSES',
       main: 'Menu Utama',
       master: 'Master Data',
       operational: 'Operasional',
@@ -641,15 +675,16 @@ export const dictionaries = {
 
     // Navigation Labels
     nav: {
+      log: 'Log',
+      personel: 'Personnel',
+      card: 'Card',
       home: 'Home',
       tracking: 'Tracking',
       groups: 'Groups',
       vehicles: 'Vehicles',
       drivers: 'Drivers',
-      personel: 'Personel',
       geofences: 'Geofences',
       routes: 'Routes',
-      card: 'Card',
       checker: 'Passenger Checker',
       trips: 'Trips',
       activities: 'Activities',
@@ -741,8 +776,41 @@ export const dictionaries = {
       projectReports: 'Project Reports',
     },
 
+    log: {
+      title: 'Card Log',
+      subtitle: 'Card usage history and access activities.',
+      columns: {
+        time: 'Time',
+        card: 'Card',
+        holder: 'Holder',
+        activity: 'Activity',
+        vehicle: 'Vehicle',
+        status: 'Status',
+      },
+      status: {
+        all: 'All Statuses',
+        success: 'Success',
+        failed: 'Failed',
+      },
+      activity: {
+        all: 'All Activities',
+        attendance: 'Attendance',
+        checker: 'Checker',
+        engineAuth: 'Engine Start',
+      },
+      holder: {
+        all: 'All Holders',
+        driver: 'Driver',
+        personel: 'Personnel',
+        unknown: 'Unknown',
+      },
+      none: '-',
+      searchPlaceholder: 'Search by UID, holder name, or plate number...',
+    },
+
     // Nav Group Titles
     navGroup: {
+      access: 'ACCESS CARDS',
       main: 'Main Menu',
       master: 'Master Data',
       operational: 'Operational',

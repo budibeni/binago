@@ -67,11 +67,19 @@ function buildNavigation(locale: Locale): NavGroup[] {
       items: [
         { id: 'vehicles', label: t.nav.vehicles, href: '/vehicles', icon: Truck },
         { id: 'drivers', label: t.nav.drivers, href: '/drivers', icon: UserRound },
-        { id: 'personel', label: (t.nav as any).personel, href: '/personel', icon: Contact },
         { id: 'geofences', label: t.nav.geofences, href: '/geofences', icon: MapPinned },
         { id: 'groups', label: t.nav.groups, href: '/groups', icon: Layers },
         { id: 'routes', label: t.nav.routes, href: '/routes', icon: Waypoints },
-        { id: 'card', label: (t.nav as any).card, href: '/card', icon: CreditCard },
+      ],
+    },
+    {
+      id: 'access',
+      title: t.navGroup.access,
+      icon: CreditCard,
+      items: [
+        { id: 'personel', label: t.nav.personel, href: '/personel', icon: Contact },
+        { id: 'card', label: t.nav.card, href: '/card', icon: CreditCard },
+        { id: 'log', label: t.nav.log, href: '/log', icon: History },
       ],
     },
 

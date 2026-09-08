@@ -1,5 +1,5 @@
 import { personelRepository } from '../repositories/personelRepository';
-import type { Personel, PersonelStatusFilter, PersonelTypeFilter } from '@/features/core/personel/types/personel';
+import type { Personel, PersonelStatusFilter, PersonelTypeFilter } from '@/features/core/access/personel/types/personel';
 
 export const personelService = {
   getPersonel(search?: string, status?: PersonelStatusFilter, type?: PersonelTypeFilter): Personel[] {

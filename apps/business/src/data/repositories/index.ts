@@ -10,4 +10,3 @@ export * from './routeRepository';
 export * from './trackingRepository';
 export * from './tripRepository';
 export * from './shareRepository';
-export * from './personelRepository';

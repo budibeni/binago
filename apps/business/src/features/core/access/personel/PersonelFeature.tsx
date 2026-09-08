@@ -3,7 +3,7 @@
 import React from 'react';
 import { getPersonelTranslation } from './i18n';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
-import { personelService } from '@/data/services';
+import { personelService } from '@/data/core/access/personel/services/personelService';
 import { PersonelTable } from './components/PersonelTable';
 import { PersonelView } from './components/PersonelView';
 import { PersonelForm } from './components/PersonelForm';

@@ -1,4 +1,4 @@
-import { CardModel } from '@/features/core/card/types/card';
+import { CardModel } from '@/features/core/access/card/types/card';
 import { mockCards } from '../mock/cards';
 
 class CredentialRepository {

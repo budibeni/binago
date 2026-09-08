@@ -1,5 +1,5 @@
-import type { Personel } from '@/features/core/personel/types/personel';
-import { mockPersonel } from '@/features/core/personel/data/mockPersonel';
+import type { Personel } from '@/features/core/access/personel/types/personel';
+import { mockPersonel } from '@/features/core/access/personel/data/mockPersonel';
 
 class PersonelRepository {
   private personel: Personel[];
