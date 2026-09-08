@@ -21,7 +21,7 @@ import {
   type ColumnVisibilityState,
   type SortingState,
 } from '@adatrack/ui';
-import type { AccessCredential } from '../types/credential';
+import type { CardModel } from '../types/card';
 import type { getCardTranslation } from '../i18n';
 
 type CardTranslation = ReturnType<typeof getCardTranslation>;
@@ -29,8 +29,8 @@ type CardTranslation = ReturnType<typeof getCardTranslation>;
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface CardTableProps {
-  data: AccessCredential[];
-  onEdit: (card: AccessCredential) => void;
+  data: CardModel[];
+  onEdit: (card: CardModel) => void;
   searchValue: string;
   onSearchChange: (value: string) => void;
   filterConfig: DataTableFilterConfig;
@@ -51,9 +51,9 @@ const PURPOSE_LABEL: Record<string, string> = {
 // ─── Column Factory ────────────────────────────────────────────────────────────
 
 function buildColumns(
-  onEdit: (v: AccessCredential) => void,
+  onEdit: (v: CardModel) => void,
   t: CardTranslation,
-): DataTableColumnDef<AccessCredential>[] {
+): DataTableColumnDef<CardModel>[] {
   return [
     {
       id: 'name',
@@ -61,14 +61,41 @@ function buildColumns(
       accessorKey: 'name',
       enableSorting: true,
       size: 200,
-      cell: ({ row }) => (
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary/10 shrink-0">
-            <CreditCard className="h-3.5 w-3.5 text-primary" />
+      cell: ({ row }) => {
+        const d = row.original;
+        return (
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary/10 shrink-0">
+              <CreditCard className="h-3.5 w-3.5 text-primary" />
+            </div>
+            <div className="flex flex-col">
+              <span className="font-medium text-foreground text-sm">{d.name}</span>
+              <span className="text-xs text-neutral-500">{d.notes || '-'}</span>
+            </div>
           </div>
-          <span className="font-medium text-foreground text-sm">{row.original.name}</span>
-        </div>
-      ),
+        );
+      },
+    },
+    {
+      id: 'holder',
+      header: t.table.colHolder,
+      size: 200,
+      cell: ({ row }) => {
+        const d = row.original;
+        const holderName = d.holderName ?? '-';
+        const subtitle = d.holderSubtitle;
+
+        return (
+          <div className="flex flex-col">
+            <span className={subtitle ? "font-medium text-foreground" : "text-neutral-500 italic"}>
+              {holderName}
+            </span>
+            {subtitle && (
+              <span className="text-xs text-neutral-500 uppercase">{subtitle}</span>
+            )}
+          </div>
+        );
+      },
     },
     {
       id: 'type',
@@ -204,8 +231,8 @@ export function CardTable({
     if (sorting.length > 0) {
       const { id, desc } = sorting[0];
       result.sort((a, b) => {
-        const valA = (a[id as keyof AccessCredential] ?? '') as string;
-        const valB = (b[id as keyof AccessCredential] ?? '') as string;
+        const valA = (a[id as keyof CardModel] ?? '') as string;
+        const valB = (b[id as keyof CardModel] ?? '') as string;
         if (typeof valA === 'string' && typeof valB === 'string') {
           return desc ? valB.localeCompare(valA) : valA.localeCompare(valB);
         }
@@ -224,7 +251,7 @@ export function CardTable({
     onPageSizeChange: (s) => { setPageSize(s); setPageIndex(0); },
   };
 
-  const table = useDataTable<AccessCredential>({
+  const table = useDataTable<CardModel>({
     data: processedData,
     columns,
     sorting,

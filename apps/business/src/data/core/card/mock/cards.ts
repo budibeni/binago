@@ -1,13 +1,13 @@
-import { AccessCredential } from '@/features/core/card/types/credential';
+import { CardModel } from '@/features/core/card/types/card';
 
-export const mockCredentials: AccessCredential[] = [
+export const mockCards: CardModel[] = [
   {
     id: 'cred-001',
     name: 'CARD-DRV-001',
     type: 'RFID',
     uid: '04:A1:B2:C3:D4:E5',
     holderType: 'DRIVER',
-    holderId: 'driver-001',
+    holderId: 'd1',
     purposes: ['ATTENDANCE', 'ENGINE_AUTH'],
     status: 'ACTIVE',
     notes: 'Kartu utama untuk Driver 001',
@@ -19,8 +19,8 @@ export const mockCredentials: AccessCredential[] = [
     name: 'CARD-CHK-001',
     type: 'NFC',
     uid: '04:11:22:33:44:55',
-    holderType: 'CHECKER',
-    holderId: 'checker-001',
+    holderType: 'PERSONEL',
+    holderId: 'p1',
     purposes: ['CHECKER', 'ATTENDANCE'],
     status: 'ACTIVE',
     notes: 'Kartu khusus Checker',
@@ -32,8 +32,8 @@ export const mockCredentials: AccessCredential[] = [
     name: 'CARD-DRV-002',
     type: 'RFID',
     uid: '04:99:88:77:66:55',
-    holderType: 'DRIVER',
-    holderId: 'driver-002',
+    holderType: null,
+    holderId: null,
     purposes: ['ENGINE_AUTH'],
     status: 'INACTIVE',
     notes: 'Kartu hilang',
@@ -45,8 +45,8 @@ export const mockCredentials: AccessCredential[] = [
     name: 'CARD-DRV-003',
     type: 'RFID',
     uid: '04:AA:BB:CC:DD:EE',
-    holderType: 'DRIVER',
-    holderId: 'driver-003',
+    holderType: null,
+    holderId: null,
     purposes: ['ATTENDANCE', 'ENGINE_AUTH', 'CHECKER'],
     status: 'ACTIVE',
     createdAt: '2026-08-20T09:15:00Z',

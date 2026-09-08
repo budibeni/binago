@@ -13,7 +13,6 @@ export interface Personel {
   phone?: string;
   email?: string;
   address?: string;
-  cardId?: string | null;
   status: PersonelStatus;
   notes?: string;
   createdAt: string;
@@ -27,7 +26,6 @@ export const getPersonelFormSchema = (t: Record<string, string>) => z.object({
   phone: z.string().optional(),
   email: z.string().email(t.emailInvalid || 'Format email tidak valid').optional().or(z.literal('')),
   address: z.string().optional(),
-  cardId: z.string().optional().nullable(),
   status: z.enum(['ACTIVE', 'INACTIVE']),
   notes: z.string().optional(),
 });

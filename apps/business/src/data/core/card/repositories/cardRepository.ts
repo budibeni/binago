@@ -1,26 +1,26 @@
-import { AccessCredential } from '@/features/core/card/types/credential';
-import { mockCredentials } from '../mock/credentials';
+import { CardModel } from '@/features/core/card/types/card';
+import { mockCards } from '../mock/cards';
 
 class CredentialRepository {
-  private credentials: AccessCredential[] = [...mockCredentials];
+  private credentials: CardModel[] = [...mockCards];
 
-  async findAll(): Promise<AccessCredential[]> {
+  async findAll(): Promise<CardModel[]> {
     return Promise.resolve([...this.credentials]);
   }
 
-  async findById(id: string): Promise<AccessCredential | null> {
+  async findById(id: string): Promise<CardModel | null> {
     const cred = this.credentials.find(c => c.id === id);
     return Promise.resolve(cred ? { ...cred } : null);
   }
 
-  async findByUid(uid: string): Promise<AccessCredential | null> {
+  async findByUid(uid: string): Promise<CardModel | null> {
     const cred = this.credentials.find(c => c.uid === uid);
     return Promise.resolve(cred ? { ...cred } : null);
   }
 
-  async create(data: Omit<AccessCredential, 'id' | 'createdAt' | 'updatedAt'>): Promise<AccessCredential> {
+  async create(data: Omit<CardModel, 'id' | 'createdAt' | 'updatedAt'>): Promise<CardModel> {
     const now = new Date().toISOString();
-    const newCred: AccessCredential = {
+    const newCred: CardModel = {
       ...data,
       id: `cred-${Date.now()}`,
       createdAt: now,
@@ -30,7 +30,7 @@ class CredentialRepository {
     return Promise.resolve({ ...newCred });
   }
 
-  async update(id: string, data: Partial<Omit<AccessCredential, 'id' | 'createdAt' | 'updatedAt'>>): Promise<AccessCredential | null> {
+  async update(id: string, data: Partial<Omit<CardModel, 'id' | 'createdAt' | 'updatedAt'>>): Promise<CardModel | null> {
     const index = this.credentials.findIndex(c => c.id === id);
     if (index === -1) return Promise.resolve(null);
 
@@ -50,4 +50,4 @@ class CredentialRepository {
   }
 }
 
-export const credentialRepository = new CredentialRepository();
+export const cardRepository = new CredentialRepository();
