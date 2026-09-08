@@ -33,34 +33,12 @@ export type DataTableInstance<TData extends RowData = RowData> =
 export type DataTableRowInstance<TData extends RowData = RowData> =
   Row<StockFeatures, TData>;
 
-export interface DataTablePaginationConfig {
-  pageIndex: number;
-  pageSize: number;
-  totalCount: number;
-  pageSizeOptions?: number[];
-  onPageChange?: (pageIndex: number) => void;
-  onPageSizeChange?: (pageSize: number) => void;
-}
-
-export interface DataTableInfiniteConfig {
-  hasNextPage: boolean;
-  isFetchingNextPage: boolean;
-  onFetchNextPage: () => void;
-}
-
-export interface DataTableFreezeConfig {
-  left?: string[];
-  right?: string[];
-  start?: string[];
-  end?: string[];
-}
+export type DataTableFilterFieldType = 'pills-single' | 'pills-multi' | 'checkbox-group';
 
 export interface DataTableExportConfig {
   filename?: string;
   enabled?: boolean;
 }
-
-export type DataTableFilterFieldType = 'pills-single' | 'pills-multi' | 'checkbox-group';
 
 export interface DataTableFilterOption {
   value: string;
@@ -88,50 +66,60 @@ export interface DataTableFilterConfig {
   };
 }
 
-export interface DataTableBaseProps<TData extends RowData = RowData> {
+export interface DataTableProps<TData extends RowData = RowData> {
+  // Core
   data: TData[];
   columns: DataTableColumnDef<TData>[];
-  mode?: DataTableMode;
-  fetchState?: FetchState;
-  errorMessage?: string;
-  onRetry?: () => void;
-  onFetch?: (params: FetchParams) => void;
 
-  // Features configuration
-  paginationConfig?: DataTablePaginationConfig;
-  infiniteConfig?: DataTableInfiniteConfig;
-  freezeConfig?: DataTableFreezeConfig;
-  exportConfig?: DataTableExportConfig;
+  // Capabilities
+  searchable?: boolean;
+  sortable?: boolean;
+  filterable?: boolean;
+  pagination?: boolean;
+  columnVisibility?: boolean;
+  selectable?: boolean;
+  exportable?: boolean;
+
+  // Search State
+  searchValue?: string;
+  onSearchChange?: (value: string) => void;
+  searchPlaceholder?: string;
+
+  // Pagination State
+  pageIndex?: number;
+  pageSize?: number;
+  totalCount?: number;
+  onPageChange?: (pageIndex: number) => void;
+  onPageSizeChange?: (pageSize: number) => void;
+  pageSizeOptions?: number[];
+
+  // Filter State
   filterConfig?: DataTableFilterConfig;
-
-  // Controlled states
   isFilterOpen?: boolean;
   onFilterOpenChange?: (open: boolean) => void;
+  activeFilterCount?: number;
+
+  // Sorting State
   sorting?: SortingState;
   onSortingChange?: (sorting: SortingState) => void;
-  columnFilters?: ColumnFiltersState;
-  onColumnFiltersChange?: (filters: ColumnFiltersState) => void;
-  globalFilter?: string;
-  onGlobalFilterChange?: (filter: string) => void;
-  columnVisibility?: ColumnVisibilityState;
-  onColumnVisibilityChange?: (visibility: ColumnVisibilityState) => void;
-  columnPinning?: ColumnPinningState;
-  onColumnPinningChange?: (pinning: ColumnPinningState) => void;
 
-  // Custom UI slots
+  // Column Visibility State
+  columnVisibilityState?: ColumnVisibilityState;
+  onColumnVisibilityChange?: (visibility: ColumnVisibilityState) => void;
+
+  // Status (UI)
+  isLoading?: boolean;
+  isError?: boolean;
+  errorMessage?: string;
+  onRetry?: () => void;
+  onRefresh?: () => void;
   emptyTitle?: string;
   emptyDescription?: string;
   emptyIcon?: React.ElementType;
-  noResultTitle?: string;
-  noResultDescription?: string;
+
+  // Customization
   className?: string;
   tableClassName?: string;
-  toolbarSlot?: ReactNode | ((props: {
-    table: DataTableInstance<TData>;
-    showFilter?: boolean;
-    isFilterOpen?: boolean;
-    onFilterOpenChange?: (open: boolean) => void;
-    activeFilterCount?: number;
-  }) => ReactNode);
-  paginationSlot?: ReactNode;
+  toolbarActions?: ReactNode; // Secondary actions (e.g., Export, Add Button)
+  exportFilename?: string;
 }

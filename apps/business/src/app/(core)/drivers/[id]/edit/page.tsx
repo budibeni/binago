@@ -16,7 +16,7 @@ export default function EditDriverPage() {
   const id = params.id as string;
   const driver = React.useMemo(() => driverService.getDriverById(params.id as string), [params.id]);
 
-  const tEdit = t.drivers.editPage;
+  // Removed tEdit
 
   const handleCancel = () => {
     router.push('/drivers');
@@ -39,10 +39,12 @@ export default function EditDriverPage() {
   return (
     <div className="flex-1 w-full h-full bg-neutral-50/80 dark:bg-neutral-900/40 overflow-y-auto relative flex flex-col">
       <DriverForm 
-        labels={tEdit} 
-        initialData={driver}
+        driver={driver}
+        open={true}
+        onOpenChange={() => {}}
+        layout="fullscreen"
         onCancel={handleCancel}
-        onSubmit={handleSubmit}
+        onSave={handleSubmit}
       />
     </div>
   );

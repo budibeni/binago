@@ -1,9 +1,19 @@
 import { CardActivityType, CardLog, CardLogStatus, HolderType } from '@/features/core/access/log/types/log';
 import { logRepository } from '../repositories/logRepository';
-import { BaseQueryParams, PaginatedResponse } from '@/features/common/types/pagination';
+export interface PaginatedResponse<T> {
+  items: T[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
 
 
-export interface LogFilterParams extends BaseQueryParams {
+export interface LogFilterParams {
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortDir?: 'asc' | 'desc';
   search?: string;
   activityType?: CardActivityType | 'ALL';
   status?: CardLogStatus | 'ALL';

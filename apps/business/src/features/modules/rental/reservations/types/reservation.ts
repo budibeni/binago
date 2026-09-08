@@ -43,12 +43,12 @@ export interface ReservationFilters {
   endDate?: string;
 }
 
-export const getReservationFormSchema = (t: Record<string, string>) => z.object({
+export const getReservationFormSchema = (t: Record<string, any>) => z.object({
   customerId: z.string().min(1, t.customerRequired || 'Pelanggan wajib dipilih'),
   vehicleId: z.string().min(1, t.vehicleRequired || 'Kendaraan wajib dipilih'),
   startDate: z.string().min(1, t.startDateRequired || 'Tanggal mulai wajib diisi'),
   endDate: z.string().min(1, t.endDateRequired || 'Tanggal selesai wajib diisi'),
-  rentalType: z.enum(['SELF_DRIVE', 'WITH_DRIVER'], { required_error: t.rentalTypeRequired || 'Tipe rental wajib dipilih' }),
+  rentalType: z.enum(['SELF_DRIVE', 'WITH_DRIVER'], t.rentalTypeRequired || 'Tipe rental wajib dipilih'),
   pickupLocation: z.string().optional(),
   dropoffLocation: z.string().optional(),
   paymentMethod: z.string().optional(),

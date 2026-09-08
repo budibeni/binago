@@ -44,7 +44,7 @@ export function DataTableBody<TData extends RowData = RowData>({
       <tbody suppressHydrationWarning>
         {Array.from({ length: 5 }).map((_, idx) => (
           <tr key={idx} className="border-b border-border">
-            <td colSpan={columnCount} className="p-4">
+            <td colSpan={columnCount} className="px-3 py-3">
               <Skeleton className="h-5 w-full" />
             </td>
           </tr>
@@ -57,7 +57,7 @@ export function DataTableBody<TData extends RowData = RowData>({
     return (
       <tbody suppressHydrationWarning>
         <tr>
-          <td colSpan={columnCount} className="p-4">
+          <td colSpan={columnCount} className="px-3 py-6">
             <EmptyState
               icon={AlertCircle}
               title="Terjadi Kesalahan"
@@ -80,7 +80,7 @@ export function DataTableBody<TData extends RowData = RowData>({
     return (
       <tbody suppressHydrationWarning>
         <tr>
-          <td colSpan={columnCount} className="p-4">
+          <td colSpan={columnCount} className="px-3 py-6">
             {isFiltered ? (
               <EmptyState
                 icon={SearchX}

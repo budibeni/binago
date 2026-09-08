@@ -1,29 +1,16 @@
 'use client';
 
 import React from 'react';
-import { MoreHorizontal, Eye, Edit2, MapPin, Trash2 } from 'lucide-react';
+import { MoreVertical, Eye, Edit2, MapPin, Trash2 } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import {
   Badge, Button,
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent,
   DropdownMenuItem, DropdownMenuSeparator,
+  DataTable,
 } from '@adatrack/ui';
-import {
-  useDataTable,
-  DataTableHeader,
-  DataTableBody,
-  DataTableToolbar,
-  DataTablePagination,
-  DataTableFilterPanel,
-  type DataTableColumnDef,
-  type DataTablePaginationConfig,
-  type DataTableFilterConfig,
-  type ColumnVisibilityState,
-  type SortingState,
-} from '@adatrack/ui';
+import type { DataTableColumnDef, DataTableFilterConfig } from '@adatrack/ui';
 import type { Vehicle } from '../types/vehicle';
-
-// â"€â"€â"€ Types â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 interface VehicleTableLabels {
   colPlateNumber: string;
@@ -75,20 +62,16 @@ interface VehicleTableProps {
   className?: string;
 }
 
-// â"€â"€â"€ Status Badge â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
-
 function getStatusBadge(status: Vehicle['status'], labels: VehicleTableLabels) {
   const map = {
     driving: { label: labels.statusDriving, variant: 'success' as const },
-    idle:    { label: labels.statusIdle,    variant: 'warning' as const },
+    idle: { label: labels.statusIdle, variant: 'warning' as const },
     parking: { label: labels.statusParking, variant: 'default' as const },
-    offline: { label: labels.statusOffline, variant: 'danger'  as const },
+    offline: { label: labels.statusOffline, variant: 'danger' as const },
   };
   const cfg = map[status];
   return <Badge variant={cfg.variant} dot>{cfg.label}</Badge>;
 }
-
-// â"€â"€â"€ Column Factory â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 function buildColumns(
   labels: VehicleTableLabels,
@@ -98,6 +81,46 @@ function buildColumns(
   onDelete: (v: Vehicle) => void,
 ): DataTableColumnDef<Vehicle>[] {
   return [
+    {
+      id: 'actions',
+      header: '',
+      enableSorting: false,
+      size: 40,
+      cell: ({ row }) => (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 w-7 p-0 flex items-center justify-center focus-visible:ring-1 focus-visible:ring-primary focus:outline-none data-[state=open]:bg-neutral-200/50 dark:data-[state=open]:bg-neutral-800"
+              aria-label="Aksi kendaraan"
+              id={`vehicle-action-${row.original.id}`}
+            >
+              <MoreVertical className="h-4 w-4 text-foreground-muted" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-48">
+            <DropdownMenuItem onClick={() => onViewDetail(row.original)}>
+              <Eye className="mr-2 h-4 w-4 text-foreground-muted" />
+              <span>{labels.actionDetail}</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onEdit(row.original)}>
+              <Edit2 className="mr-2 h-4 w-4 text-foreground-muted" />
+              <span>{labels.actionEdit}</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onTrack(row.original)}>
+              <MapPin className="mr-2 h-4 w-4 text-foreground-muted" />
+              <span>{labels.actionTrack}</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem destructive onClick={() => onDelete(row.original)}>
+              <Trash2 className="mr-2 h-4 w-4 text-danger" />
+              <span>{labels.actionDelete}</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ),
+    },
     {
       id: 'plateNumber',
       accessorKey: 'plateNumber',
@@ -173,6 +196,7 @@ function buildColumns(
       header: labels.colLastUpdate,
       enableSorting: true,
       size: 160,
+      sortFn: 'alphanumeric' as any,
       cell: ({ row }) => (
         <span suppressHydrationWarning className="text-[12px] text-foreground-muted tabular-nums">
           {new Date(row.original.lastUpdate).toLocaleString('id-ID', {
@@ -262,6 +286,7 @@ function buildColumns(
       header: labels.colRegExpiry,
       enableSorting: true,
       size: 160,
+      sortFn: 'datetime' as any,
       cell: ({ row }) => {
         const diff = (new Date(row.original.registrationExpiry).getTime() - Date.now()) / (1000 * 60 * 60 * 24);
         const isExpiring = diff < 60;
@@ -277,50 +302,8 @@ function buildColumns(
         );
       },
     },
-    {
-      id: 'actions',
-      header: '',
-      enableSorting: false,
-      size: 52,
-      cell: ({ row }) => (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 w-7 p-0 flex items-center justify-center focus-visible:ring-1 focus-visible:ring-primary focus:outline-none data-[state=open]:bg-neutral-200/50 dark:data-[state=open]:bg-neutral-800"
-              aria-label="Aksi kendaraan"
-              id={`vehicle-action-${row.original.id}`}
-            >
-              <MoreHorizontal className="h-4 w-4 text-foreground-muted" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuItem onClick={() => onViewDetail(row.original)}>
-              <Eye className="mr-2 h-4 w-4 text-foreground-muted" />
-              <span>{labels.actionDetail}</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onEdit(row.original)}>
-              <Edit2 className="mr-2 h-4 w-4 text-foreground-muted" />
-              <span>{labels.actionEdit}</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onTrack(row.original)}>
-              <MapPin className="mr-2 h-4 w-4 text-foreground-muted" />
-              <span>{labels.actionTrack}</span>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem destructive onClick={() => onDelete(row.original)}>
-              <Trash2 className="mr-2 h-4 w-4 text-danger" />
-              <span>{labels.actionDelete}</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      ),
-    },
   ];
 }
-
-// â"€â"€â"€ Default Column Visibility â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 const DEFAULT_COLUMN_VISIBILITY = {
   vehicleCategory: false,
@@ -331,8 +314,6 @@ const DEFAULT_COLUMN_VISIBILITY = {
   nextServiceKm: false,
   registrationExpiry: false,
 };
-
-// â"€â"€â"€ Component â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 export function VehicleTable({
   data,
@@ -349,121 +330,44 @@ export function VehicleTable({
   onAdd,
   className,
 }: VehicleTableProps) {
-  const [pageIndex, setPageIndex] = React.useState(0);
-  const [pageSize, setPageSize] = React.useState(10);
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnVisibility, setColumnVisibility] = React.useState<ColumnVisibilityState>(DEFAULT_COLUMN_VISIBILITY);
-
-  // Reset page when data changes
-  React.useEffect(() => { setPageIndex(0); }, [data]);
-
   const columns = React.useMemo(
     () => buildColumns(labels, onViewDetail, onEdit, onTrack, onDelete),
     [labels, onViewDetail, onEdit, onTrack, onDelete],
   );
 
-  const processedData = React.useMemo(() => {
-    const result = [...data];
-    if (sorting.length > 0) {
-      const { id, desc } = sorting[0];
-      result.sort((a, b) => {
-        let valA = a[id as keyof Vehicle];
-        let valB = b[id as keyof Vehicle];
-        
-        // Handle dates
-        if (id === 'lastUpdate' || id === 'registrationExpiry') {
-           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-           valA = new Date(valA as string).getTime() as any;
-           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-           valB = new Date(valB as string).getTime() as any;
-        }
-
-        if (typeof valA === 'number' && typeof valB === 'number') {
-          return desc ? valB - valA : valA - valB;
-        }
-        if (typeof valA === 'string' && typeof valB === 'string') {
-          return desc ? valB.localeCompare(valA) : valA.localeCompare(valB);
-        }
-        return 0;
-      });
-    }
-    return result.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize);
-  }, [data, sorting, pageIndex, pageSize]);
-
-  const paginationConfig: DataTablePaginationConfig = {
-    pageIndex,
-    pageSize,
-    totalCount: data.length,
-    pageSizeOptions: [10, 20, 50],
-    onPageChange: setPageIndex,
-    onPageSizeChange: (s) => { setPageSize(s); setPageIndex(0); },
-  };
-
-  // Create the table instance directly - no injection tricks needed
-  const table = useDataTable<Vehicle>({
-    data: processedData,
-    columns,
-    sorting,
-    onSortingChange: setSorting,
-    mode: 'pagination',
-    columnVisibility,
-    onColumnVisibilityChange: setColumnVisibility,
-    freezeConfig: { left: ['plateNumber'], right: ['actions'] },
-    paginationConfig,
-  });
-
-  const activeFilterCount = Object.values(filterConfig.state).flat().filter(Boolean).length;
-
   return (
-    <div className={cn('flex flex-col gap-3', className)}>
-      {/* Toolbar - directly uses table instance, no injection needed */}
-      <DataTableToolbar
-        table={table}
-        searchValue={searchValue}
-        onSearchChange={onSearchChange}
-        searchPlaceholder={labels.searchPlaceholder}
-        showColumnToggle
-        showExport
-        showFilter
-        isFilterOpen={isFilterOpen}
-        onFilterOpenChange={onFilterOpenChange}
-        activeFilterCount={activeFilterCount}
-        exportConfig={{ filename: labels.exportFilename, enabled: true }}
-        rightSlot={onAdd && (
+    <DataTable<Vehicle>
+      className={className}
+      data={data}
+      columns={columns}
+      // Capabilities
+      searchable
+      sortable
+      pagination
+      columnVisibility
+      exportable
+      // Initial state
+      columnVisibilityState={DEFAULT_COLUMN_VISIBILITY}
+      // Search
+      searchValue={searchValue}
+      onSearchChange={onSearchChange}
+      searchPlaceholder={labels.searchPlaceholder}
+      // Filter
+      filterConfig={filterConfig}
+      isFilterOpen={isFilterOpen}
+      onFilterOpenChange={onFilterOpenChange}
+      // Export
+      exportFilename={labels.exportFilename}
+      // UI Customizations
+      emptyTitle={labels.emptyTitle}
+      emptyDescription={labels.emptyDescription}
+      toolbarActions={
+        onAdd ? (
           <Button variant="destructive" onClick={onAdd} className="h-9">
             <span className="hidden sm:inline-block">Tambah Armada</span>
           </Button>
-        )}
-      />
-
-      {/* Table + Filter panel */}
-      <div className={cn('flex items-stretch gap-4', isFilterOpen ? 'flex-col lg:flex-row' : '')}>
-        {/* Table */}
-        <div className="flex-1 min-w-0 w-full">
-          <div className="relative w-full overflow-x-auto rounded-lg border border-border bg-background shadow-sm max-h-[600px] overflow-y-auto">
-            <table className="w-full text-left border-collapse text-sm">
-              <DataTableHeader table={table} />
-              <DataTableBody
-                table={table}
-                emptyTitle={labels.emptyTitle}
-                emptyDescription={labels.emptyDescription}
-                noResultTitle={labels.noResultTitle}
-                noResultDescription={labels.noResultDescription}
-              />
-            </table>
-          </div>
-        </div>
-
-        {/* Filter panel - full height */}
-        {isFilterOpen && (
-          <div className="w-full lg:w-[280px] shrink-0 self-stretch">
-            <DataTableFilterPanel config={filterConfig} className="h-full" />
-          </div>
-        )}
-      </div>
-
-      {/* Pagination */}
-      <DataTablePagination paginationConfig={paginationConfig} />
-    </div>
+        ) : undefined
+      }
+    />
   );
 }

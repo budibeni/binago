@@ -3,24 +3,13 @@
 import React from 'react';
 import { MapPin, Plus, MessageCircle, FileText } from 'lucide-react';
 import { cn } from '@adatrack/utils';
-import {
-  Button,
-  Badge,
-} from '@adatrack/ui';
-import {
-  useDataTable,
-  DataTableHeader,
-  DataTableBody,
-  DataTableToolbar,
-  DataTablePagination,
-  type DataTableColumnDef,
-  type DataTablePaginationConfig,
-} from '@adatrack/ui';
+import { Button, Badge, DataTable } from '@adatrack/ui';
+import type { DataTableColumnDef } from '@adatrack/ui';
 import type { Reservation, ReservationStatus } from '../types/reservation';
 
 interface ReservationListProps {
   data: Reservation[];
-  labels: Record<string, string>;
+  labels: Record<string, any>;
   onView: (r: Reservation) => void;
   onEdit: (r: Reservation) => void;
   searchValue: string;
@@ -40,18 +29,7 @@ const getStatusColor = (status: ReservationStatus) => {
   }
 };
 
-const getRentalStatusColor = (status: string) => {
-  switch (status) {
-    case 'READY':       return 'bg-success/10 text-success';
-    case 'RESERVED':    return 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400';
-    case 'RENTED':      return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400';
-    case 'MAINTENANCE': return 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400';
-    case 'UNAVAILABLE': return 'bg-neutral-100 text-neutral-500';
-    default:            return 'bg-neutral-100 text-neutral-600';
-  }
-};
-
-const getStatusLabel = (status: ReservationStatus, labels: Record<string, string>) => {
+const getStatusLabel = (status: ReservationStatus, labels: Record<string, any>) => {
   switch (status) {
     case 'PENDING':   return labels.statusPending;
     case 'CONFIRMED': return labels.statusConfirmed;
@@ -79,10 +57,9 @@ const formatShortDate = (dateStr: string) => {
 };
 
 function buildColumns(
-  labels: Record<string, string>,
+  labels: Record<string, any>,
   onView: (r: Reservation) => void,
   onOpenMap: (vehicleId: string) => void,
-  dataList: Reservation[],
 ): DataTableColumnDef<Reservation>[] {
   return [
     // --- Nomor Reservasi ---
@@ -221,7 +198,6 @@ function buildColumns(
         );
       },
     },
-    // Column removed
   ];
 }
 
@@ -235,74 +211,32 @@ export function ReservationList({
   onAdd,
   onOpenMap,
 }: ReservationListProps) {
-
-  const [pageIndex, setPageIndex] = React.useState(0);
-  const [pageSize,  setPageSize]  = React.useState(10);
-
-  React.useEffect(() => { setPageIndex(0); }, [data]);
-
-  const processedData = React.useMemo(
-    () => data.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize),
-    [data, pageIndex, pageSize],
-  );
-
-  const paginationConfig: DataTablePaginationConfig = {
-    pageIndex,
-    pageSize,
-    totalCount: data.length,
-    pageSizeOptions: [10, 20, 50],
-    onPageChange: setPageIndex,
-    onPageSizeChange: (s) => { setPageSize(s); setPageIndex(0); },
-  };
-
   const columns = React.useMemo(
-    () => buildColumns(labels, onView, onOpenMap, data),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [labels, onView, onOpenMap, data],
+    () => buildColumns(labels, onView, onOpenMap),
+    [labels, onView, onOpenMap],
   );
-
-  const table = useDataTable<Reservation>({
-    data: processedData,
-    columns,
-    mode: 'pagination',
-    paginationConfig,
-    freezeConfig: { left: ['no'] },
-  });
 
   return (
-    <div className="flex flex-col gap-3 h-full">
-      <DataTableToolbar
-        table={table}
-        searchPlaceholder={labels.searchPlaceholder}
-        searchValue={searchValue}
-        onSearchChange={onSearchChange}
-        showColumnToggle={false}
-        showExport={false}
-        showFilter={false}
-        rightSlot={
-          <Button onClick={onAdd} variant="destructive" className="h-9">
-            <Plus className="w-4 h-4 mr-2" />
-            <span className="hidden sm:inline-block">{labels.addReservation}</span>
-          </Button>
-        }
-      />
-
-      <div className="flex items-stretch gap-4 min-h-0 flex-1">
-        <div className="flex-1 min-w-0 w-full flex flex-col">
-          <div className="relative w-full flex-1 overflow-auto rounded-lg border border-border bg-background shadow-sm">
-            <table className="w-full text-left border-collapse text-sm">
-              <DataTableHeader table={table} />
-              <DataTableBody
-                table={table}
-                emptyTitle={labels.emptyTitle}
-                emptyDescription={labels.emptyDesc}
-              />
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <DataTablePagination paginationConfig={paginationConfig} />
-    </div>
+    <DataTable<Reservation>
+      data={data}
+      columns={columns}
+      // Capabilities
+      searchable
+      sortable
+      pagination
+      // Search
+      searchValue={searchValue}
+      onSearchChange={onSearchChange}
+      searchPlaceholder={labels.searchPlaceholder}
+      // UI Slots
+      emptyTitle={labels.emptyTitle}
+      emptyDescription={labels.emptyDesc}
+      toolbarActions={
+        <Button onClick={onAdd} variant="destructive" className="h-9">
+          <Plus className="w-4 h-4 mr-2" />
+          <span className="hidden sm:inline-block">{labels.addReservation}</span>
+        </Button>
+      }
+    />
   );
 }

@@ -1,133 +1,183 @@
 'use client';
 
 import React from 'react';
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import { Button } from '../Button';
-import type { DataTablePaginationConfig } from './types';
+import type { DataTableInstance, RowData } from './types';
 
-export interface DataTablePaginationProps {
-  paginationConfig: DataTablePaginationConfig;
+export interface DataTablePaginationProps<TData extends RowData = RowData> {
+  table: DataTableInstance<TData>;
+  pageIndex?: number;
+  pageSize?: number;
+  totalCount?: number;
+  pageSizeOptions?: number[];
+  onPageChange?: (pageIndex: number) => void;
+  onPageSizeChange?: (pageSize: number) => void;
   fetchState?: 'idle' | 'loading' | 'loading-more' | 'error';
   className?: string;
 }
 
 const DEFAULT_PAGE_SIZE_OPTIONS = [10, 20, 50, 100];
 
-export function DataTablePagination({
-  paginationConfig,
+export function DataTablePagination<TData extends RowData = RowData>({
+  table,
+  pageIndex: controlledPageIndex,
+  pageSize: controlledPageSize,
+  totalCount: controlledTotalCount,
+  pageSizeOptions = DEFAULT_PAGE_SIZE_OPTIONS,
+  onPageChange,
+  onPageSizeChange,
   fetchState = 'idle',
   className,
-}: DataTablePaginationProps) {
-  const {
-    pageIndex,
-    pageSize,
-    totalCount,
-    pageSizeOptions = DEFAULT_PAGE_SIZE_OPTIONS,
-    onPageChange,
-    onPageSizeChange,
-  } = paginationConfig;
+}: DataTablePaginationProps<TData>) {
+  
+  const isServerSide = typeof controlledTotalCount !== 'undefined';
+  
+  // Use controlled props if provided, otherwise fallback to TanStack internal state
+  const pageIndex = isServerSide ? controlledPageIndex! : table.state.pagination.pageIndex;
+  const pageSize = isServerSide ? controlledPageSize! : table.state.pagination.pageSize;
+  
+  const totalCount = isServerSide ? controlledTotalCount! : table.getFilteredRowModel().rows.length;
+  const pageCount = isServerSide 
+    ? (pageSize > 0 ? Math.ceil(totalCount / pageSize) : 0)
+    : table.getPageCount();
+    
+  const canPreviousPage = isServerSide ? pageIndex > 0 : table.getCanPreviousPage();
+  const canNextPage = isServerSide ? pageIndex < pageCount - 1 : table.getCanNextPage();
+  
+  const handlePageChange = (newIndex: number) => {
+    if (isServerSide && onPageChange) {
+      onPageChange(newIndex);
+    } else {
+      table.setPageIndex(newIndex);
+    }
+  };
+
+  const handlePageSizeChange = (newSize: number) => {
+    if (isServerSide && onPageSizeChange) {
+      onPageSizeChange(newSize);
+    } else {
+      table.setPageSize(newSize);
+    }
+  };
 
   const isLoading = fetchState === 'loading';
-  const pageCount = pageSize > 0 ? Math.ceil(totalCount / pageSize) : 0;
-  const canPreviousPage = pageIndex > 0;
-  const canNextPage = pageIndex < pageCount - 1;
 
   // Display range: e.g. "1-10 dari 120"
   const from = totalCount === 0 ? 0 : pageIndex * pageSize + 1;
   const to = Math.min((pageIndex + 1) * pageSize, totalCount);
 
+  // Generate page numbers
+  const generatePagination = () => {
+    // pageIndex is 0-indexed internally, but we display 1-indexed
+    const current = pageIndex + 1;
+    const total = pageCount;
+    
+    if (total <= 7) {
+      return Array.from({ length: total }, (_, i) => i + 1);
+    }
+
+    if (current <= 3) {
+      return [1, 2, 3, 4, 5, '...', total];
+    }
+
+    if (current >= total - 2) {
+      return [1, '...', total - 4, total - 3, total - 2, total - 1, total];
+    }
+
+    return [1, '...', current - 1, current, current + 1, '...', total];
+  };
+
+  const pages = generatePagination();
+
   return (
     <div
       className={cn(
-        'flex flex-wrap items-center justify-between gap-3 px-1 py-2 text-sm text-foreground-muted',
+        'flex flex-wrap items-center justify-between gap-3 text-xs text-foreground-muted',
         className,
       )}
       aria-label="Navigasi halaman"
     >
-      {/* Left: row info + page size selector */}
+      {/* Left: row info */}
       <div className="flex items-center gap-3">
         <span className="shrink-0 text-xs">
-          {totalCount > 0
-            ? `${from}-${to} dari ${totalCount.toLocaleString('id-ID')} baris`
-            : 'Tidak ada data'}
+          Menampilkan {from}-{to} dari {totalCount.toLocaleString('id-ID')} data
         </span>
-
-        {onPageSizeChange && (
-          <div className="flex items-center gap-1.5 text-xs">
-            <label
-              htmlFor="datatable-page-size"
-              className="shrink-0 text-foreground-muted"
-            >
-              Baris per halaman:
-            </label>
-            <select
-              id="datatable-page-size"
-              value={pageSize}
-              onChange={(e) => onPageSizeChange(Number(e.target.value))}
-              disabled={isLoading}
-              className={cn(
-                'h-7 rounded border border-border bg-background px-2 text-xs text-foreground',
-                'focus:outline-none focus:ring-1 focus:ring-neutral-400',
-                'disabled:cursor-not-allowed disabled:opacity-50',
-              )}
-            >
-              {pageSizeOptions.map((size) => (
-                <option key={size} value={size}>
-                  {size}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
       </div>
 
-      {/* Right: page navigation */}
-      <div className="flex items-center gap-1">
-        <span className="shrink-0 text-xs tabular-nums">
-          Halaman {pageCount > 0 ? pageIndex + 1 : 0} dari {pageCount}
-        </span>
-
-        <div className="flex items-center gap-0.5 ml-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onPageChange?.(0)}
-            disabled={!canPreviousPage || isLoading}
-            aria-label="Halaman pertama"
-            className="h-7 w-7 p-0"
+      {/* Right: page size + page navigation */}
+      <div className="flex items-center gap-3">
+        {/* Page Size Selector */}
+        <div className="flex items-center">
+          <select
+            id="datatable-page-size"
+            value={pageSize}
+            onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+            disabled={isLoading}
+            className={cn(
+              'h-8 rounded-md border border-border bg-background px-2 py-1 text-xs text-foreground',
+              'focus:outline-none focus:ring-1 focus:ring-primary',
+              'disabled:cursor-not-allowed disabled:opacity-50',
+            )}
+            aria-label="Baris per halaman"
           >
-            <ChevronsLeft className="h-3.5 w-3.5" />
-          </Button>
+            {pageSizeOptions.map((size) => (
+              <option key={size} value={size}>
+                {size} / halaman
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Page Navigation */}
+        <div className="flex items-center gap-1">
           <Button
-            variant="ghost"
+            variant="outline"
             size="sm"
-            onClick={() => onPageChange?.(pageIndex - 1)}
+            onClick={() => handlePageChange(pageIndex - 1)}
             disabled={!canPreviousPage || isLoading}
             aria-label="Halaman sebelumnya"
-            className="h-7 w-7 p-0"
+            className="h-8 w-8 p-0"
           >
-            <ChevronLeft className="h-3.5 w-3.5" />
+            <ChevronLeft className="h-4 w-4" />
           </Button>
+          
+          {pages.map((p, i) => {
+            if (p === '...') {
+              return (
+                <div key={`dots-${i}`} className="flex h-8 w-8 items-center justify-center text-muted-foreground">
+                  <MoreHorizontal className="h-4 w-4" />
+                </div>
+              );
+            }
+            const isCurrentPage = (p as number) - 1 === pageIndex;
+            return (
+              <Button
+                key={p}
+                variant={isCurrentPage ? "primary" : "ghost"}
+                size="sm"
+                onClick={() => handlePageChange((p as number) - 1)}
+                disabled={isLoading}
+                className={cn(
+                  "h-8 w-8 p-0 text-[13px]",
+                  isCurrentPage ? "bg-primary text-primary-foreground hover:bg-primary/90" : "text-foreground-muted"
+                )}
+              >
+                {p}
+              </Button>
+            );
+          })}
+
           <Button
-            variant="ghost"
+            variant="outline"
             size="sm"
-            onClick={() => onPageChange?.(pageIndex + 1)}
+            onClick={() => handlePageChange(pageIndex + 1)}
             disabled={!canNextPage || isLoading}
             aria-label="Halaman berikutnya"
-            className="h-7 w-7 p-0"
+            className="h-8 w-8 p-0"
           >
-            <ChevronRight className="h-3.5 w-3.5" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onPageChange?.(pageCount - 1)}
-            disabled={!canNextPage || isLoading}
-            aria-label="Halaman terakhir"
-            className="h-7 w-7 p-0"
-          >
-            <ChevronsRight className="h-3.5 w-3.5" />
+            <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
       </div>

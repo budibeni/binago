@@ -1,9 +1,15 @@
 'use client';
 
 import React from 'react';
-import { Download } from 'lucide-react';
+import { Download, FileSpreadsheet, FileText } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import { Button } from '../Button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '../Dropdown';
 import type { DataTableInstance, RowData } from './types';
 import type { DataTableExportConfig } from './types';
 
@@ -73,20 +79,43 @@ export function DataTableExport<TData extends RowData = RowData>({
 
   const filename = exportConfig?.filename ?? 'export';
 
-  const handleExport = () => {
+  const handleExportCSV = () => {
     exportToCsv(table, filename);
   };
 
+  const handleExportExcel = () => {
+    // TODO: Implement real Excel export (needs backend or XLSX library)
+    // For now, fallback to CSV to prevent broken functionality
+    exportToCsv(table, `${filename}_excel`);
+  };
+
   return (
-    <Button
-      variant="outline"
-      size="sm"
-      onClick={handleExport}
-      className={cn('h-8 gap-1.5 text-[13px]', className)}
-      aria-label="Export CSV"
-    >
-      <Download className="h-3.5 w-3.5" />
-      <span>Export</span>
-    </Button>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="outline"
+          size="sm"
+          className={cn('h-9 gap-2 text-[13px] font-medium', className)}
+          aria-label="Export Data"
+        >
+          <Download className="h-4 w-4 text-muted-foreground" />
+          <span className="hidden sm:inline-block">Export</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-48">
+        <div className="px-3 py-2 text-xs font-semibold text-foreground-muted uppercase tracking-wider">
+          Export Data
+        </div>
+        <div className="my-1 border-t border-border" />
+        <DropdownMenuItem onClick={handleExportCSV} className="gap-2 text-[13px] cursor-pointer p-2">
+          <FileText className="h-4 w-4 text-muted-foreground" />
+          Export CSV
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={handleExportExcel} className="gap-2 text-[13px] cursor-pointer p-2">
+          <FileSpreadsheet className="h-4 w-4 text-muted-foreground" />
+          Export Excel
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

@@ -13,6 +13,7 @@ export interface Personel {
   phone?: string;
   email?: string;
   address?: string;
+  cardId?: string | null;
   status: PersonelStatus;
   notes?: string;
   createdAt: string;

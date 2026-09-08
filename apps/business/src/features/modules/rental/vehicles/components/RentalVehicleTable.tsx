@@ -1,21 +1,8 @@
 import React from 'react';
 import { CheckCircle2, AlertCircle, Plus, FileText } from 'lucide-react';
 import { cn } from '@adatrack/utils';
-import {
-  Button,
-  Checkbox,
-} from '@adatrack/ui';
-import {
-  useDataTable,
-  DataTableHeader,
-  DataTableBody,
-  DataTableToolbar,
-  DataTablePagination,
-  type DataTableColumnDef,
-  type DataTablePaginationConfig,
-  type ColumnVisibilityState,
-  type SortingState,
-} from '@adatrack/ui';
+import { Button, Checkbox, DataTable } from '@adatrack/ui';
+import type { DataTableColumnDef } from '@adatrack/ui';
 import type { RentalVehicle } from '../types/rentalVehicle';
 
 interface RentalVehicleTableProps {
@@ -237,7 +224,6 @@ function buildColumns(
         );
       },
     },
-    // Actions removed
   ];
 }
 
@@ -254,104 +240,35 @@ export function RentalVehicleTable({
   onSearchChange,
   onAdd,
 }: RentalVehicleTableProps) {
-  const [pageIndex, setPageIndex] = React.useState(0);
-  const [pageSize, setPageSize] = React.useState(10);
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnVisibility, setColumnVisibility] = React.useState<ColumnVisibilityState>(DEFAULT_COLUMN_VISIBILITY);
-
-  React.useEffect(() => { setPageIndex(0); }, [data]);
-
   const columns = React.useMemo(
     () => buildColumns(labels, onView, onComplete, selectedIds, onSelectionChange, data),
     [labels, onView, onComplete, selectedIds, onSelectionChange, data],
   );
 
-  const processedData = React.useMemo(() => {
-    const result = [...data];
-    if (sorting.length > 0) {
-      const { id, desc } = sorting[0];
-      result.sort((a, b) => {
-        // basic sorting
-        let valA: any = a.coreVehicle.brand;
-        let valB: any = b.coreVehicle.brand;
-        if (id === 'year') {
-          valA = a.coreVehicle.year;
-          valB = b.coreVehicle.year;
-        } else if (id === 'status') {
-          valA = a.status;
-          valB = b.status;
-        } else if (id === 'rate') {
-          valA = a.dailyRate;
-          valB = b.dailyRate;
-        }
-
-        if (valA < valB) return desc ? 1 : -1;
-        if (valA > valB) return desc ? -1 : 1;
-        return 0;
-      });
-    }
-    return result.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize);
-  }, [data, sorting, pageIndex, pageSize]);
-
-  const paginationConfig: DataTablePaginationConfig = {
-    pageIndex,
-    pageSize,
-    totalCount: data.length,
-    pageSizeOptions: [10, 20, 50],
-    onPageChange: setPageIndex,
-    onPageSizeChange: (s) => { setPageSize(s); setPageIndex(0); },
-  };
-
-  const table = useDataTable<RentalVehicle>({
-    data: processedData,
-    columns,
-    sorting,
-    onSortingChange: setSorting,
-    mode: 'pagination',
-    columnVisibility,
-    onColumnVisibilityChange: setColumnVisibility,
-    freezeConfig: { left: ['select', 'vehicle'] },
-    paginationConfig,
-  });
-
   return (
-    <div className="flex flex-col gap-3 h-full">
-      <DataTableToolbar
-        table={table}
-        searchValue={searchValue}
-        onSearchChange={onSearchChange}
-        searchPlaceholder={labels.searchPlaceholder || "Cari nomor polisi, merk, atau model..."}
-        showColumnToggle
-        showExport={false}
-        showFilter={false}
-        rightSlot={
-          <Button onClick={onAdd} variant="destructive" className="h-9">
-            <Plus className="w-4 h-4 mr-2" />
-            <span className="hidden sm:inline-block">Tambah</span>
-          </Button>
-        }
-      />
-
-      <div className="flex items-stretch gap-4 min-h-0 flex-1">
-        <div className="flex-1 min-w-0 w-full flex flex-col">
-          <div className="relative w-full flex-1 overflow-auto rounded-lg border border-border bg-background shadow-sm">
-            <table className="w-full text-left border-collapse text-sm">
-              <DataTableHeader table={table} />
-              <DataTableBody 
-                table={table}
-                emptyTitle={labels.emptyTitle}
-                emptyDescription={labels.emptyDescription}
-                noResultTitle={labels.noResultTitle}
-                noResultDescription={labels.noResultDescription}
-              />
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <DataTablePagination 
-        paginationConfig={paginationConfig} 
-      />
-    </div>
+    <DataTable<RentalVehicle>
+      data={data}
+      columns={columns}
+      // Capabilities
+      searchable
+      sortable
+      pagination
+      columnVisibility
+      // Initial State
+      columnVisibilityState={DEFAULT_COLUMN_VISIBILITY}
+      // Search
+      searchValue={searchValue}
+      onSearchChange={onSearchChange}
+      searchPlaceholder={labels.searchPlaceholder || "Cari nomor polisi, merk, atau model..."}
+      // UI Customizations
+      emptyTitle={labels.emptyTitle}
+      emptyDescription={labels.emptyDescription}
+      toolbarActions={
+        <Button onClick={onAdd} variant="destructive" className="h-9">
+          <Plus className="w-4 h-4 mr-2" />
+          <span className="hidden sm:inline-block">Tambah</span>
+        </Button>
+      }
+    />
   );
 }

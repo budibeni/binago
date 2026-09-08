@@ -64,7 +64,7 @@ export function CustomerForm({
     return { ...customer } as unknown as Customer;
   }, [customer]);
 
-  const { formData, errors, isSubmitting, handleChange, handleSubmit, setFormData } = useForm<Customer>({
+  const { formData, errors, isSubmitting, handleChange, handleSubmit, setFormData } = useForm<any>({
     initialData,
     resetOn: [open, customer],
     schema: getCustomerFormSchema(t.validation || {}),

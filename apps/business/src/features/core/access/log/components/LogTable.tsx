@@ -3,23 +3,9 @@
 import React from 'react';
 import { User, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { cn } from '@adatrack/utils';
-import { Badge } from '@adatrack/ui';
-import {
-  useDataTable,
-  DataTableHeader,
-  DataTableBody,
-  DataTableToolbar,
-  DataTablePagination,
-  DataTableFilterPanel,
-  type DataTableColumnDef,
-  type DataTableFilterConfig,
-  type DataTablePaginationConfig,
-  type ColumnVisibilityState,
-  type SortingState,
-} from '@adatrack/ui';
+import { Badge, DataTable } from '@adatrack/ui';
+import type { DataTableColumnDef, DataTableFilterConfig } from '@adatrack/ui';
 import type { CardLog } from '../types/log';
-
-// ─── Column Factory ────────────────────────────────────────────────────────────
 
 function buildColumns(t: any): DataTableColumnDef<CardLog>[] {
   return [
@@ -95,22 +81,22 @@ function buildColumns(t: any): DataTableColumnDef<CardLog>[] {
       cell: ({ row }) => {
         const activity = row.original.activityType;
         let label = '';
-        let variant: 'default' | 'outline' | 'secondary' = 'secondary';
         switch (activity) {
           case 'ATTENDANCE':
             label = t.activity.attendance;
-            variant = 'outline';
             break;
           case 'CHECKER':
             label = t.activity.checker;
-            variant = 'secondary';
             break;
           case 'ENGINE_AUTH':
             label = t.activity.engineAuth;
-            variant = 'default';
             break;
         }
-        return <Badge variant={variant} className="font-medium whitespace-nowrap">{label}</Badge>;
+        return (
+          <span className="text-[13px] font-medium text-foreground-muted">
+            {label}
+          </span>
+        );
       },
     },
     {
@@ -163,8 +149,6 @@ function buildColumns(t: any): DataTableColumnDef<CardLog>[] {
   ];
 }
 
-// ─── LogTable Component ────────────────────────────────────────────────────────
-
 interface LogTableProps {
   data: CardLog[];
   searchValue: string;
@@ -186,91 +170,31 @@ export function LogTable({
   t,
   className,
 }: LogTableProps) {
-  const [columnVisibility, setColumnVisibility] = React.useState<ColumnVisibilityState>({});
-  const [sorting, setSorting] = React.useState<SortingState>([{ id: 'timestamp', desc: true }]);
-  const [pageIndex, setPageIndex] = React.useState(0);
-  const [pageSize, setPageSize] = React.useState(10);
-
   const columns = React.useMemo(() => buildColumns(t), [t]);
 
-  const processedData = React.useMemo(() => {
-    const result = [...data];
-    if (sorting.length > 0) {
-      const { id, desc } = sorting[0];
-      result.sort((a, b) => {
-        const valA = (a[id as keyof CardLog] ?? '') as string;
-        const valB = (b[id as keyof CardLog] ?? '') as string;
-        if (typeof valA === 'string' && typeof valB === 'string') {
-          return desc ? valB.localeCompare(valA) : valA.localeCompare(valB);
-        }
-        return 0;
-      });
-    }
-    return result.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize);
-  }, [data, sorting, pageIndex, pageSize]);
-
-  const paginationConfig: DataTablePaginationConfig = {
-    pageIndex,
-    pageSize,
-    totalCount: data.length,
-    pageSizeOptions: [10, 20, 50],
-    onPageChange: setPageIndex,
-    onPageSizeChange: (s) => { setPageSize(s); setPageIndex(0); },
-  };
-
-  const table = useDataTable<CardLog>({
-    data: processedData,
-    columns,
-    sorting,
-    onSortingChange: setSorting,
-    mode: 'pagination',
-    columnVisibility,
-    onColumnVisibilityChange: setColumnVisibility,
-    paginationConfig,
-  });
-
-  const activeFilterCount = Object.values(filterConfig.state)
-    .flat()
-    .filter(v => v && v !== 'ALL').length;
-
   return (
-    <div className={cn('flex flex-col gap-3', className)}>
-      <DataTableToolbar
-        table={table}
-        searchValue={searchValue}
-        onSearchChange={onSearchChange}
-        searchPlaceholder={t.searchPlaceholder}
-        showColumnToggle
-        showFilter
-        isFilterOpen={isFilterOpen}
-        onFilterOpenChange={onFilterOpenChange}
-        activeFilterCount={activeFilterCount}
-      />
-
-      <div className={cn('flex items-stretch gap-4', isFilterOpen ? 'flex-col lg:flex-row' : '')}>
-        <div className="flex-1 min-w-0 w-full">
-          <div className="relative w-full overflow-x-auto rounded-lg border border-border bg-background shadow-sm max-h-[600px] overflow-y-auto">
-            <table className="w-full text-left border-collapse text-sm">
-              <DataTableHeader table={table} />
-              <DataTableBody
-                table={table}
-                emptyTitle="Belum ada data log"
-                emptyDescription="Aktivitas Card akan tampil di sini setelah digunakan."
-                noResultTitle="Tidak ada hasil"
-                noResultDescription="Coba ubah kata kunci pencarian atau filter."
-              />
-            </table>
-          </div>
-        </div>
-
-        {isFilterOpen && (
-          <div className="w-full lg:w-[280px] shrink-0 self-stretch">
-            <DataTableFilterPanel config={filterConfig} className="h-full" />
-          </div>
-        )}
-      </div>
-
-      <DataTablePagination paginationConfig={paginationConfig} />
-    </div>
+    <DataTable<CardLog>
+      className={className}
+      data={data}
+      columns={columns}
+      // Capabilities
+      searchable
+      sortable
+      pagination
+      columnVisibility
+      // Search
+      searchValue={searchValue}
+      onSearchChange={onSearchChange}
+      searchPlaceholder={t.searchPlaceholder}
+      // Filter
+      filterConfig={filterConfig}
+      isFilterOpen={isFilterOpen}
+      onFilterOpenChange={onFilterOpenChange}
+      // Default Sort
+      sorting={[{ id: 'timestamp', desc: true }]}
+      // UI Slots
+      emptyTitle="Belum ada data log"
+      emptyDescription="Aktivitas Card akan tampil di sini setelah digunakan."
+    />
   );
 }

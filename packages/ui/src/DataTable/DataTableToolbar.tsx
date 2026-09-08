@@ -3,11 +3,12 @@
 import React from 'react';
 import { cn } from '@adatrack/utils';
 import { DataTableSearch } from './DataTableSearch';
-import { DataTableColumnToggle } from './DataTableColumnToggle';
-import { DataTableExport } from './DataTableExport';
-import { Filter } from 'lucide-react';
+import { DataTableFilterPanel } from './DataTableFilterPanel';
+import { DataTableColumnPanel } from './DataTableColumnPanel';
+import { Filter, RefreshCw, Columns3, Download } from 'lucide-react';
 import { Button } from '../Button';
-import type { DataTableInstance, DataTableExportConfig, RowData } from './types';
+import { Popover, PopoverContent, PopoverTrigger } from '../Popover';
+import type { DataTableInstance, DataTableExportConfig, RowData, DataTableFilterConfig } from './types';
 import type { FetchState } from '@adatrack/types';
 
 export interface DataTableToolbarProps<TData extends RowData = RowData> {
@@ -24,30 +25,38 @@ export interface DataTableToolbarProps<TData extends RowData = RowData> {
   showColumnToggle?: boolean;
   showExport?: boolean;
   showFilter?: boolean;
+
+  // Panel open states (controlled from DataTable parent)
   isFilterOpen?: boolean;
   onFilterOpenChange?: (open: boolean) => void;
-  activeFilterCount?: number;
+  isColumnOpen?: boolean;
+  onColumnOpenChange?: (open: boolean) => void;
+  isExportOpen?: boolean;
+  onExportOpenChange?: (open: boolean) => void;
 
-  // Export config (opsional, bisa di-override via exportConfig)
+  activeFilterCount?: number;
+  filterConfig?: DataTableFilterConfig;
+
+  // Export config
   exportConfig?: DataTableExportConfig;
 
   // State
   fetchState?: FetchState;
 
-  // Custom slot untuk action tambahan di sisi kanan
-  rightSlot?: React.ReactNode;
-  // Custom slot untuk elemen di sisi kiri (di luar search)
-  leftSlot?: React.ReactNode;
+  // Refresh
+  onRefresh?: () => void;
+
+  // Custom Actions (rendered on the far left)
+  customActions?: React.ReactNode;
 
   className?: string;
 }
 
 /**
- * DataTableToolbar menggabungkan search, column toggle, export, dan custom action slot.
- * Dirancang untuk dirender di atas tabel - biasanya dipass melalui prop `toolbarSlot` pada DataTable.
+ * DataTableToolbar
  *
  * Layout:
- * [leftSlot] [search]          [rightSlot] [columnToggle] [export]
+ * [customActions] [search]          [Refresh] [Filter] [Kolom] [Export]
  */
 export function DataTableToolbar<TData extends RowData = RowData>({
   table,
@@ -61,14 +70,24 @@ export function DataTableToolbar<TData extends RowData = RowData>({
   showFilter = false,
   isFilterOpen,
   onFilterOpenChange,
+  isColumnOpen,
+  onColumnOpenChange,
+  isExportOpen,
+  onExportOpenChange,
   activeFilterCount,
+  filterConfig,
   exportConfig,
   fetchState = 'idle',
-  rightSlot,
-  leftSlot,
+  onRefresh,
+  customActions,
   className,
 }: DataTableToolbarProps<TData>) {
   const isLoading = fetchState === 'loading';
+
+  // Hitung kolom tersembunyi untuk badge
+  const hiddenColumnCount = table
+    .getAllColumns()
+    .filter((col) => col.getCanHide() && !col.getIsVisible()).length;
 
   return (
     <div
@@ -79,54 +98,115 @@ export function DataTableToolbar<TData extends RowData = RowData>({
       role="toolbar"
       aria-label="Toolbar tabel"
     >
-      {/* Left area: leftSlot + search */}
-      <div className="flex flex-1 items-center gap-2 min-w-0">
-        {leftSlot}
+      {/* Left area: customActions + search */}
+      <div className="flex flex-1 items-center gap-3 min-w-0">
+        {customActions}
         {showSearch && onSearchChange && (
-          <DataTableSearch
-            value={searchValue}
-            onChange={onSearchChange}
-            placeholder={searchPlaceholder}
-            fetchState={fetchState}
-            debounceMs={searchDebounceMs}
-            disabled={isLoading}
-          />
+          <div className="w-full max-w-[380px]">
+            <DataTableSearch
+              value={searchValue}
+              onChange={onSearchChange}
+              placeholder={searchPlaceholder}
+              fetchState={fetchState}
+              debounceMs={searchDebounceMs}
+              disabled={isLoading}
+            />
+          </div>
         )}
       </div>
 
-      {/* Right area: custom slot + filter + column toggle + export */}
+      {/* Right area: utilities */}
       <div className="flex items-center gap-2 shrink-0">
-        {rightSlot}
-        {showFilter && onFilterOpenChange && (
+        {onRefresh && (
           <Button
             variant="outline"
             size="sm"
-            onClick={() => onFilterOpenChange(!isFilterOpen)}
-            className={cn(
-              "h-8 gap-1.5 border-dashed text-[13px]",
-              isFilterOpen && "bg-accent text-accent-foreground"
-            )}
+            onClick={onRefresh}
+            disabled={isLoading}
+            className="h-9 gap-2 text-[13px] font-medium"
           >
-            <Filter className="h-4 w-4" />
-            <span className="hidden sm:inline-block">Filter</span>
-            {activeFilterCount ? (
-              <>
-                <span className="mx-1 h-4 w-[1px] bg-border" />
-                <span className="rounded-sm bg-primary px-1 text-[10px] font-semibold tabular-nums text-primary-foreground">
-                  {activeFilterCount}
-                </span>
-              </>
-            ) : null}
+            <RefreshCw className={cn('h-4 w-4 text-muted-foreground', isLoading && 'animate-spin')} />
+            <span className="hidden sm:inline-block">Refresh</span>
           </Button>
         )}
-        {showColumnToggle && (
-          <DataTableColumnToggle table={table} />
+
+        {/* Filter toggle button — Popover */}
+        {showFilter && filterConfig && (
+          <Popover open={isFilterOpen} onOpenChange={onFilterOpenChange}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className={cn(
+                  'h-9 gap-2 text-[13px] font-medium',
+                  isFilterOpen && 'bg-muted text-foreground border-neutral-400'
+                )}
+              >
+                <Filter className="h-4 w-4 text-muted-foreground" />
+                <span className="hidden sm:inline-block">Filter</span>
+                {activeFilterCount ? (
+                  <span className="rounded-sm bg-danger px-1.5 py-0.5 text-[10px] font-bold tabular-nums text-white">
+                    {activeFilterCount}
+                  </span>
+                ) : null}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-[260px] p-0" sideOffset={8}>
+              <DataTableFilterPanel
+                config={filterConfig}
+                onClose={() => onFilterOpenChange?.(false)}
+              />
+            </PopoverContent>
+          </Popover>
         )}
+
+        {/* Column visibility toggle — Popover */}
+        {showColumnToggle && (
+          <Popover open={isColumnOpen} onOpenChange={onColumnOpenChange}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className={cn(
+                  'h-9 gap-2 text-[13px] font-medium',
+                  isColumnOpen && 'bg-muted text-foreground border-neutral-400'
+                )}
+                aria-label="Toggle kolom"
+              >
+                <Columns3 className="h-4 w-4 text-muted-foreground" />
+                <span className="hidden sm:inline-block">Kolom</span>
+                {hiddenColumnCount > 0 && (
+                  <span className="ml-0.5 rounded bg-primary/10 px-1 text-[10px] font-medium text-primary tabular-nums">
+                    -{hiddenColumnCount}
+                  </span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-[220px] p-0" sideOffset={8}>
+              <DataTableColumnPanel
+                table={table}
+                isOpen
+                onClose={() => onColumnOpenChange?.(false)}
+              />
+            </PopoverContent>
+          </Popover>
+        )}
+
+        {/* Export toggle button */}
         {showExport && exportConfig?.enabled !== false && (
-          <DataTableExport
-            table={table}
-            exportConfig={exportConfig}
-          />
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onExportOpenChange?.(!isExportOpen)}
+            className={cn(
+              'h-9 gap-2 text-[13px] font-medium',
+              isExportOpen && 'bg-muted text-foreground border-neutral-400'
+            )}
+            aria-label="Export Data"
+          >
+            <Download className="h-4 w-4 text-muted-foreground" />
+            <span className="hidden sm:inline-block">Export</span>
+          </Button>
         )}
       </div>
     </div>

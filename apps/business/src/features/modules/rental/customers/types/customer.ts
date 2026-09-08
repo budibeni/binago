@@ -53,8 +53,8 @@ export interface CustomerFilters {
   type?: CustomerTypeFilter;
 }
 
-export const getCustomerFormSchema = (t: Record<string, string>) => z.object({
-  type: z.enum(['INDIVIDUAL', 'COMPANY'], { required_error: t.typeRequired || 'Tipe pelanggan wajib dipilih' }),
+export const getCustomerFormSchema = (t: Record<string, any>) => z.object({
+  type: z.enum(['INDIVIDUAL', 'COMPANY'], t.typeRequired || 'Tipe pelanggan wajib dipilih'),
   status: z.enum(['ACTIVE', 'INACTIVE']).optional(),
   name: z.string().min(1, t.nameRequired || 'Nama wajib diisi'),
   phone: z.string().min(1, t.phoneRequired || 'No. telepon wajib diisi'),

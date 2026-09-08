@@ -171,7 +171,7 @@ export function DriversFeature() {
 
       <DriverView
         driver={detailDriver}
-        open={drawerOpen}
+        isOpen={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         onEdit={() => detailDriver && handleEdit(detailDriver)}
         onDelete={() => detailDriver && handleDelete(detailDriver)}

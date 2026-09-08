@@ -1,14 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Columns3 } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import { Button } from '../Button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from '../Dropdown';
+import { Popover, PopoverContent, PopoverTrigger } from '../Popover';
 import type { ColumnVisibilityState, DataTableInstance, RowData } from './types';
 
 export interface DataTableColumnToggleProps<TData extends RowData = RowData> {
@@ -27,18 +23,48 @@ export function DataTableColumnToggle<TData extends RowData = RowData>({
 
   if (toggleableColumns.length === 0) return null;
 
-  // Hitung kolom yang tersembunyi
+  // Hitung kolom yang tersembunyi berdasarkan state table asli
   const hiddenCount = toggleableColumns.filter(
     (col) => !col.getIsVisible(),
   ).length;
 
+  const [isOpen, setIsOpen] = useState(false);
+  const [localVisibility, setLocalVisibility] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    if (isOpen) {
+      const current: Record<string, boolean> = {};
+      toggleableColumns.forEach(col => {
+        current[col.id] = col.getIsVisible();
+      });
+      setLocalVisibility(current);
+    }
+  }, [isOpen, toggleableColumns]);
+
+  const handleApply = () => {
+    table.setColumnVisibility(localVisibility);
+    setIsOpen(false);
+  };
+
+  const handleReset = () => {
+    const allVisible: Record<string, boolean> = {};
+    toggleableColumns.forEach(col => {
+      allVisible[col.id] = true;
+    });
+    setLocalVisibility(allVisible);
+  };
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
+      <PopoverTrigger asChild>
         <Button
           variant="outline"
           size="sm"
-          className={cn('h-8 gap-1.5 text-[13px]', className)}
+          className={cn(
+            'h-9 gap-2 text-[13px] font-medium',
+            isOpen && 'bg-muted text-foreground',
+            className
+          )}
           aria-label="Toggle kolom"
         >
           <Columns3 className="h-3.5 w-3.5" />
@@ -49,15 +75,14 @@ export function DataTableColumnToggle<TData extends RowData = RowData>({
             </span>
           )}
         </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-44">
-        <div className="px-2 py-1.5 text-xs font-semibold text-foreground-muted uppercase tracking-wider">
+      </PopoverTrigger>
+      <PopoverContent align="end" className="w-[280px] p-0" sideOffset={8}>
+        <div className="px-3 py-3 border-b border-border text-sm font-semibold">
           Tampilkan Kolom
         </div>
-        <div className="my-1 border-t border-border" />
-        <div className="max-h-60 overflow-y-auto">
+        <div className="max-h-[50vh] overflow-y-auto p-2">
           {toggleableColumns.map((column) => {
-            const isVisible = column.getIsVisible();
+            const isVisible = localVisibility[column.id] ?? column.getIsVisible();
             const headerDef = column.columnDef.header;
             const label =
               typeof headerDef === 'string'
@@ -65,62 +90,30 @@ export function DataTableColumnToggle<TData extends RowData = RowData>({
                 : column.id;
 
             return (
-              <button
+              <label
                 key={column.id}
-                type="button"
-                onClick={() => column.toggleVisibility(!isVisible)}
-                className={cn(
-                  'flex w-full items-center gap-2 rounded px-2 py-1.5 text-sm',
-                  'transition-colors hover:bg-neutral-100 focus:outline-none focus:bg-neutral-100',
-                  !isVisible && 'text-foreground-muted',
-                )}
+                className="flex items-center gap-2 rounded px-2 py-1.5 cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
               >
-                {/* Custom checkbox visual */}
-                <span
-                  className={cn(
-                    'flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded border',
-                    isVisible
-                      ? 'border-primary bg-primary'
-                      : 'border-border bg-background',
-                  )}
-                  aria-hidden="true"
-                >
-                  {isVisible && (
-                    <svg
-                      viewBox="0 0 12 12"
-                      className="h-2.5 w-2.5 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                    >
-                      <polyline points="2,6 5,9 10,3" />
-                    </svg>
-                  )}
-                </span>
-                <span className="flex-1 text-left">{label}</span>
-              </button>
+                <input
+                  type="checkbox"
+                  checked={isVisible}
+                  onChange={(e) => setLocalVisibility(prev => ({ ...prev, [column.id]: e.target.checked }))}
+                  className="rounded border-border text-danger focus:ring-danger h-4 w-4"
+                />
+                <span className="text-[13px] text-foreground flex-1">{label}</span>
+              </label>
             );
           })}
         </div>
-        {hiddenCount > 0 && (
-          <>
-            <div className="my-1 border-t border-border" />
-            <button
-              type="button"
-              onClick={() => {
-                const visibility: ColumnVisibilityState = {};
-                toggleableColumns.forEach((col) => {
-                  visibility[col.id] = true;
-                });
-                table.setColumnVisibility(visibility);
-              }}
-              className="flex w-full items-center justify-center rounded px-2 py-1.5 text-xs text-primary hover:bg-neutral-100 transition-colors focus:outline-none"
-            >
-              Tampilkan Semua
-            </button>
-          </>
-        )}
-      </DropdownMenuContent>
-    </DropdownMenu>
+        <div className="p-3 border-t border-border flex items-center justify-between gap-2">
+          <Button variant="outline" className="flex-1" onClick={handleReset}>
+            Reset
+          </Button>
+          <Button variant="destructive" className="flex-1" onClick={handleApply}>
+            Terapkan
+          </Button>
+        </div>
+      </PopoverContent>
+    </Popover>
   );
 }

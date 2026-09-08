@@ -7,22 +7,10 @@ import {
   Badge, Button,
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent,
   DropdownMenuItem, DropdownMenuSeparator,
-  Avatar
+  DataTable,
 } from '@adatrack/ui';
-import {
-  useDataTable,
-  DataTableHeader,
-  DataTableBody,
-  DataTableToolbar,
-  DataTablePagination,
-  DataTableFilterPanel,
-  type DataTableColumnDef,
-  type DataTableFilterConfig,
-  type SortingState,
-} from '@adatrack/ui';
+import type { DataTableColumnDef, DataTableFilterConfig } from '@adatrack/ui';
 import type { Driver } from '../types/driver';
-
-// --- Types -------------------------------------------------------------------
 
 interface DriverTableLabels {
   colDriver: string;
@@ -44,7 +32,6 @@ interface DriverTableLabels {
   actionDetail: string;
   actionEdit: string;
   actionDelete: string;
-  // Specific labels
   phone: string;
   ktp: string;
   licenseNo: string;
@@ -63,8 +50,6 @@ interface DriverTableProps {
   className?: string;
 }
 
-// --- Status Badge ------------------------------------------------------------
-
 function getStatusBadge(status: Driver['status'], labels: DriverTableLabels) {
   const map = {
     active:   { label: labels.statusActive,   variant: 'success' as const },
@@ -74,8 +59,6 @@ function getStatusBadge(status: Driver['status'], labels: DriverTableLabels) {
   const cfg = map[status];
   return <Badge variant={cfg.variant} dot>{cfg.label}</Badge>;
 }
-
-// --- Column Factory ----------------------------------------------------------
 
 function buildColumns(
   labels: DriverTableLabels,
@@ -202,8 +185,6 @@ function buildColumns(
   ];
 }
 
-// --- Component ---------------------------------------------------------------
-
 export function DriverTable({
   data,
   labels,
@@ -216,106 +197,38 @@ export function DriverTable({
   onFilterOpenChange,
   className,
 }: DriverTableProps) {
-  
-  const [pageIndex, setPageIndex] = React.useState(0);
-  const [pageSize, setPageSize] = React.useState(10);
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnVisibility, setColumnVisibility] = React.useState({});
-
-  const columns = React.useMemo(
-    () => buildColumns(labels, onViewDetail),
-    [labels, onViewDetail]
-  );
-
-  // Client-side pagination & sorting for now
-  const processedData = React.useMemo(() => {
-    let result = [...data];
-    if (sorting.length > 0) {
-      const { id, desc } = sorting[0];
-      result.sort((a, b) => {
-        const valA = (a as any)[id];
-        const valB = (b as any)[id];
-        if (typeof valA === 'number' && typeof valB === 'number') {
-          return desc ? valB - valA : valA - valB;
-        }
-        if (typeof valA === 'string' && typeof valB === 'string') {
-          return desc ? valB.localeCompare(valA) : valA.localeCompare(valB);
-        }
-        return 0;
-      });
-    }
-    return result.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize);
-  }, [data, sorting, pageIndex, pageSize]);
-
-  const paginationConfig = {
-    pageIndex,
-    pageSize,
-    totalCount: data.length,
-    pageSizeOptions: [10, 20, 50],
-    onPageChange: setPageIndex,
-    onPageSizeChange: (s: number) => { setPageSize(s); setPageIndex(0); },
-  };
-
-  const table = useDataTable({
-    data: processedData,
-    columns,
-    sorting,
-    onSortingChange: setSorting,
-    columnVisibility,
-    onColumnVisibilityChange: setColumnVisibility,
-    paginationConfig,
-  });
-
-  const activeFilterCount = Object.values(filterConfig.state).flat().filter(Boolean).length;
+  const columns = React.useMemo(() => buildColumns(labels, onViewDetail), [labels, onViewDetail]);
 
   return (
-    <div className={cn('flex flex-col gap-3 h-full', className)}>
-      <DataTableToolbar
-        table={table}
-        searchValue={searchValue}
-        onSearchChange={onSearchChange}
-        searchPlaceholder={labels.searchPlaceholder}
-        showColumnToggle
-        showExport
-        showFilter
-        isFilterOpen={isFilterOpen}
-        onFilterOpenChange={onFilterOpenChange}
-        activeFilterCount={activeFilterCount}
-        exportConfig={{ filename: labels.exportFilename, enabled: true }}
-        rightSlot={
-          <Button onClick={onAdd} variant="primary" className="bg-danger hover:bg-danger/90 text-white gap-2 h-9">
-            <UserRound className="w-4 h-4" />
-            <span className="hidden sm:inline-block">{labels.addDriver}</span>
-          </Button>
-        }
-      />
-
-      <div className={cn('flex items-stretch gap-4 min-h-0 flex-1', isFilterOpen ? 'flex-col lg:flex-row' : '')}>
-        {/* Table */}
-        <div className="flex-1 min-w-0 w-full flex flex-col">
-          <div className="relative w-full flex-1 overflow-auto rounded-lg border border-border bg-background shadow-sm">
-            <table className="w-full text-left border-collapse text-sm">
-              <DataTableHeader table={table} />
-              <DataTableBody 
-                table={table}
-                emptyTitle={labels.emptyTitle}
-                emptyDescription={labels.emptyDescription}
-                noResultTitle={labels.noResultTitle}
-                noResultDescription={labels.noResultDescription}
-              />
-            </table>
-          </div>
-        </div>
-
-        {/* Filter panel */}
-        {isFilterOpen && (
-          <div className="w-full lg:w-[280px] shrink-0 self-stretch overflow-y-auto">
-            <DataTableFilterPanel config={filterConfig} className="h-full" />
-          </div>
-        )}
-      </div>
-
-      <DataTablePagination paginationConfig={paginationConfig} />
-    </div>
+    <DataTable<Driver>
+      className={className}
+      data={data}
+      columns={columns}
+      // Capabilities
+      searchable
+      sortable
+      pagination
+      columnVisibility
+      exportable
+      // Search
+      searchValue={searchValue}
+      onSearchChange={onSearchChange}
+      searchPlaceholder={labels.searchPlaceholder}
+      // Filter
+      filterConfig={filterConfig}
+      isFilterOpen={isFilterOpen}
+      onFilterOpenChange={onFilterOpenChange}
+      // Export
+      exportFilename={labels.exportFilename}
+      // UI Slots
+      emptyTitle={labels.emptyTitle}
+      emptyDescription={labels.emptyDescription}
+      toolbarActions={
+        <Button onClick={onAdd} variant="primary" className="bg-danger hover:bg-danger/90 text-white gap-2 h-9">
+          <UserRound className="w-4 h-4" />
+          <span className="hidden sm:inline-block">{labels.addDriver}</span>
+        </Button>
+      }
+    />
   );
 }

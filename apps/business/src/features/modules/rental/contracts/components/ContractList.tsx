@@ -3,16 +3,8 @@
 import React from 'react';
 import { FileText, Plus, Car, Edit, Printer } from 'lucide-react';
 import { cn } from '@adatrack/utils';
-import { Button, Badge } from '@adatrack/ui';
-import {
-  useDataTable,
-  DataTableHeader,
-  DataTableBody,
-  DataTableToolbar,
-  DataTablePagination,
-  type DataTableColumnDef,
-  type DataTablePaginationConfig,
-} from '@adatrack/ui';
+import { Button, Badge, DataTable } from '@adatrack/ui';
+import type { DataTableColumnDef } from '@adatrack/ui';
 import type { RentalContract, ContractStatus } from '../types/contract';
 
 interface ContractListProps {
@@ -64,7 +56,6 @@ function buildColumns(
   onEdit: ((c: RentalContract) => void) | undefined,
   onPrint: ((c: RentalContract) => void) | undefined,
   onHandover: ((c: RentalContract) => void) | undefined,
-  dataList: RentalContract[],
 ): DataTableColumnDef<RentalContract>[] {
   return [
     {
@@ -207,74 +198,32 @@ export function ContractList({
   onSearchChange,
   onAdd,
 }: ContractListProps) {
-
-  const [pageIndex, setPageIndex] = React.useState(0);
-  const [pageSize,  setPageSize]  = React.useState(10);
-
-  React.useEffect(() => { setPageIndex(0); }, [data]);
-
-  const processedData = React.useMemo(
-    () => data.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize),
-    [data, pageIndex, pageSize],
-  );
-
-  const paginationConfig: DataTablePaginationConfig = {
-    pageIndex,
-    pageSize,
-    totalCount: data.length,
-    pageSizeOptions: [10, 20, 50],
-    onPageChange: setPageIndex,
-    onPageSizeChange: (s) => { setPageSize(s); setPageIndex(0); },
-  };
-
   const columns = React.useMemo(
-    () => buildColumns(labels, onView, onEdit, onPrint, onHandover, data),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [labels, onView, onEdit, onPrint, onHandover, data],
+    () => buildColumns(labels, onView, onEdit, onPrint, onHandover),
+    [labels, onView, onEdit, onPrint, onHandover],
   );
-
-  const table = useDataTable<RentalContract>({
-    data: processedData,
-    columns,
-    mode: 'pagination',
-    paginationConfig,
-    freezeConfig: { left: ['no'] },
-  });
 
   return (
-    <div className="flex flex-col gap-3 h-full">
-      <DataTableToolbar
-        table={table}
-        searchPlaceholder={labels.searchPlaceholder}
-        searchValue={searchValue}
-        onSearchChange={onSearchChange}
-        showColumnToggle={false}
-        showExport={false}
-        showFilter={false}
-        rightSlot={
-          <Button onClick={onAdd} variant="destructive" className="h-9">
-            <Plus className="w-4 h-4 mr-2" />
-            <span className="hidden sm:inline-block">{labels.addContract}</span>
-          </Button>
-        }
-      />
-
-      <div className="flex items-stretch gap-4 min-h-0 flex-1">
-        <div className="flex-1 min-w-0 w-full flex flex-col">
-          <div className="relative w-full flex-1 overflow-auto rounded-lg border border-border bg-background shadow-sm">
-            <table className="w-full text-left border-collapse text-sm">
-              <DataTableHeader table={table} />
-              <DataTableBody
-                table={table}
-                emptyTitle="Kontrak Kosong"
-                emptyDescription="Belum ada kontrak rental yang dibuat."
-              />
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <DataTablePagination paginationConfig={paginationConfig} />
-    </div>
+    <DataTable<RentalContract>
+      data={data}
+      columns={columns}
+      // Capabilities
+      searchable
+      sortable
+      pagination
+      // Search
+      searchValue={searchValue}
+      onSearchChange={onSearchChange}
+      searchPlaceholder={labels.searchPlaceholder}
+      // UI Slots
+      emptyTitle="Kontrak Kosong"
+      emptyDescription="Belum ada kontrak rental yang dibuat."
+      toolbarActions={
+        <Button onClick={onAdd} variant="destructive" className="h-9">
+          <Plus className="w-4 h-4 mr-2" />
+          <span className="hidden sm:inline-block">{labels.addContract}</span>
+        </Button>
+      }
+    />
   );
 }

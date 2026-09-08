@@ -28,7 +28,7 @@ export function InputCheckbox({
       <Checkbox
         id={id}
         label={label}
-        helperText={description || helpText}
+        helperText={(description || helpText) as string}
         checked={value}
         onCheckedChange={(checked) => onChange(checked === true)}
         error={!!error}

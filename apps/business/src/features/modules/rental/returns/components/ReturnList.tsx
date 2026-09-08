@@ -3,16 +3,8 @@
 import React from 'react';
 import { Eye, MapPin } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { Button, Badge } from '@adatrack/ui';
-import {
-  useDataTable,
-  DataTableHeader,
-  DataTableBody,
-  DataTableToolbar,
-  DataTablePagination,
-  type DataTableColumnDef,
-  type DataTablePaginationConfig,
-} from '@adatrack/ui';
+import { Button, DataTable } from '@adatrack/ui';
+import type { DataTableColumnDef } from '@adatrack/ui';
 import { trackingNavigationService } from '@/features/core/tracking/services/trackingNavigationService';
 import type { RentalReturn } from '../types/return';
 
@@ -199,8 +191,6 @@ function buildColumns(
 
 export function ReturnList({ data, searchValue, onSearchChange, onViewDetail }: ReturnListProps) {
   const router = useRouter();
-  const [pageIndex, setPageIndex] = React.useState(0);
-  const [pageSize, setPageSize] = React.useState(10);
 
   const handleViewMap = React.useCallback((ret: RentalReturn) => {
     const handover = ret.handover;
@@ -215,63 +205,28 @@ export function ReturnList({ data, searchValue, onSearchChange, onViewDetail }: 
     });
   }, [router]);
 
-  React.useEffect(() => { setPageIndex(0); }, [data]);
-
-  const processedData = React.useMemo(
-    () => data.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize),
-    [data, pageIndex, pageSize],
-  );
-
-  const paginationConfig: DataTablePaginationConfig = {
-    pageIndex,
-    pageSize,
-    totalCount: data.length,
-    pageSizeOptions: [10, 20, 50],
-    onPageChange: setPageIndex,
-    onPageSizeChange: (s) => { setPageSize(s); setPageIndex(0); },
-  };
-
   const columns = React.useMemo(
     () => buildColumns(onViewDetail, handleViewMap),
     [onViewDetail, handleViewMap],
   );
 
-  const table = useDataTable<RentalReturn>({
-    data: processedData,
-    columns,
-    mode: 'pagination',
-    paginationConfig,
-    freezeConfig: { left: ['detail', 'map', 'returnInfo'] },
-  });
-
   return (
-    <div className="flex flex-col gap-3 h-full">
-      <DataTableToolbar
-        table={table}
-        searchPlaceholder="Cari pengembalian, customer, nomor polisi..."
-        searchValue={searchValue}
-        onSearchChange={onSearchChange}
-        showColumnToggle={true}
-        showExport={true}
-        showFilter={false}
-      />
-
-      <div className="flex items-stretch gap-4 min-h-0 flex-1">
-        <div className="flex-1 min-w-0 w-full flex flex-col">
-          <div className="relative w-full flex-1 overflow-auto rounded-lg border border-border bg-background shadow-sm">
-            <table className="w-full text-left border-collapse text-sm">
-              <DataTableHeader table={table} />
-              <DataTableBody
-                table={table}
-                emptyTitle="Tidak ada data pengembalian"
-                emptyDescription="Belum ada transaksi pengembalian yang tercatat atau sesuai dengan pencarian Anda."
-              />
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <DataTablePagination paginationConfig={paginationConfig} />
-    </div>
+    <DataTable<RentalReturn>
+      data={data}
+      columns={columns}
+      // Capabilities
+      searchable
+      sortable
+      pagination
+      columnVisibility
+      exportable
+      // Search
+      searchValue={searchValue}
+      onSearchChange={onSearchChange}
+      searchPlaceholder="Cari pengembalian, customer, nomor polisi..."
+      // UI Slots
+      emptyTitle="Tidak ada data pengembalian"
+      emptyDescription="Belum ada transaksi pengembalian yang tercatat atau sesuai dengan pencarian Anda."
+    />
   );
 }

@@ -1,27 +1,10 @@
 'use client';
 
 import React from 'react';
-import { MoreHorizontal, Edit2, Trash2, FileText, Plus } from 'lucide-react';
-import { cn } from '@adatrack/utils';
-import {
-  Badge, Button,
-  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent,
-  DropdownMenuItem, DropdownMenuSeparator,
-} from '@adatrack/ui';
-import {
-  useDataTable,
-  DataTableHeader,
-  DataTableBody,
-  DataTableToolbar,
-  DataTablePagination,
-  DataTableFilterPanel,
-  type DataTableColumnDef,
-  type DataTablePaginationConfig,
-  type DataTableFilterConfig,
-  type ColumnVisibilityState,
-  type SortingState,
-} from '@adatrack/ui';
-import type { Customer, IndividualCustomer, CompanyCustomer } from '../types/customer';
+import { FileText, Plus } from 'lucide-react';
+import { Badge, Button, DataTable } from '@adatrack/ui';
+import type { DataTableColumnDef, DataTableFilterConfig } from '@adatrack/ui';
+import type { Customer, CompanyCustomer } from '../types/customer';
 
 interface CustomerTableLabels {
   colCode: string;
@@ -189,109 +172,45 @@ export function CustomerTable({
   onAdd,
   className,
 }: CustomerTableProps) {
-  const [pageIndex, setPageIndex] = React.useState(0);
-  const [pageSize, setPageSize] = React.useState(10);
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnVisibility, setColumnVisibility] = React.useState<ColumnVisibilityState>(DEFAULT_COLUMN_VISIBILITY);
-
-  React.useEffect(() => { setPageIndex(0); }, [data]);
-
   const columns = React.useMemo(
     () => buildColumns(labels, onViewDetail, onEdit, onDelete),
     [labels, onViewDetail, onEdit, onDelete],
   );
 
-  const processedData = React.useMemo(() => {
-    const result = [...data];
-    if (sorting.length > 0) {
-      const { id, desc } = sorting[0];
-      result.sort((a, b) => {
-        let valA = a[id as keyof Customer];
-        let valB = b[id as keyof Customer];
-        
-        if (id === 'customerName') {
-           valA = a.name;
-           valB = b.name;
-        }
-
-        if (typeof valA === 'string' && typeof valB === 'string') {
-          return desc ? valB.localeCompare(valA) : valA.localeCompare(valB);
-        }
-        return 0;
-      });
-    }
-    return result.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize);
-  }, [data, sorting, pageIndex, pageSize]);
-
-  const paginationConfig: DataTablePaginationConfig = {
-    pageIndex,
-    pageSize,
-    totalCount: data.length,
-    pageSizeOptions: [10, 20, 50],
-    onPageChange: setPageIndex,
-    onPageSizeChange: (s) => { setPageSize(s); setPageIndex(0); },
-  };
-
-  const table = useDataTable<Customer>({
-    data: processedData,
-    columns,
-    sorting,
-    onSortingChange: setSorting,
-    mode: 'pagination',
-    columnVisibility,
-    onColumnVisibilityChange: setColumnVisibility,
-    freezeConfig: { left: ['customerName'] },
-    paginationConfig,
-  });
-
-  const activeFilterCount = Object.values(filterConfig.state).flat().filter(Boolean).length;
-
   return (
-    <div className={cn('flex flex-col gap-3', className)}>
-      <DataTableToolbar
-        table={table}
-        searchValue={searchValue}
-        onSearchChange={onSearchChange}
-        searchPlaceholder={labels.searchPlaceholder}
-        showColumnToggle
-        showExport
-        showFilter
-        isFilterOpen={isFilterOpen}
-        onFilterOpenChange={onFilterOpenChange}
-        activeFilterCount={activeFilterCount}
-        exportConfig={{ filename: labels.exportFilename, enabled: true }}
-        rightSlot={onAdd && (
+    <DataTable<Customer>
+      className={className}
+      data={data}
+      columns={columns}
+      // Capabilities
+      searchable
+      sortable
+      pagination
+      columnVisibility
+      exportable
+      // Initial state
+      columnVisibilityState={DEFAULT_COLUMN_VISIBILITY}
+      // Search
+      searchValue={searchValue}
+      onSearchChange={onSearchChange}
+      searchPlaceholder={labels.searchPlaceholder}
+      // Filter
+      filterConfig={filterConfig}
+      isFilterOpen={isFilterOpen}
+      onFilterOpenChange={onFilterOpenChange}
+      // Export
+      exportFilename={labels.exportFilename}
+      // UI Customizations
+      emptyTitle={labels.emptyTitle}
+      emptyDescription={labels.emptyDescription}
+      toolbarActions={
+        onAdd ? (
           <Button variant="destructive" onClick={onAdd} className="h-9">
             <Plus className="w-4 h-4 mr-2" />
             <span className="hidden sm:inline-block">Tambah</span>
           </Button>
-        )}
-      />
-
-      <div className={cn('flex items-stretch gap-4', isFilterOpen ? 'flex-col lg:flex-row' : '')}>
-        <div className="flex-1 min-w-0 w-full">
-          <div className="relative w-full overflow-x-auto rounded-lg border border-border bg-background shadow-sm max-h-[600px] overflow-y-auto">
-            <table className="w-full text-left border-collapse text-sm">
-              <DataTableHeader table={table} />
-              <DataTableBody
-                table={table}
-                emptyTitle={labels.emptyTitle}
-                emptyDescription={labels.emptyDescription}
-                noResultTitle={labels.noResultTitle}
-                noResultDescription={labels.noResultDescription}
-              />
-            </table>
-          </div>
-        </div>
-
-        {isFilterOpen && (
-          <div className="w-full lg:w-[280px] shrink-0 self-stretch">
-            <DataTableFilterPanel config={filterConfig} className="h-full" />
-          </div>
-        )}
-      </div>
-
-      <DataTablePagination paginationConfig={paginationConfig} />
-    </div>
+        ) : undefined
+      }
+    />
   );
 }

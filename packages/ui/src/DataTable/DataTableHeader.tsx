@@ -18,8 +18,8 @@ export function DataTableHeader<TData extends RowData = RowData>({
   return (
     <thead
       className={cn(
-        'bg-surface border-b border-border text-[11px] font-semibold text-foreground-muted uppercase tracking-wide',
-        stickyHeader && 'sticky top-0 z-20 bg-surface shadow-sm',
+        'border-b border-border/60 text-[11px] font-semibold text-foreground-muted uppercase tracking-wide bg-neutral-50/70 dark:bg-neutral-900/40',
+        stickyHeader && 'sticky top-0 z-20',
       )}
     >
       {table.getHeaderGroups().map((headerGroup) => (
@@ -34,10 +34,10 @@ export function DataTableHeader<TData extends RowData = RowData>({
                 key={header.id}
                 colSpan={header.colSpan}
                 className={cn(
-                  'px-3 py-2 text-left align-middle font-semibold select-none whitespace-nowrap',
-                  canSort && 'cursor-pointer hover:bg-neutral-200/50 transition-colors',
+                  'px-3 py-2 text-left align-middle font-medium select-none whitespace-nowrap group',
+                  canSort && 'cursor-pointer hover:bg-muted/30 transition-colors',
                   isPinned &&
-                    'sticky z-30 bg-surface shadow-[1px_0_0_0_rgba(0,0,0,0.05)]',
+                    'sticky z-30 bg-background shadow-[1px_0_0_0_rgba(0,0,0,0.05)]',
                   (isPinned === 'start' || (isPinned as string) === 'left') && 'left-0',
                   (isPinned === 'end' || (isPinned as string) === 'right') && 'right-0',
                 )}
@@ -51,11 +51,11 @@ export function DataTableHeader<TData extends RowData = RowData>({
                     {canSort && (
                       <span className="shrink-0 text-foreground-muted">
                         {isSorted === 'asc' ? (
-                          <ArrowUp className="h-3.5 w-3.5 text-primary" />
+                          <ArrowUp className="h-3 w-3 text-primary" />
                         ) : isSorted === 'desc' ? (
-                          <ArrowDown className="h-3.5 w-3.5 text-primary" />
+                          <ArrowDown className="h-3 w-3 text-primary" />
                         ) : (
-                          <ArrowUpDown className="h-3.5 w-3.5 opacity-50" />
+                          <ArrowUpDown className="h-3 w-3 opacity-0 group-hover:opacity-40 transition-opacity" />
                         )}
                       </span>
                     )}

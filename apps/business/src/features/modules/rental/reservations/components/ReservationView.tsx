@@ -10,7 +10,7 @@ interface ReservationViewProps {
   reservation: Reservation | null;
   open: boolean;
   onClose: () => void;
-  labels: Record<string, string>;
+  labels: Record<string, any>;
   onEdit: (reservation: Reservation) => void;
   onDelete: (reservation: Reservation) => void;
   onConfirm: (reservation: Reservation) => void;
