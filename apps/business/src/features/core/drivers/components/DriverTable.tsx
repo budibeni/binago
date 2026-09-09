@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { MoreHorizontal, IdCard, Edit2, Trash2, UserRound, MapPin, Truck, Users } from 'lucide-react';
+import { MoreVertical, IdCard, Edit2, Trash2, UserRound, MapPin, Truck, Users, Plus, Eye } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import {
   Badge, Button,
@@ -14,14 +14,18 @@ import type { Driver } from '../types/driver';
 
 interface DriverTableLabels {
   colDriver: string;
-  colContact: string;
-  colIdentity: string;
-  colStatus: string;
-  colAssignment: string;
+  colGroup: string;
+  colPlacement: string;
+  colPhone: string;
+  colEmail: string;
+  colAddress: string;
+  colKtp: string;
+  colPob: string;
+  colDob: string;
+  colLicenseNo: string;
+  colLicenseExpiry: string;
+  colJoinDate: string;
   colActions: string;
-  statusActive: string;
-  statusInactive: string;
-  statusOnLeave: string;
   emptyTitle: string;
   emptyDescription: string;
   noResultTitle: string;
@@ -32,15 +36,14 @@ interface DriverTableLabels {
   actionDetail: string;
   actionEdit: string;
   actionDelete: string;
-  phone: string;
-  ktp: string;
-  licenseNo: string;
 }
 
 interface DriverTableProps {
   data: Driver[];
   labels: DriverTableLabels;
   onViewDetail: (driver: Driver) => void;
+  onEdit: (driver: Driver) => void;
+  onDelete: (driver: Driver) => void;
   onAdd: () => void;
   searchValue: string;
   onSearchChange: (value: string) => void;
@@ -48,147 +51,164 @@ interface DriverTableProps {
   isFilterOpen: boolean;
   onFilterOpenChange: (open: boolean) => void;
   className?: string;
-}
-
-function getStatusBadge(status: Driver['status'], labels: DriverTableLabels) {
-  const map = {
-    active:   { label: labels.statusActive,   variant: 'success' as const },
-    inactive: { label: labels.statusInactive, variant: 'danger' as const },
-    on_leave: { label: labels.statusOnLeave,  variant: 'warning' as const },
-  };
-  const cfg = map[status];
-  return <Badge variant={cfg.variant} dot>{cfg.label}</Badge>;
+  dtLabels?: any;
 }
 
 function buildColumns(
   labels: DriverTableLabels,
   onViewDetail: (d: Driver) => void,
+  onEdit: (d: Driver) => void,
+  onDelete: (d: Driver) => void,
 ): DataTableColumnDef<Driver>[] {
   return [
     {
       id: 'actions',
       header: '',
-      cell: ({ row }) => {
-        const d = row.original;
-        return (
-          <div className="flex items-center justify-start px-1">
-            <Button variant="ghost" size="sm" onClick={() => onViewDetail(d)} className="h-8 w-8 p-0 text-foreground-muted hover:text-foreground" title={labels.actionDetail}>
-              <IdCard className="h-4 w-4" />
-            </Button>
-          </div>
-        );
-      },
       enableSorting: false,
-      size: 60,
+      size: 40,
+      meta: { fixedWidth: true },
+      cell: ({ row }) => (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 w-7 p-0 flex items-center justify-center focus-visible:ring-1 focus-visible:ring-primary focus:outline-none data-[state=open]:bg-neutral-200/50 dark:data-[state=open]:bg-neutral-800"
+              aria-label="Aksi pengemudi"
+              id={`driver-action-${row.original.id}`}
+            >
+              <MoreVertical className="h-4 w-4 text-foreground-muted" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-48">
+            <DropdownMenuItem onClick={() => onViewDetail(row.original)}>
+              <Eye className="mr-2 h-4 w-4 text-foreground-muted" />
+              <span>{labels.actionDetail}</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onEdit(row.original)}>
+              <Edit2 className="mr-2 h-4 w-4 text-foreground-muted" />
+              <span>{labels.actionEdit}</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem destructive onClick={() => onDelete(row.original)}>
+              <Trash2 className="mr-2 h-4 w-4 text-danger" />
+              <span>{labels.actionDelete}</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ),
     },
     {
-      id: 'driver',
+      id: 'name',
       header: labels.colDriver,
       accessorFn: (row) => row.name,
-      cell: ({ row }) => {
-        const d = row.original;
-        return (
-          <div className="flex flex-col gap-1">
-            <span 
-              onClick={() => onViewDetail(d)}
-              className="font-medium text-primary hover:text-primary/80 hover:underline cursor-pointer transition-colors w-fit"
-            >
-              {d.name}
-            </span>
-            <div className="flex items-center gap-3">
-              <span className="text-xs text-foreground-subtle flex items-center gap-1" title="Grup">
-                <Users className="w-3 h-3" />
-                {d.groupName || '-'}
-              </span>
-              <span className="text-xs text-foreground-subtle flex items-center gap-1" title="Penempatan">
-                <MapPin className="w-3 h-3" />
-                {d.placement}
-              </span>
-            </div>
-          </div>
-        );
-      },
-      enableSorting: true,
-      size: 250,
-      minSize: 200,
-    },
-    {
-      id: 'contact',
-      header: labels.colContact,
-      accessorFn: (row) => row.phone,
-      cell: ({ row }) => {
-        const d = row.original;
-        return (
-          <div className="flex flex-col gap-0.5">
-            <span className="text-sm text-foreground font-medium">{d.phone}</span>
-            <span className="text-xs text-foreground-subtle">{d.email}</span>
-            <span className="text-xs text-foreground-muted mt-1 leading-tight line-clamp-2" title={d.address}>
-              {d.address}
-            </span>
-          </div>
-        );
-      },
+      cell: ({ row }) => (
+        <span 
+          onClick={() => onViewDetail(row.original)}
+          className="font-medium text-foreground hover:text-primary hover:underline cursor-pointer transition-colors whitespace-nowrap"
+        >
+          {row.original.name}
+        </span>
+      ),
       enableSorting: true,
       size: 200,
     },
     {
-      id: 'identity',
-      header: labels.colIdentity,
-      accessorFn: (row) => row.ktpNumber,
-      cell: ({ row }) => {
-        const d = row.original;
-        return (
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-foreground-muted">{labels.ktp}:</span>
-              <span className="font-medium text-foreground-subtle">{d.ktpNumber}</span>
-            </div>
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-foreground-muted">{labels.licenseNo}:</span>
-              <span className="font-medium text-foreground-subtle">{d.licenseNumber}</span>
-            </div>
-          </div>
-        );
-      },
-      enableSorting: false,
-      size: 220,
-    },
-    {
-      id: 'status',
-      header: labels.colStatus,
-      accessorFn: (row) => row.status,
-      cell: ({ row }) => getStatusBadge(row.original.status, labels),
+      id: 'groupName',
+      header: labels.colGroup,
+      accessorFn: (row) => row.groupName || '-',
+      cell: ({ getValue }) => <span className="text-info">{getValue() as string}</span>,
       enableSorting: true,
-      size: 130,
+      size: 150,
     },
     {
-      id: 'assignment',
-      header: labels.colAssignment,
-      accessorFn: (row) => row.assignedVehiclePlate || row.assignedVehicleId,
-      cell: ({ row }) => {
-        const d = row.original;
-        if (!d.assignedVehicleId) {
-          return <span className="text-sm text-foreground-muted italic">Tidak ada penugasan</span>;
-        }
-        return (
-          <div className="flex items-center gap-2">
-            <div className="p-1.5 bg-neutral-100 dark:bg-neutral-800 rounded-md">
-              <Truck className="w-4 h-4 text-foreground-subtle" />
-            </div>
-            <span className="text-sm font-medium text-foreground">{d.assignedVehiclePlate || d.assignedVehicleId}</span>
-          </div>
-        );
-      },
+      id: 'placement',
+      header: labels.colPlacement,
+      accessorFn: (row) => row.placement,
+      enableSorting: true,
+      size: 150,
+    },
+    {
+      id: 'phone',
+      header: labels.colPhone,
+      accessorFn: (row) => row.phone,
+      enableSorting: true,
+      size: 140,
+    },
+    {
+      id: 'email',
+      header: labels.colEmail,
+      accessorFn: (row) => row.email,
       enableSorting: true,
       size: 180,
+    },
+    {
+      id: 'address',
+      header: labels.colAddress,
+      accessorFn: (row) => row.address,
+      enableSorting: true,
+      size: 250,
+    },
+    {
+      id: 'ktpNumber',
+      header: labels.colKtp,
+      accessorFn: (row) => row.ktpNumber,
+      enableSorting: true,
+      size: 160,
+    },
+    {
+      id: 'placeOfBirth',
+      header: labels.colPob,
+      accessorFn: (row) => row.placeOfBirth || '-',
+      enableSorting: true,
+      size: 150,
+    },
+    {
+      id: 'dateOfBirth',
+      header: labels.colDob,
+      accessorFn: (row) => row.dateOfBirth || '-',
+      enableSorting: true,
+      size: 140,
+    },
+    {
+      id: 'licenseNumber',
+      header: labels.colLicenseNo,
+      accessorFn: (row) => row.licenseNumber,
+      enableSorting: true,
+      size: 160,
+    },
+    {
+      id: 'licenseExpiry',
+      header: labels.colLicenseExpiry,
+      accessorFn: (row) => row.licenseExpiry || '-',
+      enableSorting: true,
+      size: 150,
+    },
+    {
+      id: 'joinDate',
+      header: labels.colJoinDate,
+      accessorFn: (row) => row.joinDate || '-',
+      // Aksi sudah di bagian atas
     }
   ];
 }
+
+const DEFAULT_COLUMN_VISIBILITY = {
+  groupName: false,
+  email: false,
+  address: false,
+  ktpNumber: false,
+  placeOfBirth: false,
+  dateOfBirth: false,
+  joinDate: false,
+};
 
 export function DriverTable({
   data,
   labels,
   onViewDetail,
+  onEdit,
+  onDelete,
   onAdd,
   searchValue,
   onSearchChange,
@@ -196,8 +216,9 @@ export function DriverTable({
   isFilterOpen,
   onFilterOpenChange,
   className,
+  dtLabels,
 }: DriverTableProps) {
-  const columns = React.useMemo(() => buildColumns(labels, onViewDetail), [labels, onViewDetail]);
+  const columns = React.useMemo(() => buildColumns(labels, onViewDetail, onEdit, onDelete), [labels, onViewDetail, onEdit, onDelete]);
 
   return (
     <DataTable<Driver>
@@ -210,6 +231,8 @@ export function DriverTable({
       pagination
       columnVisibility
       exportable
+      // Initial state
+      columnVisibilityState={DEFAULT_COLUMN_VISIBILITY}
       // Search
       searchValue={searchValue}
       onSearchChange={onSearchChange}
@@ -220,14 +243,17 @@ export function DriverTable({
       onFilterOpenChange={onFilterOpenChange}
       // Export
       exportFilename={labels.exportFilename}
+      labels={dtLabels}
       // UI Slots
       emptyTitle={labels.emptyTitle}
       emptyDescription={labels.emptyDescription}
       toolbarActions={
-        <Button onClick={onAdd} variant="primary" className="bg-danger hover:bg-danger/90 text-white gap-2 h-9">
-          <UserRound className="w-4 h-4" />
-          <span className="hidden sm:inline-block">{labels.addDriver}</span>
-        </Button>
+        onAdd ? (
+          <Button variant="destructive" onClick={onAdd} className="h-8 gap-1.5 text-[13px] font-medium shadow-none">
+            <Plus className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline-block">Tambah</span>
+          </Button>
+        ) : undefined
       }
     />
   );

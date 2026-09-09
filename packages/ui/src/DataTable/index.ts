@@ -20,6 +20,7 @@ export type {
   DataTableFilterField,
   DataTableFilterOption,
   DataTableFilterFieldType,
+  DataTableLabels,
   ColumnDef,
   ColumnVisibilityState,
   SortingState,

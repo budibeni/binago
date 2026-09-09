@@ -10,20 +10,11 @@ import { VehicleTable } from './components/VehicleTable';
 import { VehicleView } from './components/VehicleView';
 import { VehicleForm } from './components/VehicleForm';
 import type { Vehicle, VehicleStatusFilter } from './types/vehicle';
-import type { DataTableFilterConfig } from '@adatrack/ui';
+import type { DataTableFilterConfig, DataTableLabels } from '@adatrack/ui';
 
 // ===========================================================================
 
-function computeStatusCounts(search: string, groupIds: string[]) {
-  const base = vehicleService.getVehicles({ search, groupIds });
-  return {
-    all: base.length,
-    driving: base.filter((v) => v.status === 'driving').length,
-    idle: base.filter((v) => v.status === 'idle').length,
-    parking: base.filter((v) => v.status === 'parking').length,
-    offline: base.filter((v) => v.status === 'offline').length,
-  };
-}
+// count computation removed
 
 // ===========================================================================
 
@@ -37,18 +28,17 @@ export function VehiclesFeature() {
   // ===========================================================================
   const [search, setSearch] = React.useState('');
   const [filterState, setFilterState] = React.useState<Record<string, string | string[]>>({
-    status: 'all',
+    status: [],
     groupIds: [],
   });
   const [isFilterOpen, setIsFilterOpen] = React.useState(false);
-  
+
   const statusFilter = filterState.status as VehicleStatusFilter;
   const selectedGroupIds = filterState.groupIds as string[];
 
   const [detailVehicle, setDetailVehicle] = React.useState<Vehicle | null>(null);
   const [drawerOpen, setDrawerOpen] = React.useState(false);
 
-  const [isFormOpen, setIsFormOpen] = React.useState(false);
   const [editVehicle, setEditVehicle] = React.useState<Vehicle | null>(null);
 
   // ===========================================================================
@@ -57,10 +47,7 @@ export function VehiclesFeature() {
     [search, statusFilter, selectedGroupIds],
   );
 
-  const statusCounts = React.useMemo(
-    () => computeStatusCounts(search, selectedGroupIds),
-    [search, selectedGroupIds],
-  );
+  // statusCounts removed
 
   // ===========================================================================
   const handleViewDetail = React.useCallback((vehicle: Vehicle) => {
@@ -75,12 +62,6 @@ export function VehiclesFeature() {
   const handleEdit = React.useCallback((vehicle: Vehicle) => {
     setDrawerOpen(false);
     setEditVehicle(vehicle);
-    setIsFormOpen(true);
-  }, []);
-
-  const handleCreate = React.useCallback(() => {
-    setEditVehicle(null);
-    setIsFormOpen(true);
   }, []);
 
   const handleTrack = React.useCallback((vehicle: Vehicle) => {
@@ -102,16 +83,17 @@ export function VehiclesFeature() {
     colVehicle: tV.colVehicle,
     colGroup: tV.colGroup,
     colDriver: tV.colDriver,
-    colStatus: tV.colStatus,
-    colOdometer: tV.colOdometer,
-    colLastUpdate: tV.colLastUpdate,
     colCategory: tV.colCategory,
     colBrand: tV.colBrand,
     colYear: tV.colYear,
     colFuel: tV.colFuel,
     colDeviceImei: tV.colDeviceImei,
-    colNextService: tV.colNextService,
     colRegExpiry: tV.colRegExpiry,
+    colColor: locale === 'en' ? 'Color' : 'Warna',
+    colDeviceSim: locale === 'en' ? 'SIM Number' : 'Nomor SIM',
+    colFuelCapacity: locale === 'en' ? 'Fuel Capacity' : 'Kap. BBM',
+    colKirExpiry: locale === 'en' ? 'KIR Expiry' : 'Masa Berlaku KIR',
+    colNotes: locale === 'en' ? 'Notes' : 'Catatan',
     colActions: tV.colActions,
     noDriver: tV.noDriver,
     noDevice: tV.noDevice,
@@ -129,7 +111,8 @@ export function VehiclesFeature() {
     actionEdit: tV.actionEdit,
     actionTrack: tV.actionTrack,
     actionDelete: tV.actionDelete,
-  }), [tV]);
+    actionAdd: locale === 'en' ? 'Add' : 'Tambah',
+  }), [tV, locale]);
 
   const filterLabels = React.useMemo(() => ({
     filterStatus: tV.filterStatus,
@@ -156,52 +139,62 @@ export function VehiclesFeature() {
     statusOffline: tV.statusOffline,
   }), [tV]);
 
+  const dtLabels: DataTableLabels = React.useMemo(() => {
+    const isEn = locale === 'en';
+    return {
+      paginationShowing: (from: number, to: number, total: number) => isEn ? `Showing ${from}-${to} of ${total.toLocaleString('en-US')} items` : `Menampilkan ${from}-${to} dari ${total.toLocaleString('id-ID')} data`,
+      paginationPerPage: isEn ? '/ page' : '/ halaman',
+      toolbarRefresh: isEn ? 'Refresh' : 'Refresh',
+      toolbarFilter: isEn ? 'Filter' : 'Filter',
+      toolbarColumns: isEn ? 'Columns' : 'Kolom',
+      toolbarExport: isEn ? 'Export' : 'Ekspor',
+      activeFilterClear: isEn ? 'Clear Filters' : 'Reset Filter',
+      columnPanelHideAll: isEn ? 'Hide all' : 'Sembunyikan semua',
+      columnPanelShowAll: isEn ? 'Show all' : 'Tampilkan semua',
+      errorLoadData: isEn ? 'Failed to load data.' : 'Gagal memuat data.',
+      errorTryAgain: isEn ? 'Try Again' : 'Coba Lagi',
+      errorTitle: isEn ? 'An error occurred' : 'Terjadi Kesalahan',
+      noResultTitle: isEn ? 'No results found' : 'Hasil Tidak Ditemukan',
+      noResultDesc: isEn ? 'No data matches your search or filters.' : 'Tidak ada data yang sesuai dengan pencarian atau filter Anda.',
+    };
+  }, [locale]);
+
   // ===========================================================================
   const filterConfig: DataTableFilterConfig = React.useMemo(() => ({
     state: filterState,
     onStateChange: setFilterState,
-    onClearAll: () => setFilterState({ status: 'all', groupIds: [] }),
+    onClearAll: () => setFilterState({ status: [], groupIds: [] }),
     labels: {
-      title: 'Filter Kendaraan',
+      title: 'Filter',
       clearAll: filterLabels.clearFilters,
     },
     fields: [
       {
         id: 'status',
         label: filterLabels.filterStatus,
-        type: 'pills-single',
+        type: 'pills-multi',
         options: [
-          {
-            value: 'all',
-            label: filterLabels.filterAll,
-            count: statusCounts.all,
-            activeClass: 'bg-neutral-700 dark:bg-neutral-600 border-neutral-700 dark:border-neutral-500 text-white',
-          },
           {
             value: 'driving',
             label: filterLabels.statusDriving,
-            count: statusCounts.driving,
             colorClass: 'bg-success',
             activeClass: 'bg-success/15 border-success/40 text-success dark:text-success',
           },
           {
             value: 'idle',
             label: filterLabels.statusIdle,
-            count: statusCounts.idle,
             colorClass: 'bg-warning',
             activeClass: 'bg-warning/15 border-warning/40 text-warning-600 dark:text-warning-400',
           },
           {
             value: 'parking',
             label: filterLabels.statusParking,
-            count: statusCounts.parking,
             colorClass: 'bg-neutral-400',
             activeClass: 'bg-neutral-100 dark:bg-neutral-800 border-neutral-400 text-foreground',
           },
           {
             value: 'offline',
             label: filterLabels.statusOffline,
-            count: statusCounts.offline,
             colorClass: 'bg-danger',
             activeClass: 'bg-danger/15 border-danger/40 text-danger',
           },
@@ -219,7 +212,7 @@ export function VehiclesFeature() {
         })),
       },
     ],
-  }), [filterState, filterLabels, statusCounts]);
+  }), [filterState, filterLabels]);
 
   // ===========================================================================
   return (
@@ -227,7 +220,7 @@ export function VehiclesFeature() {
 
 
       {/* Content */}
-      <div className="flex-1 min-h-0 overflow-y-auto px-6 py-4">
+      <div className="flex-1 min-h-0 overflow-y-auto p-0">
         <VehicleTable
           data={filteredVehicles}
           labels={tableLabels}
@@ -240,7 +233,8 @@ export function VehiclesFeature() {
           filterConfig={filterConfig}
           isFilterOpen={isFilterOpen}
           onFilterOpenChange={setIsFilterOpen}
-          onAdd={handleCreate}
+          onAdd={undefined}
+          dtLabels={dtLabels}
         />
       </div>
 
@@ -252,23 +246,20 @@ export function VehiclesFeature() {
         labels={drawerLabels}
       />
 
-      {(isFormOpen || !!editVehicle) && (
+      {!!editVehicle && (
         <VehicleForm
           vehicle={editVehicle}
-          open={isFormOpen || !!editVehicle}
+          open={!!editVehicle}
           onOpenChange={(open) => {
             if (!open) {
-              setIsFormOpen(false);
               setEditVehicle(null);
             }
           }}
           onSave={(data) => {
             console.log('Saved vehicle:', data);
-            setIsFormOpen(false);
             setEditVehicle(null);
           }}
           onCancel={() => {
-            setIsFormOpen(false);
             setEditVehicle(null);
           }}
         />

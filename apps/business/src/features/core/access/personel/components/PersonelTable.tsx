@@ -11,16 +11,19 @@ import {
   DropdownMenuSeparator 
 } from '@adatrack/ui';
 import type { DataTableColumnDef, DataTableFilterConfig } from '@adatrack/ui';
-import { Mail, Phone, UserCircle, CreditCard, UserRound, MoreVertical } from 'lucide-react';
+import { Mail, Phone, UserCircle, CreditCard, UserRound, MoreVertical, Plus } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import type { Personel } from '../types/personel';
 
 interface PersonelTableLabels {
   colPersonel: string;
-  colContact: string;
-  colIdentity: string;
-  colStatus: string;
   colType: string;
+  colNik: string;
+  colStatus: string;
+  colPhone: string;
+  colEmail: string;
+  colAddress: string;
+  colNotes: string;
   colActions: string;
   emptyTitle: string;
   emptyDescription: string;
@@ -32,9 +35,6 @@ interface PersonelTableLabels {
   actionDetail: string;
   actionEdit: string;
   actionDelete: string;
-  phone: string;
-  nik: string;
-  noCard: string;
   statusActive: string;
   statusInactive: string;
 }
@@ -52,6 +52,7 @@ interface PersonelTableProps {
   isFilterOpen: boolean;
   onFilterOpenChange: (open: boolean) => void;
   className?: string;
+  dtLabels?: any;
 }
 
 function buildColumns(
@@ -63,7 +64,10 @@ function buildColumns(
   return [
     {
       id: 'actions',
-      header: labels.colActions,
+      header: '',
+      enableSorting: false,
+      size: 40,
+      meta: { fixedWidth: true },
       cell: ({ row }) => {
         const p = row.original;
         return (
@@ -93,80 +97,60 @@ function buildColumns(
           </DropdownMenu>
         );
       },
-      enableSorting: false,
-      size: 60,
     },
     {
-      id: 'personel',
+      id: 'name',
       header: labels.colPersonel,
       accessorFn: (row) => row.name,
       cell: ({ row }) => {
         const p = row.original;
         return (
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 shrink-0 rounded-full bg-primary/10 text-primary flex items-center justify-center">
-              <UserCircle className="w-6 h-6" />
-            </div>
-            <div className="flex flex-col gap-0.5">
-              <span 
-                onClick={() => onViewDetail(p)}
-                className="font-medium text-primary hover:text-primary/80 hover:underline cursor-pointer transition-colors w-fit"
-              >
-                {p.name}
-              </span>
-              <span className="text-xs text-muted-foreground">{p.personelType}</span>
-            </div>
-          </div>
+          <span 
+            onClick={() => onViewDetail(p)}
+            className="font-medium text-foreground hover:text-primary hover:underline cursor-pointer transition-colors whitespace-nowrap"
+          >
+            {p.name}
+          </span>
         );
       },
       enableSorting: true,
-      size: 250,
-      minSize: 200,
-    },
-    {
-      id: 'contact',
-      header: labels.colContact,
-      accessorFn: (row) => row.phone,
-      cell: ({ row }) => {
-        const p = row.original;
-        return (
-          <div className="flex flex-col gap-1 text-sm">
-            {p.phone && (
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Phone className="w-3.5 h-3.5 shrink-0" />
-                <span>{p.phone}</span>
-              </div>
-            )}
-            {p.email && (
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Mail className="w-3.5 h-3.5 shrink-0" />
-                <span>{p.email}</span>
-              </div>
-            )}
-          </div>
-        );
-      },
       size: 200,
     },
     {
-      id: 'identity',
-      header: labels.colIdentity,
+      id: 'personelType',
+      header: labels.colType,
+      accessorFn: (row) => row.personelType,
+      cell: ({ getValue }) => <span className="text-info">{getValue() as string}</span>,
+      enableSorting: true,
+      size: 140,
+    },
+    {
+      id: 'nik',
+      header: labels.colNik,
       accessorFn: (row) => row.nik,
-      cell: ({ row }) => {
-        const p = row.original;
-        return (
-          <div className="flex flex-col gap-1 text-sm">
-            <div className="text-muted-foreground">
-              {labels.nik}: {p.nik || '-'}
-            </div>
-            <div className="flex items-center gap-1.5 text-muted-foreground">
-              <CreditCard className="w-3.5 h-3.5" />
-              <span>{p.cardId || labels.noCard}</span>
-            </div>
-          </div>
-        );
-      },
-      size: 200,
+      enableSorting: true,
+      size: 150,
+    },
+    {
+      id: 'phone',
+      header: labels.colPhone,
+      accessorFn: (row) => row.phone,
+      enableSorting: true,
+      size: 140,
+    },
+    {
+      id: 'email',
+      header: labels.colEmail,
+      accessorFn: (row) => row.email,
+      enableSorting: true,
+      size: 180,
+    },
+    {
+      id: 'address',
+      header: labels.colAddress,
+      accessorFn: (row) => row.address,
+      enableSorting: true,
+      size: 250,
     },
     {
       id: 'status',
@@ -182,10 +166,29 @@ function buildColumns(
           </div>
         );
       },
-      size: 150,
+      enableSorting: true,
+      size: 130,
+    },
+    {
+      id: 'notes',
+      header: labels.colNotes,
+      accessorFn: (row) => row.notes,
+      enableSorting: false,
+      size: 200,
+      cell: ({ row }) => (
+        <span className="text-[13px] text-foreground-muted block truncate max-w-[180px]" title={row.original.notes || ''}>
+          {row.original.notes || '-'}
+        </span>
+      ),
     },
   ];
 }
+
+const DEFAULT_COLUMN_VISIBILITY = {
+  email: false,
+  address: false,
+  notes: false,
+};
 
 export function PersonelTable({
   data,
@@ -200,6 +203,7 @@ export function PersonelTable({
   isFilterOpen,
   onFilterOpenChange,
   className,
+  dtLabels,
 }: PersonelTableProps) {
   const columns = React.useMemo(
     () => buildColumns(labels, onViewDetail, onEdit, onDelete),
@@ -217,6 +221,7 @@ export function PersonelTable({
       pagination
       columnVisibility
       exportable
+      columnVisibilityState={DEFAULT_COLUMN_VISIBILITY}
       // Search
       searchValue={searchValue}
       onSearchChange={onSearchChange}
@@ -227,14 +232,17 @@ export function PersonelTable({
       onFilterOpenChange={onFilterOpenChange}
       // Export
       exportFilename={labels.exportFilename}
+      labels={dtLabels}
       // UI Slots
       emptyTitle={labels.emptyTitle}
       emptyDescription={labels.emptyDescription}
       toolbarActions={
-        <Button onClick={onAdd} variant="primary" className="bg-danger hover:bg-danger/90 text-white gap-2 h-9">
-          <UserRound className="w-4 h-4" />
-          <span className="hidden sm:inline-block">{labels.addPersonel}</span>
-        </Button>
+        onAdd ? (
+          <Button variant="destructive" onClick={onAdd} className="h-8 gap-1.5 text-[13px] font-medium shadow-none">
+            <Plus className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline-block">Tambah</span>
+          </Button>
+        ) : undefined
       }
     />
   );

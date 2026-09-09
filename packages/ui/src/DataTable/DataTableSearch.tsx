@@ -55,13 +55,13 @@ export function DataTableSearch({
         placeholder={placeholder}
         disabled={disabled}
         className={cn(
-          'h-8 w-full rounded-md border border-border bg-transparent pl-8 pr-8 text-[13px] shadow-sm transition-colors',
+          'h-8 w-full rounded-md border border-neutral-200 dark:border-neutral-800 bg-gray-50 dark:bg-gray-900/40 pl-8 pr-8 text-sm transition-colors',
           'placeholder:text-foreground-muted/70',
-          'focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary',
+          'focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600',
           'disabled:cursor-not-allowed disabled:opacity-50'
         )}
       />
-      
+
       {isLoading ? (
         <div className="absolute right-2.5 top-1/2 -translate-y-1/2">
           <Spinner size="sm" />

@@ -29,8 +29,8 @@ export const vehicleService = {
       );
     }
 
-    if (status && status !== 'all') {
-      vehicles = vehicles.filter((v) => v.status === status);
+    if (status && status.length > 0) {
+      vehicles = vehicles.filter((v) => status.includes(v.status));
     }
 
     if (groupIds && groupIds.length > 0) {

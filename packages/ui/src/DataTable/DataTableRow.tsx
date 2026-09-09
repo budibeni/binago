@@ -37,6 +37,11 @@ export function DataTableRow<TData extends RowData = RowData>({
               (isPinned === 'start' || (isPinned as string) === 'left') && 'left-0',
               (isPinned === 'end' || (isPinned as string) === 'right') && 'right-0',
             )}
+            style={(cell.column.columnDef.meta as any)?.fixedWidth ? {
+              width: cell.column.getSize(),
+              minWidth: cell.column.getSize(),
+              maxWidth: cell.column.getSize(),
+            } : undefined}
           >
             {flexRender(cell.column.columnDef.cell, cell.getContext())}
           </td>

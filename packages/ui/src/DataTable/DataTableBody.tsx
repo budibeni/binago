@@ -8,7 +8,7 @@ import { Skeleton } from '../Skeleton';
 import { EmptyState } from '../patterns/EmptyState';
 import { Button } from '../Button';
 import { AlertCircle, SearchX } from 'lucide-react';
-import type { DataTableInstance } from './types';
+import type { DataTableInstance, DataTableLabels } from './types';
 
 export interface DataTableBodyProps<TData extends RowData = RowData> {
   table: DataTableInstance<TData>;
@@ -18,8 +18,7 @@ export interface DataTableBodyProps<TData extends RowData = RowData> {
   emptyTitle?: string;
   emptyDescription?: string;
   emptyIcon?: React.ElementType;
-  noResultTitle?: string;
-  noResultDescription?: string;
+  labels?: DataTableLabels;
 }
 
 export function DataTableBody<TData extends RowData = RowData>({
@@ -30,14 +29,21 @@ export function DataTableBody<TData extends RowData = RowData>({
   emptyTitle,
   emptyDescription,
   emptyIcon,
-  noResultTitle = 'Hasil Tidak Ditemukan',
-  noResultDescription = 'Tidak ada data yang sesuai dengan pencarian atau filter Anda.',
+  labels,
 }: DataTableBodyProps<TData>) {
   const columnCount = table.getVisibleFlatColumns().length || 1;
-  const rows = table.getRowModel().rows;
+  let rows = table.getRowModel().rows;
   const isFiltered = Boolean(
     table.state.globalFilter || table.state.columnFilters.length > 0,
   );
+
+  // Apply manual client-side pagination fallback
+  const paginationState = table.state.pagination;
+  if (paginationState && rows.length > paginationState.pageSize) {
+    const start = paginationState.pageIndex * paginationState.pageSize;
+    const end = start + paginationState.pageSize;
+    rows = rows.slice(start, end);
+  }
 
   if (fetchState === 'loading') {
     return (
@@ -60,12 +66,12 @@ export function DataTableBody<TData extends RowData = RowData>({
           <td colSpan={columnCount} className="px-3 py-6">
             <EmptyState
               icon={AlertCircle}
-              title="Terjadi Kesalahan"
-              description={errorMessage}
+              title={labels?.errorTitle || "Terjadi Kesalahan"}
+              description={errorMessage || labels?.errorLoadData || "Gagal memuat data."}
               action={
                 onRetry ? (
                   <Button variant="outline" size="sm" onClick={onRetry}>
-                    Coba Lagi
+                    {labels?.errorTryAgain || "Coba Lagi"}
                   </Button>
                 ) : undefined
               }
@@ -84,8 +90,8 @@ export function DataTableBody<TData extends RowData = RowData>({
             {isFiltered ? (
               <EmptyState
                 icon={SearchX}
-                title={noResultTitle}
-                description={noResultDescription}
+                title={labels?.noResultTitle || "Hasil Tidak Ditemukan"}
+                description={labels?.noResultDesc || "Tidak ada data yang sesuai dengan pencarian atau filter Anda."}
               />
             ) : (
               <EmptyState

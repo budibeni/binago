@@ -4,14 +4,15 @@ import React from 'react';
 import { X } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import { Button } from '../Button';
-import type { DataTableFilterConfig } from './types';
+import type { DataTableFilterConfig, DataTableLabels } from './types';
 
 export interface DataTableActiveFiltersProps {
   config: DataTableFilterConfig;
+  labels?: DataTableLabels;
   className?: string;
 }
 
-export function DataTableActiveFilters({ config, className }: DataTableActiveFiltersProps) {
+export function DataTableActiveFilters({ config, labels: tableLabels, className }: DataTableActiveFiltersProps) {
   const { state, fields, onStateChange, onClearAll, labels } = config;
 
   // Derive active filters
@@ -72,7 +73,7 @@ export function DataTableActiveFilters({ config, className }: DataTableActiveFil
       {activeFilters.map((af, i) => (
         <div
           key={`${af.fieldId}-${af.value}-${i}`}
-          className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1 text-[13px] font-medium text-foreground-muted shadow-sm"
+          className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-2 py-0.5 text-xs font-medium text-foreground-muted shadow-sm"
         >
           <span>{af.fieldLabel}: <span className="text-foreground">{af.optionLabel}</span></span>
           <button
@@ -90,9 +91,9 @@ export function DataTableActiveFilters({ config, className }: DataTableActiveFil
           variant="ghost"
           size="sm"
           onClick={onClearAll}
-          className="h-7 text-[13px] text-danger hover:text-danger/80 hover:bg-danger/10 px-2 font-medium"
+          className="h-6 text-xs text-danger hover:text-danger/80 hover:bg-danger/10 px-2 font-medium"
         >
-          {labels?.clearAll || 'Reset Filter'}
+          {labels?.clearAll || tableLabels?.activeFilterClear || 'Reset Filter'}
         </Button>
       )}
     </div>

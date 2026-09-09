@@ -1,14 +1,15 @@
 'use client';
 
 import React from 'react';
-import { MoreVertical, Edit2, CreditCard } from 'lucide-react';
+import { MoreVertical, Edit2 } from 'lucide-react';
 import {
-  Badge, Button,
+  Button,
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent,
   DropdownMenuItem,
   DataTable,
 } from '@adatrack/ui';
 import type { DataTableColumnDef, DataTableFilterConfig } from '@adatrack/ui';
+import { cn } from '@adatrack/utils';
 import type { CardModel } from '../types/card';
 import type { getCardTranslation } from '../i18n';
 
@@ -24,6 +25,8 @@ interface CardTableProps {
   onFilterOpenChange: (open: boolean) => void;
   t: CardTranslation;
   className?: string;
+  dtLabels?: any;
+  exportFilename?: string;
 }
 
 function buildColumns(
@@ -33,69 +36,43 @@ function buildColumns(
   return [
     {
       id: 'actions',
-      header: t.table.colActions,
+      header: '',
       enableSorting: false,
-      size: 60,
+      size: 40,
+      meta: { fixedWidth: true },
       cell: ({ row }) => {
         const card = row.original;
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-8 w-8 px-0">
-                <MoreVertical className="h-4 w-4" />
-                <span className="sr-only">{t.table.colActions}</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 w-7 p-0 flex items-center justify-center focus-visible:ring-1 focus-visible:ring-primary focus:outline-none data-[state=open]:bg-neutral-200/50 dark:data-[state=open]:bg-neutral-800"
+                aria-label="Aksi kartu"
+              >
+                <MoreVertical className="h-4 w-4 text-foreground-muted" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-36">
+            <DropdownMenuContent align="start" className="w-40">
               <DropdownMenuItem onClick={() => onEdit(card)}>
-                <Edit2 className="mr-2 h-4 w-4 text-slate-500" /> {t.actions.editCard}
+                <Edit2 className="mr-2 h-4 w-4 text-foreground-muted" /> {t.actions.editCard}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         );
       },
     },
+    // Kolom: Nama, Tipe, Status, Pemegang, Penggunaan, UID, Catatan, Diperbarui
     {
       id: 'name',
       header: t.table.colCard,
       accessorKey: 'name',
       enableSorting: true,
-      size: 200,
-      cell: ({ row }) => {
-        const d = row.original;
-        return (
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary/10 shrink-0">
-              <CreditCard className="h-3.5 w-3.5 text-primary" />
-            </div>
-            <div className="flex flex-col">
-              <span className="font-medium text-foreground text-sm">{d.name}</span>
-              <span className="text-xs text-neutral-500">{d.notes || '-'}</span>
-            </div>
-          </div>
-        );
-      },
-    },
-    {
-      id: 'holder',
-      header: t.table.colHolder,
-      size: 200,
-      cell: ({ row }) => {
-        const d = row.original;
-        const holderName = d.holderName ?? '-';
-        const subtitle = d.holderSubtitle;
-
-        return (
-          <div className="flex flex-col">
-            <span className={subtitle ? "font-medium text-foreground" : "text-neutral-500 italic"}>
-              {holderName}
-            </span>
-            {subtitle && (
-              <span className="text-xs text-neutral-500 uppercase">{subtitle}</span>
-            )}
-          </div>
-        );
-      },
+      size: 180,
+      cell: ({ row }) => (
+        <span className="font-medium text-foreground whitespace-nowrap">{row.original.name}</span>
+      ),
     },
     {
       id: 'type',
@@ -106,41 +83,7 @@ function buildColumns(
       cell: ({ row }) => {
         const type = row.original.type;
         return (
-          <Badge variant={type === 'RFID' ? 'default' : 'info'} className="text-xs">
-            {type}
-          </Badge>
-        );
-      },
-    },
-    {
-      id: 'uid',
-      header: t.table.colUid,
-      accessorKey: 'uid',
-      enableSorting: true,
-      size: 200,
-      cell: ({ row }) => (
-        <span className="text-[12px] font-mono text-foreground-muted">
-          {row.original.uid}
-        </span>
-      ),
-    },
-    {
-      id: 'purposes',
-      header: t.table.colPurpose,
-      accessorKey: 'purposes',
-      enableSorting: false,
-      size: 240,
-      cell: ({ row }) => {
-        const purposes = row.original.purposes;
-        if (!purposes || purposes.length === 0) return <span className="text-sm text-foreground-muted/50">-</span>;
-        return (
-          <div className="flex flex-wrap gap-1">
-            {purposes.map(p => (
-              <Badge key={p} variant="default" className="text-[10px] py-0">
-                {t.purpose[p as keyof typeof t.purpose] ?? p}
-              </Badge>
-            ))}
-          </div>
+          <span className="text-[13px] text-info">{type}</span>
         );
       },
     },
@@ -152,21 +95,89 @@ function buildColumns(
       size: 110,
       cell: ({ row }) => {
         const status = row.original.status;
+        const isActive = status === 'ACTIVE';
         return (
-          <Badge variant={status === 'ACTIVE' ? 'success' : 'default'} dot>
-            {t.status[status as keyof typeof t.status] ?? status}
-          </Badge>
+          <div className="flex items-center gap-1.5">
+            <span className={cn('h-1.5 w-1.5 rounded-full', isActive ? 'bg-success' : 'bg-danger')} />
+            <span className="text-[13px] text-foreground-muted">
+              {t.status[status as keyof typeof t.status] ?? status}
+            </span>
+          </div>
         );
       },
+    },
+    {
+      id: 'holder',
+      header: t.table.colHolder,
+      size: 200,
+      accessorFn: (row) => row.holderName ?? '-',
+      cell: ({ row }) => {
+        const d = row.original;
+        const holderName = d.holderName ?? '-';
+        const hasHolder = !!d.holderId;
+        return (
+          <span className={hasHolder ? 'text-foreground' : 'text-foreground-muted italic'}>
+            {holderName}
+          </span>
+        );
+      },
+      enableSorting: true,
+    },
+    {
+      id: 'purposes',
+      header: t.table.colPurpose,
+      accessorKey: 'purposes',
+      enableSorting: false,
+      size: 200,
+      cell: ({ row }) => {
+        const purposes = row.original.purposes;
+        if (!purposes || purposes.length === 0) return <span className="text-[13px] text-foreground-muted/50">-</span>;
+        return (
+          <div className="flex flex-wrap gap-1">
+            {purposes.map(p => (
+              <span
+                key={p}
+                className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] bg-neutral-100 dark:bg-neutral-800 text-foreground-muted border border-border/60"
+              >
+                {t.purpose[p as keyof typeof t.purpose] ?? p}
+              </span>
+            ))}
+          </div>
+        );
+      },
+    },
+    {
+      id: 'uid',
+      header: t.table.colUid,
+      accessorKey: 'uid',
+      enableSorting: true,
+      size: 200,
+      cell: ({ row }) => (
+        <span className="text-[13px] font-mono text-foreground-muted">
+          {row.original.uid}
+        </span>
+      ),
+    },
+    {
+      id: 'notes',
+      header: t.form.labelNotes,
+      accessorKey: 'notes',
+      enableSorting: false,
+      size: 200,
+      cell: ({ row }) => (
+        <span className="text-[13px] text-foreground-muted block truncate max-w-[180px]" title={row.original.notes || ''}>
+          {row.original.notes || '-'}
+        </span>
+      ),
     },
     {
       id: 'updatedAt',
       header: t.table.colUpdatedAt,
       accessorKey: 'updatedAt',
       enableSorting: true,
-      size: 160,
+      size: 150,
       cell: ({ row }) => (
-        <span suppressHydrationWarning className="text-sm text-foreground-muted">
+        <span suppressHydrationWarning className="text-[13px] text-foreground-muted">
           {new Date(row.original.updatedAt).toLocaleDateString('id-ID', {
             day: '2-digit', month: 'short', year: 'numeric',
           })}
@@ -175,6 +186,11 @@ function buildColumns(
     },
   ];
 }
+
+const DEFAULT_COLUMN_VISIBILITY = {
+  notes: false,
+  updatedAt: false,
+};
 
 export function CardTable({
   data,
@@ -186,6 +202,8 @@ export function CardTable({
   onFilterOpenChange,
   t,
   className,
+  dtLabels,
+  exportFilename,
 }: CardTableProps) {
   const columns = React.useMemo(() => buildColumns(onEdit, t), [onEdit, t]);
 
@@ -199,6 +217,8 @@ export function CardTable({
       sortable
       pagination
       columnVisibility
+      exportable
+      columnVisibilityState={DEFAULT_COLUMN_VISIBILITY}
       // Search
       searchValue={searchValue}
       onSearchChange={onSearchChange}
@@ -207,6 +227,9 @@ export function CardTable({
       filterConfig={filterConfig}
       isFilterOpen={isFilterOpen}
       onFilterOpenChange={onFilterOpenChange}
+      // Export
+      exportFilename={exportFilename}
+      labels={dtLabels}
       // UI Slots
       emptyTitle={t.table.emptyTitle}
       emptyDescription={t.table.emptyDescription}

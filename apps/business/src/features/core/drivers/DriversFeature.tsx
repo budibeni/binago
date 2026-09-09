@@ -18,12 +18,12 @@ export function DriversFeature() {
   // --- State -------------------------------------------------------------------
   const [search, setSearch] = React.useState('');
   const [filterState, setFilterState] = React.useState<Record<string, string | string[]>>({
-    status: 'all',
+    status: '',
     groupIds: [],
   });
   const [isFilterOpen, setIsFilterOpen] = React.useState(false);
 
-  const statusFilter = filterState.status as DriverStatusFilter;
+  const statusFilter = (filterState.status || 'all') as DriverStatusFilter;
   const selectedGroupIds = filterState.groupIds as string[];
 
   const [detailDriver, setDetailDriver] = React.useState<Driver | null>(null);
@@ -55,7 +55,7 @@ export function DriversFeature() {
       
       return enriched;
     });
-  }, [search, statusFilter, selectedGroupIds]);
+  }, [search, selectedGroupIds]);
 
   // --- Handlers ----------------------------------------------------------------
   const handleViewDetail = React.useCallback((driver: Driver) => {
@@ -79,14 +79,18 @@ export function DriversFeature() {
   // --- Configs -----------------------------------------------------------------
   const tableLabels = React.useMemo(() => ({
     colDriver: tD.table.colDriver,
-    colContact: tD.table.colContact,
-    colIdentity: tD.table.colIdentity,
-    colStatus: tD.table.colStatus,
-    colAssignment: tD.table.colAssignment,
+    colGroup: tD.filterGroup,
+    colPlacement: tD.labels.placement,
+    colPhone: tD.labels.phone,
+    colEmail: tD.labels.email,
+    colAddress: tD.labels.address,
+    colKtp: tD.labels.ktp,
+    colPob: tD.labels.pob,
+    colDob: tD.labels.dob,
+    colLicenseNo: tD.labels.licenseNo,
+    colLicenseExpiry: tD.labels.licenseExpiry,
+    colJoinDate: tD.labels.joinDate,
     colActions: tD.table.colActions,
-    statusActive: tD.status.active,
-    statusInactive: tD.status.inactive,
-    statusOnLeave: tD.status.onLeave,
     emptyTitle: tD.table.emptyTitle,
     emptyDescription: tD.table.emptyDescription,
     noResultTitle: tD.table.noResultTitle,
@@ -97,10 +101,27 @@ export function DriversFeature() {
     actionDetail: tD.actions.detail,
     actionEdit: tD.actions.edit,
     actionDelete: tD.actions.delete,
-    phone: tD.labels.phone,
-    ktp: tD.labels.ktp,
-    licenseNo: tD.labels.licenseNo,
   }), [tD]);
+
+  const dtLabels = React.useMemo(() => {
+    const isEn = locale === 'en';
+    return {
+      paginationShowing: (from: number, to: number, total: number) => isEn ? `Showing ${from}-${to} of ${total.toLocaleString('en-US')} items` : `Menampilkan ${from}-${to} dari ${total.toLocaleString('id-ID')} data`,
+      paginationPerPage: isEn ? '/ page' : '/ halaman',
+      toolbarRefresh: isEn ? 'Refresh' : 'Refresh',
+      toolbarFilter: isEn ? 'Filter' : 'Filter',
+      toolbarColumns: isEn ? 'Columns' : 'Kolom',
+      toolbarExport: isEn ? 'Export' : 'Ekspor',
+      activeFilterClear: isEn ? 'Clear Filters' : 'Reset Filter',
+      columnPanelHideAll: isEn ? 'Hide all' : 'Sembunyikan semua',
+      columnPanelShowAll: isEn ? 'Show all' : 'Tampilkan semua',
+      errorLoadData: isEn ? 'Failed to load data.' : 'Gagal memuat data.',
+      errorTryAgain: isEn ? 'Try Again' : 'Coba Lagi',
+      errorTitle: isEn ? 'An error occurred' : 'Terjadi Kesalahan',
+      noResultTitle: isEn ? 'No results found' : 'Hasil Tidak Ditemukan',
+      noResultDesc: isEn ? 'No data matches your search or filters.' : 'Tidak ada data yang sesuai dengan pencarian atau filter Anda.',
+    };
+  }, [locale]);
 
   const drawerLabels = React.useMemo(() => ({
     title: tD.drawer.title,
@@ -129,7 +150,6 @@ export function DriversFeature() {
         label: tD.filterStatus,
         type: 'pills-single' as const,
         options: [
-          { value: 'all', label: tD.tabs.all },
           { value: 'active', label: tD.status.active },
           { value: 'inactive', label: tD.status.inactive },
           { value: 'on_leave', label: tD.status.onLeave },
@@ -148,24 +168,26 @@ export function DriversFeature() {
     ],
     state: filterState,
     onStateChange: setFilterState,
-    onClearAll: () => setFilterState({ status: 'all', groupIds: [] }),
-    labels: { clearAll: tD.clearFilters }
+    onClearAll: () => setFilterState({ status: '', groupIds: [] }),
+    labels: { title: 'Filter', clearAll: tD.clearFilters }
   }), [tD, filterState]);
 
   return (
-    <div className="flex flex-col h-full w-full bg-background p-4 md:p-6 items-center overflow-hidden">
-      
-      <div className="w-full h-full min-h-0 relative">
+    <div className="flex flex-col h-full w-full">
+      <div className="flex-1 min-h-0 overflow-y-auto p-0">
         <DriverTable
           data={filteredDrivers}
           labels={tableLabels}
           onViewDetail={handleViewDetail}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
           onAdd={handleAdd}
           searchValue={search}
           onSearchChange={setSearch}
           filterConfig={filterConfig}
           isFilterOpen={isFilterOpen}
           onFilterOpenChange={setIsFilterOpen}
+          dtLabels={dtLabels}
         />
       </div>
 

@@ -20,8 +20,8 @@ export function CardFeature() {
   const [searchValue, setSearchValue] = React.useState('');
   const [isFilterOpen, setIsFilterOpen] = React.useState(false);
   const [filterState, setFilterState] = React.useState<Record<string, string | string[]>>({
-    status: 'ALL',
-    type: 'ALL',
+    status: '',
+    type: '',
   });
 
   // Form (edit-only)
@@ -39,8 +39,8 @@ export function CardFeature() {
   const loadData = React.useCallback(async () => {
     const result = await cardService.getCredentials({
       search: searchValue,
-      status: filterState.status as any,
-      type: filterState.type as any,
+      status: (filterState.status || 'ALL') as any,
+      type: (filterState.type || 'ALL') as any,
     });
 
     const mapped = result.map((c) => {
@@ -92,7 +92,7 @@ export function CardFeature() {
   const filterConfig: DataTableFilterConfig = React.useMemo(() => ({
     state: filterState,
     onStateChange: setFilterState,
-    onClearAll: () => setFilterState({ status: 'ALL', type: 'ALL' }),
+    onClearAll: () => setFilterState({ status: '', type: '' }),
     labels: { title: t.filter.title, clearAll: t.filter.clearAll },
     fields: [
       {
@@ -100,7 +100,6 @@ export function CardFeature() {
         label: t.filter.status,
         type: 'pills-single',
         options: [
-          { value: 'ALL', label: t.filter.allStatus },
           { value: 'ACTIVE', label: t.filter.active, colorClass: 'bg-success', activeClass: 'bg-success/15 border-success/40 text-success' },
           { value: 'INACTIVE', label: t.filter.inactive, colorClass: 'bg-neutral-400', activeClass: 'bg-neutral-100 dark:bg-neutral-800 border-neutral-400 text-foreground' },
         ],
@@ -110,7 +109,6 @@ export function CardFeature() {
         label: t.filter.type,
         type: 'pills-single',
         options: [
-          { value: 'ALL', label: t.filter.allType },
           { value: 'RFID', label: 'RFID', colorClass: 'bg-info', activeClass: 'bg-info/15 border-info/40 text-info' },
           { value: 'NFC', label: 'NFC', colorClass: 'bg-primary', activeClass: 'bg-primary/15 border-primary/40 text-primary' },
         ],
@@ -122,7 +120,7 @@ export function CardFeature() {
     <div className="flex flex-col h-full w-full">
 
       {/* Content */}
-      <div className="flex-1 min-h-0 overflow-y-auto px-6 py-4">
+      <div className="flex-1 min-h-0 overflow-y-auto p-0">
         <CardTable
           data={data}
           onEdit={handleEdit}
@@ -132,6 +130,19 @@ export function CardFeature() {
           isFilterOpen={isFilterOpen}
           onFilterOpenChange={setIsFilterOpen}
           t={t}
+          exportFilename={`card-adatrack`}
+          dtLabels={{
+            paginationShowing: (from: number, to: number, total: number) => locale === 'en' ? `Showing ${from}-${to} of ${total.toLocaleString('en-US')} items` : `Menampilkan ${from}-${to} dari ${total.toLocaleString('id-ID')} data`,
+            paginationPerPage: locale === 'en' ? '/ page' : '/ halaman',
+            toolbarFilter: 'Filter',
+            toolbarColumns: locale === 'en' ? 'Columns' : 'Kolom',
+            toolbarExport: locale === 'en' ? 'Export' : 'Ekspor',
+            activeFilterClear: locale === 'en' ? 'Clear Filters' : 'Reset Filter',
+            columnPanelHideAll: locale === 'en' ? 'Hide all' : 'Sembunyikan semua',
+            columnPanelShowAll: locale === 'en' ? 'Show all' : 'Tampilkan semua',
+            noResultTitle: locale === 'en' ? 'No results found' : 'Hasil Tidak Ditemukan',
+            noResultDesc: locale === 'en' ? 'No data matches your search or filters.' : 'Tidak ada data yang sesuai.',
+          }}
         />
       </div>
 

@@ -35,28 +35,34 @@ export function useDataTable<TData extends RowData = RowData>(
     onColumnVisibilityChange: setControlledVisibility,
     
     // Pagination
-    pageIndex: controlledPageIndex = 0,
-    pageSize: controlledPageSize = 10,
+    pageIndex: controlledPageIndex,
+    pageSize: controlledPageSize,
   } = props;
 
   // Uncontrolled fallback states
   const [internalSorting, setInternalSorting] = React.useState<SortingState>([]);
   const [internalFilters, setInternalFilters] = React.useState<ColumnFiltersState>([]);
   const [internalGlobalFilter, setInternalGlobalFilter] = React.useState('');
-  const [internalVisibility, setInternalVisibility] = React.useState<ColumnVisibilityState>({});
+  const [internalVisibility, setInternalVisibility] = React.useState<ColumnVisibilityState>(controlledVisibility ?? {});
   const [internalPinning, setInternalPinning] = React.useState<ColumnPinningState>({
     start: [],
     end: [],
   });
 
+  const [internalPagination, setInternalPagination] = React.useState({
+    pageIndex: 0,
+    pageSize: 10,
+  });
+
   const sorting = controlledSorting ?? internalSorting;
-  const columnFilters = internalFilters; // Filter state is managed manually via DataTableFilterPanel for now, but we keep it here for standard tanstack integration if needed
+  const columnFilters = internalFilters;
   const globalFilter = controlledGlobalFilter ?? internalGlobalFilter;
-  const columnVisibility = controlledVisibility ?? internalVisibility;
+  const isVisibilityControlled = !!setControlledVisibility;
+  const columnVisibility = isVisibilityControlled ? (controlledVisibility ?? {}) : internalVisibility;
   const columnPinning = internalPinning;
 
-  const pageIndex = controlledPageIndex;
-  const pageSize = controlledPageSize;
+  const pageIndex = controlledPageIndex !== undefined ? controlledPageIndex : internalPagination.pageIndex;
+  const pageSize = controlledPageSize !== undefined ? controlledPageSize : internalPagination.pageSize;
 
   // We detect if server-side by checking if totalCount is provided
   // If totalCount is undefined, we assume client-side pagination
@@ -99,6 +105,16 @@ export function useDataTable<TData extends RowData = RowData>(
     onColumnPinningChange: (updater) => {
       const next = typeof updater === 'function' ? updater(columnPinning) : updater;
       setInternalPinning(next);
+    },
+    onPaginationChange: (updater) => {
+      const next = typeof updater === 'function' ? updater({ pageIndex, pageSize }) : updater;
+      if (props.onPageChange && next.pageIndex !== pageIndex) {
+        props.onPageChange(next.pageIndex);
+      }
+      if (props.onPageSizeChange && next.pageSize !== pageSize) {
+        props.onPageSizeChange(next.pageSize);
+      }
+      setInternalPagination(next);
     },
     
     manualPagination: isServerSide,

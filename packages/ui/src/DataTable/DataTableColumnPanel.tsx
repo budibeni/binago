@@ -4,12 +4,13 @@ import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import { Button } from '../Button';
-import type { ColumnVisibilityState, DataTableInstance, RowData } from './types';
+import type { ColumnVisibilityState, DataTableInstance, RowData, DataTableLabels } from './types';
 
 export interface DataTableColumnPanelProps<TData extends RowData = RowData> {
   table: DataTableInstance<TData>;
   isOpen: boolean;
   onClose: () => void;
+  labels?: DataTableLabels;
   className?: string;
 }
 
@@ -17,6 +18,7 @@ export function DataTableColumnPanel<TData extends RowData = RowData>({
   table,
   isOpen,
   onClose,
+  labels,
   className,
 }: DataTableColumnPanelProps<TData>) {
   const toggleableColumns = table
@@ -56,6 +58,21 @@ export function DataTableColumnPanel<TData extends RowData = RowData>({
         <span className="text-[13px] font-semibold text-foreground">Tampilkan Kolom</span>
         <button type="button" onClick={onClose} className="text-foreground-muted hover:text-foreground transition-colors">
           <X className="h-3.5 w-3.5" />
+        </button>
+      </div>
+
+      <div className="flex items-center gap-2 px-3 py-2 border-b border-border">
+        <button
+          onClick={() => table.toggleAllColumnsVisible(false)}
+          className="text-[12px] text-foreground-muted hover:text-foreground transition-colors outline-none"
+        >
+          {labels?.columnPanelHideAll || 'Sembunyikan semua'}
+        </button>
+        <button
+          onClick={() => table.toggleAllColumnsVisible(true)}
+          className="text-[12px] text-foreground-muted hover:text-foreground transition-colors outline-none"
+        >
+          {labels?.columnPanelShowAll || 'Tampilkan semua'}
         </button>
       </div>
 

@@ -1,10 +1,10 @@
 'use client';
 
-import React from 'react';
-import { ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react';
+import React, { useState } from 'react';
+import { ChevronLeft, ChevronRight, MoreHorizontal, Filter, List } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import { Button } from '../Button';
-import type { DataTableInstance, RowData } from './types';
+import type { DataTableInstance, RowData, DataTableLabels } from './types';
 
 export interface DataTablePaginationProps<TData extends RowData = RowData> {
   table: DataTableInstance<TData>;
@@ -15,6 +15,8 @@ export interface DataTablePaginationProps<TData extends RowData = RowData> {
   onPageChange?: (pageIndex: number) => void;
   onPageSizeChange?: (pageSize: number) => void;
   fetchState?: 'idle' | 'loading' | 'loading-more' | 'error';
+  leftContent?: React.ReactNode;
+  labels?: DataTableLabels;
   className?: string;
 }
 
@@ -29,23 +31,26 @@ export function DataTablePagination<TData extends RowData = RowData>({
   onPageChange,
   onPageSizeChange,
   fetchState = 'idle',
+  leftContent,
+  labels,
   className,
 }: DataTablePaginationProps<TData>) {
-  
+
+  const [showFilters, setShowFilters] = useState(true);
+
   const isServerSide = typeof controlledTotalCount !== 'undefined';
-  
+
   // Use controlled props if provided, otherwise fallback to TanStack internal state
   const pageIndex = isServerSide ? controlledPageIndex! : table.state.pagination.pageIndex;
   const pageSize = isServerSide ? controlledPageSize! : table.state.pagination.pageSize;
-  
+
   const totalCount = isServerSide ? controlledTotalCount! : table.getFilteredRowModel().rows.length;
-  const pageCount = isServerSide 
-    ? (pageSize > 0 ? Math.ceil(totalCount / pageSize) : 0)
-    : table.getPageCount();
-    
-  const canPreviousPage = isServerSide ? pageIndex > 0 : table.getCanPreviousPage();
-  const canNextPage = isServerSide ? pageIndex < pageCount - 1 : table.getCanNextPage();
-  
+
+  // Always calculate manually to ensure it works even if TanStack pagination features are missing
+  const pageCount = pageSize > 0 ? Math.ceil(totalCount / pageSize) : 0;
+  const canPreviousPage = pageIndex > 0;
+  const canNextPage = pageIndex < pageCount - 1;
+
   const handlePageChange = (newIndex: number) => {
     if (isServerSide && onPageChange) {
       onPageChange(newIndex);
@@ -73,7 +78,7 @@ export function DataTablePagination<TData extends RowData = RowData>({
     // pageIndex is 0-indexed internally, but we display 1-indexed
     const current = pageIndex + 1;
     const total = pageCount;
-    
+
     if (total <= 7) {
       return Array.from({ length: total }, (_, i) => i + 1);
     }
@@ -99,11 +104,50 @@ export function DataTablePagination<TData extends RowData = RowData>({
       )}
       aria-label="Navigasi halaman"
     >
-      {/* Left: row info */}
-      <div className="flex items-center gap-3">
-        <span className="shrink-0 text-xs">
-          Menampilkan {from}-{to} dari {totalCount.toLocaleString('id-ID')} data
-        </span>
+      {/* Left: row info & custom toggle */}
+      <div className="flex flex-wrap items-center gap-3">
+        {leftContent ? (
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-0.5">
+              <button
+                onClick={() => setShowFilters(true)}
+                className={cn(
+                  "p-1 rounded transition-colors flex items-center justify-center",
+                  showFilters ? "bg-neutral-100 dark:bg-neutral-800 text-foreground" : "text-foreground-muted hover:bg-neutral-50 dark:hover:bg-neutral-800/50 hover:text-foreground"
+                )}
+                aria-label="Tampilkan Filter"
+                title="Tampilkan Filter"
+              >
+                <Filter className="h-3.5 w-3.5" />
+              </button>
+              <button
+                onClick={() => setShowFilters(false)}
+                className={cn(
+                  "p-1 rounded transition-colors flex items-center justify-center",
+                  !showFilters ? "bg-neutral-100 dark:bg-neutral-800 text-foreground" : "text-foreground-muted hover:bg-neutral-50 dark:hover:bg-neutral-800/50 hover:text-foreground"
+                )}
+                aria-label="Tampilkan Info Data"
+                title="Tampilkan Info Data"
+              >
+                <List className="h-3.5 w-3.5" />
+              </button>
+            </div>
+
+            <div className="flex items-center ml-1">
+              {showFilters ? (
+                leftContent
+              ) : (
+                <span className="shrink-0 text-xs text-foreground-muted">
+                  {labels?.paginationShowing ? labels.paginationShowing(from, to, totalCount) : `Menampilkan ${from}-${to} dari ${totalCount.toLocaleString('id-ID')} data`}
+                </span>
+              )}
+            </div>
+          </div>
+        ) : (
+          <span className="shrink-0 text-xs text-foreground-muted">
+            {labels?.paginationShowing ? labels.paginationShowing(from, to, totalCount) : `Menampilkan ${from}-${to} dari ${totalCount.toLocaleString('id-ID')} data`}
+          </span>
+        )}
       </div>
 
       {/* Right: page size + page navigation */}
@@ -116,7 +160,7 @@ export function DataTablePagination<TData extends RowData = RowData>({
             onChange={(e) => handlePageSizeChange(Number(e.target.value))}
             disabled={isLoading}
             className={cn(
-              'h-8 rounded-md border border-border bg-background px-2 py-1 text-xs text-foreground',
+              'h-7 rounded-md border border-border bg-background px-2 py-0 text-xs text-foreground',
               'focus:outline-none focus:ring-1 focus:ring-primary',
               'disabled:cursor-not-allowed disabled:opacity-50',
             )}
@@ -124,7 +168,7 @@ export function DataTablePagination<TData extends RowData = RowData>({
           >
             {pageSizeOptions.map((size) => (
               <option key={size} value={size}>
-                {size} / halaman
+                {size} {labels?.paginationPerPage || '/ halaman'}
               </option>
             ))}
           </select>
@@ -138,15 +182,15 @@ export function DataTablePagination<TData extends RowData = RowData>({
             onClick={() => handlePageChange(pageIndex - 1)}
             disabled={!canPreviousPage || isLoading}
             aria-label="Halaman sebelumnya"
-            className="h-8 w-8 p-0"
+            className="h-7 w-7 p-0"
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          
+
           {pages.map((p, i) => {
             if (p === '...') {
               return (
-                <div key={`dots-${i}`} className="flex h-8 w-8 items-center justify-center text-muted-foreground">
+                <div key={`dots-${i}`} className="flex h-7 w-7 items-center justify-center text-muted-foreground">
                   <MoreHorizontal className="h-4 w-4" />
                 </div>
               );
@@ -160,7 +204,7 @@ export function DataTablePagination<TData extends RowData = RowData>({
                 onClick={() => handlePageChange((p as number) - 1)}
                 disabled={isLoading}
                 className={cn(
-                  "h-8 w-8 p-0 text-[13px]",
+                  "h-7 w-7 p-0 text-xs",
                   isCurrentPage ? "bg-primary text-primary-foreground hover:bg-primary/90" : "text-foreground-muted"
                 )}
               >
@@ -175,7 +219,7 @@ export function DataTablePagination<TData extends RowData = RowData>({
             onClick={() => handlePageChange(pageIndex + 1)}
             disabled={!canNextPage || isLoading}
             aria-label="Halaman berikutnya"
-            className="h-8 w-8 p-0"
+            className="h-7 w-7 p-0"
           >
             <ChevronRight className="h-4 w-4" />
           </Button>

@@ -66,6 +66,37 @@ export interface DataTableFilterConfig {
   };
 }
 
+export interface DataTableLabels {
+  // Pagination
+  paginationShowing?: (from: number, to: number, total: number) => string;
+  paginationPerPage?: string;
+  paginationNext?: string;
+  paginationPrev?: string;
+  paginationFilterToggle?: string;
+  paginationListToggle?: string;
+
+  // Toolbar
+  toolbarRefresh?: string;
+  toolbarFilter?: string;
+  toolbarColumns?: string;
+  toolbarExport?: string;
+
+  // Active Filters
+  activeFilterActive?: string;
+  activeFilterClear?: string;
+
+  // Column Panel
+  columnPanelHideAll?: string;
+  columnPanelShowAll?: string;
+
+  // Body / Errors
+  errorLoadData?: string;
+  errorTryAgain?: string;
+  errorTitle?: string;
+  noResultTitle?: string;
+  noResultDesc?: string;
+}
+
 export interface DataTableProps<TData extends RowData = RowData> {
   // Core
   data: TData[];
@@ -116,6 +147,7 @@ export interface DataTableProps<TData extends RowData = RowData> {
   emptyTitle?: string;
   emptyDescription?: string;
   emptyIcon?: React.ElementType;
+  labels?: DataTableLabels;
 
   // Customization
   className?: string;

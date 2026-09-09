@@ -7,9 +7,6 @@ import type { DataTableProps } from './types';
 import { useDataTable } from './useDataTable';
 import { DataTableHeader } from './DataTableHeader';
 import { DataTableBody } from './DataTableBody';
-import { DataTableFilterPanel } from './DataTableFilterPanel';
-import { DataTableColumnPanel } from './DataTableColumnPanel';
-import { DataTableExportPanel } from './DataTableExportPanel';
 import { DataTableToolbar } from './DataTableToolbar';
 import { DataTablePagination } from './DataTablePagination';
 import { DataTableActiveFilters } from './DataTableActiveFilters';
@@ -47,12 +44,14 @@ export function DataTable<TData extends RowData = RowData>(
     exportable = false,
     pagination = false,
     onRefresh,
+
+    // i18n
+    labels,
   } = props;
 
   // Internal panel state (uncontrolled)
   const [internalFilterOpen, setInternalFilterOpen] = useState(false);
   const [isColumnOpen, setIsColumnOpen] = useState(false);
-  const [isExportOpen, setIsExportOpen] = useState(false);
 
   // Use controlled state if provided, otherwise internal
   const isFilterOpen = controlledFilterOpen !== undefined ? controlledFilterOpen : internalFilterOpen;
@@ -63,7 +62,6 @@ export function DataTable<TData extends RowData = RowData>(
     handleFilterOpenChange(open);
     if (open) {
       setIsColumnOpen(false);
-      setIsExportOpen(false);
     }
   };
 
@@ -71,15 +69,6 @@ export function DataTable<TData extends RowData = RowData>(
     setIsColumnOpen(open);
     if (open) {
       handleFilterOpenChange(false);
-      setIsExportOpen(false);
-    }
-  };
-
-  const handleExportOpen = (open: boolean) => {
-    setIsExportOpen(open);
-    if (open) {
-      handleFilterOpenChange(false);
-      setIsColumnOpen(false);
     }
   };
 
@@ -93,15 +82,13 @@ export function DataTable<TData extends RowData = RowData>(
   if (isLoading) fetchState = 'loading';
   if (isError) fetchState = 'error';
 
-  const hasRightPanel = isExportOpen && exportable;
-
   return (
     <div className={cn('w-full flex flex-col gap-0 h-full', className)}>
-      {/* Card wrapper - white background with border */}
-      <div className="flex flex-col flex-1 min-h-0 bg-white dark:bg-background border border-border rounded-lg shadow-sm overflow-hidden">
+      {/* Card wrapper - white background */}
+      <div className="flex flex-col flex-1 min-h-0 bg-white dark:bg-background overflow-hidden">
 
         {/* Toolbar - inside card, with bottom border separator */}
-        <div className="px-4 py-3 border-b border-border shrink-0">
+        <div className="px-4 py-3.5 border-b border-border shrink-0">
           <DataTableToolbar
             table={table}
             showSearch={searchable}
@@ -115,22 +102,16 @@ export function DataTable<TData extends RowData = RowData>(
             onFilterOpenChange={handleFilterOpen}
             isColumnOpen={isColumnOpen}
             onColumnOpenChange={handleColumnOpen}
-            isExportOpen={isExportOpen}
-            onExportOpenChange={handleExportOpen}
             activeFilterCount={activeFilterCount}
             filterConfig={filterConfig}
             exportConfig={{ filename: exportFilename, enabled: exportable }}
             onRefresh={onRefresh}
             customActions={toolbarActions}
+            labels={labels}
           />
         </div>
 
-        {/* Active Filters - inside card */}
-        {filterConfig && activeFilterCount > 0 && (
-          <div className="px-4 py-2 border-b border-border/50 shrink-0">
-            <DataTableActiveFilters config={filterConfig} />
-          </div>
-        )}
+        {/* Active Filters removed from here, moved to footer */}
 
         {/* Table + Side Panels */}
         <div className={cn('flex flex-1 items-start min-h-0 overflow-hidden')}>
@@ -147,40 +128,38 @@ export function DataTable<TData extends RowData = RowData>(
                 emptyTitle={emptyTitle}
                 emptyDescription={emptyDescription}
                 emptyIcon={emptyIcon}
-                noResultTitle="Data tidak ditemukan"
-                noResultDescription="Pencarian atau filter tidak menghasilkan data."
+                labels={labels}
               />
             </table>
           </div>
-
-          {/* Right side panels - Export only */}
-          {hasRightPanel && (
-            <div className="flex gap-0 items-stretch shrink-0 h-full border-l border-border">
-              {isExportOpen && exportable && (
-                <DataTableExportPanel
-                  table={table}
-                  exportConfig={{ filename: exportFilename, enabled: exportable }}
-                  isOpen={isExportOpen}
-                  onClose={() => handleExportOpen(false)}
-                  className="border-0 rounded-none h-full"
-                />
-              )}
-            </div>
-          )}
         </div>
 
-        {/* Pagination - inside card with top border */}
-        {pagination && (
-          <div className="px-4 py-2 border-t border-border shrink-0 bg-white dark:bg-background">
-            <DataTablePagination
-              table={table}
-              pageIndex={props.pageIndex}
-              pageSize={props.pageSize}
-              totalCount={props.totalCount}
-              onPageChange={props.onPageChange}
-              onPageSizeChange={props.onPageSizeChange}
-              pageSizeOptions={props.pageSizeOptions}
-            />
+        {/* Footer: Pagination & Active Filters */}
+        {(pagination || (filterConfig && activeFilterCount > 0)) && (
+          <div className="px-3 py-1.5 border-t border-border shrink-0 bg-white dark:bg-background">
+            {pagination ? (
+              <DataTablePagination
+                table={table}
+                pageIndex={props.pageIndex}
+                pageSize={props.pageSize}
+                totalCount={props.totalCount}
+                onPageChange={props.onPageChange}
+                onPageSizeChange={props.onPageSizeChange}
+                pageSizeOptions={props.pageSizeOptions}
+                labels={labels}
+                leftContent={
+                  filterConfig && activeFilterCount > 0 ? (
+                    <DataTableActiveFilters config={filterConfig} labels={labels} className="pt-0 pb-0" />
+                  ) : undefined
+                }
+              />
+            ) : (
+              filterConfig && activeFilterCount > 0 && (
+                <div className="flex items-center">
+                  <DataTableActiveFilters config={filterConfig} labels={labels} className="pt-0 pb-0" />
+                </div>
+              )
+            )}
           </div>
         )}
       </div>

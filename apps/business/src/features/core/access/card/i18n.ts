@@ -4,7 +4,7 @@ export const cardDictionaries = {
   id: {
     searchPlaceholder: 'Cari card...',
     filter: {
-      title: 'Filter Card',
+      title: 'Filter',
       clearAll: 'Reset',
       allStatus: 'Semua Status',
       allType: 'Semua Jenis',
@@ -81,7 +81,7 @@ export const cardDictionaries = {
   en: {
     searchPlaceholder: 'Search card...',
     filter: {
-      title: 'Filter Card',
+      title: 'Filter',
       clearAll: 'Reset',
       allStatus: 'All Status',
       allType: 'All Types',

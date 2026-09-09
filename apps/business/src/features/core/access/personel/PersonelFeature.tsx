@@ -38,9 +38,8 @@ export function PersonelFeature() {
         label: tP.filterStatus,
         type: 'pills-single' as const,
         options: [
-          { value: 'all', label: tP.tabs.all },
-          { value: 'active', label: tP.status.active },
-          { value: 'inactive', label: tP.status.inactive },
+          { value: 'ACTIVE', label: tP.status.active },
+          { value: 'INACTIVE', label: tP.status.inactive },
         ]
       },
       {
@@ -48,7 +47,6 @@ export function PersonelFeature() {
         label: tP.filterType,
         type: 'pills-single' as const,
         options: [
-          { value: 'all', label: tP.tabs.all },
           { value: 'CHECKER', label: tP.types.CHECKER },
           { value: 'MECHANIC', label: tP.types.MECHANIC },
           { value: 'STAFF', label: tP.types.STAFF },
@@ -60,7 +58,7 @@ export function PersonelFeature() {
     state: filterState,
     onStateChange: setFilterState,
     onClearAll: () => setFilterState({ status: 'all', type: 'all' }),
-    labels: { clearAll: tP.clearFilters }
+    labels: { title: 'Filter', clearAll: tP.clearFilters }
   }), [tP, filterState]);
 
   // --- Filtered Data -----------------------------------------------------------
@@ -96,10 +94,13 @@ export function PersonelFeature() {
   // --- Configs -----------------------------------------------------------------
   const tableLabels = React.useMemo(() => ({
     colPersonel: tP.table.colPersonel,
-    colContact: tP.table.colContact,
-    colIdentity: tP.table.colIdentity,
-    colStatus: tP.table.colStatus,
-    colType: tP.table.colType,
+    colType: tP.labels.type,
+    colNik: tP.labels.nik,
+    colStatus: tP.labels.status,
+    colPhone: tP.labels.phone,
+    colEmail: tP.labels.email,
+    colAddress: tP.labels.address,
+    colNotes: tP.labels.notes,
     colActions: tP.table.colActions,
     statusActive: tP.status.active,
     statusInactive: tP.status.inactive,
@@ -113,10 +114,27 @@ export function PersonelFeature() {
     actionDetail: tP.actions.detail,
     actionEdit: tP.actions.edit,
     actionDelete: tP.actions.delete,
-    phone: tP.labels.phone,
-    nik: tP.labels.nik,
-    noCard: tP.labels.noCard,
   }), [tP]);
+
+  const dtLabels = React.useMemo(() => {
+    const isEn = locale === 'en';
+    return {
+      paginationShowing: (from: number, to: number, total: number) => isEn ? `Showing ${from}-${to} of ${total.toLocaleString('en-US')} items` : `Menampilkan ${from}-${to} dari ${total.toLocaleString('id-ID')} data`,
+      paginationPerPage: isEn ? '/ page' : '/ halaman',
+      toolbarRefresh: isEn ? 'Refresh' : 'Refresh',
+      toolbarFilter: isEn ? 'Filter' : 'Filter',
+      toolbarColumns: isEn ? 'Columns' : 'Kolom',
+      toolbarExport: isEn ? 'Export' : 'Ekspor',
+      activeFilterClear: isEn ? 'Clear Filters' : 'Reset Filter',
+      columnPanelHideAll: isEn ? 'Hide all' : 'Sembunyikan semua',
+      columnPanelShowAll: isEn ? 'Show all' : 'Tampilkan semua',
+      errorLoadData: isEn ? 'Failed to load data.' : 'Gagal memuat data.',
+      errorTryAgain: isEn ? 'Try Again' : 'Coba Lagi',
+      errorTitle: isEn ? 'An error occurred' : 'Terjadi Kesalahan',
+      noResultTitle: isEn ? 'No results found' : 'Hasil Tidak Ditemukan',
+      noResultDesc: isEn ? 'No data matches your search or filters.' : 'Tidak ada data yang sesuai dengan pencarian atau filter Anda.',
+    };
+  }, [locale]);
 
   const drawerLabels = React.useMemo(() => ({
     title: tP.drawer.title,
@@ -139,9 +157,8 @@ export function PersonelFeature() {
   }), [tP]);
 
   return (
-    <div className="flex flex-col h-full w-full bg-background p-4 md:p-6 items-center overflow-hidden">
-      
-      <div className="w-full h-full min-h-0 relative">
+    <div className="flex flex-col h-full w-full">
+      <div className="flex-1 min-h-0 overflow-y-auto p-0">
         <PersonelTable
           data={filteredPersonel}
           labels={tableLabels}
@@ -154,6 +171,7 @@ export function PersonelFeature() {
           filterConfig={filterConfig}
           isFilterOpen={isFilterOpen}
           onFilterOpenChange={setIsFilterOpen}
+          dtLabels={dtLabels}
         />
       </div>
 

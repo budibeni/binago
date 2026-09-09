@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { MoreVertical, Eye, Edit2, MapPin, Trash2 } from 'lucide-react';
+import { MoreVertical, Eye, Edit2, MapPin, Trash2, Plus } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import {
   Badge, Button,
@@ -9,7 +9,7 @@ import {
   DropdownMenuItem, DropdownMenuSeparator,
   DataTable,
 } from '@adatrack/ui';
-import type { DataTableColumnDef, DataTableFilterConfig } from '@adatrack/ui';
+import type { DataTableColumnDef, DataTableFilterConfig, DataTableLabels } from '@adatrack/ui';
 import type { Vehicle } from '../types/vehicle';
 
 interface VehicleTableLabels {
@@ -17,16 +17,17 @@ interface VehicleTableLabels {
   colVehicle: string;
   colGroup: string;
   colDriver: string;
-  colStatus: string;
-  colOdometer: string;
-  colLastUpdate: string;
   colCategory: string;
   colBrand: string;
   colYear: string;
   colFuel: string;
   colDeviceImei: string;
-  colNextService: string;
   colRegExpiry: string;
+  colColor?: string;
+  colDeviceSim?: string;
+  colFuelCapacity?: string;
+  colKirExpiry?: string;
+  colNotes?: string;
   colActions: string;
   noDriver: string;
   noDevice: string;
@@ -44,6 +45,7 @@ interface VehicleTableLabels {
   actionEdit: string;
   actionTrack: string;
   actionDelete: string;
+  actionAdd?: string;
 }
 
 interface VehicleTableProps {
@@ -60,6 +62,7 @@ interface VehicleTableProps {
   onFilterOpenChange: (open: boolean) => void;
   onAdd?: () => void;
   className?: string;
+  dtLabels?: DataTableLabels;
 }
 
 function getStatusBadge(status: Vehicle['status'], labels: VehicleTableLabels) {
@@ -86,6 +89,7 @@ function buildColumns(
       header: '',
       enableSorting: false,
       size: 40,
+      meta: { fixedWidth: true },
       cell: ({ row }) => (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -153,7 +157,9 @@ function buildColumns(
       header: labels.colGroup,
       enableSorting: true,
       size: 160,
-      cell: ({ row }) => <Badge variant="info">{row.original.groupName}</Badge>,
+      cell: ({ row }) => (
+        <span className="text-[13px] text-info">{row.original.groupName}</span>
+      ),
     },
     {
       id: 'driverName',
@@ -167,42 +173,6 @@ function buildColumns(
           row.original.driverName ? 'text-foreground' : 'text-foreground-muted italic',
         )}>
           {row.original.driverName ?? labels.noDriver}
-        </span>
-      ),
-    },
-    {
-      id: 'status',
-      accessorKey: 'status',
-      header: labels.colStatus,
-      enableSorting: true,
-      size: 120,
-      cell: ({ row }) => getStatusBadge(row.original.status, labels),
-    },
-    {
-      id: 'odometer',
-      accessorKey: 'odometer',
-      header: labels.colOdometer,
-      enableSorting: true,
-      size: 130,
-      cell: ({ row }) => (
-        <span className="text-[13px] tabular-nums text-foreground-muted">
-          {row.original.odometer.toLocaleString('id-ID')} km
-        </span>
-      ),
-    },
-    {
-      id: 'lastUpdate',
-      accessorKey: 'lastUpdate',
-      header: labels.colLastUpdate,
-      enableSorting: true,
-      size: 160,
-      sortFn: 'alphanumeric' as any,
-      cell: ({ row }) => (
-        <span suppressHydrationWarning className="text-[12px] text-foreground-muted tabular-nums">
-          {new Date(row.original.lastUpdate).toLocaleString('id-ID', {
-            day: '2-digit', month: 'short', year: 'numeric',
-            hour: '2-digit', minute: '2-digit',
-          })}
         </span>
       ),
     },
@@ -241,6 +211,16 @@ function buildColumns(
       ),
     },
     {
+      id: 'color',
+      accessorKey: 'color',
+      header: labels.colColor || 'Warna',
+      enableSorting: true,
+      size: 110,
+      cell: ({ row }) => (
+        <span className="text-[13px] text-foreground-muted">{row.original.color || '-'}</span>
+      ),
+    },
+    {
       id: 'fuelType',
       accessorKey: 'fuelType',
       header: labels.colFuel,
@@ -252,6 +232,18 @@ function buildColumns(
         };
         return <span className="text-[13px] text-foreground-muted">{fuelMap[row.original.fuelType]}</span>;
       },
+    },
+    {
+      id: 'fuelCapacity',
+      accessorKey: 'fuelCapacity',
+      header: labels.colFuelCapacity || 'Kap. BBM',
+      enableSorting: true,
+      size: 110,
+      cell: ({ row }) => (
+        <span className="text-[13px] tabular-nums text-foreground-muted">
+          {row.original.fuelCapacity ? `${row.original.fuelCapacity} L` : '-'}
+        </span>
+      ),
     },
     {
       id: 'deviceImei',
@@ -269,15 +261,13 @@ function buildColumns(
       ),
     },
     {
-      id: 'nextServiceKm',
-      accessorKey: 'nextServiceKm',
-      header: labels.colNextService,
-      enableSorting: true,
-      size: 150,
+      id: 'deviceSimNumber',
+      accessorKey: 'deviceSimNumber',
+      header: labels.colDeviceSim || 'Nomor SIM',
+      enableSorting: false,
+      size: 140,
       cell: ({ row }) => (
-        <span className="text-[13px] tabular-nums text-foreground-muted">
-          {row.original.nextServiceKm.toLocaleString('id-ID')} km
-        </span>
+        <span className="text-[13px] text-foreground-muted font-mono">{row.original.deviceSimNumber || '-'}</span>
       ),
     },
     {
@@ -302,17 +292,48 @@ function buildColumns(
         );
       },
     },
+    {
+      id: 'kirExpiry',
+      accessorKey: 'kirExpiry',
+      header: labels.colKirExpiry || 'Masa Berlaku KIR',
+      enableSorting: true,
+      size: 160,
+      sortFn: 'datetime' as any,
+      cell: ({ row }) => {
+        if (!row.original.kirExpiry) return <span className="text-[13px] text-foreground-muted">-</span>;
+        const diff = (new Date(row.original.kirExpiry).getTime() - Date.now()) / (1000 * 60 * 60 * 24);
+        const isExpiring = diff < 60;
+        return (
+          <span suppressHydrationWarning className={cn(
+            'text-[13px]',
+            isExpiring ? 'text-warning-600 dark:text-warning-400 font-semibold' : 'text-foreground-muted',
+          )}>
+            {new Date(row.original.kirExpiry).toLocaleDateString('id-ID', {
+              day: '2-digit', month: 'short', year: 'numeric',
+            })}
+          </span>
+        );
+      },
+    },
+    {
+      id: 'notes',
+      accessorKey: 'notes',
+      header: labels.colNotes || 'Catatan',
+      enableSorting: false,
+      size: 200,
+      cell: ({ row }) => (
+        <span className="text-[13px] text-foreground-muted block truncate max-w-[180px]" title={row.original.notes}>
+          {row.original.notes || '-'}
+        </span>
+      ),
+    },
   ];
 }
 
 const DEFAULT_COLUMN_VISIBILITY = {
-  vehicleCategory: false,
-  brand: false,
-  year: false,
-  fuelType: false,
+  notes: false,
+  deviceSimNumber: false,
   deviceImei: false,
-  nextServiceKm: false,
-  registrationExpiry: false,
 };
 
 export function VehicleTable({
@@ -329,6 +350,7 @@ export function VehicleTable({
   onFilterOpenChange,
   onAdd,
   className,
+  dtLabels,
 }: VehicleTableProps) {
   const columns = React.useMemo(
     () => buildColumns(labels, onViewDetail, onEdit, onTrack, onDelete),
@@ -363,11 +385,13 @@ export function VehicleTable({
       emptyDescription={labels.emptyDescription}
       toolbarActions={
         onAdd ? (
-          <Button variant="destructive" onClick={onAdd} className="h-9">
-            <span className="hidden sm:inline-block">Tambah Armada</span>
+          <Button variant="destructive" onClick={onAdd} className="h-8 gap-1.5 text-[13px] font-medium shadow-none">
+            <Plus className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline-block">Tambah</span>
           </Button>
         ) : undefined
       }
+      labels={dtLabels}
     />
   );
 }

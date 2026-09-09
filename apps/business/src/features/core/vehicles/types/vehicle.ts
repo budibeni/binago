@@ -50,7 +50,7 @@ export interface Vehicle {
 
 // --- Status Filter -----------------------------------------------------------
 
-export type VehicleStatusFilter = 'all' | VehicleStatus;
+export type VehicleStatusFilter = VehicleStatus[];
 
 // --- Table Filters -----------------------------------------------------------
 

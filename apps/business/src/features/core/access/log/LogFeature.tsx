@@ -19,9 +19,9 @@ export default function LogFeature() {
   const [searchValue, setSearchValue] = React.useState('');
   const [isFilterOpen, setIsFilterOpen] = React.useState(false);
   const [filterState, setFilterState] = React.useState<Record<string, string | string[]>>({
-    activity: 'ALL',
-    status: 'ALL',
-    holder: 'ALL',
+    activity: '',
+    status: '',
+    holder: '',
   });
 
   // ─── Load Data ───────────────────────────────────────────────────────────────
@@ -29,11 +29,11 @@ export default function LogFeature() {
     logService
       .getLogs({
         page: 1,
-        limit: 1000, // load all, client-side filtering in table
+        limit: 1000,
         search: searchValue,
-        activityType: filterState.activity as CardActivityType | 'ALL',
-        status: filterState.status as CardLogStatus | 'ALL',
-        holderType: filterState.holder as HolderType | 'ALL',
+        activityType: (filterState.activity || 'ALL') as CardActivityType | 'ALL',
+        status: (filterState.status || 'ALL') as CardLogStatus | 'ALL',
+        holderType: (filterState.holder || 'ALL') as HolderType | 'ALL',
       })
       .then((r) => setAllData(r.items))
       .catch(console.error);
@@ -43,7 +43,7 @@ export default function LogFeature() {
   const filterConfig: DataTableFilterConfig = React.useMemo(() => ({
     state: filterState,
     onStateChange: setFilterState,
-    onClearAll: () => setFilterState({ activity: 'ALL', status: 'ALL', holder: 'ALL' }),
+    onClearAll: () => setFilterState({ activity: '', status: '', holder: '' }),
     labels: { title: 'Filter', clearAll: 'Reset' },
     fields: [
       {
@@ -51,7 +51,6 @@ export default function LogFeature() {
         label: t.columns.activity,
         type: 'pills-single' as const,
         options: [
-          { value: 'ALL', label: t.activity.all },
           { value: 'ATTENDANCE', label: t.activity.attendance },
           { value: 'CHECKER', label: t.activity.checker },
           { value: 'ENGINE_AUTH', label: t.activity.engineAuth },
@@ -62,7 +61,6 @@ export default function LogFeature() {
         label: t.columns.status,
         type: 'pills-single' as const,
         options: [
-          { value: 'ALL', label: t.status.all },
           { value: 'SUCCESS', label: t.status.success },
           { value: 'FAILED', label: t.status.failed },
         ],
@@ -72,7 +70,6 @@ export default function LogFeature() {
         label: t.columns.holder,
         type: 'pills-single' as const,
         options: [
-          { value: 'ALL', label: t.holder.all },
           { value: 'DRIVER', label: t.holder.driver },
           { value: 'PERSONEL', label: t.holder.personel },
         ],
@@ -81,16 +78,31 @@ export default function LogFeature() {
   }), [filterState, t]);
 
   return (
-    <div className="flex flex-col h-full w-full bg-background p-4 md:p-6 overflow-hidden">
-      <LogTable
-        data={allData}
-        searchValue={searchValue}
-        onSearchChange={setSearchValue}
-        filterConfig={filterConfig}
-        isFilterOpen={isFilterOpen}
-        onFilterOpenChange={setIsFilterOpen}
-        t={t}
-      />
+    <div className="flex flex-col h-full w-full">
+      <div className="flex-1 min-h-0 overflow-y-auto p-0">
+        <LogTable
+          data={allData}
+          searchValue={searchValue}
+          onSearchChange={setSearchValue}
+          filterConfig={filterConfig}
+          isFilterOpen={isFilterOpen}
+          onFilterOpenChange={setIsFilterOpen}
+          t={t}
+          exportFilename="log-card-adatrack"
+          dtLabels={{
+            paginationShowing: (from: number, to: number, total: number) => locale === 'en' ? `Showing ${from}-${to} of ${total.toLocaleString('en-US')} items` : `Menampilkan ${from}-${to} dari ${total.toLocaleString('id-ID')} data`,
+            paginationPerPage: locale === 'en' ? '/ page' : '/ halaman',
+            toolbarFilter: 'Filter',
+            toolbarColumns: locale === 'en' ? 'Columns' : 'Kolom',
+            toolbarExport: locale === 'en' ? 'Export' : 'Ekspor',
+            activeFilterClear: locale === 'en' ? 'Clear Filters' : 'Reset Filter',
+            columnPanelHideAll: locale === 'en' ? 'Hide all' : 'Sembunyikan semua',
+            columnPanelShowAll: locale === 'en' ? 'Show all' : 'Tampilkan semua',
+            noResultTitle: locale === 'en' ? 'No results found' : 'Hasil Tidak Ditemukan',
+            noResultDesc: locale === 'en' ? 'No data matches your search or filters.' : 'Tidak ada data yang sesuai.',
+          }}
+        />
+      </div>
     </div>
   );
 }
