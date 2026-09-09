@@ -34,13 +34,13 @@ export function CustomersFeature() {
 
   const [search, setSearch] = React.useState('');
   const [filterState, setFilterState] = React.useState<Record<string, string | string[]>>({
-    status: 'all',
-    type: 'all',
+    status: '',
+    type: '',
   });
   const [isFilterOpen, setIsFilterOpen] = React.useState(false);
-  
-  const statusFilter = filterState.status as CustomerStatusFilter;
-  const typeFilter = filterState.type as CustomerTypeFilter;
+
+  const statusFilter = (filterState.status || 'all') as CustomerStatusFilter;
+  const typeFilter = (filterState.type || 'all') as CustomerTypeFilter;
 
   // Modals state
   const [detailCustomer, setDetailCustomer] = React.useState<Customer | null>(null);
@@ -99,8 +99,8 @@ export function CustomersFeature() {
     colType: tC.colType,
     colContact: tC.colContact,
     colPic: tC.colPic,
-    colActiveVehicles: tC.colActiveVehicles,
-    colActiveContracts: tC.colActiveContracts,
+    colAddress: 'Alamat',
+    colCity: 'Kota',
     colStatus: tC.colStatus,
     colActions: tC.colActions,
     typeIndividual: tC.typeIndividual,
@@ -121,9 +121,9 @@ export function CustomersFeature() {
   const filterConfig: DataTableFilterConfig = React.useMemo(() => ({
     state: filterState,
     onStateChange: setFilterState,
-    onClearAll: () => setFilterState({ status: 'all', type: 'all' }),
+    onClearAll: () => setFilterState({ status: '', type: '' }),
     labels: {
-      title: 'Filter Pelanggan',
+      title: 'Filter',
       clearAll: tC.clearFilters,
     },
     fields: [
@@ -132,9 +132,8 @@ export function CustomersFeature() {
         label: tC.filterType,
         type: 'pills-single',
         options: [
-          { value: 'all', label: tC.filterAll, count: counts.all, activeClass: 'bg-neutral-700 dark:bg-neutral-600 border-neutral-700 dark:border-neutral-500 text-white' },
-          { value: 'COMPANY', label: tC.typeCompany, count: counts.company, colorClass: 'bg-info', activeClass: 'bg-info/15 border-info/40 text-info dark:text-info' },
-          { value: 'INDIVIDUAL', label: tC.typeIndividual, count: counts.individual, colorClass: 'bg-secondary', activeClass: 'bg-secondary/15 border-secondary/40 text-secondary-foreground dark:text-secondary' },
+          { value: 'COMPANY', label: tC.typeCompany, colorClass: 'bg-info', activeClass: 'bg-info/15 border-info/40 text-info dark:text-info' },
+          { value: 'INDIVIDUAL', label: tC.typeIndividual, colorClass: 'bg-secondary', activeClass: 'bg-secondary/15 border-secondary/40 text-secondary-foreground dark:text-secondary' },
         ],
       },
       {
@@ -142,69 +141,48 @@ export function CustomersFeature() {
         label: tC.filterStatus,
         type: 'pills-single',
         options: [
-          { value: 'all', label: tC.filterAll, count: counts.all, activeClass: 'bg-neutral-700 dark:bg-neutral-600 border-neutral-700 dark:border-neutral-500 text-white' },
-          { value: 'ACTIVE', label: tC.statusActive, count: counts.active, colorClass: 'bg-success', activeClass: 'bg-success/15 border-success/40 text-success' },
-          { value: 'INACTIVE', label: tC.statusInactive, count: counts.inactive, colorClass: 'bg-neutral-400', activeClass: 'bg-neutral-100 dark:bg-neutral-800 border-neutral-400 text-foreground' },
+          { value: 'ACTIVE', label: tC.statusActive, colorClass: 'bg-success', activeClass: 'bg-success/15 border-success/40 text-success' },
+          { value: 'INACTIVE', label: tC.statusInactive, colorClass: 'bg-neutral-400', activeClass: 'bg-neutral-100 dark:bg-neutral-800 border-neutral-400 text-foreground' },
         ],
       },
     ],
-  }), [filterState, tC, counts]);
+  }), [filterState, tC]);
+
+  const dtLabels = React.useMemo(() => {
+    const isEn = locale === 'en';
+    return {
+      paginationShowing: (from: number, to: number, total: number) => isEn
+        ? `Showing ${from}-${to} of ${total.toLocaleString('en-US')} items`
+        : `Menampilkan ${from}-${to} dari ${total.toLocaleString('id-ID')} data`,
+      paginationPerPage: isEn ? '/ page' : '/ halaman',
+      toolbarFilter: 'Filter',
+      toolbarColumns: isEn ? 'Columns' : 'Kolom',
+      toolbarExport: isEn ? 'Export' : 'Ekspor',
+      activeFilterClear: isEn ? 'Clear Filters' : 'Reset Filter',
+      columnPanelHideAll: isEn ? 'Hide all' : 'Sembunyikan semua',
+      columnPanelShowAll: isEn ? 'Show all' : 'Tampilkan semua',
+      noResultTitle: isEn ? 'No results found' : 'Hasil Tidak Ditemukan',
+      noResultDesc: isEn ? 'No data matches your search or filters.' : 'Tidak ada data yang sesuai.',
+    };
+  }, [locale]);
 
   return (
-    <div className="flex flex-col h-full w-full bg-background p-4 md:p-6 items-center overflow-hidden relative">
-      <div className="w-full h-full flex flex-col min-h-0 space-y-4 pb-4">
-        {/* Summary Cards */}
-        <div className="grid grid-cols-3 gap-3">
-          <button onClick={() => setFilterState(prev => ({ ...prev, type: 'all' }))} className={cn("p-3 flex gap-2.5 items-center text-left bg-card rounded-lg border transition-all hover:shadow-md", typeFilter === 'all' ? "border-b-4 border-b-danger border-x-border border-t-border" : "border-border shadow-sm")}>
-            <div className="w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-600 dark:text-neutral-400 shrink-0">
-               <List className="w-4 h-4" />
-            </div>
-            <div className="min-w-0">
-               <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider truncate">Semua Pelanggan</p>
-               <p className="text-lg font-bold leading-none my-0.5">{counts.all}</p>
-               <p className="text-[9px] text-muted-foreground truncate">Total Pelanggan</p>
-            </div>
-          </button>
-          
-          <button onClick={() => setFilterState(prev => ({ ...prev, type: 'COMPANY' }))} className={cn("p-3 flex gap-2.5 items-center text-left bg-card rounded-lg border transition-all hover:shadow-md", typeFilter === 'COMPANY' ? "border-b-4 border-b-info border-x-border border-t-border" : "border-border shadow-sm")}>
-            <div className="w-8 h-8 rounded-full bg-info/10 flex items-center justify-center text-info shrink-0">
-               <Building className="w-4 h-4" />
-            </div>
-            <div className="min-w-0">
-               <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider truncate">{tC.typeCompany}</p>
-               <p className="text-lg font-bold leading-none my-0.5">{counts.company}</p>
-               <p className="text-[9px] text-muted-foreground truncate">Perusahaan</p>
-            </div>
-          </button>
-          
-          <button onClick={() => setFilterState(prev => ({ ...prev, type: 'INDIVIDUAL' }))} className={cn("p-3 flex gap-2.5 items-center text-left bg-card rounded-lg border transition-all hover:shadow-md", typeFilter === 'INDIVIDUAL' ? "border-b-4 border-b-secondary-foreground border-x-border border-t-border" : "border-border shadow-sm")}>
-            <div className="w-8 h-8 rounded-full bg-secondary/15 flex items-center justify-center text-secondary-foreground shrink-0">
-               <User className="w-4 h-4" />
-            </div>
-            <div className="min-w-0">
-               <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider truncate">{tC.typeIndividual}</p>
-               <p className="text-lg font-bold leading-none my-0.5">{counts.individual}</p>
-               <p className="text-[9px] text-muted-foreground truncate">Perorangan</p>
-            </div>
-          </button>
-        </div>
-
-        {/* Content */}
-        <div className="flex-1 min-h-0 w-full relative">
-          <CustomerTable
-            data={filteredCustomers}
-            labels={tableLabels}
-            onViewDetail={handleViewDetail}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-            searchValue={search}
-            onSearchChange={setSearch}
-            filterConfig={filterConfig}
-            isFilterOpen={isFilterOpen}
-            onFilterOpenChange={setIsFilterOpen}
-            onAdd={handleCreateNew}
-          />
-        </div>
+    <div className="flex flex-col h-full w-full">
+      <div className="flex-1 min-h-0 overflow-y-auto p-0">
+        <CustomerTable
+          data={filteredCustomers}
+          labels={tableLabels}
+          onViewDetail={handleViewDetail}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          searchValue={search}
+          onSearchChange={setSearch}
+          filterConfig={filterConfig}
+          isFilterOpen={isFilterOpen}
+          onFilterOpenChange={setIsFilterOpen}
+          dtLabels={dtLabels}
+          onAdd={handleCreateNew}
+        />
       </div>
 
       {/* Modals & Drawers */}

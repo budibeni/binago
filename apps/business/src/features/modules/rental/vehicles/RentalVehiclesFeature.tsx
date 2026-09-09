@@ -8,6 +8,7 @@ import { rentalVehicleService } from '@/data/modules/rental/services/vehicleServ
 import { buildRentalVehicleContext } from '@/data/modules/rental/services/vehicleContextBuilder';
 import { trackingNavigationService } from '@/features/core/tracking/services/trackingNavigationService';
 import type { RentalVehicle, RentalStatusFilter } from './types/rentalVehicle';
+import type { DataTableFilterConfig } from '@adatrack/ui';
 import { RentalVehicleTable } from './components/RentalVehicleTable';
 import { RentalVehicleSelectionDialog } from './components/RentalVehicleSelectionDialog';
 import { RentalVehicleDetailDrawer } from './components/RentalVehicleDetailDrawer';
@@ -17,6 +18,16 @@ import { useRouter } from 'next/navigation';
 import { Card, Input, Button, Checkbox } from '@adatrack/ui';
 import { CarFront, Plus, Search, MapPin, List, CheckCircle2, Calendar, User, Wrench, Ban, RotateCcw, ChevronRight } from 'lucide-react';
 import { cn } from '@adatrack/utils';
+
+function StatCard({ label, value, colorClass }: { label: string, value: number, colorClass: string }) {
+  return (
+    <div className="flex flex-col p-2.5 rounded-md border border-border bg-card shadow-sm relative overflow-hidden transition-all hover:shadow-md">
+      <div className={cn("absolute left-0 top-0 bottom-0 w-1", colorClass)} />
+      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider ml-1">{label}</span>
+      <span className="text-lg font-black mt-0.5 ml-1">{value}</span>
+    </div>
+  );
+}
 
 export function RentalVehiclesFeature() {
   const locale = useBusinessLocale();
@@ -31,14 +42,14 @@ export function RentalVehiclesFeature() {
 
   const [vehicles, setVehicles] = React.useState<RentalVehicle[]>([]);
   const [availableCores, setAvailableCores] = React.useState(rentalVehicleService.getAvailableCoreVehicles());
-  
+
   // UI State
   const [selectionDialogOpen, setSelectionDialogOpen] = React.useState(false);
   const [detailOpen, setDetailOpen] = React.useState(false);
   const [disableOpen, setDisableOpen] = React.useState(false);
-  
+
   const [editId, setEditId] = React.useState<string | null>(null);
-  
+
   const [selectedVehicle, setSelectedVehicle] = React.useState<RentalVehicle | null>(null);
 
   const router = useRouter();
@@ -82,9 +93,9 @@ export function RentalVehiclesFeature() {
       } else if (result.duplicate > 0) {
         desc = `Gagal: ${result.duplicate} kendaraan sudah terdaftar.`;
       }
-      
+
       showToast(result.success > 0 ? 'Berhasil' : 'Gagal', desc, result.success > 0 ? 'success' : 'error');
-      
+
       setDataVersion(prev => prev + 1);
       setSelectionDialogOpen(false);
     } catch (e: any) {
@@ -149,80 +160,54 @@ export function RentalVehiclesFeature() {
     }
   };
 
-  return (
-    <div className="flex flex-col h-full w-full bg-background p-4 md:p-6 items-center overflow-hidden relative">
-      <div className="w-full h-full flex flex-col min-h-0 space-y-4 pb-16">
+  // Filter config
+  const filterConfig: DataTableFilterConfig = React.useMemo(() => ({
+    state: { status: statusFilter === 'all' ? '' : statusFilter },
+    onStateChange: (state) => setStatusFilter((state.status as RentalStatusFilter) || 'all'),
+    onClearAll: () => setStatusFilter('all'),
+    labels: {
+      title: 'Filter',
+      clearAll: 'Hapus Filter',
+    },
+    fields: [
+      {
+        id: 'status',
+        label: labels.filterStatus || 'Status',
+        type: 'pills-single',
+        options: [
+          { value: 'READY', label: labels.statusReady || 'Siap', colorClass: 'bg-success', activeClass: 'bg-success/15 border-success/40 text-success' },
+          { value: 'RESERVED', label: labels.statusReserved || 'Dipesan', colorClass: 'bg-warning', activeClass: 'bg-warning/15 border-warning/40 text-warning' },
+          { value: 'RENTED', label: labels.statusRented || 'Disewa', colorClass: 'bg-primary', activeClass: 'bg-primary/15 border-primary/40 text-primary' },
+          { value: 'MAINTENANCE', label: labels.statusMaintenance || 'Perawatan', colorClass: 'bg-purple-500', activeClass: 'bg-purple-500/15 border-purple-500/40 text-purple-500' },
+          { value: 'UNAVAILABLE', label: labels.statusUnavailable || 'Tidak Tersedia', colorClass: 'bg-neutral-400', activeClass: 'bg-neutral-100 dark:bg-neutral-800 border-neutral-400 text-foreground' },
+        ],
+      },
+    ],
+  }), [statusFilter, labels]);
 
-        {/* Summary Cards */}
-        <div className="grid grid-cols-6 gap-3">
-          <button onClick={() => setStatusFilter('all')} className={cn("p-3 flex gap-2.5 items-center text-left bg-card rounded-lg border transition-all hover:shadow-md", statusFilter === 'all' ? "border-b-4 border-b-danger border-x-border border-t-border" : "border-border shadow-sm")}>
-            <div className="w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-600 dark:text-neutral-400 shrink-0">
-               <List className="w-4 h-4" />
+  const [isFilterOpen, setIsFilterOpen] = React.useState(false);
+  const [showStats, setShowStats] = React.useState(true);
+
+  return (
+    <div className="flex flex-col h-full w-full bg-background p-0 items-center overflow-hidden">
+      <div className="w-full flex-1 flex flex-col min-h-0 space-y-0 pb-4">
+
+        {/* Elegant Stats Ribbon */}
+        {showStats && (
+          <div className="w-full px-4 pt-4 md:px-6 md:pt-6 bg-background animate-in slide-in-from-top-2 fade-in duration-200">
+            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
+              <StatCard label="Total Armada" value={stats.all} colorClass="bg-foreground" />
+              <StatCard label={labels.statusReady || 'Siap'} value={stats.ready} colorClass="bg-success" />
+              <StatCard label={labels.statusReserved || 'Dipesan'} value={stats.reserved} colorClass="bg-warning" />
+              <StatCard label={labels.statusRented || 'Disewa'} value={stats.rented} colorClass="bg-primary" />
+              <StatCard label={labels.statusMaintenance || 'Perawatan'} value={stats.maintenance} colorClass="bg-purple-500" />
+              <StatCard label={labels.statusUnavailable || 'Tidak Tersedia'} value={stats.unavailable} colorClass="bg-neutral-500 dark:bg-neutral-400" />
             </div>
-            <div className="min-w-0">
-               <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider truncate">{labels.filterAll}</p>
-               <p className="text-lg font-bold leading-none my-0.5">{stats.all}</p>
-               <p className="text-[9px] text-muted-foreground truncate">Total Armada</p>
-            </div>
-          </button>
-          
-          <button onClick={() => setStatusFilter('READY')} className={cn("p-3 flex gap-2.5 items-center text-left bg-card rounded-lg border transition-all hover:shadow-md", statusFilter === 'READY' ? "border-b-4 border-b-success border-x-border border-t-border" : "border-border shadow-sm")}>
-            <div className="w-8 h-8 rounded-full bg-success/10 flex items-center justify-center text-success shrink-0">
-               <CheckCircle2 className="w-4 h-4" />
-            </div>
-            <div className="min-w-0">
-               <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider truncate">{labels.statusReady}</p>
-               <p className="text-lg font-bold leading-none my-0.5">{stats.ready}</p>
-               <p className="text-[9px] text-muted-foreground truncate">Kendaraan siap</p>
-            </div>
-          </button>
-          
-          <button onClick={() => setStatusFilter('RESERVED')} className={cn("p-3 flex gap-2.5 items-center text-left bg-card rounded-lg border transition-all hover:shadow-md", statusFilter === 'RESERVED' ? "border-b-4 border-b-warning border-x-border border-t-border" : "border-border shadow-sm")}>
-            <div className="w-8 h-8 rounded-full bg-warning/10 flex items-center justify-center text-warning shrink-0">
-               <Calendar className="w-4 h-4" />
-            </div>
-            <div className="min-w-0">
-               <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider truncate">{labels.statusReserved}</p>
-               <p className="text-lg font-bold leading-none my-0.5">{stats.reserved}</p>
-               <p className="text-[9px] text-muted-foreground truncate">Sedang dipesan</p>
-            </div>
-          </button>
-          
-          <button onClick={() => setStatusFilter('RENTED')} className={cn("p-3 flex gap-2.5 items-center text-left bg-card rounded-lg border transition-all hover:shadow-md", statusFilter === 'RENTED' ? "border-b-4 border-b-primary border-x-border border-t-border" : "border-border shadow-sm")}>
-            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
-               <User className="w-4 h-4" />
-            </div>
-            <div className="min-w-0">
-               <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider truncate">{labels.statusRented}</p>
-               <p className="text-lg font-bold leading-none my-0.5">{stats.rented}</p>
-               <p className="text-[9px] text-muted-foreground truncate">Sedang dalam sewa</p>
-            </div>
-          </button>
-          
-          <button onClick={() => setStatusFilter('MAINTENANCE')} className={cn("p-3 flex gap-2.5 items-center text-left bg-card rounded-lg border transition-all hover:shadow-md", statusFilter === 'MAINTENANCE' ? "border-b-4 border-b-purple-500 border-x-border border-t-border" : "border-border shadow-sm")}>
-            <div className="w-8 h-8 rounded-full bg-purple-500/10 flex items-center justify-center text-purple-500 shrink-0">
-               <Wrench className="w-4 h-4" />
-            </div>
-            <div className="min-w-0">
-               <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider truncate">{labels.statusMaintenance}</p>
-               <p className="text-lg font-bold leading-none my-0.5">{stats.maintenance}</p>
-               <p className="text-[9px] text-muted-foreground truncate">Dalam perawatan</p>
-            </div>
-          </button>
-          
-          <button onClick={() => setStatusFilter('UNAVAILABLE')} className={cn("p-3 flex gap-2.5 items-center text-left bg-card rounded-lg border transition-all hover:shadow-md", statusFilter === 'UNAVAILABLE' ? "border-b-4 border-b-neutral-400 border-x-border border-t-border" : "border-border shadow-sm")}>
-            <div className="w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-500 shrink-0">
-               <Ban className="w-4 h-4" />
-            </div>
-            <div className="min-w-0">
-               <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider truncate">{labels.statusUnavailable}</p>
-               <p className="text-lg font-bold leading-none my-0.5">{stats.unavailable}</p>
-               <p className="text-[9px] text-muted-foreground truncate">Tidak tersedia</p>
-            </div>
-          </button>
-        </div>
+          </div>
+        )}
 
         {/* Main Table */}
+
         <div className="flex-1 min-h-0 w-full relative">
           <RentalVehicleTable
             data={vehicles}
@@ -236,35 +221,41 @@ export function RentalVehiclesFeature() {
             searchValue={search}
             onSearchChange={setSearch}
             onAdd={handleAddClick}
+            filterConfig={filterConfig}
+            isFilterOpen={isFilterOpen}
+            onFilterOpenChange={setIsFilterOpen}
+            showStats={showStats}
+            onToggleStats={() => setShowStats(!showStats)}
+            className="border-none shadow-none"
+            dtLabels={{
+              noResultTitle: 'Armada tidak ditemukan',
+              noResultDescription: 'Coba sesuaikan kata kunci atau filter pencarian.',
+              emptyTitle: 'Belum ada armada',
+              emptyDescription: 'Tambahkan armada rental baru',
+              searchPlaceholder: 'Cari armada...',
+            }}
           />
         </div>
       </div>
 
-      {/* Floating Bottom Action Bar */}
-      <div className="absolute bottom-0 left-0 right-0 z-50 bg-card border-t border-border py-3 px-6 flex items-center justify-between shadow-[0_-10px_30px_-10px_rgba(0,0,0,0.1)]">
-        <div className="flex items-center gap-4">
-           <Checkbox 
-              checked={selectedIds.length > 0}
-              onCheckedChange={() => setSelectedIds([])}
-              className="w-4 h-4 data-[state=checked]:bg-danger data-[state=checked]:border-danger"
-           />
-           <div className="flex items-center gap-4 border-l border-border pl-4">
-             <span className="text-sm font-semibold">{selectedIds.length} armada dipilih</span>
-             {selectedIds.length > 0 && (
-               <button onClick={() => setSelectedIds([])} className="text-xs font-semibold text-danger hover:underline">Batal Pilih</button>
-             )}
-           </div>
+      {/* Bottom Action Bar */}
+      <div className="w-full flex-shrink-0 h-10 bg-card border-t border-border pl-4 md:pl-6 flex items-center justify-between shadow-[0_-4px_20px_-5px_rgba(0,0,0,0.05)] relative z-10">
+        <div className="flex items-center gap-3">
+          <Checkbox
+            checked={selectedIds.length > 0}
+            onCheckedChange={() => setSelectedIds([])}
+            className="w-4 h-4 data-[state=checked]:bg-muted-foreground data-[state=checked]:border-muted-foreground"
+          />
+          <span className="text-[13px] font-medium text-muted-foreground">{selectedIds.length} armada terpilih</span>
         </div>
-        <Button 
-           variant="destructive" 
-           size="sm" 
-           onClick={handleOpenTracking} 
-           disabled={selectedIds.length === 0}
-           className="px-5 rounded-md h-9 font-semibold shadow-sm shadow-danger/20 hover:shadow-md hover:shadow-danger/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        <Button
+          variant="destructive"
+          onClick={handleOpenTracking}
+          disabled={selectedIds.length === 0}
+          className="px-8 md:px-12 h-full rounded-none text-[13px] font-medium gap-1.5 shadow-none hover:bg-danger/90 transition-colors"
         >
-           <MapPin className="w-3.5 h-3.5 mr-2" />
-           Buka Lokasi ({selectedIds.length})
-           <ChevronRight className="w-3.5 h-3.5 ml-1" />
+          <MapPin className="w-3.5 h-3.5" />
+          Buka Lokasi
         </Button>
       </div>
 

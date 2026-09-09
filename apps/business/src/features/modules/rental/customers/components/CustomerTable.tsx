@@ -1,10 +1,18 @@
 'use client';
 
 import React from 'react';
-import { FileText, Plus } from 'lucide-react';
-import { Badge, Button, DataTable } from '@adatrack/ui';
-import type { DataTableColumnDef, DataTableFilterConfig } from '@adatrack/ui';
+import { MoreVertical, Plus, Eye, Edit2, Trash2 } from 'lucide-react';
+import { Button, DataTable } from '@adatrack/ui';
+import type { DataTableColumnDef, DataTableFilterConfig, DataTableLabels } from '@adatrack/ui';
 import type { Customer, CompanyCustomer } from '../types/customer';
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from '@adatrack/ui';
+import { cn } from '@adatrack/utils';
 
 interface CustomerTableLabels {
   colCode: string;
@@ -12,16 +20,16 @@ interface CustomerTableLabels {
   colType: string;
   colContact: string;
   colPic: string;
-  colActiveVehicles: string;
-  colActiveContracts: string;
+  colAddress: string;
+  colCity: string;
   colStatus: string;
   colActions: string;
-  
+
   typeIndividual: string;
   typeCompany: string;
   statusActive: string;
   statusInactive: string;
-  
+
   emptyTitle: string;
   emptyDescription: string;
   noResultTitle: string;
@@ -46,15 +54,7 @@ interface CustomerTableProps {
   onFilterOpenChange: (open: boolean) => void;
   onAdd?: () => void;
   className?: string;
-}
-
-function getStatusBadge(status: Customer['status'], labels: CustomerTableLabels) {
-  const isActive = status === 'ACTIVE';
-  return (
-    <Badge variant={isActive ? 'success' : 'default'} dot>
-      {isActive ? labels.statusActive : labels.statusInactive}
-    </Badge>
-  );
+  dtLabels?: DataTableLabels;
 }
 
 function buildColumns(
@@ -65,27 +65,67 @@ function buildColumns(
 ): DataTableColumnDef<Customer>[] {
   return [
     {
+      id: 'actions',
+      header: '',
+      enableSorting: false,
+      size: 40,
+      meta: { fixedWidth: true },
+      cell: ({ row }) => {
+        const c = row.original;
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 w-7 p-0 flex items-center justify-center focus-visible:ring-1 focus-visible:ring-primary focus:outline-none data-[state=open]:bg-neutral-200/50 dark:data-[state=open]:bg-neutral-800"
+                aria-label="Aksi pelanggan"
+              >
+                <MoreVertical className="h-4 w-4 text-foreground-muted" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-48">
+              <DropdownMenuItem onClick={() => onViewDetail(c)}>
+                <Eye className="mr-2 h-4 w-4 text-foreground-muted" />
+                <span>{labels.actionDetail}</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onEdit(c)}>
+                <Edit2 className="mr-2 h-4 w-4 text-foreground-muted" />
+                <span>{labels.actionEdit}</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem destructive onClick={() => onDelete(c)}>
+                <Trash2 className="mr-2 h-4 w-4 text-danger" />
+                <span>{labels.actionDelete}</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      },
+    },
+    {
       id: 'customerName',
       accessorKey: 'name',
       header: labels.colCustomer,
       enableSorting: true,
-      size: 260,
+      size: 240,
       cell: ({ row }) => (
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="w-8 h-8 shrink-0 text-muted-foreground hover:text-foreground"
-            onClick={() => onViewDetail(row.original)}
-            title="Buka Detail"
-          >
-            <FileText className="w-4 h-4" />
-          </Button>
-          <div className="flex flex-col">
-            <span className="text-[13px] font-medium text-foreground">{row.original.name}</span>
-            <span className="text-[12px] text-foreground-muted">{row.original.code}</span>
-          </div>
-        </div>
+        <span
+          onClick={() => onViewDetail(row.original)}
+          className="font-medium text-foreground hover:text-primary hover:underline cursor-pointer transition-colors whitespace-nowrap"
+        >
+          {row.original.name}
+        </span>
+      ),
+    },
+    {
+      id: 'code',
+      accessorKey: 'code',
+      header: labels.colCode,
+      enableSorting: true,
+      size: 120,
+      cell: ({ row }) => (
+        <span className="text-[13px] font-mono text-foreground-muted">{row.original.code}</span>
       ),
     },
     {
@@ -95,21 +135,47 @@ function buildColumns(
       enableSorting: true,
       size: 120,
       cell: ({ row }) => (
-        <Badge variant={row.original.type === 'COMPANY' ? 'info' : 'default'}>
+        <span className={cn('text-[13px]', row.original.type === 'COMPANY' ? 'text-info' : 'text-foreground-muted')}>
           {row.original.type === 'COMPANY' ? labels.typeCompany : labels.typeIndividual}
-        </Badge>
+        </span>
       ),
+    },
+    {
+      id: 'status',
+      accessorKey: 'status',
+      header: labels.colStatus,
+      enableSorting: true,
+      size: 120,
+      cell: ({ row }) => {
+        const isActive = row.original.status === 'ACTIVE';
+        return (
+          <div className="flex items-center gap-1.5">
+            <span className={cn('h-1.5 w-1.5 rounded-full', isActive ? 'bg-success' : 'bg-danger')} />
+            <span className="text-[13px] text-foreground-muted">
+              {isActive ? labels.statusActive : labels.statusInactive}
+            </span>
+          </div>
+        );
+      },
     },
     {
       id: 'contact',
       header: labels.colContact,
+      accessorFn: (row) => row.phone,
       enableSorting: false,
-      size: 180,
+      size: 160,
       cell: ({ row }) => (
-        <div className="flex flex-col text-[13px]">
-          <span className="text-foreground">{row.original.phone}</span>
-          <span className="text-foreground-muted text-[12px]">{row.original.email}</span>
-        </div>
+        <span className="text-[13px] text-foreground">{row.original.phone}</span>
+      ),
+    },
+    {
+      id: 'email',
+      header: 'Email',
+      accessorFn: (row) => row.email,
+      enableSorting: false,
+      size: 200,
+      cell: ({ row }) => (
+        <span className="text-[13px] text-foreground-muted">{row.original.email || '-'}</span>
       ),
     },
     {
@@ -118,44 +184,35 @@ function buildColumns(
       enableSorting: false,
       size: 180,
       cell: ({ row }) => {
-        if (row.original.type === 'INDIVIDUAL') return <span className="text-foreground-muted">-</span>;
+        if (row.original.type === 'INDIVIDUAL') return <span className="text-[13px] text-foreground-muted/50">-</span>;
         const comp = row.original as CompanyCustomer;
-        return (
-          <div className="flex flex-col text-[13px]">
-            <span className="text-foreground">{comp.picName}</span>
-            <span className="text-foreground-muted text-[12px]">{comp.picPhone}</span>
-          </div>
-        );
+        return <span className="text-[13px] text-foreground">{comp.picName || '-'}</span>;
       },
     },
     {
-      id: 'activeVehicles',
-      header: labels.colActiveVehicles,
-      enableSorting: false,
-      size: 130,
-      cell: () => <span className="text-foreground-muted text-[13px] text-center">-</span>,
-    },
-    {
-      id: 'activeContracts',
-      header: labels.colActiveContracts,
-      enableSorting: false,
-      size: 130,
-      cell: () => <span className="text-foreground-muted text-[13px] text-center">-</span>,
-    },
-    {
-      id: 'status',
-      accessorKey: 'status',
-      header: labels.colStatus,
+      id: 'city',
+      header: labels.colCity,
+      accessorFn: (row) => row.city,
       enableSorting: true,
-      size: 120,
-      cell: ({ row }) => getStatusBadge(row.original.status, labels),
+      size: 130,
+      cell: ({ row }) => <span className="text-[13px] text-foreground">{row.original.city || '-'}</span>,
+    },
+    {
+      id: 'address',
+      header: labels.colAddress,
+      accessorFn: (row) => row.address,
+      enableSorting: false,
+      size: 200,
+      cell: ({ row }) => <span className="text-[13px] text-foreground-muted truncate block max-w-full" title={row.original.address}>{row.original.address || '-'}</span>,
     },
   ];
 }
 
 const DEFAULT_COLUMN_VISIBILITY = {
-  activeVehicles: false,
-  activeContracts: false,
+  code: false,
+  email: false,
+  pic: false,
+  address: false,
 };
 
 export function CustomerTable({
@@ -171,6 +228,7 @@ export function CustomerTable({
   onFilterOpenChange,
   onAdd,
   className,
+  dtLabels,
 }: CustomerTableProps) {
   const columns = React.useMemo(
     () => buildColumns(labels, onViewDetail, onEdit, onDelete),
@@ -200,13 +258,14 @@ export function CustomerTable({
       onFilterOpenChange={onFilterOpenChange}
       // Export
       exportFilename={labels.exportFilename}
-      // UI Customizations
+      labels={dtLabels}
+      // UI Slots
       emptyTitle={labels.emptyTitle}
       emptyDescription={labels.emptyDescription}
       toolbarActions={
         onAdd ? (
-          <Button variant="destructive" onClick={onAdd} className="h-9">
-            <Plus className="w-4 h-4 mr-2" />
+          <Button variant="destructive" onClick={onAdd} className="h-8 gap-1.5 text-[13px] font-medium shadow-none">
+            <Plus className="h-3.5 w-3.5" />
             <span className="hidden sm:inline-block">Tambah</span>
           </Button>
         ) : undefined

@@ -1,8 +1,8 @@
 import React from 'react';
-import { CheckCircle2, AlertCircle, Plus, FileText } from 'lucide-react';
+import { CheckCircle2, AlertCircle, Plus, FileText, MoreVertical, Eye, Edit2, MapPin, Trash2, EyeOff } from 'lucide-react';
 import { cn } from '@adatrack/utils';
-import { Button, Checkbox, DataTable } from '@adatrack/ui';
-import type { DataTableColumnDef } from '@adatrack/ui';
+import { Button, Checkbox, DataTable, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@adatrack/ui';
+import type { DataTableColumnDef, DataTableFilterConfig } from '@adatrack/ui';
 import type { RentalVehicle } from '../types/rentalVehicle';
 
 interface RentalVehicleTableProps {
@@ -17,6 +17,13 @@ interface RentalVehicleTableProps {
   searchValue: string;
   onSearchChange: (value: string) => void;
   onAdd: () => void;
+  filterConfig?: DataTableFilterConfig;
+  isFilterOpen?: boolean;
+  onFilterOpenChange?: (open: boolean) => void;
+  showStats?: boolean;
+  onToggleStats?: () => void;
+  className?: string;
+  dtLabels?: any;
 }
 
 const DEFAULT_COLUMN_VISIBILITY = {};
@@ -24,6 +31,8 @@ const DEFAULT_COLUMN_VISIBILITY = {};
 function buildColumns(
   labels: Record<string, string>,
   onView: (v: RentalVehicle) => void,
+  onEdit: (v: RentalVehicle) => void,
+  onDisable: (v: RentalVehicle) => void,
   onComplete: (v: RentalVehicle) => void,
   selectedIds: string[],
   onSelectionChange: (ids: string[]) => void,
@@ -76,39 +85,78 @@ function buildColumns(
       size: 40,
     },
     {
-      id: 'vehicle',
-      accessorKey: 'vehicle',
-      header: labels.colVehicle,
-      enableSorting: true,
-      size: 240,
+      id: 'actions',
+      header: '',
+      enableSorting: false,
+      size: 40,
+      meta: { fixedWidth: true },
       cell: ({ row }) => {
-        const v = row.original.coreVehicle;
+        const v = row.original;
         return (
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-8 h-8 shrink-0 text-muted-foreground hover:text-foreground"
-              onClick={() => onView(row.original)}
-              title="Detail Armada"
-            >
-              <FileText className="w-4 h-4" />
-            </Button>
-            <div className="flex flex-col min-w-0">
-              <span className="font-bold text-[13px] text-foreground truncate">{v.brand} {v.vehicleName}</span>
-              <span className="text-[11px] font-medium text-muted-foreground mt-0.5 truncate">{v.plateNumber}</span>
-            </div>
-          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 w-7 p-0 flex items-center justify-center focus-visible:ring-1 focus-visible:ring-primary focus:outline-none data-[state=open]:bg-neutral-200/50 dark:data-[state=open]:bg-neutral-800"
+              >
+                <MoreVertical className="h-4 w-4 text-foreground-muted" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-48">
+              <DropdownMenuItem onClick={() => onView(v)}>
+                <Eye className="mr-2 h-4 w-4 text-foreground-muted" />
+                <span>Detail</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onEdit(v)}>
+                <Edit2 className="mr-2 h-4 w-4 text-foreground-muted" />
+                <span>Edit</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => {
+                // We use global navigation for single vehicle MapPin
+                window.location.href = `/tracking/live?vehicleId=${v.vehicleId}`;
+              }}>
+                <MapPin className="mr-2 h-4 w-4 text-foreground-muted" />
+                <span>Buka Lokasi</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem destructive onClick={() => onDisable(v)}>
+                <Trash2 className="mr-2 h-4 w-4 text-danger" />
+                <span>Keluarkan</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         );
       },
     },
     {
+      id: 'plateNumber',
+      accessorFn: (v) => v.coreVehicle.plateNumber,
+      header: 'No. Polisi',
+      enableSorting: true,
+      size: 130,
+      cell: ({ row }) => (
+        <span 
+          onClick={() => onView(row.original)}
+          className="font-medium text-foreground hover:text-primary hover:underline cursor-pointer transition-colors whitespace-nowrap"
+        >
+          {row.original.coreVehicle.plateNumber}
+        </span>
+      ),
+    },
+    {
+      id: 'vehicle',
+      accessorFn: (v) => `${v.coreVehicle.brand} ${v.coreVehicle.vehicleName}`,
+      header: labels.colVehicle || 'Kendaraan',
+      enableSorting: true,
+      size: 180,
+    },
+    {
       id: 'year',
-      accessorKey: 'year',
+      accessorFn: (v) => v.coreVehicle.year,
       header: labels.colYear,
       enableSorting: true,
       size: 80,
-      cell: ({ row }) => row.original.coreVehicle.year,
     },
     {
       id: 'status',
@@ -125,73 +173,61 @@ function buildColumns(
         else if (s === 'MAINTENANCE') label = labels.statusMaintenance;
         else if (s === 'UNAVAILABLE') label = labels.statusUnavailable;
 
-        const badgeClass = 
-          s === 'READY' ? 'bg-success/10 text-success border border-success/20' :
-          s === 'RESERVED' ? 'bg-warning/10 text-warning border border-warning/20' :
-          s === 'RENTED' ? 'bg-primary/10 text-primary border border-primary/20' :
-          s === 'MAINTENANCE' ? 'bg-purple-500/10 text-purple-500 border border-purple-500/20' :
-          'bg-neutral-100 text-neutral-500 border border-neutral-200 dark:bg-neutral-800 dark:border-neutral-700';
+        const textClass = 
+          s === 'READY' ? 'text-success' :
+          s === 'RESERVED' ? 'text-warning' :
+          s === 'RENTED' ? 'text-primary' :
+          s === 'MAINTENANCE' ? 'text-purple-500' :
+          'text-neutral-500 dark:text-neutral-400';
 
-        return <div className={cn("px-3 py-1 rounded-full text-[11px] font-semibold w-fit", badgeClass)}>{label}</div>;
+        return (
+          <div className="whitespace-nowrap">
+            <span className={cn("text-[13px] font-medium", textClass)}>{label}</span>
+          </div>
+        );
       },
     },
     {
       id: 'customer',
-      accessorKey: 'customer',
+      accessorFn: (v) => {
+        if (v.status !== 'RENTED' && v.status !== 'RESERVED') return '-';
+        return v.customerName || '-';
+      },
       header: labels.colCustomer,
       enableSorting: true,
       size: 180,
-      cell: ({ row }) => {
-        if (row.original.status !== 'RENTED' && row.original.status !== 'RESERVED') {
-          return <span className="text-muted-foreground">-</span>;
-        }
-        return row.original.customerName || <span className="text-muted-foreground">-</span>;
-      },
     },
     {
       id: 'period',
-      accessorKey: 'period',
+      accessorFn: (v) => {
+        if (v.status !== 'RENTED' && v.status !== 'RESERVED') return '-';
+        return v.rentalPeriod || '-';
+      },
       header: labels.colPeriod,
       enableSorting: true,
       size: 180,
-      cell: ({ row }) => {
-        if (row.original.status !== 'RENTED' && row.original.status !== 'RESERVED') {
-          return <span className="text-muted-foreground">-</span>;
-        }
-        return row.original.rentalPeriod || <span className="text-muted-foreground">-</span>;
-      },
     },
     {
       id: 'rate',
-      accessorKey: 'rate',
+      accessorFn: (v) => {
+        if (v.dailyRate > 0) return `${formatCurrency(v.dailyRate)} / hari`;
+        return '-';
+      },
       header: labels.colRate,
       enableSorting: true,
       size: 140,
-      cell: ({ row }) => {
-        if (row.original.dailyRate > 0) {
-          return (
-            <div className="flex flex-col">
-              <span className="font-bold text-[13px] text-foreground">{formatCurrency(row.original.dailyRate)}</span>
-              <span className="text-[11px] font-medium text-muted-foreground mt-0.5">/ hari</span>
-            </div>
-          );
-        }
-        return <span className="text-muted-foreground">-</span>;
-      },
     },
     {
       id: 'condition',
-      accessorKey: 'condition',
+      accessorFn: (v) => {
+        const c = v.condition;
+        if (c === 'MINOR_DAMAGE') return labels.conditionMinor || 'Rusak Ringan';
+        if (c === 'NEEDS_REPAIR') return labels.conditionRepair || 'Perlu Perbaikan';
+        return labels.conditionGood || 'Baik';
+      },
       header: labels.colCondition,
       enableSorting: true,
       size: 140,
-      cell: ({ row }) => {
-        const c = row.original.condition;
-        let lbl = labels.conditionGood;
-        if (c === 'MINOR_DAMAGE') lbl = labels.conditionMinor;
-        if (c === 'NEEDS_REPAIR') lbl = labels.conditionRepair;
-        return <span className="text-sm">{lbl}</span>;
-      },
     },
     {
       id: 'completeness',
@@ -200,26 +236,21 @@ function buildColumns(
       enableSorting: true,
       size: 160,
       cell: ({ row }) => {
-        if (row.original.isComplete) {
-          return (
-            <div className="flex items-center gap-1.5 text-success">
-              <CheckCircle2 className="w-4 h-4" />
-              <span className="text-[13px] font-semibold">{labels.dataCompleteShort || 'Lengkap'}</span>
-            </div>
-          );
-        }
+        const isComplete = row.original.isComplete;
         return (
-          <div className="flex flex-col items-start gap-0.5">
-            <div className="flex items-center gap-1.5 text-danger">
-              <AlertCircle className="w-4 h-4" />
-              <span className="text-[13px] font-semibold">{labels.dataNotCompleteShort || 'Belum Lengkap'}</span>
-            </div>
-            <button 
-               onClick={() => onComplete(row.original)}
-               className="text-[11px] font-semibold text-danger hover:underline ml-5"
-            >
-              Lengkapi Data Rental
-            </button>
+          <div className="flex items-center gap-2">
+            <span className={cn('h-1.5 w-1.5 shrink-0 rounded-full', isComplete ? 'bg-success' : 'bg-warning')} />
+            <span className="text-[13px] text-foreground-muted">
+              {isComplete ? (labels.dataCompleteShort || 'Lengkap') : (labels.dataNotCompleteShort || 'Belum Lengkap')}
+            </span>
+            {!isComplete && (
+              <button 
+                 onClick={() => onComplete(row.original)}
+                 className="text-[11px] font-semibold text-warning hover:underline"
+              >
+                (Lengkapi)
+              </button>
+            )}
           </div>
         );
       },
@@ -239,10 +270,17 @@ export function RentalVehicleTable({
   searchValue,
   onSearchChange,
   onAdd,
+  filterConfig,
+  isFilterOpen,
+  onFilterOpenChange,
+  showStats,
+  onToggleStats,
+  className,
+  dtLabels,
 }: RentalVehicleTableProps) {
   const columns = React.useMemo(
-    () => buildColumns(labels, onView, onComplete, selectedIds, onSelectionChange, data),
-    [labels, onView, onComplete, selectedIds, onSelectionChange, data],
+    () => buildColumns(labels, onView, onEdit, onDisable, onComplete, selectedIds, onSelectionChange, data),
+    [labels, onView, onEdit, onDisable, onComplete, selectedIds, onSelectionChange, data],
   );
 
   return (
@@ -254,20 +292,37 @@ export function RentalVehicleTable({
       sortable
       pagination
       columnVisibility
+      exportable
       // Initial State
       columnVisibilityState={DEFAULT_COLUMN_VISIBILITY}
       // Search
       searchValue={searchValue}
       onSearchChange={onSearchChange}
-      searchPlaceholder={labels.searchPlaceholder || "Cari nomor polisi, merk, atau model..."}
+      searchPlaceholder={dtLabels?.searchPlaceholder || labels.searchPlaceholder || "Cari armada..."}
       // UI Customizations
-      emptyTitle={labels.emptyTitle}
-      emptyDescription={labels.emptyDescription}
+      className={className}
+      emptyTitle={dtLabels?.emptyTitle || labels.emptyTitle}
+      emptyDescription={dtLabels?.emptyDescription || labels.emptyDescription}
+      filterConfig={filterConfig}
+      isFilterOpen={isFilterOpen}
+      onFilterOpenChange={onFilterOpenChange}
+      exportFilename="Data_Armada_Rental"
+      labels={dtLabels}
       toolbarActions={
-        <Button onClick={onAdd} variant="destructive" className="h-9">
-          <Plus className="w-4 h-4 mr-2" />
-          <span className="hidden sm:inline-block">Tambah</span>
-        </Button>
+        <div className="flex items-center gap-2">
+          {onAdd && (
+            <Button variant="destructive" onClick={onAdd} className="h-8 gap-1.5 text-[13px] font-medium shadow-none">
+              <Plus className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline-block">Tambah</span>
+            </Button>
+          )}
+          {onToggleStats && (
+            <Button variant="outline" onClick={onToggleStats} className="h-8 gap-1.5 text-[13px] font-medium shadow-none">
+              {showStats ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+              <span className="hidden sm:inline-block">Ringkasan</span>
+            </Button>
+          )}
+        </div>
       }
     />
   );
