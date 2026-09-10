@@ -23,6 +23,10 @@ export function HandoversFeature() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   
+  // Filter state
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [filterState, setFilterState] = useState<{ condition: string }>({ condition: '' });
+  
   // Drawer & Dialog state
   const [selectedHandover, setSelectedHandover] = useState<RentalHandover | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
@@ -49,8 +53,37 @@ export function HandoversFeature() {
     }
   };
 
+  const filterConfig = useMemo(() => {
+    return {
+      state: filterState,
+      onStateChange: setFilterState,
+      onClearAll: () => setFilterState({ condition: '' }),
+      labels: {
+        title: 'Filter',
+        clearAll: 'Hapus Semua',
+      },
+      fields: [
+        {
+          id: 'condition',
+          label: 'Kondisi Kendaraan',
+          type: 'pills-single',
+          options: [
+            { value: 'GOOD', label: 'Baik', colorClass: 'bg-success', activeClass: 'bg-success/15 border-success/40 text-success' },
+            { value: 'MINOR_DAMAGE', label: 'Kerusakan Ringan', colorClass: 'bg-warning', activeClass: 'bg-warning/15 border-warning/40 text-warning' },
+            { value: 'NEEDS_REPAIR', label: 'Perlu Perbaikan', colorClass: 'bg-danger', activeClass: 'bg-danger/15 border-danger/40 text-danger' },
+          ],
+        },
+      ],
+    };
+  }, [filterState]);
+
   const filteredData = useMemo(() => {
     return handovers.filter((h) => {
+      // Filter by Condition
+      if (filterState.condition) {
+        if (h.vehicleCondition !== filterState.condition) return false;
+      }
+
       // Filter by Search (ID Handover, Contract ID, Customer Name, Vehicle Plate/Name)
       if (search) {
         const s = search.toLowerCase();
@@ -67,7 +100,7 @@ export function HandoversFeature() {
       }
       return true;
     });
-  }, [handovers, search]);
+  }, [handovers, search, filterState]);
 
   const openDetail = (handover: RentalHandover) => {
     setSelectedHandover(handover);
@@ -80,82 +113,83 @@ export function HandoversFeature() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-neutral-50/50 dark:bg-background">
-      {/* Content */}
-      <div className="flex-1 p-6 min-h-0 overflow-y-auto">
-        <div className="h-full max-w-[1400px] mx-auto flex flex-col gap-8">
-          
-          {/* SECTION A: SIAP SERAH TERIMA */}
-          {eligibleContracts.length > 0 && (
-            <section className="space-y-4">
-              <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-                <FileText className="w-4 h-4" />
-                Siap Serah Terima
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {eligibleContracts.map(contract => (
-                  <div key={contract.id} className="bg-white dark:bg-neutral-900 border border-border rounded-xl p-4 flex flex-col justify-between hover:border-primary/50 transition-colors shadow-sm">
-                    <div>
-                      <div className="flex justify-between items-start mb-2">
-                        <span className="font-bold text-sm">{contract.contractNumber}</span>
-                        <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
-                          CONFIRMED
-                        </span>
+    <div className="flex h-full w-full overflow-hidden bg-neutral-50/50 dark:bg-background">
+      
+      {/* SECTION B: RIWAYAT SERAH TERIMA (Left) */}
+      <div className="flex-1 min-w-0 flex flex-col min-h-0 overflow-y-auto p-0 border-r border-border bg-background">
+        {loading ? (
+          <div className="flex-1 flex items-center justify-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+        ) : (
+          <HandoverList
+            className="border-0 rounded-none"
+            data={filteredData}
+            searchValue={search}
+            onSearchChange={setSearch}
+            filterConfig={filterConfig}
+            isFilterOpen={isFilterOpen}
+            onFilterOpenChange={setIsFilterOpen}
+            onViewDetail={openDetail}
+          />
+        )}
+      </div>
+
+      {/* SECTION A: SIAP SERAH TERIMA (Right) */}
+      <div className="w-[320px] shrink-0 min-h-0 flex flex-col overflow-y-auto bg-neutral-50/30 dark:bg-neutral-900/20">
+        <div className="p-4 space-y-4">
+          <h2 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+            <FileText className="w-3.5 h-3.5" />
+            Siap Serah Terima
+          </h2>
+
+          {eligibleContracts.length > 0 ? (
+            <div className="flex flex-col gap-4">
+              {eligibleContracts.map(contract => (
+                <div key={contract.id} className="group relative bg-white dark:bg-neutral-900 border border-border rounded-xl p-3.5 hover:border-primary/40 hover:shadow-sm transition-all duration-200 flex flex-col justify-between">
+                  <div>
+                    <div className="flex justify-between items-start gap-2 mb-2.5">
+                      <div className="flex flex-col min-w-0">
+                        <span className="font-semibold text-[13px] text-foreground truncate" title={contract.contractNumber}>{contract.contractNumber}</span>
+                        <span className="text-[12px] text-muted-foreground truncate" title={contract.customer?.name}>{contract.customer?.name}</span>
                       </div>
-                      <p className="text-sm font-medium mb-1 truncate">{contract.customer?.name}</p>
-                      <button
-                        onClick={() => {
-                          if (contract.vehicle?.coreVehicle?.id) {
-                            trackingNavigationService.navigateToTracking(router, {
-                              mode: 'live',
-                              vehicleId: contract.vehicle.coreVehicle.id
-                            });
-                          }
-                        }}
-                        className="group flex items-center gap-1.5 text-xs text-muted-foreground hover:text-danger transition-colors mb-4 w-fit"
-                        title="Lihat Lokasi Terkini di Pemantauan"
-                      >
-                        <MapPin className="w-3.5 h-3.5 shrink-0" />
-                        <span className="group-hover:underline truncate">
-                          {contract.vehicle?.coreVehicle?.brand} {contract.vehicle?.coreVehicle?.vehicleName} &bull; {contract.vehicle?.coreVehicle?.plateNumber}
-                        </span>
-                      </button>
+                      <span className="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 shrink-0 border border-blue-100 dark:border-blue-800/30">
+                        CONFIRMED
+                      </span>
                     </div>
-                    <Link href={`/rental/contracts/${contract.id}/handover`} className="w-full">
-                      <Button variant="outline" className="w-full justify-between">
-                        Proses Serah Terima
-                        <ArrowRight className="w-4 h-4" />
-                      </Button>
-                    </Link>
+                    <button
+                      onClick={() => {
+                        if (contract.vehicle?.coreVehicle?.id) {
+                          trackingNavigationService.navigateToTracking(router, {
+                            mode: 'live',
+                            vehicleId: contract.vehicle.coreVehicle.id
+                          });
+                        }
+                      }}
+                      className="flex items-center gap-1.5 text-[12px] text-muted-foreground hover:text-primary transition-colors mb-3 w-full text-left"
+                      title="Lihat Lokasi Terkini di Pemantauan"
+                    >
+                      <MapPin className="w-3.5 h-3.5 shrink-0" />
+                      <span className="truncate hover:underline">
+                        {contract.vehicle?.coreVehicle?.brand} {contract.vehicle?.coreVehicle?.vehicleName} &bull; <span className="font-medium text-foreground/80">{contract.vehicle?.coreVehicle?.plateNumber}</span>
+                      </span>
+                    </button>
                   </div>
-                ))}
-              </div>
-            </section>
+                  <Link href={`/rental/contracts/${contract.id}/handover`} className="w-full">
+                    <Button variant="outline" size="sm" className="w-full h-8 px-3 text-[12px] font-medium justify-between shadow-none transition-all group-hover:border-primary/40 group-hover:text-primary">
+                      Proses Serah Terima
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </Button>
+                  </Link>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center p-8 border border-dashed rounded-xl border-border text-muted-foreground text-sm flex flex-col items-center justify-center gap-2">
+              <FileText className="w-8 h-8 opacity-20" />
+              <span>Tidak ada kendaraan yang<br/>siap diserahterimakan</span>
+            </div>
           )}
-
-          {/* SECTION B: RIWAYAT SERAH TERIMA */}
-          <section className="flex-1 flex flex-col min-h-[500px] space-y-4">
-            <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-              <Key className="w-4 h-4" />
-              Riwayat Serah Terima
-            </h2>
-            
-
-            {loading ? (
-              <div className="flex-1 flex items-center justify-center bg-white dark:bg-neutral-900 border border-border rounded-xl shadow-sm">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-              </div>
-            ) : (
-              <div className="flex-1 flex flex-col min-h-[400px] bg-white dark:bg-neutral-900 border border-border rounded-xl shadow-sm p-4">
-                <HandoverList
-                  data={filteredData}
-                  searchValue={search}
-                  onSearchChange={setSearch}
-                  onViewDetail={openDetail}
-                />
-              </div>
-            )}
-          </section>
         </div>
       </div>
 

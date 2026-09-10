@@ -19,7 +19,7 @@ interface ContractDetailDrawerProps {
   onReturn?: (c: RentalContract) => void;
 }
 
-export function ContractDetailDrawer({
+export function ContractView({
   contract,
   open,
   onClose,

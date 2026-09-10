@@ -1,10 +1,18 @@
 'use client';
 
 import React from 'react';
-import { FileText, Plus, Car, Edit, Printer } from 'lucide-react';
+import { FileText, Plus, Car, Edit, Printer, MoreVertical, Eye, Trash2, EyeOff } from 'lucide-react';
 import { cn } from '@adatrack/utils';
-import { Button, Badge, DataTable } from '@adatrack/ui';
-import type { DataTableColumnDef } from '@adatrack/ui';
+import { 
+  Button, 
+  DataTable, 
+  DropdownMenu, 
+  DropdownMenuTrigger, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuSeparator 
+} from '@adatrack/ui';
+import type { DataTableColumnDef, DataTableFilterConfig } from '@adatrack/ui';
 import type { RentalContract, ContractStatus } from '../types/contract';
 
 interface ContractListProps {
@@ -17,18 +25,14 @@ interface ContractListProps {
   searchValue: string;
   onSearchChange: (value: string) => void;
   onAdd: () => void;
+  filterConfig?: DataTableFilterConfig;
+  isFilterOpen?: boolean;
+  onFilterOpenChange?: (open: boolean) => void;
+  showStats?: boolean;
+  onToggleStats?: () => void;
+  className?: string;
+  dtLabels?: any;
 }
-
-const getStatusColor = (status: ContractStatus) => {
-  switch (status) {
-    case 'DRAFT':     return 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400';
-    case 'CONFIRMED': return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400';
-    case 'ACTIVE':    return 'bg-success/10 text-success';
-    case 'COMPLETED': return 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300';
-    case 'CANCELLED': return 'bg-danger/10 text-danger';
-    default:          return 'bg-neutral-100 text-neutral-600';
-  }
-};
 
 const getStatusLabel = (status: ContractStatus, labels: Record<string, string>) => {
   switch (status) {
@@ -59,133 +63,128 @@ function buildColumns(
 ): DataTableColumnDef<RentalContract>[] {
   return [
     {
+      id: 'actions',
+      header: '',
+      enableSorting: false,
+      size: 40,
+      meta: { fixedWidth: true },
+      cell: ({ row }) => {
+        const c = row.original;
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 w-7 p-0 flex items-center justify-center focus-visible:ring-1 focus-visible:ring-primary focus:outline-none data-[state=open]:bg-neutral-200/50 dark:data-[state=open]:bg-neutral-800"
+                aria-label="Aksi"
+              >
+                <MoreVertical className="h-4 w-4 text-foreground-muted" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-48">
+              <DropdownMenuItem onClick={() => onView(c)}>
+                <Eye className="mr-2 h-4 w-4 text-foreground-muted" />
+                <span>Detail</span>
+              </DropdownMenuItem>
+              {c.status === 'DRAFT' && onEdit && (
+                <DropdownMenuItem onClick={() => onEdit(c)}>
+                  <Edit className="mr-2 h-4 w-4 text-foreground-muted" />
+                  <span>Edit</span>
+                </DropdownMenuItem>
+              )}
+              {c.status === 'CONFIRMED' && onHandover && (
+                <DropdownMenuItem onClick={() => onHandover(c)}>
+                  <Car className="mr-2 h-4 w-4 text-success" />
+                  <span className="text-success">Serah Terima</span>
+                </DropdownMenuItem>
+              )}
+              {onPrint && (
+                <DropdownMenuItem onClick={() => onPrint(c)}>
+                  <Printer className="mr-2 h-4 w-4 text-foreground-muted" />
+                  <span>Cetak</span>
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      },
+    },
+    {
       id: 'no',
-      accessorKey: 'contractNumber',
-      header: labels.colContractNo || 'NO. KONTRAK',
-      size: 200,
+      accessorFn: (row) => row.contractNumber,
+      header: labels.colContractNo || 'No. Kontrak',
+      enableSorting: true,
+      size: 150,
       cell: ({ row }) => (
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="w-8 h-8 shrink-0 text-muted-foreground hover:text-foreground"
-            onClick={() => onView(row.original)}
-            title="Buka Detail"
-          >
-            <FileText className="w-4 h-4" />
-          </Button>
-          <div className="flex flex-col min-w-0">
-            <span className="font-bold text-sm truncate">{row.original.contractNumber}</span>
-            <span className="text-[11px] text-muted-foreground truncate">{row.original.reservationId}</span>
-          </div>
-        </div>
+        <span 
+          onClick={() => onView(row.original)}
+          className="font-medium text-foreground hover:text-primary hover:underline cursor-pointer transition-colors whitespace-nowrap"
+        >
+          {row.original.contractNumber}
+        </span>
       ),
     },
     {
       id: 'customer',
-      accessorKey: 'customer.name',
-      header: labels.colCustomer || 'PELANGGAN',
-      size: 190,
-      cell: ({ row }) => (
-        <div className="flex flex-col">
-          <span className="font-semibold text-sm text-foreground">{row.original.customer?.name || '-'}</span>
-          <span className="text-[11px] text-muted-foreground mt-0.5">{row.original.customer?.phone || '-'}</span>
-        </div>
-      ),
+      accessorFn: (row) => row.customer?.name || '-',
+      header: labels.colCustomer || 'Pelanggan',
+      enableSorting: true,
+      size: 180,
     },
     {
       id: 'vehicle',
-      accessorKey: 'vehicle.coreVehicle.plateNumber',
-      header: labels.colVehicle || 'KENDARAAN',
-      size: 200,
-      cell: ({ row }) => {
-        const cv = row.original.vehicle?.coreVehicle;
-        if (!cv) return <span className="text-muted-foreground text-sm">-</span>;
-        return (
-          <div className="flex flex-col min-w-0 justify-center">
-            <p className="text-[11px] text-muted-foreground truncate mb-1">
-              {cv.brand} · {cv.vehicleName}
-            </p>
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-md bg-neutral-100 flex items-center justify-center shrink-0">
-                <Car className="w-3 h-3 text-neutral-500" />
-              </div>
-              <p className="font-bold text-sm leading-none">{cv.plateNumber}</p>
-            </div>
-          </div>
-        );
+      accessorFn: (row) => {
+        const cv = row.vehicle?.coreVehicle;
+        if (!cv) return '-';
+        return `${cv.plateNumber} - ${cv.brand} ${cv.vehicleName}`;
       },
+      header: labels.colVehicle || 'Kendaraan',
+      enableSorting: true,
+      size: 220,
     },
     {
       id: 'period',
-      accessorKey: 'startDate',
-      header: labels.colPeriod || 'PERIODE SEWA',
+      accessorFn: (row) => `${formatShortDate(row.startDate)} s/d ${formatShortDate(row.endDate)}`,
+      header: labels.colPeriod || 'Periode Sewa',
+      enableSorting: true,
       size: 180,
-      cell: ({ row }) => (
-        <div className="flex flex-col text-[12px]">
-          <span className="font-medium">
-            {formatShortDate(row.original.startDate)} <span className="text-muted-foreground font-normal mx-1">-</span> {formatShortDate(row.original.endDate)}
-          </span>
-          <span className="text-[11px] text-muted-foreground mt-0.5">{row.original.duration} hari</span>
-        </div>
-      ),
     },
     {
       id: 'total',
-      accessorKey: 'totalAmount',
-      header: labels.colTotal || 'NILAI KONTRAK',
-      size: 160,
-      cell: ({ row }) => (
-        <div className="flex flex-col">
-          <span className="font-bold text-sm text-foreground">{formatCurrency(row.original.totalAmount)}</span>
-          <span className="text-[11px] text-muted-foreground">DP: {formatCurrency(row.original.deposit)}</span>
-        </div>
-      ),
+      accessorFn: (row) => formatCurrency(row.totalAmount),
+      header: labels.colTotal || 'Nilai Kontrak',
+      enableSorting: true,
+      size: 140,
     },
     {
       id: 'status',
       accessorKey: 'status',
-      header: labels.colStatus || 'STATUS',
+      header: labels.colStatus || 'Status',
+      enableSorting: true,
       size: 140,
       cell: ({ row }) => {
         const s = row.original.status;
+        const label = getStatusLabel(s, labels);
+        const textClass = 
+          s === 'ACTIVE' ? 'text-success' :
+          s === 'DRAFT' ? 'text-neutral-500' :
+          s === 'CONFIRMED' ? 'text-blue-500' :
+          s === 'COMPLETED' ? 'text-neutral-500 dark:text-neutral-400' :
+          s === 'CANCELLED' ? 'text-danger' :
+          'text-neutral-500 dark:text-neutral-400';
+          
         return (
-          <Badge className={cn('px-2.5 py-0.5 rounded-full font-semibold border-0', getStatusColor(s))}>
-            {getStatusLabel(s, labels)}
-          </Badge>
-        );
-      },
-    },
-    {
-      id: 'actions',
-      accessorKey: 'actions',
-      header: 'AKSI',
-      size: 100,
-      cell: ({ row }) => {
-        const c = row.original;
-        return (
-          <div className="flex items-center gap-1 justify-end">
-            {c.status === 'DRAFT' && onEdit && (
-              <Button variant="ghost" size="sm" onClick={() => onEdit(c)} title="Edit Kontrak" className="text-muted-foreground hover:text-foreground">
-                <Edit className="w-4 h-4" /> 
-              </Button>
-            )}
-            {c.status === 'CONFIRMED' && onHandover && (
-              <Button variant="ghost" size="sm" onClick={() => onHandover(c)} title="Serah Terima" className="text-success hover:text-success/90">
-                <Car className="w-4 h-4" />
-              </Button>
-            )}
-            {onPrint && (
-              <Button variant="ghost" size="sm" onClick={() => onPrint(c)} title="Print Kontrak" className="text-muted-foreground hover:text-foreground">
-                <Printer className="w-4 h-4" /> 
-              </Button>
-            )}
+          <div className="whitespace-nowrap">
+            <span className={cn("text-[13px] font-medium", textClass)}>{label}</span>
           </div>
         );
       },
     },
   ];
 }
+
+const DEFAULT_COLUMN_VISIBILITY = {};
 
 export function ContractList({
   data,
@@ -197,6 +196,13 @@ export function ContractList({
   searchValue,
   onSearchChange,
   onAdd,
+  filterConfig,
+  isFilterOpen,
+  onFilterOpenChange,
+  showStats,
+  onToggleStats,
+  className,
+  dtLabels
 }: ContractListProps) {
   const columns = React.useMemo(
     () => buildColumns(labels, onView, onEdit, onPrint, onHandover),
@@ -211,18 +217,36 @@ export function ContractList({
       searchable
       sortable
       pagination
+      columnVisibility
+      exportable
+      columnVisibilityState={DEFAULT_COLUMN_VISIBILITY}
       // Search
       searchValue={searchValue}
       onSearchChange={onSearchChange}
-      searchPlaceholder={labels.searchPlaceholder}
+      searchPlaceholder={labels.searchPlaceholder || "Cari kontrak..."}
+      // Filter
+      filterConfig={filterConfig}
+      isFilterOpen={isFilterOpen}
+      onFilterOpenChange={onFilterOpenChange}
       // UI Slots
+      className={cn("h-full flex flex-col w-full min-h-0", className)}
+      exportFilename="Data_Kontrak_Rental"
+      labels={dtLabels}
       emptyTitle="Kontrak Kosong"
       emptyDescription="Belum ada kontrak rental yang dibuat."
       toolbarActions={
-        <Button onClick={onAdd} variant="destructive" className="h-9">
-          <Plus className="w-4 h-4 mr-2" />
-          <span className="hidden sm:inline-block">{labels.addContract}</span>
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button onClick={onAdd} variant="destructive" className="h-8 gap-1.5 text-[13px] font-medium shadow-none">
+            <Plus className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline-block">{labels.addContract || 'Tambah'}</span>
+          </Button>
+          {onToggleStats && (
+            <Button variant="outline" onClick={onToggleStats} className="h-8 gap-1.5 text-[13px] font-medium shadow-none">
+              {showStats ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+              <span className="hidden sm:inline-block">Ringkasan</span>
+            </Button>
+          )}
+        </div>
       }
     />
   );

@@ -13,6 +13,10 @@ interface HandoverListProps {
   searchValue: string;
   onSearchChange: (value: string) => void;
   onViewDetail: (handover: RentalHandover) => void;
+  className?: string;
+  filterConfig?: any;
+  isFilterOpen?: boolean;
+  onFilterOpenChange?: (open: boolean) => void;
 }
 
 const getConditionLabel = (condition: string) => {
@@ -43,37 +47,37 @@ function buildColumns(
   return [
     {
       id: 'detail',
-      header: 'DETAIL',
-      size: 70,
+      header: '',
+      size: 40,
       enableHiding: false,
-      meta: { exportable: false },
+      meta: { exportable: false, fixedWidth: true },
       cell: ({ row }) => (
         <Button 
           variant="ghost" 
           size="sm" 
           onClick={() => onViewDetail(row.original)} 
           title="Detail Serah Terima" 
-          className="text-muted-foreground hover:text-foreground hover:bg-neutral-100 dark:hover:bg-neutral-800"
+          className="h-7 w-7 p-0 flex items-center justify-center transition-colors text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 dark:text-neutral-600 dark:hover:text-neutral-300 dark:hover:bg-neutral-800"
         >
-          <Eye className="w-4 h-4" /> 
+          <Eye className="w-3.5 h-3.5" /> 
         </Button>
       ),
     },
     {
       id: 'map',
-      header: 'MAP',
-      size: 70,
+      header: '',
+      size: 40,
       enableHiding: false,
-      meta: { exportable: false },
+      meta: { exportable: false, fixedWidth: true },
       cell: ({ row }) => (
         <Button 
           variant="ghost" 
           size="sm" 
           onClick={() => onViewMap(row.original)} 
           title="Lihat Histori Map" 
-          className="text-muted-foreground hover:text-foreground hover:bg-neutral-100 dark:hover:bg-neutral-800"
+          className="h-7 w-7 p-0 flex items-center justify-center transition-colors text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 dark:text-neutral-600 dark:hover:text-neutral-300 dark:hover:bg-neutral-800"
         >
-          <MapPin className="w-4 h-4" /> 
+          <MapPin className="w-3.5 h-3.5" /> 
         </Button>
       ),
     },
@@ -84,8 +88,8 @@ function buildColumns(
       size: 160,
       cell: ({ row }) => (
         <div className="flex flex-col min-w-0">
-          <span className="font-bold text-sm truncate">{row.original.id}</span>
-          <span className="text-[11px] text-muted-foreground truncate">{row.original.contract?.contractNumber || row.original.contractId}</span>
+          <span className="font-medium text-[13px] truncate">{row.original.id}</span>
+          <span className="text-[12px] text-muted-foreground truncate">{row.original.contract?.contractNumber || row.original.contractId}</span>
         </div>
       ),
     },
@@ -96,11 +100,11 @@ function buildColumns(
       size: 190,
       cell: ({ row }) => {
         const cust = row.original.customer;
-        if (!cust) return <span className="text-muted-foreground text-sm">-</span>;
+        if (!cust) return <span className="text-muted-foreground text-[13px]">-</span>;
         return (
           <div className="flex flex-col min-w-0">
-            <span className="font-semibold text-sm text-foreground truncate">{cust.name}</span>
-            <span className="text-[11px] text-muted-foreground truncate capitalize">{cust.type.toLowerCase()}</span>
+            <span className="font-medium text-[13px] text-foreground truncate">{cust.name}</span>
+            <span className="text-[12px] text-muted-foreground truncate capitalize">{cust.type.toLowerCase()}</span>
           </div>
         );
       },
@@ -112,11 +116,11 @@ function buildColumns(
       size: 200,
       cell: ({ row }) => {
         const cv = row.original.vehicle?.coreVehicle;
-        if (!cv) return <span className="text-muted-foreground text-sm">-</span>;
+        if (!cv) return <span className="text-muted-foreground text-[13px]">-</span>;
         return (
           <div className="flex flex-col min-w-0">
-            <span className="font-semibold text-sm text-foreground truncate">{cv.brand} {cv.vehicleName}</span>
-            <span className="text-[11px] text-muted-foreground truncate">{cv.plateNumber}</span>
+            <span className="font-medium text-[13px] text-foreground truncate">{cv.brand} {cv.vehicleName}</span>
+            <span className="text-[12px] text-muted-foreground truncate">{cv.plateNumber}</span>
           </div>
         );
       },
@@ -128,8 +132,8 @@ function buildColumns(
       size: 150,
       cell: ({ row }) => (
         <div className="flex flex-col min-w-0">
-          <span className="font-medium text-sm text-foreground">{formatShortDate(row.original.handoverAt)}</span>
-          <span className="text-[11px] text-muted-foreground">{formatTime(row.original.handoverAt)}</span>
+          <span className="font-medium text-[13px] text-foreground">{formatShortDate(row.original.handoverAt)}</span>
+          <span className="text-[12px] text-muted-foreground">{formatTime(row.original.handoverAt)}</span>
         </div>
       ),
     },
@@ -144,15 +148,15 @@ function buildColumns(
         if (addr) {
           return (
             <div className="flex flex-col min-w-0">
-              <span className="font-medium text-sm text-foreground truncate" title={addr}>{addr.split(',')[0] || addr}</span>
-              <span className="text-[11px] text-muted-foreground truncate" title={addr}>{addr.includes(',') ? addr.substring(addr.indexOf(',') + 1).trim() : latLng}</span>
+              <span className="text-[13px] text-foreground truncate" title={addr}>{addr.split(',')[0] || addr}</span>
+              <span className="text-[12px] text-muted-foreground truncate" title={addr}>{addr.includes(',') ? addr.substring(addr.indexOf(',') + 1).trim() : latLng}</span>
             </div>
           );
         }
         return (
           <div className="flex flex-col min-w-0">
-            <span className="font-medium text-sm text-foreground truncate">Koordinat Map</span>
-            <span className="text-[11px] text-muted-foreground truncate">{latLng}</span>
+            <span className="text-[13px] text-foreground truncate">Koordinat Map</span>
+            <span className="text-[12px] text-muted-foreground truncate">{latLng}</span>
           </div>
         );
       },
@@ -163,7 +167,7 @@ function buildColumns(
       header: 'ODOMETER AWAL',
       size: 140,
       cell: ({ row }) => (
-        <div className="text-sm font-medium">
+        <div className="text-[13px] font-medium">
           {new Intl.NumberFormat('id-ID').format(row.original.odometerStart)} KM
         </div>
       )
@@ -174,7 +178,7 @@ function buildColumns(
       header: 'KONDISI',
       size: 130,
       cell: ({ row }) => (
-        <div className="text-sm">
+        <div className="text-[13px]">
           {getConditionLabel(row.original.vehicleCondition)}
         </div>
       )
@@ -187,6 +191,10 @@ export function HandoverList({
   searchValue,
   onSearchChange,
   onViewDetail,
+  className,
+  filterConfig,
+  isFilterOpen,
+  onFilterOpenChange,
 }: HandoverListProps) {
   const router = useRouter();
 
@@ -210,6 +218,7 @@ export function HandoverList({
 
   return (
     <DataTable<RentalHandover>
+      className={className}
       data={data}
       columns={columns}
       // Capabilities
@@ -222,6 +231,11 @@ export function HandoverList({
       searchValue={searchValue}
       onSearchChange={onSearchChange}
       searchPlaceholder="Cari handover, customer, nomor polisi..."
+      exportFilename="Data_Serah_Terima"
+      // Filter
+      filterConfig={filterConfig}
+      isFilterOpen={isFilterOpen}
+      onFilterOpenChange={onFilterOpenChange}
       // UI Slots
       emptyTitle="Tidak ada data serah terima"
       emptyDescription="Belum ada transaksi serah terima yang tercatat atau sesuai dengan pencarian Anda."

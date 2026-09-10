@@ -6,7 +6,7 @@ import { getTranslation } from '@/i18n';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
 import { ChevronLeft } from 'lucide-react';
 
-import { ContractCreateForm } from './components/ContractCreateForm';
+import { ContractForm } from './components/ContractForm';
 import { contractService } from '@/data/modules/rental/services/contractService';
 import type { Reservation } from '@/features/modules/rental/reservations/types/reservation';
 import type { RentalContract } from './types/contract';
@@ -61,7 +61,7 @@ export function ContractCreateFeature({ open, onOpenChange, onSuccess }: Contrac
   };
 
   return (
-    <ContractCreateForm
+    <ContractForm
       availableReservations={availableReservations}
       labels={labels}
       onSubmit={handleSubmit}

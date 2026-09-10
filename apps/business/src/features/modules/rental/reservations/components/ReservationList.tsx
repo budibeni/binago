@@ -1,10 +1,19 @@
 'use client';
 
 import React from 'react';
-import { MapPin, Plus, MessageCircle, FileText } from 'lucide-react';
+import { MapPin, Plus, MessageCircle, MoreVertical, Eye, EyeOff, Edit2, Trash2 } from 'lucide-react';
 import { cn } from '@adatrack/utils';
-import { Button, Badge, DataTable } from '@adatrack/ui';
-import type { DataTableColumnDef } from '@adatrack/ui';
+import { 
+  Button, 
+  Badge, 
+  DataTable, 
+  DropdownMenu, 
+  DropdownMenuTrigger, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuSeparator 
+} from '@adatrack/ui';
+import type { DataTableColumnDef, DataTableFilterConfig } from '@adatrack/ui';
 import type { Reservation, ReservationStatus } from '../types/reservation';
 
 interface ReservationListProps {
@@ -12,10 +21,18 @@ interface ReservationListProps {
   labels: Record<string, any>;
   onView: (r: Reservation) => void;
   onEdit: (r: Reservation) => void;
+  onDelete: (r: Reservation) => void;
   searchValue: string;
   onSearchChange: (value: string) => void;
   onAdd: () => void;
   onOpenMap: (vehicleId: string) => void;
+  filterConfig?: DataTableFilterConfig;
+  isFilterOpen?: boolean;
+  onFilterOpenChange?: (open: boolean) => void;
+  showStats?: boolean;
+  onToggleStats?: () => void;
+  className?: string;
+  dtLabels?: any;
 }
 
 const getStatusColor = (status: ReservationStatus) => {
@@ -59,128 +76,154 @@ const formatShortDate = (dateStr: string) => {
 function buildColumns(
   labels: Record<string, any>,
   onView: (r: Reservation) => void,
-  onOpenMap: (vehicleId: string) => void,
+  onEdit: (r: Reservation) => void,
+  onDelete: (r: Reservation) => void,
+  onOpenMap: (vehicleId: string) => void
 ): DataTableColumnDef<Reservation>[] {
   return [
+    {
+      id: 'actions',
+      header: '',
+      enableSorting: false,
+      size: 40,
+      meta: { fixedWidth: true },
+      cell: ({ row }) => {
+        const p = row.original;
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 w-7 p-0 flex items-center justify-center focus-visible:ring-1 focus-visible:ring-primary focus:outline-none data-[state=open]:bg-neutral-200/50 dark:data-[state=open]:bg-neutral-800"
+                aria-label="Aksi"
+              >
+                <MoreVertical className="h-4 w-4 text-foreground-muted" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-48">
+              <DropdownMenuItem onClick={() => onView(p)}>
+                <Eye className="mr-2 h-4 w-4 text-foreground-muted" />
+                <span>Detail</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onEdit(p)}>
+                <Edit2 className="mr-2 h-4 w-4 text-foreground-muted" />
+                <span>Edit</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem 
+                onClick={() => {
+                  const vid = p.vehicle?.vehicleId;
+                  if (vid) onOpenMap(vid);
+                }}
+                disabled={!p.vehicle?.vehicleId}
+              >
+                <MapPin className="mr-2 h-4 w-4 text-foreground-muted" />
+                <span>Buka Lokasi</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem destructive onClick={() => onDelete(p)}>
+                <Trash2 className="mr-2 h-4 w-4 text-danger" />
+                <span>Hapus</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      },
+    },
     // --- Nomor Reservasi ---
     {
       id: 'no',
-      accessorKey: 'reservationNumber',
+      accessorFn: (row) => row.reservationNumber,
       header: labels.colNo,
-      size: 200,
+      enableSorting: true,
+      size: 150,
       cell: ({ row }) => (
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="w-8 h-8 shrink-0 text-muted-foreground hover:text-foreground"
-            onClick={() => onView(row.original)}
-            title="Buka Detail"
-          >
-            <FileText className="w-4 h-4" />
-          </Button>
-          <div className="flex flex-col min-w-0">
-            <span className="font-bold text-sm truncate">{row.original.reservationNumber}</span>
-            <span className="text-[11px] text-muted-foreground truncate">{formatDate(row.original.createdAt)}</span>
-          </div>
-        </div>
+        <span 
+          onClick={() => onView(row.original)}
+          className="font-medium text-foreground hover:text-primary hover:underline cursor-pointer transition-colors whitespace-nowrap"
+        >
+          {row.original.reservationNumber}
+        </span>
       ),
     },
     // --- Pelanggan ---
     {
       id: 'customer',
-      accessorKey: 'customer.name',
+      accessorFn: (row) => row.customer?.name || '-',
       header: labels.colCustomer,
-      size: 190,
-      cell: ({ row }) => {
-        const phone = row.original.customer?.phone;
-        let waLink = '#';
-        if (phone) {
-          let cleanPhone = phone.replace(/\D/g, '');
-          if (cleanPhone.startsWith('0')) cleanPhone = '62' + cleanPhone.slice(1);
-          waLink = `https://wa.me/${cleanPhone}`;
-        }
-        
-        return (
-          <div className="flex flex-col">
-            <span className="font-semibold text-sm text-foreground">{row.original.customer?.name || '-'}</span>
-            <div className="flex items-center gap-1.5 mt-0.5">
-              {phone && (
-                <a
-                  href={waLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-5 h-5 flex items-center justify-center rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 transition-colors shrink-0"
-                  title="Hubungi via WhatsApp"
-                >
-                  <MessageCircle className="w-3 h-3" />
-                </a>
-              )}
-              <span className="text-[11px] text-muted-foreground">{phone || '-'}</span>
-            </div>
-          </div>
-        );
-      },
+      enableSorting: true,
+      size: 180,
     },
     // --- Kendaraan (diperluas) ---
     {
       id: 'vehicle',
-      accessorKey: 'vehicle.coreVehicle.plateNumber',
-      header: labels.colVehicle,
-      size: 230,
-      cell: ({ row }) => {
-        const v  = row.original.vehicle;
-        const cv = v?.coreVehicle;
-        const vid = v?.vehicleId ?? '';
-        if (!cv) return <span className="text-muted-foreground text-sm">-</span>;
-        return (
-          <div className="flex flex-col min-w-0 justify-center">
-            <p className="text-[11px] text-muted-foreground truncate mb-1">
-              {cv.brand} · {cv.vehicleName} · {cv.year}
-            </p>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                title="Buka Pemantauan"
-                onClick={() => vid && onOpenMap(vid)}
-                disabled={!vid}
-                className="w-6 h-6 rounded-md bg-primary/10 hover:bg-primary/20 text-primary shrink-0"
-              >
-                <MapPin className="w-3 h-3" />
-              </Button>
-              <p className="font-bold text-sm leading-none">{cv.plateNumber}</p>
-            </div>
-          </div>
-        );
+      accessorFn: (row) => {
+        const cv = row.vehicle?.coreVehicle;
+        if (!cv) return '-';
+        return `${cv.plateNumber} - ${cv.brand} ${cv.vehicleName}`;
       },
+      header: labels.colVehicle,
+      enableSorting: true,
+      size: 220,
     },
     // --- Periode Sewa ---
     {
       id: 'rentalDate',
-      accessorKey: 'startDate',
+      accessorFn: (row) => `${formatShortDate(row.startDate)} s/d ${formatShortDate(row.endDate)}`,
       header: labels.colRentalDate,
+      enableSorting: true,
       size: 180,
-      cell: ({ row }) => (
-        <div className="flex flex-col text-[12px]">
-          <span className="font-medium">
-            {formatShortDate(row.original.startDate)} <span className="text-muted-foreground font-normal mx-1">s/d</span> {formatShortDate(row.original.endDate)}
-          </span>
-          <span className="text-[11px] text-muted-foreground mt-0.5">{row.original.duration} hari</span>
-        </div>
-      ),
     },
-    // --- Total & Deposit ---
+    // --- Total ---
     {
       id: 'total',
-      accessorKey: 'totalAmount',
+      accessorFn: (row) => formatCurrency(row.totalAmount),
       header: labels.colTotal,
-      size: 160,
+      enableSorting: true,
+      size: 140,
+    },
+    // --- Tipe Rental ---
+    {
+      id: 'rentalType',
+      accessorKey: 'rentalType',
+      header: labels.colRentalType || 'Tipe Rental',
+      enableSorting: true,
+      size: 140,
+      cell: ({ row }) => row.original.rentalType === 'SELF_DRIVE' ? 'Lepas Kunci' : 'Dengan Supir',
+    },
+    // --- Pembayaran ---
+    {
+      id: 'paymentMethod',
+      accessorKey: 'paymentMethod',
+      header: labels.colPaymentMethod || 'Pembayaran',
+      enableSorting: true,
+      size: 140,
+      cell: ({ row }) => {
+        const p = row.original.paymentMethod;
+        return p === 'TRANSFER' ? 'Transfer Bank' : p === 'CASH' ? 'Tunai' : p === 'CARD' ? 'Kartu Kredit' : '-';
+      }
+    },
+    // --- Lokasi Ambil ---
+    {
+      id: 'pickupLocation',
+      accessorKey: 'pickupLocation',
+      header: labels.colPickupLocation || 'Lokasi Ambil',
+      enableSorting: true,
+      size: 180,
+      cell: ({ row }) => row.original.pickupLocation || '-',
+    },
+    // --- Catatan ---
+    {
+      id: 'notes',
+      accessorKey: 'notes',
+      header: labels.colNotes || 'Catatan',
+      enableSorting: false,
+      size: 200,
       cell: ({ row }) => (
-        <div className="flex flex-col">
-          <span className="font-bold text-sm text-foreground">{formatCurrency(row.original.totalAmount)}</span>
-          <span className="text-[11px] text-muted-foreground">{labels.dp}: {formatCurrency(row.original.deposit)}</span>
-        </div>
+        <span className="text-[13px] block truncate max-w-[180px]" title={row.original.notes || ''}>
+          {row.original.notes || '-'}
+        </span>
       ),
     },
     // --- Status Reservasi ---
@@ -188,32 +231,57 @@ function buildColumns(
       id: 'status',
       accessorKey: 'status',
       header: labels.colStatus,
+      enableSorting: true,
       size: 140,
       cell: ({ row }) => {
         const s = row.original.status;
+        const label = getStatusLabel(s, labels);
+        const textClass = 
+          s === 'ACTIVE' ? 'text-success' :
+          s === 'PENDING' ? 'text-warning' :
+          s === 'CONFIRMED' ? 'text-blue-500' :
+          s === 'COMPLETED' ? 'text-neutral-500 dark:text-neutral-400' :
+          s === 'CANCELLED' ? 'text-danger' :
+          'text-neutral-500 dark:text-neutral-400';
+          
         return (
-          <Badge className={cn('px-2.5 py-0.5 rounded-full font-semibold border-0', getStatusColor(s))}>
-            {getStatusLabel(s, labels)}
-          </Badge>
+          <div className="whitespace-nowrap">
+            <span className={cn("text-[13px] font-medium", textClass)}>{label}</span>
+          </div>
         );
       },
     },
   ];
 }
 
+const DEFAULT_COLUMN_VISIBILITY = {
+  rentalType: false,
+  paymentMethod: false,
+  pickupLocation: false,
+  notes: false,
+};
+
 export function ReservationList({
   data,
   labels,
   onView,
   onEdit,
+  onDelete,
   searchValue,
   onSearchChange,
   onAdd,
   onOpenMap,
+  filterConfig,
+  isFilterOpen,
+  onFilterOpenChange,
+  showStats,
+  onToggleStats,
+  className,
+  dtLabels
 }: ReservationListProps) {
   const columns = React.useMemo(
-    () => buildColumns(labels, onView, onOpenMap),
-    [labels, onView, onOpenMap],
+    () => buildColumns(labels, onView, onEdit, onDelete, onOpenMap),
+    [labels, onView, onEdit, onDelete, onOpenMap],
   );
 
   return (
@@ -224,18 +292,38 @@ export function ReservationList({
       searchable
       sortable
       pagination
+      columnVisibility
+      exportable
+      columnVisibilityState={DEFAULT_COLUMN_VISIBILITY}
       // Search
       searchValue={searchValue}
       onSearchChange={onSearchChange}
-      searchPlaceholder={labels.searchPlaceholder}
+      searchPlaceholder={labels.searchPlaceholder || "Cari reservasi..."}
+      // Filter
+      filterConfig={filterConfig}
+      isFilterOpen={isFilterOpen}
+      onFilterOpenChange={onFilterOpenChange}
       // UI Slots
+      className={className}
+      exportFilename="Data_Reservasi_Rental"
+      labels={dtLabels}
       emptyTitle={labels.emptyTitle}
       emptyDescription={labels.emptyDesc}
       toolbarActions={
-        <Button onClick={onAdd} variant="destructive" className="h-9">
-          <Plus className="w-4 h-4 mr-2" />
-          <span className="hidden sm:inline-block">{labels.addReservation}</span>
-        </Button>
+        <div className="flex items-center gap-2">
+          {onAdd && (
+            <Button variant="destructive" onClick={onAdd} className="h-8 gap-1.5 text-[13px] font-medium shadow-none">
+              <Plus className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline-block">{labels.addReservation || 'Tambah'}</span>
+            </Button>
+          )}
+          {onToggleStats && (
+            <Button variant="outline" onClick={onToggleStats} className="h-8 gap-1.5 text-[13px] font-medium shadow-none">
+              {showStats ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+              <span className="hidden sm:inline-block">Ringkasan</span>
+            </Button>
+          )}
+        </div>
       }
     />
   );

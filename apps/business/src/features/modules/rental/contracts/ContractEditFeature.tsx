@@ -6,7 +6,7 @@ import { getTranslation } from '@/i18n';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
 import { ChevronLeft } from 'lucide-react';
 
-import { ContractEditForm } from './components/ContractEditForm';
+import { ContractForm } from './components/ContractForm';
 import { contractService } from '@/data/modules/rental/services/contractService';
 import type { RentalContract } from './types/contract';
 
@@ -78,7 +78,7 @@ export function ContractEditFeature({ contractId, open, onOpenChange, onSuccess 
   }
 
   return (
-    <ContractEditForm
+    <ContractForm
       contract={contract}
       labels={labels}
       onSubmit={handleSubmit}

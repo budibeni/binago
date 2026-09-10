@@ -13,6 +13,10 @@ interface ReturnListProps {
   searchValue: string;
   onSearchChange: (value: string) => void;
   onViewDetail: (ret: RentalReturn) => void;
+  className?: string;
+  filterConfig?: any;
+  isFilterOpen?: boolean;
+  onFilterOpenChange?: (open: boolean) => void;
 }
 
 const getConditionLabel = (c: string) => {
@@ -37,37 +41,37 @@ function buildColumns(
   return [
     {
       id: 'detail',
-      header: 'DETAIL',
-      size: 70,
+      header: '',
+      size: 40,
       enableHiding: false,
-      meta: { exportable: false },
+      meta: { exportable: false, fixedWidth: true },
       cell: ({ row }) => (
         <Button
           variant="ghost"
           size="sm"
           onClick={() => onViewDetail(row.original)}
           title="Detail Pengembalian"
-          className="text-muted-foreground hover:text-foreground hover:bg-neutral-100 dark:hover:bg-neutral-800"
+          className="h-7 w-7 p-0 flex items-center justify-center transition-colors text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 dark:text-neutral-600 dark:hover:text-neutral-300 dark:hover:bg-neutral-800"
         >
-          <Eye className="w-4 h-4" />
+          <Eye className="w-3.5 h-3.5" />
         </Button>
       ),
     },
     {
       id: 'map',
-      header: 'MAP',
-      size: 70,
+      header: '',
+      size: 40,
       enableHiding: false,
-      meta: { exportable: false },
+      meta: { exportable: false, fixedWidth: true },
       cell: ({ row }) => (
         <Button
           variant="ghost"
           size="sm"
           onClick={() => onViewMap(row.original)}
           title="Lihat Histori Perjalanan"
-          className="text-muted-foreground hover:text-foreground hover:bg-neutral-100 dark:hover:bg-neutral-800"
+          className="h-7 w-7 p-0 flex items-center justify-center transition-colors text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 dark:text-neutral-600 dark:hover:text-neutral-300 dark:hover:bg-neutral-800"
         >
-          <MapPin className="w-4 h-4" />
+          <MapPin className="w-3.5 h-3.5" />
         </Button>
       ),
     },
@@ -78,8 +82,8 @@ function buildColumns(
       size: 170,
       cell: ({ row }) => (
         <div className="flex flex-col min-w-0">
-          <span className="font-bold text-sm truncate">{row.original.id}</span>
-          <span className="text-[11px] text-muted-foreground truncate">
+          <span className="font-medium text-[13px] truncate">{row.original.id}</span>
+          <span className="text-[12px] text-muted-foreground truncate">
             {row.original.contract?.contractNumber || row.original.contractId}
           </span>
         </div>
@@ -92,11 +96,11 @@ function buildColumns(
       size: 190,
       cell: ({ row }) => {
         const cust = row.original.customer;
-        if (!cust) return <span className="text-muted-foreground text-sm">-</span>;
+        if (!cust) return <span className="text-muted-foreground text-[13px]">-</span>;
         return (
           <div className="flex flex-col min-w-0">
-            <span className="font-semibold text-sm text-foreground truncate">{cust.name}</span>
-            <span className="text-[11px] text-muted-foreground truncate capitalize">{cust.type?.toLowerCase()}</span>
+            <span className="font-medium text-[13px] text-foreground truncate">{cust.name}</span>
+            <span className="text-[12px] text-muted-foreground truncate capitalize">{cust.type?.toLowerCase()}</span>
           </div>
         );
       },
@@ -108,11 +112,11 @@ function buildColumns(
       size: 200,
       cell: ({ row }) => {
         const cv = row.original.vehicle?.coreVehicle;
-        if (!cv) return <span className="text-muted-foreground text-sm">-</span>;
+        if (!cv) return <span className="text-muted-foreground text-[13px]">-</span>;
         return (
           <div className="flex flex-col min-w-0">
-            <span className="font-semibold text-sm text-foreground truncate">{cv.brand} {cv.vehicleName}</span>
-            <span className="text-[11px] text-muted-foreground truncate">{cv.plateNumber}</span>
+            <span className="font-medium text-[13px] text-foreground truncate">{cv.brand} {cv.vehicleName}</span>
+            <span className="text-[12px] text-muted-foreground truncate">{cv.plateNumber}</span>
           </div>
         );
       },
@@ -124,8 +128,8 @@ function buildColumns(
       size: 150,
       cell: ({ row }) => (
         <div className="flex flex-col min-w-0">
-          <span className="font-medium text-sm text-foreground">{formatShortDate(row.original.returnedAt)}</span>
-          <span className="text-[11px] text-muted-foreground">{formatTime(row.original.returnedAt)}</span>
+          <span className="font-medium text-[13px] text-foreground">{formatShortDate(row.original.returnedAt)}</span>
+          <span className="text-[12px] text-muted-foreground">{formatTime(row.original.returnedAt)}</span>
         </div>
       ),
     },
@@ -141,11 +145,11 @@ function buildColumns(
           : null;
         return (
           <div className="flex flex-col min-w-0">
-            <span className="font-medium text-sm text-foreground">
+            <span className="font-medium text-[13px] text-foreground">
               {new Intl.NumberFormat('id-ID').format(ret.odometerEnd)} KM
             </span>
             {distanceUsed !== null && (
-              <span className="text-[11px] text-muted-foreground">
+              <span className="text-[12px] text-muted-foreground">
                 +{new Intl.NumberFormat('id-ID').format(distanceUsed)} KM
               </span>
             )}
@@ -180,7 +184,7 @@ function buildColumns(
       cell: ({ row }) => {
         const charges = row.original.additionalCharges || 0;
         return (
-          <span className={`text-sm font-medium ${charges > 0 ? 'text-danger' : 'text-muted-foreground'}`}>
+          <span className={`text-[13px] font-medium ${charges > 0 ? 'text-danger' : 'text-muted-foreground'}`}>
             {charges > 0 ? formatCurrency(charges) : '-'}
           </span>
         );
@@ -189,7 +193,16 @@ function buildColumns(
   ];
 }
 
-export function ReturnList({ data, searchValue, onSearchChange, onViewDetail }: ReturnListProps) {
+export function ReturnList({ 
+  data, 
+  searchValue, 
+  onSearchChange, 
+  onViewDetail,
+  className,
+  filterConfig,
+  isFilterOpen,
+  onFilterOpenChange,
+}: ReturnListProps) {
   const router = useRouter();
 
   const handleViewMap = React.useCallback((ret: RentalReturn) => {
@@ -212,6 +225,7 @@ export function ReturnList({ data, searchValue, onSearchChange, onViewDetail }: 
 
   return (
     <DataTable<RentalReturn>
+      className={className}
       data={data}
       columns={columns}
       // Capabilities
@@ -224,6 +238,11 @@ export function ReturnList({ data, searchValue, onSearchChange, onViewDetail }: 
       searchValue={searchValue}
       onSearchChange={onSearchChange}
       searchPlaceholder="Cari pengembalian, customer, nomor polisi..."
+      exportFilename="Data_Pengembalian"
+      // Filter
+      filterConfig={filterConfig}
+      isFilterOpen={isFilterOpen}
+      onFilterOpenChange={onFilterOpenChange}
       // UI Slots
       emptyTitle="Tidak ada data pengembalian"
       emptyDescription="Belum ada transaksi pengembalian yang tercatat atau sesuai dengan pencarian Anda."
