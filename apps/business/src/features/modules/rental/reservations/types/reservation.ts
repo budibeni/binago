@@ -25,6 +25,9 @@ export interface Reservation {
   deposit: number;
   remainingAmount: number;
   status: ReservationStatus;
+  paymentMethod?: string;
+  pickupLocation?: string;
+  dropoffLocation?: string;
   notes?: string;
   createdAt: string;
   updatedAt: string;

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { cn } from '@adatrack/utils';
 import { History, MapPin, ChevronDown, CircleParking, Route, Gauge } from 'lucide-react';
+import { getTrackingTranslation } from '../../i18n';
 
 interface TableModeSelectorProps {
   mode: 'live' | 'playback' | 'heatmap' | 'parking' | 'mileage' | 'speed';
@@ -11,6 +12,7 @@ interface TableModeSelectorProps {
 export function TableModeSelector({ mode, onModeChange, locale }: TableModeSelectorProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const tTrackingLocal = getTrackingTranslation(locale);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -25,7 +27,7 @@ export function TableModeSelector({ mode, onModeChange, locale }: TableModeSelec
   const options = [
     {
       value: 'live' as const,
-      label: 'Live',
+      label: tTrackingLocal.modes.live,
       icon: (
         <svg className={cn("h-4 w-4 shrink-0", mode === 'live' ? "text-danger" : "text-neutral-400")} viewBox="0 0 16 16" fill="currentColor">
           <circle cx="8" cy="8" r="6" fill="currentColor" />
@@ -35,27 +37,27 @@ export function TableModeSelector({ mode, onModeChange, locale }: TableModeSelec
     },
     {
       value: 'playback' as const,
-      label: 'Playback',
+      label: tTrackingLocal.modes.playback,
       icon: <History className={cn("h-4 w-4 shrink-0", mode === 'playback' ? "text-blue-500" : "text-neutral-400")} strokeWidth={2.5} />
     },
     {
       value: 'heatmap' as const,
-      label: 'Heatmap',
+      label: tTrackingLocal.modes.heatmap,
       icon: <MapPin className={cn("h-4 w-4 shrink-0", mode === 'heatmap' ? "text-orange-500" : "text-neutral-400")} strokeWidth={2.5} />
     },
     {
       value: 'parking' as const,
-      label: locale === 'en' ? 'Parking' : 'Parkir',
+      label: tTrackingLocal.modes.parking,
       icon: <CircleParking className={cn("h-4 w-4 shrink-0", mode === 'parking' ? "text-blue-500" : "text-neutral-400")} strokeWidth={2.5} />
     },
     {
       value: 'mileage' as const,
-      label: locale === 'en' ? 'Mileage' : 'Jarak Tempuh',
+      label: tTrackingLocal.modes.mileage,
       icon: <Route className={cn("h-4 w-4 shrink-0", mode === 'mileage' ? "text-emerald-500" : "text-neutral-400")} strokeWidth={2.5} />
     },
     {
       value: 'speed' as const,
-      label: locale === 'en' ? 'Speed' : 'Kecepatan',
+      label: tTrackingLocal.modes.speed,
       icon: <Gauge className={cn("h-4 w-4 shrink-0", mode === 'speed' ? "text-purple-500" : "text-neutral-400")} strokeWidth={2.5} />
     }
   ];

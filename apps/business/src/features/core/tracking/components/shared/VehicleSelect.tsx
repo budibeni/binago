@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { Search } from 'lucide-react';
 import { TrackingVehicle } from '@/features/core/tracking/types/tracking';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@adatrack/ui';
+import { getTrackingTranslation } from '../../i18n';
 
 interface VehicleSelectProps {
   vehicles: TrackingVehicle[];
@@ -14,6 +15,7 @@ interface VehicleSelectProps {
 export function VehicleSelect({ vehicles, selectedVehicleId, onVehicleChange, isLoading, locale }: VehicleSelectProps) {
   const [search, setSearch] = useState('');
   const [open, setOpen] = useState(false);
+  const tTrackingLocal = getTrackingTranslation(locale);
 
   // Always show search since the user explicitly asked for it
   const showSearch = true; // or vehicles.length > 5
@@ -38,7 +40,7 @@ export function VehicleSelect({ vehicles, selectedVehicleId, onVehicleChange, is
   return (
     <Select value={selectedVehicleId ?? undefined} onValueChange={onVehicleChange} disabled={isLoading} open={open} onOpenChange={handleOpenChange}>
       <SelectTrigger className="w-full h-8 px-2 text-[12px] rounded border border-input bg-background focus:outline-none focus:ring-1 focus:ring-primary">
-        <SelectValue placeholder={locale === 'en' ? 'Select Vehicle...' : 'Pilih Kendaraan...'} />
+        <SelectValue placeholder={tTrackingLocal.messages.selectVehiclePlaceholder} />
       </SelectTrigger>
       <SelectContent className="z-[99999]">
         {showSearch && (
@@ -47,7 +49,7 @@ export function VehicleSelect({ vehicles, selectedVehicleId, onVehicleChange, is
               <Search className="w-3.5 h-3.5 absolute left-2 text-foreground-muted" />
               <input
                 type="text"
-                placeholder={locale === 'en' ? 'Search...' : 'Cari...'}
+                placeholder={tTrackingLocal.messages.searchPlaceholder}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onKeyDown={(e) => e.stopPropagation()}
@@ -67,7 +69,7 @@ export function VehicleSelect({ vehicles, selectedVehicleId, onVehicleChange, is
             ))
           ) : (
             <div className="py-4 text-center text-[12px] text-foreground-muted">
-              {locale === 'en' ? 'No results found.' : 'Tidak ada hasil ditemukan.'}
+              {tTrackingLocal.messages.noResult}
             </div>
           )}
         </div>

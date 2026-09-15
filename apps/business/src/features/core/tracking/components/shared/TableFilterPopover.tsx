@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { SlidersHorizontal, X } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Filter, SlidersHorizontal, X } from 'lucide-react';
 import { cn } from '@adatrack/utils';
+import { getTrackingTranslation } from '../../i18n';
 import { Button, Popover, PopoverContent, PopoverTrigger } from '@adatrack/ui';
 
 interface TableFilterPopoverProps {
@@ -12,8 +13,10 @@ interface TableFilterPopoverProps {
   onReset?: () => void;
 }
 
-export function TableFilterPopover({ children, locale, triggerClassName, badgeCount = 0, hideLabel = false, onReset }: TableFilterPopoverProps) {
+export function TableFilterPopover({ children, locale = 'id', triggerClassName, badgeCount = 0, hideLabel = false, onReset }: TableFilterPopoverProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const popoverRef = useRef<HTMLDivElement>(null);
+  const tTrackingLocal = getTrackingTranslation(locale);
 
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
@@ -28,7 +31,7 @@ export function TableFilterPopover({ children, locale, triggerClassName, badgeCo
               : "border-border text-foreground-muted hover:text-foreground hover:bg-neutral-50 dark:hover:bg-neutral-800",
             triggerClassName
           )}
-          title={locale === 'en' ? 'Parameters (Required)' : 'Parameter (Wajib)'}
+          title={tTrackingLocal.filters.parametersRequired}
         >
           <SlidersHorizontal className="h-4 w-4 shrink-0" />
           
@@ -48,27 +51,31 @@ export function TableFilterPopover({ children, locale, triggerClassName, badgeCo
         </Button>
       </PopoverTrigger>
 
-      <PopoverContent align="start" className="w-[300px] p-0 flex flex-col bg-background rounded-md overflow-hidden" sideOffset={8}>
+      <PopoverContent align="start" className="w-[300px] p-0 flex flex-col bg-background rounded-md overflow-hidden" sideOffset={8} ref={popoverRef}>
         {/* Header */}
-        <div className="flex items-center justify-between px-3 py-2.5 border-b border-border">
-           <span className="text-[13px] font-semibold text-foreground">
-             {locale === 'en' ? 'Parameters' : 'Parameter'}
-           </span>
-           <div className="flex items-center gap-2">
+        <div className="flex items-center justify-between p-3 border-b border-border bg-neutral-50/50 dark:bg-neutral-900/50 rounded-t-lg">
+           <h3 className="font-semibold text-[13px] text-foreground flex items-center gap-2">
+             <Filter className="h-3.5 w-3.5 text-primary" />
+             {tTrackingLocal.filters.parameters}
+           </h3>
+           <div className="flex items-center gap-1">
              {onReset && (
                <button
                  type="button"
-                 onClick={onReset}
-                 className="text-[11px] font-semibold text-danger hover:text-danger/80 transition-colors"
+                 onClick={() => {
+                   onReset();
+                   setIsOpen(false);
+                 }}
+                 className="text-[11px] text-danger hover:text-danger/80 hover:bg-danger/10 px-2 py-1 rounded transition-colors font-medium"
                >
-                 {locale === 'en' ? 'Reset' : 'Hapus Parameter'}
+                 {tTrackingLocal.filters.resetParameters}
                </button>
              )}
              <button 
                type="button"
                onClick={() => setIsOpen(false)}
-               className="text-foreground-muted hover:text-foreground transition-colors focus:outline-none ml-1"
-               title={locale === 'en' ? 'Close' : 'Tutup'}
+               className="text-foreground-muted hover:text-foreground p-1 hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded transition-colors"
+               title={tTrackingLocal.filters.close}
              >
                <X className="h-3.5 w-3.5" />
              </button>

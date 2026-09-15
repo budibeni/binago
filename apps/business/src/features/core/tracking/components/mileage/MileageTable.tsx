@@ -5,6 +5,7 @@ import { Maximize, Minimize, Calendar, RefreshCw } from 'lucide-react';
 import { DataTable, type DataTableColumnDef } from '@adatrack/ui';
 import { TableFilterPopover } from '../shared/TableFilterPopover';
 import type { TrackingVehicle, DateRange } from '../../types/tracking';
+import { getTrackingTranslation } from '../../i18n';
 
 export interface MileageTableProps {
   modeSelector?: React.ReactNode;
@@ -26,6 +27,8 @@ export function MileageTable({
   isGenerating
 }: MileageTableProps) {
   const t = getTranslation(locale);
+  const tTracking = t.tracking;
+  const tTrackingLocal = getTrackingTranslation(locale);
   
   const [searchQuery, setSearchQuery] = useState('');
   const tableContainerRef = useRef<HTMLDivElement>(null);
@@ -82,17 +85,17 @@ export function MileageTable({
     {
       id: 'no',
       header: 'No',
-      cell: ({ row }) => <div className="text-center text-foreground-muted">{row.index + 1}</div>,
+      cell: ({ row }) => <span className="text-foreground-muted">{row.index + 1}</span>,
       size: 60,
     },
     {
       accessorKey: 'plateNumber',
-      header: locale === 'en' ? 'Vehicle' : 'Armada',
+      header: tTrackingLocal.columns.vehicle,
       cell: ({ row }) => <div className="font-semibold text-foreground">{row.original.plateNumber}</div>,
     },
     {
       id: 'engineOn',
-      header: locale === 'en' ? 'Total Engine ON' : 'Total Mesin Hidup',
+      header: tTrackingLocal.columns.totalEngineOn,
       cell: ({ row }) => {
         const { hours, mins } = row.original.mileageData;
         return (
@@ -104,7 +107,7 @@ export function MileageTable({
     },
     {
       id: 'totalKm',
-      header: locale === 'en' ? 'Total KM' : 'Total KM',
+      header: tTrackingLocal.columns.totalKm,
       cell: ({ row }) => {
         const { km } = row.original.mileageData;
         return (
@@ -115,7 +118,7 @@ export function MileageTable({
         );
       },
     }
-  ], [locale]);
+  ], [tTrackingLocal]);
 
   const handleReset = () => {
     onDateRangeChange({ startDate: '', endDate: '', startTime: '06:00', endTime: '18:00' });
@@ -128,7 +131,7 @@ export function MileageTable({
         {/* Start Date */}
         <div>
           <label className="text-[11px] font-medium text-foreground-muted mb-1 block">
-            {locale === 'en' ? 'Start Date' : 'Tanggal Mulai'}
+            {tTrackingLocal.filters.startDate}
           </label>
           <div className="relative w-full">
             <input
@@ -145,7 +148,7 @@ export function MileageTable({
         {/* End Date */}
         <div>
           <label className="text-[11px] font-medium text-foreground-muted mb-1 block">
-            {locale === 'en' ? 'End Date' : 'Tanggal Selesai'}
+            {tTrackingLocal.filters.endDate}
           </label>
           <div className="relative w-full">
             <input
@@ -164,14 +167,13 @@ export function MileageTable({
           type="button"
           onClick={onGenerate}
           disabled={!dateRange.startDate || !dateRange.endDate || isGenerating}
-          className="flex items-center justify-center h-8 w-full rounded-md bg-danger hover:bg-danger/90 text-danger-foreground disabled:opacity-50 transition-colors focus:outline-none focus:ring-1 focus:ring-danger font-medium text-[12px] mt-2 gap-2"
+          className="w-full h-8 bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-md text-[12px] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center mt-2"
         >
           {isGenerating ? (
             <RefreshCw className="h-3.5 w-3.5 animate-spin" />
           ) : (
-            <RefreshCw className="h-3.5 w-3.5" />
+            tTrackingLocal.filters.generate
           )}
-          {locale === 'en' ? 'Load Data' : 'Muat Data'}
         </button>
       </TableFilterPopover>
     </>
@@ -188,13 +190,13 @@ export function MileageTable({
           columnVisibility
           searchValue={searchQuery}
           onSearchChange={setSearchQuery}
-          searchPlaceholder={locale === 'en' ? 'Search vehicle...' : 'Cari armada...'}
+          searchPlaceholder={tTrackingLocal.messages.searchVehicle}
           exportable
           exportFilename={`Mileage_Summary_${new Date().toISOString().slice(0,10)}`}
           toolbarActions={toolbarActions}
           onRefresh={onGenerate}
           isLoading={isGenerating}
-          emptyDescription={searchQuery ? (locale === 'en' ? 'No vehicle found matching your search.' : 'Tidak ada armada yang sesuai dengan pencarian.') : (locale === 'en' ? 'No data available.' : 'Tidak ada data.')}
+          emptyDescription={searchQuery ? tTrackingLocal.messages.noVehicleFound : tTrackingLocal.messages.noData}
           showFullscreen
           isFullscreen={isFullscreen}
           onToggleFullscreen={handleToggleFullscreen}

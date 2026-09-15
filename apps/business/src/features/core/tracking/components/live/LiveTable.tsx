@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { cn } from '@adatrack/utils';
 import type { TrackingVehicle, VehicleStatus } from '../../types/tracking';
+import { getTrackingTranslation } from '../../i18n';
 import { getTranslation } from '@/i18n';
 import { MapPin, Link, Maximize, Minimize, RefreshCw } from 'lucide-react';
 import { DataTable, type DataTableColumnDef } from '@adatrack/ui';
@@ -20,9 +21,9 @@ function StatusBadge({ status, label }: { status: VehicleStatus; label: string }
           'bg-neutral-400 dark:bg-neutral-500';
 
   return (
-    <div className="flex items-center gap-2">
-      <div className={cn("h-2 w-2 rounded-full shrink-0", colorClass)} />
-      <span className="text-sm font-medium truncate">{label}</span>
+    <div className="flex items-center gap-1.5">
+      <div className={cn("h-1.5 w-1.5 rounded-full shrink-0", colorClass)} />
+      <span className="text-[13px] text-foreground-muted truncate">{label}</span>
     </div>
   );
 }
@@ -30,6 +31,7 @@ function StatusBadge({ status, label }: { status: VehicleStatus; label: string }
 export function LiveTable({ modeSelector, vehicles, onVehicleSelect, locale }: LiveTableProps) {
   const t = getTranslation(locale);
   const tTracking = t.tracking;
+  const tTrackingLocal = getTrackingTranslation(locale);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -93,16 +95,21 @@ export function LiveTable({ modeSelector, vehicles, onVehicleSelect, locale }: L
   const columns = useMemo<DataTableColumnDef<TrackingVehicle>[]>(() => [
     {
       accessorKey: 'plateNumber',
-      header: locale === 'en' ? 'Vehicle' : 'Armada',
+      header: tTrackingLocal.columns.vehicle,
+      size: 140,
       cell: ({ row }) => (
-        <div className="font-semibold text-foreground cursor-pointer" onClick={() => onVehicleSelect(row.original.id)}>
+        <span 
+          className="font-medium text-foreground hover:text-primary hover:underline cursor-pointer transition-colors whitespace-nowrap" 
+          onClick={() => onVehicleSelect(row.original.id)}
+        >
           {row.original.plateNumber}
-        </div>
+        </span>
       ),
     },
     {
       accessorKey: 'status',
-      header: 'Status',
+      header: tTrackingLocal.columns.status,
+      size: 120,
       cell: ({ row }) => (
         <div onClick={() => onVehicleSelect(row.original.id)} className="cursor-pointer">
           <StatusBadge status={row.original.status} label={getStatusLabel(row.original.status)} />
@@ -110,67 +117,80 @@ export function LiveTable({ modeSelector, vehicles, onVehicleSelect, locale }: L
       ),
     },
     {
-      accessorKey: 'isLocationShared',
-      header: locale === 'en' ? 'Share Location' : 'Bagikan Lokasi',
+      accessorKey: 'speed',
+      header: tTrackingLocal.columns.speed,
+      size: 140,
       cell: ({ row }) => (
-        <div onClick={() => onVehicleSelect(row.original.id)} className="cursor-pointer">
-          {row.original.isLocationShared ? (
-            <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-primary/10 text-primary text-[11px] font-medium border border-primary/20">
-              <Link className="h-3 w-3 shrink-0" />
-              <span>{locale === 'en' ? 'Active' : 'Aktif'}</span>
-            </div>
-          ) : (
-            <span className="text-[11px] text-foreground-muted/50">-</span>
-          )}
+        <div className="font-medium text-foreground cursor-pointer tabular-nums" onClick={() => onVehicleSelect(row.original.id)}>
+          {row.original.speed > 0 ? `${row.original.speed}` : '0'}
         </div>
       ),
     },
     {
+      accessorKey: 'location.address',
+      id: 'location',
+      header: tTrackingLocal.columns.location,
+      size: 250,
+      cell: ({ row }) => {
+        const v = row.original;
+        const gmapsUrl = `https://www.google.com/maps/search/?api=1&query=${v.location.lat},${v.location.lng}`;
+        return (
+          <a
+            href={gmapsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 text-foreground-muted hover:text-primary transition-colors cursor-pointer max-w-[220px] truncate"
+            title={`${tTrackingLocal.columns.openMaps}: ${v.location.address}`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <MapPin className="h-3 w-3 shrink-0 opacity-70" />
+            <span className="truncate hover:underline">{v.location.address || `${v.location.lat.toFixed(4)}, ${v.location.lng.toFixed(4)}`}</span>
+          </a>
+        );
+      }
+    },
+    {
       accessorKey: 'groupName',
-      header: locale === 'en' ? 'Group' : 'Grup',
+      header: tTrackingLocal.columns.group,
+      size: 120,
       cell: ({ row }) => (
-        <div className="text-foreground-muted cursor-pointer" onClick={() => onVehicleSelect(row.original.id)}>
+        <div className="text-foreground-muted cursor-pointer whitespace-nowrap" onClick={() => onVehicleSelect(row.original.id)}>
           {row.original.groupName}
         </div>
       )
     },
     {
-      accessorKey: 'speed',
-      header: locale === 'en' ? 'Speed (km/h)' : 'Kecepatan (km/j)',
-      cell: ({ row }) => (
-        <div className="font-medium text-foreground cursor-pointer" onClick={() => onVehicleSelect(row.original.id)}>
-          {row.original.speed}
-        </div>
-      )
-    },
-    {
-      accessorKey: 'location.address',
-      id: 'location',
-      header: locale === 'en' ? 'Location' : 'Lokasi',
-      cell: ({ row }) => {
-        const v = row.original;
-        return (
-          <div
-            className="flex items-center gap-1.5 text-foreground-muted group-hover:text-foreground transition-colors cursor-pointer max-w-[200px] truncate"
-            title={v.location.address}
-            onClick={() => onVehicleSelect(v.id)}
-          >
-            <MapPin className="h-3.5 w-3.5 shrink-0 opacity-70" />
-            <span className="truncate">{v.location.address || `${v.location.lat.toFixed(4)}, ${v.location.lng.toFixed(4)}`}</span>
-          </div>
-        );
-      }
-    },
-    {
       accessorKey: 'lastUpdate',
-      header: tTracking.overviewLastUpdate || (locale === 'en' ? 'Last Update' : 'Update Terakhir'),
+      header: tTrackingLocal.columns.lastUpdate,
+      size: 160,
       cell: ({ row }) => (
-        <div className="text-[12px] text-foreground-muted whitespace-nowrap cursor-pointer" onClick={() => onVehicleSelect(row.original.id)}>
+        <div className="text-[12px] text-foreground-muted whitespace-nowrap cursor-pointer tabular-nums" onClick={() => onVehicleSelect(row.original.id)}>
           {formatDate(row.original.lastUpdate)}
         </div>
       )
     },
-  ], [locale, tTracking, onVehicleSelect]);
+    {
+      id: 'quickActions',
+      header: '',
+      size: 40,
+      enableSorting: false,
+      cell: ({ row }) => {
+        const v = row.original;
+        return (
+          <div className="flex items-center justify-center">
+            {v.isLocationShared && (
+              <div 
+                className="text-primary" 
+                title={tTrackingLocal.columns.locationShared}
+              >
+                <Link className="h-3 w-3" />
+              </div>
+            )}
+          </div>
+        );
+      }
+    },
+  ], [tTrackingLocal, onVehicleSelect]);
 
   const toolbarActions = (
     <>
@@ -190,11 +210,11 @@ export function LiveTable({ modeSelector, vehicles, onVehicleSelect, locale }: L
           columnVisibility
           searchValue={searchQuery}
           onSearchChange={setSearchQuery}
-          searchPlaceholder={tTracking.searchPlaceholder || "Cari kendaraan..."}
+          searchPlaceholder={tTrackingLocal.messages.searchVehicle}
           exportable
-          exportFilename={`Realtime_Tracking_${new Date().toISOString().slice(0, 10)}`}
+          exportFilename={`Fleet_Summary_${new Date().toISOString().slice(0, 10)}`}
           toolbarActions={toolbarActions}
-          emptyDescription={searchQuery ? (locale === 'en' ? 'No vehicle found matching your search.' : 'Tidak ada armada yang sesuai dengan pencarian.') : (locale === 'en' ? 'No data available.' : 'Tidak ada data.')}
+          emptyDescription={searchQuery ? tTrackingLocal.messages.noVehicleFound : tTrackingLocal.messages.noData}
           onRefresh={handleRefresh}
           isLoading={isRefreshing}
           showFullscreen

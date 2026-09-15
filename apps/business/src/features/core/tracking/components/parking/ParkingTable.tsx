@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { cn } from '@adatrack/utils';
 import { getTranslation } from '@/i18n';
-import { Maximize, Minimize, Calendar, RefreshCw } from 'lucide-react';
+import { Maximize, Minimize, Calendar, RefreshCw, MapPin } from 'lucide-react';
 import { DataTable, type DataTableColumnDef } from '@adatrack/ui';
 import { TableFilterPopover } from '../shared/TableFilterPopover';
 import type { TrackingVehicle, DateRange } from '../../types/tracking';
+import { getTrackingTranslation } from '../../i18n';
 
 export interface ParkingTableProps {
   modeSelector?: React.ReactNode;
@@ -31,6 +32,7 @@ export function ParkingTable({
 }: ParkingTableProps) {
   const t = getTranslation(locale);
   const tTracking = t.tracking;
+  const tTrackingLocal = getTrackingTranslation(locale);
 
   const [searchQuery, setSearchQuery] = useState('');
   const tableContainerRef = useRef<HTMLDivElement>(null);
@@ -96,59 +98,55 @@ export function ParkingTable({
     },
     {
       accessorKey: 'plateNumber',
-      header: locale === 'en' ? 'Vehicle' : 'Armada',
-      cell: ({ row }) => <div className="font-semibold text-foreground">{row.original.plateNumber}</div>,
-    },
-    {
-      id: 'address',
-      header: locale === 'en' ? 'Address' : 'Alamat',
-      cell: ({ row }) => (
-        <div className="text-foreground-muted truncate max-w-[200px] xl:max-w-[300px]" title={row.original.parkingData.address}>
-          {row.original.parkingData.address}
-        </div>
-      ),
-    },
-    {
-      id: 'geofence',
-      header: locale === 'en' ? 'Geofence' : 'Geofence',
-      cell: ({ row }) => {
-        const gf = row.original.parkingData.geofence;
-        return gf !== '-' ? (
-          <span className="inline-flex px-1.5 py-0.5 rounded-md bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-[11px] font-medium border border-blue-200 dark:border-blue-800">
-            {gf}
-          </span>
-        ) : <span className="text-foreground-muted">-</span>;
-      }
+      header: tTrackingLocal.columns.vehicle,
+      size: 140,
+      cell: ({ row }) => <span className="font-medium text-foreground whitespace-nowrap">{row.original.plateNumber}</span>,
     },
     {
       id: 'duration',
-      header: locale === 'en' ? 'Duration' : 'Durasi Parkir',
+      header: tTrackingLocal.columns.durationParking,
+      size: 140,
       cell: ({ row }) => {
         const { hours, mins } = row.original.parkingData;
         return (
-          <div className="font-medium text-amber-600 dark:text-amber-500">
+          <div className="font-medium text-amber-600 dark:text-amber-500 tabular-nums">
             {hours > 0 ? `${hours}j ${mins}m` : `${mins}m`}
           </div>
         );
       },
     },
     {
-      id: 'action',
-      header: locale === 'en' ? 'Action' : 'Aksi',
-      cell: () => (
-        <a 
-          href={`https://www.google.com/maps/search/?api=1&query=-6.200000,106.816666`} 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="inline-flex items-center justify-center h-7 w-7 rounded-md bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-blue-600 dark:text-blue-400 transition-colors"
-          title="Buka di Google Maps"
-        >
-          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-        </a>
-      ),
-      size: 80,
+      id: 'address',
+      header: tTrackingLocal.columns.address,
+      size: 250,
+      cell: ({ row }) => {
+        const v = row.original;
+        const gmapsUrl = `https://www.google.com/maps/search/?api=1&query=${v.location.lat},${v.location.lng}`;
+        return (
+          <a
+            href={gmapsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 text-foreground-muted hover:text-primary transition-colors cursor-pointer max-w-[220px] xl:max-w-[300px] truncate"
+            title={`${tTrackingLocal.columns.openMaps}: ${v.parkingData.address}`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <MapPin className="h-3 w-3 shrink-0 opacity-70" />
+            <span className="truncate hover:underline">{v.parkingData.address}</span>
+          </a>
+        );
+      }
+    },
+    {
+      id: 'geofence',
+      header: tTrackingLocal.columns.geofence,
+      size: 160,
+      cell: ({ row }) => {
+        const gf = row.original.parkingData.geofence;
+        return <span className="text-foreground-muted whitespace-nowrap">{gf}</span>;
+      }
     }
-  ], [locale]);
+  ], [tTrackingLocal]);
 
   const handleReset = () => {
     onMinDurationChange(10);
@@ -162,7 +160,7 @@ export function ParkingTable({
         {/* Min Duration */}
         <div>
           <label className="text-[11px] font-medium text-foreground-muted mb-1 block">
-            {locale === 'en' ? 'Min Duration (min)' : 'Min. Durasi (menit)'}
+            {tTrackingLocal.filters.minDuration}
           </label>
           <input
             type="number"
@@ -177,7 +175,7 @@ export function ParkingTable({
         {/* Start Date */}
         <div>
           <label className="text-[11px] font-medium text-foreground-muted mb-1 block">
-            {locale === 'en' ? 'Start Date' : 'Tanggal Mulai'}
+            {tTrackingLocal.filters.startDate}
           </label>
           <div className="relative w-full">
             <input
@@ -194,7 +192,7 @@ export function ParkingTable({
         {/* End Date */}
         <div>
           <label className="text-[11px] font-medium text-foreground-muted mb-1 block">
-            {locale === 'en' ? 'End Date' : 'Tanggal Selesai'}
+            {tTrackingLocal.filters.endDate}
           </label>
           <div className="relative w-full">
             <input
@@ -220,7 +218,7 @@ export function ParkingTable({
           ) : (
             <RefreshCw className="h-3.5 w-3.5" />
           )}
-          {locale === 'en' ? 'Load Data' : 'Muat Data'}
+          {tTrackingLocal.filters.generate}
         </button>
       </TableFilterPopover>
     </>
@@ -239,13 +237,13 @@ export function ParkingTable({
           columnVisibility
           searchValue={searchQuery}
           onSearchChange={setSearchQuery}
-          searchPlaceholder={locale === 'en' ? 'Search vehicle...' : 'Cari armada...'}
+          searchPlaceholder={tTrackingLocal.messages.searchVehicle}
           exportable
           exportFilename={`Parking_Summary_${new Date().toISOString().slice(0,10)}`}
           toolbarActions={toolbarActions}
           onRefresh={onGenerate}
           isLoading={isGenerating}
-          emptyDescription={searchQuery ? (locale === 'en' ? 'No vehicle found matching your search.' : 'Tidak ada armada yang sesuai dengan pencarian.') : (locale === 'en' ? 'No data available.' : 'Tidak ada data.')}
+          emptyDescription={searchQuery ? tTrackingLocal.messages.noVehicleFound : tTrackingLocal.messages.noData}
           showFullscreen
           isFullscreen={isFullscreen}
           onToggleFullscreen={handleToggleFullscreen}

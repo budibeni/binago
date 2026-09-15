@@ -6,6 +6,7 @@ import { DataTable, type DataTableColumnDef } from '@adatrack/ui';
 import { TrackingVehicle, DateRange } from '../../types/tracking';
 import { TableFilterPopover } from '../shared/TableFilterPopover';
 import { VehicleSelect } from '../shared/VehicleSelect';
+import { getTrackingTranslation } from '../../i18n';
 import type { MockPlaybackData, MockPlaybackTrackPoint } from '../../data/mockTrackingData';
 
 export interface PlaybackTableProps {
@@ -24,9 +25,9 @@ export interface PlaybackTableProps {
 function StatusBadge({ speed }: { speed: number }) {
   const isDriving = speed > 0;
   return (
-    <div className="flex items-center gap-2">
-      <div className={cn("h-2 w-2 rounded-full shrink-0", isDriving ? "bg-emerald-500" : "bg-blue-500")} />
-      <span className="text-sm font-medium truncate">{isDriving ? 'Berjalan' : 'Parkir'}</span>
+    <div className="flex items-center gap-1.5">
+      <div className={cn("h-1.5 w-1.5 rounded-full shrink-0", isDriving ? "bg-emerald-500" : "bg-blue-500")} />
+      <span className="text-[13px] text-foreground-muted truncate">{isDriving ? 'Berjalan' : 'Parkir'}</span>
     </div>
   );
 }
@@ -45,6 +46,7 @@ export function PlaybackTable({
 }: PlaybackTableProps) {
   const t = getTranslation(locale);
   const tTracking = t.tracking;
+  const tTrackingLocal = getTrackingTranslation(locale);
   const [searchQuery, setSearchQuery] = useState('');
   const tableContainerRef = useRef<HTMLDivElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -104,38 +106,54 @@ export function PlaybackTable({
     },
     {
       accessorKey: 'timestamp',
-      header: locale === 'en' ? 'Time' : 'Waktu',
-      cell: ({ row }) => <span className="font-medium text-foreground">{formatDate(row.original.timestamp)}</span>,
-    },
-    {
-      id: 'status',
-      header: 'Status',
-      cell: ({ row }) => <StatusBadge speed={row.original.speed} />,
+      header: tTrackingLocal.columns.time || 'Waktu',
+      size: 160,
+      cell: ({ row }) => {
+        const d = new Date(row.original.timestamp);
+        return <span className="font-medium text-foreground hover:text-primary hover:underline cursor-pointer tabular-nums">{formatDate(d.toISOString())}</span>;
+      }
     },
     {
       accessorKey: 'speed',
-      header: locale === 'en' ? 'Speed (km/h)' : 'Kecepatan (km/j)',
-      cell: ({ row }) => <span className="font-medium text-foreground">{row.original.speed}</span>,
+      header: tTrackingLocal.columns.speed,
+      size: 120,
+      cell: ({ row }) => <span className="font-medium text-foreground tabular-nums">{row.original.speed > 0 ? `${Math.round(row.original.speed)}` : '0'}</span>,
+    },
+    {
+      id: 'status',
+      header: tTrackingLocal.columns.status,
+      size: 120,
+      cell: ({ row }) => <StatusBadge speed={row.original.speed} />
     },
     {
       accessorKey: 'odometer',
       header: 'Odometer',
-      cell: ({ row }) => <span className="text-foreground-muted">{row.original.odometer}</span>,
+      size: 130,
+      cell: ({ row }) => <span className="text-foreground-muted tabular-nums">{row.original.odometer}</span>,
     },
     {
-      accessorKey: 'address',
-      header: locale === 'en' ? 'Location' : 'Lokasi',
+      id: 'address',
+      header: tTrackingLocal.columns.address,
+      size: 300,
       cell: ({ row }) => {
         const p = row.original;
+        const gmapsUrl = `https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lng}`;
         return (
-          <div className="flex items-center gap-1.5 text-foreground-muted group-hover:text-foreground transition-colors max-w-[300px] truncate" title={p.address}>
-            <MapPin className="h-3.5 w-3.5 shrink-0 opacity-70" />
-            <span className="truncate">{p.address || `${p.lat.toFixed(4)}, ${p.lng.toFixed(4)}`}</span>
-          </div>
+          <a
+            href={gmapsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 text-foreground-muted hover:text-primary transition-colors cursor-pointer max-w-[280px] truncate"
+            title={`${tTrackingLocal.columns.openMaps}: ${p.address}`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <MapPin className="h-3 w-3 shrink-0 opacity-70" />
+            <span className="truncate hover:underline">{p.address || `${p.lat.toFixed(4)}, ${p.lng.toFixed(4)}`}</span>
+          </a>
         );
       },
     },
-  ], [locale]);
+  ], [tTracking, tTrackingLocal]);
 
   const toolbarActions = (
     <>
@@ -144,7 +162,7 @@ export function PlaybackTable({
         {/* Vehicle Select */}
         <div>
           <label className="text-[11px] font-medium text-foreground-muted mb-1 block">
-            {tTracking.playbackSelectVehicle || (locale === 'en' ? 'Select Vehicle' : 'Pilih Kendaraan')}
+            {tTrackingLocal.messages.selectVehicle}
           </label>
           <VehicleSelect
             vehicles={vehicles}
@@ -158,7 +176,7 @@ export function PlaybackTable({
         {/* Start Date */}
         <div>
           <label className="text-[11px] font-medium text-foreground-muted mb-1 block">
-            {locale === 'en' ? 'Start Date' : 'Tanggal Mulai'}
+            {tTrackingLocal.filters.startDate}
           </label>
           <div className="relative w-full">
             <input
@@ -175,7 +193,7 @@ export function PlaybackTable({
         {/* End Date */}
         <div>
           <label className="text-[11px] font-medium text-foreground-muted mb-1 block">
-            {locale === 'en' ? 'End Date' : 'Tanggal Selesai'}
+            {tTrackingLocal.filters.endDate}
           </label>
           <div className="relative w-full">
             <input
@@ -201,7 +219,7 @@ export function PlaybackTable({
           ) : (
             <RefreshCw className="h-3.5 w-3.5" />
           )}
-          {tTracking.playbackLoading || (locale === 'en' ? 'Load Data' : 'Muat Data')}
+          {tTrackingLocal.filters.generate}
         </button>
       </TableFilterPopover>
     </>
@@ -218,16 +236,17 @@ export function PlaybackTable({
           columnVisibility
           searchValue={searchQuery}
           onSearchChange={setSearchQuery}
-          searchPlaceholder={locale === 'en' ? 'Search address...' : 'Cari lokasi...'}
+          searchPlaceholder={tTrackingLocal.messages.searchAddress}
           exportable
-          exportFilename={`Playback_History_${new Date().toISOString().slice(0,10)}`}
+          exportFilename={`Playback_Summary_${new Date().toISOString().slice(0,10)}`}
           toolbarActions={toolbarActions}
           onRefresh={onLoad}
           isLoading={isLoading}
+          emptyTitle={tTracking.playbackNoVehicle || 'Playback'}
           emptyDescription={
-            !playbackData ? (locale === 'en' ? 'Please load playback data first.' : 'Silakan muat data perjalanan terlebih dahulu.') :
-            searchQuery ? (locale === 'en' ? 'No points match your search.' : 'Tidak ada titik yang cocok dengan pencarian.') : 
-            (locale === 'en' ? 'No history data available.' : 'Data riwayat tidak tersedia.')
+            !playbackData ? tTrackingLocal.messages.loadPlaybackFirst :
+            searchQuery ? tTrackingLocal.messages.noPointsMatch : 
+            tTrackingLocal.messages.noHistoryData
           }
           showFullscreen
           isFullscreen={isFullscreen}

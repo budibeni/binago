@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
 import { cn } from '@adatrack/utils';
-import { AlertTriangle, Info, MapPin, Wrench, Radio, Map as MapIcon, Car, Clock } from 'lucide-react';
+import { AlertTriangle, Info, MapPin, Wrench, Radio, Map as MapIcon, Car, Clock, Bell } from 'lucide-react';
+import { getTrackingTranslation } from '../../i18n';
 
 export interface TrackingNotificationPanelProps {
   locale: 'id' | 'en';
   visibleVehicleIds?: string[];
+  open?: boolean;
+  onClose?: () => void;
 }
 
-type NotificationCategory = 'all' | 'geofence' | 'alarm_vehicle' | 'sensor' | 'maintenance' | 'operation';
+type NotificationCategory = 'all' | 'alarm_vehicle' | 'maintenance' | 'operation';
 
 const mockNotifications = [
   {
@@ -66,17 +69,16 @@ const mockNotifications = [
   },
 ];
 
-export function TrackingNotificationPanel({ locale, visibleVehicleIds }: TrackingNotificationPanelProps) {
-  const [activeTab, setActiveTab] = useState<NotificationCategory>('all');
+export function TrackingNotificationPanel({ open, onClose, locale = 'id', visibleVehicleIds }: TrackingNotificationPanelProps) {
+  const [activeTab, setActiveTab] = useState<'all' | 'alarm_vehicle' | 'maintenance' | 'operation'>('all');
+  const tTrackingLocal = getTrackingTranslation(locale);
 
-  const tabs: { id: NotificationCategory; label: string; icon?: React.ReactNode }[] = [
-    { id: 'all', label: locale === 'en' ? 'All' : 'Semua' },
-    { id: 'geofence', label: 'Geofence', icon: <MapIcon className="h-3.5 w-3.5" /> },
-    { id: 'alarm_vehicle', label: locale === 'en' ? 'Alarm Vehicle' : 'Alarm Kendaraan', icon: <Car className="h-3.5 w-3.5" /> },
-    { id: 'sensor', label: 'Sensor', icon: <Radio className="h-3.5 w-3.5" /> },
-    { id: 'maintenance', label: locale === 'en' ? 'Maintenance' : 'Perawatan', icon: <Wrench className="h-3.5 w-3.5" /> },
-    { id: 'operation', label: locale === 'en' ? 'Operation' : 'Operasional', icon: <Clock className="h-3.5 w-3.5" /> },
-  ];
+  const tabs = [
+    { id: 'all', label: tTrackingLocal.notifications.all },
+    { id: 'alarm_vehicle', label: tTrackingLocal.notifications.alarm, icon: <Car className="h-3.5 w-3.5" /> },
+    { id: 'maintenance', label: tTrackingLocal.notifications.maintenance, icon: <Wrench className="h-3.5 w-3.5" /> },
+    { id: 'operation', label: tTrackingLocal.notifications.operation, icon: <Clock className="h-3.5 w-3.5" /> },
+  ] as const;
 
   const filteredNotifications = mockNotifications.filter((notif) => {
     const matchesTab = activeTab === 'all' || notif.category === activeTab;
@@ -124,7 +126,7 @@ export function TrackingNotificationPanel({ locale, visibleVehicleIds }: Trackin
                   : 'bg-neutral-100 dark:bg-neutral-800 text-foreground-muted hover:bg-neutral-200 dark:hover:bg-neutral-700'
               )}
             >
-              {tab.icon}
+              {'icon' in tab && tab.icon}
               {tab.label}
             </button>
           ))}
@@ -133,8 +135,9 @@ export function TrackingNotificationPanel({ locale, visibleVehicleIds }: Trackin
         {/* Notifications List */}
         <div className="bg-background rounded-lg border border-border overflow-hidden">
           {filteredNotifications.length === 0 ? (
-            <div className="text-center py-8 text-foreground-muted text-sm">
-              {locale === 'en' ? 'No notifications found' : 'Tidak ada notifikasi'}
+            <div className="flex-1 flex flex-col items-center justify-center text-foreground-muted p-8">
+              <Bell className="h-8 w-8 mb-3 opacity-20" />
+              <p className="text-[13px] font-medium">{tTrackingLocal.notifications.none}</p>
             </div>
           ) : (
             <div className="divide-y divide-border">
@@ -156,10 +159,10 @@ export function TrackingNotificationPanel({ locale, visibleVehicleIds }: Trackin
                     {/* Kolom 2: Datetime & Location */}
                     <div className="flex flex-col items-end shrink-0">
                       <span className="text-xs text-foreground-muted whitespace-nowrap mb-1">{formatDate(notif.timestamp)}</span>
-                      <div className="flex items-center gap-1 text-[11px] font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button className="flex items-center gap-1.5 text-[11px] font-medium text-primary hover:text-primary/80 transition-colors bg-primary/5 hover:bg-primary/10 px-2.5 py-1 rounded-full mt-2">
                         <MapPin className="h-3 w-3" />
-                        <span>{locale === 'en' ? 'View Location' : 'Lihat Lokasi'}</span>
-                      </div>
+                        <span>{tTrackingLocal.notifications.viewLocation}</span>
+                      </button>
                     </div>
                   </div>
                 </div>

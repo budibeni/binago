@@ -24,6 +24,7 @@ import { trackingNavigationService } from './services/trackingNavigationService'
 import type { MockPlaybackData } from './data/mockTrackingData';
 import { getTranslation } from '../../../i18n';
 import { useBusinessLocale } from '../../../components/BusinessShellLayout';
+import { getTrackingTranslation } from './i18n';
 import type { StatusFilter, DateRange, PlaybackState, TrackingView } from './types/tracking';
 import type { Locale } from '@adatrack/types';
 
@@ -42,6 +43,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
   const locale = localeProp ?? contextLocale ?? 'id';
   const t = getTranslation(locale);
   const tTracking = t.tracking;
+  const tTrackingLocal = getTrackingTranslation(locale);
 
   // â"€â"€ Mode â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
   const [mode, setMode] = React.useState<TrackingMode>('live');
@@ -766,7 +768,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
             )}
           >
             <Map className="h-3.5 w-3.5 text-sky-500 dark:text-sky-400" />
-            {locale === 'en' ? 'Maps' : 'Peta'}
+            {tTrackingLocal.modes.maps}
           </button>
           <button
             type="button"
@@ -777,7 +779,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
             )}
           >
             <svg className="h-3.5 w-3.5 text-emerald-500 dark:text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2" /><path d="M3 9h18" /><path d="M3 15h18" /><path d="M9 3v18" /><path d="M15 3v18" /></svg>
-            {locale === 'en' ? 'Table' : 'Tabel'}
+            {tTrackingLocal.modes.table}
           </button>
           <button
             type="button"
@@ -788,7 +790,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
             )}
           >
             <Activity className="h-3.5 w-3.5 text-blue-500 dark:text-blue-400" />
-            {tTracking.viewActivity || (locale === 'en' ? 'Activity' : 'Aktivitas')}
+            {tTrackingLocal.modes.activity}
           </button>
         </div>
       </div>

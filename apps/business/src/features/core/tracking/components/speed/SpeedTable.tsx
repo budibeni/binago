@@ -5,6 +5,7 @@ import { Maximize, Minimize, Calendar, RefreshCw } from 'lucide-react';
 import { DataTable, type DataTableColumnDef } from '@adatrack/ui';
 import { TableFilterPopover } from '../shared/TableFilterPopover';
 import type { TrackingVehicle, DateRange } from '../../types/tracking';
+import { getTrackingTranslation } from '../../i18n';
 
 export interface SpeedTableProps {
   modeSelector?: React.ReactNode;
@@ -26,6 +27,8 @@ export function SpeedTable({
   isGenerating
 }: SpeedTableProps) {
   const t = getTranslation(locale);
+  const tTracking = t.tracking;
+  const tTrackingLocal = getTrackingTranslation(locale);
   
   const [searchQuery, setSearchQuery] = useState('');
   const tableContainerRef = useRef<HTMLDivElement>(null);
@@ -87,12 +90,12 @@ export function SpeedTable({
     },
     {
       accessorKey: 'plateNumber',
-      header: locale === 'en' ? 'Vehicle' : 'Armada',
+      header: tTrackingLocal.columns.vehicle,
       cell: ({ row }) => <div className="font-semibold text-foreground">{row.original.plateNumber}</div>,
     },
     {
       id: 'minSpeed',
-      header: locale === 'en' ? 'Min. Speed' : 'Min. Kecepatan',
+      header: tTrackingLocal.columns.minSpeed,
       cell: ({ row }) => {
         const { minSpeed } = row.original.speedData;
         return (
@@ -105,7 +108,7 @@ export function SpeedTable({
     },
     {
       id: 'avgSpeed',
-      header: locale === 'en' ? 'Average' : 'Rata-rata',
+      header: tTrackingLocal.columns.averageSpeed,
       cell: ({ row }) => {
         const { avgSpeed } = row.original.speedData;
         return (
@@ -118,7 +121,7 @@ export function SpeedTable({
     },
     {
       id: 'maxSpeed',
-      header: locale === 'en' ? 'Max. Speed' : 'Max. Kecepatan',
+      header: tTrackingLocal.columns.maxSpeed,
       cell: ({ row }) => {
         const { maxSpeed } = row.original.speedData;
         return (
@@ -132,7 +135,6 @@ export function SpeedTable({
   ], [locale]);
 
   const handleReset = () => {
-    onMinSpeedChange(60);
     onDateRangeChange({ startDate: '', endDate: '', startTime: '06:00', endTime: '18:00' });
   };
 
@@ -143,7 +145,7 @@ export function SpeedTable({
         {/* Start Date */}
         <div>
           <label className="text-[11px] font-medium text-foreground-muted mb-1 block">
-            {locale === 'en' ? 'Start Date' : 'Tanggal Mulai'}
+            {tTrackingLocal.filters.startDate}
           </label>
           <div className="relative w-full">
             <input
@@ -160,7 +162,7 @@ export function SpeedTable({
         {/* End Date */}
         <div>
           <label className="text-[11px] font-medium text-foreground-muted mb-1 block">
-            {locale === 'en' ? 'End Date' : 'Tanggal Selesai'}
+            {tTrackingLocal.filters.endDate}
           </label>
           <div className="relative w-full">
             <input
@@ -186,7 +188,7 @@ export function SpeedTable({
           ) : (
             <RefreshCw className="h-3.5 w-3.5" />
           )}
-          {locale === 'en' ? 'Load Data' : 'Muat Data'}
+          {tTrackingLocal.filters.generate}
         </button>
       </TableFilterPopover>
     </>
@@ -203,13 +205,13 @@ export function SpeedTable({
           columnVisibility
           searchValue={searchQuery}
           onSearchChange={setSearchQuery}
-          searchPlaceholder={locale === 'en' ? 'Search vehicle...' : 'Cari armada...'}
+          searchPlaceholder={tTrackingLocal.messages.searchVehicle}
           exportable
           exportFilename={`Speed_Summary_${new Date().toISOString().slice(0,10)}`}
           toolbarActions={toolbarActions}
           onRefresh={onGenerate}
           isLoading={isGenerating}
-          emptyDescription={searchQuery ? (locale === 'en' ? 'No vehicle found matching your search.' : 'Tidak ada armada yang sesuai dengan pencarian.') : (locale === 'en' ? 'No data available.' : 'Tidak ada data.')}
+          emptyDescription={searchQuery ? tTrackingLocal.messages.noVehicleFound : tTrackingLocal.messages.noData}
           showFullscreen
           isFullscreen={isFullscreen}
           onToggleFullscreen={handleToggleFullscreen}

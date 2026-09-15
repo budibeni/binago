@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { cn } from '@adatrack/utils';
 import { getTranslation } from '@/i18n';
-import { Maximize, Minimize, Calendar, ChevronDown, RefreshCw } from 'lucide-react';
+import { Maximize, Minimize, Calendar, ChevronDown, RefreshCw, MapPin } from 'lucide-react';
 import { DataTable, type DataTableColumnDef } from '@adatrack/ui';
 import { TableFilterPopover } from '../shared/TableFilterPopover';
 import type { TrackingVehicle, DateRange } from '../../types/tracking';
+import { getTrackingTranslation } from '../../i18n';
 
 export interface HeatmapTableProps {
   modeSelector?: React.ReactNode;
@@ -31,6 +32,7 @@ export function HeatmapTable({
 }: HeatmapTableProps) {
   const t = getTranslation(locale);
   const tTracking = t.tracking;
+  const tTrackingLocal = getTrackingTranslation(locale);
 
   const [searchQuery, setSearchQuery] = useState('');
   const tableContainerRef = useRef<HTMLDivElement>(null);
@@ -68,25 +70,27 @@ export function HeatmapTable({
     {
       id: 'no',
       header: 'No',
-      cell: ({ row }) => <span className="text-foreground-muted">{row.index + 1}</span>,
+      cell: ({ row }) => <div className="text-center text-foreground-muted">{row.index + 1}</div>,
       size: 60,
     },
     {
       accessorKey: 'plateNumber',
-      header: locale === 'en' ? 'Vehicle' : 'Armada',
-      cell: ({ row }) => <div className="font-semibold text-foreground">{row.original.plateNumber}</div>,
+      header: tTrackingLocal.columns.vehicle,
+      size: 140,
+      cell: ({ row }) => <span className="font-medium text-foreground hover:text-primary transition-colors whitespace-nowrap">{row.original.plateNumber}</span>,
     },
     {
       accessorKey: 'groupName',
-      header: locale === 'en' ? 'Group' : 'Grup',
-      cell: ({ row }) => <div className="text-foreground-muted">{row.original.groupName}</div>,
+      header: tTrackingLocal.columns.group,
+      size: 130,
+      cell: ({ row }) => <span className="text-foreground-muted whitespace-nowrap">{row.original.groupName}</span>,
     },
     {
       accessorKey: 'vehicleType',
-      header: locale === 'en' ? 'Vehicle Type' : 'Tipe Kendaraan',
+      header: tTrackingLocal.columns.vehicleType,
       cell: ({ row }) => <div className="text-foreground-muted">{row.original.vehicleType || '-'}</div>,
     },
-  ], [locale]);
+  ], [tTrackingLocal]);
 
   const handleReset = () => {
     onStatusFilterChange('driving');
@@ -109,9 +113,9 @@ export function HeatmapTable({
               disabled={isGenerating}
               className="w-full h-8 rounded-md bg-background border border-border hover:border-foreground-muted px-2.5 text-[12px] font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50 transition-all appearance-none cursor-pointer"
             >
-              <option value="driving">{locale === 'en' ? 'Driving' : 'Berjalan'}</option>
-              <option value="idle">{locale === 'en' ? 'Idle' : 'Idle'}</option>
-              <option value="parking">{locale === 'en' ? 'Parking' : 'Parkir'}</option>
+              <option value="driving">{tTrackingLocal.filters.statusDriving}</option>
+              <option value="idle">{tTrackingLocal.filters.statusIdle}</option>
+              <option value="parking">{tTrackingLocal.filters.statusParking}</option>
             </select>
             <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-foreground-muted" />
           </div>
@@ -120,7 +124,7 @@ export function HeatmapTable({
         {/* Start Date */}
         <div>
           <label className="text-[11px] font-medium text-foreground-muted mb-1 block">
-            {locale === 'en' ? 'Start Date' : 'Tanggal Mulai'}
+            {tTrackingLocal.filters.startDate}
           </label>
           <div className="relative w-full">
             <input
@@ -137,7 +141,7 @@ export function HeatmapTable({
         {/* End Date */}
         <div>
           <label className="text-[11px] font-medium text-foreground-muted mb-1 block">
-            {locale === 'en' ? 'End Date' : 'Tanggal Selesai'}
+            {tTrackingLocal.filters.endDate}
           </label>
           <div className="relative w-full">
             <input
@@ -161,9 +165,9 @@ export function HeatmapTable({
           {isGenerating ? (
             <RefreshCw className="h-3.5 w-3.5 animate-spin" />
           ) : (
-            <RefreshCw className="h-3.5 w-3.5" />
+            <MapPin className="h-3.5 w-3.5" />
           )}
-          {locale === 'en' ? 'Generate' : 'Buat Heatmap'}
+          {tTrackingLocal.filters.generateHeatmap}
         </button>
       </TableFilterPopover>
     </>
@@ -186,7 +190,7 @@ export function HeatmapTable({
           toolbarActions={toolbarActions}
           onRefresh={onGenerate}
           isLoading={isGenerating}
-          emptyDescription={searchQuery ? (locale === 'en' ? 'No vehicles match your search.' : 'Tidak ada kendaraan yang cocok dengan pencarian.') : (tTracking.emptyDescription || 'Tidak ada kendaraan.')}
+          emptyDescription={searchQuery ? tTrackingLocal.messages.noVehicleFound : tTrackingLocal.messages.noData}
           showFullscreen
           isFullscreen={isFullscreen}
           onToggleFullscreen={handleToggleFullscreen}
