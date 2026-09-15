@@ -1,8 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { cn } from '@adatrack/utils';
 import type { TrackingVehicle, VehicleStatus } from '../../types/tracking';
 import { getTranslation } from '@/i18n';
-import { MapPin, Search, Link, Download, Maximize, Minimize, RefreshCw } from 'lucide-react';
+import { MapPin, Link, Maximize, Minimize, RefreshCw } from 'lucide-react';
+import { DataTable, type DataTableColumnDef } from '@adatrack/ui';
 
 export interface LiveTableProps {
   modeSelector?: React.ReactNode;
@@ -20,8 +21,8 @@ function StatusBadge({ status, label }: { status: VehicleStatus; label: string }
 
   return (
     <div className="flex items-center gap-2">
-      <div className={cn("h-2 w-2 rounded-full", colorClass)} />
-      <span className="text-sm font-medium">{label}</span>
+      <div className={cn("h-2 w-2 rounded-full shrink-0", colorClass)} />
+      <span className="text-sm font-medium truncate">{label}</span>
     </div>
   );
 }
@@ -32,6 +33,8 @@ export function LiveTable({ modeSelector, vehicles, onVehicleSelect, locale }: L
 
   const [searchQuery, setSearchQuery] = useState('');
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const tableContainerRef = useRef<HTMLDivElement>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   const handleRefresh = () => {
     setIsRefreshing(true);
@@ -59,19 +62,6 @@ export function LiveTable({ modeSelector, vehicles, onVehicleSelect, locale }: L
     }
   };
 
-  const filteredVehicles = vehicles.filter((v) => {
-    if (!searchQuery) return true;
-    const q = searchQuery.toLowerCase();
-    return (
-      v.plateNumber.toLowerCase().includes(q) ||
-      (v.driverName || '').toLowerCase().includes(q) ||
-      v.groupName.toLowerCase().includes(q)
-    );
-  });
-
-  const tableContainerRef = useRef<HTMLDivElement>(null);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-
   useEffect(() => {
     const handleFullscreenChange = () => {
       setIsFullscreen(!!document.fullscreenElement);
@@ -90,198 +80,146 @@ export function LiveTable({ modeSelector, vehicles, onVehicleSelect, locale }: L
     }
   };
 
-  const handleExportExcel = () => {
-    const headers = [
-      'ID',
-      locale === 'en' ? 'Driver' : 'Pengemudi',
-      'Status',
-      locale === 'en' ? 'Share Location' : 'Bagikan Lokasi',
-      locale === 'en' ? 'Group' : 'Grup',
-      locale === 'en' ? 'Speed (km/h)' : 'Kecepatan (km/j)',
-      locale === 'en' ? 'Location' : 'Lokasi',
-      tTracking.overviewLastUpdate || (locale === 'en' ? 'Last Update' : 'Update Terakhir')
-    ];
+  const filteredVehicles = useMemo(() => {
+    if (!searchQuery) return vehicles;
+    const q = searchQuery.toLowerCase();
+    return vehicles.filter((v) => 
+      v.plateNumber.toLowerCase().includes(q) ||
+      (v.driverName || '').toLowerCase().includes(q) ||
+      v.groupName.toLowerCase().includes(q)
+    );
+  }, [vehicles, searchQuery]);
 
-    const toCsvCell = (val: string | number | boolean) => {
-      const str = String(val ?? '');
-      if (str.includes(',') || str.includes('"') || str.includes('\n')) {
-        return `"${str.replace(/"/g, '""')}"`;
+  const columns = useMemo<DataTableColumnDef<TrackingVehicle>[]>(() => [
+    {
+      accessorKey: 'plateNumber',
+      header: locale === 'en' ? 'Vehicle' : 'Armada',
+      cell: ({ row }) => (
+        <div className="font-semibold text-foreground cursor-pointer" onClick={() => onVehicleSelect(row.original.id)}>
+          {row.original.plateNumber}
+        </div>
+      ),
+    },
+    {
+      accessorKey: 'status',
+      header: 'Status',
+      cell: ({ row }) => (
+        <div onClick={() => onVehicleSelect(row.original.id)} className="cursor-pointer">
+          <StatusBadge status={row.original.status} label={getStatusLabel(row.original.status)} />
+        </div>
+      ),
+    },
+    {
+      accessorKey: 'isLocationShared',
+      header: locale === 'en' ? 'Share Location' : 'Bagikan Lokasi',
+      cell: ({ row }) => (
+        <div onClick={() => onVehicleSelect(row.original.id)} className="cursor-pointer">
+          {row.original.isLocationShared ? (
+            <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-primary/10 text-primary text-[11px] font-medium border border-primary/20">
+              <Link className="h-3 w-3 shrink-0" />
+              <span>{locale === 'en' ? 'Active' : 'Aktif'}</span>
+            </div>
+          ) : (
+            <span className="text-[11px] text-foreground-muted/50">-</span>
+          )}
+        </div>
+      ),
+    },
+    {
+      accessorKey: 'groupName',
+      header: locale === 'en' ? 'Group' : 'Grup',
+      cell: ({ row }) => (
+        <div className="text-foreground-muted cursor-pointer" onClick={() => onVehicleSelect(row.original.id)}>
+          {row.original.groupName}
+        </div>
+      )
+    },
+    {
+      accessorKey: 'speed',
+      header: locale === 'en' ? 'Speed (km/h)' : 'Kecepatan (km/j)',
+      cell: ({ row }) => (
+        <div className="font-medium text-foreground cursor-pointer" onClick={() => onVehicleSelect(row.original.id)}>
+          {row.original.speed}
+        </div>
+      )
+    },
+    {
+      accessorKey: 'location.address',
+      id: 'location',
+      header: locale === 'en' ? 'Location' : 'Lokasi',
+      cell: ({ row }) => {
+        const v = row.original;
+        return (
+          <div 
+            className="flex items-center gap-1.5 text-foreground-muted group-hover:text-foreground transition-colors cursor-pointer max-w-[200px] truncate" 
+            title={v.location.address}
+            onClick={() => onVehicleSelect(v.id)}
+          >
+            <MapPin className="h-3.5 w-3.5 shrink-0 opacity-70" />
+            <span className="truncate">{v.location.address || `${v.location.lat.toFixed(4)}, ${v.location.lng.toFixed(4)}`}</span>
+          </div>
+        );
       }
-      return str;
-    };
+    },
+    {
+      accessorKey: 'lastUpdate',
+      header: tTracking.overviewLastUpdate || (locale === 'en' ? 'Last Update' : 'Update Terakhir'),
+      cell: ({ row }) => (
+        <div className="text-[12px] text-foreground-muted whitespace-nowrap cursor-pointer" onClick={() => onVehicleSelect(row.original.id)}>
+          {formatDate(row.original.lastUpdate)}
+        </div>
+      )
+    },
+  ], [locale, tTracking, onVehicleSelect]);
 
-    const dataRows = filteredVehicles.map(v => {
-      return [
-        toCsvCell(v.plateNumber),
-        toCsvCell(v.driverName || '-'),
-        toCsvCell(getStatusLabel(v.status)),
-        toCsvCell(v.isLocationShared ? (locale === 'en' ? 'Active' : 'Aktif') : '-'),
-        toCsvCell(v.groupName),
-        toCsvCell(v.speed),
-        toCsvCell(v.location.address || `${v.location.lat}, ${v.location.lng}`),
-        toCsvCell(formatDate(v.lastUpdate))
-      ].join(',');
-    });
-
-    const csvContent = [headers.map(toCsvCell).join(','), ...dataRows].join('\n');
-    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `Realtime_Tracking_${new Date().toISOString().slice(0,10)}.csv`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  };
+  const toolbarActions = (
+    <button
+      type="button"
+      onClick={handleToggleFullscreen}
+      className="flex items-center justify-center w-8 h-8 rounded-md border border-border bg-white dark:bg-neutral-900 text-foreground-muted hover:text-foreground hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors focus:outline-none focus:ring-1 focus:ring-primary"
+      title={isFullscreen ? (locale === 'en' ? 'Exit Fullscreen' : 'Keluar Layar Penuh') : (locale === 'en' ? 'Fullscreen' : 'Layar Penuh')}
+    >
+      {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
+    </button>
+  );
 
   return (
     <div ref={tableContainerRef} className="flex flex-col flex-1 min-h-0 w-full px-1.5 sm:px-2 pb-1.5 sm:pb-2 gap-2 mt-3">
-      {/* Card 1: Mode Selector & Filters */}
+      {/* Mode Selector & Filters */}
       <div className="flex flex-col xl:flex-row xl:items-center justify-between p-2 shrink-0 bg-background border border-border rounded-lg gap-2">
-
-          {/* Posisi Kiri: Mode Selector */}
-          {modeSelector && (
-            <div className="flex items-center shrink-0 w-full xl:w-auto">
-              {modeSelector}
-            </div>
-          )}
-
-          {/* Posisi Kanan: Action Buttons */}
-          <div className="flex flex-wrap items-center justify-start xl:justify-end gap-2 w-full xl:w-auto">
-             <button
-               type="button"
-               onClick={handleRefresh}
-               className="flex items-center justify-center h-8 w-8 shrink-0 rounded-md bg-emerald-500 hover:bg-emerald-600 text-white transition-colors focus:outline-none focus:ring-1 focus:ring-emerald-500"
-               title={locale === 'en' ? 'Refresh Live Data' : 'Perbarui Data Live'}
-             >
-               <RefreshCw className={cn("h-4 w-4", isRefreshing && "animate-spin")} />
-             </button>
+        {modeSelector && (
+          <div className="flex items-center shrink-0 w-full xl:w-auto">
+            {modeSelector}
           </div>
+        )}
+        <div className="flex flex-wrap items-center justify-start xl:justify-end gap-2 w-full xl:w-auto">
+           <button
+             type="button"
+             onClick={handleRefresh}
+             className="flex items-center justify-center h-8 w-8 shrink-0 rounded-md bg-emerald-500 hover:bg-emerald-600 text-white transition-colors focus:outline-none focus:ring-1 focus:ring-emerald-500"
+             title={locale === 'en' ? 'Refresh Live Data' : 'Perbarui Data Live'}
+           >
+             <RefreshCw className={cn("h-4 w-4", isRefreshing && "animate-spin")} />
+           </button>
+        </div>
       </div>
 
-      {/* Card 2: Table, Search & Actions */}
-      <div className="flex flex-col flex-1 min-h-0 bg-background border border-border rounded-lg overflow-hidden">
-        {/* Toolbar for Table */}
-        <div className="flex items-center justify-between p-2 shrink-0 bg-white dark:bg-neutral-900 border-b border-border">
-          {/* Posisi Kiri: Search */}
-          <div className="relative flex items-center gap-2">
-             {/* Search */}
-             <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground-muted" />
-                <input
-                  type="text"
-                  placeholder={tTracking.searchPlaceholder || "Cari kendaraan..."}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-56 sm:w-64 pl-9 pr-3 py-1 h-8 text-[13px] rounded-md border border-border bg-[#fafafa] dark:bg-neutral-950 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all"
-                />
-             </div>
-          </div>
-
-          {/* Posisi Kanan: Action Buttons */}
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={handleExportExcel}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 h-8 text-[12px] font-semibold rounded-md border border-border bg-white dark:bg-neutral-900 text-foreground-muted hover:text-foreground hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors focus:outline-none focus:ring-1 focus:ring-primary"
-              title={locale === 'en' ? 'Export Excel' : 'Ekspor Excel'}
-            >
-              <Download className="h-3.5 w-3.5" />
-              <span>Excel</span>
-            </button>
-            <button
-              type="button"
-              onClick={handleToggleFullscreen}
-              className="flex items-center justify-center w-8 h-8 rounded-md border border-border bg-white dark:bg-neutral-900 text-foreground-muted hover:text-foreground hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors focus:outline-none focus:ring-1 focus:ring-primary"
-              title={isFullscreen ? (locale === 'en' ? 'Exit Fullscreen' : 'Keluar Layar Penuh') : (locale === 'en' ? 'Fullscreen' : 'Layar Penuh')}
-            >
-              {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
-            </button>
-          </div>
-        </div>
-
-        {/* Table Container */}
-        <div className="flex-1 overflow-auto">
-          <table className="w-full text-left border-collapse min-w-[900px]">
-            <thead className="sticky top-0 bg-neutral-100 dark:bg-neutral-800/80 backdrop-blur-sm border-b border-border z-10">
-              <tr>
-                <th className="px-2.5 py-2 text-[12px] font-semibold text-foreground-muted whitespace-nowrap">
-                  {locale === 'en' ? 'Vehicle' : 'Armada'}
-                </th>
-                <th className="px-2.5 py-2 text-[12px] font-semibold text-foreground-muted whitespace-nowrap">
-                  Status
-                </th>
-                <th className="px-2.5 py-2 text-[12px] font-semibold text-foreground-muted whitespace-nowrap">
-                  {locale === 'en' ? 'Share Location' : 'Bagikan Lokasi'}
-                </th>
-                <th className="px-2.5 py-2 text-[12px] font-semibold text-foreground-muted whitespace-nowrap">
-                  {locale === 'en' ? 'Group' : 'Grup'}
-                </th>
-                <th className="px-2.5 py-2 text-[12px] font-semibold text-foreground-muted whitespace-nowrap">
-                  {locale === 'en' ? 'Speed (km/h)' : 'Kecepatan (km/j)'}
-                </th>
-                <th className="px-2.5 py-2 text-[12px] font-semibold text-foreground-muted whitespace-nowrap">
-                  {locale === 'en' ? 'Location' : 'Lokasi'}
-                </th>
-                <th className="px-2.5 py-2 text-[12px] font-semibold text-foreground-muted whitespace-nowrap">
-                  {tTracking.overviewLastUpdate || (locale === 'en' ? 'Last Update' : 'Update Terakhir')}
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border bg-background">
-              {filteredVehicles.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="px-4 py-12 text-center text-foreground-muted text-sm">
-                    {searchQuery
-                      ? (locale === 'en' ? 'No vehicles match your search.' : 'Tidak ada kendaraan yang cocok dengan pencarian.')
-                      : (tTracking.emptyDescription || 'Tidak ada kendaraan.')}
-                  </td>
-                </tr>
-              ) : (
-                filteredVehicles.map((v) => (
-                  <tr
-                    key={v.id}
-                    onClick={() => onVehicleSelect(v.id)}
-                    className="group hover:bg-neutral-50 dark:hover:bg-neutral-800/50 cursor-pointer transition-colors"
-                  >
-                    <td className="px-2.5 py-1.5 text-[13px]">
-                      <div className="font-semibold text-foreground">{v.plateNumber}</div>
-                    </td>
-                    <td className="px-2.5 py-1.5 text-[13px]">
-                      <StatusBadge status={v.status} label={getStatusLabel(v.status)} />
-                    </td>
-                    <td className="px-2.5 py-1.5 text-[13px]">
-                      {v.isLocationShared ? (
-                        <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-primary/10 text-primary text-[11px] font-medium border border-primary/20">
-                          <Link className="h-3 w-3" />
-                          <span>{locale === 'en' ? 'Active' : 'Aktif'}</span>
-                        </div>
-                      ) : (
-                        <span className="text-[11px] text-foreground-muted/50">-</span>
-                      )}
-                    </td>
-                    <td className="px-2.5 py-1.5 text-[13px] text-foreground-muted">
-                      {v.groupName}
-                    </td>
-                    <td className="px-2.5 py-1.5 text-[13px]">
-                      <div className="font-medium text-foreground">{v.speed}</div>
-                    </td>
-                    <td className="px-2.5 py-1.5 text-[13px] max-w-[200px] truncate" title={v.location.address}>
-                      <div className="flex items-center gap-1.5 text-foreground-muted group-hover:text-foreground transition-colors">
-                        <MapPin className="h-3.5 w-3.5 shrink-0 opacity-70" />
-                        <span className="truncate">{v.location.address || `${v.location.lat.toFixed(4)}, ${v.location.lng.toFixed(4)}`}</span>
-                      </div>
-                    </td>
-                    <td className="px-2.5 py-1.5 text-[12px] text-foreground-muted whitespace-nowrap">
-                      {formatDate(v.lastUpdate)}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+      {/* DataTable */}
+      <div className="flex-1 min-h-0 border border-border rounded-lg overflow-hidden bg-background">
+        <DataTable
+          columns={columns}
+          data={filteredVehicles}
+          searchable
+          columnVisibility
+          searchValue={searchQuery}
+          onSearchChange={setSearchQuery}
+          searchPlaceholder={tTracking.searchPlaceholder || "Cari kendaraan..."}
+          exportable
+          exportFilename={`Realtime_Tracking_${new Date().toISOString().slice(0,10)}`}
+          toolbarActions={toolbarActions}
+          emptyDescription={searchQuery ? (locale === 'en' ? 'No vehicles match your search.' : 'Tidak ada kendaraan yang cocok dengan pencarian.') : (tTracking.emptyDescription || 'Tidak ada kendaraan.')}
+          tableClassName="min-w-[900px]"
+        />
       </div>
     </div>
   );

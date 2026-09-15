@@ -57,7 +57,6 @@ function buildNavigation(locale: Locale): NavGroup[] {
       items: [
         { id: 'home', label: t.nav.home, href: '/', icon: Home },
         { id: 'tracking', label: t.nav.tracking, href: '/tracking', icon: Map },
-        { id: 'trips', label: t.nav.trips, href: '/trips', icon: Route },
       ],
     },
     {

@@ -91,10 +91,24 @@ export function PlaybackMapLayerPanel({
     }
   };
 
-  // Safe pagination array to avoid extremely long lists if data grows big
   const getPaginationArray = (current: number, total: number) => {
-    // For small data we can just return all pages
-    return Array.from({ length: total }).map((_, i) => i + 1);
+    if (total <= 5) {
+      return Array.from({ length: total }).map((_, i) => i + 1);
+    }
+    
+    let start = Math.max(1, current - 2);
+    let end = start + 4;
+    
+    if (end > total) {
+      end = total;
+      start = Math.max(1, end - 4);
+    }
+    
+    const arr = [];
+    for (let i = start; i <= end; i++) {
+      arr.push(i);
+    }
+    return arr;
   };
 
   return (
@@ -212,7 +226,7 @@ export function PlaybackMapLayerPanel({
                 >
                   <ChevronLeft className="w-3.5 h-3.5" />
                 </button>
-                <div className="flex gap-0.5 overflow-x-auto max-w-[120px] scrollbar-hide">
+                <div className="flex gap-0.5">
                   {getPaginationArray(currentGeoPage, geoTotalPages).map((p) => (
                     <button
                       key={p}
@@ -315,7 +329,7 @@ export function PlaybackMapLayerPanel({
                 >
                   <ChevronLeft className="w-3.5 h-3.5" />
                 </button>
-                <div className="flex gap-0.5 overflow-x-auto max-w-[120px] scrollbar-hide">
+                <div className="flex gap-0.5">
                   {getPaginationArray(currentRoutePage, routeTotalPages).map((p) => (
                     <button
                       key={p}
