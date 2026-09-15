@@ -42,8 +42,14 @@ export function DataTable<TData extends RowData = RowData>(
     // Capabilities
     columnVisibility = false,
     exportable = false,
+    showFullscreen = false,
+    hideToolbarLabels = false,
     pagination = false,
     onRefresh,
+
+    // Fullscreen State
+    isFullscreen,
+    onToggleFullscreen,
 
     // i18n
     labels,
@@ -105,6 +111,10 @@ export function DataTable<TData extends RowData = RowData>(
             activeFilterCount={activeFilterCount}
             filterConfig={filterConfig}
             exportConfig={{ filename: exportFilename, enabled: exportable }}
+            showFullscreen={showFullscreen}
+            isFullscreen={isFullscreen}
+            onToggleFullscreen={onToggleFullscreen}
+            hideToolbarLabels={hideToolbarLabels}
             onRefresh={onRefresh}
             customActions={toolbarActions}
             labels={labels}

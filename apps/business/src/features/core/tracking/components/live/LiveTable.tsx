@@ -83,7 +83,7 @@ export function LiveTable({ modeSelector, vehicles, onVehicleSelect, locale }: L
   const filteredVehicles = useMemo(() => {
     if (!searchQuery) return vehicles;
     const q = searchQuery.toLowerCase();
-    return vehicles.filter((v) => 
+    return vehicles.filter((v) =>
       v.plateNumber.toLowerCase().includes(q) ||
       (v.driverName || '').toLowerCase().includes(q) ||
       v.groupName.toLowerCase().includes(q)
@@ -150,8 +150,8 @@ export function LiveTable({ modeSelector, vehicles, onVehicleSelect, locale }: L
       cell: ({ row }) => {
         const v = row.original;
         return (
-          <div 
-            className="flex items-center gap-1.5 text-foreground-muted group-hover:text-foreground transition-colors cursor-pointer max-w-[200px] truncate" 
+          <div
+            className="flex items-center gap-1.5 text-foreground-muted group-hover:text-foreground transition-colors cursor-pointer max-w-[200px] truncate"
             title={v.location.address}
             onClick={() => onVehicleSelect(v.id)}
           >
@@ -173,36 +173,13 @@ export function LiveTable({ modeSelector, vehicles, onVehicleSelect, locale }: L
   ], [locale, tTracking, onVehicleSelect]);
 
   const toolbarActions = (
-    <button
-      type="button"
-      onClick={handleToggleFullscreen}
-      className="flex items-center justify-center w-8 h-8 rounded-md border border-border bg-white dark:bg-neutral-900 text-foreground-muted hover:text-foreground hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors focus:outline-none focus:ring-1 focus:ring-primary"
-      title={isFullscreen ? (locale === 'en' ? 'Exit Fullscreen' : 'Keluar Layar Penuh') : (locale === 'en' ? 'Fullscreen' : 'Layar Penuh')}
-    >
-      {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
-    </button>
+    <>
+      {modeSelector}
+    </>
   );
 
   return (
     <div ref={tableContainerRef} className="flex flex-col flex-1 min-h-0 w-full px-1.5 sm:px-2 pb-1.5 sm:pb-2 gap-2 mt-3">
-      {/* Mode Selector & Filters */}
-      <div className="flex flex-col xl:flex-row xl:items-center justify-between p-2 shrink-0 bg-background border border-border rounded-lg gap-2">
-        {modeSelector && (
-          <div className="flex items-center shrink-0 w-full xl:w-auto">
-            {modeSelector}
-          </div>
-        )}
-        <div className="flex flex-wrap items-center justify-start xl:justify-end gap-2 w-full xl:w-auto">
-           <button
-             type="button"
-             onClick={handleRefresh}
-             className="flex items-center justify-center h-8 w-8 shrink-0 rounded-md bg-emerald-500 hover:bg-emerald-600 text-white transition-colors focus:outline-none focus:ring-1 focus:ring-emerald-500"
-             title={locale === 'en' ? 'Refresh Live Data' : 'Perbarui Data Live'}
-           >
-             <RefreshCw className={cn("h-4 w-4", isRefreshing && "animate-spin")} />
-           </button>
-        </div>
-      </div>
 
       {/* DataTable */}
       <div className="flex-1 min-h-0 border border-border rounded-lg overflow-hidden bg-background">
@@ -215,9 +192,15 @@ export function LiveTable({ modeSelector, vehicles, onVehicleSelect, locale }: L
           onSearchChange={setSearchQuery}
           searchPlaceholder={tTracking.searchPlaceholder || "Cari kendaraan..."}
           exportable
-          exportFilename={`Realtime_Tracking_${new Date().toISOString().slice(0,10)}`}
+          exportFilename={`Realtime_Tracking_${new Date().toISOString().slice(0, 10)}`}
           toolbarActions={toolbarActions}
-          emptyDescription={searchQuery ? (locale === 'en' ? 'No vehicles match your search.' : 'Tidak ada kendaraan yang cocok dengan pencarian.') : (tTracking.emptyDescription || 'Tidak ada kendaraan.')}
+          emptyDescription={searchQuery ? (locale === 'en' ? 'No vehicle found matching your search.' : 'Tidak ada armada yang sesuai dengan pencarian.') : (locale === 'en' ? 'No data available.' : 'Tidak ada data.')}
+          onRefresh={handleRefresh}
+          isLoading={isRefreshing}
+          showFullscreen
+          isFullscreen={isFullscreen}
+          onToggleFullscreen={handleToggleFullscreen}
+          hideToolbarLabels={true}
           tableClassName="min-w-[900px]"
         />
       </div>

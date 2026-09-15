@@ -5,7 +5,7 @@ import { cn } from '@adatrack/utils';
 import { DataTableSearch } from './DataTableSearch';
 import { DataTableFilterPanel } from './DataTableFilterPanel';
 import { DataTableColumnPanel } from './DataTableColumnPanel';
-import { Filter, RefreshCw, Columns3, Download } from 'lucide-react';
+import { Filter, RefreshCw, Columns3, Download, Maximize, Minimize } from 'lucide-react';
 import { Button } from '../Button';
 import { Popover, PopoverContent, PopoverTrigger } from '../Popover';
 import type { DataTableInstance, DataTableExportConfig, RowData, DataTableFilterConfig, DataTableLabels } from './types';
@@ -77,6 +77,12 @@ export interface DataTableToolbarProps<TData extends RowData = RowData> {
   activeFilterCount?: number;
   filterConfig?: DataTableFilterConfig;
 
+  showFullscreen?: boolean;
+  isFullscreen?: boolean;
+  onToggleFullscreen?: () => void;
+
+  hideToolbarLabels?: boolean;
+
   // Export config
   exportConfig?: DataTableExportConfig;
 
@@ -118,6 +124,10 @@ export function DataTableToolbar<TData extends RowData = RowData>({
   onExportOpenChange,
   activeFilterCount,
   filterConfig,
+  showFullscreen,
+  isFullscreen,
+  onToggleFullscreen,
+  hideToolbarLabels,
   exportConfig,
   fetchState = 'idle',
   onRefresh,
@@ -161,21 +171,25 @@ export function DataTableToolbar<TData extends RowData = RowData>({
 
       {/* Right area: utilities */}
       <div className="flex items-center gap-3 shrink-0">
-        {onRefresh && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onRefresh}
-            disabled={isLoading}
-            className="h-8 gap-2 text-[13px] font-medium border-neutral-200 dark:border-neutral-800 text-foreground-muted hover:text-foreground"
-          >
-            <RefreshCw className={cn('h-3.5 w-3.5', isLoading && 'animate-spin')} />
-            <span className="hidden sm:inline-block">{labels?.toolbarRefresh || 'Refresh'}</span>
-          </Button>
-        )}
-
-        {/* Button Group: Filter, Kolom, Export */}
+        {/* Button Group: Refresh, Filter, Fullscreen, Kolom, Export */}
         <div className="flex items-center h-8 divide-x divide-neutral-200 dark:divide-neutral-800 rounded-md border border-neutral-200 dark:border-neutral-800 bg-background overflow-hidden">
+          
+          {/* Refresh Button */}
+          {onRefresh && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onRefresh}
+              disabled={isLoading}
+              className="h-8 gap-2 text-[13px] font-medium rounded-none text-foreground-muted hover:text-foreground hover:bg-neutral-50 dark:hover:bg-neutral-800/50"
+              aria-label="Refresh Data"
+              title={labels?.toolbarRefresh || 'Refresh'}
+            >
+              <RefreshCw className={cn('h-3.5 w-3.5', isLoading && 'animate-spin')} />
+              {!hideToolbarLabels && <span className="hidden sm:inline-block">{labels?.toolbarRefresh || 'Refresh'}</span>}
+            </Button>
+          )}
+
           {/* Filter toggle button — Popover */}
           {showFilter && filterConfig && (
             <Popover open={isFilterOpen} onOpenChange={onFilterOpenChange}>
@@ -189,7 +203,7 @@ export function DataTableToolbar<TData extends RowData = RowData>({
                   )}
                 >
                   <Filter className={cn("h-3.5 w-3.5", activeFilterCount ? "text-danger" : "")} />
-                  <span className="hidden sm:inline-block">{labels?.toolbarFilter || 'Filter'}</span>
+                  {!hideToolbarLabels && <span className="hidden sm:inline-block">{labels?.toolbarFilter || 'Filter'}</span>}
                 </Button>
               </PopoverTrigger>
               <PopoverContent align="end" className="w-[260px] p-0" sideOffset={8}>
@@ -199,6 +213,21 @@ export function DataTableToolbar<TData extends RowData = RowData>({
                 />
               </PopoverContent>
             </Popover>
+          )}
+
+          {/* Fullscreen toggle button */}
+          {showFullscreen && onToggleFullscreen && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onToggleFullscreen}
+              className="h-8 gap-2 text-[13px] font-medium rounded-none text-foreground-muted hover:text-foreground hover:bg-neutral-50 dark:hover:bg-neutral-800/50"
+              aria-label={isFullscreen ? 'Keluar Layar Penuh' : 'Layar Penuh'}
+              title={isFullscreen ? (labels?.toolbarExitFullscreen || 'Keluar Layar Penuh') : (labels?.toolbarFullscreen || 'Layar Penuh')}
+            >
+              {isFullscreen ? <Minimize className="h-3.5 w-3.5" /> : <Maximize className="h-3.5 w-3.5" />}
+              {!hideToolbarLabels && <span className="hidden sm:inline-block">{isFullscreen ? (labels?.toolbarExitFullscreen || 'Kecilkan') : (labels?.toolbarFullscreen || 'Layar Penuh')}</span>}
+            </Button>
           )}
 
           {/* Column visibility toggle — Popover */}
@@ -213,9 +242,10 @@ export function DataTableToolbar<TData extends RowData = RowData>({
                     isColumnOpen && 'bg-neutral-100 text-foreground dark:bg-neutral-800'
                   )}
                   aria-label="Toggle kolom"
+                  title={labels?.toolbarColumns || 'Kolom'}
                 >
                   <Columns3 className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline-block">{labels?.toolbarColumns || 'Kolom'}</span>
+                  {!hideToolbarLabels && <span className="hidden sm:inline-block">{labels?.toolbarColumns || 'Kolom'}</span>}
                 </Button>
               </PopoverTrigger>
               <PopoverContent align="end" className="w-[220px] p-0" sideOffset={8}>
@@ -240,9 +270,10 @@ export function DataTableToolbar<TData extends RowData = RowData>({
               }}
               className="h-8 gap-2 text-[13px] font-medium rounded-none text-foreground-muted hover:text-foreground hover:bg-neutral-50 dark:hover:bg-neutral-800/50"
               aria-label="Export Data"
+              title={labels?.toolbarExport || 'Ekspor'}
             >
               <Download className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline-block">{labels?.toolbarExport || 'Ekspor'}</span>
+              {!hideToolbarLabels && <span className="hidden sm:inline-block">{labels?.toolbarExport || 'Ekspor'}</span>}
             </Button>
           )}
         </div>

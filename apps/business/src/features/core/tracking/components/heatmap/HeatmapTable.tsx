@@ -3,6 +3,7 @@ import { cn } from '@adatrack/utils';
 import { getTranslation } from '@/i18n';
 import { Maximize, Minimize, Calendar, ChevronDown, RefreshCw } from 'lucide-react';
 import { DataTable, type DataTableColumnDef } from '@adatrack/ui';
+import { TableFilterPopover } from '../shared/TableFilterPopover';
 import type { TrackingVehicle, DateRange } from '../../types/tracking';
 
 export interface HeatmapTableProps {
@@ -87,29 +88,41 @@ export function HeatmapTable({
     },
   ], [locale]);
 
-  const toolbarActions = (
-    <button
-      type="button"
-      onClick={handleToggleFullscreen}
-      className="flex items-center justify-center w-8 h-8 rounded-md border border-border bg-white dark:bg-neutral-900 text-foreground-muted hover:text-foreground hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors focus:outline-none focus:ring-1 focus:ring-primary"
-      title={isFullscreen ? (locale === 'en' ? 'Exit Fullscreen' : 'Keluar Layar Penuh') : (locale === 'en' ? 'Fullscreen' : 'Layar Penuh')}
-    >
-      {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
-    </button>
-  );
+  const handleReset = () => {
+    onStatusFilterChange('driving');
+    onDateRangeChange({ startDate: '', endDate: '', startTime: '06:00', endTime: '18:00' });
+  };
 
-  return (
-    <div ref={tableContainerRef} className="flex flex-col flex-1 min-h-0 w-full px-1.5 sm:px-2 pb-1.5 sm:pb-2 gap-2 mt-3">
-      {/* Mode Selector & Filters */}
-      <div className="flex flex-col xl:flex-row xl:items-center justify-between p-2 shrink-0 bg-background border border-border rounded-lg gap-2">
-        {modeSelector && (
-          <div className="flex items-center shrink-0 w-full xl:w-auto">
-            {modeSelector}
+  const toolbarActions = (
+    <>
+      {modeSelector}
+      <TableFilterPopover locale={locale} hideLabel={true} onReset={handleReset}>
+        {/* Status Filter */}
+        <div>
+          <label className="text-[11px] font-medium text-foreground-muted mb-1 block">
+            {locale === 'en' ? 'Status' : 'Status'}
+          </label>
+          <div className="relative w-full">
+            <select
+              value={statusFilter}
+              onChange={(e) => onStatusFilterChange(e.target.value as 'driving' | 'idle' | 'parking')}
+              disabled={isGenerating}
+              className="w-full h-8 rounded-md bg-background border border-border hover:border-foreground-muted px-2.5 text-[12px] font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50 transition-all appearance-none cursor-pointer"
+            >
+              <option value="driving">{locale === 'en' ? 'Driving' : 'Berjalan'}</option>
+              <option value="idle">{locale === 'en' ? 'Idle' : 'Idle'}</option>
+              <option value="parking">{locale === 'en' ? 'Parking' : 'Parkir'}</option>
+            </select>
+            <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-foreground-muted" />
           </div>
-        )}
-        <div className="flex flex-wrap items-center justify-start xl:justify-end gap-3 w-full xl:w-auto">
-          {/* Start Date */}
-          <div className="relative w-[120px] shrink-0">
+        </div>
+
+        {/* Start Date */}
+        <div>
+          <label className="text-[11px] font-medium text-foreground-muted mb-1 block">
+            {locale === 'en' ? 'Start Date' : 'Tanggal Mulai'}
+          </label>
+          <div className="relative w-full">
             <input
               type="date"
               className="w-full h-8 rounded-md bg-background border border-border hover:border-foreground-muted px-2.5 pr-7 text-[12px] font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50 transition-all [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:w-full cursor-pointer"
@@ -119,11 +132,14 @@ export function HeatmapTable({
             />
             <Calendar className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-foreground-muted" />
           </div>
+        </div>
 
-          <span className="text-foreground-muted text-[11px] font-bold mx-1">-</span>
-
-          {/* End Date */}
-          <div className="relative w-[120px] shrink-0">
+        {/* End Date */}
+        <div>
+          <label className="text-[11px] font-medium text-foreground-muted mb-1 block">
+            {locale === 'en' ? 'End Date' : 'Tanggal Selesai'}
+          </label>
+          <div className="relative w-full">
             <input
               type="date"
               className="w-full h-8 rounded-md bg-background border border-border hover:border-foreground-muted px-2.5 pr-7 text-[12px] font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50 transition-all [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:w-full cursor-pointer"
@@ -133,35 +149,28 @@ export function HeatmapTable({
             />
             <Calendar className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-foreground-muted" />
           </div>
-
-          {/* Status Filter */}
-          <div className="relative w-[100px] shrink-0">
-            <select
-              value={statusFilter}
-              onChange={(e) => onStatusFilterChange(e.target.value as any)}
-              disabled={isGenerating}
-              className="w-full h-8 rounded-md bg-background border border-border hover:border-foreground-muted px-2.5 text-[12px] font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50 transition-all appearance-none cursor-pointer"
-            >
-              <option value="driving">{tTracking.statusDriving}</option>
-              <option value="idle">{tTracking.statusIdle}</option>
-              <option value="parking">{tTracking.statusParking}</option>
-            </select>
-            <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-foreground-muted" />
-          </div>
-
-          {/* Generate Button */}
-          <button
-            type="button"
-            onClick={onGenerate}
-            disabled={!dateRange.startDate || !dateRange.endDate || isGenerating}
-            className="flex items-center justify-center h-8 w-8 shrink-0 rounded-md bg-orange-500 hover:bg-orange-600 text-white disabled:opacity-50 transition-colors focus:outline-none focus:ring-1 focus:ring-orange-500"
-            title={tTracking.heatmapGenerate}
-          >
-            <RefreshCw className={cn("h-4 w-4", isGenerating && "animate-spin")} />
-          </button>
         </div>
-      </div>
 
+        {/* Generate Button */}
+        <button
+          type="button"
+          onClick={onGenerate}
+          disabled={!dateRange.startDate || !dateRange.endDate || isGenerating}
+          className="flex items-center justify-center h-8 w-full rounded-md bg-danger hover:bg-danger/90 text-danger-foreground disabled:opacity-50 transition-colors focus:outline-none focus:ring-1 focus:ring-danger font-medium text-[12px] mt-2 gap-2"
+        >
+          {isGenerating ? (
+            <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <RefreshCw className="h-3.5 w-3.5" />
+          )}
+          {locale === 'en' ? 'Generate' : 'Buat Heatmap'}
+        </button>
+      </TableFilterPopover>
+    </>
+  );
+
+  return (
+    <div ref={tableContainerRef} className="flex flex-col flex-1 min-h-0 w-full px-1.5 sm:px-2 pb-1.5 sm:pb-2 gap-2 mt-3">
       {/* DataTable */}
       <div className="flex-1 min-h-0 border border-border rounded-lg overflow-hidden bg-background">
         <DataTable
@@ -175,7 +184,13 @@ export function HeatmapTable({
           exportable
           exportFilename={`Heatmap_Summary_${new Date().toISOString().slice(0,10)}`}
           toolbarActions={toolbarActions}
+          onRefresh={onGenerate}
+          isLoading={isGenerating}
           emptyDescription={searchQuery ? (locale === 'en' ? 'No vehicles match your search.' : 'Tidak ada kendaraan yang cocok dengan pencarian.') : (tTracking.emptyDescription || 'Tidak ada kendaraan.')}
+          showFullscreen
+          isFullscreen={isFullscreen}
+          onToggleFullscreen={handleToggleFullscreen}
+          hideToolbarLabels={true}
           tableClassName="min-w-[900px]"
         />
       </div>

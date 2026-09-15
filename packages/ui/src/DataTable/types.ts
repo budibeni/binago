@@ -80,6 +80,8 @@ export interface DataTableLabels {
   toolbarFilter?: string;
   toolbarColumns?: string;
   toolbarExport?: string;
+  toolbarFullscreen?: string;
+  toolbarExitFullscreen?: string;
 
   // Active Filters
   activeFilterActive?: string;
@@ -110,6 +112,8 @@ export interface DataTableProps<TData extends RowData = RowData> {
   columnVisibility?: boolean;
   selectable?: boolean;
   exportable?: boolean;
+  showFullscreen?: boolean;
+  hideToolbarLabels?: boolean;
 
   // Search State
   searchValue?: string;
@@ -137,6 +141,10 @@ export interface DataTableProps<TData extends RowData = RowData> {
   // Column Visibility State
   columnVisibilityState?: ColumnVisibilityState;
   onColumnVisibilityChange?: (visibility: ColumnVisibilityState) => void;
+
+  // Fullscreen State
+  isFullscreen?: boolean;
+  onToggleFullscreen?: () => void;
 
   // Status (UI)
   isLoading?: boolean;

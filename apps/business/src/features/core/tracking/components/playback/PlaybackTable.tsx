@@ -3,8 +3,10 @@ import { cn } from '@adatrack/utils';
 import { getTranslation } from '@/i18n';
 import { Maximize, Minimize, Calendar, ChevronDown, RefreshCw, MapPin } from 'lucide-react';
 import { DataTable, type DataTableColumnDef } from '@adatrack/ui';
-import type { MockPlaybackData, MockPlaybackPoint } from '../../data/mockTrackingData';
-import type { TrackingVehicle, DateRange } from '../../types/tracking';
+import { TrackingVehicle, DateRange } from '../../types/tracking';
+import { TableFilterPopover } from '../shared/TableFilterPopover';
+import { VehicleSelect } from '../shared/VehicleSelect';
+import type { MockPlaybackData, MockPlaybackTrackPoint } from '../../data/mockTrackingData';
 
 export interface PlaybackTableProps {
   modeSelector?: React.ReactNode;
@@ -58,6 +60,11 @@ export function PlaybackTable({
     }
   };
 
+  const handleReset = () => {
+    onVehicleChange('');
+    onDateRangeChange({ startDate: '', endDate: '', startTime: '06:00', endTime: '18:00' });
+  };
+
   useEffect(() => {
     const handleFullscreenChange = () => {
       setIsFullscreen(!!document.fullscreenElement);
@@ -88,7 +95,7 @@ export function PlaybackTable({
     });
   }, [points, searchQuery]);
 
-  const columns = useMemo<DataTableColumnDef<MockPlaybackPoint>[]>(() => [
+  const columns = useMemo<DataTableColumnDef<MockPlaybackTrackPoint>[]>(() => [
     {
       id: 'no',
       header: 'No',
@@ -131,44 +138,29 @@ export function PlaybackTable({
   ], [locale]);
 
   const toolbarActions = (
-    <button
-      type="button"
-      onClick={handleToggleFullscreen}
-      className="flex items-center justify-center w-8 h-8 rounded-md border border-border bg-white dark:bg-neutral-900 text-foreground-muted hover:text-foreground hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors focus:outline-none focus:ring-1 focus:ring-primary"
-      title={isFullscreen ? (locale === 'en' ? 'Exit Fullscreen' : 'Keluar Layar Penuh') : (locale === 'en' ? 'Fullscreen' : 'Layar Penuh')}
-    >
-      {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
-    </button>
-  );
+    <>
+      {modeSelector}
+      <TableFilterPopover locale={locale} onReset={handleReset}>
+        {/* Vehicle Select */}
+        <div>
+          <label className="text-[11px] font-medium text-foreground-muted mb-1 block">
+            {tTracking.playbackSelectVehicle || (locale === 'en' ? 'Select Vehicle' : 'Pilih Kendaraan')}
+          </label>
+          <VehicleSelect
+            vehicles={vehicles}
+            selectedVehicleId={selectedVehicleId}
+            onVehicleChange={onVehicleChange}
+            isLoading={isLoading}
+            locale={locale}
+          />
+        </div>
 
-  return (
-    <div ref={tableContainerRef} className="flex flex-col flex-1 min-h-0 w-full px-1.5 sm:px-2 pb-1.5 sm:pb-2 gap-2 mt-3">
-      {/* Mode Selector & Filters */}
-      <div className="flex flex-col xl:flex-row xl:items-center justify-between p-2 shrink-0 bg-background border border-border rounded-lg gap-2">
-        {modeSelector && (
-          <div className="flex items-center shrink-0 w-full xl:w-auto">
-            {modeSelector}
-          </div>
-        )}
-        <div className="flex flex-wrap items-center justify-start xl:justify-end gap-3 w-full xl:w-auto">
-          {/* Vehicle Select */}
-          <div className="relative w-[160px] shrink-0">
-            <select
-              value={selectedVehicleId || ''}
-              onChange={(e) => onVehicleChange(e.target.value)}
-              disabled={isLoading}
-              className="w-full h-8 rounded-md bg-background border border-border hover:border-foreground-muted px-2.5 text-[12px] font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50 transition-all appearance-none cursor-pointer"
-            >
-              <option value="" disabled>{tTracking.playbackSelectVehicle}</option>
-              {vehicles.map((v) => (
-                <option key={v.id} value={v.id}>{v.plateNumber}</option>
-              ))}
-            </select>
-            <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-foreground-muted" />
-          </div>
-
-          {/* Start Date */}
-          <div className="relative w-[120px] shrink-0">
+        {/* Start Date */}
+        <div>
+          <label className="text-[11px] font-medium text-foreground-muted mb-1 block">
+            {locale === 'en' ? 'Start Date' : 'Tanggal Mulai'}
+          </label>
+          <div className="relative w-full">
             <input
               type="date"
               className="w-full h-8 rounded-md bg-background border border-border hover:border-foreground-muted px-2.5 pr-7 text-[12px] font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50 transition-all [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:w-full cursor-pointer"
@@ -178,11 +170,14 @@ export function PlaybackTable({
             />
             <Calendar className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-foreground-muted" />
           </div>
+        </div>
 
-          <span className="text-foreground-muted text-[11px] font-bold mx-1">-</span>
-
-          {/* End Date */}
-          <div className="relative w-[120px] shrink-0">
+        {/* End Date */}
+        <div>
+          <label className="text-[11px] font-medium text-foreground-muted mb-1 block">
+            {locale === 'en' ? 'End Date' : 'Tanggal Selesai'}
+          </label>
+          <div className="relative w-full">
             <input
               type="date"
               className="w-full h-8 rounded-md bg-background border border-border hover:border-foreground-muted px-2.5 pr-7 text-[12px] font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50 transition-all [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:w-full cursor-pointer"
@@ -192,20 +187,28 @@ export function PlaybackTable({
             />
             <Calendar className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-foreground-muted" />
           </div>
-
-          {/* Load Button */}
-          <button
-            type="button"
-            onClick={onLoad}
-            disabled={!selectedVehicleId || !dateRange.startDate || !dateRange.endDate || isLoading}
-            className="flex items-center justify-center h-8 w-8 shrink-0 rounded-md bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-50 transition-colors focus:outline-none focus:ring-1 focus:ring-primary"
-            title={tTracking.playbackLoading}
-          >
-            <RefreshCw className={cn("h-4 w-4", isLoading && "animate-spin")} />
-          </button>
         </div>
-      </div>
 
+        {/* Load Button */}
+        <button
+          type="button"
+          onClick={onLoad}
+          disabled={!selectedVehicleId || !dateRange.startDate || !dateRange.endDate || isLoading}
+          className="flex items-center justify-center h-8 w-full rounded-md bg-danger hover:bg-danger/90 text-danger-foreground disabled:opacity-50 transition-colors focus:outline-none focus:ring-1 focus:ring-danger font-medium text-[12px] mt-2 gap-2"
+        >
+          {isLoading ? (
+            <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <RefreshCw className="h-3.5 w-3.5" />
+          )}
+          {tTracking.playbackLoading || (locale === 'en' ? 'Load Data' : 'Muat Data')}
+        </button>
+      </TableFilterPopover>
+    </>
+  );
+
+  return (
+    <div ref={tableContainerRef} className="flex flex-col flex-1 min-h-0 w-full px-1.5 sm:px-2 pb-1.5 sm:pb-2 gap-2 mt-3">
       {/* DataTable */}
       <div className="flex-1 min-h-0 border border-border rounded-lg overflow-hidden bg-background">
         <DataTable
@@ -219,11 +222,17 @@ export function PlaybackTable({
           exportable
           exportFilename={`Playback_History_${new Date().toISOString().slice(0,10)}`}
           toolbarActions={toolbarActions}
+          onRefresh={onLoad}
+          isLoading={isLoading}
           emptyDescription={
             !playbackData ? (locale === 'en' ? 'Please load playback data first.' : 'Silakan muat data perjalanan terlebih dahulu.') :
             searchQuery ? (locale === 'en' ? 'No points match your search.' : 'Tidak ada titik yang cocok dengan pencarian.') : 
             (locale === 'en' ? 'No history data available.' : 'Data riwayat tidak tersedia.')
           }
+          showFullscreen
+          isFullscreen={isFullscreen}
+          onToggleFullscreen={handleToggleFullscreen}
+          hideToolbarLabels={true}
           tableClassName="min-w-[900px]"
         />
       </div>
