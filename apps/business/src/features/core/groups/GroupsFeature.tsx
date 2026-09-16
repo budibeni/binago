@@ -5,6 +5,7 @@ import { Plus, Truck, UserRound, MapPinned } from 'lucide-react';
 import { getTranslation } from '../../../i18n';
 import { groupService } from '@/data/services';
 import { GroupDataTable } from './components/GroupDataTable';
+import { GroupForm } from './components/GroupForm';
 import { Button, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@adatrack/ui';
 
 export interface GroupsFeatureProps {
@@ -15,6 +16,8 @@ type GroupType = 'vehicles' | 'drivers' | 'geofences';
 
 export function GroupsFeature({ locale }: GroupsFeatureProps) {
   const [activeType, setActiveType] = useState<GroupType>('vehicles');
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editGroup, setEditGroup] = useState<any>(null); // any used temporarily to avoid strict type imports, will be casted.
   const t = getTranslation(locale);
   const tGroups = t.groups;
 
@@ -39,17 +42,39 @@ export function GroupsFeature({ locale }: GroupsFeatureProps) {
   };
 
   const handleAdd = () => {
-    // TODO: Implement add functionality
-    console.log('Add group of type:', activeType);
+    setEditGroup(null);
+    setIsFormOpen(true);
+  };
+  
+  const handleEdit = (group: any) => {
+    setEditGroup(group);
+    setIsFormOpen(true);
+  };
+  
+  const handleDelete = (group: any) => {
+    console.log('Delete group:', group.id);
+  };
+  
+  const handleSave = (data: any) => {
+    console.log('Save group:', data);
+    setIsFormOpen(false);
+  };
+
+  const getDefaultTypeSingular = () => {
+    if (activeType === 'vehicles') return 'vehicle';
+    if (activeType === 'drivers') return 'driver';
+    return 'geofence';
   };
 
   return (
-    <div className="flex flex-col h-full w-full">
+    <div className="flex flex-col h-full w-full relative">
       <div className="flex-1 min-h-0 overflow-y-auto p-0">
         <GroupDataTable 
           key={activeType}
           groups={currentTabData} 
           labels={tableLabels}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
           toolbarActions={
             <div className="flex items-center gap-2">
               <div className="w-[140px]">
@@ -87,6 +112,16 @@ export function GroupsFeature({ locale }: GroupsFeatureProps) {
           }
         />
       </div>
+      
+      <GroupForm
+        group={editGroup}
+        open={isFormOpen}
+        onOpenChange={setIsFormOpen}
+        onSave={handleSave}
+        onCancel={() => setIsFormOpen(false)}
+        layout="drawer"
+        defaultType={getDefaultTypeSingular() as any}
+      />
     </div>
   );
 }

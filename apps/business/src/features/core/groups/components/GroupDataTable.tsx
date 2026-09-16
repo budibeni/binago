@@ -18,9 +18,11 @@ export interface GroupDataTableProps {
     deleteBtn: string;
   };
   toolbarActions?: React.ReactNode;
+  onEdit?: (group: GroupData) => void;
+  onDelete?: (group: GroupData) => void;
 }
 
-export function GroupDataTable({ groups, labels, toolbarActions }: GroupDataTableProps) {
+export function GroupDataTable({ groups, labels, toolbarActions, onEdit, onDelete }: GroupDataTableProps) {
   const [searchValue, setSearchValue] = React.useState('');
 
   const columns = React.useMemo<DataTableColumnDef<GroupData>[]>(() => [
@@ -42,12 +44,12 @@ export function GroupDataTable({ groups, labels, toolbarActions }: GroupDataTabl
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-48">
-            <DropdownMenuItem onClick={() => {}}>
+            <DropdownMenuItem onClick={() => onEdit?.(row.original)}>
               <Edit2 className="mr-2 h-4 w-4 text-foreground-muted" />
               <span>{labels.editBtn}</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem destructive onClick={() => {}}>
+            <DropdownMenuItem destructive onClick={() => onDelete?.(row.original)}>
               <Trash2 className="mr-2 h-4 w-4 text-danger" />
               <span>{labels.deleteBtn}</span>
             </DropdownMenuItem>
