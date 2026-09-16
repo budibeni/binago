@@ -11,7 +11,7 @@ export const mockDrivers = Array.from({ length: 50 }, (_, i) => {
     dateOfBirth: '1990-01-01',
     joinDate: '2021-01-01',
     placement: 'Pool Pusat',
-    groupId: `grp-00${(i % 6) + 1}`,
+    groupId: `grp-d-00${(i % 4) + 1}`,
     licenseNumber: `SIM-B2-${10000 + i}`,
     licenseExpiry: '2028-01-01',
     status: 'active' as const,

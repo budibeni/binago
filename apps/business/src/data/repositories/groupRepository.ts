@@ -3,7 +3,7 @@
  */
 
 import type { GroupData } from '@/features/core/groups/data/mockGroupsData';
-import { mockGroups } from '../mock';
+import { mockVehicleGroups, mockDriverGroups, mockGeofenceGroups } from '../mock';
 
 // --- Repository Interface ------------------------------------------------------
 
@@ -17,23 +17,15 @@ export interface GroupRepository {
 
 class MockGroupRepository implements GroupRepository {
   getVehicleGroups(): GroupData[] {
-    return mockGroups as GroupData[];
+    return mockVehicleGroups as GroupData[];
   }
 
   getDriverGroups(): GroupData[] {
-    return mockGroups.map((g) => ({
-      ...g,
-      id: g.id.replace('grp', 'dg'),
-      type: 'driver' as const,
-    }));
+    return mockDriverGroups as GroupData[];
   }
 
   getGeofenceGroups(): GroupData[] {
-    return mockGroups.map((g) => ({
-      ...g,
-      id: g.id.replace('grp', 'gg'),
-      type: 'geofence' as const,
-    }));
+    return mockGeofenceGroups as GroupData[];
   }
 }
 

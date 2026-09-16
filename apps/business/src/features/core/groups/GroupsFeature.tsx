@@ -1,28 +1,31 @@
+'use client';
+
 import React, { useState } from 'react';
-import { cn } from '@adatrack/utils';
-import { Truck, UserRound, MapPinned } from 'lucide-react';
+import { Plus, Truck, UserRound, MapPinned } from 'lucide-react';
 import { getTranslation } from '../../../i18n';
 import { groupService } from '@/data/services';
 import { GroupDataTable } from './components/GroupDataTable';
+import { Button, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@adatrack/ui';
 
 export interface GroupsFeatureProps {
   locale: 'id' | 'en';
 }
 
-type TabType = 'vehicles' | 'drivers' | 'geofences';
+type GroupType = 'vehicles' | 'drivers' | 'geofences';
 
 export function GroupsFeature({ locale }: GroupsFeatureProps) {
-  const [activeTab, setActiveTab] = useState<TabType>('vehicles');
+  const [activeType, setActiveType] = useState<GroupType>('vehicles');
   const t = getTranslation(locale);
   const tGroups = t.groups;
 
-  const tabs = [
-    { id: 'vehicles' as const, label: tGroups.tabs.vehicles, icon: Truck, data: groupService.getVehicleGroups() },
-    { id: 'drivers' as const, label: tGroups.tabs.drivers, icon: UserRound, data: groupService.getDriverGroups() },
-    { id: 'geofences' as const, label: tGroups.tabs.geofences, icon: MapPinned, data: groupService.getGeofenceGroups() },
-  ];
-
-  const currentTabData = tabs.find(t => t.id === activeTab)?.data || [];
+  const currentTabData = React.useMemo(() => {
+    switch (activeType) {
+      case 'vehicles': return groupService.getVehicleGroups();
+      case 'drivers': return groupService.getDriverGroups();
+      case 'geofences': return groupService.getGeofenceGroups();
+      default: return [];
+    }
+  }, [activeType]);
 
   const tableLabels = {
     searchPlaceholder: tGroups.table.searchPlaceholder,
@@ -35,46 +38,54 @@ export function GroupsFeature({ locale }: GroupsFeatureProps) {
     deleteBtn: tGroups.actions.delete,
   };
 
-  return (
-    <div className="flex flex-col h-full w-full bg-neutral-50 dark:bg-neutral-900/30 p-4 items-center overflow-hidden">
-      
-      <div className="w-full h-full flex flex-col bg-background border border-border/60 rounded-xl shadow-sm overflow-hidden">
-        
-        {/* Tabs - Segmented Control (Compact) */}
-        <div className="w-full flex justify-center py-3 border-b border-border/50 bg-neutral-50/50 dark:bg-neutral-900/50">
-          <div className="flex items-center p-1 bg-neutral-200/50 dark:bg-neutral-800/50 rounded-lg">
-            {tabs.map((tab) => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={cn(
-                    'flex items-center gap-2 px-4 py-1.5 text-sm font-medium rounded-md transition-all',
-                    isActive 
-                      ? 'text-danger shadow-sm bg-background border border-border/50' 
-                      : 'text-foreground-muted hover:text-foreground hover:bg-neutral-300/30 dark:hover:bg-neutral-700/30'
-                  )}
-                >
-                  <Icon className={cn("w-4 h-4", isActive && "scale-105")} />
-                  <span>{tab.label}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
+  const handleAdd = () => {
+    // TODO: Implement add functionality
+    console.log('Add group of type:', activeType);
+  };
 
-        {/* Content Area */}
-        <div className="flex-1 min-h-0 p-4">
-          <GroupDataTable 
-            key={activeTab}
-            activeTab={activeTab}
-            groups={currentTabData} 
-            locale={locale} 
-            labels={tableLabels}
-          />
-        </div>
+  return (
+    <div className="flex flex-col h-full w-full">
+      <div className="flex-1 min-h-0 overflow-y-auto p-0">
+        <GroupDataTable 
+          key={activeType}
+          groups={currentTabData} 
+          labels={tableLabels}
+          toolbarActions={
+            <div className="flex items-center gap-2">
+              <div className="w-[140px]">
+                <Select value={activeType} onValueChange={(val) => setActiveType(val as GroupType)}>
+                  <SelectTrigger className="h-8 text-[13px] font-medium shadow-none px-3 bg-transparent">
+                    <SelectValue placeholder="Pilih Tipe Grup" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="vehicles" className="text-[13px] py-1.5">
+                      <div className="flex items-center gap-2">
+                        <Truck className="w-3.5 h-3.5 text-foreground-muted" />
+                        <span>{tGroups.tabs.vehicles}</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="drivers" className="text-[13px] py-1.5">
+                      <div className="flex items-center gap-2">
+                        <UserRound className="w-3.5 h-3.5 text-foreground-muted" />
+                        <span>{tGroups.tabs.drivers}</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="geofences" className="text-[13px] py-1.5">
+                      <div className="flex items-center gap-2">
+                        <MapPinned className="w-3.5 h-3.5 text-foreground-muted" />
+                        <span>{tGroups.tabs.geofences}</span>
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button variant="destructive" onClick={handleAdd} className="h-8 gap-1.5 text-[13px] font-medium shadow-none">
+                <Plus className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline-block">{tGroups.actions.add}</span>
+              </Button>
+            </div>
+          }
+        />
       </div>
     </div>
   );

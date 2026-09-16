@@ -3,7 +3,7 @@
  */
 
 import type { Geofence, GeofenceGroup } from '@/features/core/geofences/types';
-import { mockGeofences as centralGeofences, mockGroups } from '../mock';
+import { mockGeofences as centralGeofences, mockGeofenceGroups } from '../mock';
 
 // --- Repository Interface ------------------------------------------------------
 
@@ -26,7 +26,7 @@ class MockGeofenceRepository implements GeofenceRepository {
       updatedAt: '2025-01-15T10:30:00Z',
     })) as unknown as Geofence[];
 
-    this.groups = mockGroups.map((g) => ({
+    this.groups = mockGeofenceGroups.map((g) => ({
       id: g.id,
       name: g.name,
     }));

@@ -15,7 +15,7 @@ import type {
   Trip,
   PlaybackData,
 } from '@/features/core/tracking/types/tracking';
-import { mockGroups, mockVehicles as centralVehicles, mockTrackingState, mockTrips } from '../mock';
+import { mockVehicleGroups, mockVehicles as centralVehicles, mockTrackingState, mockTrips } from '../mock';
 
 // --- Waypoint type (simulation only, not a Route master entity) ----------------
 
@@ -167,7 +167,7 @@ class MockTrackingRepository implements TrackingRepository {
       } as unknown as TrackingVehicle;
     });
 
-    this.vehicleGroups = mockGroups.map((g) => ({
+    this.vehicleGroups = mockVehicleGroups.map((g) => ({
       ...g,
       vehicles: this.vehicles.filter((v) => v.groupId === g.id),
     })) as unknown as TrackingVehicleGroup[];

@@ -11,7 +11,7 @@ const baseVehicles = [
     "brand": "Daihatsu",
     "year": 2018,
     "fuelType": "bensin",
-    "groupId": "grp-002",
+    "groupId": "grp-v-001",
     "driverId": "drv-001",
     "deviceId": "dev-001"
   },
@@ -23,7 +23,7 @@ const baseVehicles = [
     "brand": "Toyota",
     "year": 2021,
     "fuelType": "bensin",
-    "groupId": "grp-003",
+    "groupId": "grp-v-002",
     "driverId": "drv-002",
     "deviceId": "dev-002"
   },
@@ -35,7 +35,7 @@ const baseVehicles = [
     "brand": "Mitsubishi",
     "year": 2022,
     "fuelType": "bensin",
-    "groupId": "grp-004",
+    "groupId": "grp-v-002",
     "driverId": "drv-003",
     "deviceId": "dev-003"
   },
@@ -47,7 +47,7 @@ const baseVehicles = [
     "brand": "Daihatsu",
     "year": 2023,
     "fuelType": "bensin",
-    "groupId": "grp-005",
+    "groupId": "grp-v-003",
     "driverId": "drv-004",
     "deviceId": "dev-004"
   },
@@ -59,7 +59,7 @@ const baseVehicles = [
     "brand": "Toyota",
     "year": 2018,
     "fuelType": "bensin",
-    "groupId": "grp-006",
+    "groupId": "grp-v-002",
     "driverId": "drv-005",
     "deviceId": "dev-005"
   },
@@ -71,7 +71,7 @@ const baseVehicles = [
     "brand": "Toyota",
     "year": 2020,
     "fuelType": "bensin",
-    "groupId": "grp-001",
+    "groupId": "grp-v-004",
     "driverId": "drv-006",
     "deviceId": "dev-006"
   },
@@ -83,7 +83,7 @@ const baseVehicles = [
     "brand": "Honda",
     "year": 2020,
     "fuelType": "bensin",
-    "groupId": "grp-002",
+    "groupId": "grp-v-002",
     "driverId": "drv-007",
     "deviceId": "dev-007"
   },
@@ -95,7 +95,7 @@ const baseVehicles = [
     "brand": "Toyota",
     "year": 2023,
     "fuelType": "bensin",
-    "groupId": "grp-003",
+    "groupId": "grp-v-001",
     "driverId": "drv-008",
     "deviceId": "dev-008"
   },
@@ -107,7 +107,7 @@ const baseVehicles = [
     "brand": "Daihatsu",
     "year": 2018,
     "fuelType": "bensin",
-    "groupId": "grp-004",
+    "groupId": "grp-v-002",
     "driverId": "drv-009",
     "deviceId": "dev-009"
   },
@@ -119,7 +119,7 @@ const baseVehicles = [
     "brand": "Mitsubishi",
     "year": 2022,
     "fuelType": "bensin",
-    "groupId": "grp-005",
+    "groupId": "grp-v-003",
     "driverId": "drv-010",
     "deviceId": "dev-010"
   },
@@ -131,7 +131,7 @@ const baseVehicles = [
     "brand": "Toyota",
     "year": 2019,
     "fuelType": "bensin",
-    "groupId": "grp-006",
+    "groupId": "grp-v-001",
     "driverId": "drv-011",
     "deviceId": "dev-011"
   },
@@ -143,7 +143,7 @@ const baseVehicles = [
     "brand": "Suzuki",
     "year": 2018,
     "fuelType": "bensin",
-    "groupId": "grp-001",
+    "groupId": "grp-v-004",
     "driverId": "drv-012",
     "deviceId": "dev-012"
   },
@@ -155,7 +155,7 @@ const baseVehicles = [
     "brand": "Isuzu",
     "year": 2023,
     "fuelType": "bensin",
-    "groupId": "grp-002",
+    "groupId": "grp-v-002",
     "driverId": "drv-013",
     "deviceId": "dev-013"
   },
@@ -167,7 +167,7 @@ const baseVehicles = [
     "brand": "Daihatsu",
     "year": 2022,
     "fuelType": "bensin",
-    "groupId": "grp-003",
+    "groupId": "grp-v-004",
     "driverId": "drv-014",
     "deviceId": "dev-014"
   },
@@ -179,7 +179,7 @@ const baseVehicles = [
     "brand": "Toyota",
     "year": 2023,
     "fuelType": "bensin",
-    "groupId": "grp-004",
+    "groupId": "grp-v-001",
     "driverId": "drv-015",
     "deviceId": "dev-015"
   },
@@ -191,7 +191,7 @@ const baseVehicles = [
     "brand": "Suzuki",
     "year": 2022,
     "fuelType": "bensin",
-    "groupId": "grp-005",
+    "groupId": "grp-v-003",
     "driverId": "drv-016",
     "deviceId": "dev-016"
   },
@@ -203,7 +203,7 @@ const baseVehicles = [
     "brand": "Mitsubishi",
     "year": 2021,
     "fuelType": "bensin",
-    "groupId": "grp-006",
+    "groupId": "grp-v-002",
     "driverId": "drv-017",
     "deviceId": "dev-017"
   },
@@ -215,7 +215,7 @@ const baseVehicles = [
     "brand": "Mitsubishi",
     "year": 2019,
     "fuelType": "bensin",
-    "groupId": "grp-001",
+    "groupId": "grp-v-002",
     "driverId": "drv-018",
     "deviceId": "dev-018"
   },
@@ -227,7 +227,7 @@ const baseVehicles = [
     "brand": "Toyota",
     "year": 2018,
     "fuelType": "bensin",
-    "groupId": "grp-002",
+    "groupId": "grp-v-004",
     "driverId": "drv-019",
     "deviceId": "dev-019"
   },
@@ -239,7 +239,7 @@ const baseVehicles = [
     "brand": "Toyota",
     "year": 2022,
     "fuelType": "bensin",
-    "groupId": "grp-003",
+    "groupId": "grp-v-003",
     "driverId": "drv-020",
     "deviceId": "dev-020"
   },
@@ -251,7 +251,7 @@ const baseVehicles = [
     "brand": "Daihatsu",
     "year": 2018,
     "fuelType": "bensin",
-    "groupId": "grp-004",
+    "groupId": "grp-v-004",
     "driverId": "drv-021",
     "deviceId": "dev-021"
   },
@@ -263,7 +263,7 @@ const baseVehicles = [
     "brand": "Honda",
     "year": 2019,
     "fuelType": "bensin",
-    "groupId": "grp-005",
+    "groupId": "grp-v-002",
     "driverId": "drv-022",
     "deviceId": "dev-022"
   },
@@ -275,7 +275,7 @@ const baseVehicles = [
     "brand": "Suzuki",
     "year": 2019,
     "fuelType": "bensin",
-    "groupId": "grp-006",
+    "groupId": "grp-v-001",
     "driverId": "drv-023",
     "deviceId": "dev-023"
   },
@@ -287,7 +287,7 @@ const baseVehicles = [
     "brand": "Isuzu",
     "year": 2022,
     "fuelType": "bensin",
-    "groupId": "grp-001",
+    "groupId": "grp-v-002",
     "driverId": "drv-024",
     "deviceId": "dev-024"
   },
@@ -299,7 +299,7 @@ const baseVehicles = [
     "brand": "Daihatsu",
     "year": 2023,
     "fuelType": "bensin",
-    "groupId": "grp-002",
+    "groupId": "grp-v-004",
     "driverId": "drv-025",
     "deviceId": "dev-025"
   },
@@ -311,7 +311,7 @@ const baseVehicles = [
     "brand": "Toyota",
     "year": 2020,
     "fuelType": "bensin",
-    "groupId": "grp-003",
+    "groupId": "grp-v-001",
     "driverId": "drv-026",
     "deviceId": "dev-026"
   },
@@ -323,7 +323,7 @@ const baseVehicles = [
     "brand": "Toyota",
     "year": 2022,
     "fuelType": "bensin",
-    "groupId": "grp-004",
+    "groupId": "grp-v-002",
     "driverId": "drv-027",
     "deviceId": "dev-027"
   },
@@ -335,7 +335,7 @@ const baseVehicles = [
     "brand": "Toyota",
     "year": 2022,
     "fuelType": "bensin",
-    "groupId": "grp-005",
+    "groupId": "grp-v-001",
     "driverId": "drv-028",
     "deviceId": "dev-028"
   },
@@ -347,7 +347,7 @@ const baseVehicles = [
     "brand": "Daihatsu",
     "year": 2023,
     "fuelType": "bensin",
-    "groupId": "grp-006",
+    "groupId": "grp-v-003",
     "driverId": "drv-029",
     "deviceId": "dev-029"
   },
@@ -359,7 +359,7 @@ const baseVehicles = [
     "brand": "Toyota",
     "year": 2023,
     "fuelType": "bensin",
-    "groupId": "grp-001",
+    "groupId": "grp-v-001",
     "driverId": "drv-030",
     "deviceId": "dev-030"
   },
@@ -371,7 +371,7 @@ const baseVehicles = [
     "brand": "Suzuki",
     "year": 2021,
     "fuelType": "bensin",
-    "groupId": "grp-002",
+    "groupId": "grp-v-002",
     "driverId": "drv-031",
     "deviceId": "dev-031"
   },
@@ -383,7 +383,7 @@ const baseVehicles = [
     "brand": "Honda",
     "year": 2022,
     "fuelType": "bensin",
-    "groupId": "grp-003",
+    "groupId": "grp-v-001",
     "driverId": "drv-032",
     "deviceId": "dev-032"
   },
@@ -395,7 +395,7 @@ const baseVehicles = [
     "brand": "Toyota",
     "year": 2021,
     "fuelType": "bensin",
-    "groupId": "grp-004",
+    "groupId": "grp-v-004",
     "driverId": "drv-033",
     "deviceId": "dev-033"
   },
@@ -407,7 +407,7 @@ const baseVehicles = [
     "brand": "Toyota",
     "year": 2019,
     "fuelType": "bensin",
-    "groupId": "grp-005",
+    "groupId": "grp-v-003",
     "driverId": "drv-034",
     "deviceId": "dev-034"
   },
@@ -419,7 +419,7 @@ const baseVehicles = [
     "brand": "Toyota",
     "year": 2018,
     "fuelType": "bensin",
-    "groupId": "grp-006",
+    "groupId": "grp-v-004",
     "driverId": "drv-035",
     "deviceId": "dev-035"
   },
@@ -431,7 +431,7 @@ const baseVehicles = [
     "brand": "Honda",
     "year": 2022,
     "fuelType": "bensin",
-    "groupId": "grp-001",
+    "groupId": "grp-v-003",
     "driverId": "drv-036",
     "deviceId": "dev-036"
   },
@@ -443,7 +443,7 @@ const baseVehicles = [
     "brand": "Honda",
     "year": 2018,
     "fuelType": "bensin",
-    "groupId": "grp-002",
+    "groupId": "grp-v-001",
     "driverId": "drv-037",
     "deviceId": "dev-037"
   },
@@ -455,7 +455,7 @@ const baseVehicles = [
     "brand": "Mitsubishi",
     "year": 2022,
     "fuelType": "bensin",
-    "groupId": "grp-003",
+    "groupId": "grp-v-001",
     "driverId": "drv-038",
     "deviceId": "dev-038"
   },
@@ -467,7 +467,7 @@ const baseVehicles = [
     "brand": "Mitsubishi",
     "year": 2018,
     "fuelType": "bensin",
-    "groupId": "grp-004",
+    "groupId": "grp-v-004",
     "driverId": "drv-039",
     "deviceId": "dev-039"
   },
@@ -479,7 +479,7 @@ const baseVehicles = [
     "brand": "Isuzu",
     "year": 2022,
     "fuelType": "bensin",
-    "groupId": "grp-005",
+    "groupId": "grp-v-003",
     "driverId": "drv-040",
     "deviceId": "dev-040"
   },
@@ -491,7 +491,7 @@ const baseVehicles = [
     "brand": "Toyota",
     "year": 2019,
     "fuelType": "bensin",
-    "groupId": "grp-006",
+    "groupId": "grp-v-004",
     "driverId": "drv-041",
     "deviceId": "dev-041"
   },
@@ -503,7 +503,7 @@ const baseVehicles = [
     "brand": "Honda",
     "year": 2020,
     "fuelType": "bensin",
-    "groupId": "grp-001",
+    "groupId": "grp-v-004",
     "driverId": "drv-042",
     "deviceId": "dev-042"
   },
@@ -515,7 +515,7 @@ const baseVehicles = [
     "brand": "Suzuki",
     "year": 2021,
     "fuelType": "bensin",
-    "groupId": "grp-002",
+    "groupId": "grp-v-004",
     "driverId": "drv-043",
     "deviceId": "dev-043"
   },
@@ -527,7 +527,7 @@ const baseVehicles = [
     "brand": "Honda",
     "year": 2021,
     "fuelType": "bensin",
-    "groupId": "grp-003",
+    "groupId": "grp-v-003",
     "driverId": "drv-044",
     "deviceId": "dev-044"
   },
@@ -539,7 +539,7 @@ const baseVehicles = [
     "brand": "Toyota",
     "year": 2018,
     "fuelType": "bensin",
-    "groupId": "grp-004",
+    "groupId": "grp-v-003",
     "driverId": "drv-045",
     "deviceId": "dev-045"
   },
@@ -551,7 +551,7 @@ const baseVehicles = [
     "brand": "Toyota",
     "year": 2021,
     "fuelType": "bensin",
-    "groupId": "grp-005",
+    "groupId": "grp-v-003",
     "driverId": "drv-046",
     "deviceId": "dev-046"
   },
@@ -563,7 +563,7 @@ const baseVehicles = [
     "brand": "Toyota",
     "year": 2021,
     "fuelType": "bensin",
-    "groupId": "grp-006",
+    "groupId": "grp-v-001",
     "driverId": "drv-047",
     "deviceId": "dev-047"
   },
@@ -575,7 +575,7 @@ const baseVehicles = [
     "brand": "Mitsubishi",
     "year": 2018,
     "fuelType": "bensin",
-    "groupId": "grp-001",
+    "groupId": "grp-v-001",
     "driverId": "drv-048",
     "deviceId": "dev-048"
   },
@@ -587,7 +587,7 @@ const baseVehicles = [
     "brand": "Toyota",
     "year": 2021,
     "fuelType": "bensin",
-    "groupId": "grp-002",
+    "groupId": "grp-v-004",
     "driverId": "drv-049",
     "deviceId": "dev-049"
   },
@@ -599,7 +599,7 @@ const baseVehicles = [
     "brand": "Honda",
     "year": 2018,
     "fuelType": "bensin",
-    "groupId": "grp-003",
+    "groupId": "grp-v-002",
     "driverId": "drv-050",
     "deviceId": "dev-050"
   }
