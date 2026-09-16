@@ -5,6 +5,11 @@ export const dictionaries = {
     appName: 'ADATRACK Business',
     welcome: 'Selamat Datang di ADATRACK Business',
 
+    common: {
+      cancel: 'Batal',
+      save: 'Simpan',
+    },
+
     // Navigation Labels
     nav: {
       log: 'Log',
@@ -137,7 +142,7 @@ export const dictionaries = {
         unknown: 'Belum diketahui',
       },
       none: '-',
-      searchPlaceholder: 'Cari berdasarkan UID, nama pemegang, atau nopol...',
+      searchPlaceholder: 'Cari...',
     },
 
     // Nav Group Titles
@@ -236,7 +241,7 @@ export const dictionaries = {
     tracking: {
       title: 'Filter',
       unitCount: 'Unit',
-      searchPlaceholder: 'Cari plat nomor, grup, atau nama driver',
+      searchPlaceholder: 'Cari...',
       filterSettings: 'Pengaturan Filter',
       allUnits: 'Semua Unit',
       selectAll: 'Pilih Semua',
@@ -299,7 +304,7 @@ export const dictionaries = {
       playbackLoadHistory: 'Muat Histori',
       playbackErrorLoad: 'Gagal memuat histori',
       playbackInstructions: 'Pilih kendaraan dan tentukan rentang waktu untuk memuat histori perjalanan.',
-      playbackSearchPlaceholder: 'Cari plat nomor atau pengemudi...',
+      playbackSearchPlaceholder: 'Cari...',
       playbackNoVehicle: 'Kendaraan tidak ditemukan',
       playbackTitle: 'PLAYBACK',
       playbackTo: 'KE',
@@ -327,7 +332,7 @@ export const dictionaries = {
       title: 'Kendaraan',
       pageSubtitle: 'Kelola data kendaraan, grup, dan informasi kendaraan Anda.',
       addVehicle: 'Tambah Kendaraan',
-      searchPlaceholder: 'Cari plat nomor, kendaraan, atau pengemudi...',
+      searchPlaceholder: 'Cari...',
       exportFilename: 'kendaraan-adatrack',
       filterStatus: 'Status',
       filterGroup: 'Grup',
@@ -387,7 +392,7 @@ export const dictionaries = {
       filterVehicle: 'Kendaraan',
       filterDriver: 'Pengemudi',
       filterStatus: 'Status',
-      searchPlaceholder: 'Cari plat nomor, pengemudi, asal, atau tujuan...',
+      searchPlaceholder: 'Cari...',
       statusAll: 'Semua',
       statusOngoing: 'Berlangsung',
       statusCompleted: 'Selesai',
@@ -483,7 +488,7 @@ export const dictionaries = {
     rentalVehicles: {
       title: 'Armada Rental',
       pageSubtitle: 'Kelola ketersediaan dan informasi kendaraan untuk kebutuhan rental.',
-      searchPlaceholder: 'Cari nomor polisi, merk, atau model...',
+      searchPlaceholder: 'Cari...',
       addVehicle: 'Daftarkan Kendaraan',
       exportFilename: 'kendaraan-rental-adatrack',
       
@@ -591,7 +596,7 @@ export const dictionaries = {
       addContract: 'Buat Kontrak Rental',
       editContract: 'Edit Kontrak',
       printContract: 'Print Kontrak',
-      searchPlaceholder: 'Cari nomor kontrak...',
+      searchPlaceholder: 'Cari...',
       colContractNo: 'NO. KONTRAK',
       colCustomer: 'PELANGGAN',
       colVehicle: 'KENDARAAN',
@@ -672,6 +677,11 @@ export const dictionaries = {
   en: {
     appName: 'ADATRACK Business',
     welcome: 'Welcome to ADATRACK Business',
+
+    common: {
+      cancel: 'Cancel',
+      save: 'Save',
+    },
 
     // Navigation Labels
     nav: {
@@ -805,7 +815,7 @@ export const dictionaries = {
         unknown: 'Unknown',
       },
       none: '-',
-      searchPlaceholder: 'Search by UID, holder name, or plate number...',
+      searchPlaceholder: 'Search...',
     },
 
     // Nav Group Titles
@@ -904,7 +914,7 @@ export const dictionaries = {
     tracking: {
       title: 'Filter',
       unitCount: 'Units',
-      searchPlaceholder: 'Search plate, group, or driver name',
+      searchPlaceholder: 'Search...',
       filterSettings: 'Filter Settings',
       allUnits: 'All Units',
       selectAll: 'Select All',
@@ -967,7 +977,7 @@ export const dictionaries = {
       playbackLoadHistory: 'Load History',
       playbackErrorLoad: 'Failed to load history',
       playbackInstructions: 'Select a vehicle and time range to load travel history.',
-      playbackSearchPlaceholder: 'Search plate number or driver...',
+      playbackSearchPlaceholder: 'Search...',
       playbackNoVehicle: 'Vehicle not found',
       playbackTitle: 'PLAYBACK',
       playbackTo: 'TO',
@@ -995,7 +1005,7 @@ export const dictionaries = {
       title: 'Vehicles',
       pageSubtitle: 'Manage your fleet vehicle data, groups, and status.',
       addVehicle: 'Add Vehicle',
-      searchPlaceholder: 'Search plate, vehicle, or driver...',
+      searchPlaceholder: 'Search...',
       exportFilename: 'fleet-adatrack',
       filterStatus: 'Status',
       filterGroup: 'Group',
@@ -1057,7 +1067,7 @@ export const dictionaries = {
       filterVehicle: 'Vehicle',
       filterDriver: 'Driver',
       filterStatus: 'Status',
-      searchPlaceholder: 'Search plate number, driver, origin, or destination...',
+      searchPlaceholder: 'Search...',
       statusAll: 'All',
       statusOngoing: 'Ongoing',
       statusCompleted: 'Completed',
@@ -1151,7 +1161,7 @@ export const dictionaries = {
     rentalVehicles: {
       title: 'Rental Fleet',
       pageSubtitle: 'Manage availability and vehicle information for rental needs.',
-      searchPlaceholder: 'Search plate number, brand, or model...',
+      searchPlaceholder: 'Search...',
       addVehicle: 'Register Fleet',
       exportFilename: 'rental-fleet-adatrack',
       
@@ -1259,7 +1269,7 @@ export const dictionaries = {
       addContract: 'Create Rental Contract',
       editContract: 'Edit Contract',
       printContract: 'Print Contract',
-      searchPlaceholder: 'Search contract number...',
+      searchPlaceholder: 'Search...',
       colContractNo: 'CONTRACT NO.',
       colCustomer: 'CUSTOMER',
       colVehicle: 'VEHICLE',

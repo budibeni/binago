@@ -260,7 +260,7 @@ export function ReturnForm({ contract, handover, onSubmit, onCancel, isSubmittin
         <div className="p-4 grid grid-cols-1 sm:grid-cols-3 gap-6">
           <div className="p-4 bg-neutral-50 dark:bg-neutral-900/50 rounded-xl border border-border">
             <p className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Odometer Awal (Serah Terima)</p>
-            <p className="text-2xl font-bold">{handover.odometerStart.toLocaleString('id-ID')}</p>
+            <p className="text-xl font-bold">{handover.odometerStart.toLocaleString('id-ID')}</p>
             <p className="text-xs text-muted-foreground">KM</p>
           </div>
           <div>
@@ -276,7 +276,7 @@ export function ReturnForm({ contract, handover, onSubmit, onCancel, isSubmittin
           </div>
           <div className="p-4 bg-primary/5 dark:bg-primary/10 rounded-xl border border-primary/20">
             <p className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Jarak Tempuh</p>
-            <p className="text-2xl font-bold text-primary">{distanceUsed.toLocaleString('id-ID')}</p>
+            <p className="text-xl font-bold text-primary">{distanceUsed.toLocaleString('id-ID')}</p>
             <p className="text-xs text-muted-foreground">KM</p>
           </div>
         </div>

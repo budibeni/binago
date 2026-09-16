@@ -36,7 +36,7 @@ import {
   Building, FolderKanban,
   Database
 } from 'lucide-react';
-import { AppShell } from '@adatrack/ui';
+import { AppShell, UIProvider } from '@adatrack/ui';
 import type { NavGroup, NavItem, UserInfo, Locale } from '@adatrack/types';
 import { getTranslation } from '../i18n';
 import { ShareLocationProvider } from '../features/core/sharing/context/ShareLocationContext';
@@ -67,8 +67,8 @@ function buildNavigation(locale: Locale): NavGroup[] {
         { id: 'vehicles', label: t.nav.vehicles, href: '/vehicles', icon: Truck },
         { id: 'drivers', label: t.nav.drivers, href: '/drivers', icon: UserRound },
         { id: 'geofences', label: t.nav.geofences, href: '/geofences', icon: MapPinned },
-        { id: 'groups', label: t.nav.groups, href: '/groups', icon: Layers },
         { id: 'routes', label: t.nav.routes, href: '/routes', icon: Waypoints },
+        { id: 'groups', label: t.nav.groups, href: '/groups', icon: Layers },
       ],
     },
     {
@@ -292,24 +292,26 @@ export function BusinessShellLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <AppShell
-      brandName="ADATRACK"
-      navigation={navigation}
-      bottomNavigation={buildBottomNavigation(locale)}
-      currentPath={currentPath}
-      breadcrumbItems={breadcrumbItems}
-      user={DUMMY_USER}
-      currentLocale={locale}
-      onLocaleChange={setLocale}
-      currentTheme={theme}
-      onThemeChange={handleThemeChange}
-      userMenuLabels={t.userMenu}
-    >
-      <ShareLocationProvider>
-        <BusinessLocaleContext.Provider value={locale}>
-          {children}
-        </BusinessLocaleContext.Provider>
-      </ShareLocationProvider>
-    </AppShell>
+    <UIProvider config={{ cancelText: t.common.cancel, saveText: t.common.save }}>
+      <AppShell
+        brandName="ADATRACK"
+        navigation={navigation}
+        bottomNavigation={buildBottomNavigation(locale)}
+        currentPath={currentPath}
+        breadcrumbItems={breadcrumbItems}
+        user={DUMMY_USER}
+        currentLocale={locale}
+        onLocaleChange={setLocale}
+        currentTheme={theme}
+        onThemeChange={handleThemeChange}
+        userMenuLabels={t.userMenu}
+      >
+        <ShareLocationProvider>
+          <BusinessLocaleContext.Provider value={locale}>
+            {children}
+          </BusinessLocaleContext.Provider>
+        </ShareLocationProvider>
+      </AppShell>
+    </UIProvider>
   );
 }

@@ -4,7 +4,7 @@ export const driversDictionaries = {
   id: {
     pageTitle: 'Pengemudi',
     pageSubtitle: 'Manajemen data pengemudi dan riwayat penugasan',
-    searchPlaceholder: 'Cari nama atau No. KTP...',
+    searchPlaceholder: 'Cari...',
     addDriver: 'Tambah',
     exportFilename: 'pengemudi-adatrack',
     filterStatus: 'Status',
@@ -120,7 +120,7 @@ export const driversDictionaries = {
   en: {
     pageTitle: 'Drivers',
     pageSubtitle: 'Manage drivers data and assignment history',
-    searchPlaceholder: 'Search name or ID Card No...',
+    searchPlaceholder: 'Search...',
     addDriver: 'Add Driver',
     exportFilename: 'drivers-adatrack',
     filterStatus: 'Status',

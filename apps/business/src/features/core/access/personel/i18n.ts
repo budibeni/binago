@@ -6,7 +6,7 @@ export function getPersonelTranslation(locale: 'id' | 'en') {
       
       addPersonel: 'Add Personel',
       exportFilename: 'personel-adatrack',
-      searchPlaceholder: 'Search name, NIK, or phone...',
+      searchPlaceholder: 'Search...',
       clearFilters: 'Clear Filters',
       
       filterStatus: 'Status',
@@ -95,7 +95,7 @@ export function getPersonelTranslation(locale: 'id' | 'en') {
     
     addPersonel: 'Tambah Personel',
     exportFilename: 'personel-adatrack',
-    searchPlaceholder: 'Cari nama, NIK, atau telepon...',
+    searchPlaceholder: 'Cari...',
     clearFilters: 'Hapus Filter',
     
     filterStatus: 'Status',

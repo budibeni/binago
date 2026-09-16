@@ -240,7 +240,7 @@ export function ContractView({
                   </div>
                   <div className="flex justify-between items-center pt-1">
                     <p className="text-xs font-bold text-danger">Sisa Tagihan</p>
-                    <p className="text-lg font-black text-danger">{formatCurrency(contract.remainingAmount || 0)}</p>
+                    <p className="text-xl font-bold text-danger">{formatCurrency(contract.remainingAmount || 0)}</p>
                   </div>
                 </div>
               </div>

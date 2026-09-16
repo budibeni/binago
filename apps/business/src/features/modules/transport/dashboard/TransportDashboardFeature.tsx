@@ -49,7 +49,7 @@ export function TransportDashboardFeature() {
       <div className="shrink-0 p-4 lg:p-6 bg-white dark:bg-neutral-950 border-b border-border shadow-sm z-10">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-lg lg:text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50 flex items-center gap-2">
+            <h1 className="text-xl font-bold text-neutral-900 dark:text-neutral-50 flex items-center gap-2">
               <Bus className="w-5 h-5 text-indigo-600" />
               {t.title}
             </h1>
@@ -91,7 +91,7 @@ export function TransportDashboardFeature() {
               </div>
               <p className="text-sm text-neutral-600 font-medium">{t.totalDepartures}</p>
             </div>
-            <p className="text-2xl font-bold text-neutral-900">{summary.total}</p>
+            <p className="text-xl font-bold text-neutral-900">{summary.total}</p>
           </Card>
           <Card className="p-4 bg-white">
             <div className="flex items-center gap-3 mb-2">
@@ -100,7 +100,7 @@ export function TransportDashboardFeature() {
               </div>
               <p className="text-sm text-neutral-600 font-medium">{t.onTimeRate}</p>
             </div>
-            <p className="text-2xl font-bold text-neutral-900">{summary.onTimeRate.toFixed(1)}%</p>
+            <p className="text-xl font-bold text-neutral-900">{summary.onTimeRate.toFixed(1)}%</p>
           </Card>
           <Card className="p-4 bg-white">
             <div className="flex items-center gap-3 mb-2">
@@ -109,7 +109,7 @@ export function TransportDashboardFeature() {
               </div>
               <p className="text-sm text-neutral-600 font-medium">{t.totalPassengers}</p>
             </div>
-            <p className="text-2xl font-bold text-neutral-900">{summary.totalBoarding}</p>
+            <p className="text-xl font-bold text-neutral-900">{summary.totalBoarding}</p>
           </Card>
           <Card className="p-4 bg-white">
             <div className="flex items-center gap-3 mb-2">
@@ -118,7 +118,7 @@ export function TransportDashboardFeature() {
               </div>
               <p className="text-sm text-neutral-600 font-medium">{t.avgOccupancy}</p>
             </div>
-            <p className="text-2xl font-bold text-neutral-900">{summary.avgOccupancy.toFixed(1)}%</p>
+            <p className="text-xl font-bold text-neutral-900">{summary.avgOccupancy.toFixed(1)}%</p>
           </Card>
         </div>
 

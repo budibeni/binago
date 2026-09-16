@@ -81,7 +81,7 @@ export const dictionaries = {
 
     // Tracking
     tracking: {
-      searchPlaceholder: 'Cari kendaraan...',
+      searchPlaceholder: 'Cari...',
       filterAll: 'Semua',
       statusDriving: 'Berjalan',
       statusIdle: 'Berhenti',
@@ -439,7 +439,7 @@ export const dictionaries = {
 
     // Tracking
     tracking: {
-      searchPlaceholder: 'Search vehicle...',
+      searchPlaceholder: 'Search...',
       filterAll: 'All',
       statusDriving: 'Driving',
       statusIdle: 'Idle',

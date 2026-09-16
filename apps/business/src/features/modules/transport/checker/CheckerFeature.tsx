@@ -347,7 +347,7 @@ export function CheckerFeature() {
                     <p className="text-[11px] font-bold text-foreground-muted uppercase tracking-wider mb-2">Departure Dipilih</p>
                     <div className="bg-background border border-border p-4 rounded-xl">
                       <div className="flex justify-between items-center mb-2">
-                        <span className="font-black text-lg text-foreground">{selectedDeparture.vehicle?.plateNumber}</span>
+                        <span className="font-bold text-lg text-foreground">{selectedDeparture.vehicle?.plateNumber}</span>
                         <Badge className="bg-emerald-500/10 text-emerald-600 border-0">ONGOING</Badge>
                       </div>
                       <p className="text-xs font-medium text-foreground-muted mb-4">{selectedDeparture.route?.name}</p>

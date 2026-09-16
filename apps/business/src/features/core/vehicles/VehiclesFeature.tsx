@@ -6,6 +6,7 @@ import { Car } from 'lucide-react';
 import { getTranslation } from '../../../i18n';
 import { useBusinessLocale } from '../../../components/BusinessShellLayout';
 import { vehicleService } from '@/data/services';
+import { trackingNavigationService } from '../tracking/services/trackingNavigationService';
 import { VehicleTable } from './components/VehicleTable';
 import { VehicleView } from './components/VehicleView';
 import { VehicleForm } from './components/VehicleForm';
@@ -65,9 +66,10 @@ export function VehiclesFeature() {
   }, []);
 
   const handleTrack = React.useCallback((vehicle: Vehicle) => {
-    // Navigate to tracking page
-    router.push('/tracking');
-    console.log('Track vehicle:', vehicle.id);
+    trackingNavigationService.navigateToTracking(router, {
+      mode: 'live',
+      vehicleId: vehicle.id
+    });
   }, [router]);
 
   const handleDelete = React.useCallback((vehicle: Vehicle) => {

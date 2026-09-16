@@ -11,11 +11,12 @@ import {
   Waypoints,
   MapPin,
   Edit2,
-  Trash2,
-  Plus
+  Plus,
+  Filter,
+  MoreVertical
 } from 'lucide-react';
 import { cn } from '@adatrack/utils';
-import { Checkbox } from '@adatrack/ui';
+import { Checkbox, Button, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@adatrack/ui';
 import type { Geofence, GeofenceGroup } from '../types';
 import { type GeofenceLocale, getGeofencesTranslation } from '../i18n';
 
@@ -51,8 +52,9 @@ export function GeofenceListPanel({
   const t = getGeofencesTranslation(locale);
   const [search, setSearch] = React.useState('');
   const [expandedGroups, setExpandedGroups] = React.useState<Record<string, boolean>>(() =>
-    Object.fromEntries(groups.map((g) => [g.id, true])),
+    Object.fromEntries(groups.map((g) => [g.id, false])),
   );
+  const [statusFilter, setStatusFilter] = React.useState<'all' | 'active' | 'inactive'>('all');
 
   const toggleGroup = (groupId: string) => {
     setExpandedGroups((prev) => ({ ...prev, [groupId]: !prev[groupId] }));
@@ -65,7 +67,8 @@ export function GeofenceListPanel({
 
   geofences.forEach(gf => {
     const matchSearch = gf.name.toLowerCase().includes(search.toLowerCase());
-    if (!matchSearch) return;
+    const matchStatus = statusFilter === 'all' || gf.status === statusFilter;
+    if (!matchSearch || !matchStatus) return;
 
     if (gf.groupId && groupMap.has(gf.groupId)) {
       groupMap.get(gf.groupId)!.push(gf);
@@ -87,12 +90,14 @@ export function GeofenceListPanel({
       <div className="shrink-0 flex items-center justify-between px-3 h-[44px] bg-white dark:bg-neutral-900 border-b border-border">
         {/* Kiri: Button Tambah Geofence */}
         <div className="flex items-center">
-          <button
+          <Button
+            variant="destructive"
             onClick={onAdd}
-            className="flex h-7 px-3 items-center justify-center gap-1.5 rounded-md bg-red-600 text-[10px] font-bold text-white hover:bg-red-700 transition-colors"
+            className="h-8 gap-1.5 text-[13px] font-medium shadow-none"
           >
-            <Plus className="h-3.5 w-3.5" /> {t.addGeofence}
-          </button>
+            <Plus className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline-block">{t.addGeofence}</span>
+          </Button>
         </div>
 
         {/* Kanan: Close */}
@@ -116,10 +121,45 @@ export function GeofenceListPanel({
             type="search"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder={t.searchGeofence}
+            placeholder="Cari..."
             className="w-full h-8 rounded-md border border-border bg-[#fafafa] dark:bg-neutral-900 pl-8 pr-3 text-[12px] text-foreground focus:outline-none focus:border-neutral-300 focus:bg-white transition-all placeholder:text-neutral-400"
           />
         </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              className={cn(
+                "flex h-8 w-8 items-center justify-center rounded-md border transition-colors shrink-0",
+                statusFilter !== 'all' 
+                  ? "bg-red-50 border-red-200 text-red-600 dark:bg-red-900/30 dark:border-red-800 dark:text-red-400"
+                  : "bg-[#fafafa] dark:bg-neutral-900 border-border text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+              )}
+              title="Filter Status"
+            >
+              <Filter className="h-3.5 w-3.5" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-36">
+            <DropdownMenuItem 
+              onClick={() => setStatusFilter('all')} 
+              className={statusFilter === 'all' ? 'font-bold' : ''}
+            >
+              Semua Status
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              onClick={() => setStatusFilter('active')} 
+              className={statusFilter === 'active' ? 'font-bold' : ''}
+            >
+              {t.active}
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              onClick={() => setStatusFilter('inactive')} 
+              className={statusFilter === 'inactive' ? 'font-bold' : ''}
+            >
+              {t.inactive}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {/* -- Select All ------------------------------------------------------ */}
@@ -130,8 +170,8 @@ export function GeofenceListPanel({
               id="geofence-select-all"
               checked={
                 visibleIds.length === 0 ? false :
-                visibleIds.length === geofences.length ? true :
-                'indeterminate'
+                  visibleIds.length === geofences.length ? true :
+                    'indeterminate'
               }
               onCheckedChange={(checked) => onSelectAll(!!checked)}
               aria-label="Tampilkan semua geofence"
@@ -161,7 +201,7 @@ export function GeofenceListPanel({
 
         {/* Groups */}
         {filteredGroups.map((group) => {
-          const isExpanded = expandedGroups[group.id] ?? true;
+          const isExpanded = expandedGroups[group.id] ?? false;
           const groupGeofenceIds = group.geofences.map(g => g.id);
           const isGroupChecked = groupGeofenceIds.length > 0 && groupGeofenceIds.every(id => visibleIds.includes(id));
           const isGroupIndeterminate = !isGroupChecked && groupGeofenceIds.some(id => visibleIds.includes(id));
@@ -173,7 +213,7 @@ export function GeofenceListPanel({
                 onClick={() => toggleGroup(group.id)}
               >
                 <ChevronDown className={cn("w-3.5 h-3.5 text-neutral-400 transition-transform", !isExpanded && "-rotate-90")} />
-                
+
                 <div onClick={(e) => e.stopPropagation()} className="shrink-0 flex items-center bg-transparent">
                   <Checkbox
                     checked={isGroupIndeterminate ? 'indeterminate' : isGroupChecked}
@@ -216,44 +256,43 @@ export function GeofenceListPanel({
         {/* Unassigned */}
         {unassignedGeofences.length > 0 && (
           <div className="bg-white dark:bg-neutral-900 border border-border rounded-md shadow-[0_2px_8px_-4px_rgba(0,0,0,0.03)] overflow-hidden">
-             <div className="flex items-center gap-2 px-3 py-2.5 bg-[#fafafa] dark:bg-neutral-900">
-                <div className="shrink-0 flex items-center bg-transparent ml-[22px]">
-                   <Checkbox
-                      checked={unassignedGeofences.every(g => visibleIds.includes(g.id))}
-                      onCheckedChange={(checked) => onCheck(unassignedGeofences.map(g => g.id), !!checked)}
-                      aria-label="Tampilkan lainnya"
-                      className="h-3.5 w-3.5 data-[state=checked]:bg-neutral-400 data-[state=checked]:border-neutral-400 data-[state=checked]:text-white rounded-sm shadow-none"
-                   />
-                </div>
-                <span className="text-xs font-semibold text-neutral-500 flex-1 tracking-tight">
-                  {t.unassigned}
-                </span>
-                <span className="text-[10px] font-bold text-neutral-500 bg-white dark:bg-neutral-800 border border-border px-1.5 py-0.5 rounded-md leading-none">
-                  {unassignedGeofences.length}
-                </span>
-             </div>
-             <div className="flex flex-col border-t border-border">
-                {unassignedGeofences.map(gf => (
-                  <GeofenceListItem
-                    key={gf.id}
-                    geofence={gf}
-                    isSelected={selectedId === gf.id}
-                    isChecked={visibleIds.includes(gf.id)}
-                    onCheck={(checked) => onCheck([gf.id], checked)}
-                    onSelect={() => onSelect(gf.id)}
-                    onEdit={() => onEdit(gf)}
-                    onDelete={() => onDelete(gf.id)}
-                    locale={locale}
-                  />
-                ))}
-             </div>
+            <div className="flex items-center gap-2 px-3 py-2.5 bg-[#fafafa] dark:bg-neutral-900">
+              <div className="shrink-0 flex items-center bg-transparent ml-[22px]">
+                <Checkbox
+                  checked={unassignedGeofences.every(g => visibleIds.includes(g.id))}
+                  onCheckedChange={(checked) => onCheck(unassignedGeofences.map(g => g.id), !!checked)}
+                  aria-label="Tampilkan lainnya"
+                  className="h-3.5 w-3.5 data-[state=checked]:bg-neutral-400 data-[state=checked]:border-neutral-400 data-[state=checked]:text-white rounded-sm shadow-none"
+                />
+              </div>
+              <span className="text-xs font-semibold text-neutral-500 flex-1 tracking-tight">
+                {t.unassigned}
+              </span>
+              <span className="text-[10px] font-bold text-neutral-500 bg-white dark:bg-neutral-800 border border-border px-1.5 py-0.5 rounded-md leading-none">
+                {unassignedGeofences.length}
+              </span>
+            </div>
+            <div className="flex flex-col border-t border-border">
+              {unassignedGeofences.map(gf => (
+                <GeofenceListItem
+                  key={gf.id}
+                  geofence={gf}
+                  isSelected={selectedId === gf.id}
+                  isChecked={visibleIds.includes(gf.id)}
+                  onCheck={(checked) => onCheck([gf.id], checked)}
+                  onSelect={() => onSelect(gf.id)}
+                  onEdit={() => onEdit(gf)}
+                  onDelete={() => onDelete(gf.id)}
+                  locale={locale}
+                />
+              ))}
+            </div>
           </div>
         )}
       </div>
     </aside>
   );
 }
-
 function GeofenceListItem({
   geofence,
   isSelected,
@@ -276,7 +315,7 @@ function GeofenceListItem({
   const t = getGeofencesTranslation(locale);
   const isRectangle = geofence.geometry.type === 'rectangle';
   const isMultiline = geofence.geometry.type === 'multiline';
-  
+
   let descText = `${(geofence.geometry as any).coordinates?.length || 0} ${t.points}`;
   if (isRectangle) descText = t.areaDimension;
   if (isMultiline) descText = `${(geofence.geometry as any).coordinates?.length || 0} ${t.routePoints}`;
@@ -289,8 +328,8 @@ function GeofenceListItem({
         isSelected ? 'bg-neutral-50 dark:bg-neutral-800/80' : 'hover:bg-[#fafafa] dark:hover:bg-neutral-800/40'
       )}
     >
-      <div className="flex items-center gap-2 min-w-0">
-        <div onClick={(e) => e.stopPropagation()} className="shrink-0 flex items-center bg-transparent mr-1">
+      <div className="flex items-center gap-3 min-w-0">
+        <div onClick={(e) => e.stopPropagation()} className="shrink-0 flex items-center bg-transparent">
           <Checkbox
             checked={isChecked}
             onCheckedChange={(checked) => onCheck(!!checked)}
@@ -298,18 +337,8 @@ function GeofenceListItem({
             className="h-3.5 w-3.5 data-[state=checked]:bg-neutral-400 data-[state=checked]:border-neutral-400 data-[state=checked]:text-white rounded-sm shadow-none"
           />
         </div>
-        <div className={cn(
-          "flex h-6 w-6 shrink-0 items-center justify-center rounded-md",
-          isRectangle ? "bg-blue-50 text-blue-500 dark:bg-blue-500/10" : 
-          isMultiline ? "bg-emerald-50 text-emerald-500 dark:bg-emerald-500/10" : 
-          "bg-red-50 text-red-400 dark:bg-red-500/10"
-        )}>
-          {isRectangle ? <Square className="h-3 w-3" /> : 
-            isMultiline ? <Waypoints className="h-3 w-3" /> : 
-            <Hexagon className="h-3 w-3" />}
-        </div>
         <div className="flex flex-col min-w-0">
-          <span className="text-xs font-semibold text-neutral-800 dark:text-neutral-200 truncate tracking-tight leading-tight">
+          <span className="text-xs font-medium text-neutral-800 dark:text-neutral-200 truncate tracking-tight leading-tight">
             {geofence.name}
           </span>
           <div className="flex items-center gap-1 mt-0.5">
@@ -322,23 +351,40 @@ function GeofenceListItem({
           </div>
         </div>
       </div>
-      
-      {/* Actions */}
-      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-        <button 
-          onClick={(e) => { e.stopPropagation(); onEdit(); }} 
-          className="p-1 text-neutral-400 hover:text-foreground hover:bg-neutral-200 rounded"
-          title={t.edit}
-        >
-          <Edit2 className="h-3.5 w-3.5" />
-        </button>
-        <button 
-          onClick={(e) => { e.stopPropagation(); onDelete(); }} 
-          className="p-1 text-neutral-400 hover:text-red-500 hover:bg-red-50 rounded"
-          title={t.delete}
-        >
-          <Trash2 className="h-3.5 w-3.5" />
-        </button>
+
+      {/* Right Side: Actions & Icon */}
+      <div className="flex items-center gap-2 shrink-0">
+        {/* Icon */}
+        <div className={cn(
+          "flex h-6 w-6 shrink-0 items-center justify-center rounded-md",
+          isRectangle ? "bg-blue-50 text-blue-500 dark:bg-blue-500/10" : 
+          isMultiline ? "bg-emerald-50 text-emerald-500 dark:bg-emerald-500/10" : 
+          "bg-red-50 text-red-400 dark:bg-red-500/10"
+        )}>
+          {isRectangle ? <Square className="h-3 w-3" /> : 
+            isMultiline ? <Waypoints className="h-3 w-3" /> : 
+            <Hexagon className="h-3 w-3" />}
+        </div>
+
+        {/* Actions */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="h-6 w-6 flex items-center justify-center rounded-sm hover:bg-neutral-100 text-neutral-400 hover:text-neutral-900 transition-colors" onClick={(e) => e.stopPropagation()}>
+              <MoreVertical className="w-4 h-4" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-36">
+            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onEdit(); }}>
+              {t.edit}
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              className="text-red-600 focus:bg-red-50 focus:text-red-700 dark:focus:bg-red-950"
+              onClick={(e) => { e.stopPropagation(); onDelete(); }}
+            >
+              {t.delete}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );

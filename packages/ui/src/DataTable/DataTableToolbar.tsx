@@ -159,7 +159,7 @@ export function DataTableToolbar<TData extends RowData = RowData>({
             <DataTableSearch
               value={searchValue}
               onChange={onSearchChange}
-              placeholder={searchPlaceholder}
+              placeholder="Cari..."
               fetchState={fetchState}
               debounceMs={searchDebounceMs}
               disabled={isLoading}

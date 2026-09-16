@@ -2,7 +2,7 @@ export type GeofenceLocale = 'id' | 'en';
 
 export const geofencesTranslations = {
   id: {
-    addGeofence: 'Tambah Geofence',
+    addGeofence: 'Tambah',
     searchGeofence: 'Cari geofence...',
     allGeofences: 'Semua Geofence',
     noGeofences: 'Tidak ada geofence',
@@ -35,7 +35,7 @@ export const geofencesTranslations = {
     fillCorrectly: 'Pastikan area peta dan detail informasi terisi dengan benar',
   },
   en: {
-    addGeofence: 'Add Geofence',
+    addGeofence: 'Add',
     searchGeofence: 'Search geofences...',
     allGeofences: 'All Geofences',
     noGeofences: 'No geofences found',

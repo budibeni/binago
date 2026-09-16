@@ -71,7 +71,7 @@ export function SchedulesFeature() {
       <div className="shrink-0 p-4 lg:p-6 bg-white dark:bg-neutral-950 border-b border-border shadow-sm z-10">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-lg lg:text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50 flex items-center gap-2">
+            <h1 className="text-xl font-bold text-neutral-900 dark:text-neutral-50 flex items-center gap-2">
               <CalendarDays className="w-5 h-5 text-violet-600" />
               Jadwal Operasional
             </h1>
@@ -90,19 +90,19 @@ export function SchedulesFeature() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <Card className="p-4 bg-white">
             <p className="text-sm text-neutral-500 font-medium">Total Jadwal</p>
-            <p className="text-2xl font-bold mt-1">{stats.all}</p>
+            <p className="text-xl font-bold mt-1">{stats.all}</p>
           </Card>
           <Card className="p-4 bg-white border-violet-200">
             <p className="text-sm text-violet-600 font-medium">Aktif</p>
-            <p className="text-2xl font-bold mt-1 text-violet-700">{stats.active}</p>
+            <p className="text-xl font-bold mt-1 text-violet-700">{stats.active}</p>
           </Card>
           <Card className="p-4 bg-white border-neutral-200">
             <p className="text-sm text-neutral-600 font-medium">Nonaktif</p>
-            <p className="text-2xl font-bold mt-1 text-neutral-700">{stats.inactive}</p>
+            <p className="text-xl font-bold mt-1 text-neutral-700">{stats.inactive}</p>
           </Card>
           <Card className="p-4 bg-white border-red-200">
             <p className="text-sm text-red-600 font-medium">Suspended</p>
-            <p className="text-2xl font-bold mt-1 text-red-700">{stats.suspended}</p>
+            <p className="text-xl font-bold mt-1 text-red-700">{stats.suspended}</p>
           </Card>
         </div>
 

@@ -116,11 +116,6 @@ function buildColumns(
               <MapPin className="mr-2 h-4 w-4 text-foreground-muted" />
               <span>{labels.actionTrack}</span>
             </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem destructive onClick={() => onDelete(row.original)}>
-              <Trash2 className="mr-2 h-4 w-4 text-danger" />
-              <span>{labels.actionDelete}</span>
-            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       ),

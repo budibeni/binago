@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Route, RouteStop, RouteLocation, MapInteractionMode, ActiveLocationTarget } from '../types';
 import { Geofence } from '../../geofences/types';
-import { Button, Input, Label } from '@adatrack/ui';
+import { Button, Input, Label, InputString, InputNumber, InputSelect } from '@adatrack/ui';
 import { getRouteTranslation } from '../i18n';
 import type { Locale } from '@adatrack/types';
 import { MapGeometry } from '@adatrack/maps';
-import { PenTool, Trash2, Plus, MapPin } from 'lucide-react';
+import { PenTool, Trash2, Plus, MapPin, ChevronUp, ChevronDown } from 'lucide-react';
 import { RouteMap } from './RouteMap';
+import { cn } from '@adatrack/utils';
 
 interface RouteEditorViewProps {
   initialData?: Route;
@@ -42,6 +43,7 @@ export function RouteEditorView({
   const [editorGeometry, setEditorGeometry] = useState<MapGeometry | null>(initialData?.plannedPath || null);
   
   const [activeLocationTarget, setActiveLocationTarget] = useState<ActiveLocationTarget>(null);
+  const [isExpanded, setIsExpanded] = useState(true);
 
   const handleAddStop = () => {
     setStops([
@@ -154,16 +156,13 @@ export function RouteEditorView({
         </div>
 
         {loc.type === 'geofence' ? (
-          <select 
-            className={`${selectClass} ${error ? 'border-red-500' : ''}`}
+          <InputSelect
             value={loc.geofenceId || ''}
-            onChange={(e) => onChange({ ...loc, geofenceId: e.target.value })}
-          >
-            <option value="" disabled>{t.geofencePlaceholder}</option>
-            {geofences.map(gf => (
-              <option key={gf.id} value={gf.id}>{gf.name}</option>
-            ))}
-          </select>
+            onChange={(val) => onChange({ ...loc, geofenceId: val })}
+            options={geofences.map(gf => ({ value: gf.id, label: gf.name }))}
+            placeholder={t.geofencePlaceholder}
+            error={error}
+          />
         ) : (
           <div className="space-y-2 border border-neutral-200 dark:border-neutral-800 rounded-md p-3 bg-white dark:bg-neutral-900 shadow-sm">
             <Input 
@@ -230,8 +229,8 @@ export function RouteEditorView({
   return (
     <div className="flex h-full w-full flex-col bg-background relative">
       <div className="flex flex-1 overflow-hidden relative">
-        {/* Left Side: Map Preview */}
-        <div className="flex-1 relative z-0">
+        {/* Main Panel: Map */}
+        <div className="relative flex-1 bg-neutral-100 dark:bg-neutral-900">
           <RouteMap
             geofences={geofences}
             selectedRoute={tempRoute}
@@ -242,93 +241,108 @@ export function RouteEditorView({
           />
         </div>
 
-        {/* Right Side: Editor Panel */}
-        <div className="w-[380px] lg:w-[420px] h-full flex flex-col bg-white dark:bg-neutral-950 border-l border-border z-10 shadow-[-4px_0_15px_-3px_rgba(0,0,0,0.05)]">
-          <div className="p-3 border-b border-border flex justify-between items-center bg-white dark:bg-neutral-900 shrink-0">
-            <h3 className="text-[11px] font-bold text-neutral-900 dark:text-neutral-100 uppercase tracking-wider">
+        {/* Floating Left Panel - Editor */}
+        <div 
+          data-layout="drawer"
+          className={cn(
+            "group/form absolute left-4 top-4 w-[380px] bg-background rounded-xl shadow-lg border border-border flex flex-col z-20 overflow-hidden transition-all duration-300",
+            isExpanded ? "max-h-[calc(100%-80px)]" : "max-h-[44px]"
+          )}
+        >
+          {/* Header */}
+          <div 
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="flex items-center justify-between px-3 py-2 border-b border-border bg-surface cursor-pointer hover:bg-surface-hover shrink-0"
+          >
+            <h3 className="text-[11px] font-bold text-foreground uppercase tracking-wider">
               {initialData ? t.editTitle : t.createTitle}
             </h3>
+            <button className="text-foreground-muted hover:text-foreground">
+              {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-3 space-y-3 bg-[#fafafa] dark:bg-neutral-950">
+          <div className="flex-1 overflow-y-auto p-3 space-y-3">
             {/* Basic Info */}
-            <div className="space-y-2.5 bg-white dark:bg-neutral-900 p-2.5 rounded-lg border border-border">
-              <div>
-                <Label className="text-xs font-semibold">{t.name} <span className="text-red-500">*</span></Label>
-                <Input 
-                  value={name} 
-                  onChange={(e) => setName(e.target.value)} 
-                  placeholder={t.namePlaceholder}
-                  className={`mt-1.5 ${errors.name ? 'border-red-500' : ''}`}
-                />
-                {errors.name && <p className="text-[10px] text-red-500 mt-1">{errors.name}</p>}
-              </div>
-              <div>
-                <Label className="text-xs font-semibold">{t.description}</Label>
-                <Input 
-                  value={description} 
-                  onChange={(e) => setDescription(e.target.value)} 
-                  placeholder={t.descriptionPlaceholder}
-                  className="mt-1.5"
-                />
-              </div>
+            <div className="space-y-2.5">
+              <InputString 
+                label={t.name}
+                required
+                value={name}
+                onChange={setName}
+                placeholder={t.namePlaceholder}
+                error={errors.name}
+              />
+              <InputString 
+                label={t.description}
+                value={description}
+                onChange={setDescription}
+                placeholder={t.descriptionPlaceholder}
+              />
             </div>
 
             {/* Route Points */}
-            <div className="space-y-3 p-2.5 rounded-lg border border-border bg-white dark:bg-neutral-900 relative">
-              <div className="absolute left-[19px] top-[26px] bottom-[26px] w-0.5 bg-neutral-200 dark:bg-neutral-800" />
+            <div className="relative pt-3 border-t border-border/50">
+              <div className="absolute left-[11px] top-[24px] bottom-[24px] w-[2px] bg-neutral-200 dark:bg-neutral-800" />
               
-              <div className="relative z-10 bg-white dark:bg-neutral-900">
+              {/* Origin */}
+              <div className="relative z-10 pl-6 pb-4">
+                <div className="absolute left-[7px] top-1 h-2.5 w-2.5 rounded-full border-2 border-blue-500 bg-background" />
                 <Label className="font-semibold text-xs text-blue-600 dark:text-blue-400">{t.origin}</Label>
                 {renderLocationPicker('origin', origin, setOrigin, errors.origin)}
               </div>
 
               {/* Stops */}
-              <div className="space-y-2.5 relative z-10">
-                <div className="flex justify-between items-center bg-white dark:bg-neutral-900">
+              <div className="relative z-10 pl-6 pb-4">
+                <div className="flex justify-between items-center mb-2">
                   <Label className="text-[11px] font-semibold text-neutral-600 dark:text-neutral-400">{t.stops}</Label>
                 </div>
-                {stops.map((stop, index) => (
-                  <div key={stop.id} className="flex gap-2 items-start p-2 rounded-md border border-neutral-200 dark:border-neutral-800 bg-[#fafafa] dark:bg-neutral-950 relative">
-                    <div className="w-5 pt-1 text-[10px] font-bold text-neutral-400 text-center shrink-0">{index + 1}</div>
-                    <div className="flex-1">
-                      {renderLocationPicker(stop.id as any, stop.location, (loc) => handleUpdateStopLocation(stop.id, loc))}
+                <div className="space-y-2.5">
+                  {stops.map((stop, index) => (
+                    <div key={stop.id} className="flex gap-2 items-start p-2 rounded-md border border-border bg-surface relative">
+                      <div className="w-5 pt-1 text-[10px] font-bold text-neutral-400 text-center shrink-0">{index + 1}</div>
+                      <div className="flex-1 min-w-0">
+                        {renderLocationPicker(stop.id as any, stop.location, (loc) => handleUpdateStopLocation(stop.id, loc))}
+                      </div>
+                      <Button variant="ghost" onClick={() => handleRemoveStop(stop.id)} className="h-6 w-6 p-0 text-neutral-400 hover:text-red-500 absolute top-1.5 right-1.5 shrink-0">
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
                     </div>
-                    <Button variant="ghost" onClick={() => handleRemoveStop(stop.id)} className="h-6 w-6 p-0 text-neutral-400 hover:text-red-500 absolute top-1.5 right-1.5">
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </Button>
-                  </div>
-                ))}
-                <Button variant="outline" size="sm" onClick={handleAddStop} className="mt-2 text-[10px] h-7 bg-white">
-                  <Plus className="w-3 h-3 mr-1" />
-                  {t.addStop}
-                </Button>
+                  ))}
+                  <Button variant="outline" size="sm" onClick={handleAddStop} className="mt-2 text-[10px] h-7 bg-background">
+                    <Plus className="w-3 h-3 mr-1" />
+                    {t.addStop}
+                  </Button>
+                </div>
               </div>
 
-              <div className="relative z-10 bg-white dark:bg-neutral-900 pt-2">
+              {/* Destination */}
+              <div className="relative z-10 pl-6">
+                <div className="absolute left-[7px] top-1 h-2.5 w-2.5 rounded-full border-2 border-emerald-500 bg-background" />
                 <Label className="font-semibold text-xs text-emerald-600 dark:text-emerald-400">{t.destination}</Label>
                 {renderLocationPicker('destination', destination, setDestination, errors.destination)}
               </div>
             </div>
 
             {/* Path Drawing */}
-            <div className="space-y-2 p-2.5 rounded-lg border border-border bg-white dark:bg-neutral-900">
+            <div className="space-y-2 pt-2 border-t border-border/50">
               <Label className="text-[11px] font-semibold">{t.drawPath}</Label>
               <div className="flex items-center gap-2">
                 <Button 
+                  size="sm"
                   variant={editorMode === 'draw_multiline' ? 'primary' : 'outline'} 
                   onClick={() => {
                     setEditorMode(editorMode === 'draw_multiline' ? 'idle' : 'draw_multiline');
                     setActiveLocationTarget(null);
                   }} 
-                  className="w-full justify-center"
+                  className="w-full justify-center text-[11px] h-8"
                 >
-                  <PenTool className="w-4 h-4 mr-2" />
+                  <PenTool className="w-3.5 h-3.5 mr-1.5" />
                   {editorMode === 'draw_multiline' ? 'Selesai Menggambar' : (editorGeometry ? 'Ubah Jalur' : 'Gambar Jalur (Multiline)')}
                 </Button>
                 {editorGeometry && (
-                  <Button variant="outline" className="text-red-500 border-red-200 hover:bg-red-50 px-3" onClick={() => { setEditorGeometry(null); setEditorMode('idle'); }}>
-                    <Trash2 className="w-4 h-4" />
+                  <Button size="sm" variant="outline" className="text-red-500 border-red-200 hover:bg-red-50 px-2.5 h-8" onClick={() => { setEditorGeometry(null); setEditorMode('idle'); }}>
+                    <Trash2 className="w-3.5 h-3.5" />
                   </Button>
                 )}
               </div>
@@ -336,38 +350,30 @@ export function RouteEditorView({
             </div>
 
             {/* Estimations & Status */}
-            <div className="space-y-2.5 p-2.5 rounded-lg border border-border bg-white dark:bg-neutral-900">
+            <div className="space-y-2.5 pt-2 border-t border-border/50">
               <div className="grid grid-cols-2 gap-2.5">
-                <div>
-                  <Label className="text-xs font-semibold">{t.estimatedDistance}</Label>
-                  <Input 
-                    type="number" 
-                    value={plannedDistance || ''} 
-                    onChange={(e) => setPlannedDistance(e.target.value ? Number(e.target.value) : undefined)} 
-                    className="mt-1.5"
-                  />
-                </div>
-                <div>
-                  <Label className="text-xs font-semibold">{t.estimatedDuration}</Label>
-                  <Input 
-                    type="number" 
-                    value={estimatedDuration || ''} 
-                    onChange={(e) => setEstimatedDuration(e.target.value ? Number(e.target.value) : undefined)} 
-                    className="mt-1.5"
-                  />
-                </div>
+                <InputNumber 
+                  label={t.estimatedDistance}
+                  value={plannedDistance || null}
+                  onChange={(val) => setPlannedDistance(val || undefined)}
+                />
+                <InputNumber 
+                  label={t.estimatedDuration}
+                  value={estimatedDuration || null}
+                  onChange={(val) => setEstimatedDuration(val || undefined)}
+                />
               </div>
               
               <div className="pt-2">
-                <Label className="text-xs font-semibold">Status</Label>
-                <select 
-                  className={`${selectClass} mt-1.5`}
+                <InputSelect 
+                  label="Status"
                   value={status}
-                  onChange={(e) => setStatus(e.target.value as 'active'|'inactive')}
-                >
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
-                </select>
+                  onChange={(val) => setStatus(val as 'active'|'inactive')}
+                  options={[
+                    { value: 'active', label: 'Active' },
+                    { value: 'inactive', label: 'Inactive' }
+                  ]}
+                />
               </div>
             </div>
           </div>
@@ -375,7 +381,7 @@ export function RouteEditorView({
       </div>
 
       {/* Fixed Full-Width Footer */}
-      <div className="flex shrink-0 items-center justify-between px-6 py-3 bg-background border-t border-border/40 z-20">
+      <div className="flex shrink-0 items-center justify-between px-6 py-4 bg-background border-t border-border/40 z-20">
         <div className="flex flex-col">
           <span className="text-sm font-semibold text-foreground">
             {initialData ? t.editTitle : t.createTitle}
@@ -393,7 +399,8 @@ export function RouteEditorView({
             variant="primary" 
             size="sm" 
             onClick={handleSave} 
-            className="min-w-[100px]"
+            disabled={!name.trim() || !isLocationValid(origin) || !isLocationValid(destination)}
+            className="bg-danger hover:bg-danger/90 text-white min-w-[100px]"
           >
             {t.save}
           </Button>

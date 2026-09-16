@@ -25,3 +25,4 @@ export * from './patterns';
 export * from './FavoriteManager';
 export * from './form';
 export * from './hooks/useForm';
+export * from './providers/UIProvider';

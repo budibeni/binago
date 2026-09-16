@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Search, Plus, MapPin, MapPinned, MoreVertical, Route as RouteIcon, ChevronRight } from 'lucide-react';
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@adatrack/ui';
+import { Search, Plus, MapPin, MapPinned, MoreVertical, Route as RouteIcon, ChevronRight, AlignJustify, LayoutList, Filter } from 'lucide-react';
+import { cn } from '@adatrack/utils';
+import { Button, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@adatrack/ui';
 import type { Route, RouteLocation } from '../types';
 import type { Geofence } from '../../geofences/types';
 import { getRouteTranslation } from '../i18n';
@@ -31,11 +32,15 @@ export function RouteListPanel({
 }: RouteListPanelProps) {
   const t = getRouteTranslation(locale);
   const [search, setSearch] = useState('');
+  const [viewMode, setViewMode] = useState<'detailed' | 'compact'>('compact');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
 
-  const filteredRoutes = routes.filter(r => 
-    r.name.toLowerCase().includes(search.toLowerCase()) || 
-    (r.description && r.description.toLowerCase().includes(search.toLowerCase()))
-  );
+  const filteredRoutes = routes.filter(r => {
+    const matchSearch = r.name.toLowerCase().includes(search.toLowerCase()) ||
+      (r.description && r.description.toLowerCase().includes(search.toLowerCase()));
+    const matchStatus = statusFilter === 'all' || r.status === statusFilter;
+    return matchSearch && matchStatus;
+  });
 
   const getLocationLabel = (loc: RouteLocation) => {
     if (loc.type === 'geofence' && loc.geofenceId) {
@@ -56,12 +61,14 @@ export function RouteListPanel({
       <div className="shrink-0 flex items-center justify-between px-3 h-[44px] bg-white dark:bg-neutral-900 border-b border-border">
         {/* Kiri: Button Tambah Rute */}
         <div className="flex items-center">
-          <button
+          <Button
+            variant="destructive"
             onClick={onCreateNew}
-            className="flex h-7 px-3 items-center justify-center gap-1.5 rounded-md bg-red-600 text-[10px] font-bold text-white hover:bg-red-700 transition-colors"
+            className="h-8 gap-1.5 text-[13px] font-medium shadow-none"
           >
-            <Plus className="h-3.5 w-3.5" /> {t.addBtn}
-          </button>
+            <Plus className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline-block">{t.addBtn}</span>
+          </Button>
         </div>
 
         {/* Kanan: Close */}
@@ -85,10 +92,53 @@ export function RouteListPanel({
             type="search"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder={t.searchPlaceholder}
+            placeholder="Cari..."
             className="w-full h-8 rounded-md border border-border bg-[#fafafa] dark:bg-neutral-900 pl-8 pr-3 text-[12px] text-foreground focus:outline-none focus:border-neutral-300 focus:bg-white transition-all placeholder:text-neutral-400"
           />
         </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              className={cn(
+                "flex h-8 w-8 items-center justify-center rounded-md border transition-colors shrink-0",
+                statusFilter !== 'all'
+                  ? "bg-red-50 border-red-200 text-red-600 dark:bg-red-900/30 dark:border-red-800 dark:text-red-400"
+                  : "bg-[#fafafa] dark:bg-neutral-900 border-border text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+              )}
+              title="Filter Status"
+            >
+              <Filter className="h-3.5 w-3.5" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-36">
+            <DropdownMenuItem
+              onClick={() => setStatusFilter('all')}
+              className={statusFilter === 'all' ? 'font-bold' : ''}
+            >
+              Semua Status
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => setStatusFilter('active')}
+              className={statusFilter === 'active' ? 'font-bold' : ''}
+            >
+              {t.status.active}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => setStatusFilter('inactive')}
+              className={statusFilter === 'inactive' ? 'font-bold' : ''}
+            >
+              {t.status.inactive}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        <button
+          onClick={() => setViewMode(v => v === 'detailed' ? 'compact' : 'detailed')}
+          className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-[#fafafa] dark:bg-neutral-900 text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors shrink-0"
+          title={viewMode === 'detailed' ? 'Tampilan Ringkas' : 'Tampilan Detail'}
+        >
+          {viewMode === 'detailed' ? <AlignJustify className="h-3.5 w-3.5" /> : <LayoutList className="h-3.5 w-3.5" />}
+        </button>
       </div>
 
       <div className="flex-1 overflow-y-auto p-2 space-y-1 bg-[#fafafa] dark:bg-neutral-950">
@@ -99,71 +149,93 @@ export function RouteListPanel({
             <p className="text-[12px]">{t.list.emptyDesc}</p>
           </div>
         ) : (
-          filteredRoutes.map((route) => (
-            <div
-              key={route.id}
-              onClick={() => onSelectRoute(route.id)}
-              className={`p-3 rounded-md cursor-pointer transition-colors border ${
-                selectedRouteId === route.id 
-                  ? 'bg-white dark:bg-neutral-900 border-primary-300 dark:border-primary-800 shadow-sm' 
-                  : 'bg-white dark:bg-neutral-900 border-transparent hover:border-neutral-200 dark:hover:border-neutral-800'
-              }`}
-            >
-              <div className="flex justify-between items-start mb-2">
-                <div>
-                  <h3 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">{route.name}</h3>
-                  <span className={`inline-flex items-center text-[10px] font-medium px-1.5 py-0.5 rounded-sm mt-1 ${
-                    route.status === 'active' 
-                      ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
-                      : 'bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-400'
-                  }`}>
-                    {t.status[route.status]}
-                  </span>
+          filteredRoutes.map((route) => {
+            const isDetailed = viewMode === 'detailed' || selectedRouteId === route.id;
+            return (
+              <div
+                key={route.id}
+                onClick={() => onSelectRoute(route.id)}
+                className={cn(
+                  "rounded-md cursor-pointer transition-colors border",
+                  isDetailed ? "p-3" : "py-2 px-3",
+                  selectedRouteId === route.id
+                    ? 'bg-white dark:bg-neutral-900 border-primary-300 dark:border-primary-800 shadow-sm'
+                    : 'bg-white dark:bg-neutral-900 border-transparent hover:border-neutral-200 dark:hover:border-neutral-800'
+                )}
+              >
+                <div className={cn("flex justify-between", isDetailed ? "items-start mb-2" : "items-center")}>
+                  <div className="flex items-center gap-2 flex-1 min-w-0 pr-2">
+                    {!isDetailed && (
+                      <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-red-50 text-red-500 dark:bg-red-900/30 dark:text-red-400">
+                        <RouteIcon className="h-3 w-3" />
+                      </div>
+                    )}
+                    <div className="flex flex-col min-w-0">
+                      <h3 className={cn(
+                      "text-xs font-semibold truncate tracking-tight leading-tight",
+                      selectedRouteId === route.id 
+                        ? "text-red-600 dark:text-red-500" 
+                        : "text-neutral-800 dark:text-neutral-200"
+                    )}>
+                        {route.name}
+                      </h3>
+                      {isDetailed && (
+                        <span className={`inline-flex items-center text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-sm mt-1 w-fit ${route.status === 'active'
+                          ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+                          : 'bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-400'
+                          }`}>
+                          {t.status[route.status]}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className="h-6 w-6 flex items-center justify-center rounded-sm hover:bg-neutral-100 text-neutral-400 hover:text-neutral-900 transition-colors" onClick={(e) => e.stopPropagation()}>
+                        <MoreVertical className="w-4 h-4" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-36">
+                      <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onEdit(route.id); }}>
+                        Edit
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="text-red-600 focus:bg-red-50 focus:text-red-700 dark:focus:bg-red-950"
+                        onClick={(e) => { e.stopPropagation(); onDelete(route.id); }}
+                      >
+                        Hapus
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button className="h-6 w-6 flex items-center justify-center rounded-sm hover:bg-neutral-100 text-neutral-400 hover:text-neutral-900 transition-colors" onClick={(e) => e.stopPropagation()}>
-                      <MoreVertical className="w-4 h-4" />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onEdit(route.id); }}>
-                      Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem 
-                      className="text-red-600 focus:bg-red-50 focus:text-red-700 dark:focus:bg-red-950"
-                      onClick={(e) => { e.stopPropagation(); onDelete(route.id); }}
-                    >
-                      Hapus
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
 
-              <div className="space-y-1.5 text-xs text-neutral-600 dark:text-neutral-400 mt-3">
-                <div className="flex items-start gap-2">
-                  <MapPin className="w-3.5 h-3.5 text-blue-500 shrink-0 mt-0.5" />
-                  <span className="truncate" title={getLocationLabel(route.origin)}>
-                    {getLocationLabel(route.origin)}
-                  </span>
-                </div>
-                {route.stops && route.stops.length > 0 && (
-                  <div className="flex items-center gap-2 pl-0.5">
-                    <div className="w-3 border-l-2 border-dashed border-neutral-300 dark:border-neutral-700 h-3 ml-1" />
-                    <span className="text-neutral-400 text-[10px] font-medium italic">
-                      + {route.stops.length} {t.list.stopCount}
-                    </span>
+                {isDetailed && (
+                  <div className="space-y-1.5 text-[10px] text-neutral-600 dark:text-neutral-400 mt-3">
+                    <div className="flex items-start gap-2">
+                      <MapPin className="w-3 h-3 text-blue-500 shrink-0 mt-0.5" />
+                      <span className="truncate" title={getLocationLabel(route.origin)}>
+                        {getLocationLabel(route.origin)}
+                      </span>
+                    </div>
+                    {route.stops && route.stops.length > 0 && (
+                      <div className="flex items-center gap-2 pl-0.5">
+                        <div className="w-2 border-l-2 border-dashed border-neutral-300 dark:border-neutral-700 h-3 ml-1" />
+                        <span className="text-neutral-400 text-[9px] font-bold uppercase tracking-wider italic">
+                          + {route.stops.length} {t.list.stopCount}
+                        </span>
+                      </div>
+                    )}
+                    <div className="flex items-start gap-2">
+                      <MapPinned className="w-3 h-3 text-emerald-500 shrink-0 mt-0.5" />
+                      <span className="truncate" title={getLocationLabel(route.destination)}>
+                        {getLocationLabel(route.destination)}
+                      </span>
+                    </div>
                   </div>
                 )}
-                <div className="flex items-start gap-2">
-                  <MapPinned className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
-                  <span className="truncate" title={getLocationLabel(route.destination)}>
-                    {getLocationLabel(route.destination)}
-                  </span>
-                </div>
               </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
     </aside>

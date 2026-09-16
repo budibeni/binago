@@ -20,7 +20,7 @@ function MetricCard({ icon: Icon, value, label, iconBg = 'bg-white/10' }: Metric
         <Icon className="h-5 w-5 text-white" />
       </div>
       <div className="min-w-0">
-        <p className="text-2xl font-bold text-white leading-tight">{value}</p>
+        <p className="text-xl font-bold text-white leading-tight">{value}</p>
         <p className="text-xs text-white/60 mt-0.5 leading-tight">{label}</p>
       </div>
     </div>

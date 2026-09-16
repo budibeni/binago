@@ -21,7 +21,7 @@ function StatCard({ label, value, colorClass }: { label: string, value: number, 
     <div className="flex flex-col p-2.5 rounded-md border border-border bg-card shadow-sm relative overflow-hidden transition-all hover:shadow-md">
       <div className={cn("absolute left-0 top-0 bottom-0 w-1", colorClass)} />
       <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider ml-1">{label}</span>
-      <span className="text-lg font-black mt-0.5 ml-1">{value}</span>
+      <span className="text-xl font-bold mt-0.5 ml-1">{value}</span>
     </div>
   );
 }

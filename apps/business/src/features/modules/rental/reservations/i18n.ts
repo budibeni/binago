@@ -5,7 +5,7 @@ export const reservationDictionaries = {
     title: 'Reservasi Rental',
     createTitle: 'Buat Reservasi',
     pageSubtitle: 'Kelola pemesanan kendaraan dan reservasi rental Anda.',
-    searchPlaceholder: 'Cari nomor reservasi, pelanggan, atau plat nomor...',
+    searchPlaceholder: 'Cari...',
     addReservation: 'Buat Reservasi',
     
     // Status
@@ -116,7 +116,7 @@ export const reservationDictionaries = {
     title: 'Rental Reservations',
     createTitle: 'Create Reservation',
     pageSubtitle: 'Manage your vehicle bookings and rental reservations.',
-    searchPlaceholder: 'Search reservation number, customer, or plate number...',
+    searchPlaceholder: 'Search...',
     addReservation: 'Create Reservation',
     
     // Status

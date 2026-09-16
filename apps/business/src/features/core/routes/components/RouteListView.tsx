@@ -49,7 +49,7 @@ export function RouteListView({
         className={cn(
           'shrink-0 h-full z-10 transition-all duration-300 ease-in-out flex flex-col relative',
           isPanelVisible
-            ? 'w-[320px] lg:w-[380px] border-l border-neutral-200 dark:border-neutral-800 bg-background shadow-[-4px_0_15px_-3px_rgba(0,0,0,0.05)]'
+            ? 'w-[320px] border-l border-neutral-200 dark:border-neutral-800 bg-background shadow-[-4px_0_15px_-3px_rgba(0,0,0,0.05)]'
             : 'w-[34px] py-2 items-center bg-transparent border-l border-neutral-200 dark:border-neutral-800'
         )}
       >

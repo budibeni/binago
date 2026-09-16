@@ -246,7 +246,7 @@ export function ReservationView({
                   </div>
                   <div className="flex justify-between items-center pt-1">
                     <p className="text-xs font-bold text-danger">Sisa Tagihan</p>
-                    <p className="text-lg font-black text-danger">{formatCurrency(Math.max((reservation.totalAmount || 0) - (reservation.deposit || 0), 0))}</p>
+                    <p className="text-xl font-bold text-danger">{formatCurrency(Math.max((reservation.totalAmount || 0) - (reservation.deposit || 0), 0))}</p>
                   </div>
                 </div>
               </div>

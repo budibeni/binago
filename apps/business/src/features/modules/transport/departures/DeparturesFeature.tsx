@@ -143,7 +143,7 @@ export function DeparturesFeature() {
       <div className="shrink-0 p-4 lg:p-6 bg-white dark:bg-neutral-950 border-b border-border shadow-sm z-10">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-lg lg:text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50 flex items-center gap-2">
+            <h1 className="text-xl font-bold text-neutral-900 dark:text-neutral-50 flex items-center gap-2">
               <PlaneTakeoff className="w-5 h-5 text-amber-600" />
               Keberangkatan
             </h1>
@@ -162,19 +162,19 @@ export function DeparturesFeature() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <Card className="p-4 bg-white border-blue-200">
             <p className="text-sm text-blue-600 font-medium">Terjadwal</p>
-            <p className="text-2xl font-bold mt-1 text-blue-700">{stats.scheduled}</p>
+            <p className="text-xl font-bold mt-1 text-blue-700">{stats.scheduled}</p>
           </Card>
           <Card className="p-4 bg-white border-amber-200">
             <p className="text-sm text-amber-600 font-medium">Ongoing</p>
-            <p className="text-2xl font-bold mt-1 text-amber-700">{stats.ongoing}</p>
+            <p className="text-xl font-bold mt-1 text-amber-700">{stats.ongoing}</p>
           </Card>
           <Card className="p-4 bg-white border-emerald-200">
             <p className="text-sm text-emerald-600 font-medium">Completed</p>
-            <p className="text-2xl font-bold mt-1 text-emerald-700">{stats.completed}</p>
+            <p className="text-xl font-bold mt-1 text-emerald-700">{stats.completed}</p>
           </Card>
           <Card className="p-4 bg-white border-red-200">
             <p className="text-sm text-red-600 font-medium">Dibatalkan</p>
-            <p className="text-2xl font-bold mt-1 text-red-700">{stats.cancelled}</p>
+            <p className="text-xl font-bold mt-1 text-red-700">{stats.cancelled}</p>
           </Card>
         </div>
 

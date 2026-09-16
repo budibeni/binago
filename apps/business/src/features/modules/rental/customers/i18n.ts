@@ -4,7 +4,7 @@ export const rentalCustomersDictionaries = {
   id: {
     title: 'Pelanggan Rental',
     pageSubtitle: 'Manajemen data pelanggan perorangan dan perusahaan.',
-    searchPlaceholder: 'Cari nama, kode, no. telepon, NIK, atau NPWP...',
+    searchPlaceholder: 'Cari...',
     addCustomer: 'Tambah',
     exportFilename: 'pelanggan-rental-adatrack',
     filterType: 'Tipe',
@@ -101,7 +101,7 @@ export const rentalCustomersDictionaries = {
   en: {
     title: 'Rental Customers',
     pageSubtitle: 'Manage individual and company customer data.',
-    searchPlaceholder: 'Search name, code, phone, NIK, or NPWP...',
+    searchPlaceholder: 'Search...',
     addCustomer: 'Add Customer',
     exportFilename: 'rental-customers-adatrack',
     filterType: 'Type',

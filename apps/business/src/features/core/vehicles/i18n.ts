@@ -56,7 +56,7 @@ export const vehiclesDictionaries = {
       editSubtitle: 'Modify vehicle detail information.',
       cardIdentity: 'Vehicle Identity',
       cardIdentityDesc: 'Basic information about the vehicle',
-      cardDeviceGroup: 'Perangkat',
+      cardDeviceGroup: 'Device',
       cardDeviceGroupDesc: 'Installed GPS device information. Managed via Device Management.',
       cardAdminMaintenance: 'Specification & Legality',
       cardAdminMaintenanceDesc: 'Fuel information and vehicle document validity periods',

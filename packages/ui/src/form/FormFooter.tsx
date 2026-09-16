@@ -2,6 +2,7 @@ import React from 'react';
 import { Save } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import { Button, type ButtonProps } from '../Button';
+import { useUIConfig } from '../providers/UIProvider';
 
 export interface FormFooterProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
   /**
@@ -85,6 +86,10 @@ export const FormFooter = React.forwardRef<HTMLDivElement, FormFooterProps>(
     },
     ref
   ) => {
+    const uiConfig = useUIConfig();
+    const finalCancelText = cancelText !== 'Batal' ? cancelText : (uiConfig.cancelText || 'Batal');
+    const finalSaveText = saveText !== 'Simpan' ? saveText : (uiConfig.saveText || 'Simpan');
+
     return (
       <div
         ref={ref}
@@ -120,7 +125,7 @@ export const FormFooter = React.forwardRef<HTMLDivElement, FormFooterProps>(
                   className={cn('h-7 text-xs px-3 bg-background', cancelProps?.className)}
                   {...cancelProps}
                 >
-                  {cancelText}
+                  {finalCancelText}
                 </Button>
               )}
               <Button
@@ -133,7 +138,7 @@ export const FormFooter = React.forwardRef<HTMLDivElement, FormFooterProps>(
                 leftIcon={<Save className="w-3.5 h-3.5" />}
                 {...saveProps}
               >
-                {saveText}
+                {finalSaveText}
               </Button>
             </>
           )}

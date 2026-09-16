@@ -230,7 +230,7 @@ export function HandoverList({
       // Search
       searchValue={searchValue}
       onSearchChange={onSearchChange}
-      searchPlaceholder="Cari handover, customer, nomor polisi..."
+      searchPlaceholder="Cari..."
       exportFilename="Data_Serah_Terima"
       // Filter
       filterConfig={filterConfig}

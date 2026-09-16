@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Hexagon, Square, Waypoints, MapPin, ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
 import { cn } from '@adatrack/utils';
-import { Button, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@adatrack/ui';
+import { Button, InputString, InputSelect, InputTextarea } from '@adatrack/ui';
 import { geofenceService } from '@/data/services';
 import { GeofenceMap } from './GeofenceMap';
 import type { Geofence } from '../types';
@@ -72,10 +72,13 @@ export function GeofenceEditorView({
         </div>
 
         {/* Floating Left Panel - Form */}
-        <div className={cn(
-          "absolute left-4 top-4 w-[320px] bg-background rounded-xl shadow-lg border border-border flex flex-col z-20 overflow-hidden transition-all duration-300",
-          isExpanded ? "max-h-[calc(100%-32px)]" : "max-h-[44px]"
-        )}>
+        <div 
+          data-layout="drawer"
+          className={cn(
+            "group/form absolute left-4 top-4 w-[320px] bg-background rounded-xl shadow-lg border border-border flex flex-col z-20 overflow-hidden transition-all duration-300",
+            isExpanded ? "max-h-[calc(100%-32px)]" : "max-h-[44px]"
+          )}
+        >
           {/* Header */}
           <div
             onClick={() => setIsExpanded(!isExpanded)}
@@ -89,33 +92,23 @@ export function GeofenceEditorView({
 
           <div className="flex-1 overflow-y-auto p-3 space-y-3">
             <div className="space-y-2.5">
-              <div className="space-y-1">
-                <label className="text-[11px] font-semibold text-foreground">{t.geofenceName} <span className="text-red-500">*</span></label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder={t.geofenceNamePlaceholder}
-                  className="h-8 w-full rounded-md border border-border bg-background px-2.5 text-xs text-foreground focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
-                />
-              </div>
+              <InputString
+                label={t.geofenceName}
+                required
+                value={formData.name}
+                onChange={(val) => setFormData({ ...formData, name: val })}
+                placeholder={t.geofenceNamePlaceholder}
+              />
 
-              <div className="space-y-1">
-                <label className="text-[11px] font-semibold text-foreground">{t.geofenceGroup}</label>
-                <Select value={formData.groupId} onValueChange={(val) => setFormData({ ...formData, groupId: val === 'none' ? '' : val })}>
-                  <SelectTrigger className="h-8 text-xs px-2.5">
-                    <SelectValue placeholder={t.selectGroup} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none" className="text-xs text-foreground-muted italic">-- {t.unassigned} --</SelectItem>
-                    {geofenceService.getGeofenceGroups().map(group => (
-                      <SelectItem key={group.id} value={group.id} className="text-xs">
-                        {group.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              <InputSelect
+                label={t.geofenceGroup}
+                value={formData.groupId || 'none'}
+                onChange={(val) => setFormData({ ...formData, groupId: val === 'none' ? '' : val })}
+                options={[
+                  { value: 'none', label: `-- ${t.unassigned} --` },
+                  ...geofenceService.getGeofenceGroups().map(group => ({ value: group.id, label: group.name }))
+                ]}
+              />
 
               <div className="space-y-1.5">
                 <label className="text-[11px] font-semibold text-foreground">{t.geofenceType} <span className="text-red-500">*</span></label>
@@ -185,16 +178,13 @@ export function GeofenceEditorView({
                 </div>
               </div>
 
-              <div className="space-y-1">
-                <label className="text-[11px] font-semibold text-foreground">{t.description}</label>
-                <textarea
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder={t.descriptionPlaceholder}
-                  rows={2}
-                  className="w-full rounded-md border border-border bg-background px-2.5 py-1.5 text-xs text-foreground focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 resize-none"
-                />
-              </div>
+              <InputTextarea
+                label={t.description}
+                value={formData.description}
+                onChange={(val) => setFormData({ ...formData, description: val })}
+                placeholder={t.descriptionPlaceholder}
+                rows={2}
+              />
             </div>
 
             <div className="space-y-3 pt-2 border-t border-border/50">

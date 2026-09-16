@@ -4,8 +4,8 @@ export const routeDictionaries = {
   id: {
     title: 'Rute',
     subtitle: 'Kelola daftar rute untuk perjalanan operasional.',
-    addBtn: 'Tambah Rute',
-    searchPlaceholder: 'Cari rute...',
+    addBtn: 'Tambah',
+    searchPlaceholder: 'Cari...',
     status: {
       active: 'Aktif',
       inactive: 'Nonaktif',
@@ -58,8 +58,8 @@ export const routeDictionaries = {
   en: {
     title: 'Routes',
     subtitle: 'Manage route list for operational trips.',
-    addBtn: 'Add Route',
-    searchPlaceholder: 'Search routes...',
+    addBtn: 'Add',
+    searchPlaceholder: 'Search...',
     status: {
       active: 'Active',
       inactive: 'Inactive',

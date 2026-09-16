@@ -237,7 +237,7 @@ export function ReturnList({
       // Search
       searchValue={searchValue}
       onSearchChange={onSearchChange}
-      searchPlaceholder="Cari pengembalian, customer, nomor polisi..."
+      searchPlaceholder="Cari..."
       exportFilename="Data_Pengembalian"
       // Filter
       filterConfig={filterConfig}

@@ -2,7 +2,7 @@ import type { Locale } from '@adatrack/types';
 
 export const cardDictionaries = {
   id: {
-    searchPlaceholder: 'Cari card...',
+    searchPlaceholder: 'Cari...',
     filter: {
       title: 'Filter',
       clearAll: 'Reset',
@@ -79,7 +79,7 @@ export const cardDictionaries = {
     },
   },
   en: {
-    searchPlaceholder: 'Search card...',
+    searchPlaceholder: 'Search...',
     filter: {
       title: 'Filter',
       clearAll: 'Reset',
