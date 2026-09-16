@@ -13,7 +13,7 @@ export const dictionaries = {
       home: 'Beranda',
       tracking: 'Pemantauan',
       groups: 'Grup',
-      vehicles: 'Armada',
+      vehicles: 'Kendaraan',
       drivers: 'Pengemudi',
       geofences: 'Geofence',
       routes: 'Rute',
@@ -172,9 +172,9 @@ export const dictionaries = {
     home: {
       title: 'Beranda',
       pageTitle: 'Beranda',
-      pageSubtitle: 'Kelola armada dan operasional bisnis Anda dengan mudah dan real-time.',
+      pageSubtitle: 'Kelola kendaraan dan operasional bisnis Anda dengan mudah dan real-time.',
       heroGreeting: 'Selamat datang kembali,',
-      heroSubtitle: 'Pantau armada, kelola operasional, dan ambil keputusan berbasis data secara real-time dalam satu platform.',
+      heroSubtitle: 'Pantau kendaraan, kelola operasional, dan ambil keputusan berbasis data secara real-time dalam satu platform.',
       metrics: {
         totalVehicles: 'Total Kendaraan',
         movingVehicles: 'Kendaraan Bergerak',
@@ -194,7 +194,7 @@ export const dictionaries = {
       learnMore: 'Pelajari lebih lanjut',
       shortcuts: {
         tracking: { label: 'Pemantauan', desc: 'Lihat lokasi kendaraan secara real-time' },
-        vehicles: { label: 'Armada', desc: 'Kelola data kendaraan dan informasinya' },
+        vehicles: { label: 'Kendaraan', desc: 'Kelola data kendaraan dan informasinya' },
         drivers: { label: 'Pengemudi', desc: 'Kelola data pengemudi dan performa' },
         trips: { label: 'Perjalanan', desc: 'Lihat dan kelola perjalanan' },
         deliveries: { label: 'Pengiriman', desc: 'Kelola pengiriman dan statusnya' },
@@ -212,9 +212,9 @@ export const dictionaries = {
     groups: {
       title: 'Grup',
       pageTitle: 'Manajemen Grup',
-      pageSubtitle: 'Kelola pengelompokan data master (Armada, Pengemudi, Geofence).',
+      pageSubtitle: 'Kelola pengelompokan data master (Kendaraan, Pengemudi, Geofence).',
       tabs: {
-        vehicles: 'Armada',
+        vehicles: 'Kendaraan',
         drivers: 'Pengemudi',
         geofences: 'Geofence',
       },
@@ -324,11 +324,11 @@ export const dictionaries = {
 
     // Vehicles
     vehicles: {
-      title: 'Armada',
-      pageSubtitle: 'Kelola data kendaraan, grup, dan status armada Anda.',
+      title: 'Kendaraan',
+      pageSubtitle: 'Kelola data kendaraan, grup, dan informasi kendaraan Anda.',
       addVehicle: 'Tambah Kendaraan',
       searchPlaceholder: 'Cari plat nomor, kendaraan, atau pengemudi...',
-      exportFilename: 'armada-adatrack',
+      exportFilename: 'kendaraan-adatrack',
       filterStatus: 'Status',
       filterGroup: 'Grup',
       filterCategory: 'Kategori',
@@ -384,7 +384,7 @@ export const dictionaries = {
       summaryTotalDistance: 'Total Jarak',
       filterStart: 'Tanggal Mulai',
       filterEnd: 'Tanggal Akhir',
-      filterVehicle: 'Armada',
+      filterVehicle: 'Kendaraan',
       filterDriver: 'Pengemudi',
       filterStatus: 'Status',
       searchPlaceholder: 'Cari plat nomor, pengemudi, asal, atau tujuan...',
@@ -392,7 +392,7 @@ export const dictionaries = {
       statusOngoing: 'Berlangsung',
       statusCompleted: 'Selesai',
       colTime: 'Waktu',
-      colVehicle: 'Armada',
+      colVehicle: 'Kendaraan',
       colDriver: 'Pengemudi',
       colOrigin: 'Asal',
       colDestination: 'Tujuan',
@@ -412,7 +412,7 @@ export const dictionaries = {
       noRouteDesc: 'Tidak ada Route terkait.',
       detailTitle: 'Detail Perjalanan',
       detailSummary: {
-        vehicle: 'Armada',
+        vehicle: 'Kendaraan',
         driver: 'Pengemudi',
         startTime: 'Waktu Mulai',
         endTime: 'Waktu Selesai',
@@ -484,8 +484,8 @@ export const dictionaries = {
       title: 'Armada Rental',
       pageSubtitle: 'Kelola ketersediaan dan informasi kendaraan untuk kebutuhan rental.',
       searchPlaceholder: 'Cari nomor polisi, merk, atau model...',
-      addVehicle: 'Daftarkan Armada',
-      exportFilename: 'armada-rental-adatrack',
+      addVehicle: 'Daftarkan Kendaraan',
+      exportFilename: 'kendaraan-rental-adatrack',
       
       // Filter & Status
       filterStatus: 'Status',
@@ -508,15 +508,15 @@ export const dictionaries = {
       actionCompleteData: 'Lengkapi Data Rental',
       
       // Detail & Form Section
-      detailTitle: 'Detail Armada',
+      detailTitle: 'Detail Kendaraan',
       tabCoreInfo: 'Data Kendaraan',
       tabRentalInfo: 'Data Rental',
-      coreInfoNotice: 'Data kendaraan dikelola di Master Data Armada. Tidak boleh diedit dari halaman Rental.',
+      coreInfoNotice: 'Data kendaraan dikelola di Master Data Kendaraan. Tidak boleh diedit dari halaman Rental.',
       alreadyRegistered: 'Kendaraan sudah terdaftar pada Armada Rental.',
       noCoreVehicles: 'Tidak ada kendaraan master yang belum didaftarkan ke rental.',
       
       // Table Columns
-      colVehicle: 'Armada',
+      colVehicle: 'Kendaraan',
       colYear: 'Tahun',
       colStatus: 'Status Rental',
       colCustomer: 'Pelanggan',
@@ -569,12 +569,12 @@ export const dictionaries = {
       save: 'Simpan',
       createSuccess: 'Armada Rental berhasil didaftarkan.',
       updateSuccess: 'Data Armada Rental berhasil diperbarui.',
-      deleteSuccess: 'Armada berhasil dinonaktifkan dari Rental.',
+      deleteSuccess: 'Kendaraan berhasil dinonaktifkan dari Rental.',
       
       // Empty state
       emptyTitle: 'Belum ada Armada Rental',
       emptyDescription: 'Belum ada profil armada rental yang terdaftar.',
-      noResultTitle: 'Armada tidak ditemukan',
+      noResultTitle: 'Kendaraan tidak ditemukan',
       noResultDescription: 'Coba sesuaikan kata kunci atau filter pencarian.',
     },
 

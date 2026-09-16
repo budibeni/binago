@@ -27,6 +27,14 @@ export type DataTableColumnDef<
   TValue = unknown,
 > = ColumnDef<StockFeatures, TData, TValue>;
 
+// Column meta extension — declare in module augmentation by consumers
+export interface DataTableColumnMeta {
+  /** Pin this column to left or right, or none to opt-out of auto-pinning. */
+  pin?: 'left' | 'right' | 'none';
+  /** Force a fixed pixel width for this column */
+  fixedWidth?: boolean;
+}
+
 export type DataTableInstance<TData extends RowData = RowData> =
   ReactTable<StockFeatures, TData>;
 

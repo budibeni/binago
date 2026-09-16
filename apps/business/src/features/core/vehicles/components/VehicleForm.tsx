@@ -39,6 +39,10 @@ const DEFAULT_VEHICLE = {
   groupId: '',
   driverId: null,
   deviceImei: '',
+  vehicleId: '',
+  gpsDeviceBrand: '',
+  gpsDeviceType: '',
+  gpsInstallDate: '',
   registrationExpiry: '',
   passengerCapacity: undefined,
   notes: ''
@@ -159,14 +163,6 @@ export function VehicleForm({
             options={VEHICLE_CATEGORY_OPTIONS}
             required
           />
-        </FormCard>
-
-        <FormCard
-          title={tF.cardDeviceGroup}
-          description={tF.cardDeviceGroupDesc}
-          icon={<Cpu className="w-5 h-5 text-purple-500" />}
-          columns={2}
-        >
           <InputSelect
             label={tF.lblGroup}
             value={formData.groupId || ''}
@@ -181,19 +177,49 @@ export function VehicleForm({
             onChange={(val) => handleChange('driverId', val)}
             options={drivers}
           />
+        </FormCard>
+
+        <FormCard
+          title={tF.cardDeviceGroup}
+          description={tF.cardDeviceGroupDesc}
+          icon={<Cpu className="w-5 h-5 text-purple-500" />}
+          columns={2}
+        >
+          <InputString
+            label={tF.lblVehicleId}
+            value={formData.vehicleId || ''}
+            onChange={(val) => handleChange('vehicleId', val)}
+            disabled
+          />
+          <InputDate
+            label={tF.lblGpsInstallDate}
+            value={formData.gpsInstallDate || ''}
+            onChange={(val) => handleChange('gpsInstallDate', val)}
+            disabled
+          />
+          <InputString
+            label={tF.lblGpsDeviceBrand}
+            value={formData.gpsDeviceBrand || ''}
+            onChange={(val) => handleChange('gpsDeviceBrand', val)}
+            disabled
+          />
+          <InputString
+            label={tF.lblGpsDeviceType}
+            value={formData.gpsDeviceType || ''}
+            onChange={(val) => handleChange('gpsDeviceType', val)}
+            disabled
+          />
           <InputString
             label={tF.lblImei}
             value={formData.deviceImei || ''}
             onChange={(val) => handleChange('deviceImei', val)}
             disabled
-            helpText={tF.helpDeviceManage}
           />
           <InputString
             label={tF.lblSimCard}
             value={formData.deviceSimNumber || ''}
             onChange={(val) => handleChange('deviceSimNumber', val)}
             disabled
-            helpText={tF.helpDeviceManage}
           />
         </FormCard>
       </div>

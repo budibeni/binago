@@ -35,6 +35,10 @@ export interface Vehicle {
   driverName: string | null;
   deviceImei: string | null;
   deviceSimNumber?: string | null;
+  vehicleId?: string;         // ID internal kendaraan
+  gpsDeviceBrand?: string;    // Merek perangkat GPS
+  gpsDeviceType?: string;     // Tipe perangkat GPS
+  gpsInstallDate?: string;    // Tanggal instalasi GPS (YYYY-MM-DD)
   status: VehicleStatus;
   odometer: number;           // km
   lastServiceKm: number;      // km terakhir servis
@@ -68,10 +72,14 @@ export const getVehicleFormSchema = (t: Record<string, string>) => z.object({
   year: z.number().nullable().optional(),
   color: z.string().optional(),
   fuelType: z.enum(['solar', 'bensin', 'listrik']),
-  groupId: z.string().min(1, t.groupRequired || 'Grup armada wajib dipilih'),
+  groupId: z.string().min(1, t.groupRequired || 'Grup kendaraan wajib dipilih'),
   driverId: z.string().nullable().optional(),
   deviceImei: z.string().nullable().optional(),
   deviceSimNumber: z.string().nullable().optional(),
+  vehicleId: z.string().optional(),
+  gpsDeviceBrand: z.string().optional(),
+  gpsDeviceType: z.string().optional(),
+  gpsInstallDate: z.string().optional(),
   fuelCapacity: z.number().nullable().optional(),
   registrationExpiry: z.string().optional(),
   kirExpiry: z.string().optional(),

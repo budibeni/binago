@@ -37,16 +37,25 @@ export function DataTableHeader<TData extends RowData = RowData>({
                   'px-3 py-2 text-left align-middle font-medium select-none whitespace-nowrap group',
                   canSort && 'cursor-pointer hover:bg-muted/30 transition-colors',
                   isPinned &&
-                  'sticky z-30 bg-background shadow-[1px_0_0_0_rgba(0,0,0,0.05)]',
-                  (isPinned === 'start' || (isPinned as string) === 'left') && 'left-0',
-                  (isPinned === 'end' || (isPinned as string) === 'right') && 'right-0',
+                  'sticky z-30 bg-gray-100 dark:bg-gray-800/50',
+                (isPinned === 'start' || (isPinned as string) === 'left') &&
+                  'shadow-[2px_0_4px_-1px_rgba(0,0,0,0.08)]',
+                (isPinned === 'end' || (isPinned as string) === 'right') &&
+                  'shadow-[-2px_0_4px_-1px_rgba(0,0,0,0.08)]',
                 )}
                 onClick={header.column.getToggleSortingHandler()}
-                style={(header.column.columnDef.meta as any)?.fixedWidth ? {
-                  width: header.column.getSize(),
-                  minWidth: header.column.getSize(),
-                  maxWidth: header.column.getSize(),
-                } : undefined}
+                style={{
+                  ...((header.column.columnDef.meta as any)?.fixedWidth ? {
+                    width: header.column.getSize(),
+                    minWidth: header.column.getSize(),
+                    maxWidth: header.column.getSize(),
+                  } : {}),
+                  ...(isPinned === 'left' || isPinned === 'start'
+                    ? { left: `${header.column.getStart('left')}px` }
+                    : isPinned === 'right' || isPinned === 'end'
+                    ? { right: `${header.column.getAfter('right')}px` }
+                    : {}),
+                }}
               >
                 {header.isPlaceholder ? null : (
                   <div className="flex items-center gap-1.5">

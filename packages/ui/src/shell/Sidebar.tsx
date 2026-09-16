@@ -34,57 +34,25 @@ export function Sidebar({
   onMobileOpenChange,
   className,
 }: SidebarProps) {
-  const [openSections, setOpenSections] = React.useState<Record<string, boolean>>({});
-
-  React.useEffect(() => {
-    try {
-      const stored = localStorage.getItem('adatrack-sidebar-sections');
-      if (stored) {
-        setOpenSections(JSON.parse(stored));
-      }
-    } catch (e) {
-      console.warn('localStorage error', e);
-    }
-  }, []);
-
-  React.useEffect(() => {
-    setOpenSections(prev => {
-      let changed = false;
-      const next = { ...prev };
-
-      navigation.forEach(group => {
-        if (group.id === 'main') return;
-        const groupId = group.id || '';
-        if (!groupId) return;
-
-        const hasActive = group.items.some(
-          item => currentPath === item.href || (item.href !== '/' && currentPath.startsWith(item.href))
-        );
-        if (hasActive && !next[groupId]) {
-          next[groupId] = true;
-          changed = true;
-        }
-      });
-
-      if (changed) {
-        try {
-          localStorage.setItem('adatrack-sidebar-sections', JSON.stringify(next));
-        } catch (e) { }
-        return next;
-      }
-      return prev;
+  const getInitialOpenSections = () => {
+    const result: Record<string, boolean> = {};
+    navigation.forEach(group => {
+      if (group.id === 'main') return;
+      const groupId = group.id || '';
+      if (!groupId) return;
+      const hasActive = group.items.some(
+        item => currentPath === item.href || (item.href !== '/' && currentPath.startsWith(item.href))
+      );
+      if (hasActive) result[groupId] = true;
     });
-  }, [currentPath, navigation]);
+    return result;
+  };
+
+  const [openSections, setOpenSections] = React.useState<Record<string, boolean>>(getInitialOpenSections);
 
   const toggleSection = (groupId: string) => {
     if (!groupId || groupId === 'main') return;
-    setOpenSections(prev => {
-      const next = { ...prev, [groupId]: !prev[groupId] };
-      try {
-        localStorage.setItem('adatrack-sidebar-sections', JSON.stringify(next));
-      } catch (e) { }
-      return next;
-    });
+    setOpenSections(prev => ({ ...prev, [groupId]: !prev[groupId] }));
   };
 
   // Handle keyboard Escape to close mobile drawer
@@ -112,7 +80,7 @@ export function Sidebar({
     }
   };
 
-  const renderNavItems = (items: NavItem[]) => {
+  const renderNavItems = (items: NavItem[], isMain = false) => {
     return items.map((item) => {
       const isActive =
         currentPath === item.href ||
@@ -125,7 +93,10 @@ export function Sidebar({
           href={item.href}
           onClick={(e) => handleItemClick(e, item)}
           className={cn(
-            'group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-300 ease-out',
+            'group flex items-center gap-2.5 rounded-lg transition-all duration-300 ease-out',
+            isMain
+              ? 'px-2 py-1.5 text-[11px] font-semibold uppercase tracking-wider'
+              : 'pl-8 pr-2 py-1.5 text-[13px] font-medium',
             'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50',
             isActive
               ? 'bg-black text-white dark:bg-black dark:text-white shadow-sm'
@@ -140,7 +111,7 @@ export function Sidebar({
           {Icon && (
             <Icon
               className={cn(
-                'h-4 w-4 shrink-0 transition-colors duration-300',
+                isMain ? 'h-4 w-4 shrink-0 transition-colors duration-300' : 'h-3.5 w-3.5 shrink-0 transition-colors duration-300',
                 isActive ? 'text-red-500' : 'text-foreground-muted group-hover:text-foreground',
               )}
             />
@@ -268,7 +239,7 @@ export function Sidebar({
               )}
               {isOpen && (
                 <div className={cn("space-y-0.5", !isMain && !collapsed && "mt-1")}>
-                  {renderNavItems(group.items)}
+                  {renderNavItems(group.items, isMain)}
                 </div>
               )}
             </div>

@@ -44,9 +44,46 @@ export function useDataTable<TData extends RowData = RowData>(
   const [internalFilters, setInternalFilters] = React.useState<ColumnFiltersState>([]);
   const [internalGlobalFilter, setInternalGlobalFilter] = React.useState('');
   const [internalVisibility, setInternalVisibility] = React.useState<ColumnVisibilityState>(controlledVisibility ?? {});
-  const [internalPinning, setInternalPinning] = React.useState<ColumnPinningState>({
-    start: [],
-    end: [],
+  const [internalPinning, setInternalPinning] = React.useState<ColumnPinningState>(() => {
+    // Auto-derive pinning from column meta.pin declarations
+    const left: string[] = [];
+    const end: string[] = [];
+    
+    // Determine how many columns to auto-pin left
+    // We count auxiliary columns (like select, no, actions) at the start
+    let auxiliaryCount = 0;
+    const auxiliaryIds = ['actions', 'select', 'checkbox', 'no', 'number', 'index'];
+    
+    for (let i = 0; i < props.columns.length; i++) {
+      const colId = String((props.columns[i] as any).id ?? (props.columns[i] as any).accessorKey).toLowerCase();
+      if (auxiliaryIds.includes(colId)) {
+        auxiliaryCount++;
+      } else {
+        break; // Stop when we hit the first regular data column
+      }
+    }
+    
+    // Auto-pin limit is all prefix auxiliary columns + 1 main data column
+    const autoPinLimit = auxiliaryCount + 1;
+
+    props.columns.forEach((col, index) => {
+      const id = (col as any).id ?? (col as any).accessorKey;
+      const pin = (col.meta as any)?.pin;
+      
+      if (id) {
+        if (pin === 'left') {
+          left.push(String(id));
+        } else if (pin === 'right') {
+          end.push(String(id));
+        } else if (pin === 'none') {
+          // Explicitly opted out of pinning
+        } else if (index < autoPinLimit) {
+          // Auto-pin based on the calculated limit
+          left.push(String(id));
+        }
+      }
+    });
+    return { start: left, end };
   });
 
   const [internalPagination, setInternalPagination] = React.useState({

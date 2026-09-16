@@ -3,7 +3,7 @@ import type { Locale } from '@adatrack/types';
 export const trackingDictionaries = {
   id: {
     columns: {
-      vehicle: 'Armada',
+      vehicle: 'Kendaraan',
       status: 'Status',
       speed: 'Kecepatan (km/j)',
       location: 'Lokasi',
@@ -58,12 +58,12 @@ export const trackingDictionaries = {
     },
     messages: {
       searchAddress: 'Cari lokasi...',
-      searchVehicle: 'Cari armada...',
+      searchVehicle: 'Cari kendaraan...',
       searchPlaceholder: 'Cari...',
       selectVehicle: 'Pilih Kendaraan',
       selectVehiclePlaceholder: 'Pilih Kendaraan...',
       noData: 'Tidak ada data.',
-      noVehicleFound: 'Tidak ada armada yang sesuai dengan pencarian.',
+      noVehicleFound: 'Tidak ada kendaraan yang sesuai dengan pencarian.',
       noHistoryData: 'Data riwayat tidak tersedia.',
       noPointsMatch: 'Tidak ada titik yang cocok dengan pencarian.',
       loadPlaybackFirst: 'Silakan muat data perjalanan terlebih dahulu.',

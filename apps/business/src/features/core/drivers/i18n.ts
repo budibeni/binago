@@ -113,7 +113,7 @@ export const driversDictionaries = {
       ktpRequired: 'Nomor KTP wajib diisi',
       phoneRequired: 'Nomor telepon wajib diisi',
       placementRequired: 'Penempatan wajib diisi',
-      groupRequired: 'Grup armada wajib dipilih',
+      groupRequired: 'Grup kendaraan wajib dipilih',
       licenseRequired: 'Nomor SIM wajib diisi',
     }
   },

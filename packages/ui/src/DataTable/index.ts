@@ -12,6 +12,7 @@ export { DataTableFilterPanel } from './DataTableFilterPanel';
 export { useDataTable } from './useDataTable';
 export type {
   DataTableColumnDef,
+  DataTableColumnMeta,
   DataTableInstance,
   DataTableRowInstance,
   DataTableProps,

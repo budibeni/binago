@@ -73,7 +73,7 @@ function buildColumns(
             <Button
               variant="ghost"
               size="sm"
-              className="h-7 w-7 p-0 flex items-center justify-center focus-visible:ring-1 focus-visible:ring-primary focus:outline-none data-[state=open]:bg-neutral-200/50 dark:data-[state=open]:bg-neutral-800"
+              className="h-7 w-7 p-0 flex items-center justify-center focus:outline-none focus-visible:outline-none focus-visible:ring-0 data-[state=open]:bg-neutral-200/50 dark:data-[state=open]:bg-neutral-800"
               aria-label="Aksi pengemudi"
               id={`driver-action-${row.original.id}`}
             >
