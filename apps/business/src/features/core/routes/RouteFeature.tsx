@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import type { Locale } from '@adatrack/types';
 import { Route } from './types';
-import { routeService, geofenceService } from '@/data/services'; 
+import { routeService, geofenceService, groupService } from '@/data/services';
 import { RouteListView } from './components/RouteListView';
 import { RouteEditorView } from './components/RouteEditorView';
 import { getRouteTranslation } from './i18n';
@@ -18,7 +18,7 @@ export function RouteFeature({ locale = 'id' }: RouteFeatureProps) {
   const t = getRouteTranslation(locale);
   const searchParams = useSearchParams();
   const initialRouteId = searchParams?.get('routeId') || undefined;
-  
+
   const [routes, setRoutes] = useState<Route[]>(() => routeService.getRoutes());
   const [selectedRouteId, setSelectedRouteId] = useState<string | undefined>(initialRouteId);
   const [isEditing, setIsEditing] = useState(false);
@@ -49,7 +49,7 @@ export function RouteFeature({ locale = 'id' }: RouteFeatureProps) {
 
   const handleSave = (route: Partial<Route>) => {
     const now = new Date().toISOString();
-    
+
     if (route.id) {
       setRoutes(routes.map((r) => (r.id === route.id ? { ...r, ...route, updatedAt: now } as Route : r)));
     } else {
@@ -62,7 +62,7 @@ export function RouteFeature({ locale = 'id' }: RouteFeatureProps) {
       setRoutes([newRoute, ...routes]);
       setSelectedRouteId(newRoute.id);
     }
-    
+
     setIsEditing(false);
   };
 
@@ -77,6 +77,7 @@ export function RouteFeature({ locale = 'id' }: RouteFeatureProps) {
         <RouteEditorView
           initialData={selectedRoute}
           geofences={geofenceService.getGeofences()}
+          groups={groupService.getRouteGroups()}
           onSave={handleSave}
           onCancel={handleCancelEdit}
           locale={locale}
@@ -90,6 +91,7 @@ export function RouteFeature({ locale = 'id' }: RouteFeatureProps) {
       <RouteListView
         routes={routes}
         geofences={geofenceService.getGeofences()}
+        groups={groupService.getRouteGroups()}
         selectedRouteId={selectedRouteId}
         onSelectRoute={handleSelectRoute}
         onCreateNew={handleCreateNew}

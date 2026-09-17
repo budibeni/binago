@@ -3,7 +3,7 @@
  */
 
 import type { GroupData } from '@/features/core/groups/data/mockGroupsData';
-import { mockVehicleGroups, mockDriverGroups, mockGeofenceGroups } from '../mock';
+import { mockVehicleGroups, mockDriverGroups, mockGeofenceGroups, mockRouteGroups } from '../mock';
 
 // --- Repository Interface ------------------------------------------------------
 
@@ -11,6 +11,7 @@ export interface GroupRepository {
   getVehicleGroups(): GroupData[];
   getDriverGroups(): GroupData[];
   getGeofenceGroups(): GroupData[];
+  getRouteGroups(): GroupData[];
 }
 
 // --- Mock Repository Implementation -------------------------------------------
@@ -26,6 +27,10 @@ class MockGroupRepository implements GroupRepository {
 
   getGeofenceGroups(): GroupData[] {
     return mockGeofenceGroups as GroupData[];
+  }
+
+  getRouteGroups(): GroupData[] {
+    return mockRouteGroups as GroupData[];
   }
 }
 

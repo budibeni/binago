@@ -17,4 +17,8 @@ export const groupService = {
   getGeofenceGroups(): GroupData[] {
     return groupRepository.getGeofenceGroups();
   },
+
+  getRouteGroups(): GroupData[] {
+    return groupRepository.getRouteGroups();
+  },
 };

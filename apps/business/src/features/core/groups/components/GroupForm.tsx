@@ -6,12 +6,12 @@ import { Folder, FileText } from 'lucide-react';
 import { FormShell, FormCard, InputString, InputTextarea, useForm } from '@adatrack/ui';
 import type { GroupData } from '../data/mockGroupsData';
 
-export type GroupType = 'vehicle' | 'driver' | 'geofence';
+export type GroupType = 'vehicle' | 'driver' | 'geofence' | 'route';
 
 export const getGroupFormSchema = () => z.object({
   name: z.string().min(1, 'Nama grup wajib diisi'),
   description: z.string().optional(),
-  type: z.enum(['vehicle', 'driver', 'geofence']),
+  type: z.enum(['vehicle', 'driver', 'geofence', 'route']),
 });
 
 interface GroupFormProps {
@@ -22,6 +22,7 @@ interface GroupFormProps {
   onCancel: () => void;
   layout?: 'default' | 'drawer' | 'dialog' | 'fullscreen';
   defaultType?: GroupType;
+  title?: string;
 }
 
 const DEFAULT_GROUP = {
@@ -38,6 +39,7 @@ export function GroupForm({
   onCancel,
   layout = 'default',
   defaultType = 'vehicle',
+  title,
 }: GroupFormProps) {
   const isEdit = !!group;
   
@@ -54,7 +56,7 @@ export function GroupForm({
 
   return (
     <FormShell
-      title={isEdit ? 'Ubah Grup' : 'Tambah Grup'}
+      title={title || (isEdit ? 'Ubah Grup' : 'Tambah Grup')}
       open={open}
       onOpenChange={onOpenChange}
       onCancel={onCancel}

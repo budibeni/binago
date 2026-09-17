@@ -5,7 +5,7 @@ import type { DataTableColumnDef } from '@adatrack/ui';
 import { MoreVertical, Edit2, Trash2 } from 'lucide-react';
 import { Button, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@adatrack/ui';
 
-export interface GroupDataTableProps {
+export interface GroupTableProps {
   groups: GroupData[];
   labels: {
     searchPlaceholder: string;
@@ -22,7 +22,7 @@ export interface GroupDataTableProps {
   onDelete?: (group: GroupData) => void;
 }
 
-export function GroupDataTable({ groups, labels, toolbarActions, onEdit, onDelete }: GroupDataTableProps) {
+export function GroupTable({ groups, labels, toolbarActions, onEdit, onDelete }: GroupTableProps) {
   const [searchValue, setSearchValue] = React.useState('');
 
   const columns = React.useMemo<DataTableColumnDef<GroupData>[]>(() => [

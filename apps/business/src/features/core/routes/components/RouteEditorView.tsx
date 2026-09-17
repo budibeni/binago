@@ -12,6 +12,7 @@ import { cn } from '@adatrack/utils';
 interface RouteEditorViewProps {
   initialData?: Route;
   geofences: Geofence[];
+  groups?: any[]; // using any[] or GroupData[] (we can just use any to avoid importing GroupData if we don't have to)
   onSave: (route: Partial<Route>) => void;
   onCancel: () => void;
   locale?: Locale;
@@ -20,6 +21,7 @@ interface RouteEditorViewProps {
 export function RouteEditorView({
   initialData,
   geofences,
+  groups = [],
   onSave,
   onCancel,
   locale = 'id'
@@ -28,6 +30,7 @@ export function RouteEditorView({
   
   const [name, setName] = useState(initialData?.name || '');
   const [description, setDescription] = useState(initialData?.description || '');
+  const [groupId, setGroupId] = useState(initialData?.groupId || '');
   
   const [origin, setOrigin] = useState<RouteLocation>(initialData?.origin || { type: 'geofence' });
   const [destination, setDestination] = useState<RouteLocation>(initialData?.destination || { type: 'geofence' });
@@ -86,6 +89,7 @@ export function RouteEditorView({
       id: initialData?.id,
       name,
       description,
+      groupId: groupId || undefined,
       origin,
       destination,
       stops: validStops,
@@ -217,6 +221,7 @@ export function RouteEditorView({
   const tempRoute: Route = {
     id: initialData?.id || 'temp',
     name,
+    groupId: groupId || undefined,
     origin,
     destination,
     stops,
@@ -278,6 +283,13 @@ export function RouteEditorView({
                 value={description}
                 onChange={setDescription}
                 placeholder={t.descriptionPlaceholder}
+              />
+              <InputSelect
+                label="Grup Rute (Opsional)"
+                value={groupId}
+                onChange={setGroupId}
+                options={groups.map(g => ({ value: g.id, label: g.name }))}
+                placeholder="Pilih Grup Rute"
               />
             </div>
 

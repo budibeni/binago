@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Plus, Truck, UserRound, MapPinned } from 'lucide-react';
+import { Plus, Truck, UserRound, MapPinned, Route } from 'lucide-react';
 import { getTranslation } from '../../../i18n';
 import { groupService } from '@/data/services';
-import { GroupDataTable } from './components/GroupDataTable';
+import { GroupTable } from './components/GroupTable';
 import { GroupForm } from './components/GroupForm';
 import { Button, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@adatrack/ui';
 
@@ -12,7 +12,7 @@ export interface GroupsFeatureProps {
   locale: 'id' | 'en';
 }
 
-type GroupType = 'vehicles' | 'drivers' | 'geofences';
+type GroupType = 'vehicles' | 'drivers' | 'geofences' | 'routes';
 
 export function GroupsFeature({ locale }: GroupsFeatureProps) {
   const [activeType, setActiveType] = useState<GroupType>('vehicles');
@@ -26,6 +26,7 @@ export function GroupsFeature({ locale }: GroupsFeatureProps) {
       case 'vehicles': return groupService.getVehicleGroups();
       case 'drivers': return groupService.getDriverGroups();
       case 'geofences': return groupService.getGeofenceGroups();
+      case 'routes': return groupService.getRouteGroups();
       default: return [];
     }
   }, [activeType]);
@@ -63,13 +64,14 @@ export function GroupsFeature({ locale }: GroupsFeatureProps) {
   const getDefaultTypeSingular = () => {
     if (activeType === 'vehicles') return 'vehicle';
     if (activeType === 'drivers') return 'driver';
-    return 'geofence';
+    if (activeType === 'geofences') return 'geofence';
+    return 'route';
   };
 
   return (
     <div className="flex flex-col h-full w-full relative">
       <div className="flex-1 min-h-0 overflow-y-auto p-0">
-        <GroupDataTable 
+        <GroupTable 
           key={activeType}
           groups={currentTabData} 
           labels={tableLabels}
@@ -101,6 +103,12 @@ export function GroupsFeature({ locale }: GroupsFeatureProps) {
                         <span>{tGroups.tabs.geofences}</span>
                       </div>
                     </SelectItem>
+                    <SelectItem value="routes" className="text-[13px] py-1.5">
+                      <div className="flex items-center gap-2">
+                        <Route className="w-3.5 h-3.5 text-foreground-muted" />
+                        <span>{tGroups.tabs.routes}</span>
+                      </div>
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -121,6 +129,12 @@ export function GroupsFeature({ locale }: GroupsFeatureProps) {
         onCancel={() => setIsFormOpen(false)}
         layout="drawer"
         defaultType={getDefaultTypeSingular() as any}
+        title={`${editGroup ? 'Ubah' : 'Tambah'} Grup ${
+          activeType === 'vehicles' ? tGroups.tabs.vehicles :
+          activeType === 'drivers' ? tGroups.tabs.drivers :
+          activeType === 'geofences' ? tGroups.tabs.geofences :
+          tGroups.tabs.routes
+        }`}
       />
     </div>
   );

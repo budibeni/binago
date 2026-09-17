@@ -19,6 +19,7 @@ export interface Route {
   id: string;
   name: string;
   description?: string;
+  groupId?: string;
 
   origin: RouteLocation;
   stops: RouteStop[];

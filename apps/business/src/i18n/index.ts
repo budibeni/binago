@@ -222,6 +222,7 @@ export const dictionaries = {
         vehicles: 'Kendaraan',
         drivers: 'Pengemudi',
         geofences: 'Geofence',
+        routes: 'Rute',
       },
       table: {
         searchPlaceholder: 'Cari...',
@@ -895,6 +896,7 @@ export const dictionaries = {
         vehicles: 'Vehicles',
         drivers: 'Drivers',
         geofences: 'Geofences',
+        routes: 'Routes',
       },
       table: {
         searchPlaceholder: 'Search...',

@@ -19,7 +19,12 @@ export const mockGeofenceGroups = [
   { id: 'grp-g-004', name: 'Zona Rest Area', description: 'Titik perhentian aman untuk istirahat', memberCount: 8, type: 'geofence' as const },
 ];
 
-export const mockGroups = [...mockVehicleGroups, ...mockDriverGroups, ...mockGeofenceGroups];
+export const mockRouteGroups = [
+  { id: 'grp-r-001', name: 'Rute Antar Kota', description: 'Rute logistik antar kota utama', memberCount: 5, type: 'route' as const },
+  { id: 'grp-r-002', name: 'Rute Dalam Kota', description: 'Rute distribusi dalam kota', memberCount: 12, type: 'route' as const },
+];
+
+export const mockGroups = [...mockVehicleGroups, ...mockDriverGroups, ...mockGeofenceGroups, ...mockRouteGroups];
 
 export function getGroupById(id: string) {
   return mockGroups.find(g => g.id === id);

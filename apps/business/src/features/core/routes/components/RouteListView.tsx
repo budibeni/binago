@@ -10,6 +10,7 @@ import { ChevronLeft } from 'lucide-react';
 interface RouteListViewProps {
   routes: Route[];
   geofences: Geofence[];
+  groups?: any[];
   selectedRouteId?: string;
   onSelectRoute: (id: string | undefined) => void;
   onCreateNew: () => void;
@@ -21,6 +22,7 @@ interface RouteListViewProps {
 export function RouteListView({
   routes,
   geofences,
+  groups = [],
   selectedRouteId,
   onSelectRoute,
   onCreateNew,
@@ -40,7 +42,7 @@ export function RouteListView({
           selectedRoute={selectedRoute}
           editorMode="idle"
           editorGeometry={null}
-          onEditorGeometryChange={() => {}}
+          onEditorGeometryChange={() => { }}
         />
       </div>
 
@@ -57,6 +59,7 @@ export function RouteListView({
           <RouteListPanel
             routes={routes}
             geofences={geofences}
+            groups={groups}
             selectedRouteId={selectedRouteId}
             onSelectRoute={onSelectRoute}
             onCreateNew={onCreateNew}
