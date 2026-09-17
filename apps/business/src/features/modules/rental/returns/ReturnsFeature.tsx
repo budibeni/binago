@@ -188,8 +188,8 @@ export function ReturnsFeature() {
           ) : (
             <div className="flex flex-col items-center justify-center p-6 text-center border-2 border-dashed border-border rounded-xl">
               <RotateCcw className="w-8 h-8 text-muted-foreground/30 mb-2" />
-              <p className="text-[13px] font-medium text-muted-foreground">Tidak ada armada</p>
-              <p className="text-[12px] text-muted-foreground/70">Belum ada armada yang siap untuk dikembalikan.</p>
+              <p className="text-[13px] font-medium text-muted-foreground">Tidak ada kendaraan</p>
+              <p className="text-[12px] text-muted-foreground/70">Belum ada kendaraan yang siap untuk dikembalikan.</p>
             </div>
           )}
         </div>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '@adatrack/ui';
 import type { RentalVehicle } from '../types/rentalVehicle';
-import { Edit2, CheckCircle2, AlertCircle, X, Car, Tag, Calendar, User, MapPin, FileText, CreditCard, Trash2 } from 'lucide-react';
+import { Edit2, CheckCircle2, AlertCircle, X, Car, Tag, Calendar, User, MapPin, FileText, CreditCard, LogOut } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 
 interface RentalVehicleDetailDrawerProps {
@@ -58,7 +58,7 @@ export function RentalVehicleDetailDrawer({
             <div className="w-8 h-8 rounded-full bg-danger/10 text-danger flex items-center justify-center">
               <Car className="w-4 h-4" />
             </div>
-            <h2 className="text-sm font-bold">Detail Armada</h2>
+            <h2 className="text-sm font-bold">Detail Kendaraan</h2>
           </div>
           <Button variant="ghost" onClick={() => onOpenChange(false)} className="h-7 w-7 rounded-full p-0 flex items-center justify-center text-muted-foreground hover:bg-neutral-100">
             <X className="h-4 w-4" />
@@ -260,11 +260,11 @@ export function RentalVehicleDetailDrawer({
             <Button 
               variant="outline" 
               size="sm" 
-              title="Hapus"
+              title="Keluarkan"
               className="text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300 w-8 h-8 shrink-0" 
               onClick={() => { onOpenChange(false); onDelete(data); }}
             >
-              <Trash2 className="w-4 h-4" />
+              <LogOut className="w-4 h-4" />
             </Button>
           )}
         </div>

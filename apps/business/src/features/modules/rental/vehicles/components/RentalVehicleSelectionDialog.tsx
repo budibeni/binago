@@ -77,10 +77,10 @@ export function RentalVehicleSelectionDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange} title="Daftarkan Armada">
+    <Dialog open={open} onOpenChange={onOpenChange} title="Daftarkan Kendaraan">
       <div className="flex flex-col gap-4 w-[700px] max-w-full max-h-[85vh] p-1">
         <p className="text-sm text-muted-foreground">
-          Pilih kendaraan dari Master Armada yang akan dimasukkan ke Armada Rental.
+          Pilih kendaraan dari Master Kendaraan yang akan dimasukkan ke Kendaraan Rental.
         </p>
 
         <div className="flex flex-col gap-4 flex-1 min-h-0 py-2">
@@ -100,7 +100,7 @@ export function RentalVehicleSelectionDialog({
             {availableCoreVehicles.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-center p-6 text-muted-foreground absolute inset-0">
                 <p className="font-semibold text-foreground mb-1">Semua kendaraan sudah terdaftar</p>
-                <p className="text-sm">Semua kendaraan dari Master Armada sudah menjadi bagian dari Armada Rental.</p>
+                <p className="text-sm">Semua kendaraan dari Master Kendaraan sudah menjadi bagian dari Kendaraan Rental.</p>
               </div>
             ) : filteredVehicles.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-center p-6 text-muted-foreground absolute inset-0">
@@ -119,7 +119,7 @@ export function RentalVehicleSelectionDialog({
                       />
                     </th>
                     <th className="py-2.5 px-4 font-semibold text-muted-foreground border-b border-border">
-                      Armada
+                      Kendaraan
                     </th>
                     <th className="py-2.5 px-4 font-semibold text-muted-foreground border-b border-border">
                       Tahun
@@ -181,7 +181,7 @@ export function RentalVehicleSelectionDialog({
               disabled={selectedIds.length === 0}
               onClick={handleSubmit}
             >
-              Masukkan ke Armada
+              Masukkan ke Kendaraan
             </Button>
           </div>
         </div>

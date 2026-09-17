@@ -22,7 +22,7 @@ export const rentalCustomersDictionaries = {
     colType: 'Tipe',
     colContact: 'Kontak',
     colPic: 'PIC',
-    colActiveVehicles: 'Armada Aktif',
+    colActiveVehicles: 'Kendaraan Aktif',
     colActiveContracts: 'Kontrak Aktif',
     colStatus: 'Status',
     colActions: 'Aksi',

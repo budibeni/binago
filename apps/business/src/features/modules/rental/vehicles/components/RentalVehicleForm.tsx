@@ -88,7 +88,7 @@ export function RentalVehicleForm({
         open={open}
         onOpenChange={onOpenChange}
         title={title}
-        subtitle="Lengkapi data armada rental Anda"
+        subtitle="Lengkapi data kendaraan rental Anda"
         onCancel={onCancel}
         cancelProps={{ disabled: isSubmitting }}
         saveText={isSubmitting ? 'Menyimpan...' : 'Simpan'}
@@ -104,7 +104,7 @@ export function RentalVehicleForm({
             {/* Core Info Card */}
             <FormCard
               title="Data Kendaraan"
-              description="Data kendaraan dikelola di Master Data Armada. Informasi berikut bersifat read-only."
+              description="Data kendaraan dikelola di Master Data Kendaraan. Informasi berikut bersifat read-only."
               icon={<CarFront className="w-5 h-5 text-danger" />}
             >
 

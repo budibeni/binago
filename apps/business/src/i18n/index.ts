@@ -45,7 +45,7 @@ export const dictionaries = {
       // Rental
       dashboardRental: 'Dashboard Rental',
       customers: 'Pelanggan',
-      rentalVehicles: 'Armada Rental',
+      rentalVehicles: 'Kendaraan Rental',
       rentalContracts: 'Kontrak Rental',
       reservations: 'Reservasi',
       handovers: 'Serah Terima',
@@ -487,7 +487,7 @@ export const dictionaries = {
 
     // Rental Vehicles
     rentalVehicles: {
-      title: 'Armada Rental',
+      title: 'Kendaraan Rental',
       pageSubtitle: 'Kelola ketersediaan dan informasi kendaraan untuk kebutuhan rental.',
       searchPlaceholder: 'Cari...',
       addVehicle: 'Daftarkan Kendaraan',
@@ -518,7 +518,7 @@ export const dictionaries = {
       tabCoreInfo: 'Data Kendaraan',
       tabRentalInfo: 'Data Rental',
       coreInfoNotice: 'Data kendaraan dikelola di Master Data Kendaraan. Tidak boleh diedit dari halaman Rental.',
-      alreadyRegistered: 'Kendaraan sudah terdaftar pada Armada Rental.',
+      alreadyRegistered: 'Kendaraan sudah terdaftar pada Kendaraan Rental.',
       noCoreVehicles: 'Tidak ada kendaraan master yang belum didaftarkan ke rental.',
       
       // Table Columns
@@ -568,18 +568,18 @@ export const dictionaries = {
       actionDetail: 'Detail',
       actionEdit: 'Edit Data Rental',
       actionDisable: 'Nonaktifkan dari Rental',
-      confirmDisable: 'Nonaktifkan Armada Rental',
-      confirmDisableDesc: 'Apakah Anda yakin ingin menonaktifkan kendaraan ini dari Armada Rental? Data master pada CORE Vehicle tidak akan terhapus.',
+      confirmDisable: 'Nonaktifkan Kendaraan Rental',
+      confirmDisableDesc: 'Apakah Anda yakin ingin menonaktifkan kendaraan ini dari Kendaraan Rental? Data master pada CORE Vehicle tidak akan terhapus.',
       cancel: 'Batal',
       confirm: 'Nonaktifkan',
       save: 'Simpan',
-      createSuccess: 'Armada Rental berhasil didaftarkan.',
-      updateSuccess: 'Data Armada Rental berhasil diperbarui.',
+      createSuccess: 'Kendaraan Rental berhasil didaftarkan.',
+      updateSuccess: 'Data Kendaraan Rental berhasil diperbarui.',
       deleteSuccess: 'Kendaraan berhasil dinonaktifkan dari Rental.',
       
       // Empty state
-      emptyTitle: 'Belum ada Armada Rental',
-      emptyDescription: 'Belum ada profil armada rental yang terdaftar.',
+      emptyTitle: 'Belum ada Kendaraan Rental',
+      emptyDescription: 'Belum ada profil kendaraan rental yang terdaftar.',
       noResultTitle: 'Kendaraan tidak ditemukan',
       noResultDescription: 'Coba sesuaikan kata kunci atau filter pencarian.',
     },

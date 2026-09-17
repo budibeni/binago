@@ -89,7 +89,7 @@ export function RentalVehiclesFeature() {
       if (result.success > 0 && result.duplicate > 0) {
         desc = `${result.success} berhasil dimasukkan. ${result.duplicate} sudah terdaftar.`;
       } else if (result.success > 0) {
-        desc = `${result.success} kendaraan berhasil dimasukkan ke Armada Rental.`;
+        desc = `${result.success} kendaraan berhasil dimasukkan ke Kendaraan Rental.`;
       } else if (result.duplicate > 0) {
         desc = `Gagal: ${result.duplicate} kendaraan sudah terdaftar.`;
       }
@@ -196,7 +196,7 @@ export function RentalVehiclesFeature() {
         {showStats && (
           <div className="w-full px-4 pt-4 md:px-6 md:pt-6 bg-background animate-in slide-in-from-top-2 fade-in duration-200">
             <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
-              <StatCard label="Total Armada" value={stats.all} colorClass="bg-foreground" />
+              <StatCard label="Total Kendaraan" value={stats.all} colorClass="bg-foreground" />
               <StatCard label={labels.statusReady || 'Siap'} value={stats.ready} colorClass="bg-success" />
               <StatCard label={labels.statusReserved || 'Dipesan'} value={stats.reserved} colorClass="bg-warning" />
               <StatCard label={labels.statusRented || 'Disewa'} value={stats.rented} colorClass="bg-primary" />
@@ -228,11 +228,11 @@ export function RentalVehiclesFeature() {
             onToggleStats={() => setShowStats(!showStats)}
             className="border-none shadow-none"
             dtLabels={{
-              noResultTitle: 'Armada tidak ditemukan',
+              noResultTitle: 'Kendaraan tidak ditemukan',
               noResultDescription: 'Coba sesuaikan kata kunci atau filter pencarian.',
-              emptyTitle: 'Belum ada armada',
-              emptyDescription: 'Tambahkan armada rental baru',
-              searchPlaceholder: 'Cari armada...',
+              emptyTitle: 'Belum ada kendaraan',
+              emptyDescription: 'Tambahkan kendaraan rental baru',
+              searchPlaceholder: 'Cari kendaraan...',
             }}
           />
         </div>
@@ -246,7 +246,7 @@ export function RentalVehiclesFeature() {
             onCheckedChange={() => setSelectedIds([])}
             className="w-4 h-4 data-[state=checked]:bg-muted-foreground data-[state=checked]:border-muted-foreground"
           />
-          <span className="text-[13px] font-medium text-muted-foreground">{selectedIds.length} armada terpilih</span>
+          <span className="text-[13px] font-medium text-muted-foreground">{selectedIds.length} kendaraan terpilih</span>
         </div>
         <Button
           variant="destructive"
@@ -295,7 +295,7 @@ export function RentalVehiclesFeature() {
           onOpenChange={(open) => {
             if (!open) setEditId(null);
           }}
-          title={labels.actionEdit || 'Edit Armada Rental'}
+          title={labels.actionEdit || 'Edit Kendaraan Rental'}
           labels={labels}
           initialData={vehicles.find(v => v.id === editId)}
           onCancel={() => setEditId(null)}

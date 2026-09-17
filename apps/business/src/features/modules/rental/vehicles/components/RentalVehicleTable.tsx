@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle2, AlertCircle, Plus, FileText, MoreVertical, Eye, Edit2, MapPin, Trash2, EyeOff } from 'lucide-react';
+import { CheckCircle2, AlertCircle, Plus, FileText, MoreVertical, Eye, Edit2, MapPin, LogOut, EyeOff } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import { Button, Checkbox, DataTable, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@adatrack/ui';
 import type { DataTableColumnDef, DataTableFilterConfig } from '@adatrack/ui';
@@ -121,7 +121,7 @@ function buildColumns(
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem destructive onClick={() => onDisable(v)}>
-                <Trash2 className="mr-2 h-4 w-4 text-danger" />
+                <LogOut className="mr-2 h-4 w-4 text-danger" />
                 <span>Keluarkan</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -298,7 +298,7 @@ export function RentalVehicleTable({
       // Search
       searchValue={searchValue}
       onSearchChange={onSearchChange}
-      searchPlaceholder={dtLabels?.searchPlaceholder || labels.searchPlaceholder || "Cari armada..."}
+      searchPlaceholder={dtLabels?.searchPlaceholder || labels.searchPlaceholder || "Cari kendaraan..."}
       // UI Customizations
       className={className}
       emptyTitle={dtLabels?.emptyTitle || labels.emptyTitle}
@@ -306,7 +306,7 @@ export function RentalVehicleTable({
       filterConfig={filterConfig}
       isFilterOpen={isFilterOpen}
       onFilterOpenChange={onFilterOpenChange}
-      exportFilename="Data_Armada_Rental"
+      exportFilename="Data_Kendaraan_Rental"
       labels={dtLabels}
       toolbarActions={
         <div className="flex items-center gap-2">
