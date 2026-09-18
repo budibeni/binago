@@ -5,8 +5,6 @@ import { MoreVertical, Eye, Edit2, MapPin, Trash2, Plus } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import {
   Badge, Button,
-  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent,
-  DropdownMenuItem, DropdownMenuSeparator,
   DataTable,
 } from '@adatrack/ui';
 import type { DataTableColumnDef, DataTableFilterConfig, DataTableLabels } from '@adatrack/ui';
@@ -366,7 +364,7 @@ export function VehicleTable({
         onAdd ? (
           <Button variant="destructive" onClick={onAdd} className="h-8 gap-1.5 text-[13px] font-medium shadow-none">
             <Plus className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline-block">Tambah</span>
+            <span className="hidden sm:inline-block">{labels.actionAdd || 'Tambah'}</span>
           </Button>
         ) : undefined
       }

@@ -121,7 +121,7 @@ export const driversDictionaries = {
     pageTitle: 'Drivers',
     pageSubtitle: 'Manage drivers data and assignment history',
     searchPlaceholder: 'Search...',
-    addDriver: 'Add Driver',
+    addDriver: 'Add',
     exportFilename: 'drivers-adatrack',
     filterStatus: 'Status',
     filterGroup: 'Group',

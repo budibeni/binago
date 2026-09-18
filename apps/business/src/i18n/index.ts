@@ -49,7 +49,7 @@ export const dictionaries = {
       dashboardRental: 'Dashboard Rental',
       customers: 'Pelanggan',
       rentalVehicles: 'Kendaraan Rental',
-      pricingGroups: 'Grup Tarif',
+      pricingCategory: 'Kategori Tarif',
       rentalContracts: 'Kontrak Rental',
       reservations: 'Reservasi',
       handovers: 'Serah Terima',
@@ -236,7 +236,7 @@ export const dictionaries = {
         actions: 'Aksi',
       },
       actions: {
-        add: 'Tambah Grup',
+        add: 'Tambah',
         edit: 'Edit',
         delete: 'Hapus',
       }
@@ -336,7 +336,7 @@ export const dictionaries = {
     vehicles: {
       title: 'Kendaraan',
       pageSubtitle: 'Kelola data kendaraan, grup, dan informasi kendaraan Anda.',
-      addVehicle: 'Tambah Kendaraan',
+      addVehicle: 'Tambah',
       searchPlaceholder: 'Cari...',
       exportFilename: 'kendaraan-adatrack',
       filterStatus: 'Status',
@@ -494,7 +494,7 @@ export const dictionaries = {
       title: 'Kendaraan Rental',
       pageSubtitle: 'Kelola ketersediaan dan informasi kendaraan untuk kebutuhan rental.',
       searchPlaceholder: 'Cari...',
-      addVehicle: 'Daftarkan Kendaraan',
+      addVehicle: 'Tambah',
       exportFilename: 'kendaraan-rental-adatrack',
       
       // Filter & Status
@@ -726,8 +726,8 @@ export const dictionaries = {
       // Rental
       dashboardRental: 'Rental Dashboard',
       customers: 'Customers',
-      rentalVehicles: 'Rental Fleet',
-      pricingGroups: 'Pricing Groups',
+      rentalVehicles: 'Rental Vehicles',
+      pricingCategory: 'Pricing Category',
       rentalContracts: 'Rental Contracts',
       reservations: 'Reservations',
       handovers: 'Handovers',
@@ -914,7 +914,7 @@ export const dictionaries = {
         actions: 'Actions',
       },
       actions: {
-        add: 'Add Group',
+        add: 'Add',
         edit: 'Edit',
         delete: 'Delete',
       }
@@ -1014,7 +1014,7 @@ export const dictionaries = {
     vehicles: {
       title: 'Vehicles',
       pageSubtitle: 'Manage your fleet vehicle data, groups, and status.',
-      addVehicle: 'Add Vehicle',
+      addVehicle: 'Add',
       searchPlaceholder: 'Search...',
       exportFilename: 'fleet-adatrack',
       filterStatus: 'Status',
@@ -1172,7 +1172,7 @@ export const dictionaries = {
       title: 'Rental Fleet',
       pageSubtitle: 'Manage availability and vehicle information for rental needs.',
       searchPlaceholder: 'Search...',
-      addVehicle: 'Register Fleet',
+      addVehicle: 'Add',
       exportFilename: 'rental-fleet-adatrack',
       
       // Filter & Status

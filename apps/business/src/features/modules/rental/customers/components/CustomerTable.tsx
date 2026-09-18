@@ -5,13 +5,7 @@ import { MoreVertical, Plus, Eye, Edit2, Trash2 } from 'lucide-react';
 import { Button, DataTable } from '@adatrack/ui';
 import type { DataTableColumnDef, DataTableFilterConfig, DataTableLabels } from '@adatrack/ui';
 import type { Customer, CompanyCustomer } from '../types/customer';
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-} from '@adatrack/ui';
+
 import { cn } from '@adatrack/utils';
 
 interface CustomerTableLabels {
@@ -39,6 +33,7 @@ interface CustomerTableLabels {
   actionDetail: string;
   actionEdit: string;
   actionDelete: string;
+  addCustomer: string;
 }
 
 interface CustomerTableProps {
@@ -248,7 +243,7 @@ export function CustomerTable({
         onAdd ? (
           <Button variant="destructive" onClick={onAdd} className="h-8 gap-1.5 text-[13px] font-medium shadow-none">
             <Plus className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline-block">Tambah</span>
+            <span className="hidden sm:inline-block">{labels.addCustomer}</span>
           </Button>
         ) : undefined
       }

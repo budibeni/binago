@@ -99,8 +99,8 @@ export function CustomersFeature() {
     colType: tC.colType,
     colContact: tC.colContact,
     colPic: tC.colPic,
-    colAddress: 'Alamat',
-    colCity: 'Kota',
+    colAddress: tC.colAddress,
+    colCity: tC.colCity,
     colStatus: tC.colStatus,
     colActions: tC.colActions,
     typeIndividual: tC.typeIndividual,
@@ -116,6 +116,7 @@ export function CustomersFeature() {
     actionDetail: tC.actionDetail,
     actionEdit: tC.actionEdit,
     actionDelete: tC.actionDelete,
+    addCustomer: tC.addCustomer,
   }), [tC]);
 
   const filterConfig: DataTableFilterConfig = React.useMemo(() => ({

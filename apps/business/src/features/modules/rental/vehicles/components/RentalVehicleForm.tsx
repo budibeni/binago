@@ -3,6 +3,8 @@
 import React from 'react';
 import { Button, Input, Label, FormShell, FormCard, InputSelect, InputDate, InputDecimal, InputString } from '@adatrack/ui';
 import { CarFront, FileText, Settings, ShieldCheck, FileSpreadsheet } from 'lucide-react';
+import { cn } from '@adatrack/utils';
+import type { RentalPricingCategory } from '../../pricing-category/types/pricing';
 import type { RentalVehicle, RentalVehicleProfile, RentalEquipment, RentalStatus, RentalCondition } from '../types/rentalVehicle';
 import type { Vehicle } from '@/features/core/vehicles/types/vehicle';
 
@@ -11,6 +13,7 @@ interface RentalVehicleFormProps {
   labels: Record<string, string>;
   initialData?: RentalVehicle;
   availableCoreVehicles?: Vehicle[];
+  availablePricingCategory?: RentalPricingCategory[];
   onCancel: () => void;
   onSave: (data: Omit<RentalVehicleProfile, 'id' | 'createdAt' | 'updatedAt'>) => void;
   layout?: 'default' | 'drawer' | 'dialog' | 'fullscreen';
@@ -23,6 +26,7 @@ export function RentalVehicleForm({
   labels,
   initialData,
   availableCoreVehicles = [],
+  availablePricingCategory = [],
   onCancel,
   onSave,
   layout = 'default',
@@ -33,6 +37,8 @@ export function RentalVehicleForm({
   const isEdit = !!initialData;
   const [vehicleId, setVehicleId] = React.useState(initialData?.vehicleId || '');
   const [status, setStatus] = React.useState<RentalStatus>(initialData?.status || 'READY');
+  const [pricingType, setPricingType] = React.useState<'CATEGORY' | 'INDEPENDENT'>(initialData?.pricingType || 'INDEPENDENT');
+  const [pricingCategoryId, setPricingCategoryId] = React.useState(initialData?.pricingCategoryId || '');
   const [dailyRate, setDailyRate] = React.useState(initialData?.dailyRate?.toString() || '');
   const [weeklyRate, setWeeklyRate] = React.useState(initialData?.weeklyRate?.toString() || '');
   const [monthlyRate, setMonthlyRate] = React.useState(initialData?.monthlyRate?.toString() || '');
@@ -58,9 +64,11 @@ export function RentalVehicleForm({
       onSave({
         vehicleId,
         status,
-        dailyRate: Number(dailyRate) || 0,
-        weeklyRate: Number(weeklyRate) || 0,
-        monthlyRate: Number(monthlyRate) || 0,
+        pricingType,
+        pricingCategoryId: pricingType === 'CATEGORY' ? pricingCategoryId : undefined,
+        dailyRate: pricingType === 'INDEPENDENT' ? (Number(dailyRate) || 0) : 0,
+        weeklyRate: pricingType === 'INDEPENDENT' ? (Number(weeklyRate) || 0) : 0,
+        monthlyRate: pricingType === 'INDEPENDENT' ? (Number(monthlyRate) || 0) : 0,
         deposit: Number(deposit) || 0,
         condition,
         currentOdometer: Number(currentOdo) || 0,
@@ -211,47 +219,93 @@ export function RentalVehicleForm({
                   />
                 </div>
 
-                <div>
-                  <InputDecimal
-                    id="dailyRate"
-                    label="Tarif Harian"
-                    value={dailyRate ? Number(dailyRate) : null}
-                    onChange={(v) => setDailyRate(v !== null ? String(v) : '')}
-                    prefixIcon={<span className="text-muted-foreground text-sm font-medium">Rp</span>}
-                    placeholder="0"
-                  />
-                </div>
-                <div>
-                  <InputDecimal
-                    id="deposit"
-                    label="Deposit"
-                    value={deposit ? Number(deposit) : null}
-                    onChange={(v) => setDeposit(v !== null ? String(v) : '')}
-                    prefixIcon={<span className="text-muted-foreground text-sm font-medium">Rp</span>}
-                    placeholder="0"
-                  />
+                <div className="sm:col-span-2">
+                  <div className="flex flex-col gap-1.5 mb-2">
+                    <Label className="text-xs font-semibold">Pengaturan Tarif</Label>
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setPricingType('CATEGORY')}
+                        className={cn(
+                          "flex-1 py-2.5 px-3 border rounded-lg text-[13px] font-medium transition-colors text-center",
+                          pricingType === 'CATEGORY' 
+                            ? "bg-primary/10 text-primary border-primary" 
+                            : "bg-background text-foreground hover:bg-muted border-border"
+                        )}
+                      >
+                        Tarif Kategori
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setPricingType('INDEPENDENT')}
+                        className={cn(
+                          "flex-1 py-2.5 px-3 border rounded-lg text-[13px] font-medium transition-colors text-center",
+                          pricingType === 'INDEPENDENT' 
+                            ? "bg-primary/10 text-primary border-primary" 
+                            : "bg-background text-foreground hover:bg-muted border-border"
+                        )}
+                      >
+                        Tarif Mandiri (Kustom)
+                      </button>
+                    </div>
+                  </div>
                 </div>
 
-                <div>
-                  <InputDecimal
-                    id="weeklyRate"
-                    label="Tarif Mingguan"
-                    value={weeklyRate ? Number(weeklyRate) : null}
-                    onChange={(v) => setWeeklyRate(v !== null ? String(v) : '')}
-                    prefixIcon={<span className="text-muted-foreground text-sm font-medium">Rp</span>}
-                    placeholder="0"
-                  />
-                </div>
-                <div>
-                  <InputDecimal
-                    id="monthlyRate"
-                    label="Tarif Bulanan"
-                    value={monthlyRate ? Number(monthlyRate) : null}
-                    onChange={(v) => setMonthlyRate(v !== null ? String(v) : '')}
-                    prefixIcon={<span className="text-muted-foreground text-sm font-medium">Rp</span>}
-                    placeholder="0"
-                  />
-                </div>
+                {pricingType === 'CATEGORY' ? (
+                  <div className="sm:col-span-2">
+                    <InputSelect
+                      id="pricingCategoryId"
+                      label="Pilih Kategori Tarif"
+                      value={pricingCategoryId}
+                      onChange={setPricingCategoryId}
+                      options={availablePricingCategory.map(g => ({ value: g.id, label: g.name }))}
+                      required={pricingType === 'CATEGORY'}
+                    />
+                  </div>
+                ) : (
+                  <>
+                    <div>
+                      <InputDecimal
+                        id="dailyRate"
+                        label="Tarif Harian"
+                        value={dailyRate ? Number(dailyRate) : null}
+                        onChange={(v) => setDailyRate(v !== null ? String(v) : '')}
+                        prefixIcon={<span className="text-muted-foreground text-sm font-medium">Rp</span>}
+                        placeholder="0"
+                      />
+                    </div>
+                    <div>
+                      <InputDecimal
+                        id="deposit"
+                        label="Deposit"
+                        value={deposit ? Number(deposit) : null}
+                        onChange={(v) => setDeposit(v !== null ? String(v) : '')}
+                        prefixIcon={<span className="text-muted-foreground text-sm font-medium">Rp</span>}
+                        placeholder="0"
+                      />
+                    </div>
+                    <div>
+                      <InputDecimal
+                        id="weeklyRate"
+                        label="Tarif Mingguan"
+                        value={weeklyRate ? Number(weeklyRate) : null}
+                        onChange={(v) => setWeeklyRate(v !== null ? String(v) : '')}
+                        prefixIcon={<span className="text-muted-foreground text-sm font-medium">Rp</span>}
+                        placeholder="0"
+                      />
+                    </div>
+                    <div>
+                      <InputDecimal
+                        id="monthlyRate"
+                        label="Tarif Bulanan"
+                        value={monthlyRate ? Number(monthlyRate) : null}
+                        onChange={(v) => setMonthlyRate(v !== null ? String(v) : '')}
+                        prefixIcon={<span className="text-muted-foreground text-sm font-medium">Rp</span>}
+                        placeholder="0"
+                      />
+                    </div>
+                  </>
+                )}
 
                 <div className="sm:col-span-2">
                   <InputSelect

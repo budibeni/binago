@@ -1,22 +1,22 @@
 import type { RateType } from '../../reservations/types/reservation';
 
-export type PricingGroupStatus = 'ACTIVE' | 'INACTIVE';
+export type PricingCategoryStatus = 'ACTIVE' | 'INACTIVE';
 
-export interface RentalPricingGroup {
+export interface RentalPricingCategory {
   id: string;
   name: string;
   description?: string;
-  status: PricingGroupStatus;
+  status: PricingCategoryStatus;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface RentalRate {
   id: string;
-  pricingGroupId: string;
+  pricingCategoryId: string;
   rateType: RateType;
   amount: number;
-  status: PricingGroupStatus;
+  status: PricingCategoryStatus;
   createdAt: string;
   updatedAt: string;
 }
@@ -26,20 +26,20 @@ export interface VehicleRateOverride {
   vehicleId: string; // CORE Vehicle ID
   rateType: RateType;
   amount: number;
-  status: PricingGroupStatus;
+  status: PricingCategoryStatus;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface VehiclePricingAssignment {
   vehicleId: string;
-  pricingGroupId: string;
+  pricingCategoryId: string;
   assignedAt: string;
 }
 
-export type PricingGroupStatusFilter = 'all' | PricingGroupStatus;
+export type PricingCategoryStatusFilter = 'all' | PricingCategoryStatus;
 
-export interface PricingGroupFilters {
+export interface PricingCategoryFilters {
   search?: string;
-  status?: PricingGroupStatusFilter;
+  status?: PricingCategoryStatusFilter;
 }

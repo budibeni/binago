@@ -115,8 +115,8 @@ function buildNavigation(locale: Locale): NavGroup[] {
       icon: CarFront,
       items: [
         { id: 'rentalCustomers', label: t.nav.customers, href: '/rental/customers', icon: Users },
+        { id: 'pricingCategory', label: (t.nav as any).pricingCategory || 'Kategori Tarif', href: '/rental/pricing-category', icon: Tag },
         { id: 'rentalVehicles', label: t.nav.rentalVehicles, href: '/rental/vehicles', icon: CarFront },
-        { id: 'pricingGroups', label: (t.nav as any).pricingGroups || 'Grup Tarif', href: '/rental/pricing-groups', icon: Tag },
         { id: 'reservations', label: t.nav.reservations, href: '/rental/reservations', icon: CalendarClock },
         { id: 'rentalContracts', label: t.nav.rentalContracts, href: '/rental/contracts', icon: FileSignature },
         { id: 'handovers', label: t.nav.handovers, href: '/rental/handovers', icon: Key },
@@ -251,6 +251,11 @@ export function BusinessShellLayout({ children }: { children: React.ReactNode })
         if (savedTheme === 'dark') document.documentElement.classList.add('dark');
         else document.documentElement.classList.remove('dark');
       }
+      
+      const savedLocale = localStorage.getItem('adatrack.locale') as Locale;
+      if (savedLocale === 'id' || savedLocale === 'en') {
+        setLocale(savedLocale);
+      }
     } catch (e) {
       console.warn('localStorage error', e);
     }
@@ -262,6 +267,15 @@ export function BusinessShellLayout({ children }: { children: React.ReactNode })
       localStorage.setItem('adatrack.theme', newTheme);
       if (newTheme === 'dark') document.documentElement.classList.add('dark');
       else document.documentElement.classList.remove('dark');
+    } catch (e) {
+      console.warn('localStorage error', e);
+    }
+  }, []);
+
+  const handleLocaleChange = React.useCallback((newLocale: Locale) => {
+    setLocale(newLocale);
+    try {
+      localStorage.setItem('adatrack.locale', newLocale);
     } catch (e) {
       console.warn('localStorage error', e);
     }
@@ -308,7 +322,7 @@ export function BusinessShellLayout({ children }: { children: React.ReactNode })
         breadcrumbItems={breadcrumbItems}
         user={DUMMY_USER}
         currentLocale={locale}
-        onLocaleChange={setLocale}
+        onLocaleChange={handleLocaleChange}
         currentTheme={theme}
         onThemeChange={handleThemeChange}
         userMenuLabels={t.userMenu}

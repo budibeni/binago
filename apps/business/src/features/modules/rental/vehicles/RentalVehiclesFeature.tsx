@@ -4,10 +4,12 @@ import React from 'react';
 import { getTranslation } from '@/i18n';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
 import { rentalVehicleService } from '@/data/modules/rental/services/vehicleService';
+import { pricingService } from '@/data/modules/rental/services/pricingService';
 
 import { buildRentalVehicleContext } from '@/data/modules/rental/services/vehicleContextBuilder';
 import { trackingNavigationService } from '@/features/core/tracking/services/trackingNavigationService';
 import type { RentalVehicle, RentalStatusFilter } from './types/rentalVehicle';
+import type { RentalPricingCategory } from '../pricing-category/types/pricing';
 import type { DataTableFilterConfig } from '@adatrack/ui';
 import { RentalVehicleTable } from './components/RentalVehicleTable';
 import { RentalVehicleSelectionDialog } from './components/RentalVehicleSelectionDialog';
@@ -15,16 +17,26 @@ import { RentalVehicleDetailDrawer } from './components/RentalVehicleDetailDrawe
 import { RentalVehicleDisableDialog } from './components/RentalVehicleDisableDialog';
 import { RentalVehicleForm } from './components/RentalVehicleForm';
 import { useRouter } from 'next/navigation';
-import { Card, Input, Button, Checkbox } from '@adatrack/ui';
+import { Card, Input, Button, Checkbox, PanelShell } from '@adatrack/ui';
 import { CarFront, Plus, Search, MapPin, List, CheckCircle2, Calendar, User, Wrench, Ban, RotateCcw, ChevronRight } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 
-function StatCard({ label, value, colorClass }: { label: string, value: number, colorClass: string }) {
+function StatCard({ label, value, colorClass, icon: Icon }: { label: string, value: number, colorClass: string, icon?: React.ElementType }) {
+  const textColorClass = colorClass.replace(/bg-/g, 'text-');
+  
   return (
-    <div className="flex flex-col p-2.5 rounded-md border border-border bg-card shadow-sm relative overflow-hidden transition-all hover:shadow-md">
-      <div className={cn("absolute left-0 top-0 bottom-0 w-1", colorClass)} />
-      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider ml-1">{label}</span>
-      <span className="text-xl font-bold mt-0.5 ml-1">{value}</span>
+    <div className="flex items-center justify-between p-3 rounded-lg border border-border/80 bg-background transition-colors hover:border-border">
+      <div className="flex items-center gap-2.5">
+        {Icon ? (
+          <div className={cn("p-1.5 rounded-md bg-neutral-100 dark:bg-neutral-800", textColorClass)}>
+            <Icon className="w-3.5 h-3.5" />
+          </div>
+        ) : (
+          <div className={cn("w-2 h-2 rounded-full", colorClass)} />
+        )}
+        <span className="text-[11px] font-semibold text-foreground-muted tracking-tight">{label}</span>
+      </div>
+      <span className="text-sm font-bold text-foreground">{value}</span>
     </div>
   );
 }
@@ -41,6 +53,7 @@ export function RentalVehiclesFeature() {
   const [selectedIds, setSelectedIds] = React.useState<string[]>([]);
 
   const [vehicles, setVehicles] = React.useState<RentalVehicle[]>([]);
+  const [pricingCategorys, setPricingCategory] = React.useState<RentalPricingCategory[]>([]);
   const [availableCores, setAvailableCores] = React.useState(rentalVehicleService.getAvailableCoreVehicles());
 
   // UI State
@@ -64,6 +77,7 @@ export function RentalVehiclesFeature() {
     const data = rentalVehicleService.getRentalVehicles({ search, status: statusFilter });
     setVehicles(data);
     setAvailableCores(rentalVehicleService.getAvailableCoreVehicles());
+    setPricingCategory(pricingService.getPricingCategory({ status: 'ACTIVE' }));
   }, [search, statusFilter, dataVersion]);
 
   // Derived stats
@@ -189,28 +203,16 @@ export function RentalVehiclesFeature() {
   const [showStats, setShowStats] = React.useState(true);
 
   return (
-    <div className="flex flex-col h-full w-full bg-background p-0 items-center overflow-hidden">
-      <div className="w-full flex-1 flex flex-col min-h-0 space-y-0 pb-4">
-
-        {/* Elegant Stats Ribbon */}
-        {showStats && (
-          <div className="w-full px-4 pt-4 md:px-6 md:pt-6 bg-background animate-in slide-in-from-top-2 fade-in duration-200">
-            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
-              <StatCard label="Total Kendaraan" value={stats.all} colorClass="bg-foreground" />
-              <StatCard label={labels.statusReady || 'Siap'} value={stats.ready} colorClass="bg-success" />
-              <StatCard label={labels.statusReserved || 'Dipesan'} value={stats.reserved} colorClass="bg-warning" />
-              <StatCard label={labels.statusRented || 'Disewa'} value={stats.rented} colorClass="bg-primary" />
-              <StatCard label={labels.statusMaintenance || 'Perawatan'} value={stats.maintenance} colorClass="bg-purple-500" />
-              <StatCard label={labels.statusUnavailable || 'Tidak Tersedia'} value={stats.unavailable} colorClass="bg-neutral-500 dark:bg-neutral-400" />
-            </div>
-          </div>
-        )}
+    <div className="flex flex-row h-full w-full bg-background overflow-hidden">
+      
+      {/* Left Column (Table + Bottom Action Bar) */}
+      <div className="flex-1 flex flex-col min-w-0 h-full">
 
         {/* Main Table */}
-
-        <div className="flex-1 min-h-0 w-full relative">
+        <div className="flex-1 min-h-0 min-w-0 relative">
           <RentalVehicleTable
             data={vehicles}
+            pricingCategorys={pricingCategorys}
             labels={labels}
             onView={handleViewClick}
             onEdit={handleEditClick}
@@ -224,8 +226,6 @@ export function RentalVehiclesFeature() {
             filterConfig={filterConfig}
             isFilterOpen={isFilterOpen}
             onFilterOpenChange={setIsFilterOpen}
-            showStats={showStats}
-            onToggleStats={() => setShowStats(!showStats)}
             className="border-none shadow-none"
             dtLabels={{
               noResultTitle: 'Kendaraan tidak ditemukan',
@@ -236,30 +236,50 @@ export function RentalVehiclesFeature() {
             }}
           />
         </div>
+
+        {/* Bottom Action Bar */}
+        {selectedIds.length > 0 && (
+          <div className="w-full flex-shrink-0 h-10 bg-card border-t border-border pl-4 md:pl-6 flex items-center justify-between shadow-[0_-4px_20px_-5px_rgba(0,0,0,0.05)] relative z-10 animate-in slide-in-from-bottom-2 fade-in duration-200">
+            <div className="flex items-center gap-3">
+              <Checkbox
+                checked={selectedIds.length > 0}
+                onCheckedChange={() => setSelectedIds([])}
+                className="w-4 h-4 data-[state=checked]:bg-muted-foreground data-[state=checked]:border-muted-foreground"
+              />
+              <span className="text-[13px] font-medium text-muted-foreground">{selectedIds.length} kendaraan terpilih</span>
+            </div>
+            <Button
+              variant="destructive"
+              onClick={handleOpenTracking}
+              disabled={selectedIds.length === 0}
+              className="px-8 md:px-12 h-full rounded-none text-[13px] font-medium gap-1.5 shadow-none hover:bg-danger/90 transition-colors"
+            >
+              <MapPin className="w-3.5 h-3.5" />
+              Buka Lokasi
+            </Button>
+          </div>
+        )}
       </div>
 
-      {/* Bottom Action Bar */}
-      <div className="w-full flex-shrink-0 h-10 bg-card border-t border-border pl-4 md:pl-6 flex items-center justify-between shadow-[0_-4px_20px_-5px_rgba(0,0,0,0.05)] relative z-10">
-        <div className="flex items-center gap-3">
-          <Checkbox
-            checked={selectedIds.length > 0}
-            onCheckedChange={() => setSelectedIds([])}
-            className="w-4 h-4 data-[state=checked]:bg-muted-foreground data-[state=checked]:border-muted-foreground"
-          />
-          <span className="text-[13px] font-medium text-muted-foreground">{selectedIds.length} kendaraan terpilih</span>
-        </div>
-        <Button
-          variant="destructive"
-          onClick={handleOpenTracking}
-          disabled={selectedIds.length === 0}
-          className="px-8 md:px-12 h-full rounded-none text-[13px] font-medium gap-1.5 shadow-none hover:bg-danger/90 transition-colors"
+      {/* Panel Shell for Stats (Now spanning full height) */}
+        <PanelShell
+          title="Ringkasan"
+          side="right"
+          isOpen={showStats}
+          onClose={() => setShowStats(false)}
+          onOpen={() => setShowStats(true)}
+          collapsedTitle="RINGKASAN"
+          className="w-80 min-w-80 shrink-0 h-full bg-gray-50 dark:bg-gray-900/40"
         >
-          <MapPin className="w-3.5 h-3.5" />
-          Buka Lokasi
-        </Button>
-      </div>
-
-
+          <div className="flex flex-col gap-2.5 p-4">
+            <StatCard label="Total Kendaraan" value={stats.all} colorClass="bg-foreground" icon={CarFront} />
+            <StatCard label={labels.statusReady || 'Siap'} value={stats.ready} colorClass="bg-success" icon={CheckCircle2} />
+            <StatCard label={labels.statusReserved || 'Dipesan'} value={stats.reserved} colorClass="bg-warning" icon={Calendar} />
+            <StatCard label={labels.statusRented || 'Disewa'} value={stats.rented} colorClass="bg-primary" icon={User} />
+            <StatCard label={labels.statusMaintenance || 'Perawatan'} value={stats.maintenance} colorClass="bg-purple-500" icon={Wrench} />
+            <StatCard label={labels.statusUnavailable || 'Tidak Tersedia'} value={stats.unavailable} colorClass="bg-neutral-500 dark:bg-neutral-400" icon={Ban} />
+          </div>
+        </PanelShell>
 
       <RentalVehicleSelectionDialog
         open={selectionDialogOpen}
@@ -298,6 +318,7 @@ export function RentalVehiclesFeature() {
           title={labels.actionEdit || 'Edit Kendaraan Rental'}
           labels={labels}
           initialData={vehicles.find(v => v.id === editId)}
+          availablePricingCategory={pricingCategorys}
           onCancel={() => setEditId(null)}
           onSave={(data) => {
             // TODO: dispatch edit save

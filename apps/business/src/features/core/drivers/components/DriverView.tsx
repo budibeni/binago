@@ -3,7 +3,7 @@
 import React from 'react';
 import { X, UserRound, MapPin, Mail, Phone, Calendar, Hash, Truck, Clock, Edit2, Trash2 } from 'lucide-react';
 import { cn } from '@adatrack/utils';
-import { Button, Avatar, Tabs, Badge } from '@adatrack/ui';
+import { Button, Avatar, Tabs, Badge, DetailShell } from '@adatrack/ui';
 import type { Driver, DriverHistory } from '../types/driver';
 
 interface DriverViewProps {
@@ -41,6 +41,39 @@ export function DriverView({
   onDelete,
   labels,
 }: DriverViewProps) {
+// â"€â"€â"€ Helper Components â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+function InfoRow({ icon: Icon, label, value, highlight }: {
+  icon: React.ElementType;
+  label: string;
+  value: string | number | null | undefined;
+  highlight?: boolean;
+}) {
+  return (
+    <div className="flex items-start gap-3 py-2.5 border-b border-border/60 last:border-0">
+      <div className="mt-0.5 p-1.5 rounded-md bg-neutral-100 dark:bg-neutral-800 text-foreground-muted shrink-0">
+        <Icon className="h-3.5 w-3.5" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="text-[10px] text-foreground-muted uppercase tracking-wider font-semibold mb-0.5">{label}</p>
+        <p className={cn(
+          'text-[13px] font-medium text-foreground truncate',
+          highlight && 'text-warning-600 dark:text-warning-400 font-semibold',
+        )}>
+          {value ?? '-'}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function SectionHeader({ icon: Icon, title }: { icon: React.ElementType; title: string }) {
+  return (
+    <div className="flex items-center gap-2 mb-1 mt-4 first:mt-0">
+      <Icon className="h-3.5 w-3.5 text-primary" />
+      <h3 className="text-[11px] font-bold text-foreground uppercase tracking-widest">{title}</h3>
+    </div>
+  );
+}
   const [activeTab, setActiveTab] = React.useState('info');
 
   if (!isOpen || !driver) return null;
@@ -56,37 +89,24 @@ export function DriverView({
   };
 
   return (
-    <>
-      <div 
-        className={cn(
-          "fixed inset-0 bg-black/40 backdrop-blur-sm z-40 transition-opacity duration-300",
-          isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-        )}
-        onClick={onClose}
-      />
-
-      <div className={cn(
-        "fixed top-0 right-0 h-full w-full max-w-sm bg-background border-l border-border shadow-2xl z-50 flex flex-col transition-transform duration-300 ease-in-out",
-        isOpen ? "translate-x-0" : "translate-x-full"
-      )}>
-        {/* Header */}
-        <div className="flex items-center justify-between p-3 md:px-4 py-2 border-b border-border bg-surface">
-          <h2 className="text-sm font-semibold text-foreground">{labels.title}</h2>
-          <Button variant="ghost" size="sm" onClick={onClose} className="rounded-full h-8 w-8 text-foreground-muted hover:text-foreground">
-            <X className="w-4 h-4" />
-          </Button>
-        </div>
-
+    <DetailShell
+      open={isOpen}
+      onOpenChange={(val) => !val && onClose()}
+      title={labels.title}
+      onEdit={onEdit}
+      onDelete={onDelete}
+    >
+      <div className="flex-1 overflow-y-auto px-4 py-3">
         {/* Profile Header */}
-        <div className="px-4 md:px-5 pt-4 pb-1 flex items-center gap-3">
+        <div className="pb-4 mb-4 border-b border-border flex items-center gap-3">
           <div className="flex flex-col w-full">
             <div className="flex items-center justify-between w-full">
-              <h3 className="text-base font-bold text-foreground">{driver.name}</h3>
+              <h3 className="text-[15px] font-bold text-foreground">{driver.name}</h3>
               <Badge variant={driver.status === 'active' ? 'success' : driver.status === 'inactive' ? 'danger' : 'warning'} dot className="text-[10px] px-1.5 py-0 h-4">
                 {driver.status === 'active' ? 'Aktif' : driver.status === 'inactive' ? 'Tidak Aktif' : 'Cuti'}
               </Badge>
             </div>
-            <span className="text-xs text-foreground-muted flex items-center gap-1 mt-0.5">
+            <span className="text-[12px] text-foreground-muted flex items-center gap-1 mt-0.5">
               <MapPin className="w-3 h-3" />
               {driver.placement}
             </span>
@@ -94,7 +114,7 @@ export function DriverView({
         </div>
 
         {/* Tabs */}
-        <div className="px-4 md:px-5 mt-3 border-b border-border/50">
+        <div className="mb-4">
           <Tabs
             tabs={[
               { id: 'info', label: labels.tabInfo },
@@ -107,72 +127,32 @@ export function DriverView({
           />
         </div>
 
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto p-4 md:px-5">
-          {activeTab === 'info' && (
-            <div className="flex flex-col gap-4">
-              
-              {/* Kontak */}
-              <section>
-                <h4 className="text-xs font-semibold text-foreground mb-1.5 flex items-center gap-1.5">
-                  <Phone className="w-3.5 h-3.5 text-danger" /> Kontak
-                </h4>
-                <div className="bg-surface border border-border/50 rounded-xl px-3.5 py-2.5 space-y-2 text-xs">
-                  <div className="flex justify-between">
-                    <span className="text-foreground-muted">{labels.phone}</span>
-                    <span className="font-medium text-foreground">{driver.phone}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-foreground-muted">{labels.email}</span>
-                    <span className="font-medium text-foreground">{driver.email}</span>
-                  </div>
-                  <div className="flex flex-col gap-0.5 pt-1.5 border-t border-border/50 mt-1.5">
-                    <span className="text-foreground-muted">{labels.address}</span>
-                    <span className="font-medium text-foreground leading-relaxed">{driver.address}</span>
-                  </div>
-                </div>
-              </section>
-
-              {/* Identitas */}
-              <section>
-                <h4 className="text-xs font-semibold text-foreground mb-1.5 flex items-center gap-1.5">
-                  <UserRound className="w-3.5 h-3.5 text-danger" /> Identitas
-                </h4>
-                <div className="bg-surface border border-border/50 rounded-xl px-3.5 py-2.5 space-y-2 text-xs">
-                  <div className="flex justify-between">
-                    <span className="text-foreground-muted">{labels.ktp}</span>
-                    <span className="font-medium text-foreground">{driver.ktpNumber}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-foreground-muted">{labels.pob} / {labels.dob}</span>
-                    <span className="font-medium text-foreground">{driver.placeOfBirth}, {driver.dateOfBirth}</span>
-                  </div>
-                  <div className="flex justify-between pt-1.5 border-t border-border/50 mt-1.5">
-                    <span className="text-foreground-muted">{labels.joinDate}</span>
-                    <span className="font-medium text-foreground">{driver.joinDate}</span>
-                  </div>
-                </div>
-              </section>
-
-              {/* SIM */}
-              <section>
-                <h4 className="text-xs font-semibold text-foreground mb-1.5 flex items-center gap-1.5">
-                  <Hash className="w-3.5 h-3.5 text-danger" /> Lisensi (SIM)
-                </h4>
-                <div className="bg-surface border border-border/50 rounded-xl px-3.5 py-2.5 space-y-2 text-xs">
-                  <div className="flex justify-between">
-                    <span className="text-foreground-muted">{labels.licenseNo}</span>
-                    <span className="font-medium text-foreground">{driver.licenseNumber}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-foreground-muted">{labels.licenseExpiry}</span>
-                    <span className="font-medium text-foreground">{driver.licenseExpiry}</span>
-                  </div>
-                </div>
-              </section>
-
+        {activeTab === 'info' && (
+          <div className="flex flex-col gap-4">
+            {/* Kontak */}
+            <SectionHeader icon={Phone} title="Kontak" />
+            <div className="rounded-lg border border-border/60 bg-neutral-50/30 dark:bg-neutral-900/20 px-3">
+              <InfoRow icon={Phone} label={labels.phone} value={driver.phone} />
+              <InfoRow icon={Mail} label={labels.email} value={driver.email} />
+              <InfoRow icon={MapPin} label={labels.address} value={driver.address} />
             </div>
-          )}
+
+            {/* Identitas */}
+            <SectionHeader icon={UserRound} title="Identitas" />
+            <div className="rounded-lg border border-border/60 bg-neutral-50/30 dark:bg-neutral-900/20 px-3">
+              <InfoRow icon={Hash} label={labels.ktp} value={driver.ktpNumber} />
+              <InfoRow icon={Calendar} label={`${labels.pob} / ${labels.dob}`} value={`${driver.placeOfBirth}, ${driver.dateOfBirth}`} />
+              <InfoRow icon={Clock} label={labels.joinDate} value={driver.joinDate} />
+            </div>
+
+            {/* SIM */}
+            <SectionHeader icon={Hash} title="Lisensi (SIM)" />
+            <div className="rounded-lg border border-border/60 bg-neutral-50/30 dark:bg-neutral-900/20 px-3">
+              <InfoRow icon={Hash} label={labels.licenseNo} value={driver.licenseNumber} />
+              <InfoRow icon={Calendar} label={labels.licenseExpiry} value={driver.licenseExpiry} />
+            </div>
+          </div>
+        )}
 
           {activeTab === 'history' && (
             <div className="flex flex-col gap-4 relative">
@@ -216,20 +196,8 @@ export function DriverView({
               )}
             </div>
           )}
-        </div>
-
-        {/* Footer */}
-        <div className="p-3 border-t border-border bg-surface flex items-center justify-between">
-          <Button variant="outline" size="sm" className="text-xs h-8" onClick={onEdit}>
-            <Edit2 className="w-3.5 h-3.5 mr-1.5" />
-            {labels.actionEdit}
-          </Button>
-          <Button variant="outline" size="sm" className="text-xs h-8 text-danger border-danger/30 hover:bg-danger/10 hover:border-danger hover:text-danger" onClick={onDelete}>
-            <Trash2 className="w-3.5 h-3.5 mr-1.5" />
-            {labels.actionDelete}
-          </Button>
-        </div>
+        <div className="h-4" />
       </div>
-    </>
+    </DetailShell>
   );
 }

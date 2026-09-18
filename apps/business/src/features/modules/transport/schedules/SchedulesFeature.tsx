@@ -80,7 +80,7 @@ export function SchedulesFeature() {
           <div className="flex items-center gap-2">
             <Button variant="primary" onClick={handleCreateNew}>
               <Plus className="w-4 h-4 mr-2" />
-              Tambah Jadwal
+              {locale === 'en' ? 'Add' : 'Tambah'}
             </Button>
           </div>
         </div>

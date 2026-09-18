@@ -102,6 +102,7 @@ class RentalVehicleService {
       rentalVehicleRepository.create({
         vehicleId,
         status: 'READY',
+        pricingType: 'INDEPENDENT',
         dailyRate: 0,
         weeklyRate: 0,
         monthlyRate: 0,

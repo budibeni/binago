@@ -22,6 +22,8 @@ export interface RentalVehicleProfile {
   dailyRate: number;
   weeklyRate: number;
   monthlyRate: number;
+  pricingType: 'CATEGORY' | 'INDEPENDENT';
+  pricingCategoryId?: string;
   deposit: number;
   condition: RentalCondition;
   currentOdometer: number;

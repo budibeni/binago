@@ -4,7 +4,7 @@ export function getPersonelTranslation(locale: 'id' | 'en') {
       pageTitle: 'Personel',
       pageSubtitle: 'Manage personel data and assignments',
       
-      addPersonel: 'Add Personel',
+      addPersonel: 'Add',
       exportFilename: 'personel-adatrack',
       searchPlaceholder: 'Search...',
       clearFilters: 'Clear Filters',
@@ -93,7 +93,7 @@ export function getPersonelTranslation(locale: 'id' | 'en') {
     pageTitle: 'Personel',
     pageSubtitle: 'Manajemen data personel dan penugasan',
     
-    addPersonel: 'Tambah Personel',
+    addPersonel: 'Tambah',
     exportFilename: 'personel-adatrack',
     searchPlaceholder: 'Cari...',
     clearFilters: 'Hapus Filter',

@@ -1,17 +1,9 @@
 'use client';
 
 import React from 'react';
-import { 
-  Button, 
-  DataTable, 
-  DropdownMenu, 
-  DropdownMenuTrigger, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuSeparator 
-} from '@adatrack/ui';
+import { Button, DataTable } from '@adatrack/ui';
 import type { DataTableColumnDef, DataTableFilterConfig } from '@adatrack/ui';
-import { Mail, Phone, UserCircle, CreditCard, UserRound, MoreVertical, Plus } from 'lucide-react';
+import { Mail, Phone, UserCircle, CreditCard, UserRound, Eye, Plus } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import type { Personel } from '../types/personel';
 
@@ -71,30 +63,15 @@ function buildColumns(
       cell: ({ row }) => {
         const p = row.original;
         return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 w-7 p-0 flex items-center justify-center focus:outline-none focus-visible:outline-none focus-visible:ring-0 data-[state=open]:bg-neutral-200/50 dark:data-[state=open]:bg-neutral-800"
-                aria-label="Aksi personel"
-              >
-                <MoreVertical className="h-4 w-4 text-foreground-muted" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-48">
-              <DropdownMenuItem onClick={() => onViewDetail(p)}>
-                {labels.actionDetail}
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onEdit(p)}>
-                {labels.actionEdit}
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem destructive onClick={() => onDelete(p)}>
-                <span className="text-danger">{labels.actionDelete}</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 w-8 p-0 flex items-center justify-center text-foreground-muted hover:text-primary hover:bg-primary/10 rounded-full"
+            onClick={() => onViewDetail(p)}
+            title="Detail"
+          >
+            <Eye className="h-4 w-4" />
+          </Button>
         );
       },
     },
@@ -240,7 +217,7 @@ export function PersonelTable({
         onAdd ? (
           <Button variant="destructive" onClick={onAdd} className="h-8 gap-1.5 text-[13px] font-medium shadow-none">
             <Plus className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline-block">Tambah</span>
+            <span className="hidden sm:inline-block">{labels.addPersonel}</span>
           </Button>
         ) : undefined
       }

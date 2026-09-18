@@ -45,7 +45,7 @@ export function PricingVehicleCustomRateDialog({
       open={open}
       onOpenChange={onOpenChange}
       title="Set Harga Independen"
-      subtitle="Kendaraan ini akan menggunakan harga berikut dan dikeluarkan dari grup saat ini."
+      subtitle="Kendaraan ini akan menggunakan harga berikut dan dikeluarkan dari kategori saat ini."
       onSubmit={handleSubmit}
       layout="dialog"
       onCancel={() => onOpenChange(false)}
@@ -81,7 +81,7 @@ export function PricingVehicleCustomRateDialog({
           />
         </div>
         <p className="text-xs text-warning mt-2">
-          Peringatan: Kendaraan ini otomatis akan terlepas dari grup tarif mana pun jika diberi harga independen.
+          Peringatan: Kendaraan ini otomatis akan terlepas dari kategori tarif mana pun jika diberi harga independen.
         </p>
       </div>
     </FormShell>

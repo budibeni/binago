@@ -1,12 +1,14 @@
 import React from 'react';
 import { CheckCircle2, AlertCircle, Plus, FileText, MoreVertical, Eye, Edit2, MapPin, LogOut, EyeOff } from 'lucide-react';
 import { cn } from '@adatrack/utils';
-import { Button, Checkbox, DataTable, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@adatrack/ui';
+import { Button, Checkbox, DataTable } from '@adatrack/ui';
 import type { DataTableColumnDef, DataTableFilterConfig } from '@adatrack/ui';
 import type { RentalVehicle } from '../types/rentalVehicle';
+import type { RentalPricingCategory } from '../../pricing-category/types/pricing';
 
 interface RentalVehicleTableProps {
   data: RentalVehicle[];
+  pricingCategorys?: RentalPricingCategory[];
   labels: Record<string, string>;
   onView: (v: RentalVehicle) => void;
   onEdit: (v: RentalVehicle) => void;
@@ -20,8 +22,6 @@ interface RentalVehicleTableProps {
   filterConfig?: DataTableFilterConfig;
   isFilterOpen?: boolean;
   onFilterOpenChange?: (open: boolean) => void;
-  showStats?: boolean;
-  onToggleStats?: () => void;
   className?: string;
   dtLabels?: any;
 }
@@ -36,7 +36,8 @@ function buildColumns(
   onComplete: (v: RentalVehicle) => void,
   selectedIds: string[],
   onSelectionChange: (ids: string[]) => void,
-  dataList: RentalVehicle[]
+  dataList: RentalVehicle[],
+  pricingCategorys: RentalPricingCategory[]
 ): DataTableColumnDef<RentalVehicle>[] {
   const formatCurrency = (value: number) => {
     if (value === 0) return '-';
@@ -184,14 +185,34 @@ function buildColumns(
       size: 180,
     },
     {
-      id: 'rate',
-      accessorFn: (v) => {
-        if (v.dailyRate > 0) return `${formatCurrency(v.dailyRate)} / hari`;
-        return '-';
+      id: 'pricingType',
+      accessorKey: 'pricingType',
+      header: 'Kategori Tarif',
+      enableSorting: true,
+      size: 130,
+      cell: ({ row }) => {
+        const isGroup = row.original.pricingType === 'CATEGORY';
+        const group = isGroup ? pricingCategorys.find(g => g.id === row.original.pricingCategoryId) : null;
+        return isGroup ? (
+          <span className="w-fit text-[11px] font-semibold px-2 py-1 rounded bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 border border-border">
+            {group?.name || 'Unknown'}
+          </span>
+        ) : (
+          <span className="w-fit text-[11px] font-semibold px-2 py-1 rounded bg-primary/10 text-primary border border-primary/20">Mandiri</span>
+        );
       },
+    },
+    {
+      id: 'rate',
+      accessorKey: 'dailyRate',
       header: labels.colRate,
       enableSorting: true,
       size: 140,
+      cell: ({ row }) => {
+        const v = row.original;
+        if (v.dailyRate === 0) return <span className="text-muted-foreground">-</span>;
+        return <span className="text-[13px] font-medium">{formatCurrency(v.dailyRate)} / hari</span>;
+      },
     },
     {
       id: 'condition',
@@ -236,6 +257,7 @@ function buildColumns(
 
 export function RentalVehicleTable({
   data,
+  pricingCategorys = [],
   labels,
   onView,
   onEdit,
@@ -249,14 +271,12 @@ export function RentalVehicleTable({
   filterConfig,
   isFilterOpen,
   onFilterOpenChange,
-  showStats,
-  onToggleStats,
   className,
   dtLabels,
 }: RentalVehicleTableProps) {
   const columns = React.useMemo(
-    () => buildColumns(labels, onView, onEdit, onDisable, onComplete, selectedIds, onSelectionChange, data),
-    [labels, onView, onEdit, onDisable, onComplete, selectedIds, onSelectionChange, data],
+    () => buildColumns(labels, onView, onEdit, onDisable, onComplete, selectedIds, onSelectionChange, data, pricingCategorys),
+    [labels, onView, onEdit, onDisable, onComplete, selectedIds, onSelectionChange, data, pricingCategorys],
   );
 
   return (
@@ -289,13 +309,7 @@ export function RentalVehicleTable({
           {onAdd && (
             <Button variant="destructive" onClick={onAdd} className="h-8 gap-1.5 text-[13px] font-medium shadow-none">
               <Plus className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline-block">Tambah</span>
-            </Button>
-          )}
-          {onToggleStats && (
-            <Button variant="outline" onClick={onToggleStats} className="h-8 gap-1.5 text-[13px] font-medium shadow-none">
-              {showStats ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
-              <span className="hidden sm:inline-block">Ringkasan</span>
+              <span className="hidden sm:inline-block">{labels.addVehicle}</span>
             </Button>
           )}
         </div>

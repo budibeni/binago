@@ -1,9 +1,9 @@
 'use client';
 
 import React from 'react';
-import { Dialog } from '@adatrack/ui';
+import { DetailShell } from '@adatrack/ui';
+import { cn } from '@adatrack/utils';
 import { X, Pencil, Trash2, UserCircle, MapPin, Phone, Mail, CreditCard, FileText } from 'lucide-react';
-import { Button } from '@adatrack/ui';
 import type { Personel } from '../types/personel';
 
 interface PersonelViewLabels {
@@ -35,78 +35,75 @@ interface PersonelViewProps {
   labels: PersonelViewLabels;
 }
 
+// â"€â"€â"€ Helper Components â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+function InfoRow({ icon: Icon, label, value, highlight }: {
+  icon: React.ElementType;
+  label: string;
+  value: string | number | null | undefined;
+  highlight?: boolean;
+}) {
+  return (
+    <div className="flex items-start gap-3 py-2.5 border-b border-border/60 last:border-0">
+      <div className="mt-0.5 p-1.5 rounded-md bg-neutral-100 dark:bg-neutral-800 text-foreground-muted shrink-0">
+        <Icon className="h-3.5 w-3.5" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="text-[10px] text-foreground-muted uppercase tracking-wider font-semibold mb-0.5">{label}</p>
+        <p className={cn(
+          'text-[13px] font-medium text-foreground truncate',
+          highlight && 'text-warning-600 dark:text-warning-400 font-semibold',
+        )}>
+          {value ?? '-'}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function SectionHeader({ icon: Icon, title }: { icon: React.ElementType; title: string }) {
+  return (
+    <div className="flex items-center gap-2 mb-1 mt-4 first:mt-0">
+      <Icon className="h-3.5 w-3.5 text-primary" />
+      <h3 className="text-[11px] font-bold text-foreground uppercase tracking-widest">{title}</h3>
+    </div>
+  );
+}
+
 export function PersonelView({ personel, open, onClose, onEdit, onDelete, labels }: PersonelViewProps) {
   if (!personel) return null;
 
   const isActive = personel.status === 'ACTIVE';
 
   return (
-    <Dialog open={open} onOpenChange={(val) => !val && onClose()} title={labels.title}>
-      <div className="flex-1 overflow-y-auto bg-slate-50/50 -mx-6 -mb-6 mt-4">
-        <div className="p-6">
-          <div className="flex items-center gap-4 mb-8">
-            <div className="h-16 w-16 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
-              <UserCircle className="w-10 h-10" />
-            </div>
-            <div className="flex flex-col">
-              <h3 className="text-xl font-bold text-foreground">{personel.name}</h3>
-              <span className="text-sm text-muted-foreground">{personel.personelType}</span>
-              <div className="mt-1">
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                  {isActive ? labels.statusActive : labels.statusInactive}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-6">
-            <div>
-              <h4 className="text-xs font-semibold text-foreground mb-1.5 flex items-center gap-1.5">
-                <FileText className="w-3.5 h-3.5 text-danger" /> {labels.tabInfo}
-              </h4>
-              <div className="bg-surface border border-border/50 rounded-xl px-3.5 py-2.5 space-y-2 text-xs">
-                <div className="flex justify-between">
-                  <span className="text-foreground-muted flex items-center gap-1.5"><CreditCard className="w-3.5 h-3.5"/> {labels.nik}</span>
-                  <span className="font-medium text-foreground">{personel.nik || '-'}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-foreground-muted flex items-center gap-1.5"><Phone className="w-3.5 h-3.5"/> {labels.phone}</span>
-                  <span className="font-medium text-foreground">{personel.phone || '-'}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-foreground-muted flex items-center gap-1.5"><Mail className="w-3.5 h-3.5"/> {labels.email}</span>
-                  <span className="font-medium text-foreground">{personel.email || '-'}</span>
-                </div>
-                <div className="flex flex-col gap-0.5 pt-1.5 border-t border-border/50 mt-1.5">
-                  <span className="text-foreground-muted flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5"/> {labels.address}</span>
-                  <span className="font-medium text-foreground leading-relaxed">{personel.address || '-'}</span>
-                </div>
-                <div className="flex justify-between pt-1.5 border-t border-border/50 mt-1.5">
-                  <span className="text-foreground-muted flex items-center gap-1.5"><CreditCard className="w-3.5 h-3.5"/> {labels.card}</span>
-                  <span className="font-medium text-foreground">{personel.cardId || labels.noCard}</span>
-                </div>
-                {personel.notes && (
-                  <div className="flex flex-col gap-0.5 pt-1.5 border-t border-border/50 mt-1.5">
-                    <span className="text-foreground-muted">{labels.notes}</span>
-                    <span className="font-medium text-foreground leading-relaxed">{personel.notes}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+    <DetailShell
+      open={open}
+      onOpenChange={(val) => !val && onClose()}
+      title={labels.title}
+      onEdit={onEdit}
+      onDelete={onDelete}
+    >
+      <div className="flex-1 overflow-y-auto px-4 py-3">
+        <SectionHeader icon={UserCircle} title="Informasi Personal" />
+        <div className="rounded-lg border border-border/60 bg-neutral-50/30 dark:bg-neutral-900/20 px-3">
+          <InfoRow icon={UserCircle} label={labels.name} value={personel.name} />
+          <InfoRow icon={FileText} label={labels.type} value={personel.personelType} />
+          <InfoRow icon={CreditCard} label={labels.nik} value={personel.nik} />
+          <InfoRow icon={Phone} label={labels.phone} value={personel.phone} />
+          <InfoRow icon={Mail} label={labels.email} value={personel.email} />
+          <InfoRow icon={MapPin} label={labels.address} value={personel.address} />
+          <InfoRow icon={CreditCard} label={labels.card} value={personel.cardId || labels.noCard} />
         </div>
-      </div>
 
-      <div className="p-4 border-t border-border bg-background sticky bottom-0 z-10 flex gap-3 -mx-6 -mb-6 mt-auto">
-        <Button variant="outline" className="flex-1 text-danger hover:text-danger hover:bg-danger/10 border-danger/20" onClick={onDelete}>
-          <Trash2 className="w-4 h-4 mr-2" />
-          {labels.actionDelete}
-        </Button>
-        <Button variant="primary" className="flex-1" onClick={onEdit}>
-          <Pencil className="w-4 h-4 mr-2" />
-          {labels.actionEdit}
-        </Button>
+        {personel.notes && (
+          <>
+            <SectionHeader icon={FileText} title={labels.notes} />
+            <div className="rounded-lg border border-border/60 bg-neutral-50/30 dark:bg-neutral-900/20 px-3 py-2.5">
+              <p className="text-[13px] text-foreground leading-relaxed">{personel.notes}</p>
+            </div>
+          </>
+        )}
+        <div className="h-4" />
       </div>
-    </Dialog>
+    </DetailShell>
   );
 }

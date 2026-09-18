@@ -17,27 +17,27 @@ export interface FormShellProps extends Omit<FormFooterProps, 'isSticky'> {
    * Presentation layout of the form.
    */
   layout?: 'default' | 'dialog' | 'drawer' | 'fullscreen';
-  
+
   /**
    * Controlled open state (for dialog and drawer modes).
    */
   open?: boolean;
-  
+
   /**
    * Callback when open state changes (for dialog and drawer modes).
    */
   onOpenChange?: (open: boolean) => void;
-  
+
   /**
    * The form content.
    */
   children: React.ReactNode;
-  
+
   /**
    * Optional onSubmit handler for the form wrapper.
    */
   onSubmit?: (e: React.FormEvent) => void;
-  
+
   /**
    * Number of columns for the outer grid layout (1 or 2). Defaults to 1.
    */
@@ -60,7 +60,7 @@ export function FormShell({
   onCancel,
   ...footerProps
 }: FormShellProps) {
-  
+
   const [internalLayout, setInternalLayout] = React.useState(layout);
   const [internalOpen, setInternalOpen] = React.useState(open ?? true);
 
@@ -93,7 +93,7 @@ export function FormShell({
     <div className={cn("z-[9999]", className)}>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button 
+          <button
             type="button"
             className="flex items-center justify-center text-muted-foreground hover:text-foreground transition-all focus:outline-none"
             title="Ubah Layout Form"
@@ -102,29 +102,29 @@ export function FormShell({
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-32 z-[9999]">
-          <DropdownMenuItem 
-            onClick={() => { setInternalLayout('default'); setInternalOpen(true); }} 
+          <DropdownMenuItem
+            onClick={() => { setInternalLayout('default'); setInternalOpen(true); }}
             className={cn("flex items-center gap-2 text-xs", internalLayout === 'default' ? 'font-bold text-danger' : 'text-muted-foreground')}
           >
             <Layout className="w-3.5 h-3.5" />
             Default
           </DropdownMenuItem>
-          <DropdownMenuItem 
-            onClick={() => { setInternalLayout('drawer'); setInternalOpen(true); }} 
+          <DropdownMenuItem
+            onClick={() => { setInternalLayout('drawer'); setInternalOpen(true); }}
             className={cn("flex items-center gap-2 text-xs", internalLayout === 'drawer' ? 'font-bold text-danger' : 'text-muted-foreground')}
           >
             <PanelRight className="w-3.5 h-3.5" />
             Drawer
           </DropdownMenuItem>
-          <DropdownMenuItem 
-            onClick={() => { setInternalLayout('dialog'); setInternalOpen(true); }} 
+          <DropdownMenuItem
+            onClick={() => { setInternalLayout('dialog'); setInternalOpen(true); }}
             className={cn("flex items-center gap-2 text-xs", internalLayout === 'dialog' ? 'font-bold text-danger' : 'text-muted-foreground')}
           >
             <AppWindow className="w-3.5 h-3.5" />
             Dialog
           </DropdownMenuItem>
-          <DropdownMenuItem 
-            onClick={() => { setInternalLayout('fullscreen'); setInternalOpen(true); }} 
+          <DropdownMenuItem
+            onClick={() => { setInternalLayout('fullscreen'); setInternalOpen(true); }}
             className={cn("flex items-center gap-2 text-xs", internalLayout === 'fullscreen' ? 'font-bold text-danger' : 'text-muted-foreground')}
           >
             <Maximize className="w-3.5 h-3.5" />
@@ -146,8 +146,8 @@ export function FormShell({
   };
 
   const renderContent = () => {
-    const gridClass = columns === 1 
-      ? "flex flex-col gap-6" 
+    const gridClass = columns === 1
+      ? "flex flex-col gap-6"
       : "grid grid-cols-1 gap-6 items-start group-data-[layout=default]/form:lg:grid-cols-2 group-data-[layout=fullscreen]/form:lg:grid-cols-2 group-data-[layout=dialog]/form:lg:grid-cols-2";
 
     const content = onSubmit ? (
@@ -172,23 +172,38 @@ export function FormShell({
       <Dialog 
         open={internalOpen} 
         onOpenChange={handleOpenChange}
-        title={typeof title === 'string' ? title : undefined}
-        description={typeof subtitle === 'string' ? subtitle : undefined}
         hideCloseButton={true}
-        className="max-w-2xl p-4 md:p-5"
+        className="max-w-2xl p-0 overflow-hidden"
       >
-        <div className={cn("flex flex-col max-h-[80vh] relative group/form", className)} data-layout={internalLayout}>
-          <LayoutToggleBtn className="absolute -top-10 md:-top-12 right-0" />
-          <div className="flex-1 overflow-y-auto pr-1 -mr-1 pb-4">
+        <div className={cn("flex flex-col max-h-[80vh] w-full", className)} data-layout={internalLayout}>
+          
+          {/* Header */}
+          <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-neutral-100 dark:bg-neutral-800 shrink-0 min-h-[32px]">
+            {title ? (
+              <RadixDialog.Title className="text-[13px] font-bold text-foreground leading-none truncate flex-1 pr-2">
+                {title}
+              </RadixDialog.Title>
+            ) : (
+              <div className="flex-1" />
+            )}
+            <div className="flex items-center shrink-0">
+              <LayoutToggleBtn />
+            </div>
+          </div>
+
+          {/* Content */}
+          <div className="flex-1 overflow-y-auto p-4 md:p-5">
             {renderContent()}
           </div>
-          <div className="-mx-4 md:-mx-5 -mb-4 md:-mb-5 mt-2">
+          
+          {/* Footer */}
+          <div className="mt-auto shrink-0">
             <FormFooter 
               {...formFooterProps}
               title={undefined}
               subtitle={undefined}
               isSticky={false} 
-              className="border-t border-border/40 px-4 md:px-5"
+              className="border-t border-border/40 px-4 md:px-5 py-3 bg-neutral-50 dark:bg-neutral-900"
             />
           </div>
         </div>
@@ -199,15 +214,15 @@ export function FormShell({
   if (internalLayout === 'fullscreen' || internalLayout === 'default') {
     if (!internalOpen) return null;
     return (
-      <div 
+      <div
         data-layout={internalLayout}
         className={cn(
-        "flex flex-col w-full bg-neutral-50 dark:bg-neutral-950 duration-200 animate-in fade-in group/form",
-        internalLayout === 'fullscreen' 
-          ? "fixed inset-0 z-[9999] h-[100dvh]" 
-          : "absolute inset-0 z-[999] h-full",
-        className
-      )}>
+          "flex flex-col w-full bg-neutral-50 dark:bg-neutral-950 duration-200 animate-in fade-in group/form",
+          internalLayout === 'fullscreen'
+            ? "fixed inset-0 z-[9999] h-[100dvh]"
+            : "absolute inset-0 z-[999] h-full",
+          className
+        )}>
         {/* Header */}
         <div className="flex items-center justify-between gap-2 px-3 py-1 md:px-4 md:py-1 border-b border-border bg-neutral-100 dark:bg-neutral-800 shrink-0 min-h-[32px]">
           {title ? (
@@ -235,10 +250,10 @@ export function FormShell({
         </div>
 
         {/* Footer */}
-        <FormFooter 
-          {...formFooterProps} 
+        <FormFooter
+          {...formFooterProps}
           title={undefined}
-          isSticky={false} 
+          isSticky={false}
           className="border-t border-border/40 px-5 md:px-6 shrink-0 shadow-[0_-4px_12px_rgba(0,0,0,0.02)]"
         />
       </div>
@@ -285,10 +300,10 @@ export function FormShell({
           </div>
 
           {/* Footer */}
-          <FormFooter 
-            {...formFooterProps} 
+          <FormFooter
+            {...formFooterProps}
             title={undefined}
-            isSticky={false} 
+            isSticky={false}
             className="border-t border-border/40 px-4 md:px-5 shrink-0 shadow-[0_-4px_12px_rgba(0,0,0,0.02)]"
           />
         </RadixDialog.Content>

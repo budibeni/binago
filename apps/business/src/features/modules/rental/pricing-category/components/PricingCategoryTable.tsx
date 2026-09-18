@@ -1,36 +1,44 @@
 import React from 'react';
 import { DataTable } from '@adatrack/ui';
-import type { DataTableColumnDef } from '@adatrack/ui';
+import type { DataTableColumnDef, DataTableFilterConfig, DataTableLabels } from '@adatrack/ui';
 import { MoreVertical, Edit2, Info, Users, Tag, Eye } from 'lucide-react';
-import { Button, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, Badge } from '@adatrack/ui';
-import type { RentalPricingGroup } from '../types/pricing';
+import { Button, Badge } from '@adatrack/ui';
+import type { RentalPricingCategory } from '../types/pricing';
 
-export interface EnrichedPricingGroup extends RentalPricingGroup {
+export interface EnrichedPricingCategory extends RentalPricingCategory {
   vehicleCount: number;
 }
 
-export interface PricingGroupTableProps {
-  data: EnrichedPricingGroup[];
+export interface PricingCategoryTableProps {
+  data: EnrichedPricingCategory[];
   labels: Record<string, string>;
   toolbarActions?: React.ReactNode;
-  onEdit: (group: EnrichedPricingGroup) => void;
-  onDetail: (group: EnrichedPricingGroup) => void;
+  onEdit: (group: EnrichedPricingCategory) => void;
+  onDetail: (group: EnrichedPricingCategory) => void;
+  filterConfig: DataTableFilterConfig;
+  isFilterOpen: boolean;
+  onFilterOpenChange: (open: boolean) => void;
+  dtLabels?: DataTableLabels;
   isLoading?: boolean;
   className?: string;
 }
 
-export function PricingGroupTable({ 
+export function PricingCategoryTable({ 
   data, 
   labels, 
   toolbarActions, 
   onEdit, 
   onDetail, 
+  filterConfig,
+  isFilterOpen,
+  onFilterOpenChange,
+  dtLabels,
   isLoading,
   className
-}: PricingGroupTableProps) {
+}: PricingCategoryTableProps) {
   const [searchValue, setSearchValue] = React.useState('');
 
-  const columns = React.useMemo<DataTableColumnDef<EnrichedPricingGroup>[]>(() => [
+  const columns = React.useMemo<DataTableColumnDef<EnrichedPricingCategory>[]>(() => [
     {
       id: 'actions',
       header: '',
@@ -51,7 +59,7 @@ export function PricingGroupTable({
     },
     {
       accessorKey: 'name',
-      header: 'Nama Grup Tarif',
+      header: labels.headerName || 'Nama Kategori Tarif',
       enableSorting: true,
       size: 200,
       cell: ({ row }) => (
@@ -65,38 +73,38 @@ export function PricingGroupTable({
     },
     {
       accessorKey: 'description',
-      header: 'Deskripsi',
+      header: labels.headerDesc || 'Deskripsi',
       enableSorting: true,
       size: 300,
       cell: ({ row }) => <span className="text-sm text-foreground-subtle">{row.original.description || '-'}</span>,
     },
     {
       accessorKey: 'vehicleCount',
-      header: 'Kendaraan',
+      header: labels.headerVehicles || 'Kendaraan',
       enableSorting: true,
       size: 150,
       cell: ({ row }) => (
         <div className="flex items-center space-x-1.5 text-foreground-muted">
           <Users className="h-3.5 w-3.5" />
-          <span className="text-sm">{row.original.vehicleCount} unit</span>
+          <span className="text-sm">{row.original.vehicleCount} {labels.unit || 'unit'}</span>
         </div>
       ),
     },
     {
       accessorKey: 'status',
-      header: 'Status',
+      header: labels.headerStatus || 'Status',
       enableSorting: true,
       size: 150,
       cell: ({ row }) => (
         <Badge variant={row.original.status === 'ACTIVE' ? 'success' : 'default'}>
-          {row.original.status === 'ACTIVE' ? 'Aktif' : 'Nonaktif'}
+          {row.original.status === 'ACTIVE' ? (labels.statusActive || 'Aktif') : (labels.statusInactive || 'Nonaktif')}
         </Badge>
       ),
     },
   ], [labels]);
 
   return (
-    <DataTable<EnrichedPricingGroup>
+    <DataTable<EnrichedPricingCategory>
       className={className}
       columns={columns}
       data={data}
@@ -104,11 +112,16 @@ export function PricingGroupTable({
       sortable
       pagination
       exportable
-      exportFilename="grup-tarif-rental"
+      exportFilename="kategori-tarif-rental"
       searchValue={searchValue}
       onSearchChange={setSearchValue}
       searchPlaceholder={labels.searchPlaceholder}
       toolbarActions={toolbarActions}
+      filterConfig={filterConfig}
+      isFilterOpen={isFilterOpen}
+      onFilterOpenChange={onFilterOpenChange}
+      columnVisibility={true}
+      labels={dtLabels}
       isLoading={isLoading}
     />
   );

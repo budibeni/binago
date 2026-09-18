@@ -6,11 +6,6 @@ import { cn } from '@adatrack/utils';
 import { 
   Button, 
   DataTable, 
-  DropdownMenu, 
-  DropdownMenuTrigger, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuSeparator 
 } from '@adatrack/ui';
 import type { DataTableColumnDef, DataTableFilterConfig } from '@adatrack/ui';
 import type { RentalContract, ContractStatus } from '../types/contract';

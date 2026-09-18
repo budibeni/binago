@@ -112,7 +112,6 @@ export function VehicleView({ vehicle, open, onClose, labels, onEdit, onDelete, 
       onOpenChange={(isOpen) => !isOpen && onClose()}
       title={labels.detailTitle}
       onEdit={onEdit ? () => onEdit(vehicle) : undefined}
-      onDelete={onDelete ? () => onDelete(vehicle) : undefined}
     >
       <div className="flex-1 overflow-y-auto">
         {/* Header content (was inside drawer header) */}

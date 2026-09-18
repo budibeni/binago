@@ -6,36 +6,49 @@ import { useBusinessLocale } from '@/components/BusinessShellLayout';
 import { pricingService } from '@/data/modules/rental/services/pricingService';
 import { rentalVehicleService } from '@/data/modules/rental/services/vehicleService';
 
-import type { RentalPricingGroup, RentalRate } from './types/pricing';
-import { PricingGroupTable, type EnrichedPricingGroup } from './components/PricingGroupTable';
-import { PricingGroupForm, type PricingGroupFormData } from './components/PricingGroupForm';
-import { PricingGroupDetailDrawer } from './components/PricingGroupDetailDrawer';
+import type { RentalPricingCategory, RentalRate } from './types/pricing';
+import { PricingCategoryTable, type EnrichedPricingCategory } from './components/PricingCategoryTable';
+import { PricingCategoryForm, type PricingCategoryFormData } from './components/PricingCategoryForm';
+import { PricingCategoryDetailDrawer } from './components/PricingCategoryDetailDrawer';
 import { PricingVehicleAssignmentDialog } from './components/PricingVehicleAssignmentDialog';
 import { PricingVehicleCustomRateDialog } from './components/PricingVehicleCustomRateDialog';
 import type { VehiclePricingSelection } from '@/data/modules/rental/services/pricingService';
 import { Button, Card } from '@adatrack/ui';
+import type { DataTableFilterConfig } from '@adatrack/ui';
 import { Plus } from 'lucide-react';
 import type { RateType } from '../reservations/types/reservation';
 
-export function PricingGroupsFeature() {
+export function PricingCategoryFeature() {
   const locale = useBusinessLocale();
   const t = getTranslation(locale);
   // Using some standard labels or adding specific ones if they don't exist
-  const labels = (t as any).pricingGroups || {
-    title: 'Grup Tarif',
-    pageSubtitle: 'Kelola master tarif penyewaan kendaraan',
-    addBtn: 'Tambah',
-    searchPlaceholder: 'Cari grup tarif...',
-    actionDetail: 'Detail',
-    actionEdit: 'Edit',
-    formAddTitle: 'Tambah Grup Tarif Baru',
-    formEditTitle: 'Edit Grup Tarif'
+  const labels = (t as any).pricingCategorys || {
+    title: locale === 'en' ? 'Pricing Category' : 'Kategori Tarif',
+    pageSubtitle: locale === 'en' ? 'Manage rental pricing categories' : 'Kelola master tarif penyewaan kendaraan',
+    addBtn: locale === 'en' ? 'Add' : 'Tambah',
+    exportBtn: locale === 'en' ? 'Export' : 'Ekspor',
+    searchPlaceholder: locale === 'en' ? 'Search pricing category...' : 'Cari kategori tarif...',
+    actionDetail: locale === 'en' ? 'Detail' : 'Detail',
+    actionEdit: locale === 'en' ? 'Edit' : 'Edit',
+    formAddTitle: locale === 'en' ? 'Add New Pricing Category' : 'Tambah Kategori Tarif Baru',
+    formEditTitle: locale === 'en' ? 'Edit Pricing Category' : 'Edit Kategori Tarif',
+    headerName: locale === 'en' ? 'Pricing Category' : 'Kategori Tarif',
+    headerDesc: locale === 'en' ? 'Description' : 'Deskripsi',
+    headerVehicles: locale === 'en' ? 'Vehicles' : 'Kendaraan',
+    headerStatus: locale === 'en' ? 'Status' : 'Status',
+    statusActive: locale === 'en' ? 'Active' : 'Aktif',
+    statusInactive: locale === 'en' ? 'Inactive' : 'Nonaktif',
+    unit: locale === 'en' ? 'units' : 'unit',
   };
 
   const [dataVersion, setDataVersion] = React.useState(0);
   
   // Data State
-  const [groups, setGroups] = React.useState<EnrichedPricingGroup[]>([]);
+  const [groups, setGroups] = React.useState<EnrichedPricingCategory[]>([]);
+  
+  // Filter State
+  const [filterState, setFilterState] = React.useState<Record<string, string | string[]>>({ status: [] });
+  const [isFilterOpen, setIsFilterOpen] = React.useState(false);
   
   // UI State
   const [formOpen, setFormOpen] = React.useState(false);
@@ -43,23 +56,28 @@ export function PricingGroupsFeature() {
   const [assignmentOpen, setAssignmentOpen] = React.useState(false);
   const [customRateOpen, setCustomRateOpen] = React.useState(false);
   
-  const [selectedGroup, setSelectedGroup] = React.useState<RentalPricingGroup | undefined>();
+  const [selectedGroup, setSelectedGroup] = React.useState<RentalPricingCategory | undefined>();
   const [selectedOverrideVehicleId, setSelectedOverrideVehicleId] = React.useState<string | undefined>();
   const [selectedRates, setSelectedRates] = React.useState<{ rateType: RateType, amount: number }[]>([]);
   const [selectedVehicles, setSelectedVehicles] = React.useState<any[]>([]);
   const [availableVehicles, setAvailableVehicles] = React.useState<VehiclePricingSelection[]>([]);
 
   React.useEffect(() => {
-    const rawGroups = pricingService.getPricingGroups();
-    const enriched = rawGroups.map(g => {
+    const rawGroups = pricingService.getPricingCategory();
+    let enriched = rawGroups.map(g => {
       const assignments = pricingService.getAssignedVehicles(g.id);
       return {
         ...g,
         vehicleCount: assignments.length
       };
     });
+
+    if (filterState.status && filterState.status.length > 0) {
+      enriched = enriched.filter(g => filterState.status.includes(g.status));
+    }
+
     setGroups(enriched);
-  }, [dataVersion]);
+  }, [dataVersion, filterState]);
 
   const handleAdd = () => {
     setSelectedGroup(undefined);
@@ -67,14 +85,14 @@ export function PricingGroupsFeature() {
     setFormOpen(true);
   };
 
-  const handleEdit = (group: EnrichedPricingGroup) => {
+  const handleEdit = (group: EnrichedPricingCategory) => {
     const rates = pricingService.getRatesByGroupId(group.id);
     setSelectedGroup(group);
     setSelectedRates(rates.map(r => ({ rateType: r.rateType, amount: r.amount })));
     setFormOpen(true);
   };
 
-  const handleDetail = (group: EnrichedPricingGroup) => {
+  const handleDetail = (group: EnrichedPricingCategory) => {
     const rates = pricingService.getRatesByGroupId(group.id);
     const assignments = pricingService.getAssignedVehicles(group.id);
     
@@ -96,8 +114,8 @@ export function PricingGroupsFeature() {
   };
 
   const handleDelete = (id: string) => {
-    if (confirm('Apakah Anda yakin ingin menghapus Grup Tarif ini? Semua kendaraan di dalamnya akan dikeluarkan dari grup.')) {
-      pricingService.deletePricingGroup(id);
+    if (confirm('Apakah Anda yakin ingin menghapus Kategori Tarif ini? Semua kendaraan di dalamnya akan dikeluarkan dari kategori.')) {
+      pricingService.deletePricingCategory(id);
       setDataVersion(v => v + 1);
       setDetailOpen(false);
     }
@@ -105,14 +123,14 @@ export function PricingGroupsFeature() {
 
   const handleOpenAssignment = async () => {
     if (!selectedGroup) return;
-    const selections = await pricingService.getAvailableVehiclesForPricingGroup(selectedGroup.id);
+    const selections = await pricingService.getAvailableVehiclesForPricingCategory(selectedGroup.id);
     setAvailableVehicles(selections);
     setAssignmentOpen(true);
   };
 
   const handleSaveAssignment = (vehicleIds: string[]) => {
     if (!selectedGroup) return;
-    pricingService.updatePricingGroupVehicles(selectedGroup.id, vehicleIds);
+    pricingService.updatePricingCategoryVehicles(selectedGroup.id, vehicleIds);
     setAssignmentOpen(false);
     setAssignmentOpen(false);
     
@@ -149,7 +167,7 @@ export function PricingGroupsFeature() {
     }
   };
 
-  const handleSubmitForm = (formData: PricingGroupFormData) => {
+  const handleSubmitForm = (formData: PricingCategoryFormData) => {
     const rates = [
       { rateType: 'DAILY' as RateType, amount: formData.dailyRate },
       { rateType: 'WEEKLY' as RateType, amount: formData.weeklyRate },
@@ -157,13 +175,13 @@ export function PricingGroupsFeature() {
     ];
 
     if (selectedGroup) {
-      pricingService.updatePricingGroup(selectedGroup.id, {
+      pricingService.updatePricingCategory(selectedGroup.id, {
         name: formData.name,
         description: formData.description,
         status: formData.status
       }, rates);
     } else {
-      pricingService.createPricingGroup({
+      pricingService.createPricingCategory({
         name: formData.name,
         description: formData.description,
         status: formData.status
@@ -173,6 +191,40 @@ export function PricingGroupsFeature() {
     setFormOpen(false);
     setDataVersion(v => v + 1);
   };
+
+  const filterConfig: DataTableFilterConfig = React.useMemo(() => ({
+    state: filterState,
+    onStateChange: setFilterState,
+    onClearAll: () => setFilterState({ status: [] }),
+    labels: {
+      title: 'Filter',
+      clearAll: locale === 'en' ? 'Clear Filters' : 'Hapus Filter',
+    },
+    fields: [
+      {
+        id: 'status',
+        label: 'Status',
+        type: 'pills-single',
+        options: [
+          { value: 'ACTIVE', label: locale === 'en' ? 'Active' : 'Aktif', colorClass: 'bg-success', activeClass: 'bg-success/15 border-success/40 text-success' },
+          { value: 'INACTIVE', label: locale === 'en' ? 'Inactive' : 'Nonaktif', colorClass: 'bg-neutral-400', activeClass: 'bg-neutral-100 dark:bg-neutral-800 border-neutral-400 text-foreground' },
+        ],
+      },
+    ],
+  }), [filterState, locale]);
+
+  const dtLabels = React.useMemo(() => {
+    const isEn = locale === 'en';
+    return {
+      paginationShowing: (from: number, to: number, total: number) => isEn
+        ? `Showing ${from}-${to} of ${total.toLocaleString('en-US')} items`
+        : `Menampilkan ${from}-${to} dari ${total.toLocaleString('id-ID')} data`,
+      paginationPerPage: isEn ? '/ page' : '/ halaman',
+      toolbarFilter: isEn ? 'Filter' : 'Filter',
+      toolbarColumns: isEn ? 'Columns' : 'Kolom',
+      toolbarExport: isEn ? 'Export' : 'Ekspor',
+    };
+  }, [locale]);
 
   const toolbarActions = (
     <Button onClick={handleAdd} size="sm" variant="destructive" className="h-8 gap-1.5 text-[13px] font-medium shadow-none">
@@ -184,16 +236,20 @@ export function PricingGroupsFeature() {
   return (
     <div className="flex flex-col h-full w-full">
       <div className="flex-1 min-h-0 overflow-y-auto p-0">
-        <PricingGroupTable 
+        <PricingCategoryTable 
           data={groups}
           labels={labels as any}
           toolbarActions={toolbarActions}
           onEdit={handleEdit}
           onDetail={handleDetail}
+          filterConfig={filterConfig}
+          isFilterOpen={isFilterOpen}
+          onFilterOpenChange={setIsFilterOpen}
+          dtLabels={dtLabels}
         />
       </div>
 
-      <PricingGroupForm
+      <PricingCategoryForm
         open={formOpen}
         onOpenChange={setFormOpen}
         initialData={selectedGroup}
@@ -202,7 +258,7 @@ export function PricingGroupsFeature() {
         title={selectedGroup ? labels.formEditTitle : labels.formAddTitle}
       />
 
-      <PricingGroupDetailDrawer
+      <PricingCategoryDetailDrawer
         open={detailOpen}
         onOpenChange={setDetailOpen}
         group={selectedGroup}

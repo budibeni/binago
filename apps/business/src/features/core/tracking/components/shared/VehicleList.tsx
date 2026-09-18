@@ -18,7 +18,7 @@ import {
   Tag
 } from 'lucide-react';
 import { cn } from '@adatrack/utils';
-import { Checkbox } from '@adatrack/ui';
+import { Checkbox, PanelShell } from '@adatrack/ui';
 import type {
   TrackingVehicle,
   TrackingVehicleGroup,
@@ -326,118 +326,112 @@ export function VehicleList({
   };
 
   return (
-    <aside
-      className={cn(
-        'flex flex-col h-full bg-background border-r border-border overflow-hidden',
-        className,
-      )}
+    <PanelShell
+      title={labels.title}
+      badge={totalAllUnfiltered}
+      onClose={onClose}
+      className={className}
       aria-label={labels.title}
-    >
-      {/* -- Header ---------------------------------------------------------- */}
-      <div className="shrink-0 flex items-center justify-between px-3 h-[40px] bg-background border-b border-border">
-        <div className="flex items-center gap-2">
-          <h2 className="text-[12px] font-bold text-foreground tracking-tight">
-            {labels.title}
-          </h2>
-          <span className="text-[10px] font-bold text-danger bg-danger/10 px-1.5 py-0.5 rounded-md leading-none">
-            {totalAllUnfiltered}
+      toolbar={
+        <>
+          {/* -- Search ---------------------------------------------------------- */}
+          <div className="shrink-0 px-3 py-2 bg-background border-b border-border flex gap-2 items-center">
+            <div className="relative flex-1 min-w-0">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-foreground-muted pointer-events-none" />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => onSearchChange(e.target.value)}
+                placeholder={labels.searchPlaceholder}
+                className="w-full pl-8 pr-2 py-1.5 text-[11px] rounded border border-border bg-surface text-foreground placeholder:text-foreground-muted focus:outline-none focus:ring-1 focus:ring-danger focus:border-danger transition-shadow"
+              />
+            </div>
+            <button
+              type="button"
+              className="flex h-[30px] w-[30px] items-center justify-center rounded border border-border bg-surface text-foreground-muted hover:bg-surface-elevated transition-colors shrink-0"
+            >
+              <RefreshCw className="h-3.5 w-3.5" />
+            </button>
+          </div>
+
+          {/* -- Tabs ------------------------------------------------------------ */}
+          {!hideStatusFilterTabs && (
+            <div className="shrink-0 bg-background border-b border-border px-1">
+              <div className="flex items-center justify-between">
+                {statusFilters.map(({ key, label, count }) => {
+                  const isSelected = statusFilter === key;
+
+                  const IconContent = () => {
+                    if (key === 'all') return <LayoutGrid className={cn("w-4 h-4 mb-1", isSelected ? 'text-danger' : 'text-danger')} />;
+                    if (key === 'driving') return <Play className={cn("w-4 h-4 mb-1", isSelected ? 'text-success fill-transparent' : 'text-success fill-transparent')} />;
+                    if (key === 'idle') return <PauseCircle className="w-4 h-4 mb-1 text-amber-500" />;
+                    if (key === 'parking') return (
+                      <div className="w-4 h-4 mb-1 rounded-full border-[1.5px] border-blue-500 flex items-center justify-center">
+                        <span className="text-[9px] font-bold text-blue-500 leading-none">P</span>
+                      </div>
+                    );
+                    if (key === 'offline') return <CircleDot className="w-4 h-4 mb-1 text-foreground-muted" />;
+                    return null;
+                  };
+
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => onStatusFilterChange(key)}
+                      className={cn(
+                        "flex-1 flex flex-col items-center py-2 border-b-2 transition-colors focus:outline-none",
+                        isSelected ? 'border-[#de3531]' : 'border-transparent hover:border-neutral-100'
+                      )}
+                    >
+                      <IconContent />
+                      <span className={cn("text-[10px] font-bold leading-none mb-0.5 tracking-tight", isSelected ? 'text-danger' : 'text-foreground-muted')}>
+                        {key === 'all' ? labels.statusAll : label}
+                      </span>
+                      <span className={cn("text-[10px] font-bold leading-none", isSelected ? 'text-danger' : 'text-foreground-muted')}>
+                        {count}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* -- Select All ------------------------------------------------------ */}
+          <div className="shrink-0 flex items-center justify-between px-3 py-2 bg-surface border-b border-border">
+            <div className="flex items-center gap-2.5">
+              <Checkbox
+                id="vehicle-list-select-all"
+                checked={someChecked ? 'indeterminate' : allChecked}
+                onCheckedChange={(checked) => onSelectAll(!!checked)}
+                aria-label="Semua"
+                className="h-3.5 w-3.5 data-[state=checked]:bg-neutral-400 data-[state=checked]:border-neutral-400 data-[state=checked]:text-white data-[state=indeterminate]:bg-neutral-400 data-[state=indeterminate]:border-neutral-400 data-[state=indeterminate]:text-white rounded-sm"
+              />
+              <label
+                htmlFor="vehicle-list-select-all"
+                className="text-[11.5px] font-normal text-foreground-muted hover:text-danger transition-colors cursor-pointer select-none leading-none"
+              >
+                {labels.statusAll}
+              </label>
+            </div>
+            <span className="text-[10px] font-bold text-foreground-muted bg-surface-elevated px-1.5 py-0.5 border border-border rounded-md leading-none">
+              {totalAllUnfiltered}
+            </span>
+          </div>
+        </>
+      }
+      footer={
+        <div className="shrink-0 flex items-center justify-between px-3 h-[34px] border-t border-border bg-surface">
+          <span className="text-[10px] font-semibold text-foreground-muted tracking-tight">
+            {labels.groupSummary ? labels.groupSummary(filteredGroups.length) : `${filteredGroups.length} grup`}
           </span>
-        </div>
-        {onClose && (
-          <button
-            type="button"
-            onClick={onClose}
-            className="flex h-6 w-6 items-center justify-center rounded text-foreground-muted hover:bg-surface hover:text-foreground transition-colors"
-          >
-            <ChevronRight className="h-3.5 w-3.5" />
-          </button>
-        )}
-      </div>
-
-      {/* -- Search ---------------------------------------------------------- */}
-      <div className="shrink-0 px-3 py-2 bg-background border-b border-border flex gap-2 items-center">
-        <div className="relative flex-1 min-w-0">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-foreground-muted pointer-events-none" />
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => onSearchChange(e.target.value)}
-            placeholder={labels.searchPlaceholder}
-            className="w-full pl-8 pr-2 py-1.5 text-[11px] rounded border border-border bg-surface text-foreground placeholder:text-foreground-muted focus:outline-none focus:ring-1 focus:ring-danger focus:border-danger transition-shadow"
-          />
-        </div>
-        <button
-          type="button"
-          className="flex h-[30px] w-[30px] items-center justify-center rounded border border-border bg-surface text-foreground-muted hover:bg-surface-elevated transition-colors shrink-0"
-        >
-          <RefreshCw className="h-3.5 w-3.5" />
-        </button>
-      </div>
-
-      {/* -- Tabs ------------------------------------------------------------ */}
-      {!hideStatusFilterTabs && (
-        <div className="shrink-0 bg-background border-b border-border px-1">
-          <div className="flex items-center justify-between">
-            {statusFilters.map(({ key, label, count }) => {
-              const isSelected = statusFilter === key;
-
-              const IconContent = () => {
-                if (key === 'all') return <LayoutGrid className={cn("w-4 h-4 mb-1", isSelected ? 'text-danger' : 'text-danger')} />;
-                if (key === 'driving') return <Play className={cn("w-4 h-4 mb-1", isSelected ? 'text-success fill-transparent' : 'text-success fill-transparent')} />;
-                if (key === 'idle') return <PauseCircle className="w-4 h-4 mb-1 text-amber-500" />;
-                if (key === 'parking') return (
-                  <div className="w-4 h-4 mb-1 rounded-full border-[1.5px] border-blue-500 flex items-center justify-center">
-                    <span className="text-[9px] font-bold text-blue-500 leading-none">P</span>
-                  </div>
-                );
-                if (key === 'offline') return <CircleDot className="w-4 h-4 mb-1 text-foreground-muted" />;
-                return null;
-              };
-
-              return (
-                <button
-                  key={key}
-                  onClick={() => onStatusFilterChange(key)}
-                  className={cn(
-                    "flex-1 flex flex-col items-center py-2 border-b-2 transition-colors focus:outline-none",
-                    isSelected ? 'border-[#de3531]' : 'border-transparent hover:border-neutral-100'
-                  )}
-                >
-                  <IconContent />
-                  <span className={cn("text-[10px] font-bold leading-none mb-0.5 tracking-tight", isSelected ? 'text-danger' : 'text-foreground-muted')}>
-                    {key === 'all' ? labels.statusAll : label}
-                  </span>
-                  <span className={cn("text-[10px] font-bold leading-none", isSelected ? 'text-danger' : 'text-foreground-muted')}>
-                    {count}
-                  </span>
-                </button>
-              );
-            })}
+          <div className="flex items-center gap-1.5 text-[10px] font-medium text-foreground-muted tracking-tight">
+            <RefreshCw className="w-3 h-3" />
+            <span>{labels.lastUpdated || 'Terakhir diperbarui'} 10:45:23</span>
           </div>
         </div>
-      )}
-
-      {/* -- Select All ------------------------------------------------------ */}
-      <div className="shrink-0 flex items-center justify-between px-3 py-2 bg-surface border-b border-border">
-        <div className="flex items-center gap-2.5">
-          <Checkbox
-            id="vehicle-list-select-all"
-            checked={someChecked ? 'indeterminate' : allChecked}
-            onCheckedChange={(checked) => onSelectAll(!!checked)}
-            aria-label="Semua"
-            className="h-3.5 w-3.5 data-[state=checked]:bg-neutral-400 data-[state=checked]:border-neutral-400 data-[state=checked]:text-white data-[state=indeterminate]:bg-neutral-400 data-[state=indeterminate]:border-neutral-400 data-[state=indeterminate]:text-white rounded-sm"
-          />
-          <label
-            htmlFor="vehicle-list-select-all"
-            className="text-[11.5px] font-normal text-foreground-muted hover:text-danger transition-colors cursor-pointer select-none leading-none"
-          >
-            {labels.statusAll}
-          </label>
-        </div>
-        <span className="text-[10px] font-bold text-foreground-muted bg-surface-elevated px-1.5 py-0.5 border border-border rounded-md leading-none">
-          {totalAllUnfiltered}
-        </span>
-      </div>
+      }
+    >
 
       {/* -- Scrollable List ------------------------------------------------- */}
       <div className="flex-1 min-h-0 overflow-y-auto  px-2 py-2 space-y-2" role="list">
@@ -492,16 +486,7 @@ export function VehicleList({
         })}
       </div>
 
-      {/* -- Footer ---------------------------------------------------------- */}
-      <div className="shrink-0 flex items-center justify-between px-3 h-[34px] border-t border-border bg-surface">
-        <span className="text-[10px] font-semibold text-foreground-muted tracking-tight">
-          {labels.groupSummary ? labels.groupSummary(filteredGroups.length) : `${filteredGroups.length} grup`}
-        </span>
-        <div className="flex items-center gap-1.5 text-[10px] font-medium text-foreground-muted tracking-tight">
-          <RefreshCw className="w-3 h-3" />
-          <span>{labels.lastUpdated || 'Terakhir diperbarui'} 10:45:23</span>
-        </div>
-      </div>
-    </aside>
+
+    </PanelShell>
   );
 }

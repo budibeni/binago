@@ -1,26 +1,26 @@
 import type {
-  RentalPricingGroup,
+  RentalPricingCategory,
   RentalRate,
   VehicleRateOverride,
   VehiclePricingAssignment
-} from '../../../../features/modules/rental/pricing-groups/types/pricing';
+} from '../../../../features/modules/rental/pricing-category/types/pricing';
 import { 
-  mockPricingGroups, 
+  mockPricingCategory, 
   mockRentalRates, 
   mockVehicleRateOverrides, 
   mockVehiclePricingAssignments 
 } from '../mock/pricing';
 import type { RateType } from '../../../../features/modules/rental/reservations/types/reservation';
 
-let pricingGroupsData = [...mockPricingGroups];
+let pricingCategorysData = [...mockPricingCategory];
 let rentalRatesData = [...mockRentalRates];
 let vehicleOverridesData = [...mockVehicleRateOverrides];
 let vehicleAssignmentsData = [...mockVehiclePricingAssignments];
 
 class PricingRepository {
-  // --- Pricing Groups ---
-  getPricingGroups(filters?: any): RentalPricingGroup[] {
-    let result = [...pricingGroupsData];
+  // --- Kategori Tarifs ---
+  getPricingCategory(filters?: any): RentalPricingCategory[] {
+    let result = [...pricingCategorysData];
     if (filters) {
       if (filters.search) {
         const query = filters.search.toLowerCase();
@@ -36,58 +36,58 @@ class PricingRepository {
     return result;
   }
 
-  getPricingGroupById(id: string): RentalPricingGroup | undefined {
-    return pricingGroupsData.find(g => g.id === id);
+  getPricingCategoryById(id: string): RentalPricingCategory | undefined {
+    return pricingCategorysData.find(g => g.id === id);
   }
 
-  createPricingGroup(data: Omit<RentalPricingGroup, 'id' | 'createdAt' | 'updatedAt'>): RentalPricingGroup {
-    const newGroup: RentalPricingGroup = {
+  createPricingCategory(data: Omit<RentalPricingCategory, 'id' | 'createdAt' | 'updatedAt'>): RentalPricingCategory {
+    const newGroup: RentalPricingCategory = {
       ...data,
       id: `prg-${Date.now()}`,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
-    pricingGroupsData.push(newGroup);
+    pricingCategorysData.push(newGroup);
     return newGroup;
   }
 
-  updatePricingGroup(id: string, data: Partial<RentalPricingGroup>): RentalPricingGroup | undefined {
-    const index = pricingGroupsData.findIndex(g => g.id === id);
+  updatePricingCategory(id: string, data: Partial<RentalPricingCategory>): RentalPricingCategory | undefined {
+    const index = pricingCategorysData.findIndex(g => g.id === id);
     if (index === -1) return undefined;
     
-    pricingGroupsData[index] = {
-      ...pricingGroupsData[index],
+    pricingCategorysData[index] = {
+      ...pricingCategorysData[index],
       ...data,
       updatedAt: new Date().toISOString(),
     };
-    return pricingGroupsData[index];
+    return pricingCategorysData[index];
   }
 
-  deletePricingGroup(id: string): boolean {
-    const index = pricingGroupsData.findIndex(g => g.id === id);
+  deletePricingCategory(id: string): boolean {
+    const index = pricingCategorysData.findIndex(g => g.id === id);
     if (index === -1) return false;
-    pricingGroupsData.splice(index, 1);
+    pricingCategorysData.splice(index, 1);
     // Also remove associated rates and vehicle assignments
-    const rateIndices = rentalRatesData.reduce((acc, r, i) => r.pricingGroupId === id ? [...acc, i] : acc, [] as number[]).reverse();
+    const rateIndices = rentalRatesData.reduce((acc, r, i) => r.pricingCategoryId === id ? [...acc, i] : acc, [] as number[]).reverse();
     rateIndices.forEach(i => rentalRatesData.splice(i, 1));
     
-    const assignIndices = vehicleAssignmentsData.reduce((acc: number[], a, i) => a.pricingGroupId === id ? [...acc, i] : acc, []).reverse();
+    const assignIndices = vehicleAssignmentsData.reduce((acc: number[], a, i) => a.pricingCategoryId === id ? [...acc, i] : acc, []).reverse();
     assignIndices.forEach(i => vehicleAssignmentsData.splice(i, 1));
     return true;
   }
 
   // --- Rates ---
   getRatesByGroupId(groupId: string): RentalRate[] {
-    return rentalRatesData.filter(r => r.pricingGroupId === groupId);
+    return rentalRatesData.filter(r => r.pricingCategoryId === groupId);
   }
 
   setRatesForGroup(groupId: string, rates: { rateType: RateType, amount: number }[]): RentalRate[] {
     // Remove existing rates for this group
-    rentalRatesData = rentalRatesData.filter(r => r.pricingGroupId !== groupId);
+    rentalRatesData = rentalRatesData.filter(r => r.pricingCategoryId !== groupId);
     
     const newRates = rates.map((r, index) => ({
       id: `rate-${Date.now()}-${index}`,
-      pricingGroupId: groupId,
+      pricingCategoryId: groupId,
       rateType: r.rateType,
       amount: r.amount,
       status: 'ACTIVE' as const,
@@ -101,13 +101,13 @@ class PricingRepository {
 
   // --- Vehicle Assignments ---
   getAssignedVehiclesByGroupId(groupId: string): VehiclePricingAssignment[] {
-    return vehicleAssignmentsData.filter(a => a.pricingGroupId === groupId);
+    return vehicleAssignmentsData.filter(a => a.pricingCategoryId === groupId);
   }
 
-  getPricingGroupForVehicle(vehicleId: string): RentalPricingGroup | undefined {
+  getPricingCategoryForVehicle(vehicleId: string): RentalPricingCategory | undefined {
     const assignment = vehicleAssignmentsData.find(a => a.vehicleId === vehicleId);
     if (!assignment) return undefined;
-    return this.getPricingGroupById(assignment.pricingGroupId);
+    return this.getPricingCategoryById(assignment.pricingCategoryId);
   }
 
   assignVehiclesToGroup(groupId: string, vehicleIds: string[]) {
@@ -116,7 +116,7 @@ class PricingRepository {
     
     const newAssignments = vehicleIds.map(vid => ({
       vehicleId: vid,
-      pricingGroupId: groupId,
+      pricingCategoryId: groupId,
       assignedAt: new Date().toISOString(),
     }));
     
@@ -125,13 +125,13 @@ class PricingRepository {
 
   removeVehicleFromGroup(vehicleId: string, groupId: string) {
     vehicleAssignmentsData = vehicleAssignmentsData.filter(
-      a => !(a.vehicleId === vehicleId && a.pricingGroupId === groupId)
+      a => !(a.vehicleId === vehicleId && a.pricingCategoryId === groupId)
     );
   }
 
   setVehiclesForGroup(groupId: string, vehicleIds: string[]) {
     // 1. Remove all existing assignments for this group
-    vehicleAssignmentsData = vehicleAssignmentsData.filter(a => a.pricingGroupId !== groupId);
+    vehicleAssignmentsData = vehicleAssignmentsData.filter(a => a.pricingCategoryId !== groupId);
     
     // 2. Remove these new vehicleIds from any other groups they might belong to
     vehicleAssignmentsData = vehicleAssignmentsData.filter(a => !vehicleIds.includes(a.vehicleId));
@@ -139,7 +139,7 @@ class PricingRepository {
     // 3. Add the new assignments
     const newAssignments = vehicleIds.map(vid => ({
       vehicleId: vid,
-      pricingGroupId: groupId,
+      pricingCategoryId: groupId,
       assignedAt: new Date().toISOString(),
     }));
     

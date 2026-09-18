@@ -1,11 +1,9 @@
 'use client';
 
 import React from 'react';
-import { MoreVertical, Edit2 } from 'lucide-react';
+import { Eye } from 'lucide-react';
 import {
   Button,
-  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent,
-  DropdownMenuItem,
   DataTable,
 } from '@adatrack/ui';
 import type { DataTableColumnDef, DataTableFilterConfig } from '@adatrack/ui';
@@ -17,6 +15,7 @@ type CardTranslation = ReturnType<typeof getCardTranslation>;
 
 interface CardTableProps {
   data: CardModel[];
+  onViewDetail?: (card: CardModel) => void;
   onEdit: (card: CardModel) => void;
   searchValue: string;
   onSearchChange: (value: string) => void;
@@ -30,6 +29,7 @@ interface CardTableProps {
 }
 
 function buildColumns(
+  onViewDetail: ((v: CardModel) => void) | undefined,
   onEdit: (v: CardModel) => void,
   t: CardTranslation,
 ): DataTableColumnDef<CardModel>[] {
@@ -43,23 +43,15 @@ function buildColumns(
       cell: ({ row }) => {
         const card = row.original;
         return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 w-7 p-0 flex items-center justify-center focus:outline-none focus-visible:outline-none focus-visible:ring-0 data-[state=open]:bg-neutral-200/50 dark:data-[state=open]:bg-neutral-800"
-                aria-label="Aksi kartu"
-              >
-                <MoreVertical className="h-4 w-4 text-foreground-muted" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-40">
-              <DropdownMenuItem onClick={() => onEdit(card)}>
-                <Edit2 className="mr-2 h-4 w-4 text-foreground-muted" /> {t.actions.editCard}
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 w-8 p-0 flex items-center justify-center text-foreground-muted hover:text-primary hover:bg-primary/10 rounded-full"
+            onClick={() => onViewDetail?.(card)}
+            title="Detail"
+          >
+            <Eye className="h-4 w-4" />
+          </Button>
         );
       },
     },
@@ -71,7 +63,13 @@ function buildColumns(
       enableSorting: true,
       size: 180,
       cell: ({ row }) => (
-        <span className="font-medium text-foreground whitespace-nowrap">{row.original.name}</span>
+        <button
+          type="button"
+          className="font-bold text-primary hover:underline underline-offset-2 focus:outline-none text-[13px] whitespace-nowrap"
+          onClick={() => onViewDetail?.(row.original)}
+        >
+          {row.original.name}
+        </button>
       ),
     },
     {
@@ -194,6 +192,7 @@ const DEFAULT_COLUMN_VISIBILITY = {
 
 export function CardTable({
   data,
+  onViewDetail,
   onEdit,
   searchValue,
   onSearchChange,
@@ -205,7 +204,7 @@ export function CardTable({
   dtLabels,
   exportFilename,
 }: CardTableProps) {
-  const columns = React.useMemo(() => buildColumns(onEdit, t), [onEdit, t]);
+  const columns = React.useMemo(() => buildColumns(onViewDetail, onEdit, t), [onViewDetail, onEdit, t]);
 
   return (
     <DataTable<CardModel>

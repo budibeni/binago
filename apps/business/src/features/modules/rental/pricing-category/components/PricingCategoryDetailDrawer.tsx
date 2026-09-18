@@ -1,14 +1,14 @@
 import React from 'react';
 import { Button, Input, DetailShell } from '@adatrack/ui';
 import { Tag, Users, CarFront, X, Trash2, Search } from 'lucide-react';
-import type { RentalPricingGroup, RentalRate, VehiclePricingAssignment, VehicleRateOverride } from '../types/pricing';
+import type { RentalPricingCategory, RentalRate, VehiclePricingAssignment, VehicleRateOverride } from '../types/pricing';
 import type { RentalVehicle } from '../../vehicles/types/rentalVehicle';
 import { cn } from '@adatrack/utils';
 
-export interface PricingGroupDetailDrawerProps {
+export interface PricingCategoryDetailDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  group?: RentalPricingGroup;
+  group?: RentalPricingCategory;
   rates?: RentalRate[];
   vehicles?: {
     assignment: VehiclePricingAssignment;
@@ -21,7 +21,7 @@ export interface PricingGroupDetailDrawerProps {
   onRemoveVehicle?: (vehicleId: string) => void;
 }
 
-export function PricingGroupDetailDrawer({ 
+export function PricingCategoryDetailDrawer({ 
   open, 
   onOpenChange, 
   group, 
@@ -31,7 +31,7 @@ export function PricingGroupDetailDrawer({
   onDelete,
   onAssignVehicle,
   onRemoveVehicle
-}: PricingGroupDetailDrawerProps) {
+}: PricingCategoryDetailDrawerProps) {
   const [searchQuery, setSearchQuery] = React.useState('');
 
   // Reset search when drawer opens/closes or group changes
@@ -137,7 +137,7 @@ export function PricingGroupDetailDrawer({
                     <CarFront className="h-4 w-4 text-foreground-muted" />
                   </div>
                   <span className="text-foreground-subtle text-xs">
-                    {searchQuery ? 'Kendaraan tidak ditemukan' : 'Belum ada kendaraan di grup ini'}
+                    {searchQuery ? 'Kendaraan tidak ditemukan' : 'Belum ada kendaraan di kategori ini'}
                   </span>
                 </div>
               ) : filteredVehicles.map((v) => {
@@ -166,7 +166,7 @@ export function PricingGroupDetailDrawer({
                           size="sm" 
                           className="h-7 w-7 p-0 shrink-0 text-foreground-muted hover:text-danger hover:bg-danger/10 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                           onClick={() => onRemoveVehicle(v.vehicle.id)}
-                          title="Keluarkan dari grup"
+                          title="Keluarkan dari kategori"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                         </Button>

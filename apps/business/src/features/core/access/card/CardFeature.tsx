@@ -7,6 +7,7 @@ import { personelService } from '@/data/core/access/personel/services/personelSe
 import { CardModel } from './types/card';
 import { CardTable } from './components/CardTable';
 import { CardForm } from './components/CardForm';
+import { CardView } from './components/CardView';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
 import { getCardTranslation } from './i18n';
 import type { DataTableFilterConfig } from '@adatrack/ui';
@@ -27,6 +28,10 @@ export function CardFeature() {
   // Form (edit-only)
   const [editCard, setEditCard] = React.useState<CardModel | null>(null);
   const [isFormOpen, setIsFormOpen] = React.useState(false);
+  
+  // View (detail)
+  const [detailCard, setDetailCard] = React.useState<CardModel | null>(null);
+  const [isViewOpen, setIsViewOpen] = React.useState(false);
 
   const activeAssignments = React.useMemo(() => {
     const set = new Set<string>();
@@ -76,6 +81,15 @@ export function CardFeature() {
     setIsFormOpen(true);
   }, []);
 
+  const handleView = React.useCallback((card: CardModel) => {
+    setDetailCard(card);
+    setIsViewOpen(true);
+  }, []);
+
+  const handleDelete = React.useCallback((card: CardModel) => {
+    console.log('Delete card:', card.id);
+  }, []);
+
   const handleSave = React.useCallback(async (formData: Partial<CardModel>) => {
     if (!editCard?.id) return;
     await cardService.saveCredential(formData as any, editCard.id);
@@ -123,6 +137,7 @@ export function CardFeature() {
       <div className="flex-1 min-h-0 overflow-y-auto p-0">
         <CardTable
           data={data}
+          onViewDetail={handleView}
           onEdit={handleEdit}
           searchValue={searchValue}
           onSearchChange={setSearchValue}
@@ -163,6 +178,16 @@ export function CardFeature() {
           t={t}
         />
       )}
+      
+      {/* Detail View */}
+      <CardView
+        card={detailCard}
+        open={isViewOpen}
+        onClose={() => setIsViewOpen(false)}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        t={t}
+      />
 
     </div>
   );

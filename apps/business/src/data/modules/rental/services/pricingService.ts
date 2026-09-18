@@ -1,11 +1,11 @@
 import { pricingRepository } from '../repositories/pricingRepository';
 import type { 
-  RentalPricingGroup, 
+  RentalPricingCategory, 
   RentalRate, 
-  PricingGroupFilters, 
+  PricingCategoryFilters, 
   VehiclePricingAssignment,
   VehicleRateOverride
-} from '../../../../features/modules/rental/pricing-groups/types/pricing';
+} from '../../../../features/modules/rental/pricing-category/types/pricing';
 import type { RateType } from '../../../../features/modules/rental/reservations/types/reservation';
 import { rentalVehicleService } from './vehicleService';
 import type { RentalVehicle } from '../../../../features/modules/rental/vehicles/types/rentalVehicle';
@@ -17,22 +17,22 @@ export interface VehiclePricingSelection {
 }
 
 class PricingService {
-  getPricingGroups(filters?: Partial<PricingGroupFilters>): RentalPricingGroup[] {
-    return pricingRepository.getPricingGroups(filters);
+  getPricingCategory(filters?: Partial<PricingCategoryFilters>): RentalPricingCategory[] {
+    return pricingRepository.getPricingCategory(filters);
   }
 
-  getPricingGroupById(id: string): RentalPricingGroup | undefined {
-    return pricingRepository.getPricingGroupById(id);
+  getPricingCategoryById(id: string): RentalPricingCategory | undefined {
+    return pricingRepository.getPricingCategoryById(id);
   }
 
-  createPricingGroup(data: Omit<RentalPricingGroup, 'id' | 'createdAt' | 'updatedAt'>, rates: { rateType: RateType, amount: number }[]): RentalPricingGroup {
-    const group = pricingRepository.createPricingGroup(data);
+  createPricingCategory(data: Omit<RentalPricingCategory, 'id' | 'createdAt' | 'updatedAt'>, rates: { rateType: RateType, amount: number }[]): RentalPricingCategory {
+    const group = pricingRepository.createPricingCategory(data);
     pricingRepository.setRatesForGroup(group.id, rates);
     return group;
   }
 
-  updatePricingGroup(id: string, data: Partial<RentalPricingGroup>, rates?: { rateType: RateType, amount: number }[]): RentalPricingGroup {
-    const group = pricingRepository.updatePricingGroup(id, data);
+  updatePricingCategory(id: string, data: Partial<RentalPricingCategory>, rates?: { rateType: RateType, amount: number }[]): RentalPricingCategory {
+    const group = pricingRepository.updatePricingCategory(id, data);
     if (!group) throw new Error('Grup tarif tidak ditemukan');
     
     if (rates) {
@@ -41,8 +41,8 @@ class PricingService {
     return group;
   }
 
-  deletePricingGroup(id: string): boolean {
-    return pricingRepository.deletePricingGroup(id);
+  deletePricingCategory(id: string): boolean {
+    return pricingRepository.deletePricingCategory(id);
   }
 
   getRatesByGroupId(groupId: string): RentalRate[] {
@@ -57,7 +57,7 @@ class PricingService {
     pricingRepository.assignVehiclesToGroup(groupId, vehicleIds);
   }
 
-  updatePricingGroupVehicles(groupId: string, vehicleIds: string[]) {
+  updatePricingCategoryVehicles(groupId: string, vehicleIds: string[]) {
     pricingRepository.setVehiclesForGroup(groupId, vehicleIds);
     // Remove independent rates for vehicles that just joined a group
     for (const vid of vehicleIds) {
@@ -65,12 +65,12 @@ class PricingService {
     }
   }
 
-  async getAvailableVehiclesForPricingGroup(groupId: string): Promise<VehiclePricingSelection[]> {
+  async getAvailableVehiclesForPricingCategory(groupId: string): Promise<VehiclePricingSelection[]> {
     const allVehicles = await rentalVehicleService.getRentalVehicles();
     const selections: VehiclePricingSelection[] = [];
 
     for (const vehicle of allVehicles) {
-      const currentGroup = pricingRepository.getPricingGroupForVehicle(vehicle.id);
+      const currentGroup = pricingRepository.getPricingCategoryForVehicle(vehicle.id);
       
       let status: 'AVAILABLE' | 'CURRENT_GROUP' | 'OTHER_GROUP' = 'AVAILABLE';
       let otherGroupName: string | undefined;
@@ -104,7 +104,7 @@ class PricingService {
 
   setVehicleOverride(vehicleId: string, rateType: RateType, amount: number): VehicleRateOverride {
     // If set an independent rate, remove from any group
-    const currentGroup = pricingRepository.getPricingGroupForVehicle(vehicleId);
+    const currentGroup = pricingRepository.getPricingCategoryForVehicle(vehicleId);
     if (currentGroup) {
       pricingRepository.removeVehicleFromGroup(vehicleId, currentGroup.id);
     }
@@ -118,7 +118,7 @@ class PricingService {
   /**
    * Resolves the final rate for a vehicle based on priorities:
    * 1. Active Vehicle Rate Override
-   * 2. Active Pricing Group Rate
+   * 2. Active Kategori Tarif Rate
    * 3. Throws Error if not found (No fallback to arbitrary values)
    */
   resolveVehicleRate(vehicleId: string, rateType: RateType): number {
@@ -128,8 +128,8 @@ class PricingService {
       return override.amount;
     }
 
-    // 2. Check Pricing Group
-    const group = pricingRepository.getPricingGroupForVehicle(vehicleId);
+    // 2. Check Kategori Tarif
+    const group = pricingRepository.getPricingCategoryForVehicle(vehicleId);
     if (group && group.status === 'ACTIVE') {
       const rates = pricingRepository.getRatesByGroupId(group.id);
       const groupRate = rates.find(r => r.rateType === rateType && r.status === 'ACTIVE');
@@ -139,7 +139,7 @@ class PricingService {
     }
 
     // 3. No Rate Found - Return Error
-    throw new Error(`Tarif sewa tidak ditemukan. Pastikan kendaraan dimasukkan ke dalam Grup Tarif atau diberikan Tarif Khusus (Override).`);
+    throw new Error(`Tarif sewa tidak ditemukan. Pastikan kendaraan dimasukkan ke dalam Kategori Tarif atau diberikan Tarif Khusus (Override).`);
   }
 }
 

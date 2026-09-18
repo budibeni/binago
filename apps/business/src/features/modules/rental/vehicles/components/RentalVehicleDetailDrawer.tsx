@@ -157,11 +157,13 @@ export function RentalVehicleDetailDrawer({
 
               <div className="px-3.5 pb-3.5 flex flex-col">
                 
-                {/* Row 1 */}
+                {/* Row Pricing Type */}
                 <div className="grid grid-cols-2 py-2 border-b border-border/40">
                   <div className="flex flex-col gap-0.5">
-                    <span className="text-[10px] text-muted-foreground">Tarif Harian</span>
-                    <span className="text-xs font-semibold">{data.dailyRate ? formatCurrency(data.dailyRate) : '-'}</span>
+                    <span className="text-[10px] text-muted-foreground">Tipe Tarif</span>
+                    <span className="text-xs font-semibold">
+                      {data.pricingType === 'CATEGORY' ? 'Kategori' : 'Mandiri (Kustom)'}
+                    </span>
                   </div>
                   <div className="flex flex-col gap-0.5">
                     <span className="text-[10px] text-muted-foreground">Deposit</span>
@@ -169,8 +171,12 @@ export function RentalVehicleDetailDrawer({
                   </div>
                 </div>
 
-                {/* Row 2 */}
-                <div className="grid grid-cols-2 py-2 border-b border-border/40">
+                {/* Row Rates */}
+                <div className="grid grid-cols-3 py-2 border-b border-border/40">
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-[10px] text-muted-foreground">Tarif Harian</span>
+                    <span className="text-xs font-semibold">{data.dailyRate ? formatCurrency(data.dailyRate) : '-'}</span>
+                  </div>
                   <div className="flex flex-col gap-0.5">
                     <span className="text-[10px] text-muted-foreground">Tarif Mingguan</span>
                     <span className="text-xs font-semibold">{data.weeklyRate ? formatCurrency(data.weeklyRate) : '-'}</span>

@@ -5,8 +5,6 @@ import { MoreVertical, IdCard, Edit2, Trash2, UserRound, MapPin, Truck, Users, P
 import { cn } from '@adatrack/utils';
 import {
   Badge, Button,
-  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent,
-  DropdownMenuItem, DropdownMenuSeparator,
   DataTable,
 } from '@adatrack/ui';
 import type { DataTableColumnDef, DataTableFilterConfig } from '@adatrack/ui';
@@ -68,34 +66,15 @@ function buildColumns(
       size: 40,
       meta: { fixedWidth: true },
       cell: ({ row }) => (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 w-7 p-0 flex items-center justify-center focus:outline-none focus-visible:outline-none focus-visible:ring-0 data-[state=open]:bg-neutral-200/50 dark:data-[state=open]:bg-neutral-800"
-              aria-label="Aksi pengemudi"
-              id={`driver-action-${row.original.id}`}
-            >
-              <MoreVertical className="h-4 w-4 text-foreground-muted" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-48">
-            <DropdownMenuItem onClick={() => onViewDetail(row.original)}>
-              <Eye className="mr-2 h-4 w-4 text-foreground-muted" />
-              <span>{labels.actionDetail}</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onEdit(row.original)}>
-              <Edit2 className="mr-2 h-4 w-4 text-foreground-muted" />
-              <span>{labels.actionEdit}</span>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem destructive onClick={() => onDelete(row.original)}>
-              <Trash2 className="mr-2 h-4 w-4 text-danger" />
-              <span>{labels.actionDelete}</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 w-8 p-0 flex items-center justify-center text-foreground-muted hover:text-primary hover:bg-primary/10 rounded-full"
+          onClick={() => onViewDetail(row.original)}
+          title="Detail"
+        >
+          <Eye className="h-4 w-4" />
+        </Button>
       ),
     },
     {
@@ -251,7 +230,7 @@ export function DriverTable({
         onAdd ? (
           <Button variant="destructive" onClick={onAdd} className="h-8 gap-1.5 text-[13px] font-medium shadow-none">
             <Plus className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline-block">Tambah</span>
+            <span className="hidden sm:inline-block">{labels.addDriver}</span>
           </Button>
         ) : undefined
       }

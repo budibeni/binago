@@ -147,7 +147,7 @@ export function PricingVehicleAssignmentDialog({
                     </div>
                     {isDisabled && otherGroupName && (
                       <div className="mt-2 text-[11px] text-foreground-muted">
-                        Sudah berada di Grup Tarif: <span className="font-medium text-foreground">{otherGroupName}</span>
+                        Sudah berada di Kategori Tarif: <span className="font-medium text-foreground">{otherGroupName}</span>
                       </div>
                     )}
                   </div>
