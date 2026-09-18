@@ -17,7 +17,7 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 import { cn } from '@adatrack/utils';
-import { Badge } from '@adatrack/ui';
+import { Badge, Button, DetailShell, InfoRow, SectionHeader } from '@adatrack/ui';
 import type { Vehicle } from '../types/vehicle';
 
 // â"€â"€â"€ Types â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
@@ -39,6 +39,9 @@ interface VehicleViewProps {
     statusParking: string;
     statusOffline: string;
   };
+  onEdit?: (v: Vehicle) => void;
+  onDelete?: (v: Vehicle) => void;
+  onTrack?: (v: Vehicle) => void;
 }
 
 // â"€â"€â"€ Status Config â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
@@ -86,54 +89,9 @@ function formatDateTime(iso: string): string {
   });
 }
 
-// â"€â"€â"€ Info Row â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
-
-function InfoRow({ icon: Icon, label, value, highlight }: {
-  icon: React.ElementType;
-  label: string;
-  value: string | number | null | undefined;
-  highlight?: boolean;
-}) {
-  return (
-    <div className="flex items-start gap-3 py-2.5 border-b border-border/60 last:border-0">
-      <div className="mt-0.5 p-1.5 rounded-md bg-neutral-100 dark:bg-neutral-800 text-foreground-muted shrink-0">
-        <Icon className="h-3.5 w-3.5" />
-      </div>
-      <div className="min-w-0 flex-1">
-        <p className="text-[10px] text-foreground-muted uppercase tracking-wider font-semibold mb-0.5">{label}</p>
-        <p className={cn(
-          'text-[13px] font-medium text-foreground truncate',
-          highlight && 'text-warning-600 dark:text-warning-400 font-semibold',
-        )}>
-          {value ?? '-'}
-        </p>
-      </div>
-    </div>
-  );
-}
-
-// â"€â"€â"€ Section Header â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
-
-function SectionHeader({ icon: Icon, title }: { icon: React.ElementType; title: string }) {
-  return (
-    <div className="flex items-center gap-2 mb-1 mt-4 first:mt-0">
-      <Icon className="h-3.5 w-3.5 text-primary" />
-      <h3 className="text-[11px] font-bold text-foreground uppercase tracking-widest">{title}</h3>
-    </div>
-  );
-}
-
 // â"€â"€â"€ Component â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
-export function VehicleView({ vehicle, open, onClose, labels }: VehicleViewProps) {
-  // Close on Escape
-  React.useEffect(() => {
-    if (!open) return;
-    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  }, [open, onClose]);
-
+export function VehicleView({ vehicle, open, onClose, labels, onEdit, onDelete, onTrack }: VehicleViewProps) {
   if (!vehicle) return null;
 
   const statusCfg = getStatusConfig(vehicle.status, labels);
@@ -149,30 +107,15 @@ export function VehicleView({ vehicle, open, onClose, labels }: VehicleViewProps
   const isServiceDue = serviceProgress >= 90;
 
   return (
-    <>
-      {/* Backdrop */}
-      <div
-        className={cn(
-          'fixed inset-0 z-40 bg-black/40 backdrop-blur-[2px] transition-opacity duration-200',
-          open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none',
-        )}
-        onClick={onClose}
-        aria-hidden="true"
-      />
-
-      {/* Drawer */}
-      <aside
-        role="dialog"
-        aria-modal="true"
-        aria-label={labels.detailTitle}
-        className={cn(
-          'fixed right-0 top-0 z-50 flex h-full w-full max-w-[400px] flex-col bg-background shadow-xl',
-          'border-l border-border',
-          'transition-transform duration-300 ease-in-out',
-          open ? 'translate-x-0' : 'translate-x-full',
-        )}
-      >
-        {/* Header */}
+    <DetailShell
+      open={open}
+      onOpenChange={(isOpen) => !isOpen && onClose()}
+      title={labels.detailTitle}
+      onEdit={onEdit ? () => onEdit(vehicle) : undefined}
+      onDelete={onDelete ? () => onDelete(vehicle) : undefined}
+    >
+      <div className="flex-1 overflow-y-auto">
+        {/* Header content (was inside drawer header) */}
         <div className="flex items-start justify-between px-4 py-3 border-b border-border shrink-0 bg-neutral-50/50 dark:bg-neutral-900/30">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
@@ -185,18 +128,18 @@ export function VehicleView({ vehicle, open, onClose, labels }: VehicleViewProps
             </div>
             <p className="text-[12px] text-foreground-muted truncate">{vehicle.vehicleName}</p>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="ml-2 flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-foreground-muted hover:bg-neutral-200/60 dark:hover:bg-neutral-700/50 hover:text-foreground transition-colors focus:outline-none"
-            aria-label={labels.detailClose}
-          >
-            <X className="h-4 w-4" />
-          </button>
         </div>
 
-        {/* Body */}
-        <div className="flex-1 overflow-y-auto px-4 py-3">
+        {onTrack && (
+          <div className="px-4 py-3 border-b border-border">
+            <Button variant="outline" size="sm" className="w-full text-xs h-8 bg-surface" onClick={() => onTrack(vehicle)}>
+              <MapPin className="w-3.5 h-3.5 mr-2 text-info" />
+              Lacak Lokasi
+            </Button>
+          </div>
+        )}
+
+        <div className="px-4 py-3">
 
           {/* Section: Vehicle Info */}
           <SectionHeader icon={Car} title={labels.detailVehicleInfo} />
@@ -280,7 +223,7 @@ export function VehicleView({ vehicle, open, onClose, labels }: VehicleViewProps
 
           <div className="h-4" />
         </div>
-      </aside>
-    </>
+      </div>
+    </DetailShell>
   );
 }

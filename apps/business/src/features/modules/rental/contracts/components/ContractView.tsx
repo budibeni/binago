@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { Button } from '@adatrack/ui';
-import { User, Car, Calendar, DollarSign, FileText, FileCheck, Info } from 'lucide-react';
+import { Button, DetailShell } from '@adatrack/ui';
+import { User, Car, Calendar, DollarSign, FileText, FileCheck, Info, CheckCircle, Printer, XCircle } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import type { RentalContract } from '../types/contract';
 
@@ -31,13 +31,6 @@ export function ContractView({
   onHandover,
   onReturn,
 }: ContractDetailDrawerProps) {
-  React.useEffect(() => {
-    if (!open) return;
-    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  }, [open, onClose]);
-
   if (!contract) return null;
 
   const formatCurrency = (value: number) => {
@@ -63,18 +56,16 @@ export function ContractView({
   };
 
   return (
-    <React.Fragment>
-      <div 
-        className={cn("fixed inset-0 bg-black/40 z-50 transition-opacity", open ? "opacity-100" : "opacity-0 pointer-events-none")} 
-        onClick={onClose} 
-      />
-      <aside 
-        className={cn("fixed top-0 right-0 h-full w-[90%] sm:w-[450px] bg-white dark:bg-neutral-950 shadow-2xl z-50 flex flex-col transition-transform duration-300 border-l border-border", open ? "translate-x-0" : "translate-x-full")}
-      >
-        <div className="flex flex-col h-full overflow-hidden">
+    <DetailShell
+      open={open}
+      onOpenChange={(isOpen) => !isOpen && onClose()}
+      title="Detail Kontrak Rental"
+      onEdit={contract.status === 'DRAFT' && onEdit ? () => onEdit(contract) : undefined}
+    >
+      <div className="flex flex-col h-full overflow-hidden">
         
         {/* Header */}
-        <div className="flex-none p-6 border-b border-border bg-danger/5 relative overflow-hidden">
+        <div className="flex-none p-5 border-b border-border bg-danger/5 relative overflow-hidden">
           <div className="absolute top-0 right-0 p-4 opacity-10 text-danger pointer-events-none">
             <FileCheck className="w-24 h-24" />
           </div>
@@ -90,7 +81,7 @@ export function ContractView({
         </div>
 
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto p-6">
+        <div className="flex-1 overflow-y-auto p-4 md:p-5">
           <div className="flex flex-col gap-4 max-w-4xl mx-auto">
             
             {/* Info Kontrak & Reservasi */}
@@ -288,51 +279,43 @@ export function ContractView({
           </Button>
           
           <div className="flex w-full sm:w-auto gap-2">
-            {contract.status === 'DRAFT' && onCancel && (
-              <Button variant="outline" className="flex-1 sm:flex-none text-danger border-danger/30 hover:bg-danger/10" onClick={() => onCancel(contract)}>
-                Batalkan
-              </Button>
-            )}
-
-            {onPrint && (
-              <Button variant="outline" className="flex-1 sm:flex-none border-border hover:bg-neutral-100 dark:hover:bg-neutral-800" onClick={() => onPrint(contract)}>
-                Print Kontrak
-              </Button>
-            )}
-            
-            {contract.status === 'DRAFT' && onEdit && (
-              <Button variant="outline" className="flex-1 sm:flex-none" onClick={() => onEdit(contract)}>
-                Edit
-              </Button>
-            )}
-
-            {contract.status === 'DRAFT' && onConfirm && (
-              <Button variant="primary" className="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 text-white" onClick={() => onConfirm(contract)}>
-                Konfirmasi
-              </Button>
-            )}
-
-            {contract.status === 'CONFIRMED' && onHandover && (
-              <Button variant="primary" className="flex-1 sm:flex-none bg-success hover:bg-success/90 text-white" onClick={() => onHandover(contract)}>
-                Serah Terima
-              </Button>
-            )}
-            
-            {contract.status === 'CONFIRMED' && onCancel && (
-              <Button variant="outline" className="flex-1 sm:flex-none text-danger border-danger/30 hover:bg-danger/10" onClick={() => onCancel(contract)}>
-                Batalkan
-              </Button>
-            )}
-
-            {contract.status === 'ACTIVE' && onReturn && (
-              <Button variant="primary" className="flex-1 sm:flex-none bg-primary hover:bg-primary/90 text-white" onClick={() => onReturn(contract)}>
-                Pengembalian
-              </Button>
-            )}
+            {/* The rest of the actions are handled by DetailShell footer or we can put them here */}
           </div>
         </div>
+      </div>
+
+      {/* Extra Actions below content */}
+      <div className="p-4 border-t border-border bg-surface flex flex-col gap-2">
+        <div className="flex gap-2">
+          {contract.status === 'DRAFT' && onConfirm && (
+            <Button className="flex-1 bg-success hover:bg-success/90 text-white" onClick={() => onConfirm(contract)}>
+              <CheckCircle className="w-4 h-4 mr-2" /> Konfirmasi
+            </Button>
+          )}
+          {contract.status === 'CONFIRMED' && onHandover && (
+            <Button className="flex-1 bg-blue-600 hover:bg-blue-700 text-white" onClick={() => onHandover(contract)}>
+              <Car className="w-4 h-4 mr-2" /> Serah Terima
+            </Button>
+          )}
+          {contract.status === 'ACTIVE' && onReturn && (
+            <Button className="flex-1 bg-amber-500 hover:bg-amber-600 text-white" onClick={() => onReturn(contract)}>
+              <Info className="w-4 h-4 mr-2" /> Pengembalian
+            </Button>
+          )}
+          {onPrint && (
+            <Button variant="outline" className={cn(contract.status === 'DRAFT' ? "flex-1" : "flex-none")} onClick={() => onPrint(contract)}>
+              <Printer className="w-4 h-4 mr-2" /> Cetak
+            </Button>
+          )}
         </div>
-      </aside>
-    </React.Fragment>
+        
+        {contract.status === 'DRAFT' && onCancel && (
+          <Button variant="outline" className="w-full text-danger border-danger/30 hover:bg-danger/10" onClick={() => onCancel(contract)}>
+            <XCircle className="w-4 h-4 mr-2" /> Batalkan Kontrak
+          </Button>
+        )}
+      </div>
+
+    </DetailShell>
   );
 }

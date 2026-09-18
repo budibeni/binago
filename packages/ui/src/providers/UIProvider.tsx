@@ -4,11 +4,17 @@ import React, { createContext, useContext } from 'react';
 export interface UIConfig {
   cancelText?: string;
   saveText?: string;
+  detailTitle?: string;
+  editText?: string;
+  deleteText?: string;
 }
 
 const UIConfigContext = createContext<UIConfig>({
   cancelText: 'Batal',
-  saveText: 'Simpan'
+  saveText: 'Simpan',
+  detailTitle: 'Detail',
+  editText: 'Edit',
+  deleteText: 'Hapus',
 });
 
 export const useUIConfig = () => useContext(UIConfigContext);

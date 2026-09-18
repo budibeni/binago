@@ -2,8 +2,8 @@ import React from 'react';
 import { GroupData } from '../data/mockGroupsData';
 import { DataTable } from '@adatrack/ui';
 import type { DataTableColumnDef } from '@adatrack/ui';
-import { MoreVertical, Edit2, Trash2 } from 'lucide-react';
-import { Button, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@adatrack/ui';
+import { MoreVertical, Edit2, Trash2, Eye } from 'lucide-react';
+import { Button } from '@adatrack/ui';
 
 export interface GroupTableProps {
   groups: GroupData[];
@@ -18,11 +18,12 @@ export interface GroupTableProps {
     deleteBtn: string;
   };
   toolbarActions?: React.ReactNode;
+  onViewDetail?: (group: GroupData) => void;
   onEdit?: (group: GroupData) => void;
   onDelete?: (group: GroupData) => void;
 }
 
-export function GroupTable({ groups, labels, toolbarActions, onEdit, onDelete }: GroupTableProps) {
+export function GroupTable({ groups, labels, toolbarActions, onViewDetail, onEdit, onDelete }: GroupTableProps) {
   const [searchValue, setSearchValue] = React.useState('');
 
   const columns = React.useMemo<DataTableColumnDef<GroupData>[]>(() => [
@@ -33,28 +34,15 @@ export function GroupTable({ groups, labels, toolbarActions, onEdit, onDelete }:
       size: 40,
       meta: { fixedWidth: true },
       cell: ({ row }) => (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 w-7 p-0 flex items-center justify-center focus:outline-none focus-visible:outline-none focus-visible:ring-0 data-[state=open]:bg-neutral-200/50 dark:data-[state=open]:bg-neutral-800"
-            >
-              <MoreVertical className="h-4 w-4 text-foreground-muted" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-48">
-            <DropdownMenuItem onClick={() => onEdit?.(row.original)}>
-              <Edit2 className="mr-2 h-4 w-4 text-foreground-muted" />
-              <span>{labels.editBtn}</span>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem destructive onClick={() => onDelete?.(row.original)}>
-              <Trash2 className="mr-2 h-4 w-4 text-danger" />
-              <span>{labels.deleteBtn}</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 w-8 p-0 flex items-center justify-center text-foreground-muted hover:text-primary hover:bg-primary/10 rounded-full"
+          onClick={() => onViewDetail?.(row.original)}
+          title="Detail"
+        >
+          <Eye className="h-4 w-4" />
+        </Button>
       ),
     },
     {
@@ -62,7 +50,15 @@ export function GroupTable({ groups, labels, toolbarActions, onEdit, onDelete }:
       header: labels.nameCol,
       enableSorting: true,
       size: 250,
-      cell: ({ row }) => <span className="font-semibold text-sm">{row.original.name}</span>,
+      cell: ({ row }) => (
+        <button
+          type="button"
+          className="font-bold text-primary hover:underline underline-offset-2 focus:outline-none text-[13px]"
+          onClick={() => onViewDetail?.(row.original)}
+        >
+          {row.original.name}
+        </button>
+      ),
     },
     {
       accessorKey: 'description',

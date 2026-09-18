@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from '@adatrack/ui';
+import { Button, DetailShell } from '@adatrack/ui';
 import type { RentalVehicle } from '../types/rentalVehicle';
 import { Edit2, CheckCircle2, AlertCircle, X, Car, Tag, Calendar, User, MapPin, FileText, CreditCard, LogOut } from 'lucide-react';
 import { cn } from '@adatrack/utils';
@@ -11,6 +11,7 @@ interface RentalVehicleDetailDrawerProps {
   labels: Record<string, string>;
   onEdit: (v: RentalVehicle) => void;
   onDelete?: (v: RentalVehicle) => void;
+  onDisable?: (v: RentalVehicle) => void;
 }
 
 export function RentalVehicleDetailDrawer({
@@ -20,6 +21,7 @@ export function RentalVehicleDetailDrawer({
   labels,
   onEdit,
   onDelete,
+  onDisable,
 }: RentalVehicleDetailDrawerProps) {
   if (!data) return null;
 
@@ -44,36 +46,46 @@ export function RentalVehicleDetailDrawer({
   };
 
   return (
-    <>
-      <div 
-        className={cn("fixed inset-0 bg-black/40 z-50 transition-opacity", open ? "opacity-100" : "opacity-0 pointer-events-none")} 
-        onClick={() => onOpenChange(false)} 
-      />
-      <aside 
-        className={cn("fixed top-0 right-0 h-full w-[300px] sm:w-[360px] bg-white dark:bg-neutral-950 shadow-2xl z-50 flex flex-col transition-transform duration-300", open ? "translate-x-0" : "translate-x-full")}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between p-3.5 border-b border-border/40">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-full bg-danger/10 text-danger flex items-center justify-center">
-              <Car className="w-4 h-4" />
-            </div>
-            <h2 className="text-sm font-bold">Detail Kendaraan</h2>
+    <DetailShell
+      open={open}
+      onOpenChange={onOpenChange}
+      title="Detail Kendaraan"
+      onEdit={() => onEdit(data)}
+      onDelete={onDelete ? () => onDelete(data) : undefined}
+    >
+      <div className="flex-1 overflow-y-auto">
+        {/* Main Title Area */}
+        <div className="px-4 py-3.5 border-b border-border/40 flex justify-between items-start">
+          <div className="flex flex-col gap-0.5">
+            <h2 className="text-[15px] font-bold">{core.brand} {core.vehicleName}</h2>
+            <p className="text-xs text-muted-foreground">{core.plateNumber}</p>
           </div>
-          <Button variant="ghost" onClick={() => onOpenChange(false)} className="h-7 w-7 rounded-full p-0 flex items-center justify-center text-muted-foreground hover:bg-neutral-100">
-            <X className="h-4 w-4" />
-          </Button>
+          {renderStatus()}
         </div>
 
-        <div className="flex-1 overflow-y-auto">
-          {/* Main Title Area */}
-          <div className="px-4 py-3.5 border-b border-border/40 flex justify-between items-start">
-            <div className="flex flex-col gap-0.5">
-              <h2 className="text-[15px] font-bold">{core.brand} {core.vehicleName}</h2>
-              <p className="text-xs text-muted-foreground">{core.plateNumber}</p>
-            </div>
-            {renderStatus()}
-          </div>
+        {/* Custom Actions (Map & Disable) */}
+        <div className="px-4 py-3 flex gap-2 border-b border-border/40">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="flex-1 h-8 text-xs bg-surface"
+            onClick={() => window.location.href = `/tracking/live?vehicleId=${data.vehicleId}`}
+            leftIcon={<MapPin className="w-3.5 h-3.5 text-info" />}
+          >
+            Buka Lokasi
+          </Button>
+          {onDisable && (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="flex-1 h-8 text-xs bg-surface"
+              onClick={() => onDisable(data)}
+              leftIcon={<LogOut className="w-3.5 h-3.5 text-warning" />}
+            >
+              Keluarkan
+            </Button>
+          )}
+        </div>
 
           <div className="p-4 flex flex-col gap-4">
             
@@ -256,19 +268,7 @@ export function RentalVehicleDetailDrawer({
               Edit
             </Button>
           </div>
-          {onDelete && (
-            <Button 
-              variant="outline" 
-              size="sm" 
-              title="Keluarkan"
-              className="text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300 w-8 h-8 shrink-0" 
-              onClick={() => { onOpenChange(false); onDelete(data); }}
-            >
-              <LogOut className="w-4 h-4" />
-            </Button>
-          )}
-        </div>
-      </aside>
-    </>
+      </div>
+    </DetailShell>
   );
 }

@@ -34,7 +34,7 @@ import {
   CalendarDays, HardHat, CheckCircle,
   Shield, UserCheck, Search, AlertTriangle, History,
   Building, FolderKanban,
-  Database
+  Database, Tag
 } from 'lucide-react';
 import { AppShell, UIProvider } from '@adatrack/ui';
 import type { NavGroup, NavItem, UserInfo, Locale } from '@adatrack/types';
@@ -116,6 +116,7 @@ function buildNavigation(locale: Locale): NavGroup[] {
       items: [
         { id: 'rentalCustomers', label: t.nav.customers, href: '/rental/customers', icon: Users },
         { id: 'rentalVehicles', label: t.nav.rentalVehicles, href: '/rental/vehicles', icon: CarFront },
+        { id: 'pricingGroups', label: (t.nav as any).pricingGroups || 'Grup Tarif', href: '/rental/pricing-groups', icon: Tag },
         { id: 'reservations', label: t.nav.reservations, href: '/rental/reservations', icon: CalendarClock },
         { id: 'rentalContracts', label: t.nav.rentalContracts, href: '/rental/contracts', icon: FileSignature },
         { id: 'handovers', label: t.nav.handovers, href: '/rental/handovers', icon: Key },
@@ -292,7 +293,13 @@ export function BusinessShellLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <UIProvider config={{ cancelText: t.common.cancel, saveText: t.common.save }}>
+    <UIProvider config={{ 
+      cancelText: t.common.cancel, 
+      saveText: t.common.save,
+      detailTitle: (t.common as any).detailTitle || 'Detail',
+      editText: (t.common as any).editText || 'Edit',
+      deleteText: (t.common as any).deleteText || 'Hapus',
+    }}>
       <AppShell
         brandName="ADATRACK"
         navigation={navigation}

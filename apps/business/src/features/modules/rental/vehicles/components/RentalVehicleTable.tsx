@@ -93,39 +93,15 @@ function buildColumns(
       cell: ({ row }) => {
         const v = row.original;
         return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 w-7 p-0 flex items-center justify-center focus:outline-none focus-visible:outline-none focus-visible:ring-0 data-[state=open]:bg-neutral-200/50 dark:data-[state=open]:bg-neutral-800"
-              >
-                <MoreVertical className="h-4 w-4 text-foreground-muted" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-48">
-              <DropdownMenuItem onClick={() => onView(v)}>
-                <Eye className="mr-2 h-4 w-4 text-foreground-muted" />
-                <span>Detail</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onEdit(v)}>
-                <Edit2 className="mr-2 h-4 w-4 text-foreground-muted" />
-                <span>Edit</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => {
-                // We use global navigation for single vehicle MapPin
-                window.location.href = `/tracking/live?vehicleId=${v.vehicleId}`;
-              }}>
-                <MapPin className="mr-2 h-4 w-4 text-foreground-muted" />
-                <span>Buka Lokasi</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem destructive onClick={() => onDisable(v)}>
-                <LogOut className="mr-2 h-4 w-4 text-danger" />
-                <span>Keluarkan</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 w-8 p-0 flex items-center justify-center text-foreground-muted hover:text-primary hover:bg-primary/10 rounded-full"
+            onClick={() => onView(v)}
+            title="Detail"
+          >
+            <Eye className="h-4 w-4" />
+          </Button>
         );
       },
     },

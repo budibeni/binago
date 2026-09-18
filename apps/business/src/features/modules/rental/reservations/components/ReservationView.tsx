@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { Button } from '@adatrack/ui';
-import { User, Car, Calendar, DollarSign, FileText, Trash2, Edit2, ClipboardList } from 'lucide-react';
+import { Button, DetailShell } from '@adatrack/ui';
+import { User, Car, Calendar, DollarSign, FileText, Trash2, Edit2, ClipboardList, CheckCircle2 } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import type { Reservation } from '../types/reservation';
 
@@ -25,13 +25,6 @@ export function ReservationView({
   onDelete,
   onConfirm,
 }: ReservationViewProps) {
-  React.useEffect(() => {
-    if (!open) return;
-    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  }, [open, onClose]);
-
   if (!reservation) return null;
 
   const formatCurrency = (value: number) => {
@@ -58,18 +51,17 @@ export function ReservationView({
   };
 
   return (
-    <React.Fragment>
-      <div 
-        className={cn("fixed inset-0 bg-black/40 z-50 transition-opacity", open ? "opacity-100" : "opacity-0 pointer-events-none")} 
-        onClick={onClose} 
-      />
-      <aside 
-        className={cn("fixed top-0 right-0 h-full w-[90%] sm:w-[420px] bg-white dark:bg-neutral-950 shadow-2xl z-50 flex flex-col transition-transform duration-300 border-l border-border", open ? "translate-x-0" : "translate-x-full")}
-      >
-        <div className="flex flex-col h-full overflow-hidden">
+    <DetailShell
+      open={open}
+      onOpenChange={(isOpen) => !isOpen && onClose()}
+      title="Detail Reservasi"
+      onEdit={() => onEdit(reservation)}
+      onDelete={() => onDelete(reservation)}
+    >
+      <div className="flex flex-col h-full overflow-hidden">
         
         {/* Header - Danger Colored */}
-        <div className="flex-none p-6 border-b border-border bg-danger/5 relative overflow-hidden">
+        <div className="flex-none p-5 border-b border-border bg-danger/5 relative overflow-hidden">
           <div className="absolute top-0 right-0 p-4 opacity-10 text-danger pointer-events-none">
             <ClipboardList className="w-24 h-24" />
           </div>
@@ -85,7 +77,7 @@ export function ReservationView({
         </div>
 
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto p-6">
+        <div className="flex-1 overflow-y-auto p-4 md:p-5">
           <div className="flex flex-col gap-4 max-w-4xl mx-auto">
             
             {/* Informasi Pelanggan */}
@@ -255,30 +247,21 @@ export function ReservationView({
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="flex-none p-4 px-6 border-t border-border bg-white dark:bg-neutral-950 flex items-center justify-between">
-          <div className="flex gap-3">
-            <Button variant="outline" className="text-foreground" onClick={onClose}>
-              Tutup
-            </Button>
-            <Button variant="primary" className="bg-danger hover:bg-danger/90 text-white gap-2" onClick={() => onEdit(reservation)}>
-              <Edit2 className="w-4 h-4" />
-              Edit
-            </Button>
-            {reservation.status === 'PENDING' && (
-              <Button variant="primary" className="bg-success hover:bg-success/90 text-white gap-2" onClick={() => onConfirm(reservation)}>
-                <ClipboardList className="w-4 h-4" />
-                Konfirmasi
-              </Button>
-            )}
-          </div>
-          <Button variant="outline" className="text-danger border-danger/30 hover:bg-danger/10 gap-2" onClick={() => onDelete(reservation)}>
-            <Trash2 className="w-4 h-4" />
-            Hapus
+      </div>
+      
+      {/* We can put extra confirm button outside the main content if needed, but DetailShell footer only supports Edit and Delete. 
+          We'll add the confirm button as a custom action in the content area if status is PENDING */}
+      {reservation.status === 'PENDING' && (
+        <div className="p-4 border-t border-border bg-surface">
+          <Button 
+            className="w-full bg-success hover:bg-success/90 text-white" 
+            onClick={() => onConfirm(reservation)}
+          >
+            <CheckCircle2 className="w-4 h-4 mr-2" />
+            Konfirmasi Reservasi
           </Button>
         </div>
-        </div>
-      </aside>
-    </React.Fragment>
+      )}
+    </DetailShell>
   );
 }

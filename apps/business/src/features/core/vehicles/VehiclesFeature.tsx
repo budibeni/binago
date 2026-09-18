@@ -246,6 +246,9 @@ export function VehiclesFeature() {
         open={drawerOpen}
         onClose={handleCloseDrawer}
         labels={drawerLabels}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        onTrack={handleTrack}
       />
 
       {!!editVehicle && (

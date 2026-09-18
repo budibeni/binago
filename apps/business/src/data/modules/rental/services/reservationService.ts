@@ -2,6 +2,7 @@ import type { Reservation, ReservationStatus, RateType } from '@/features/module
 import { reservationRepository } from '../repositories/reservationRepository';
 import { rentalVehicleService } from './vehicleService';
 import { rentalCustomerService as customerService } from './customerService';
+import { pricingService } from './pricingService';
 
 
 class ReservationService {
@@ -120,11 +121,36 @@ class ReservationService {
       throw new Error(avail.reason);
     }
 
+    // 2. Pricing Snapshot Resolution
+    let resolvedDailyRate = data.dailyRate || 0;
+    let resolvedWeeklyRate = data.weeklyRate || 0;
+    let resolvedMonthlyRate = data.monthlyRate || 0;
+
+    try {
+      resolvedDailyRate = pricingService.resolveVehicleRate(data.vehicleId, 'DAILY');
+    } catch { /* if not available, fallback to 0 or leave as is */ }
+    try {
+      resolvedWeeklyRate = pricingService.resolveVehicleRate(data.vehicleId, 'WEEKLY');
+    } catch { /* */ }
+    try {
+      resolvedMonthlyRate = pricingService.resolveVehicleRate(data.vehicleId, 'MONTHLY');
+    } catch { /* */ }
+
+    // Re-calculate total amount based on the selected rate type
+    let totalAmount = data.totalAmount;
+    if (!totalAmount || totalAmount === 0) {
+      totalAmount = this.calculateTotalAmount(data.rateType, data.duration, resolvedDailyRate, resolvedWeeklyRate, resolvedMonthlyRate);
+    }
+
     const reservationNumber = this.generateReservationNumber();
-    const remainingAmount = Math.max(data.totalAmount - data.deposit, 0);
+    const remainingAmount = Math.max(totalAmount - data.deposit, 0);
 
     return reservationRepository.createReservation({
       ...data,
+      dailyRate: resolvedDailyRate,
+      weeklyRate: resolvedWeeklyRate,
+      monthlyRate: resolvedMonthlyRate,
+      totalAmount,
       reservationNumber,
       remainingAmount,
       status: 'PENDING', // Force pending

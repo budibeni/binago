@@ -6,6 +6,7 @@ import { getTranslation } from '../../../i18n';
 import { groupService } from '@/data/services';
 import { GroupTable } from './components/GroupTable';
 import { GroupForm } from './components/GroupForm';
+import { GroupView } from './components/GroupView';
 import { Button, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@adatrack/ui';
 
 export interface GroupsFeatureProps {
@@ -17,7 +18,9 @@ type GroupType = 'vehicles' | 'drivers' | 'geofences' | 'routes';
 export function GroupsFeature({ locale }: GroupsFeatureProps) {
   const [activeType, setActiveType] = useState<GroupType>('vehicles');
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isViewOpen, setIsViewOpen] = useState(false);
   const [editGroup, setEditGroup] = useState<any>(null); // any used temporarily to avoid strict type imports, will be casted.
+  const [detailGroup, setDetailGroup] = useState<any>(null);
   const t = getTranslation(locale);
   const tGroups = t.groups;
 
@@ -52,6 +55,11 @@ export function GroupsFeature({ locale }: GroupsFeatureProps) {
     setIsFormOpen(true);
   };
   
+  const handleView = (group: any) => {
+    setDetailGroup(group);
+    setIsViewOpen(true);
+  };
+  
   const handleDelete = (group: any) => {
     console.log('Delete group:', group.id);
   };
@@ -73,8 +81,9 @@ export function GroupsFeature({ locale }: GroupsFeatureProps) {
       <div className="flex-1 min-h-0 overflow-y-auto p-0">
         <GroupTable 
           key={activeType}
-          groups={currentTabData} 
+          groups={currentTabData as any} 
           labels={tableLabels}
+          onViewDetail={handleView}
           onEdit={handleEdit}
           onDelete={handleDelete}
           toolbarActions={
@@ -135,6 +144,13 @@ export function GroupsFeature({ locale }: GroupsFeatureProps) {
           activeType === 'geofences' ? tGroups.tabs.geofences :
           tGroups.tabs.routes
         }`}
+      />
+      <GroupView
+        group={detailGroup}
+        open={isViewOpen}
+        onClose={() => setIsViewOpen(false)}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
       />
     </div>
   );

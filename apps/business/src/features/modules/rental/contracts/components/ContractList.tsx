@@ -71,42 +71,15 @@ function buildColumns(
       cell: ({ row }) => {
         const c = row.original;
         return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 w-7 p-0 flex items-center justify-center focus:outline-none focus-visible:outline-none focus-visible:ring-0 data-[state=open]:bg-neutral-200/50 dark:data-[state=open]:bg-neutral-800"
-                aria-label="Aksi"
-              >
-                <MoreVertical className="h-4 w-4 text-foreground-muted" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-48">
-              <DropdownMenuItem onClick={() => onView(c)}>
-                <Eye className="mr-2 h-4 w-4 text-foreground-muted" />
-                <span>Detail</span>
-              </DropdownMenuItem>
-              {c.status === 'DRAFT' && onEdit && (
-                <DropdownMenuItem onClick={() => onEdit(c)}>
-                  <Edit className="mr-2 h-4 w-4 text-foreground-muted" />
-                  <span>Edit</span>
-                </DropdownMenuItem>
-              )}
-              {c.status === 'CONFIRMED' && onHandover && (
-                <DropdownMenuItem onClick={() => onHandover(c)}>
-                  <Car className="mr-2 h-4 w-4 text-success" />
-                  <span className="text-success">Serah Terima</span>
-                </DropdownMenuItem>
-              )}
-              {onPrint && (
-                <DropdownMenuItem onClick={() => onPrint(c)}>
-                  <Printer className="mr-2 h-4 w-4 text-foreground-muted" />
-                  <span>Cetak</span>
-                </DropdownMenuItem>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 w-8 p-0 flex items-center justify-center text-foreground-muted hover:text-primary hover:bg-primary/10 rounded-full"
+            onClick={() => onView(c)}
+            title="Detail"
+          >
+            <Eye className="h-4 w-4" />
+          </Button>
         );
       },
     },

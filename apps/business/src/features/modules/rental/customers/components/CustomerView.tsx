@@ -17,7 +17,7 @@ import {
   Settings,
 } from 'lucide-react';
 import { cn } from '@adatrack/utils';
-import { Button, Tabs, Badge } from '@adatrack/ui';
+import { Button, Tabs, Badge, DetailShell } from '@adatrack/ui';
 import type { Customer, IndividualCustomer, CompanyCustomer } from '../types/customer';
 
 interface CustomerViewProps {
@@ -52,12 +52,8 @@ export function CustomerView({
 }: CustomerViewProps) {
   const [activeTab, setActiveTab] = React.useState('info');
 
-  React.useEffect(() => {
-    if (!open) return;
-    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  }, [open, onClose]);
+  // Remove manual escape listener since Radix Dialog handles it
+  if (!customer) return null;
 
   if (!open || !customer) return null;
 
@@ -66,27 +62,13 @@ export function CustomerView({
   const cComp = customer as CompanyCustomer;
 
   return (
-    <>
-      <div 
-        className={cn(
-          "fixed inset-0 bg-black/40 backdrop-blur-sm z-40 transition-opacity duration-300",
-          open ? "opacity-100" : "opacity-0 pointer-events-none"
-        )}
-        onClick={onClose}
-      />
-
-      <div className={cn(
-        "fixed top-0 right-0 h-full w-full max-w-sm bg-background border-l border-border shadow-2xl z-50 flex flex-col transition-transform duration-300 ease-in-out",
-        open ? "translate-x-0" : "translate-x-full"
-      )}>
-        {/* Header */}
-        <div className="flex items-center justify-between p-3 md:px-4 py-2 border-b border-border bg-surface">
-          <h2 className="text-sm font-semibold text-foreground">Detail Pelanggan</h2>
-          <Button variant="ghost" size="sm" onClick={onClose} className="rounded-full h-8 w-8 text-foreground-muted hover:text-foreground">
-            <X className="w-4 h-4" />
-          </Button>
-        </div>
-
+    <DetailShell
+      open={open}
+      onOpenChange={(isOpen) => !isOpen && onClose()}
+      title="Detail Pelanggan"
+      onEdit={onEdit ? () => onEdit(customer) : undefined}
+      onDelete={onDelete ? () => onDelete(customer) : undefined}
+    >
         {/* Profile Header */}
         <div className="px-4 md:px-5 pt-4 pb-1 flex items-center gap-3">
           <div className="flex items-center justify-center w-12 h-12 rounded-full shrink-0 border border-border/50 bg-neutral-100 dark:bg-neutral-800 text-foreground-muted">
@@ -253,18 +235,6 @@ export function CustomerView({
           )}
         </div>
 
-        {/* Footer */}
-        <div className="p-3 border-t border-border bg-surface flex items-center justify-between">
-          <Button variant="outline" size="sm" className="text-xs h-8" onClick={() => onEdit?.(customer)}>
-            <Edit2 className="w-3.5 h-3.5 mr-1.5" />
-            Edit
-          </Button>
-          <Button variant="outline" size="sm" className="text-xs h-8 text-danger border-danger/30 hover:bg-danger/10 hover:border-danger hover:text-danger" onClick={() => onDelete?.(customer)}>
-            <Trash2 className="w-3.5 h-3.5 mr-1.5" />
-            Hapus
-          </Button>
-        </div>
-      </div>
-    </>
+      </DetailShell>
   );
 }

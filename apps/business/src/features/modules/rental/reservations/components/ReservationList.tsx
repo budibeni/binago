@@ -90,44 +90,15 @@ function buildColumns(
       cell: ({ row }) => {
         const p = row.original;
         return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 w-7 p-0 flex items-center justify-center focus:outline-none focus-visible:outline-none focus-visible:ring-0 data-[state=open]:bg-neutral-200/50 dark:data-[state=open]:bg-neutral-800"
-                aria-label="Aksi"
-              >
-                <MoreVertical className="h-4 w-4 text-foreground-muted" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-48">
-              <DropdownMenuItem onClick={() => onView(p)}>
-                <Eye className="mr-2 h-4 w-4 text-foreground-muted" />
-                <span>Detail</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onEdit(p)}>
-                <Edit2 className="mr-2 h-4 w-4 text-foreground-muted" />
-                <span>Edit</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem 
-                onClick={() => {
-                  const vid = p.vehicle?.vehicleId;
-                  if (vid) onOpenMap(vid);
-                }}
-                disabled={!p.vehicle?.vehicleId}
-              >
-                <MapPin className="mr-2 h-4 w-4 text-foreground-muted" />
-                <span>Buka Lokasi</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem destructive onClick={() => onDelete(p)}>
-                <Trash2 className="mr-2 h-4 w-4 text-danger" />
-                <span>Hapus</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 w-8 p-0 flex items-center justify-center text-foreground-muted hover:text-primary hover:bg-primary/10 rounded-full"
+            onClick={() => onView(p)}
+            title="Detail"
+          >
+            <Eye className="h-4 w-4" />
+          </Button>
         );
       },
     },

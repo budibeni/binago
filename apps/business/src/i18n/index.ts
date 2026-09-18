@@ -8,6 +8,9 @@ export const dictionaries = {
     common: {
       cancel: 'Batal',
       save: 'Simpan',
+      detailTitle: 'Detail',
+      editText: 'Edit',
+      deleteText: 'Hapus',
     },
 
     // Navigation Labels
@@ -46,6 +49,7 @@ export const dictionaries = {
       dashboardRental: 'Dashboard Rental',
       customers: 'Pelanggan',
       rentalVehicles: 'Kendaraan Rental',
+      pricingGroups: 'Grup Tarif',
       rentalContracts: 'Kontrak Rental',
       reservations: 'Reservasi',
       handovers: 'Serah Terima',
@@ -682,6 +686,9 @@ export const dictionaries = {
     common: {
       cancel: 'Cancel',
       save: 'Save',
+      detailTitle: 'Details',
+      editText: 'Edit',
+      deleteText: 'Delete',
     },
 
     // Navigation Labels
@@ -720,6 +727,7 @@ export const dictionaries = {
       dashboardRental: 'Rental Dashboard',
       customers: 'Customers',
       rentalVehicles: 'Rental Fleet',
+      pricingGroups: 'Pricing Groups',
       rentalContracts: 'Rental Contracts',
       reservations: 'Reservations',
       handovers: 'Handovers',
