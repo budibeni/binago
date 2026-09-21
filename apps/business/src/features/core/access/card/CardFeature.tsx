@@ -23,6 +23,7 @@ export function CardFeature() {
   const [filterState, setFilterState] = React.useState<Record<string, string | string[]>>({
     status: '',
     type: '',
+    holderType: '',
   });
 
   // Form (edit-only)
@@ -46,6 +47,7 @@ export function CardFeature() {
       search: searchValue,
       status: (filterState.status || 'ALL') as any,
       type: (filterState.type || 'ALL') as any,
+      holderType: (filterState.holderType || 'ALL') as any,
     });
 
     const mapped = result.map((c) => {
@@ -106,7 +108,7 @@ export function CardFeature() {
   const filterConfig: DataTableFilterConfig = React.useMemo(() => ({
     state: filterState,
     onStateChange: setFilterState,
-    onClearAll: () => setFilterState({ status: '', type: '' }),
+    onClearAll: () => setFilterState({ status: '', type: '', holderType: '' }),
     labels: { title: t.filter.title, clearAll: t.filter.clearAll },
     fields: [
       {
@@ -125,6 +127,16 @@ export function CardFeature() {
         options: [
           { value: 'RFID', label: 'RFID', colorClass: 'bg-info', activeClass: 'bg-info/15 border-info/40 text-info' },
           { value: 'NFC', label: 'NFC', colorClass: 'bg-primary', activeClass: 'bg-primary/15 border-primary/40 text-primary' },
+        ],
+      },
+      {
+        id: 'holderType',
+        label: t.form.labelHolderType,
+        type: 'pills-single',
+        options: [
+          { value: 'DRIVER', label: t.form.valDriver, colorClass: 'bg-neutral-400', activeClass: 'bg-neutral-100 dark:bg-neutral-800 border-neutral-400 text-foreground' },
+          { value: 'PERSONEL', label: t.form.valPersonel, colorClass: 'bg-neutral-400', activeClass: 'bg-neutral-100 dark:bg-neutral-800 border-neutral-400 text-foreground' },
+          { value: 'UNASSIGNED', label: t.form.valNone, colorClass: 'bg-neutral-400', activeClass: 'bg-neutral-100 dark:bg-neutral-800 border-neutral-400 text-foreground' },
         ],
       },
     ],

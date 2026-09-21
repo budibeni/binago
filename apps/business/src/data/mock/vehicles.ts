@@ -628,6 +628,13 @@ export const mockVehicles = baseVehicles.map((v, i) => {
   }
   const colors = ['Hitam', 'Putih', 'Silver', 'Abu-abu', 'Merah', 'Biru'];
 
+  // Deterministic performance metrics calculation (using i)
+  const baseScore = 60 + ((i * 17) % 41); // 60 to 100
+  const idleRatio = 2 + ((i * 3) % 15); // 2% to 16%
+  const activeHours = 100 + ((i * 11) % 150); // 100 to 249 hours
+  const speedingRatio = 0 + ((i * 7) % 10); // 0% to 9%
+  const signalStability = 90 + ((i * 13) % 11); // 90% to 100%
+
   return {
     ...v,
     vehicleCategory: v.vehicleCategory === 'car' ? 'minibus' : v.vehicleCategory,
@@ -643,6 +650,13 @@ export const mockVehicles = baseVehicles.map((v, i) => {
     color: colors[i % colors.length],
     fuelCapacity: 45 + (i % 20),
     registrationExpiry: regExpiryDate.toISOString().split('T')[0],
+    performanceMetrics: {
+      score: baseScore,
+      idleRatio,
+      activeHours,
+      speedingRatio,
+      signalStability,
+    },
     notes: i % 2 === 0 ? 'Kendaraan dalam kondisi baik' : 'Perlu perawatan rutin bulan depan',
     assetNumber: `AST-${(1000 + i).toString()}`,
     dimLength: 4.0 + (i % 3),

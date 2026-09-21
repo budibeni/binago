@@ -5,6 +5,7 @@ export interface CardFilter {
   search?: string;
   status?: CardStatus | 'ALL';
   type?: CardType | 'ALL';
+  holderType?: 'DRIVER' | 'PERSONEL' | 'UNASSIGNED' | 'ALL';
 }
 
 class CardService {
@@ -27,6 +28,14 @@ class CardService {
 
       if (filter.type && filter.type !== 'ALL') {
         data = data.filter(c => c.type === filter.type);
+      }
+
+      if (filter.holderType && filter.holderType !== 'ALL') {
+        if (filter.holderType === 'UNASSIGNED') {
+          data = data.filter(c => c.holderType === null);
+        } else {
+          data = data.filter(c => c.holderType === filter.holderType);
+        }
       }
     }
 

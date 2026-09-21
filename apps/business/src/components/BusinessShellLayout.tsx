@@ -42,10 +42,10 @@ import { getTranslation } from '../i18n';
 import { ShareLocationProvider } from '../features/core/sharing/context/ShareLocationContext';
 
 const DUMMY_USER: UserInfo = {
-  name: 'Budi Setiawan',
-  email: 'budi.setiawan@adatrack.id',
+  name: 'Budi Beni',
+  email: 'budi.beni@adatrack.id',
   role: 'Super Admin',
-  initials: 'BS',
+  initials: 'BB',
 };
 
 function buildNavigation(locale: Locale): NavGroup[] {

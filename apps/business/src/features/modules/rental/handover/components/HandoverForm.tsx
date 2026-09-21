@@ -81,7 +81,7 @@ export function HandoverForm({ contract, labels, onSubmit, onCancel, isSubmittin
       equipmentChecklist: equipment,
       notes,
       staffId: 'usr-budi',
-      staffName: 'Budi Setiawan'
+      staffName: 'Budi Beni'
     });
   };
 

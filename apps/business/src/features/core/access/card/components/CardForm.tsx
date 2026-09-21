@@ -63,7 +63,7 @@ export function CardForm({ card, open, onOpenChange, onSave, onCancel, activeAss
         <FormCard
           title={t.form.sectionInfo}
           description={t.form.descInfo}
-          icon={<CreditCard className="w-5 h-5 text-blue-500" />}
+          icon={<CreditCard className="w-5 h-5 text-danger" />}
           columns={2}
         >
 

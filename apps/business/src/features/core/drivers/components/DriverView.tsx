@@ -147,16 +147,17 @@ function SectionHeader({ icon: Icon, title }: { icon: React.ElementType; title: 
                       return (
                         <Star 
                           key={star} 
-                          className={cn("w-3.5 h-3.5", star <= rating ? "fill-warning text-warning" : "text-border/50 fill-transparent")} 
+                          className={cn(
+                            "w-3.5 h-3.5",
+                            star <= rating 
+                              ? "fill-warning text-warning" 
+                              : "fill-neutral-200 text-neutral-200 dark:fill-neutral-800 dark:text-neutral-800"
+                          )} 
                         />
                       );
                     })}
                   </div>
-                  <span className={cn(
-                    'text-[12px] font-bold tabular-nums ml-1',
-                    (driver.performanceScore || 0) < 60 ? 'text-danger' : 
-                    (driver.performanceScore || 0) < 80 ? 'text-warning' : 'text-success'
-                  )}>
+                  <span className="text-[12px] font-bold tabular-nums ml-1 text-foreground">
                     {driver.performanceScore || 0} Poin
                   </span>
                 </div>

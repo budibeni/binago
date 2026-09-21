@@ -21,9 +21,10 @@ export interface GroupTableProps {
   onViewDetail?: (group: GroupData) => void;
   onEdit?: (group: GroupData) => void;
   onDelete?: (group: GroupData) => void;
+  dtLabels?: any;
 }
 
-export function GroupTable({ groups, labels, toolbarActions, onViewDetail, onEdit, onDelete }: GroupTableProps) {
+export function GroupTable({ groups, labels, toolbarActions, onViewDetail, onEdit, onDelete, dtLabels }: GroupTableProps) {
   const [searchValue, setSearchValue] = React.useState('');
 
   const columns = React.useMemo<DataTableColumnDef<GroupData>[]>(() => [
@@ -96,6 +97,7 @@ export function GroupTable({ groups, labels, toolbarActions, onViewDetail, onEdi
         toolbarActions={toolbarActions}
         emptyTitle="Grup Tidak Ditemukan"
         emptyDescription="Tidak ada data grup yang cocok dengan pencarian Anda."
+        labels={dtLabels}
       />
     </div>
   );

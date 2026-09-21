@@ -53,7 +53,7 @@ export function BusinessHeroSection() {
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-white/60 mb-1">{h.heroGreeting}</p>
           <h1 className="text-3xl font-bold text-white leading-tight mb-3">
-            Budi Setiawan!
+            Budi Beni!
           </h1>
           <p className="text-sm text-white/60 max-w-sm leading-relaxed">
             {h.heroSubtitle}

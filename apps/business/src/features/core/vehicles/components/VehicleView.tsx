@@ -17,6 +17,9 @@ import {
   AlertTriangle,
   Settings,
   Power,
+  Star,
+  Activity,
+  RefreshCw,
 } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import { Badge, Button, DetailShell, SectionHeader } from '@adatrack/ui';
@@ -134,20 +137,71 @@ export function VehicleView({ vehicle, open, onClose, onEdit, onDelete, onTrack 
         </div>
 
         {onTrack && (
-          <div className="px-4 py-3 border-b border-border bg-neutral-50/50 dark:bg-neutral-900 grid grid-cols-2 gap-3 shrink-0">
-            <Button variant="outline" size="sm" className="w-full text-[12px] h-8 bg-transparent border-info/30 text-info hover:bg-info/10 dark:hover:bg-info/20 font-medium" onClick={() => onTrack(vehicle)}>
-              <MapPin className="w-3.5 h-3.5 mr-1.5" />
+          <div className="px-4 py-3 border-b border-border bg-neutral-50/50 dark:bg-neutral-900 grid grid-cols-3 gap-2 shrink-0">
+            <Button variant="outline" size="sm" className="w-full text-[11px] lg:text-[12px] px-1 whitespace-nowrap h-8 bg-transparent border-info/30 text-info hover:bg-info/10 dark:hover:bg-info/20 font-medium" onClick={() => onTrack(vehicle)}>
+              <MapPin className="w-3 h-3 lg:w-3.5 lg:h-3.5 mr-1" />
               {labels.btnTrack}
             </Button>
-            <Button variant="outline" size="sm" className="w-full text-[12px] h-8 bg-transparent border-danger/30 text-danger hover:bg-danger/10 dark:hover:bg-danger/20 font-medium" onClick={() => alert(labels.alertTurnOffEngine)}>
-              <Power className="w-3.5 h-3.5 mr-1.5" />
-              {labels.btnTurnOffEngine}
+            <Button variant="outline" size="sm" className="w-full text-[11px] lg:text-[12px] px-1 whitespace-nowrap h-8 bg-transparent border-warning/30 text-warning hover:bg-warning/10 dark:hover:bg-warning/20 font-medium" onClick={() => alert("Mengirim sinyal restart ke perangkat GPS...")}>
+              <RefreshCw className="w-3 h-3 lg:w-3.5 lg:h-3.5 mr-1" />
+              Restart GPS
+            </Button>
+            <Button variant="outline" size="sm" className="w-full text-[11px] lg:text-[12px] px-1 whitespace-nowrap h-8 bg-transparent border-danger/30 text-danger hover:bg-danger/10 dark:hover:bg-danger/20 font-medium" onClick={() => alert(labels.btnTurnOffEngine || 'Matikan Mesin')}>
+              <Power className="w-3 h-3 lg:w-3.5 lg:h-3.5 mr-1" />
+              <span className="truncate">{labels.btnTurnOffEngine || 'Matikan Mesin'}</span>
             </Button>
           </div>
         )}
 
         <div className="p-4 grid grid-cols-1 lg:group-data-[layout=dialog]/detail:grid-cols-2 lg:group-data-[layout=fullscreen]/detail:grid-cols-2 gap-6 items-start">
           <div className="flex flex-col gap-4">
+          {/* Section: Efisiensi & Stabilitas */}
+          <SectionHeader icon={Activity} title="Efisiensi & Stabilitas" />
+          <div className="rounded-lg border border-border bg-neutral-50/30 dark:bg-neutral-900 px-3 py-3 flex flex-col gap-3">
+            <div className="flex flex-col gap-1 items-center pb-3 border-b border-border/60">
+              <span className="text-[10px] text-foreground-muted font-medium uppercase tracking-wider">Skor Efisiensi (30 Hari)</span>
+              <div className="flex items-center gap-0.5" title={`${vehicle.performanceMetrics?.score || 0} / 100`}>
+                {[1, 2, 3, 4, 5].map(star => {
+                  const score = vehicle.performanceMetrics?.score || 0;
+                  const rating = score >= 100 ? 5 : Math.floor(score / 20);
+                  return (
+                    <Star 
+                      key={star} 
+                      className={cn(
+                        "w-5 h-5",
+                        star <= rating 
+                          ? "fill-warning text-warning" 
+                          : "fill-neutral-200 text-neutral-200 dark:fill-neutral-800 dark:text-neutral-800"
+                      )} 
+                    />
+                  );
+                })}
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-x-3 gap-y-3 pt-1">
+              <CompactField 
+                label="Rasio Idle" 
+                value={`${vehicle.performanceMetrics?.idleRatio || 0}%`} 
+                highlight={(vehicle.performanceMetrics?.idleRatio || 0) > 10} 
+              />
+              <CompactField 
+                label="Jam Mesin Aktif" 
+                value={`${vehicle.performanceMetrics?.activeHours || 0} Jam`} 
+              />
+              <CompactField 
+                label="Pelanggaran Ngebut" 
+                value={`${vehicle.performanceMetrics?.speedingRatio || 0}%`} 
+                highlight={(vehicle.performanceMetrics?.speedingRatio || 0) > 5} 
+              />
+              <CompactField 
+                label="Stabilitas Sinyal" 
+                value={`${vehicle.performanceMetrics?.signalStability || 0}%`} 
+                highlight={(vehicle.performanceMetrics?.signalStability || 0) < 95} 
+              />
+            </div>
+          </div>
+
             {/* Section: Informasi Dasar & Spesifikasi */}
             <SectionHeader icon={Car} title={labels.detailInfoSpec} />
           <div className="rounded-lg border border-border bg-neutral-50/30 dark:bg-neutral-900 px-3 py-2.5 grid grid-cols-2 gap-x-3 gap-y-2.5">
@@ -160,6 +214,8 @@ export function VehicleView({ vehicle, open, onClose, onEdit, onDelete, onTrack 
             <CompactField label={labels.fieldSeats} value={vehicle.passengerCapacity ? `${vehicle.passengerCapacity}` : '-'} />
             <CompactField label={labels.fieldDimension} value={(vehicle.dimLength && vehicle.dimWidth && vehicle.dimHeight) ? `${vehicle.dimLength}m x ${vehicle.dimWidth}m x ${vehicle.dimHeight}m` : '-'} colSpan={2} />
           </div>
+
+
 
           {/* Section: Operasional & Performa */}
           <SectionHeader icon={Gauge} title={labels.detailOpsPerf} />

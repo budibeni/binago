@@ -115,7 +115,7 @@ function buildColumns(
           variant = 'danger';
           label = 'Nonaktif';
         }
-        return <Badge variant={variant} dot className="capitalize">{label}</Badge>;
+        return <Badge variant={variant} dot className="capitalize border-transparent">{label}</Badge>;
       },
       enableSorting: true,
       size: 130,
@@ -135,20 +135,22 @@ function buildColumns(
       cell: ({ getValue }) => {
         const val = getValue() as number;
         const rating = val >= 100 ? 5 : Math.floor(val / 20); // 100 -> 5, 80-99 -> 4, 60-79 -> 3, 40-59 -> 2, <40 -> 1
-        let color = 'text-success';
-        if (val < 60) color = 'text-danger';
-        else if (val < 80) color = 'text-warning';
         return (
           <div className="flex flex-col gap-0.5">
             <div className="flex items-center gap-0.5" title={`${val} / 100`}>
-              {[1, 2, 3, 4, 5].map(star => (
-                <Star 
-                  key={star} 
-                  className={cn("w-3 h-3", star <= rating ? "fill-warning text-warning" : "text-border/50 fill-transparent")} 
+              {[1, 2, 3, 4, 5].map((star) => (
+                <Star
+                  key={star}
+                  className={cn(
+                    'w-3.5 h-3.5',
+                    star <= rating
+                      ? 'fill-warning text-warning'
+                      : 'fill-neutral-200 text-neutral-200 dark:fill-neutral-800 dark:text-neutral-800'
+                  )}
                 />
               ))}
             </div>
-            <span className={cn('font-bold text-[11px] tabular-nums', color)}>{val} Poin</span>
+            <span className="font-bold text-[11px] tabular-nums text-foreground">{val} Poin</span>
           </div>
         );
       },

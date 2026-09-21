@@ -128,7 +128,7 @@ export function PersonelForm({
       <div className="flex flex-col gap-6">
         <FormCard
           title="Kontak & Alamat"
-          icon={<Phone className="w-5 h-5 text-danger" />}
+          icon={<Phone className="w-5 h-5 text-green-500" />}
           description={tP.form.descAddress}
         >
           <InputPhone
@@ -157,7 +157,7 @@ export function PersonelForm({
 
         <FormCard
           title={tP.labels.notes}
-          icon={<Briefcase className="w-5 h-5 text-danger" />}
+          icon={<Briefcase className="w-5 h-5 text-purple-500" />}
           description={tP.form.descNotes}
         >
           <InputTextarea

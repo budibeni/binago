@@ -82,12 +82,13 @@ function buildColumns(
       cell: ({ row }) => {
         const p = row.original;
         return (
-          <span 
+          <button 
+            type="button"
             onClick={() => onViewDetail(p)}
-            className="font-medium text-foreground hover:text-primary hover:underline cursor-pointer transition-colors whitespace-nowrap"
+            className="font-bold text-primary hover:underline underline-offset-2 text-[13px] tracking-wider uppercase focus:outline-none whitespace-nowrap"
           >
             {p.name}
-          </span>
+          </button>
         );
       },
       enableSorting: true,
@@ -97,7 +98,7 @@ function buildColumns(
       id: 'personelType',
       header: labels.colType,
       accessorFn: (row) => row.personelType,
-      cell: ({ getValue }) => <span className="text-info">{getValue() as string}</span>,
+      cell: ({ getValue }) => <span className="text-[13px] text-info">{getValue() as string}</span>,
       enableSorting: true,
       size: 140,
     },
@@ -105,6 +106,7 @@ function buildColumns(
       id: 'nik',
       header: labels.colNik,
       accessorFn: (row) => row.nik,
+      cell: ({ getValue }) => <span className="text-[13px] tabular-nums text-foreground-muted">{getValue() as string}</span>,
       enableSorting: true,
       size: 150,
     },
@@ -112,6 +114,7 @@ function buildColumns(
       id: 'phone',
       header: labels.colPhone,
       accessorFn: (row) => row.phone,
+      cell: ({ getValue }) => <span className="text-[13px] tabular-nums text-foreground-muted">{getValue() as string}</span>,
       enableSorting: true,
       size: 140,
     },
@@ -119,6 +122,7 @@ function buildColumns(
       id: 'email',
       header: labels.colEmail,
       accessorFn: (row) => row.email,
+      cell: ({ getValue }) => <span className="text-[13px] text-foreground-muted">{getValue() as string}</span>,
       enableSorting: true,
       size: 180,
     },
@@ -126,6 +130,7 @@ function buildColumns(
       id: 'address',
       header: labels.colAddress,
       accessorFn: (row) => row.address,
+      cell: ({ getValue }) => <span className="text-[13px] text-foreground-muted">{getValue() as string}</span>,
       enableSorting: true,
       size: 250,
     },

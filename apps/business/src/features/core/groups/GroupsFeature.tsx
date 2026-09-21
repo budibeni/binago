@@ -45,6 +45,26 @@ export function GroupsFeature({ locale }: GroupsFeatureProps) {
     deleteBtn: tGroups.actions.delete,
   };
 
+  const dtLabels = React.useMemo(() => {
+    const isEn = locale === 'en';
+    return {
+      paginationShowing: (from: number, to: number, total: number) => isEn ? `Showing ${from}-${to} of ${total.toLocaleString('en-US')} items` : `Menampilkan ${from}-${to} dari ${total.toLocaleString('id-ID')} data`,
+      paginationPerPage: isEn ? '/ page' : '/ halaman',
+      toolbarRefresh: isEn ? 'Refresh' : 'Refresh',
+      toolbarFilter: isEn ? 'Filter' : 'Filter',
+      toolbarColumns: isEn ? 'Columns' : 'Kolom',
+      toolbarExport: isEn ? 'Export' : 'Ekspor',
+      activeFilterClear: isEn ? 'Clear Filters' : 'Reset Filter',
+      columnPanelHideAll: isEn ? 'Hide all' : 'Sembunyikan semua',
+      columnPanelShowAll: isEn ? 'Show all' : 'Tampilkan semua',
+      errorLoadData: isEn ? 'Failed to load data.' : 'Gagal memuat data.',
+      errorTryAgain: isEn ? 'Try Again' : 'Coba Lagi',
+      errorTitle: isEn ? 'An error occurred' : 'Terjadi Kesalahan',
+      noResultTitle: isEn ? 'No results found' : 'Hasil Tidak Ditemukan',
+      noResultDesc: isEn ? 'No data matches your search or filters.' : 'Tidak ada data yang sesuai dengan pencarian atau filter Anda.',
+    };
+  }, [locale]);
+
   const handleAdd = () => {
     setEditGroup(null);
     setIsFormOpen(true);
@@ -86,6 +106,7 @@ export function GroupsFeature({ locale }: GroupsFeatureProps) {
           onViewDetail={handleView}
           onEdit={handleEdit}
           onDelete={handleDelete}
+          dtLabels={dtLabels}
           toolbarActions={
             <div className="flex items-center gap-2">
               <div className="w-[140px]">

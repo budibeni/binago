@@ -64,13 +64,19 @@ export function GroupForm({
       isSubmitting={isSubmitting}
       layout={layout}
     >
-      <FormCard title="Informasi Dasar">
+      <FormCard>
         <InputString
           label="Nama Grup"
           value={formData.name || ''}
           onChange={(v) => handleChange('name', v)}
           error={errors.name}
-          placeholder="Contoh: Logistik Area Jakarta"
+          placeholder={
+            formData.type === 'vehicle' ? 'Contoh: Armada Logistik Jakarta' :
+            formData.type === 'driver' ? 'Contoh: Tim Pengemudi Shift Pagi' :
+            formData.type === 'geofence' ? 'Contoh: Wilayah Pergudangan' :
+            formData.type === 'route' ? 'Contoh: Rute Distribusi Utama' :
+            'Masukkan nama grup...'
+          }
         />
         <InputTextarea
           label="Deskripsi"

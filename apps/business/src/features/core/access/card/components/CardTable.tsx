@@ -65,7 +65,7 @@ function buildColumns(
       cell: ({ row }) => (
         <button
           type="button"
-          className="font-bold text-primary hover:underline underline-offset-2 focus:outline-none text-[13px] whitespace-nowrap"
+          className="font-bold text-primary hover:underline underline-offset-2 focus:outline-none text-[13px] tracking-wider uppercase whitespace-nowrap"
           onClick={() => onViewDetail?.(row.original)}
         >
           {row.original.name}
@@ -105,16 +105,32 @@ function buildColumns(
       },
     },
     {
+      id: 'holderType',
+      header: t.table.colHolderType,
+      size: 130,
+      accessorFn: (row) => row.holderType ?? '-',
+      cell: ({ row }) => {
+        const type = row.original.holderType;
+        if (!type) return <span className="text-[13px] text-foreground-muted/50">-</span>;
+        return (
+          <span className="text-[13px] text-foreground">
+            {type === 'DRIVER' ? t.form.valDriver : type === 'PERSONEL' ? t.form.valPersonel : t.form.valNone}
+          </span>
+        );
+      },
+      enableSorting: true,
+    },
+    {
       id: 'holder',
       header: t.table.colHolder,
-      size: 200,
+      size: 180,
       accessorFn: (row) => row.holderName ?? '-',
       cell: ({ row }) => {
         const d = row.original;
         const holderName = d.holderName ?? '-';
         const hasHolder = !!d.holderId;
         return (
-          <span className={hasHolder ? 'text-foreground' : 'text-foreground-muted italic'}>
+          <span className={cn('text-[13px]', hasHolder ? 'text-foreground font-medium' : 'text-foreground-muted italic')}>
             {holderName}
           </span>
         );

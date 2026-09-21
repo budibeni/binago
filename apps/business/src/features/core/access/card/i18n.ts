@@ -16,7 +16,8 @@ export const cardDictionaries = {
     table: {
       colCard: 'Card',
       colHolder: 'Pemegang',
-      colType: 'Tipe',
+      colHolderType: 'Tipe Pemegang',
+      colType: 'Jenis',
       colUid: 'UID / Nomor Kartu',
       colPurpose: 'Penggunaan',
       colStatus: 'Status',
@@ -93,6 +94,7 @@ export const cardDictionaries = {
     table: {
       colCard: 'Card',
       colHolder: 'Holder',
+      colHolderType: 'Holder Type',
       colType: 'Type',
       colUid: 'UID / Card Number',
       colPurpose: 'Purpose',

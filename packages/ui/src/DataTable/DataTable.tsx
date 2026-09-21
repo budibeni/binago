@@ -81,7 +81,7 @@ export function DataTable<TData extends RowData = RowData>(
   const table = useDataTable(props);
 
   const activeFilterCount = filterConfig
-    ? Object.values(filterConfig.state).flat().filter(Boolean).length
+    ? Object.values(filterConfig.state).flat().filter(v => Boolean(v) && v !== 'all' && v !== 'ALL').length
     : 0;
 
   let fetchState: 'idle' | 'loading' | 'error' = 'idle';

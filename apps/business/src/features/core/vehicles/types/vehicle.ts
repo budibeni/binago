@@ -19,6 +19,14 @@ export interface VehicleGroup {
   name: string;
 }
 
+export interface VehiclePerformanceMetrics {
+  score: number;
+  idleRatio: number;
+  activeHours: number;
+  speedingRatio: number;
+  signalStability: number;
+}
+
 // --- Vehicle -----------------------------------------------------------------
 
 export interface Vehicle {
@@ -40,10 +48,13 @@ export interface Vehicle {
   gpsDeviceType?: string;     // Tipe perangkat GPS
   gpsInstallDate?: string;    // Tanggal instalasi GPS (YYYY-MM-DD)
   status: VehicleStatus;
+  lastUpdate: string;         // ISO 8601
+  speed: number;
+  course: number;
   odometer: number;           // km
+  performanceMetrics?: VehiclePerformanceMetrics;
   lastServiceKm: number;      // km terakhir servis
   nextServiceKm: number;      // km servis berikutnya
-  lastUpdate: string;         // ISO 8601
   registrationExpiry: string; // ISO date YYYY-MM-DD
   passengerCapacity?: number;
   color?: string;
@@ -74,6 +85,7 @@ export interface VehicleFilters {
   status: VehicleStatusFilter;
   groupIds: string[];
   stnkStatus: string[];
+  performanceStars?: string[];
 }
 
 export const getVehicleFormSchema = (t: Record<string, string>) => z.object({

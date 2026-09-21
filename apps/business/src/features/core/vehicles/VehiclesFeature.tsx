@@ -2,7 +2,8 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { Car } from 'lucide-react';
+import { Car, Star } from 'lucide-react';
+import { cn } from '@adatrack/utils';
 import { getTranslation } from '../../../i18n';
 import { useBusinessLocale } from '../../../components/BusinessShellLayout';
 import { vehicleService } from '@/data/services';
@@ -32,12 +33,14 @@ export function VehiclesFeature() {
     status: [],
     groupIds: [],
     stnkStatus: [],
+    performanceStars: [],
   });
   const [isFilterOpen, setIsFilterOpen] = React.useState(false);
 
   const statusFilter = filterState.status as VehicleStatusFilter;
   const selectedGroupIds = filterState.groupIds as string[];
   const stnkStatusFilter = filterState.stnkStatus as string[];
+  const performanceStarsFilter = filterState.performanceStars as string[];
 
   const [detailVehicle, setDetailVehicle] = React.useState<Vehicle | null>(null);
   const [drawerOpen, setDrawerOpen] = React.useState(false);
@@ -46,8 +49,14 @@ export function VehiclesFeature() {
 
   // ===========================================================================
   const filteredVehicles = React.useMemo(
-    () => vehicleService.getVehicles({ search, status: statusFilter, groupIds: selectedGroupIds, stnkStatus: stnkStatusFilter }),
-    [search, statusFilter, selectedGroupIds, stnkStatusFilter],
+    () => vehicleService.getVehicles({ 
+      search, 
+      status: statusFilter, 
+      groupIds: selectedGroupIds, 
+      stnkStatus: stnkStatusFilter,
+      performanceStars: performanceStarsFilter 
+    }),
+    [search, statusFilter, selectedGroupIds, stnkStatusFilter, performanceStarsFilter],
   );
 
   // statusCounts removed
@@ -161,12 +170,37 @@ export function VehiclesFeature() {
   const filterConfig: DataTableFilterConfig = React.useMemo(() => ({
     state: filterState,
     onStateChange: setFilterState,
-    onClearAll: () => setFilterState({ status: [], groupIds: [], stnkStatus: [] }),
+    onClearAll: () => setFilterState({ status: [], groupIds: [], stnkStatus: [], performanceStars: [] }),
     labels: {
       title: 'Filter',
       clearAll: filterLabels.clearFilters,
     },
     fields: [
+      {
+        id: 'performanceStars',
+        label: 'Efisiensi',
+        type: 'pills-multi',
+        options: [5, 4, 3, 2, 1].map((star) => ({
+          value: star.toString(),
+          label: (
+            <div className="flex items-center gap-0.5" title={`${star} Bintang`}>
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Star
+                  key={i}
+                  className={cn(
+                    'w-3.5 h-3.5',
+                    i < star
+                      ? 'fill-warning text-warning'
+                      : 'fill-neutral-200 text-neutral-200 dark:fill-neutral-700 dark:text-neutral-700'
+                  )}
+                />
+              ))}
+            </div>
+          ),
+          colorClass: 'bg-neutral-100 dark:bg-neutral-800',
+          activeClass: 'bg-primary/10 border-primary/30 text-primary',
+        })),
+      },
       {
         id: 'status',
         label: filterLabels.filterStatus,

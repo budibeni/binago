@@ -46,6 +46,15 @@ export const vehicleService = {
       });
     }
 
+    if (filters.performanceStars && filters.performanceStars.length > 0) {
+      const stars = filters.performanceStars;
+      vehicles = vehicles.filter((v) => {
+        const score = v.performanceMetrics?.score || 0;
+        const rating = score >= 100 ? 5 : Math.floor(score / 20);
+        return stars.includes(rating.toString());
+      });
+    }
+
     return vehicles;
   },
 

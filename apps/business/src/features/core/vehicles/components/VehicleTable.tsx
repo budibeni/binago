@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { MoreVertical, Eye, Edit2, MapPin, Trash2, Plus, Search, Map, MoreHorizontal, ShieldAlert, Edit } from 'lucide-react';
+import { MoreVertical, Eye, Edit2, MapPin, Trash2, Plus, Search, Map, MoreHorizontal, ShieldAlert, Edit, Star } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import {
   Badge, Button,
@@ -172,6 +172,33 @@ function buildColumns(
                   {row.original.driverName ?? labels.noDriver}
                 </span>
               ),
+            },
+    {
+              id: 'efficiency',
+              accessorFn: (row) => row.performanceMetrics?.score || 0,
+              header: 'Efisiensi',
+              enableSorting: true,
+              size: 140,
+              cell: ({ row }) => {
+                const score = row.original.performanceMetrics?.score || 0;
+                const rating = score >= 100 ? 5 : Math.floor(score / 20);
+
+                return (
+                  <div className="flex items-center gap-0.5" title={`${score} / 100`}>
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star
+                        key={star}
+                        className={cn(
+                          'w-3.5 h-3.5',
+                          star <= rating
+                            ? 'fill-warning text-warning'
+                            : 'fill-neutral-200 text-neutral-200 dark:fill-neutral-800 dark:text-neutral-800'
+                        )}
+                      />
+                    ))}
+                  </div>
+                );
+              },
             },
     {
               id: 'vehicleCategory',
