@@ -162,7 +162,7 @@ export function ContractPrintFeature({ contractId }: ContractPrintFeatureProps) 
         <div className="mb-8">
           <h3 className="font-bold text-lg border-b border-neutral-300 pb-2 mb-4 uppercase">Data Kendaraan</h3>
           <div className="grid grid-cols-2 gap-y-3 gap-x-8 text-sm">
-            <div><span className="text-neutral-500 font-semibold inline-block w-32">Nomor Polisi:</span> <span className="font-medium">{contract.vehicle?.coreVehicle?.plateNumber}</span></div>
+            <div><span className="text-neutral-500 font-semibold inline-block w-32">Plat Nomor:</span> <span className="font-medium">{contract.vehicle?.coreVehicle?.plateNumber}</span></div>
             <div><span className="text-neutral-500 font-semibold inline-block w-32">Merk:</span> <span className="font-medium">{contract.vehicle?.coreVehicle?.brand}</span></div>
             <div><span className="text-neutral-500 font-semibold inline-block w-32">Model:</span> <span className="font-medium">{contract.vehicle?.coreVehicle?.vehicleName}</span></div>
             <div><span className="text-neutral-500 font-semibold inline-block w-32">Tahun:</span> <span className="font-medium">{contract.vehicle?.coreVehicle?.year}</span></div>

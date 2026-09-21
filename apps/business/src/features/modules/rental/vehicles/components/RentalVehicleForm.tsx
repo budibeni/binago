@@ -33,7 +33,7 @@ export function RentalVehicleForm({
   open,
   onOpenChange,
 }: RentalVehicleFormProps) {
-  
+
   const isEdit = !!initialData;
   const [vehicleId, setVehicleId] = React.useState(initialData?.vehicleId || '');
   const [status, setStatus] = React.useState<RentalStatus>(initialData?.status || 'READY');
@@ -47,10 +47,6 @@ export function RentalVehicleForm({
   const [startOdo, setStartOdo] = React.useState(initialData?.rentalStartOdometer?.toString() || '');
   const [currentOdo, setCurrentOdo] = React.useState(initialData?.currentOdometer?.toString() || '');
   const [notes, setNotes] = React.useState(initialData?.notes || '');
-  const [stnkExpiry, setStnkExpiry] = React.useState(initialData?.stnkExpiredAt || '');
-  const [taxExpiry, setTaxExpiry] = React.useState(initialData?.taxExpiredAt || '');
-  const [insuranceExpiry, setInsuranceExpiry] = React.useState(initialData?.insuranceExpiredAt || '');
-  
   const defaultEq = { stnk: false, bpkb: false, spareTire: false, jack: false, toolkit: false, firstAidKit: false, fireExtinguisher: false, carpet: false, audio: false };
   const [equipment, setEquipment] = React.useState<RentalEquipment>(initialData?.equipment || defaultEq);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -74,9 +70,9 @@ export function RentalVehicleForm({
         currentOdometer: Number(currentOdo) || 0,
         rentalStartOdometer: Number(startOdo) || 0,
         notes,
-        stnkExpiredAt: stnkExpiry,
-        taxExpiredAt: taxExpiry,
-        insuranceExpiredAt: insuranceExpiry,
+        stnkExpiredAt: initialData?.stnkExpiredAt || '',
+        taxExpiredAt: initialData?.taxExpiredAt || '',
+        insuranceExpiredAt: initialData?.insuranceExpiredAt || '',
         equipment,
       });
       setIsSubmitting(false);
@@ -90,20 +86,20 @@ export function RentalVehicleForm({
   const selectedCoreVehicle = isEdit ? initialData.coreVehicle : availableCoreVehicles.find(v => v.id === vehicleId);
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col w-full h-full relative">
-      <FormShell
-        layout={layout}
-        open={open}
-        onOpenChange={onOpenChange}
-        title={title}
-        subtitle="Lengkapi data kendaraan rental Anda"
-        onCancel={onCancel}
-        cancelProps={{ disabled: isSubmitting }}
-        saveText={isSubmitting ? 'Menyimpan...' : 'Simpan'}
-        saveProps={{ disabled: isSubmitting || !vehicleId }}
-        isSubmitting={isSubmitting}
-      >
-        <div className="w-full max-w-6xl mx-auto p-4 lg:p-6 flex flex-col gap-4 lg:gap-5">
+    <FormShell
+      onSubmit={handleSubmit}
+      layout={layout}
+      open={open}
+      onOpenChange={onOpenChange}
+      title={title}
+      subtitle="Lengkapi data kendaraan rental Anda"
+      onCancel={onCancel}
+      cancelProps={{ disabled: isSubmitting }}
+      saveText={isSubmitting ? 'Menyimpan...' : 'Simpan'}
+      saveProps={{ disabled: isSubmitting || !vehicleId }}
+      isSubmitting={isSubmitting}
+    >
+      <div className="w-full max-w-6xl mx-auto p-4 lg:p-6 flex flex-col gap-4 lg:gap-5">
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-5 items-start">
           {/* Kolom Kiri */}
@@ -133,60 +129,89 @@ export function RentalVehicleForm({
               )}
 
               {selectedCoreVehicle && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-3 bg-neutral-50/50 dark:bg-neutral-900/50 p-4 rounded-xl border border-border/60">
-                  <div className="space-y-1">
+                <div className="grid grid-cols-2 gap-y-2.5 gap-x-3 bg-gray-100 dark:bg-neutral-800 p-4 rounded-xl border border-gray-200 dark:border-neutral-700">
+                  <div className="flex flex-col gap-0.5">
                     <span className="text-[11px] text-muted-foreground">Plat Nomor</span>
-                    <p className="font-semibold text-sm">{selectedCoreVehicle.plateNumber}</p>
+                    <p className="font-semibold text-sm uppercase">{selectedCoreVehicle.plateNumber || '-'}</p>
                   </div>
-                  <div className="space-y-1">
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-[11px] text-muted-foreground">Grup</span>
+                    <p className="font-semibold text-sm">{selectedCoreVehicle.groupName || '-'}</p>
+                  </div>
+                  <div className="flex flex-col gap-0.5">
                     <span className="text-[11px] text-muted-foreground">Merk</span>
-                    <p className="font-semibold text-sm">{selectedCoreVehicle.brand}</p>
+                    <p className="font-semibold text-sm">{selectedCoreVehicle.brand || '-'}</p>
                   </div>
-                  <div className="space-y-1">
-                    <span className="text-[11px] text-muted-foreground">Model</span>
-                    <p className="font-semibold text-sm">{selectedCoreVehicle.vehicleName}</p>
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-[11px] text-muted-foreground">Kendaraan (Alias)</span>
+                    <p className="font-semibold text-sm">{selectedCoreVehicle.vehicleName || '-'}</p>
                   </div>
-                  <div className="space-y-1">
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-[11px] text-muted-foreground">Kategori</span>
+                    <p className="font-semibold text-sm capitalize">{selectedCoreVehicle.vehicleCategory || '-'}</p>
+                  </div>
+                  <div className="flex flex-col gap-0.5">
                     <span className="text-[11px] text-muted-foreground">Tahun</span>
-                    <p className="font-semibold text-sm">{selectedCoreVehicle.year}</p>
+                    <p className="font-semibold text-sm">{selectedCoreVehicle.year || '-'}</p>
+                  </div>
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-[11px] text-muted-foreground">Warna</span>
+                    <p className="font-semibold text-sm">{selectedCoreVehicle.color || '-'}</p>
+                  </div>
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-[11px] text-muted-foreground">Bahan Bakar</span>
+                    <p className="font-semibold text-sm capitalize">{selectedCoreVehicle.fuelType || '-'}</p>
+                  </div>
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-[11px] text-muted-foreground">No. STNK</span>
+                    <p className="font-semibold text-sm">{selectedCoreVehicle.stnkNumber || '-'}</p>
+                  </div>
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-[11px] text-muted-foreground">Berlaku STNK</span>
+                    <p className="font-semibold text-sm">{selectedCoreVehicle.registrationExpiry || '-'}</p>
                   </div>
                 </div>
               )}
-            </FormCard>
 
-            {/* Document Expire Card */}
-            <FormCard
-              title="Dokumen Kendaraan"
-              description="Masa berlaku dokumen legal kendaraan."
-              icon={<FileSpreadsheet className="w-5 h-5 text-danger" />}
-            >
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3.5">
-                <div className="sm:col-span-2">
-                  <InputDate
-                    id="stnkExpiry"
-                    label="Masa Berlaku STNK"
-                    value={stnkExpiry}
-                    onChange={(v) => setStnkExpiry(v)}
-                  />
+              {/* Kelengkapan */}
+              <div className="mt-6 border-t border-border/40 pt-5">
+                <div className="mb-3">
+                  <h4 className="text-xs font-semibold text-foreground">Kelengkapan Kendaraan</h4>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">Ceklis perlengkapan yang tersedia di kendaraan ini.</p>
                 </div>
-                <div>
-                  <InputDate
-                    id="taxExpiry"
-                    label="Masa Berlaku Pajak"
-                    value={taxExpiry}
-                    onChange={(v) => setTaxExpiry(v)}
-                  />
-                </div>
-                <div>
-                  <InputDate
-                    id="insuranceExpiry"
-                    label="Masa Berlaku Asuransi"
-                    value={insuranceExpiry}
-                    onChange={(v) => setInsuranceExpiry(v)}
-                  />
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {[
+                    { id: 'stnk', label: 'STNK' },
+                    { id: 'bpkb', label: 'BPKB' },
+                    { id: 'spareTire', label: 'Ban Cadangan' },
+                    { id: 'jack', label: 'Dongkrak' },
+                    { id: 'toolkit', label: 'Toolkit' },
+                    { id: 'firstAidKit', label: 'P3K' },
+                    { id: 'fireExtinguisher', label: 'APAR' },
+                    { id: 'carpet', label: 'Karpet' },
+                    { id: 'audio', label: 'Radio / Audio' }
+                  ].map((item) => (
+                    <label
+                      key={item.id}
+                      className={cn(
+                        "flex items-center gap-2.5 px-3 min-h-[42px] border rounded-lg cursor-pointer transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-800/50",
+                        equipment[item.id as keyof RentalEquipment]
+                          ? "bg-danger/5 border-danger/40"
+                          : "border-border/60"
+                      )}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={equipment[item.id as keyof RentalEquipment]}
+                        onChange={() => handleEqToggle(item.id as keyof RentalEquipment)}
+                        className="rounded border-neutral-300 text-danger accent-red-600 focus:ring-danger w-4 h-4 shrink-0"
+                      />
+                      <span className="text-xs font-medium">{item.label}</span>
+                    </label>
+                  ))}
                 </div>
               </div>
+
             </FormCard>
 
           </div>
@@ -228,8 +253,8 @@ export function RentalVehicleForm({
                         onClick={() => setPricingType('CATEGORY')}
                         className={cn(
                           "flex-1 py-2.5 px-3 border rounded-lg text-[12px] font-medium transition-colors text-center",
-                          pricingType === 'CATEGORY' 
-                            ? "bg-primary/10 text-primary border-primary" 
+                          pricingType === 'CATEGORY'
+                            ? "bg-primary/10 text-primary border-primary"
                             : "bg-background text-foreground hover:bg-muted border-border"
                         )}
                       >
@@ -240,8 +265,8 @@ export function RentalVehicleForm({
                         onClick={() => setPricingType('INDEPENDENT')}
                         className={cn(
                           "flex-1 py-2.5 px-3 border rounded-lg text-[12px] font-medium transition-colors text-center",
-                          pricingType === 'INDEPENDENT' 
-                            ? "bg-primary/10 text-primary border-primary" 
+                          pricingType === 'INDEPENDENT'
+                            ? "bg-primary/10 text-primary border-primary"
                             : "bg-background text-foreground hover:bg-muted border-border"
                         )}
                       >
@@ -328,7 +353,7 @@ export function RentalVehicleForm({
                     <Button type="button" variant="outline" size="sm" className="h-9 text-[11px] px-3 whitespace-nowrap" onClick={() => setCurrentOdo('15000')}>Ambil dari odometer</Button>
                   </div>
                 </div>
-                
+
                 <div className="sm:col-span-2">
                   <InputString
                     id="notes"
@@ -346,60 +371,8 @@ export function RentalVehicleForm({
           </div>
         </div>
 
-        {/* Equipment Card (Full Width at Bottom) */}
-        <FormCard
-          title="Kelengkapan"
-          description="Checklist perlengkapan yang ada pada kendaraan."
-          icon={<ShieldCheck className="w-5 h-5 text-danger" />}
-        >
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-3 gap-x-4 text-sm mt-1">
-            {/* Col 1 */}
-            <div className="flex flex-col gap-3">
-              <label className="flex items-center gap-2 cursor-pointer group">
-                <input type="checkbox" checked={equipment.stnk} onChange={() => handleEqToggle('stnk')} className="rounded border-muted-foreground/30 text-primary focus:ring-primary/20 cursor-pointer w-3.5 h-3.5" />
-                <span className="group-hover:text-foreground transition-colors text-muted-foreground text-xs">STNK</span>
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer group">
-                <input type="checkbox" checked={equipment.spareTire} onChange={() => handleEqToggle('spareTire')} className="rounded border-muted-foreground/30 text-primary focus:ring-primary/20 cursor-pointer w-3.5 h-3.5" />
-                <span className="group-hover:text-foreground transition-colors text-muted-foreground text-xs">Ban Cadangan</span>
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer group">
-                <input type="checkbox" checked={equipment.toolkit} onChange={() => handleEqToggle('toolkit')} className="rounded border-muted-foreground/30 text-primary focus:ring-primary/20 cursor-pointer w-3.5 h-3.5" />
-                <span className="group-hover:text-foreground transition-colors text-muted-foreground text-xs">Toolkit</span>
-              </label>
-            </div>
-            
-            {/* Col 2 */}
-            <div className="flex flex-col gap-3">
-              <label className="flex items-center gap-2 cursor-pointer group">
-                <input type="checkbox" checked={equipment.fireExtinguisher} onChange={() => handleEqToggle('fireExtinguisher')} className="rounded border-muted-foreground/30 text-primary focus:ring-primary/20 cursor-pointer w-3.5 h-3.5" />
-                <span className="group-hover:text-foreground transition-colors text-muted-foreground text-xs">APAR</span>
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer group">
-                <input type="checkbox" checked={equipment.jack} onChange={() => handleEqToggle('jack')} className="rounded border-muted-foreground/30 text-primary focus:ring-primary/20 cursor-pointer w-3.5 h-3.5" />
-                <span className="group-hover:text-foreground transition-colors text-muted-foreground text-xs">Dongkrak</span>
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer group">
-                <input type="checkbox" checked={equipment.firstAidKit} onChange={() => handleEqToggle('firstAidKit')} className="rounded border-muted-foreground/30 text-primary focus:ring-primary/20 cursor-pointer w-3.5 h-3.5" />
-                <span className="group-hover:text-foreground transition-colors text-muted-foreground text-xs">P3K</span>
-              </label>
-            </div>
 
-            {/* Col 3 */}
-            <div className="flex flex-col gap-3">
-              <label className="flex items-center gap-2 cursor-pointer group">
-                <input type="checkbox" checked={equipment.bpkb} onChange={() => handleEqToggle('bpkb')} className="rounded border-muted-foreground/30 text-primary focus:ring-primary/20 cursor-pointer w-3.5 h-3.5" />
-                <span className="group-hover:text-foreground transition-colors text-muted-foreground text-xs">BPKB</span>
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer group">
-                <input type="checkbox" checked={equipment.audio} onChange={() => handleEqToggle('audio')} className="rounded border-muted-foreground/30 text-primary focus:ring-primary/20 cursor-pointer w-3.5 h-3.5" />
-                <span className="group-hover:text-foreground transition-colors text-muted-foreground text-xs">Radio / Audio</span>
-              </label>
-            </div>
-          </div>
-        </FormCard>
-        </div>
-      </FormShell>
-    </form>
+      </div>
+    </FormShell>
   );
 }

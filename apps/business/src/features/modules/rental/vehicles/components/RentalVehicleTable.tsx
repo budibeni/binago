@@ -109,7 +109,7 @@ function buildColumns(
     {
       id: 'plateNumber',
       accessorFn: (v) => v.coreVehicle.plateNumber,
-      header: 'No. Polisi',
+      header: 'Plat Nomor',
       enableSorting: true,
       size: 130,
       cell: ({ row }) => (

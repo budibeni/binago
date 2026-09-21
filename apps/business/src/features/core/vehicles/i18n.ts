@@ -17,7 +17,7 @@ export const vehiclesDictionaries = {
       cardSpecsDesc: 'Informasi fisik dan kapasitas kendaraan',
       cardLegal: 'Lisensi & Legalitas',
       cardLegalDesc: 'Informasi dokumen legal kendaraan seperti BPKB, STNK, dan KIR',
-      lblPlateNumber: 'Nomor Polisi',
+      lblPlateNumber: 'Plat Nomor',
       lblVehicleName: 'Nama / Alias Kendaraan',
       lblBrand: 'Merek',
       lblYear: 'Tahun Pembuatan',
@@ -67,7 +67,7 @@ export const vehiclesDictionaries = {
       btnCancel: 'Batal',
     },
     validation: {
-      plateRequired: 'Nomor polisi wajib diisi',
+      plateRequired: 'Plat nomor wajib diisi',
       nameRequired: 'Nama kendaraan wajib diisi',
       groupRequired: 'Grup kendaraan wajib dipilih',
     }

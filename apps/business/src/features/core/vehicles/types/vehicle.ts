@@ -89,7 +89,7 @@ export interface VehicleFilters {
 }
 
 export const getVehicleFormSchema = (t: Record<string, string>) => z.object({
-  plateNumber: z.string().min(1, t.plateRequired || 'Nomor polisi wajib diisi'),
+  plateNumber: z.string().min(1, t.plateRequired || 'Plat nomor wajib diisi'),
   vehicleName: z.string().min(1, t.nameRequired || 'Nama kendaraan wajib diisi'),
   vehicleCategory: z.enum(['truck', 'minibus', 'pickup', 'motorcycle', 'other']),
   brand: z.string().optional(),

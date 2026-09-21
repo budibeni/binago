@@ -263,18 +263,6 @@ export function RentalVehicleDetailDrawer({
           </div>
         </div>
         
-        {/* Footer */}
-        <div className="p-3.5 border-t border-border/40 flex justify-between items-center bg-background">
-          <div className="flex items-center gap-2.5">
-            <Button variant="outline" size="sm" onClick={() => onOpenChange(false)} className="bg-white text-foreground">
-              Batal
-            </Button>
-            <Button variant="primary" size="sm" className="bg-danger hover:bg-danger/90 text-white" onClick={() => { onOpenChange(false); onEdit(data); }}>
-              <Edit2 className="w-3.5 h-3.5 mr-1.5" />
-              Edit
-            </Button>
-          </div>
-      </div>
     </DetailShell>
   );
 }

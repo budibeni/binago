@@ -12,7 +12,7 @@ import type { RentalVehicle, RentalStatusFilter } from './types/rentalVehicle';
 import type { RentalPricingCategory } from '../pricing-category/types/pricing';
 import type { DataTableFilterConfig } from '@adatrack/ui';
 import { RentalVehicleTable } from './components/RentalVehicleTable';
-import { RentalVehicleSelectionDialog } from './components/RentalVehicleSelectionDialog';
+import { VehicleSelectionDialog } from '@/features/core/vehicles/components/VehicleSelectionDialog';
 import { RentalVehicleDetailDrawer } from './components/RentalVehicleDetailDrawer';
 import { RentalVehicleDisableDialog } from './components/RentalVehicleDisableDialog';
 import { RentalVehicleForm } from './components/RentalVehicleForm';
@@ -92,6 +92,8 @@ export function RentalVehiclesFeature() {
   };
 
   // Handlers
+  const [isRefreshing, setIsRefreshing] = React.useState(false);
+
   const handleAddClick = () => {
     setSelectionDialogOpen(true);
   };
@@ -203,7 +205,7 @@ export function RentalVehiclesFeature() {
   const [showStats, setShowStats] = React.useState(true);
 
   return (
-    <div className="flex flex-row h-full w-full bg-background overflow-hidden">
+    <div className="flex flex-row h-full w-full bg-background overflow-hidden relative">
       
       {/* Left Column (Table + Bottom Action Bar) */}
       <div className="flex-1 flex flex-col min-w-0 h-full">
@@ -281,11 +283,20 @@ export function RentalVehiclesFeature() {
           </div>
         </PanelShell>
 
-      <RentalVehicleSelectionDialog
+      <VehicleSelectionDialog
         open={selectionDialogOpen}
         onOpenChange={setSelectionDialogOpen}
-        availableCoreVehicles={availableCores}
-        onRegister={handleRegisterMultiple}
+        vehicles={availableCores}
+        onSubmit={handleRegisterMultiple}
+        title="Daftarkan Kendaraan"
+        emptyTitle="Semua kendaraan sudah terdaftar"
+        emptyDescription="Semua kendaraan dari Master Kendaraan sudah menjadi bagian dari Kendaraan Rental."
+        submitLabel="Pilih"
+        onRefresh={() => {
+          setIsRefreshing(true);
+          setTimeout(() => setIsRefreshing(false), 800);
+        }}
+        isLoading={isRefreshing}
       />
 
       <RentalVehicleDetailDrawer
