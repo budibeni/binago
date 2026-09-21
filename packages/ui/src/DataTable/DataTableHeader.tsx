@@ -36,12 +36,12 @@ export function DataTableHeader<TData extends RowData = RowData>({
                 className={cn(
                   'px-3 py-2 text-left align-middle font-medium select-none whitespace-nowrap group',
                   canSort && 'cursor-pointer hover:bg-muted/30 transition-colors',
-                  isPinned &&
-                  'sticky z-30 bg-gray-100 dark:bg-gray-800/50',
+                  isPinned && 'sticky z-30 bg-gray-100 dark:bg-gray-800/50',
                 (isPinned === 'start' || (isPinned as string) === 'left') &&
                   'shadow-[2px_0_4px_-1px_rgba(0,0,0,0.08)]',
                 (isPinned === 'end' || (isPinned as string) === 'right') &&
                   'shadow-[-2px_0_4px_-1px_rgba(0,0,0,0.08)]',
+                (header.column.columnDef.meta as any)?.className,
                 )}
                 onClick={header.column.getToggleSortingHandler()}
                 style={{
@@ -50,10 +50,10 @@ export function DataTableHeader<TData extends RowData = RowData>({
                     minWidth: header.column.getSize(),
                     maxWidth: header.column.getSize(),
                   } : {}),
-                  ...(isPinned === 'left' || isPinned === 'start'
-                    ? { left: `${header.column.getStart('left')}px` }
-                    : isPinned === 'right' || isPinned === 'end'
-                    ? { right: `${header.column.getAfter('right')}px` }
+                  ...((isPinned as string) === 'left' || isPinned === 'start'
+                    ? { left: `${header.column.getStart('left' as any)}px` }
+                    : (isPinned as string) === 'right' || isPinned === 'end'
+                    ? { right: `${header.column.getAfter('right' as any)}px` }
                     : {}),
                 }}
               >

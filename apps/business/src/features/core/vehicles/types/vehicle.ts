@@ -45,11 +45,22 @@ export interface Vehicle {
   nextServiceKm: number;      // km servis berikutnya
   lastUpdate: string;         // ISO 8601
   registrationExpiry: string; // ISO date YYYY-MM-DD
-  kirExpiry?: string;         // ISO date YYYY-MM-DD
   passengerCapacity?: number;
   color?: string;
   fuelCapacity?: number;      // liters
   notes?: string;
+  assetNumber?: string;       // No Asset
+  dimLength?: number;         // meter
+  dimWidth?: number;          // meter
+  dimHeight?: number;         // meter
+  fuelRatio?: number;         // km/L
+  maxSpeed?: number;          // km/h
+  stnkNumber?: string;
+  kirNumber?: string;
+  bpkbNumber?: string;
+  engineNumber?: string;
+  chassisNumber?: string;
+  engineCapacity?: number;    // CC
 }
 
 // --- Status Filter -----------------------------------------------------------
@@ -62,6 +73,7 @@ export interface VehicleFilters {
   search: string;
   status: VehicleStatusFilter;
   groupIds: string[];
+  stnkStatus: string[];
 }
 
 export const getVehicleFormSchema = (t: Record<string, string>) => z.object({
@@ -82,6 +94,21 @@ export const getVehicleFormSchema = (t: Record<string, string>) => z.object({
   gpsInstallDate: z.string().optional(),
   fuelCapacity: z.number().nullable().optional(),
   registrationExpiry: z.string().optional(),
-  kirExpiry: z.string().optional(),
   notes: z.string().optional(),
+  assetNumber: z.string().optional(),
+  dimLength: z.number().nullable().optional(),
+  dimWidth: z.number().nullable().optional(),
+  dimHeight: z.number().nullable().optional(),
+  fuelRatio: z.number().nullable().optional(),
+  maxSpeed: z.number().nullable().optional(),
+  passengerCapacity: z.number().nullable().optional(),
+  stnkNumber: z.string().optional(),
+  kirNumber: z.string().optional(),
+  bpkbNumber: z.string().optional(),
+  engineNumber: z.string().optional(),
+  chassisNumber: z.string().optional(),
+  engineCapacity: z.number().nullable().optional(),
+  odometer: z.number().nullable().optional(),
+  lastServiceKm: z.number().nullable().optional(),
+  nextServiceKm: z.number().nullable().optional(),
 });

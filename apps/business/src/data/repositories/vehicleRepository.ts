@@ -27,11 +27,10 @@ class MockVehicleRepository implements VehicleRepository {
       return {
         ...v,
         status: (tracking?.status ?? 'offline') as Vehicle['status'],
-        odometer: 48000,
-        lastServiceKm: 40000,
-        nextServiceKm: 50000,
+        odometer: (v as any).odometer ?? (48000 + (parseInt(v.id.split('-')[1] || '0') * 100)),
+        lastServiceKm: (v as any).lastServiceKm ?? (40000 + (parseInt(v.id.split('-')[1] || '0') * 100)),
+        nextServiceKm: (v as any).nextServiceKm ?? (50000 + (parseInt(v.id.split('-')[1] || '0') * 100)),
         lastUpdate: tracking?.lastUpdate ?? new Date().toISOString(),
-        registrationExpiry: '2027-01-01',
       } as unknown as Vehicle;
     });
   }

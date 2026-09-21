@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { MoreVertical, IdCard, Edit2, Trash2, UserRound, MapPin, Truck, Users, Plus, Eye } from 'lucide-react';
+import { MoreVertical, IdCard, Edit2, Trash2, UserRound, MapPin, Truck, Users, Plus, Eye, Star } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import {
   Badge, Button,
@@ -23,6 +23,9 @@ interface DriverTableLabels {
   colLicenseNo: string;
   colLicenseExpiry: string;
   colJoinDate: string;
+  colStatus: string;
+  colVehicle: string;
+  colPerformance: string;
   colActions: string;
   emptyTitle: string;
   emptyDescription: string;
@@ -64,7 +67,7 @@ function buildColumns(
       header: '',
       enableSorting: false,
       size: 40,
-      meta: { fixedWidth: true },
+      meta: { fixedWidth: true, pin: 'left', className: 'w-[1%] px-1 whitespace-nowrap' },
       cell: ({ row }) => (
         <Button
           variant="ghost"
@@ -82,21 +85,81 @@ function buildColumns(
       header: labels.colDriver,
       accessorFn: (row) => row.name,
       cell: ({ row }) => (
-        <span 
+        <button
+          type="button"
           onClick={() => onViewDetail(row.original)}
-          className="font-medium text-foreground hover:text-primary hover:underline cursor-pointer transition-colors whitespace-nowrap"
+          className="font-bold text-primary hover:underline underline-offset-2 text-[13px] tracking-wider uppercase focus:outline-none"
         >
           {row.original.name}
-        </span>
+        </button>
       ),
       enableSorting: true,
       size: 200,
+      meta: { pin: 'left' },
+    },
+    {
+      id: 'status',
+      header: labels.colStatus,
+      accessorFn: (row) => row.status,
+      cell: ({ row }) => {
+        const s = row.original.status;
+        let variant: 'default' | 'destructive' | 'warning' | 'success' | 'outline' | 'secondary' = 'secondary';
+        let label = s;
+        if (s === 'active') {
+          variant = 'success';
+          label = 'Aktif';
+        } else if (s === 'on_leave') {
+          variant = 'warning';
+          label = 'Cuti';
+        } else if (s === 'inactive') {
+          variant = 'danger';
+          label = 'Nonaktif';
+        }
+        return <Badge variant={variant} dot className="capitalize">{label}</Badge>;
+      },
+      enableSorting: true,
+      size: 130,
+    },
+    {
+      id: 'assignedVehiclePlate',
+      header: labels.colVehicle,
+      accessorFn: (row) => row.assignedVehiclePlate || '-',
+      cell: ({ getValue }) => <span className="font-semibold text-[13px] text-foreground tracking-wider uppercase">{getValue() as string}</span>,
+      enableSorting: true,
+      size: 140,
+    },
+    {
+      id: 'performanceScore',
+      header: labels.colPerformance,
+      accessorFn: (row) => row.performanceScore || 0,
+      cell: ({ getValue }) => {
+        const val = getValue() as number;
+        const rating = val >= 100 ? 5 : Math.floor(val / 20); // 100 -> 5, 80-99 -> 4, 60-79 -> 3, 40-59 -> 2, <40 -> 1
+        let color = 'text-success';
+        if (val < 60) color = 'text-danger';
+        else if (val < 80) color = 'text-warning';
+        return (
+          <div className="flex flex-col gap-0.5">
+            <div className="flex items-center gap-0.5" title={`${val} / 100`}>
+              {[1, 2, 3, 4, 5].map(star => (
+                <Star 
+                  key={star} 
+                  className={cn("w-3 h-3", star <= rating ? "fill-warning text-warning" : "text-border/50 fill-transparent")} 
+                />
+              ))}
+            </div>
+            <span className={cn('font-bold text-[11px] tabular-nums', color)}>{val} Poin</span>
+          </div>
+        );
+      },
+      enableSorting: true,
+      size: 130,
     },
     {
       id: 'groupName',
       header: labels.colGroup,
       accessorFn: (row) => row.groupName || '-',
-      cell: ({ getValue }) => <span className="text-info">{getValue() as string}</span>,
+      cell: ({ getValue }) => <span className="text-[13px] text-info">{getValue() as string}</span>,
       enableSorting: true,
       size: 150,
     },
@@ -104,55 +167,15 @@ function buildColumns(
       id: 'placement',
       header: labels.colPlacement,
       accessorFn: (row) => row.placement,
+      cell: ({ getValue }) => <span className="text-[13px] text-foreground-muted">{getValue() as string}</span>,
       enableSorting: true,
       size: 150,
-    },
-    {
-      id: 'phone',
-      header: labels.colPhone,
-      accessorFn: (row) => row.phone,
-      enableSorting: true,
-      size: 140,
-    },
-    {
-      id: 'email',
-      header: labels.colEmail,
-      accessorFn: (row) => row.email,
-      enableSorting: true,
-      size: 180,
-    },
-    {
-      id: 'address',
-      header: labels.colAddress,
-      accessorFn: (row) => row.address,
-      enableSorting: true,
-      size: 250,
-    },
-    {
-      id: 'ktpNumber',
-      header: labels.colKtp,
-      accessorFn: (row) => row.ktpNumber,
-      enableSorting: true,
-      size: 160,
-    },
-    {
-      id: 'placeOfBirth',
-      header: labels.colPob,
-      accessorFn: (row) => row.placeOfBirth || '-',
-      enableSorting: true,
-      size: 150,
-    },
-    {
-      id: 'dateOfBirth',
-      header: labels.colDob,
-      accessorFn: (row) => row.dateOfBirth || '-',
-      enableSorting: true,
-      size: 140,
     },
     {
       id: 'licenseNumber',
       header: labels.colLicenseNo,
       accessorFn: (row) => row.licenseNumber,
+      cell: ({ getValue }) => <span className="text-[13px] text-foreground-muted">{getValue() as string}</span>,
       enableSorting: true,
       size: 160,
     },
@@ -160,14 +183,65 @@ function buildColumns(
       id: 'licenseExpiry',
       header: labels.colLicenseExpiry,
       accessorFn: (row) => row.licenseExpiry || '-',
+      cell: ({ getValue }) => <span className="text-[13px] tabular-nums text-foreground-muted">{getValue() as string}</span>,
       enableSorting: true,
       size: 150,
+    },
+    {
+      id: 'phone',
+      header: labels.colPhone,
+      accessorFn: (row) => row.phone,
+      cell: ({ getValue }) => <span className="text-[13px] tabular-nums text-foreground-muted">{getValue() as string}</span>,
+      enableSorting: true,
+      size: 140,
+    },
+    {
+      id: 'email',
+      header: labels.colEmail,
+      accessorFn: (row) => row.email,
+      cell: ({ getValue }) => <span className="text-[13px] text-foreground-muted">{getValue() as string}</span>,
+      enableSorting: true,
+      size: 180,
+    },
+    {
+      id: 'address',
+      header: labels.colAddress,
+      accessorFn: (row) => row.address,
+      cell: ({ getValue }) => <span className="text-[13px] text-foreground-muted">{getValue() as string}</span>,
+      enableSorting: true,
+      size: 250,
+    },
+    {
+      id: 'ktpNumber',
+      header: labels.colKtp,
+      accessorFn: (row) => row.ktpNumber,
+      cell: ({ getValue }) => <span className="text-[13px] tabular-nums text-foreground-muted">{getValue() as string}</span>,
+      enableSorting: true,
+      size: 160,
+    },
+    {
+      id: 'placeOfBirth',
+      header: labels.colPob,
+      accessorFn: (row) => row.placeOfBirth || '-',
+      cell: ({ getValue }) => <span className="text-[13px] text-foreground-muted">{getValue() as string}</span>,
+      enableSorting: true,
+      size: 150,
+    },
+    {
+      id: 'dateOfBirth',
+      header: labels.colDob,
+      accessorFn: (row) => row.dateOfBirth || '-',
+      cell: ({ getValue }) => <span className="text-[13px] tabular-nums text-foreground-muted">{getValue() as string}</span>,
+      enableSorting: true,
+      size: 140,
     },
     {
       id: 'joinDate',
       header: labels.colJoinDate,
       accessorFn: (row) => row.joinDate || '-',
-      // Aksi sudah di bagian atas
+      cell: ({ getValue }) => <span className="text-[13px] tabular-nums text-foreground-muted">{getValue() as string}</span>,
+      enableSorting: true,
+      size: 140,
     }
   ];
 }
@@ -180,6 +254,7 @@ const DEFAULT_COLUMN_VISIBILITY = {
   placeOfBirth: false,
   dateOfBirth: false,
   joinDate: false,
+  licenseExpiry: false,
 };
 
 export function DriverTable({

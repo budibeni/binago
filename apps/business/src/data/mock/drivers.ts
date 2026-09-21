@@ -14,9 +14,15 @@ export const mockDrivers = Array.from({ length: 50 }, (_, i) => {
     groupId: `grp-d-00${(i % 4) + 1}`,
     licenseNumber: `SIM-B2-${10000 + i}`,
     licenseExpiry: '2028-01-01',
-    status: 'active' as const,
-    assignedVehicleId: `veh-${num}`,
-    performanceScore: 90,
+    status: (i % 7 === 0 ? 'on_leave' : i % 11 === 0 ? 'inactive' : 'active') as 'active' | 'inactive' | 'on_leave',
+    assignedVehicleId: i % 3 === 0 ? undefined : `veh-${num}`,
+    performanceScore: 60 + ((i * 13) % 41), // deterministic pseudo-random for hydration
+    performanceMetrics: {
+      harshDriving: i % 5,
+      speeding: (i * 2) % 4,
+      overIdling: i % 3,
+      fatigueDriving: i % 2,
+    },
     history: []
   };
 });

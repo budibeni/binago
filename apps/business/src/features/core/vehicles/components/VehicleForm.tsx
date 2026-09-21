@@ -1,5 +1,5 @@
 import React from 'react';
-import { CarFront, Cpu, Wrench } from 'lucide-react';
+import { CarFront, Cpu, Wrench, Hash, Calendar, Smartphone, FileText } from 'lucide-react';
 import {
   FormShell,
   FormCard,
@@ -8,25 +8,14 @@ import {
   InputSelect,
   InputDate,
   InputTextarea,
-  useForm
+  useForm,
+  InfoRow
 } from '@adatrack/ui';
 import { getVehicleFormSchema, type Vehicle } from '../types/vehicle';
 import { vehicleService, driverService } from '@/data/services';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
 import { getVehiclesTranslation } from '../i18n';
-const VEHICLE_CATEGORY_OPTIONS = [
-  { value: 'truck', label: 'Truk' },
-  { value: 'minibus', label: 'Minibus' },
-  { value: 'pickup', label: 'Pickup' },
-  { value: 'motorcycle', label: 'Sepeda Motor' },
-  { value: 'other', label: 'Lainnya' },
-];
-
-const FUEL_TYPE_OPTIONS = [
-  { value: 'solar', label: 'Solar' },
-  { value: 'bensin', label: 'Bensin' },
-  { value: 'listrik', label: 'Listrik' },
-];
+// Options moved inside component to support localization
 
 
 const DEFAULT_VEHICLE = {
@@ -45,7 +34,22 @@ const DEFAULT_VEHICLE = {
   gpsInstallDate: '',
   registrationExpiry: '',
   passengerCapacity: undefined,
-  notes: ''
+  notes: '',
+  assetNumber: '',
+  dimLength: undefined,
+  dimWidth: undefined,
+  dimHeight: undefined,
+  fuelRatio: undefined,
+  maxSpeed: undefined,
+  stnkNumber: '',
+  kirNumber: '',
+  bpkbNumber: '',
+  engineNumber: '',
+  chassisNumber: '',
+  engineCapacity: undefined,
+  odometer: undefined,
+  lastServiceKm: undefined,
+  nextServiceKm: undefined,
 } as unknown as Vehicle;
 
 function useVehicleOptions(open: boolean) {
@@ -84,9 +88,19 @@ export function VehicleForm({
   const tV = getVehiclesTranslation(locale);
   const tF = tV.form;
 
+  const VEHICLE_CATEGORY_OPTIONS = React.useMemo(() => [
+    { value: 'truck', label: tF.catTruck },
+    { value: 'minibus', label: tF.catMinibus },
+    { value: 'pickup', label: tF.catPickup },
+    { value: 'motorcycle', label: tF.catMotorcycle },
+    { value: 'other', label: tF.catOther },
+  ], [tF]);
 
-
-  const { formData, errors, isSubmitting, handleChange, handleSubmit } = useForm<Vehicle>({
+  const FUEL_TYPE_OPTIONS = React.useMemo(() => [
+    { value: 'solar', label: tF.fuelSolar },
+    { value: 'bensin', label: tF.fuelBensin },
+    { value: 'listrik', label: tF.fuelListrik },
+  ], [tF]);  const { formData, errors, isSubmitting, handleChange, handleSubmit } = useForm<Vehicle>({
     initialData: vehicle || DEFAULT_VEHICLE,
     resetOn: [open, vehicle],
     schema: getVehicleFormSchema(tV.validation || {}),
@@ -119,6 +133,7 @@ export function VehicleForm({
       columns={2}
     >
       <div className="flex flex-col gap-6">
+        {/* 1. Informasi Dasar */}
         <FormCard
           title={tF.cardIdentity}
           description={tF.cardIdentityDesc}
@@ -133,13 +148,43 @@ export function VehicleForm({
             required
           />
           <InputString
+            label="Nomor Aset"
+            value={formData.assetNumber || ''}
+            onChange={(val) => handleChange('assetNumber', val)}
+            error={errors.assetNumber}
+          />
+
+          <InputString
             label={tF.lblVehicleName}
             value={formData.vehicleName || ''}
             onChange={(val) => handleChange('vehicleName', val)}
             error={errors.vehicleName}
             required
           />
+          <InputSelect
+            label={tF.lblGroup}
+            value={formData.groupId || ''}
+            onChange={(val) => handleChange('groupId', val)}
+            options={groups}
+            error={errors.groupId}
+            required
+          />
+        </FormCard>
 
+        {/* 2. Spesifikasi Kendaraan */}
+        <FormCard
+          title={tF.cardSpecs}
+          description={tF.cardSpecsDesc}
+          icon={<Cpu className="w-5 h-5 text-indigo-500" />}
+          columns={2}
+        >
+          <InputSelect
+            label={tF.lblCategory}
+            value={formData.vehicleCategory || ''}
+            onChange={(val) => handleChange('vehicleCategory', val)}
+            options={VEHICLE_CATEGORY_OPTIONS}
+            required
+          />
           <InputString
             label={tF.lblBrand}
             value={formData.brand || ''}
@@ -155,82 +200,48 @@ export function VehicleForm({
             value={formData.color || ''}
             onChange={(val) => handleChange('color', val)}
           />
+          <InputNumber
+            label={tF.lblLength}
+            value={formData.dimLength ?? null}
+            onChange={(val) => handleChange('dimLength', val)}
+          />
+          <InputNumber
+            label={tF.lblWidth}
+            value={formData.dimWidth ?? null}
+            onChange={(val) => handleChange('dimWidth', val)}
+          />
+          <InputNumber
+            label={tF.lblHeight}
+            value={formData.dimHeight ?? null}
+            onChange={(val) => handleChange('dimHeight', val)}
+          />
+          <InputNumber
+            label={tF.lblPassengerCapacity}
+            value={formData.passengerCapacity ?? null}
+            onChange={(val) => handleChange('passengerCapacity', val)}
+          />
+          <InputNumber
+            label={tF.lblEngineCapacity}
+            value={formData.engineCapacity ?? null}
+            onChange={(val) => handleChange('engineCapacity', val)}
+          />
+        </FormCard>
+      </div>
 
-          <InputSelect
-            label={tF.lblCategory}
-            value={formData.vehicleCategory || ''}
-            onChange={(val) => handleChange('vehicleCategory', val)}
-            options={VEHICLE_CATEGORY_OPTIONS}
-            required
-          />
-          <InputSelect
-            label={tF.lblGroup}
-            value={formData.groupId || ''}
-            onChange={(val) => handleChange('groupId', val)}
-            options={groups}
-            error={errors.groupId}
-            required
-          />
+      <div className="flex flex-col gap-6">
+        {/* 3. Operasional & Performa */}
+        <FormCard
+          title={tF.cardOps}
+          description={tF.cardOpsDesc}
+          icon={<Wrench className="w-5 h-5 text-orange-500" />}
+          columns={2}
+        >
           <InputSelect
             label={tF.lblDriver}
             value={formData.driverId || ''}
             onChange={(val) => handleChange('driverId', val)}
             options={drivers}
           />
-        </FormCard>
-
-        <FormCard
-          title={tF.cardDeviceGroup}
-          description={tF.cardDeviceGroupDesc}
-          icon={<Cpu className="w-5 h-5 text-purple-500" />}
-          columns={2}
-        >
-          <InputString
-            label={tF.lblVehicleId}
-            value={formData.vehicleId || ''}
-            onChange={(val) => handleChange('vehicleId', val)}
-            disabled
-          />
-          <InputDate
-            label={tF.lblGpsInstallDate}
-            value={formData.gpsInstallDate || ''}
-            onChange={(val) => handleChange('gpsInstallDate', val)}
-            disabled
-          />
-          <InputString
-            label={tF.lblGpsDeviceBrand}
-            value={formData.gpsDeviceBrand || ''}
-            onChange={(val) => handleChange('gpsDeviceBrand', val)}
-            disabled
-          />
-          <InputString
-            label={tF.lblGpsDeviceType}
-            value={formData.gpsDeviceType || ''}
-            onChange={(val) => handleChange('gpsDeviceType', val)}
-            disabled
-          />
-          <InputString
-            label={tF.lblImei}
-            value={formData.deviceImei || ''}
-            onChange={(val) => handleChange('deviceImei', val)}
-            disabled
-          />
-          <InputString
-            label={tF.lblSimCard}
-            value={formData.deviceSimNumber || ''}
-            onChange={(val) => handleChange('deviceSimNumber', val)}
-            disabled
-          />
-        </FormCard>
-      </div>
-
-      <div className="flex flex-col gap-6">
-        <FormCard
-          title={tF.cardAdminMaintenance}
-          description={tF.cardAdminMaintenanceDesc}
-          icon={<Wrench className="w-5 h-5 text-orange-500" />}
-          columns={2}
-        >
           <InputSelect
             label={tF.lblFuelType}
             value={formData.fuelType || ''}
@@ -243,15 +254,83 @@ export function VehicleForm({
             value={formData.fuelCapacity ?? null}
             onChange={(val) => handleChange('fuelCapacity', val)}
           />
+          <InputNumber
+            label={tF.lblFuelRatio}
+            value={formData.fuelRatio ?? null}
+            onChange={(val) => handleChange('fuelRatio', val)}
+          />
+          <InputNumber
+            label={tF.lblMaxSpeed}
+            value={formData.maxSpeed ?? null}
+            onChange={(val) => handleChange('maxSpeed', val)}
+          />
+        </FormCard>
+
+        {/* 4. Lisensi & Legalitas */}
+        <FormCard
+          title={tF.cardLegal}
+          description={tF.cardLegalDesc}
+          icon={<Wrench className="w-5 h-5 text-green-500" />}
+          columns={2}
+        >
+          <InputString
+            label="No. STNK"
+            value={formData.stnkNumber || ''}
+            onChange={(val) => handleChange('stnkNumber', val)}
+          />
           <InputDate
-            label={tF.lblRegExpiry}
+            label="Berlaku STNK"
             value={formData.registrationExpiry || ''}
             onChange={(val) => handleChange('registrationExpiry', val)}
           />
-          <InputDate
-            label={tF.lblKirExpiry}
-            value={formData.kirExpiry || ''}
-            onChange={(val) => handleChange('kirExpiry', val)}
+          <InputString
+            label="No. KIR"
+            value={formData.kirNumber || ''}
+            onChange={(val) => handleChange('kirNumber', val)}
+          />
+          <InputString
+            label={tF.lblBpkbNo}
+            value={formData.bpkbNumber || ''}
+            onChange={(val) => handleChange('bpkbNumber', val)}
+          />
+          <InputString
+            label={tF.lblEngineNo}
+            value={formData.engineNumber || ''}
+            onChange={(val) => handleChange('engineNumber', val)}
+          />
+          <InputString
+            label={tF.lblChassisNo}
+            value={formData.chassisNumber || ''}
+            onChange={(val) => handleChange('chassisNumber', val)}
+          />
+        </FormCard>
+
+        {/* 5. Administrasi & Perawatan */}
+        <FormCard
+          title={tF.cardAdminMaintenance}
+          description={tF.cardAdminMaintenanceDesc}
+          icon={<FileText className="w-5 h-5 text-violet-500" />}
+          columns={2}
+        >
+          <div className="col-span-1 group-data-[layout=default]/form:md:col-span-2 group-data-[layout=fullscreen]/form:md:col-span-2">
+            <p className="text-[11px] text-foreground-muted mb-4 bg-neutral-100 dark:bg-neutral-800 p-2.5 rounded border border-border/50">
+              <strong className="text-foreground">Info:</strong> Nilai di bawah ini berfungsi sebagai saldo awal (baseline). Nantinya angka ini akan diperbarui otomatis oleh sistem telematika dan modul perawatan.
+            </p>
+          </div>
+          <InputNumber
+            label={tF.lblOdometer}
+            value={formData.odometer ?? null}
+            onChange={(val) => handleChange('odometer', val)}
+          />
+          <InputNumber
+            label={tF.lblLastService}
+            value={formData.lastServiceKm ?? null}
+            onChange={(val) => handleChange('lastServiceKm', val)}
+          />
+          <InputNumber
+            label={tF.lblNextService}
+            value={formData.nextServiceKm ?? null}
+            onChange={(val) => handleChange('nextServiceKm', val)}
           />
           <div className="col-span-1 group-data-[layout=default]/form:md:col-span-2 group-data-[layout=fullscreen]/form:md:col-span-2">
             <InputTextarea
@@ -259,6 +338,36 @@ export function VehicleForm({
               value={formData.notes || ''}
               onChange={(val) => handleChange('notes', val)}
             />
+          </div>
+        </FormCard>
+
+      </div>
+
+      {/* 6. Perangkat GPS */}
+      <div className="col-span-1 group-data-[layout=default]/form:lg:col-span-2 group-data-[layout=fullscreen]/form:lg:col-span-2 group-data-[layout=dialog]/form:lg:col-span-2">
+        <FormCard
+          title={tF.cardDeviceGroup}
+          description={tF.cardDeviceGroupDesc}
+          icon={<Cpu className="w-5 h-5 text-purple-500" />}
+          columns={2}
+        >
+          <div className="col-span-1 md:col-span-2 grid grid-cols-2 md:grid-cols-3 gap-3">
+            {[
+              { icon: Hash, label: tF.lblVehicleId, value: formData.vehicleId },
+              { icon: Hash, label: tF.lblImei, value: formData.deviceImei },
+              { icon: Smartphone, label: tF.lblSimCard, value: formData.deviceSimNumber },
+              { icon: Cpu, label: tF.lblGpsDeviceBrand, value: formData.gpsDeviceBrand },
+              { icon: Cpu, label: tF.lblGpsDeviceType, value: formData.gpsDeviceType },
+              { icon: Calendar, label: tF.lblGpsInstallDate, value: formData.gpsInstallDate ? new Date(formData.gpsInstallDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) : '' },
+            ].map((item, idx) => (
+              <div key={idx} className="flex flex-col p-2.5 bg-neutral-50 dark:bg-neutral-800 rounded-md border border-border/50">
+                <div className="flex items-center gap-1.5 text-foreground-muted mb-1">
+                  <item.icon className="w-3.5 h-3.5" />
+                  <span className="text-[10px] uppercase font-semibold tracking-wider">{item.label}</span>
+                </div>
+                <span className="text-[13px] font-bold text-foreground truncate">{item.value || '-'}</span>
+              </div>
+            ))}
           </div>
         </FormCard>
       </div>

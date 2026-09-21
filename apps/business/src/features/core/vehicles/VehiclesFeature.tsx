@@ -31,11 +31,13 @@ export function VehiclesFeature() {
   const [filterState, setFilterState] = React.useState<Record<string, string | string[]>>({
     status: [],
     groupIds: [],
+    stnkStatus: [],
   });
   const [isFilterOpen, setIsFilterOpen] = React.useState(false);
 
   const statusFilter = filterState.status as VehicleStatusFilter;
   const selectedGroupIds = filterState.groupIds as string[];
+  const stnkStatusFilter = filterState.stnkStatus as string[];
 
   const [detailVehicle, setDetailVehicle] = React.useState<Vehicle | null>(null);
   const [drawerOpen, setDrawerOpen] = React.useState(false);
@@ -44,8 +46,8 @@ export function VehiclesFeature() {
 
   // ===========================================================================
   const filteredVehicles = React.useMemo(
-    () => vehicleService.getVehicles({ search, status: statusFilter, groupIds: selectedGroupIds }),
-    [search, statusFilter, selectedGroupIds],
+    () => vehicleService.getVehicles({ search, status: statusFilter, groupIds: selectedGroupIds, stnkStatus: stnkStatusFilter }),
+    [search, statusFilter, selectedGroupIds, stnkStatusFilter],
   );
 
   // statusCounts removed
@@ -91,11 +93,17 @@ export function VehiclesFeature() {
     colFuel: tV.colFuel,
     colDeviceImei: tV.colDeviceImei,
     colRegExpiry: tV.colRegExpiry,
-    colColor: locale === 'en' ? 'Color' : 'Warna',
-    colDeviceSim: locale === 'en' ? 'SIM Number' : 'Nomor SIM',
-    colFuelCapacity: locale === 'en' ? 'Fuel Capacity' : 'Kap. BBM',
-    colKirExpiry: locale === 'en' ? 'KIR Expiry' : 'Masa Berlaku KIR',
-    colNotes: locale === 'en' ? 'Notes' : 'Catatan',
+    colColor: tV.fieldColor || (locale === 'en' ? 'Color' : 'Warna'),
+    colDeviceSim: tV.fieldSim || (locale === 'en' ? 'SIM Number' : 'Nomor SIM'),
+    colFuelCapacity: tV.fieldFuelCap || (locale === 'en' ? 'Fuel Capacity' : 'Kap. BBM'),
+    colKirExpiry: tV.colKirNumber || (locale === 'en' ? 'KIR Expiry' : 'Masa Berlaku KIR'),
+    colKirNumber: tV.colKirNumber,
+    colBpkbNumber: tV.colBpkbNumber,
+    colEngineNumber: tV.colEngineNumber,
+    colChassisNumber: tV.colChassisNumber,
+    colAssetNumber: tV.colAssetNumber,
+    colCapacityCC: tV.colCapacityCC,
+    colNotes: tV.detailNotes || (locale === 'en' ? 'Notes' : 'Catatan'),
     colActions: tV.colActions,
     noDriver: tV.noDriver,
     noDevice: tV.noDevice,
@@ -127,19 +135,7 @@ export function VehiclesFeature() {
     statusOffline: tV.statusOffline,
   }), [tV]);
 
-  const drawerLabels = React.useMemo(() => ({
-    detailTitle: tV.detailTitle,
-    detailVehicleInfo: tV.detailVehicleInfo,
-    detailOperational: tV.detailOperational,
-    detailMaintenance: tV.detailMaintenance,
-    detailClose: tV.detailClose,
-    noDriver: tV.noDriver,
-    noDevice: tV.noDevice,
-    statusDriving: tV.statusDriving,
-    statusIdle: tV.statusIdle,
-    statusParking: tV.statusParking,
-    statusOffline: tV.statusOffline,
-  }), [tV]);
+  // drawerLabels removed as it is handled inside VehicleView
 
   const dtLabels: DataTableLabels = React.useMemo(() => {
     const isEn = locale === 'en';
@@ -165,7 +161,7 @@ export function VehiclesFeature() {
   const filterConfig: DataTableFilterConfig = React.useMemo(() => ({
     state: filterState,
     onStateChange: setFilterState,
-    onClearAll: () => setFilterState({ status: [], groupIds: [] }),
+    onClearAll: () => setFilterState({ status: [], groupIds: [], stnkStatus: [] }),
     labels: {
       title: 'Filter',
       clearAll: filterLabels.clearFilters,
@@ -213,8 +209,18 @@ export function VehiclesFeature() {
           activeClass: 'bg-info/15 border-info/40 text-info dark:text-info',
         })),
       },
+      {
+        id: 'stnkStatus',
+        label: 'Status STNK',
+        type: 'checkbox-group',
+        options: [
+          { value: 'active', label: tV.stnkActive || 'Masih Panjang' },
+          { value: 'expiring', label: tV.stnkExpiring || 'Hampir Habis (< 60 Hari)' },
+          { value: 'expired', label: tV.stnkExpired || 'Kedaluwarsa' },
+        ],
+      },
     ],
-  }), [filterState, filterLabels]);
+  }), [filterState, filterLabels, tV]);
 
   // ===========================================================================
   return (
@@ -245,7 +251,6 @@ export function VehiclesFeature() {
         vehicle={detailVehicle}
         open={drawerOpen}
         onClose={handleCloseDrawer}
-        labels={drawerLabels}
         onEdit={handleEdit}
         onDelete={handleDelete}
         onTrack={handleTrack}

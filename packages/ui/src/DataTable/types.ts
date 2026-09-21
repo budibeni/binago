@@ -33,6 +33,8 @@ export interface DataTableColumnMeta {
   pin?: 'left' | 'right' | 'none';
   /** Force a fixed pixel width for this column */
   fixedWidth?: boolean;
+  /** Add custom CSS classes to th and td */
+  className?: string;
 }
 
 export type DataTableInstance<TData extends RowData = RowData> =
@@ -50,7 +52,7 @@ export interface DataTableExportConfig {
 
 export interface DataTableFilterOption {
   value: string;
-  label: string;
+  label: React.ReactNode;
   count?: number;
   colorClass?: string;
   activeClass?: string;

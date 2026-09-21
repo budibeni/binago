@@ -37,6 +37,15 @@ export const vehicleService = {
       vehicles = vehicles.filter((v) => groupIds.includes(v.groupId));
     }
 
+    if (filters.stnkStatus && filters.stnkStatus.length > 0) {
+      vehicles = vehicles.filter((v) => {
+        if (!v.registrationExpiry) return false;
+        const diff = (new Date(v.registrationExpiry).getTime() - Date.now()) / (1000 * 60 * 60 * 24);
+        const stnkState = diff < 0 ? 'expired' : diff < 60 ? 'expiring' : 'active';
+        return filters.stnkStatus!.includes(stnkState);
+      });
+    }
+
     return vehicles;
   },
 

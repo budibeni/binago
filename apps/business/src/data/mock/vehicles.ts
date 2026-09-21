@@ -605,18 +605,58 @@ const baseVehicles = [
   }
 ];
 
-export const mockVehicles = baseVehicles.map(v => {
+export const mockVehicles = baseVehicles.map((v, i) => {
   const driver = getDriverById(v.driverId);
   const group = getGroupById(v.groupId);
   const device = getDeviceById(v.deviceId);
 
+  const baseInstallDate = new Date('2024-01-01');
+  baseInstallDate.setMonth(baseInstallDate.getMonth() - (i % 24));
+  
+  // Use a fixed reference date to ensure deterministic mock data for SSR hydration
+  const regExpiryDate = new Date('2026-09-21T12:00:00Z');
+  
+  if (i % 4 === 0) {
+    // Expired (e.g. 15 days ago)
+    regExpiryDate.setDate(regExpiryDate.getDate() - 15 - (i % 5));
+  } else if (i % 4 === 1) {
+    // Expiring soon (e.g. 25 days from now)
+    regExpiryDate.setDate(regExpiryDate.getDate() + 25 + (i % 10));
+  } else {
+    // Normal (e.g. 200 days from now)
+    regExpiryDate.setDate(regExpiryDate.getDate() + 200 + (i * 10));
+  }
+  const colors = ['Hitam', 'Putih', 'Silver', 'Abu-abu', 'Merah', 'Biru'];
+
   return {
     ...v,
+    vehicleCategory: v.vehicleCategory === 'car' ? 'minibus' : v.vehicleCategory,
     driverName: driver ? driver.name : 'Unknown Driver',
     groupName: group ? group.name : 'Unknown Group',
     status: 'active' as const,
-    deviceModel: device ? device.model : 'Unknown Device',
-    deviceImei: device ? device.imei : 'Unknown IMEI'
+    deviceImei: device ? device.imei : null,
+    deviceSimNumber: device ? `0812${(10000000 + i).toString().padStart(8, '0')}` : null,
+    gpsDeviceBrand: device ? device.model.split(' ')[0] : undefined,
+    gpsDeviceType: device ? device.model.split(' ')[1] || device.model : undefined,
+    gpsInstallDate: device ? baseInstallDate.toISOString().split('T')[0] : undefined,
+    vehicleId: `V-${v.id.split('-')[1]}`,
+    color: colors[i % colors.length],
+    fuelCapacity: 45 + (i % 20),
+    registrationExpiry: regExpiryDate.toISOString().split('T')[0],
+    notes: i % 2 === 0 ? 'Kendaraan dalam kondisi baik' : 'Perlu perawatan rutin bulan depan',
+    assetNumber: `AST-${(1000 + i).toString()}`,
+    dimLength: 4.0 + (i % 3),
+    dimWidth: 1.7 + ((i % 5) * 0.1),
+    dimHeight: 1.5 + ((i % 4) * 0.2),
+    fuelRatio: 10 + (i % 5),
+    maxSpeed: 120 + (i % 40),
+    passengerCapacity: v.vehicleCategory === 'minibus' ? 7 : (v.vehicleCategory === 'pickup' ? 2 : 5),
+    stnkNumber: `STNK-${(800000 + i * 7).toString()}`,
+    kirNumber: `KIR-${(500000 + i * 3).toString()}`,
+    bpkbNumber: `BPKB-${(900000 + i * 11).toString()}`,
+    engineNumber: `M-${(10000 + i * 13).toString()}`,
+    chassisNumber: `MH${(20000 + i * 17).toString()}`,
+    engineCapacity: v.vehicleCategory === 'motorcycle' ? 150 : (v.vehicleCategory === 'pickup' ? 1500 : 2500) + (i % 5) * 100,
   };
 });
 

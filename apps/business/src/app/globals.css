@@ -82,8 +82,8 @@
   --color-background: #09090B;
   --color-surface: #18181B;
   --color-surface-elevated: #27272A;
-  --color-border: rgba(255, 255, 255, 0.08);
-  --color-border-strong: rgba(255, 255, 255, 0.15);
+  --color-border: rgba(255, 255, 255, 0.04);
+  --color-border-strong: rgba(255, 255, 255, 0.08);
 
   /* Text */
   --color-foreground: #FAFAFA;

@@ -43,6 +43,12 @@ export interface Driver {
   
   // Performance
   performanceScore: number; // 0 - 100
+  performanceMetrics?: {
+    harshDriving: number;
+    speeding: number;
+    overIdling: number;
+    fatigueDriving: number;
+  };
   
   history: DriverHistory[];
 }

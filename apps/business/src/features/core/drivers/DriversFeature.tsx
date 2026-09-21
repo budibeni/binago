@@ -1,6 +1,8 @@
 'use client';
 
 import React from 'react';
+import { Star } from 'lucide-react';
+import { cn } from '@adatrack/utils';
 import { getDriversTranslation } from './i18n';
 import { useBusinessLocale } from '../../../components/BusinessShellLayout';
 import { driverService, vehicleService, groupService } from '@/data/services';
@@ -20,10 +22,12 @@ export function DriversFeature() {
   const [filterState, setFilterState] = React.useState<Record<string, string | string[]>>({
     status: '',
     groupIds: [],
+    performance: [],
   });
   const [isFilterOpen, setIsFilterOpen] = React.useState(false);
 
   const statusFilter = (filterState.status || 'all') as DriverStatusFilter;
+  const performanceFilter = (filterState.performance || []) as string[];
   const selectedGroupIds = filterState.groupIds as string[];
 
   const [detailDriver, setDetailDriver] = React.useState<Driver | null>(null);
@@ -34,7 +38,7 @@ export function DriversFeature() {
 
   // --- Filtered Data -----------------------------------------------------------
   const filteredDrivers = React.useMemo(() => {
-    const filtered = driverService.getDrivers(search, statusFilter, selectedGroupIds);
+    const filtered = driverService.getDrivers(search, statusFilter, selectedGroupIds, performanceFilter);
     // Enrich with plate number & group name
     return filtered.map(driver => {
       let enriched = { ...driver };
@@ -55,7 +59,7 @@ export function DriversFeature() {
       
       return enriched;
     });
-  }, [search, selectedGroupIds]);
+  }, [search, statusFilter, selectedGroupIds, performanceFilter]);
 
   // --- Handlers ----------------------------------------------------------------
   const handleViewDetail = React.useCallback((driver: Driver) => {
@@ -90,6 +94,9 @@ export function DriversFeature() {
     colLicenseNo: tD.labels.licenseNo,
     colLicenseExpiry: tD.labels.licenseExpiry,
     colJoinDate: tD.labels.joinDate,
+    colStatus: tD.table.colStatus,
+    colVehicle: tD.table.colVehicle,
+    colPerformance: tD.table.colPerformance,
     colActions: tD.table.colActions,
     emptyTitle: tD.table.emptyTitle,
     emptyDescription: tD.table.emptyDescription,
@@ -134,6 +141,7 @@ export function DriversFeature() {
     joinDate: tD.labels.joinDate,
     address: tD.labels.address,
     placement: tD.labels.placement,
+    group: tD.filterGroup,
     licenseNo: tD.labels.licenseNo,
     licenseExpiry: tD.labels.licenseExpiry,
     phone: tD.labels.phone,
@@ -155,6 +163,18 @@ export function DriversFeature() {
           { value: 'on_leave', label: tD.status.onLeave },
         ]
       },
+      {
+        id: 'performance',
+        label: 'Performa',
+        type: 'pills-multi' as const,
+        options: [
+          { value: '5', label: <div className="flex items-center gap-0.5 py-0.5">{Array.from({length: 5}).map((_,i) => <Star key={i} className="w-3.5 h-3.5 fill-warning text-warning" />)}</div> },
+          { value: '4', label: <div className="flex items-center gap-0.5 py-0.5">{Array.from({length: 4}).map((_,i) => <Star key={i} className="w-3.5 h-3.5 fill-warning text-warning" />)}</div> },
+          { value: '3', label: <div className="flex items-center gap-0.5 py-0.5">{Array.from({length: 3}).map((_,i) => <Star key={i} className="w-3.5 h-3.5 fill-warning text-warning" />)}</div> },
+          { value: '2', label: <div className="flex items-center gap-0.5 py-0.5">{Array.from({length: 2}).map((_,i) => <Star key={i} className="w-3.5 h-3.5 fill-warning text-warning" />)}</div> },
+          { value: '1', label: <div className="flex items-center gap-0.5 py-0.5">{Array.from({length: 1}).map((_,i) => <Star key={i} className="w-3.5 h-3.5 fill-warning text-warning" />)}</div> },
+        ]
+      },
       // Note: Groups filter would normally load from an API. We'll use static options for now.
       {
         id: 'groupIds',
@@ -168,7 +188,7 @@ export function DriversFeature() {
     ],
     state: filterState,
     onStateChange: setFilterState,
-    onClearAll: () => setFilterState({ status: '', groupIds: [] }),
+    onClearAll: () => setFilterState({ status: '', performance: [], groupIds: [] }),
     labels: { title: 'Filter', clearAll: tD.clearFilters }
   }), [tD, filterState]);
 

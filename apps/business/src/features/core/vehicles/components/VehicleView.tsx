@@ -15,38 +15,38 @@ import {
   Calendar,
   Hash,
   AlertTriangle,
+  Settings,
+  Power,
 } from 'lucide-react';
 import { cn } from '@adatrack/utils';
-import { Badge, Button, DetailShell, InfoRow, SectionHeader } from '@adatrack/ui';
+import { Badge, Button, DetailShell, SectionHeader } from '@adatrack/ui';
 import type { Vehicle } from '../types/vehicle';
+import { getTranslation } from '../../../../i18n';
+import { useBusinessLocale } from '../../../../components/BusinessShellLayout';
 
-// â"€â"€â"€ Types â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+function CompactField({ label, value, highlight, colSpan = 1 }: { label: string, value: React.ReactNode, highlight?: boolean, colSpan?: number }) {
+  return (
+    <div className={cn('flex flex-col', colSpan === 2 && 'col-span-2')}>
+      <span className="text-[10px] uppercase tracking-wider text-foreground-muted font-semibold mb-0.5">{label}</span>
+      <span className={cn('text-[12px] font-medium leading-tight', highlight ? 'text-danger font-bold' : 'text-foreground')}>{value}</span>
+    </div>
+  );
+}
+
+// ─── Types ──────────────────────────────────────────────────────────────────
 
 interface VehicleViewProps {
   vehicle: Vehicle | null;
   open: boolean;
   onClose: () => void;
-  labels: {
-    detailTitle: string;
-    detailVehicleInfo: string;
-    detailOperational: string;
-    detailMaintenance: string;
-    detailClose: string;
-    noDriver: string;
-    noDevice: string;
-    statusDriving: string;
-    statusIdle: string;
-    statusParking: string;
-    statusOffline: string;
-  };
   onEdit?: (v: Vehicle) => void;
   onDelete?: (v: Vehicle) => void;
   onTrack?: (v: Vehicle) => void;
 }
 
-// â"€â"€â"€ Status Config â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ─── Status Config ────────────────────────────────────────────────────────
 
-function getStatusConfig(status: Vehicle['status'], labels: VehicleViewProps['labels']) {
+function getStatusConfig(status: Vehicle['status'], labels: any) {
   const map = {
     driving: { label: labels.statusDriving, variant: 'success' as const },
     idle: { label: labels.statusIdle, variant: 'warning' as const },
@@ -56,42 +56,46 @@ function getStatusConfig(status: Vehicle['status'], labels: VehicleViewProps['la
   return map[status];
 }
 
-function getCategoryLabel(cat: Vehicle['vehicleCategory']): string {
+function getCategoryLabel(cat: Vehicle['vehicleCategory'], labels: any): string {
   const map: Record<Vehicle['vehicleCategory'], string> = {
-    truck: 'Truk',
-    minibus: 'Minibus',
-    pickup: 'Pickup',
-    motorcycle: 'Motor',
-    other: 'Lainnya',
+    truck: labels.categoryTruck || 'Truk',
+    minibus: labels.categoryMinibus || 'Minibus',
+    pickup: labels.categoryPickup || 'Pickup',
+    motorcycle: labels.categoryMotorcycle || 'Motor',
+    other: labels.categoryOther || 'Lainnya',
   };
   return map[cat];
 }
 
-function getFuelLabel(fuel: Vehicle['fuelType']): string {
+function getFuelLabel(fuel: Vehicle['fuelType'], labels: any): string {
   const map: Record<Vehicle['fuelType'], string> = {
-    solar: 'Solar',
-    bensin: 'Bensin',
-    listrik: 'Listrik',
+    solar: labels.fuelSolar || 'Solar',
+    bensin: labels.fuelBensin || 'Bensin',
+    listrik: labels.fuelElectric || labels.fuelListrik || 'Listrik',
   };
   return map[fuel];
 }
 
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString('id-ID', {
+function formatDate(iso: string, locale: string = 'id-ID'): string {
+  return new Date(iso).toLocaleDateString(locale, {
     day: '2-digit', month: 'long', year: 'numeric',
   });
 }
 
-function formatDateTime(iso: string): string {
-  return new Date(iso).toLocaleString('id-ID', {
+function formatDateTime(iso: string, locale: string = 'id-ID'): string {
+  return new Date(iso).toLocaleString(locale, {
     day: '2-digit', month: 'short', year: 'numeric',
     hour: '2-digit', minute: '2-digit',
   });
 }
 
-// â"€â"€â"€ Component â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ─── Main Component ─────────────────────────────────────────────────────────
 
-export function VehicleView({ vehicle, open, onClose, labels, onEdit, onDelete, onTrack }: VehicleViewProps) {
+export function VehicleView({ vehicle, open, onClose, onEdit, onDelete, onTrack }: VehicleViewProps) {
+  const locale = useBusinessLocale();
+  const dict = getTranslation(locale);
+  const labels = dict.vehicles;
+
   if (!vehicle) return null;
 
   const statusCfg = getStatusConfig(vehicle.status, labels);
@@ -115,7 +119,7 @@ export function VehicleView({ vehicle, open, onClose, labels, onEdit, onDelete, 
     >
       <div className="flex-1 overflow-y-auto">
         {/* Header content (was inside drawer header) */}
-        <div className="flex items-start justify-between px-4 py-3 border-b border-border shrink-0 bg-neutral-50/50 dark:bg-neutral-900/30">
+        <div className="flex items-start justify-between px-4 py-3 border-b border-border shrink-0 bg-neutral-50/50 dark:bg-neutral-900">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
               <h2 className="text-[15px] font-bold text-foreground tracking-widest uppercase truncate">
@@ -130,64 +134,59 @@ export function VehicleView({ vehicle, open, onClose, labels, onEdit, onDelete, 
         </div>
 
         {onTrack && (
-          <div className="px-4 py-3 border-b border-border">
-            <Button variant="outline" size="sm" className="w-full text-xs h-8 bg-surface" onClick={() => onTrack(vehicle)}>
-              <MapPin className="w-3.5 h-3.5 mr-2 text-info" />
-              Lacak Lokasi
+          <div className="px-4 py-3 border-b border-border bg-neutral-50/50 dark:bg-neutral-900 grid grid-cols-2 gap-3 shrink-0">
+            <Button variant="outline" size="sm" className="w-full text-[12px] h-8 bg-transparent border-info/30 text-info hover:bg-info/10 dark:hover:bg-info/20 font-medium" onClick={() => onTrack(vehicle)}>
+              <MapPin className="w-3.5 h-3.5 mr-1.5" />
+              {labels.btnTrack}
+            </Button>
+            <Button variant="outline" size="sm" className="w-full text-[12px] h-8 bg-transparent border-danger/30 text-danger hover:bg-danger/10 dark:hover:bg-danger/20 font-medium" onClick={() => alert(labels.alertTurnOffEngine)}>
+              <Power className="w-3.5 h-3.5 mr-1.5" />
+              {labels.btnTurnOffEngine}
             </Button>
           </div>
         )}
 
-        <div className="px-4 py-3">
-
-          {/* Section: Vehicle Info */}
-          <SectionHeader icon={Car} title={labels.detailVehicleInfo} />
-          <div className="rounded-lg border border-border/60 bg-neutral-50/30 dark:bg-neutral-900/20 px-3">
-            <InfoRow icon={Hash} label="Plat Nomor" value={vehicle.plateNumber} />
-            <InfoRow icon={Car} label="Kendaraan" value={vehicle.vehicleName} />
-            <InfoRow icon={Car} label="Kategori" value={getCategoryLabel(vehicle.vehicleCategory)} />
-            <InfoRow icon={Car} label="Merk / Tahun" value={`${vehicle.brand} - ${vehicle.year}`} />
-            <InfoRow icon={Fuel} label="Jenis BBM" value={getFuelLabel(vehicle.fuelType)} />
+        <div className="p-4 grid grid-cols-1 lg:group-data-[layout=dialog]/detail:grid-cols-2 lg:group-data-[layout=fullscreen]/detail:grid-cols-2 gap-6 items-start">
+          <div className="flex flex-col gap-4">
+            {/* Section: Informasi Dasar & Spesifikasi */}
+            <SectionHeader icon={Car} title={labels.detailInfoSpec} />
+          <div className="rounded-lg border border-border bg-neutral-50/30 dark:bg-neutral-900 px-3 py-2.5 grid grid-cols-2 gap-x-3 gap-y-2.5">
+            <CompactField label={labels.fieldGroup} value={vehicle.groupName} colSpan={2} />
+            <CompactField label={labels.fieldCategory} value={getCategoryLabel(vehicle.vehicleCategory, labels)} />
+            <CompactField label={labels.fieldBrandYear} value={`${vehicle.brand || '-'} - ${vehicle.year || '-'}`} />
+            <CompactField label={labels.fieldColor} value={vehicle.color || '-'} />
+            <CompactField label={labels.fieldEngineCapacity} value={vehicle.engineCapacity ? `${vehicle.engineCapacity.toLocaleString('id-ID')} CC` : '-'} />
+            <CompactField label={labels.fieldAssetNumber} value={vehicle.assetNumber || '-'} />
+            <CompactField label={labels.fieldSeats} value={vehicle.passengerCapacity ? `${vehicle.passengerCapacity}` : '-'} />
+            <CompactField label={labels.fieldDimension} value={(vehicle.dimLength && vehicle.dimWidth && vehicle.dimHeight) ? `${vehicle.dimLength}m x ${vehicle.dimWidth}m x ${vehicle.dimHeight}m` : '-'} colSpan={2} />
           </div>
 
-          {/* Section: Operational */}
-          <SectionHeader icon={MapPin} title={labels.detailOperational} />
-          <div className="rounded-lg border border-border/60 bg-neutral-50/30 dark:bg-neutral-900/20 px-3">
-            <InfoRow icon={User} label="Pengemudi" value={vehicle.driverName || labels.noDriver} />
-            <InfoRow icon={Car} label="Grup" value={vehicle.groupName} />
-            <InfoRow icon={Cpu} label="IMEI Device" value={vehicle.deviceImei || labels.noDevice} />
-            <InfoRow icon={Gauge} label="Odometer" value={`${vehicle.odometer.toLocaleString('id-ID')} km`} />
-            <InfoRow icon={Clock} label="Update Terakhir" value={formatDateTime(vehicle.lastUpdate)} />
+          {/* Section: Operasional & Performa */}
+          <SectionHeader icon={Gauge} title={labels.detailOpsPerf} />
+          <div className="rounded-lg border border-border bg-neutral-50/30 dark:bg-neutral-900 px-3 py-2.5 grid grid-cols-2 gap-x-3 gap-y-2.5">
+            <CompactField label={labels.fieldDriver} value={vehicle.driverName || labels.noDriver} colSpan={2} />
+            <CompactField label={labels.fieldFuelType} value={getFuelLabel(vehicle.fuelType, labels)} />
+            <CompactField label={labels.fieldFuelCap} value={vehicle.fuelCapacity ? `${vehicle.fuelCapacity} L` : '-'} />
+            <CompactField label={labels.fieldFuelRatio} value={vehicle.fuelRatio ? `${vehicle.fuelRatio} km/L` : '-'} />
+            <CompactField label={labels.fieldMaxSpeed} value={vehicle.maxSpeed ? `${vehicle.maxSpeed} km/h` : '-'} />
           </div>
 
-          {/* Section: Maintenance */}
-          <SectionHeader icon={Wrench} title={labels.detailMaintenance} />
-          <div className="rounded-lg border border-border/60 bg-neutral-50/30 dark:bg-neutral-900/20 px-3">
-            <InfoRow icon={Wrench} label="Servis Terakhir" value={`${vehicle.lastServiceKm.toLocaleString('id-ID')} km`} />
-
+          {/* Section: Administrasi & Perawatan */}
+          <SectionHeader icon={Wrench} title={labels.detailAdminMaint} />
+          <div className="rounded-lg border border-border bg-neutral-50/30 dark:bg-neutral-900 px-3 py-2.5 flex flex-col gap-2.5">
+            <div className="grid grid-cols-2 gap-x-3 gap-y-2.5">
+              <CompactField label={labels.fieldOdometer} value={`${(vehicle.odometer || 0).toLocaleString('id-ID')} km`} />
+              <CompactField label={labels.fieldLastService} value={`${(vehicle.lastServiceKm || 0).toLocaleString('id-ID')} km`} />
+            </div>
             {/* Service progress */}
-            <div className="py-2.5 border-b border-border/60">
-              <div className="flex items-center gap-3 mb-1.5">
-                <div className="mt-0.5 p-1.5 rounded-md bg-neutral-100 dark:bg-neutral-800 text-foreground-muted shrink-0">
-                  <Wrench className="h-3.5 w-3.5" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[10px] text-foreground-muted uppercase tracking-wider font-semibold mb-0.5">
-                    Servis Berikutnya
-                  </p>
-                  <p className={cn(
-                    'text-[13px] font-medium',
-                    isServiceDue ? 'text-warning-600 dark:text-warning-400 font-semibold' : 'text-foreground',
-                  )}>
-                    {vehicle.nextServiceKm.toLocaleString('id-ID')} km
-                  </p>
-                </div>
-                {isServiceDue && (
-                  <AlertTriangle className="h-4 w-4 text-warning shrink-0" />
-                )}
+            <div className="pt-2 border-t border-border/60">
+              <div className="flex items-center justify-between mb-1.5">
+                <p className="text-[10px] text-foreground-muted uppercase tracking-wider font-semibold">
+                  {labels.fieldNextService}: <span className={cn("ml-1", isServiceDue ? 'text-danger font-bold' : 'text-foreground font-medium')}>{vehicle.nextServiceKm.toLocaleString('id-ID')} km</span>
+                </p>
+                {isServiceDue && <AlertTriangle className="h-3.5 w-3.5 text-danger" />}
               </div>
-              {/* Progress bar */}
-              <div className="ml-[2.375rem] h-1.5 rounded-full bg-neutral-200 dark:bg-neutral-700 overflow-hidden">
+              <div className="h-1.5 rounded-full bg-neutral-200 dark:bg-neutral-700 overflow-hidden">
                 <div
                   className={cn(
                     'h-full rounded-full transition-all',
@@ -197,30 +196,47 @@ export function VehicleView({ vehicle, open, onClose, labels, onEdit, onDelete, 
                   style={{ width: `${serviceProgress}%` }}
                 />
               </div>
-              <p className="ml-[2.375rem] text-[10px] text-foreground-muted mt-1">
-                {Math.round(serviceProgress)}% menuju servis berikutnya
+              <p className="text-[10px] text-foreground-muted mt-1 text-right">
+                {Math.round(serviceProgress)}%
               </p>
             </div>
+          </div>
+          </div>
 
-            <InfoRow
-              icon={Calendar}
-              label="STNK Kedaluwarsa"
-              value={formatDate(vehicle.registrationExpiry)}
-              highlight={isRegistrationExpiringSoon}
-            />
+          <div className="flex flex-col gap-4">
+            {/* Section: Lisensi & Legalitas */}
+            <SectionHeader icon={FileText} title={labels.detailLicensing} />
+          <div className="rounded-lg border border-border bg-neutral-50/30 dark:bg-neutral-900 px-3 py-2.5 grid grid-cols-2 gap-x-3 gap-y-2.5">
+            <CompactField label={labels.fieldStnkExpiry} value={vehicle.registrationExpiry ? formatDate(vehicle.registrationExpiry) : '-'} highlight={isRegistrationExpiringSoon} />
+            <CompactField label={labels.fieldStnkNo} value={vehicle.stnkNumber || '-'} />
+            <CompactField label={labels.fieldKirNo} value={vehicle.kirNumber || '-'} />
+            <CompactField label={labels.fieldBpkbNo} value={vehicle.bpkbNumber || '-'} />
+            <CompactField label={labels.fieldEngineNo} value={vehicle.engineNumber || '-'} />
+            <CompactField label={labels.fieldChassisNo} value={vehicle.chassisNumber || '-'} />
+          </div>
+
+          {/* Section: Perangkat GPS */}
+          <SectionHeader icon={Cpu} title={labels.detailGpsDevice} />
+          <div className="rounded-lg border border-border bg-neutral-50/30 dark:bg-neutral-900 px-3 py-2.5 grid grid-cols-2 gap-x-3 gap-y-2.5">
+            <CompactField label={labels.fieldSystemId} value={vehicle.vehicleId || '-'} colSpan={2} />
+            <CompactField label={labels.fieldGpsBrand} value={`${vehicle.gpsDeviceBrand || '-'} ${vehicle.gpsDeviceType || ''}`.trim() || '-'} />
+            <CompactField label={labels.fieldGpsInstall} value={vehicle.gpsInstallDate ? formatDate(vehicle.gpsInstallDate) : '-'} />
+            <CompactField label={labels.fieldImei} value={vehicle.deviceImei || labels.noDevice} />
+            <CompactField label={labels.fieldSim} value={vehicle.deviceSimNumber || '-'} />
+            <CompactField label={labels.fieldLastUpdate} value={vehicle.lastUpdate ? formatDateTime(vehicle.lastUpdate) : '-'} colSpan={2} />
           </div>
 
           {/* Notes */}
           {vehicle.notes && (
             <>
-              <SectionHeader icon={FileText} title="Catatan" />
-              <div className="rounded-lg border border-border/60 bg-neutral-50/30 dark:bg-neutral-900/20 px-3 py-2.5">
-                <p className="text-[13px] text-foreground leading-relaxed">{vehicle.notes}</p>
+              <SectionHeader icon={FileText} title={labels.detailNotes} />
+              <div className="rounded-lg border border-border bg-neutral-50/30 dark:bg-neutral-900 px-3 py-2.5">
+                <p className="text-[12px] text-foreground leading-relaxed italic">{vehicle.notes}</p>
               </div>
             </>
           )}
-
-          <div className="h-4" />
+          
+          </div>
         </div>
       </div>
     </DetailShell>
