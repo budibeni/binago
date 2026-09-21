@@ -643,6 +643,46 @@ export const dictionaries = {
       emptyDescription: 'Belum ada profil kendaraan rental yang terdaftar.',
       noResultTitle: 'Kendaraan tidak ditemukan',
       noResultDescription: 'Coba sesuaikan kata kunci atau filter pencarian.',
+
+      // Form section titles & helpers
+      sectionVehicleData: 'Data Kendaraan',
+      sectionVehicleDataDesc: 'Data kendaraan dikelola di Master Data Kendaraan. Informasi berikut bersifat read-only.',
+      sectionRentalData: 'Data Rental',
+      sectionRentalDataDesc: 'Pengaturan tarif, status, kondisi, dan kilometer.',
+      sectionNotes: 'Catatan',
+      sectionNotesDesc: 'Informasi tambahan atau catatan khusus mengenai kendaraan rental ini.',
+      sectionDocExpiry: 'Masa Berlaku Dokumen',
+      sectionEquipmentTitle: 'Kelengkapan Kendaraan',
+      sectionEquipmentDesc: 'Ceklis perlengkapan yang tersedia di kendaraan ini.',
+
+      // Status auto-manage
+      statusSystemManaged: 'Status dikelola otomatis oleh sistem karena ada transaksi aktif.',
+      statusManualHint: 'Set manual untuk Maintenance atau Tidak Tersedia. Status lain dikelola otomatis saat ada transaksi.',
+
+      // Pricing
+      pricingLabel: 'Pengaturan Tarif',
+      pricingCategory: 'Tarif Kategori',
+      pricingIndependent: 'Tarif Mandiri (Kustom)',
+      fieldPricingCategoryId: 'Pilih Kategori Tarif',
+      fieldDailyRateRp: 'Tarif Harian (Rp)',
+      fieldWeeklyRateRp: 'Tarif Mingguan (Rp)',
+      fieldMonthlyRateRp: 'Tarif Bulanan (Rp)',
+      fieldDepositRp: 'Deposit (Rp)',
+
+      // Core vehicle labels
+      fieldPlatNomor: 'Plat Nomor',
+      fieldGrup: 'Grup',
+      fieldMerk: 'Merk',
+      fieldAlias: 'Kendaraan (Alias)',
+      fieldKategori: 'Kategori',
+      fieldTahun: 'Tahun',
+      fieldWarna: 'Warna',
+      fieldBahanBakar: 'Bahan Bakar',
+      fieldNoStnk: 'No. STNK',
+      fieldBerlakuStnk: 'Berlaku STNK',
+
+      // Notes placeholder
+      notesPlaceholder: 'Tulis catatan (opsional)',
     },
 
 
@@ -1378,6 +1418,45 @@ export const dictionaries = {
       emptyDescription: 'No rental fleet profiles are registered yet.',
       noResultTitle: 'Fleet not found',
       noResultDescription: 'Try adjusting your keywords or search filters.',
+      // Form section titles & helpers
+      sectionVehicleData: 'Vehicle Data',
+      sectionVehicleDataDesc: 'Vehicle data is managed in Master Fleet Data. The following information is read-only.',
+      sectionRentalData: 'Rental Data',
+      sectionRentalDataDesc: 'Rental rate, status, condition, and odometer settings.',
+      sectionNotes: 'Notes',
+      sectionNotesDesc: 'Additional information or special notes about this rental vehicle.',
+      sectionDocExpiry: 'Document Expiry',
+      sectionEquipmentTitle: 'Vehicle Equipment',
+      sectionEquipmentDesc: 'Check the equipment available in this vehicle.',
+      
+      // Status auto-manage
+      statusSystemManaged: 'Status is automatically managed by the system due to an active transaction.',
+      statusManualHint: 'Set manually for Maintenance or Unavailable. Other statuses are managed automatically when a transaction occurs.',
+      
+      // Pricing
+      pricingLabel: 'Pricing Settings',
+      pricingCategory: 'Category Rate',
+      pricingIndependent: 'Custom Rate',
+      fieldPricingCategoryId: 'Select Rate Category',
+      fieldDailyRateRp: 'Daily Rate (Rp)',
+      fieldWeeklyRateRp: 'Weekly Rate (Rp)',
+      fieldMonthlyRateRp: 'Monthly Rate (Rp)',
+      fieldDepositRp: 'Deposit (Rp)',
+      
+      // Core vehicle labels
+      fieldPlatNomor: 'Plate Number',
+      fieldGrup: 'Group',
+      fieldMerk: 'Brand',
+      fieldAlias: 'Vehicle (Alias)',
+      fieldKategori: 'Category',
+      fieldTahun: 'Year',
+      fieldWarna: 'Color',
+      fieldBahanBakar: 'Fuel Type',
+      fieldNoStnk: 'STNK No.',
+      fieldBerlakuStnk: 'STNK Expiry',
+      
+      // Notes placeholder
+      notesPlaceholder: 'Write notes (optional)',
     },
 
 

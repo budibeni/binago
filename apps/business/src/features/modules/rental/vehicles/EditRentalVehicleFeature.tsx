@@ -67,6 +67,7 @@ export function EditRentalVehicleFeature({ id }: EditRentalVehicleFeatureProps) 
   return (
     <div className="flex-1 w-full h-full bg-neutral-50/80 dark:bg-neutral-900/40 overflow-y-auto relative flex flex-col">
       <RentalVehicleForm
+        layout="fullscreen"
         title={labels.actionEdit || "Edit Data Rental"}
         labels={labels}
         initialData={vehicle}

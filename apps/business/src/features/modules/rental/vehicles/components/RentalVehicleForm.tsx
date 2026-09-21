@@ -14,6 +14,7 @@ interface RentalVehicleFormProps {
   initialData?: RentalVehicle;
   availableCoreVehicles?: Vehicle[];
   availablePricingCategory?: RentalPricingCategory[];
+  availableRates?: import('@/features/modules/rental/pricing-category/types/pricing').RentalRate[];
   onCancel: () => void;
   onSave: (data: Omit<RentalVehicleProfile, 'id' | 'createdAt' | 'updatedAt'>) => void;
   layout?: 'default' | 'drawer' | 'dialog' | 'fullscreen';
@@ -27,6 +28,7 @@ export function RentalVehicleForm({
   initialData,
   availableCoreVehicles = [],
   availablePricingCategory = [],
+  availableRates = [],
   onCancel,
   onSave,
   layout = 'default',
@@ -101,14 +103,14 @@ export function RentalVehicleForm({
     >
       <div className="w-full max-w-6xl mx-auto p-4 lg:p-6 flex flex-col gap-4 lg:gap-5">
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-5 items-start">
+        <div className={cn("grid gap-4 lg:gap-5 items-start", (layout === 'fullscreen' || layout === 'default') ? "grid-cols-1 lg:grid-cols-2" : "grid-cols-1")}>
           {/* Kolom Kiri */}
           <div className="flex flex-col gap-4 lg:gap-5">
 
             {/* Core Info Card */}
             <FormCard
-              title="Data Kendaraan"
-              description="Data kendaraan dikelola di Master Data Kendaraan. Informasi berikut bersifat read-only."
+              title={labels.sectionVehicleData}
+              description={labels.sectionVehicleDataDesc}
               icon={<CarFront className="w-5 h-5 text-danger" />}
             >
 
@@ -131,87 +133,87 @@ export function RentalVehicleForm({
               {selectedCoreVehicle && (
                 <div className="grid grid-cols-2 gap-y-2.5 gap-x-3 bg-gray-100 dark:bg-neutral-800 p-4 rounded-xl border border-gray-200 dark:border-neutral-700">
                   <div className="flex flex-col gap-0.5">
-                    <span className="text-[11px] text-muted-foreground">Plat Nomor</span>
+                    <span className="text-[11px] text-muted-foreground">{labels.fieldPlatNomor}</span>
                     <p className="font-semibold text-sm uppercase">{selectedCoreVehicle.plateNumber || '-'}</p>
                   </div>
                   <div className="flex flex-col gap-0.5">
-                    <span className="text-[11px] text-muted-foreground">Grup</span>
+                    <span className="text-[11px] text-muted-foreground">{labels.fieldGrup}</span>
                     <p className="font-semibold text-sm">{selectedCoreVehicle.groupName || '-'}</p>
                   </div>
                   <div className="flex flex-col gap-0.5">
-                    <span className="text-[11px] text-muted-foreground">Merk</span>
+                    <span className="text-[11px] text-muted-foreground">{labels.fieldMerk}</span>
                     <p className="font-semibold text-sm">{selectedCoreVehicle.brand || '-'}</p>
                   </div>
                   <div className="flex flex-col gap-0.5">
-                    <span className="text-[11px] text-muted-foreground">Kendaraan (Alias)</span>
+                    <span className="text-[11px] text-muted-foreground">{labels.fieldAlias}</span>
                     <p className="font-semibold text-sm">{selectedCoreVehicle.vehicleName || '-'}</p>
                   </div>
                   <div className="flex flex-col gap-0.5">
-                    <span className="text-[11px] text-muted-foreground">Kategori</span>
+                    <span className="text-[11px] text-muted-foreground">{labels.fieldKategori}</span>
                     <p className="font-semibold text-sm capitalize">{selectedCoreVehicle.vehicleCategory || '-'}</p>
                   </div>
                   <div className="flex flex-col gap-0.5">
-                    <span className="text-[11px] text-muted-foreground">Tahun</span>
+                    <span className="text-[11px] text-muted-foreground">{labels.fieldTahun}</span>
                     <p className="font-semibold text-sm">{selectedCoreVehicle.year || '-'}</p>
                   </div>
                   <div className="flex flex-col gap-0.5">
-                    <span className="text-[11px] text-muted-foreground">Warna</span>
+                    <span className="text-[11px] text-muted-foreground">{labels.fieldWarna}</span>
                     <p className="font-semibold text-sm">{selectedCoreVehicle.color || '-'}</p>
                   </div>
                   <div className="flex flex-col gap-0.5">
-                    <span className="text-[11px] text-muted-foreground">Bahan Bakar</span>
+                    <span className="text-[11px] text-muted-foreground">{labels.fieldBahanBakar}</span>
                     <p className="font-semibold text-sm capitalize">{selectedCoreVehicle.fuelType || '-'}</p>
                   </div>
                   <div className="flex flex-col gap-0.5">
-                    <span className="text-[11px] text-muted-foreground">No. STNK</span>
+                    <span className="text-[11px] text-muted-foreground">{labels.fieldNoStnk}</span>
                     <p className="font-semibold text-sm">{selectedCoreVehicle.stnkNumber || '-'}</p>
                   </div>
                   <div className="flex flex-col gap-0.5">
-                    <span className="text-[11px] text-muted-foreground">Berlaku STNK</span>
+                    <span className="text-[11px] text-muted-foreground">{labels.fieldBerlakuStnk}</span>
                     <p className="font-semibold text-sm">{selectedCoreVehicle.registrationExpiry || '-'}</p>
                   </div>
                 </div>
               )}
 
-              {/* Kelengkapan */}
-              <div className="mt-6 border-t border-border/40 pt-5">
-                <div className="mb-3">
-                  <h4 className="text-xs font-semibold text-foreground">Kelengkapan Kendaraan</h4>
-                  <p className="text-[11px] text-muted-foreground mt-0.5">Ceklis perlengkapan yang tersedia di kendaraan ini.</p>
-                </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {[
-                    { id: 'stnk', label: 'STNK' },
-                    { id: 'bpkb', label: 'BPKB' },
-                    { id: 'spareTire', label: 'Ban Cadangan' },
-                    { id: 'jack', label: 'Dongkrak' },
-                    { id: 'toolkit', label: 'Toolkit' },
-                    { id: 'firstAidKit', label: 'P3K' },
-                    { id: 'fireExtinguisher', label: 'APAR' },
-                    { id: 'carpet', label: 'Karpet' },
-                    { id: 'audio', label: 'Radio / Audio' }
-                  ].map((item) => (
-                    <label
-                      key={item.id}
-                      className={cn(
-                        "flex items-center gap-2.5 px-3 min-h-[42px] border rounded-lg cursor-pointer transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-800/50",
-                        equipment[item.id as keyof RentalEquipment]
-                          ? "bg-danger/5 border-danger/40"
-                          : "border-border/60"
-                      )}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={equipment[item.id as keyof RentalEquipment]}
-                        onChange={() => handleEqToggle(item.id as keyof RentalEquipment)}
-                        className="rounded border-neutral-300 text-danger accent-red-600 focus:ring-danger w-4 h-4 shrink-0"
-                      />
-                      <span className="text-xs font-medium">{item.label}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
+            </FormCard>
 
+            {/* Kelengkapan Card */}
+            <FormCard
+              title={labels.sectionEquipmentTitle}
+              description={labels.sectionEquipmentDesc}
+              icon={<ShieldCheck className="w-5 h-5 text-danger" />}
+            >
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {[
+                  { id: 'stnk', label: labels.equipStnk },
+                  { id: 'bpkb', label: labels.equipBpkb },
+                  { id: 'spareTire', label: labels.equipSpareTire },
+                  { id: 'jack', label: labels.equipJack },
+                  { id: 'toolkit', label: labels.equipToolkit },
+                  { id: 'firstAidKit', label: labels.equipFirstAid },
+                  { id: 'fireExtinguisher', label: labels.equipFireExtinguisher },
+                  { id: 'carpet', label: labels.equipCarpet },
+                  { id: 'audio', label: labels.equipAudio }
+                ].map((item) => (
+                  <label
+                    key={item.id}
+                    className={cn(
+                      "flex items-center gap-2.5 px-3 min-h-[42px] border rounded-lg cursor-pointer transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-800/50",
+                      equipment[item.id as keyof RentalEquipment]
+                        ? "bg-danger/5 border-danger/40"
+                        : "border-border/60"
+                    )}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={equipment[item.id as keyof RentalEquipment]}
+                      onChange={() => handleEqToggle(item.id as keyof RentalEquipment)}
+                      className="rounded border-neutral-300 text-danger accent-red-600 focus:ring-danger w-4 h-4 shrink-0"
+                    />
+                    <span className="text-xs font-medium">{item.label}</span>
+                  </label>
+                ))}
+              </div>
             </FormCard>
 
           </div>
@@ -221,32 +223,49 @@ export function RentalVehicleForm({
 
             {/* Rental Config Card */}
             <FormCard
-              title="Data Rental"
-              description="Pengaturan tarif, status, kondisi, dan kilometer."
+              title={labels.sectionRentalData}
+              description={labels.sectionRentalDataDesc}
               icon={<Settings className="w-5 h-5 text-danger" />}
               className="h-full"
             >
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
+              <div className={cn("grid gap-x-4 gap-y-4", (layout === 'fullscreen' || layout === 'default') ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1")}>
                 <div className="sm:col-span-2">
-                  <InputSelect
-                    id="status"
-                    label="Status Rental"
-                    value={status}
-                    onChange={(v) => setStatus(v as RentalStatus)}
-                    options={[
-                      { value: 'READY', label: 'Ready / Tersedia' },
-                      { value: 'RESERVED', label: 'Reserved / Dipesan' },
-                      { value: 'RENTED', label: 'Disewa' },
-                      { value: 'MAINTENANCE', label: 'Maintenance' },
-                      { value: 'UNAVAILABLE', label: 'Tidak Tersedia' }
-                    ]}
-                  />
+                  {(() => {
+                    const isSystemManaged = status === 'RESERVED' || status === 'RENTED';
+                    return (
+                      <div className="flex flex-col gap-1">
+                        <InputSelect
+                          id="status"
+                          label={labels.fieldRentalStatus}
+                          value={status}
+                          onChange={(v) => setStatus(v as RentalStatus)}
+                          disabled={isSystemManaged}
+                          options={[
+                            { value: 'READY', label: labels.statusReady },
+                            { value: 'RESERVED', label: labels.statusReserved },
+                            { value: 'RENTED', label: labels.statusRented },
+                            { value: 'MAINTENANCE', label: labels.statusMaintenance },
+                            { value: 'UNAVAILABLE', label: labels.statusUnavailable }
+                          ]}
+                        />
+                        {isSystemManaged ? (
+                          <p className="text-[11px] text-warning flex items-center gap-1 mt-0.5">
+                            <span>⚠</span> {labels.statusSystemManaged}
+                          </p>
+                        ) : (
+                          <p className="text-[11px] text-muted-foreground mt-0.5">
+                            {labels.statusManualHint}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })()}
                 </div>
 
                 <div className="sm:col-span-2">
                   <div className="flex flex-col gap-1.5 mb-2">
-                    <Label className="text-xs font-semibold">Pengaturan Tarif</Label>
+                    <Label className="text-xs font-semibold">{labels.pricingLabel}</Label>
                     <div className="flex flex-col sm:flex-row gap-3">
                       <button
                         type="button"
@@ -254,11 +273,11 @@ export function RentalVehicleForm({
                         className={cn(
                           "flex-1 py-2.5 px-3 border rounded-lg text-[12px] font-medium transition-colors text-center",
                           pricingType === 'CATEGORY'
-                            ? "bg-primary/10 text-primary border-primary"
+                            ? "bg-danger/10 text-danger border-danger"
                             : "bg-background text-foreground hover:bg-muted border-border"
                         )}
                       >
-                        Tarif Kategori
+                        {labels.pricingCategory}
                       </button>
                       <button
                         type="button"
@@ -266,111 +285,134 @@ export function RentalVehicleForm({
                         className={cn(
                           "flex-1 py-2.5 px-3 border rounded-lg text-[12px] font-medium transition-colors text-center",
                           pricingType === 'INDEPENDENT'
-                            ? "bg-primary/10 text-primary border-primary"
+                            ? "bg-danger/10 text-danger border-danger"
                             : "bg-background text-foreground hover:bg-muted border-border"
                         )}
                       >
-                        Tarif Mandiri (Kustom)
+                        {labels.pricingIndependent}
                       </button>
                     </div>
                   </div>
                 </div>
 
                 {pricingType === 'CATEGORY' ? (
-                  <div className="sm:col-span-2">
+                  <div className="sm:col-span-2 flex flex-col gap-3">
                     <InputSelect
                       id="pricingCategoryId"
-                      label="Pilih Kategori Tarif"
+                      label={labels.fieldPricingCategoryId}
                       value={pricingCategoryId}
                       onChange={setPricingCategoryId}
                       options={availablePricingCategory.map(g => ({ value: g.id, label: g.name }))}
                       required={pricingType === 'CATEGORY'}
                     />
+                    {pricingCategoryId && (() => {
+                      const cat = availablePricingCategory.find(c => c.id === pricingCategoryId);
+                      if (!cat) return null;
+                      const catRates = availableRates.filter(r => r.pricingCategoryId === pricingCategoryId && r.status === 'ACTIVE');
+                      const daily = catRates.find(r => r.rateType === 'DAILY');
+                      const weekly = catRates.find(r => r.rateType === 'WEEKLY');
+                      const monthly = catRates.find(r => r.rateType === 'MONTHLY');
+                      const fmt = (n: number) => `Rp ${n.toLocaleString('id-ID')}`;
+                      return (
+                        <div className="bg-gray-100 dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-3">
+                          <div className="flex flex-col gap-0.5 mb-3">
+                            <span className="text-[11px] text-muted-foreground">Kategori Terpilih</span>
+                            <p className="font-semibold text-sm">{cat.name}</p>
+                            {cat.description && <p className="text-[11px] text-muted-foreground">{cat.description}</p>}
+                          </div>
+                          {catRates.length > 0 ? (
+                            <div className="grid grid-cols-3 gap-2">
+                              {daily && (
+                                <div className="flex flex-col gap-0.5">
+                                  <span className="text-[11px] text-muted-foreground">{labels.fieldDailyRate}</span>
+                                  <p className="font-semibold text-sm text-foreground">{fmt(daily.amount)}</p>
+                                </div>
+                              )}
+                              {weekly && (
+                                <div className="flex flex-col gap-0.5">
+                                  <span className="text-[11px] text-muted-foreground">{labels.fieldWeeklyRate}</span>
+                                  <p className="font-semibold text-sm text-foreground">{fmt(weekly.amount)}</p>
+                                </div>
+                              )}
+                              {monthly && (
+                                <div className="flex flex-col gap-0.5">
+                                  <span className="text-[11px] text-muted-foreground">{labels.fieldMonthlyRate}</span>
+                                  <p className="font-semibold text-sm text-foreground">{fmt(monthly.amount)}</p>
+                                </div>
+                              )}
+                            </div>
+                          ) : (
+                            <p className="text-[11px] text-muted-foreground italic">Belum ada tarif yang ditetapkan.</p>
+                          )}
+                        </div>
+                      );
+                    })()}
                   </div>
                 ) : (
                   <>
                     <div>
                       <InputDecimal
                         id="dailyRate"
-                        label="Tarif Harian"
+                        label={labels.fieldDailyRateRp}
                         value={dailyRate ? Number(dailyRate) : null}
                         onChange={(v) => setDailyRate(v !== null ? String(v) : '')}
-                        prefixIcon={<span className="text-muted-foreground text-sm font-medium">Rp</span>}
-                        placeholder="0"
-                      />
-                    </div>
-                    <div>
-                      <InputDecimal
-                        id="deposit"
-                        label="Deposit"
-                        value={deposit ? Number(deposit) : null}
-                        onChange={(v) => setDeposit(v !== null ? String(v) : '')}
-                        prefixIcon={<span className="text-muted-foreground text-sm font-medium">Rp</span>}
                         placeholder="0"
                       />
                     </div>
                     <div>
                       <InputDecimal
                         id="weeklyRate"
-                        label="Tarif Mingguan"
+                        label={labels.fieldWeeklyRateRp}
                         value={weeklyRate ? Number(weeklyRate) : null}
                         onChange={(v) => setWeeklyRate(v !== null ? String(v) : '')}
-                        prefixIcon={<span className="text-muted-foreground text-sm font-medium">Rp</span>}
                         placeholder="0"
                       />
                     </div>
                     <div>
                       <InputDecimal
                         id="monthlyRate"
-                        label="Tarif Bulanan"
+                        label={labels.fieldMonthlyRateRp}
                         value={monthlyRate ? Number(monthlyRate) : null}
                         onChange={(v) => setMonthlyRate(v !== null ? String(v) : '')}
-                        prefixIcon={<span className="text-muted-foreground text-sm font-medium">Rp</span>}
                         placeholder="0"
                       />
                     </div>
                   </>
                 )}
 
+                {/* Deposit - selalu tampil */}
                 <div className="sm:col-span-2">
-                  <InputSelect
-                    id="condition"
-                    label="Kondisi"
-                    value={condition}
-                    onChange={(v) => setCondition(v as RentalCondition)}
-                    options={[
-                      { value: 'GOOD', label: 'Baik' },
-                      { value: 'MINOR_DAMAGE', label: 'Kerusakan Ringan' },
-                      { value: 'NEEDS_REPAIR', label: 'Perlu Perbaikan' }
-                    ]}
+                  <InputDecimal
+                    id="deposit"
+                    label={labels.fieldDepositRp}
+                    value={deposit ? Number(deposit) : null}
+                    onChange={(v) => setDeposit(v !== null ? String(v) : '')}
+                    placeholder="0"
                   />
                 </div>
 
-                <div className="flex flex-col gap-1.5 sm:col-span-2">
-                  <Label className="text-xs font-semibold">Kilometer Terakhir</Label>
-                  <div className="flex gap-2">
-                    <Input type="number" min="0" value={currentOdo} onChange={e => setCurrentOdo(e.target.value)} className="h-9 text-sm w-32" placeholder="15.000" />
-                    <Button type="button" variant="outline" size="sm" className="h-9 text-[11px] px-3 whitespace-nowrap" onClick={() => setCurrentOdo('15000')}>Ambil dari odometer</Button>
-                  </div>
-                </div>
-
-                <div className="sm:col-span-2">
-                  <InputString
-                    id="notes"
-                    label="Catatan"
-                    value={notes}
-                    onChange={(v) => setNotes(v)}
-                    placeholder="Tulis catatan (opsional)"
-                    maxLength={500}
-                    helpText={`${notes.length} / 500 karakter`}
-                  />
-                </div>
               </div>
+            </FormCard>
+
+            {/* Catatan Card */}
+            <FormCard
+              title={labels.sectionNotes}
+              description={labels.sectionNotesDesc}
+              icon={<FileText className="w-5 h-5 text-danger" />}
+            >
+              <InputString
+                id="notes"
+                label=""
+                value={notes}
+                onChange={(v) => setNotes(v)}
+                placeholder={labels.notesPlaceholder}
+                maxLength={500}
+                helpText={`${notes.length} / 500`}
+              />
             </FormCard>
 
           </div>
         </div>
-
 
       </div>
     </FormShell>

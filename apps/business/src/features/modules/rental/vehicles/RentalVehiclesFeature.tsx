@@ -13,7 +13,7 @@ import type { RentalPricingCategory } from '../pricing-category/types/pricing';
 import type { DataTableFilterConfig } from '@adatrack/ui';
 import { RentalVehicleTable } from './components/RentalVehicleTable';
 import { VehicleSelectionDialog } from '@/features/core/vehicles/components/VehicleSelectionDialog';
-import { RentalVehicleDetailDrawer } from './components/RentalVehicleDetailDrawer';
+import { RentalVehicleView } from './components/RentalVehicleView';
 import { RentalVehicleDisableDialog } from './components/RentalVehicleDisableDialog';
 import { RentalVehicleForm } from './components/RentalVehicleForm';
 import { useRouter } from 'next/navigation';
@@ -54,6 +54,7 @@ export function RentalVehiclesFeature() {
 
   const [vehicles, setVehicles] = React.useState<RentalVehicle[]>([]);
   const [pricingCategorys, setPricingCategory] = React.useState<RentalPricingCategory[]>([]);
+  const [pricingRates, setPricingRates] = React.useState<import('@/features/modules/rental/pricing-category/types/pricing').RentalRate[]>([]);
   const [availableCores, setAvailableCores] = React.useState(rentalVehicleService.getAvailableCoreVehicles());
 
   // UI State
@@ -77,7 +78,11 @@ export function RentalVehiclesFeature() {
     const data = rentalVehicleService.getRentalVehicles({ search, status: statusFilter });
     setVehicles(data);
     setAvailableCores(rentalVehicleService.getAvailableCoreVehicles());
-    setPricingCategory(pricingService.getPricingCategory({ status: 'ACTIVE' }));
+    const cats = pricingService.getPricingCategory({ status: 'ACTIVE' });
+    setPricingCategory(cats);
+    // Load all rates from all active categories
+    const allRates = cats.flatMap(c => pricingService.getRatesByGroupId(c.id));
+    setPricingRates(allRates);
   }, [search, statusFilter, dataVersion]);
 
   // Derived stats
@@ -299,7 +304,7 @@ export function RentalVehiclesFeature() {
         isLoading={isRefreshing}
       />
 
-      <RentalVehicleDetailDrawer
+      <RentalVehicleView
         open={detailOpen}
         onOpenChange={setDetailOpen}
         data={selectedVehicle}
@@ -330,6 +335,7 @@ export function RentalVehiclesFeature() {
           labels={labels}
           initialData={vehicles.find(v => v.id === editId)}
           availablePricingCategory={pricingCategorys}
+          availableRates={pricingRates}
           onCancel={() => setEditId(null)}
           onSave={(data) => {
             // TODO: dispatch edit save
