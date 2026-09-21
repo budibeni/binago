@@ -143,7 +143,7 @@ export function ReturnsFeature() {
                   <div>
                     <div className="flex justify-between items-start gap-2 mb-2.5">
                       <div className="flex flex-col min-w-0">
-                        <span className="font-semibold text-[13px] text-foreground truncate" title={contract.contractNumber}>{contract.contractNumber}</span>
+                        <span className="font-semibold text-[12px] text-foreground truncate" title={contract.contractNumber}>{contract.contractNumber}</span>
                         <span className="text-[12px] text-muted-foreground truncate" title={contract.customer?.name}>{contract.customer?.name}</span>
                       </div>
                       <span className="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 shrink-0 border border-blue-100 dark:border-blue-800/30">
@@ -188,7 +188,7 @@ export function ReturnsFeature() {
           ) : (
             <div className="flex flex-col items-center justify-center p-6 text-center border-2 border-dashed border-border rounded-xl">
               <RotateCcw className="w-8 h-8 text-muted-foreground/30 mb-2" />
-              <p className="text-[13px] font-medium text-muted-foreground">Tidak ada kendaraan</p>
+              <p className="text-[12px] font-medium text-muted-foreground">Tidak ada kendaraan</p>
               <p className="text-[12px] text-muted-foreground/70">Belum ada kendaraan yang siap untuk dikembalikan.</p>
             </div>
           )}

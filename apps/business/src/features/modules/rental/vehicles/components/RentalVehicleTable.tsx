@@ -159,7 +159,7 @@ function buildColumns(
 
         return (
           <div className="whitespace-nowrap">
-            <span className={cn("text-[13px] font-medium", textClass)}>{label}</span>
+            <span className={cn("text-[12px] font-medium", textClass)}>{label}</span>
           </div>
         );
       },
@@ -211,7 +211,7 @@ function buildColumns(
       cell: ({ row }) => {
         const v = row.original;
         if (v.dailyRate === 0) return <span className="text-muted-foreground">-</span>;
-        return <span className="text-[13px] font-medium">{formatCurrency(v.dailyRate)} / hari</span>;
+        return <span className="text-[12px] font-medium">{formatCurrency(v.dailyRate)} / hari</span>;
       },
     },
     {
@@ -237,7 +237,7 @@ function buildColumns(
         return (
           <div className="flex items-center gap-2">
             <span className={cn('h-1.5 w-1.5 shrink-0 rounded-full', isComplete ? 'bg-success' : 'bg-warning')} />
-            <span className="text-[13px] text-foreground-muted">
+            <span className="text-[12px] text-foreground-muted">
               {isComplete ? (labels.dataCompleteShort || 'Lengkap') : (labels.dataNotCompleteShort || 'Belum Lengkap')}
             </span>
             {!isComplete && (
@@ -307,7 +307,7 @@ export function RentalVehicleTable({
       toolbarActions={
         <div className="flex items-center gap-2">
           {onAdd && (
-            <Button variant="destructive" onClick={onAdd} className="h-8 gap-1.5 text-[13px] font-medium shadow-none">
+            <Button variant="destructive" onClick={onAdd} className="h-8 gap-1.5 text-[12px] font-medium shadow-none">
               <Plus className="h-3.5 w-3.5" />
               <span className="hidden sm:inline-block">{labels.addVehicle}</span>
             </Button>

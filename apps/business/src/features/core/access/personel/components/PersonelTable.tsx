@@ -85,7 +85,7 @@ function buildColumns(
           <button 
             type="button"
             onClick={() => onViewDetail(p)}
-            className="font-bold text-primary hover:underline underline-offset-2 text-[13px] tracking-wider uppercase focus:outline-none whitespace-nowrap"
+            className="font-bold text-primary hover:underline underline-offset-2 text-[12px] tracking-wider uppercase focus:outline-none whitespace-nowrap"
           >
             {p.name}
           </button>
@@ -98,7 +98,7 @@ function buildColumns(
       id: 'personelType',
       header: labels.colType,
       accessorFn: (row) => row.personelType,
-      cell: ({ getValue }) => <span className="text-[13px] text-info">{getValue() as string}</span>,
+      cell: ({ getValue }) => <span className="text-[12px] text-info">{getValue() as string}</span>,
       enableSorting: true,
       size: 140,
     },
@@ -106,7 +106,7 @@ function buildColumns(
       id: 'nik',
       header: labels.colNik,
       accessorFn: (row) => row.nik,
-      cell: ({ getValue }) => <span className="text-[13px] tabular-nums text-foreground-muted">{getValue() as string}</span>,
+      cell: ({ getValue }) => <span className="text-[12px] tabular-nums text-foreground-muted">{getValue() as string}</span>,
       enableSorting: true,
       size: 150,
     },
@@ -114,7 +114,7 @@ function buildColumns(
       id: 'phone',
       header: labels.colPhone,
       accessorFn: (row) => row.phone,
-      cell: ({ getValue }) => <span className="text-[13px] tabular-nums text-foreground-muted">{getValue() as string}</span>,
+      cell: ({ getValue }) => <span className="text-[12px] tabular-nums text-foreground-muted">{getValue() as string}</span>,
       enableSorting: true,
       size: 140,
     },
@@ -122,7 +122,7 @@ function buildColumns(
       id: 'email',
       header: labels.colEmail,
       accessorFn: (row) => row.email,
-      cell: ({ getValue }) => <span className="text-[13px] text-foreground-muted">{getValue() as string}</span>,
+      cell: ({ getValue }) => <span className="text-[12px] text-foreground-muted">{getValue() as string}</span>,
       enableSorting: true,
       size: 180,
     },
@@ -130,7 +130,7 @@ function buildColumns(
       id: 'address',
       header: labels.colAddress,
       accessorFn: (row) => row.address,
-      cell: ({ getValue }) => <span className="text-[13px] text-foreground-muted">{getValue() as string}</span>,
+      cell: ({ getValue }) => <span className="text-[12px] text-foreground-muted">{getValue() as string}</span>,
       enableSorting: true,
       size: 250,
     },
@@ -144,7 +144,7 @@ function buildColumns(
         return (
           <div className="flex items-center gap-1.5">
             <span className={cn('h-1.5 w-1.5 rounded-full', isActive ? 'bg-success' : 'bg-danger')} />
-            <span className="text-[13px] text-foreground-muted">{isActive ? labels.statusActive : labels.statusInactive}</span>
+            <span className="text-[12px] text-foreground-muted">{isActive ? labels.statusActive : labels.statusInactive}</span>
           </div>
         );
       },
@@ -158,7 +158,7 @@ function buildColumns(
       enableSorting: false,
       size: 200,
       cell: ({ row }) => (
-        <span className="text-[13px] text-foreground-muted block truncate max-w-[180px]" title={row.original.notes || ''}>
+        <span className="text-[12px] text-foreground-muted block truncate max-w-[180px]" title={row.original.notes || ''}>
           {row.original.notes || '-'}
         </span>
       ),
@@ -220,7 +220,7 @@ export function PersonelTable({
       emptyDescription={labels.emptyDescription}
       toolbarActions={
         onAdd ? (
-          <Button variant="destructive" onClick={onAdd} className="h-8 gap-1.5 text-[13px] font-medium shadow-none">
+          <Button variant="destructive" onClick={onAdd} className="h-8 gap-1.5 text-[12px] font-medium shadow-none">
             <Plus className="h-3.5 w-3.5" />
             <span className="hidden sm:inline-block">{labels.addPersonel}</span>
           </Button>

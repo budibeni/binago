@@ -54,7 +54,7 @@ export function GroupTable({ groups, labels, toolbarActions, onViewDetail, onEdi
       cell: ({ row }) => (
         <button
           type="button"
-          className="font-bold text-primary hover:underline underline-offset-2 focus:outline-none text-[13px]"
+          className="font-bold text-primary hover:underline underline-offset-2 focus:outline-none text-[12px]"
           onClick={() => onViewDetail?.(row.original)}
         >
           {row.original.name}

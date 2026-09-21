@@ -148,12 +148,12 @@ export function ShareLocationDialog({ vehicle, open, onOpenChange }: ShareLocati
         title={ls.stopSharingTitle}
       >
         <div className="pt-2 flex flex-col gap-4">
-          <p className="text-[13px] text-foreground">
+          <p className="text-[12px] text-foreground">
             {ls.stopSharingDesc} <strong>{vehicle.vehicleType}</strong>
           </p>
           <div className="flex gap-3 justify-end mt-2">
-            <Button variant="outline" className="rounded-xl px-5 py-2 h-auto text-[13px]" onClick={() => setShowStopConfirm(false)}>{ls.cancel}</Button>
-            <Button variant="destructive" className="rounded-xl px-5 py-2 h-auto text-[13px]" onClick={handleStopSharing}>{ls.confirmStop}</Button>
+            <Button variant="outline" className="rounded-xl px-5 py-2 h-auto text-[12px]" onClick={() => setShowStopConfirm(false)}>{ls.cancel}</Button>
+            <Button variant="destructive" className="rounded-xl px-5 py-2 h-auto text-[12px]" onClick={handleStopSharing}>{ls.confirmStop}</Button>
           </div>
         </div>
       </Dialog>
@@ -172,7 +172,7 @@ export function ShareLocationDialog({ vehicle, open, onOpenChange }: ShareLocati
 
           <div className="mb-6">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-[13px] font-bold text-foreground">{ls.chooseDuration}</span>
+              <span className="text-[12px] font-bold text-foreground">{ls.chooseDuration}</span>
               <span className="text-[12px] font-semibold text-red-600 dark:text-red-400">{selectedDuration} {locale === 'id' ? 'Jam' : 'Hrs'}</span>
             </div>
             
@@ -183,7 +183,7 @@ export function ShareLocationDialog({ vehicle, open, onOpenChange }: ShareLocati
                   type="button"
                   onClick={() => setSelectedDuration(h)}
                   className={cn(
-                    'flex-1 py-1.5 text-[13px] font-semibold rounded-[8px] transition-all duration-200',
+                    'flex-1 py-1.5 text-[12px] font-semibold rounded-[8px] transition-all duration-200',
                     selectedDuration === h
                       ? 'bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-sm'
                       : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-200/50 dark:hover:bg-neutral-800/50'
@@ -217,7 +217,7 @@ export function ShareLocationDialog({ vehicle, open, onOpenChange }: ShareLocati
             <div className="flex items-start gap-3 p-3 rounded-xl bg-green-50 dark:bg-green-950/30 border border-green-100 dark:border-green-900/50 text-green-800 dark:text-green-300">
               <CheckCircle2 className="w-5 h-5 shrink-0 text-green-500 mt-0.5" />
               <div>
-                <p className="text-[13px] font-bold">{ls.locationShared}</p>
+                <p className="text-[12px] font-bold">{ls.locationShared}</p>
                 <p className="text-[12px] mt-0.5 opacity-90 leading-snug">{ls.linkActive} {currentSession.durationHours} {locale === 'id' ? 'jam' : 'hrs'}</p>
               </div>
             </div>
@@ -248,7 +248,7 @@ export function ShareLocationDialog({ vehicle, open, onOpenChange }: ShareLocati
             <div className="flex items-start gap-3 p-3 rounded-xl bg-blue-50 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/50 text-blue-800 dark:text-blue-300">
               <Clock className="w-5 h-5 shrink-0 text-blue-500 mt-0.5" />
               <div>
-                <p className="text-[13px] font-bold">{ls.activeSharing}</p>
+                <p className="text-[12px] font-bold">{ls.activeSharing}</p>
                 <p className="text-[12px] mt-0.5 opacity-90 leading-snug">{ls.expiresIn}: {formatCountdown(activeSession.expiresAt)}</p>
               </div>
             </div>

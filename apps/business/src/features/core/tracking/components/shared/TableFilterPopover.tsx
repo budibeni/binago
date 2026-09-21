@@ -54,7 +54,7 @@ export function TableFilterPopover({ children, locale = 'id', triggerClassName, 
       <PopoverContent align="start" className="w-[300px] p-0 flex flex-col bg-background rounded-md overflow-hidden" sideOffset={8} ref={popoverRef}>
         {/* Header */}
         <div className="flex items-center justify-between p-3 border-b border-border bg-neutral-50/50 dark:bg-neutral-900/50 rounded-t-lg">
-           <h3 className="font-semibold text-[13px] text-foreground flex items-center gap-2">
+           <h3 className="font-semibold text-[12px] text-foreground flex items-center gap-2">
              <Filter className="h-3.5 w-3.5 text-primary" />
              {tTrackingLocal.filters.parameters}
            </h3>

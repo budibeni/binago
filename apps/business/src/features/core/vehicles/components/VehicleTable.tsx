@@ -131,7 +131,7 @@ function buildColumns(
               cell: ({ row }) => (
                 <button
                   type="button"
-                  className="font-bold text-primary hover:underline underline-offset-2 text-[13px] tracking-wider uppercase focus:outline-none"
+                  className="font-bold text-primary hover:underline underline-offset-2 text-[12px] tracking-wider uppercase focus:outline-none"
                   onClick={() => onViewDetail(row.original)}
                 >
                   {row.original.plateNumber}
@@ -145,7 +145,7 @@ function buildColumns(
               enableSorting: true,
               size: 220,
               cell: ({ row }) => (
-                <span className="text-[13px] text-foreground">{row.original.vehicleName}</span>
+                <span className="text-[12px] text-foreground">{row.original.vehicleName}</span>
               ),
             },
     {
@@ -155,7 +155,7 @@ function buildColumns(
               enableSorting: true,
               size: 160,
               cell: ({ row }) => (
-                <span className="text-[13px] text-info">{row.original.groupName}</span>
+                <span className="text-[12px] text-info">{row.original.groupName}</span>
               ),
             },
     {
@@ -166,7 +166,7 @@ function buildColumns(
               size: 180,
               cell: ({ row }) => (
                 <span className={cn(
-                  'text-[13px]',
+                  'text-[12px]',
                   row.original.driverName ? 'text-foreground' : 'text-foreground-muted italic',
                 )}>
                   {row.original.driverName ?? labels.noDriver}
@@ -214,7 +214,7 @@ function buildColumns(
                   motorcycle: (labels as any).categoryMotorcycle || 'Motor',
                   other: (labels as any).categoryOther || 'Lainnya',
                 };
-                return <span className="text-[13px] text-foreground-muted">{catMap[row.original.vehicleCategory]}</span>;
+                return <span className="text-[12px] text-foreground-muted">{catMap[row.original.vehicleCategory]}</span>;
               },
             },
     {
@@ -224,7 +224,7 @@ function buildColumns(
               enableSorting: true,
               size: 130,
               cell: ({ row }) => (
-                <span className="text-[13px] text-foreground-muted">{row.original.brand}</span>
+                <span className="text-[12px] text-foreground-muted">{row.original.brand}</span>
               ),
             },
     {
@@ -234,7 +234,7 @@ function buildColumns(
               enableSorting: true,
               size: 90,
               cell: ({ row }) => (
-                <span className="text-[13px] tabular-nums text-foreground-muted">{row.original.year}</span>
+                <span className="text-[12px] tabular-nums text-foreground-muted">{row.original.year}</span>
               ),
             },
     {
@@ -244,7 +244,7 @@ function buildColumns(
               enableSorting: true,
               size: 110,
               cell: ({ row }) => (
-                <span className="text-[13px] text-foreground-muted">{row.original.color || '-'}</span>
+                <span className="text-[12px] text-foreground-muted">{row.original.color || '-'}</span>
               ),
             },
     {
@@ -259,7 +259,7 @@ function buildColumns(
                   bensin: (labels as any).fuelBensin || 'Bensin',
                   listrik: (labels as any).fuelElectric || 'Listrik',
                 };
-                return <span className="text-[13px] text-foreground-muted">{fuelMap[row.original.fuelType]}</span>;
+                return <span className="text-[12px] text-foreground-muted">{fuelMap[row.original.fuelType]}</span>;
               },
             },
     {
@@ -269,7 +269,7 @@ function buildColumns(
               enableSorting: true,
               size: 110,
               cell: ({ row }) => (
-                <span className="text-[13px] tabular-nums text-foreground-muted">
+                <span className="text-[12px] tabular-nums text-foreground-muted">
                   {row.original.fuelCapacity ? `${row.original.fuelCapacity} L` : '-'}
                 </span>
               ),
@@ -280,7 +280,7 @@ function buildColumns(
               header: labels.colCapacityCC || 'Kap. Mesin',
               enableSorting: true,
               size: 110,
-              cell: ({ row }) => <span className="text-[13px] tabular-nums text-foreground-muted">{row.original.engineCapacity ? `${row.original.engineCapacity} CC` : '-'}</span>,
+              cell: ({ row }) => <span className="text-[12px] tabular-nums text-foreground-muted">{row.original.engineCapacity ? `${row.original.engineCapacity} CC` : '-'}</span>,
             },
     {
               id: 'odometer',
@@ -288,7 +288,7 @@ function buildColumns(
               header: labels.fieldOdometer || 'Odometer',
               enableSorting: true,
               size: 130,
-              cell: ({ row }) => <span className="text-[13px] tabular-nums text-foreground-muted">{row.original.odometer?.toLocaleString('id-ID') || '-'}</span>,
+              cell: ({ row }) => <span className="text-[12px] tabular-nums text-foreground-muted">{row.original.odometer?.toLocaleString('id-ID') || '-'}</span>,
             },
     {
               id: 'lastServiceKm',
@@ -296,7 +296,7 @@ function buildColumns(
               header: labels.fieldLastService || 'Servis Terakhir',
               enableSorting: true,
               size: 130,
-              cell: ({ row }) => <span className="text-[13px] tabular-nums text-foreground-muted">{row.original.lastServiceKm?.toLocaleString('id-ID') || '-'}</span>,
+              cell: ({ row }) => <span className="text-[12px] tabular-nums text-foreground-muted">{row.original.lastServiceKm?.toLocaleString('id-ID') || '-'}</span>,
             },
     {
               id: 'nextServiceKm',
@@ -304,7 +304,7 @@ function buildColumns(
               header: labels.fieldNextService || 'Servis Berikutnya',
               enableSorting: true,
               size: 130,
-              cell: ({ row }) => <span className="text-[13px] tabular-nums text-foreground-muted">{row.original.nextServiceKm?.toLocaleString('id-ID') || '-'}</span>,
+              cell: ({ row }) => <span className="text-[12px] tabular-nums text-foreground-muted">{row.original.nextServiceKm?.toLocaleString('id-ID') || '-'}</span>,
             },
     {
               id: 'registrationExpiry',
@@ -314,13 +314,13 @@ function buildColumns(
               size: 140,
               sortFn: 'datetime' as any,
               cell: ({ row }) => {
-                if (!row.original.registrationExpiry) return <span className="text-[13px] text-foreground-muted">-</span>;
+                if (!row.original.registrationExpiry) return <span className="text-[12px] text-foreground-muted">-</span>;
                 const diff = (new Date(row.original.registrationExpiry).getTime() - Date.now()) / (1000 * 60 * 60 * 24);
                 const isExpired = diff < 0;
                 const isExpiring = diff >= 0 && diff < 60;
                 return (
                   <span suppressHydrationWarning className={cn(
-                    'text-[13px]',
+                    'text-[12px]',
                     isExpired ? 'text-red-600 dark:text-red-400 font-bold' : 
                     isExpiring ? 'text-amber-600 dark:text-amber-400 font-bold' : 'text-foreground-muted',
                   )}>
@@ -337,7 +337,7 @@ function buildColumns(
               header: labels.fieldStnkNo || 'No. STNK',
               enableSorting: true,
               size: 150,
-              cell: ({ row }) => <span className="text-[13px] text-foreground-muted">{row.original.stnkNumber || '-'}</span>,
+              cell: ({ row }) => <span className="text-[12px] text-foreground-muted">{row.original.stnkNumber || '-'}</span>,
             },
     {
               id: 'kirNumber',
@@ -345,7 +345,7 @@ function buildColumns(
               header: labels.fieldKirNo || 'No. KIR',
               enableSorting: true,
               size: 140,
-              cell: ({ row }) => <span className="text-[13px] text-foreground-muted">{row.original.kirNumber || '-'}</span>,
+              cell: ({ row }) => <span className="text-[12px] text-foreground-muted">{row.original.kirNumber || '-'}</span>,
             },
     {
               id: 'bpkbNumber',
@@ -353,7 +353,7 @@ function buildColumns(
               header: labels.fieldBpkbNo || 'No. BPKB',
               enableSorting: true,
               size: 140,
-              cell: ({ row }) => <span className="text-[13px] text-foreground-muted">{row.original.bpkbNumber || '-'}</span>,
+              cell: ({ row }) => <span className="text-[12px] text-foreground-muted">{row.original.bpkbNumber || '-'}</span>,
             },
     {
               id: 'engineNumber',
@@ -361,7 +361,7 @@ function buildColumns(
               header: labels.fieldEngineNo || 'No. Mesin',
               enableSorting: true,
               size: 140,
-              cell: ({ row }) => <span className="text-[13px] text-foreground-muted">{row.original.engineNumber || '-'}</span>,
+              cell: ({ row }) => <span className="text-[12px] text-foreground-muted">{row.original.engineNumber || '-'}</span>,
             },
     {
               id: 'chassisNumber',
@@ -369,7 +369,7 @@ function buildColumns(
               header: labels.fieldChassisNo || 'No. Rangka',
               enableSorting: true,
               size: 140,
-              cell: ({ row }) => <span className="text-[13px] text-foreground-muted">{row.original.chassisNumber || '-'}</span>,
+              cell: ({ row }) => <span className="text-[12px] text-foreground-muted">{row.original.chassisNumber || '-'}</span>,
             },
     {
               id: 'id',
@@ -377,7 +377,7 @@ function buildColumns(
               header: labels.fieldSystemId || 'ID Kendaraan (GPS)',
               enableSorting: true,
               size: 150,
-              cell: ({ row }) => <span className="text-[13px] text-foreground-muted">{row.original.id}</span>,
+              cell: ({ row }) => <span className="text-[12px] text-foreground-muted">{row.original.id}</span>,
             },
     {
               id: 'gpsDeviceBrand',
@@ -385,7 +385,7 @@ function buildColumns(
               header: labels.fieldGpsBrand || 'Merek & Tipe GPS',
               enableSorting: true,
               size: 140,
-              cell: ({ row }) => <span className="text-[13px] text-foreground-muted">{row.original.gpsDeviceBrand || '-'} {row.original.gpsDeviceType || ''}</span>,
+              cell: ({ row }) => <span className="text-[12px] text-foreground-muted">{row.original.gpsDeviceBrand || '-'} {row.original.gpsDeviceType || ''}</span>,
             },
     {
               id: 'gpsInstallDate',
@@ -393,7 +393,7 @@ function buildColumns(
               header: labels.fieldGpsInstall || 'Tanggal Pasang GPS',
               enableSorting: true,
               size: 140,
-              cell: ({ row }) => <span className="text-[13px] text-foreground-muted">{row.original.gpsInstallDate ? new Date(row.original.gpsInstallDate).toLocaleDateString('id-ID') : '-'}</span>,
+              cell: ({ row }) => <span className="text-[12px] text-foreground-muted">{row.original.gpsInstallDate ? new Date(row.original.gpsInstallDate).toLocaleDateString('id-ID') : '-'}</span>,
             },
     {
               id: 'deviceImei',
@@ -417,7 +417,7 @@ function buildColumns(
               enableSorting: true,
               size: 140,
               cell: ({ row }) => (
-                <span className="text-[13px] text-foreground-muted font-mono">{row.original.deviceSimNumber || '-'}</span>
+                <span className="text-[12px] text-foreground-muted font-mono">{row.original.deviceSimNumber || '-'}</span>
               ),
             },
     {
@@ -427,7 +427,7 @@ function buildColumns(
               enableSorting: true,
               size: 130,
               cell: ({ row }) => (
-                <span className="text-[13px] font-mono text-foreground-muted">{row.original.assetNumber || '-'}</span>
+                <span className="text-[12px] font-mono text-foreground-muted">{row.original.assetNumber || '-'}</span>
               ),
             },
     {
@@ -437,7 +437,7 @@ function buildColumns(
               enableSorting: true,
               size: 150,
               cell: ({ row }) => (
-                <span className="text-[13px] text-foreground-muted tabular-nums">{row.original.lastUpdate ? new Date(row.original.lastUpdate).toLocaleString('id-ID', {
+                <span className="text-[12px] text-foreground-muted tabular-nums">{row.original.lastUpdate ? new Date(row.original.lastUpdate).toLocaleString('id-ID', {
                   day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
                 }) : '-'}</span>
               ),
@@ -449,7 +449,7 @@ function buildColumns(
               enableSorting: false,
               size: 200,
               cell: ({ row }) => (
-                <span className="text-[13px] text-foreground-muted block truncate max-w-[180px]" title={row.original.notes}>
+                <span className="text-[12px] text-foreground-muted block truncate max-w-[180px]" title={row.original.notes}>
                   {row.original.notes || '-'}
                 </span>
               ),
@@ -530,7 +530,7 @@ export function VehicleTable({
       emptyDescription={labels.emptyDescription}
       toolbarActions={
         onAdd ? (
-          <Button variant="destructive" onClick={onAdd} className="h-8 gap-1.5 text-[13px] font-medium shadow-none">
+          <Button variant="destructive" onClick={onAdd} className="h-8 gap-1.5 text-[12px] font-medium shadow-none">
             <Plus className="h-3.5 w-3.5" />
             <span className="hidden sm:inline-block">{labels.actionAdd || 'Tambah'}</span>
           </Button>

@@ -111,29 +111,29 @@ export function GroupsFeature({ locale }: GroupsFeatureProps) {
             <div className="flex items-center gap-2">
               <div className="w-[140px]">
                 <Select value={activeType} onValueChange={(val) => setActiveType(val as GroupType)}>
-                  <SelectTrigger className="h-8 text-[13px] font-medium shadow-none px-3 bg-transparent">
+                  <SelectTrigger className="h-8 text-[12px] font-medium shadow-none px-3 bg-transparent">
                     <SelectValue placeholder="Pilih Tipe Grup" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="vehicles" className="text-[13px] py-1.5">
+                    <SelectItem value="vehicles" className="text-[12px] py-1.5">
                       <div className="flex items-center gap-2">
                         <Truck className="w-3.5 h-3.5 text-foreground-muted" />
                         <span>{tGroups.tabs.vehicles}</span>
                       </div>
                     </SelectItem>
-                    <SelectItem value="drivers" className="text-[13px] py-1.5">
+                    <SelectItem value="drivers" className="text-[12px] py-1.5">
                       <div className="flex items-center gap-2">
                         <UserRound className="w-3.5 h-3.5 text-foreground-muted" />
                         <span>{tGroups.tabs.drivers}</span>
                       </div>
                     </SelectItem>
-                    <SelectItem value="geofences" className="text-[13px] py-1.5">
+                    <SelectItem value="geofences" className="text-[12px] py-1.5">
                       <div className="flex items-center gap-2">
                         <MapPinned className="w-3.5 h-3.5 text-foreground-muted" />
                         <span>{tGroups.tabs.geofences}</span>
                       </div>
                     </SelectItem>
-                    <SelectItem value="routes" className="text-[13px] py-1.5">
+                    <SelectItem value="routes" className="text-[12px] py-1.5">
                       <div className="flex items-center gap-2">
                         <Route className="w-3.5 h-3.5 text-foreground-muted" />
                         <span>{tGroups.tabs.routes}</span>
@@ -142,7 +142,7 @@ export function GroupsFeature({ locale }: GroupsFeatureProps) {
                   </SelectContent>
                 </Select>
               </div>
-              <Button variant="destructive" onClick={handleAdd} className="h-8 gap-1.5 text-[13px] font-medium shadow-none">
+              <Button variant="destructive" onClick={handleAdd} className="h-8 gap-1.5 text-[12px] font-medium shadow-none">
                 <Plus className="h-3.5 w-3.5" />
                 <span className="hidden sm:inline-block">{tGroups.actions.add}</span>
               </Button>

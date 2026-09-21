@@ -89,7 +89,7 @@ function buildColumns(
       cell: ({ row }) => (
         <span
           onClick={() => onViewDetail(row.original)}
-          className="font-medium text-foreground hover:text-primary hover:underline cursor-pointer transition-colors whitespace-nowrap"
+          className="text-[12px] font-bold text-foreground hover:text-primary hover:underline cursor-pointer transition-colors whitespace-nowrap uppercase tracking-wider"
         >
           {row.original.name}
         </span>
@@ -102,7 +102,7 @@ function buildColumns(
       enableSorting: true,
       size: 120,
       cell: ({ row }) => (
-        <span className="text-[13px] font-mono text-foreground-muted">{row.original.code}</span>
+        <span className="text-[12px] font-mono text-foreground-muted">{row.original.code}</span>
       ),
     },
     {
@@ -112,7 +112,7 @@ function buildColumns(
       enableSorting: true,
       size: 120,
       cell: ({ row }) => (
-        <span className={cn('text-[13px]', row.original.type === 'COMPANY' ? 'text-info' : 'text-foreground-muted')}>
+        <span className={cn('text-[12px]', row.original.type === 'COMPANY' ? 'text-info' : 'text-foreground-muted')}>
           {row.original.type === 'COMPANY' ? labels.typeCompany : labels.typeIndividual}
         </span>
       ),
@@ -128,7 +128,7 @@ function buildColumns(
         return (
           <div className="flex items-center gap-1.5">
             <span className={cn('h-1.5 w-1.5 rounded-full', isActive ? 'bg-success' : 'bg-danger')} />
-            <span className="text-[13px] text-foreground-muted">
+            <span className="text-[12px] text-foreground-muted">
               {isActive ? labels.statusActive : labels.statusInactive}
             </span>
           </div>
@@ -142,7 +142,7 @@ function buildColumns(
       enableSorting: false,
       size: 160,
       cell: ({ row }) => (
-        <span className="text-[13px] text-foreground">{row.original.phone}</span>
+        <span className="text-[12px] text-foreground">{row.original.phone}</span>
       ),
     },
     {
@@ -152,7 +152,7 @@ function buildColumns(
       enableSorting: false,
       size: 200,
       cell: ({ row }) => (
-        <span className="text-[13px] text-foreground-muted">{row.original.email || '-'}</span>
+        <span className="text-[12px] text-foreground-muted">{row.original.email || '-'}</span>
       ),
     },
     {
@@ -161,9 +161,9 @@ function buildColumns(
       enableSorting: false,
       size: 180,
       cell: ({ row }) => {
-        if (row.original.type === 'INDIVIDUAL') return <span className="text-[13px] text-foreground-muted/50">-</span>;
+        if (row.original.type === 'INDIVIDUAL') return <span className="text-[12px] text-foreground-muted/50">-</span>;
         const comp = row.original as CompanyCustomer;
-        return <span className="text-[13px] text-foreground">{comp.picName || '-'}</span>;
+        return <span className="text-[12px] text-foreground">{comp.picName || '-'}</span>;
       },
     },
     {
@@ -172,7 +172,7 @@ function buildColumns(
       accessorFn: (row) => row.city,
       enableSorting: true,
       size: 130,
-      cell: ({ row }) => <span className="text-[13px] text-foreground">{row.original.city || '-'}</span>,
+      cell: ({ row }) => <span className="text-[12px] text-foreground">{row.original.city || '-'}</span>,
     },
     {
       id: 'address',
@@ -180,7 +180,7 @@ function buildColumns(
       accessorFn: (row) => row.address,
       enableSorting: false,
       size: 200,
-      cell: ({ row }) => <span className="text-[13px] text-foreground-muted truncate block max-w-full" title={row.original.address}>{row.original.address || '-'}</span>,
+      cell: ({ row }) => <span className="text-[12px] text-foreground-muted truncate block max-w-full" title={row.original.address}>{row.original.address || '-'}</span>,
     },
   ];
 }
@@ -241,7 +241,7 @@ export function CustomerTable({
       emptyDescription={labels.emptyDescription}
       toolbarActions={
         onAdd ? (
-          <Button variant="destructive" onClick={onAdd} className="h-8 gap-1.5 text-[13px] font-medium shadow-none">
+          <Button variant="destructive" onClick={onAdd} className="h-8 gap-1.5 text-[12px] font-medium shadow-none">
             <Plus className="h-3.5 w-3.5" />
             <span className="hidden sm:inline-block">{labels.addCustomer}</span>
           </Button>

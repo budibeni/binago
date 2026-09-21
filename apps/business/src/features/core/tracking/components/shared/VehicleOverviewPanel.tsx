@@ -137,7 +137,7 @@ export function VehicleOverviewPanel({
 
         {/* Plate + subtitle */}
         <div className="min-w-0 flex-1">
-          <h2 className="text-[13px] font-extrabold text-foreground tracking-widest uppercase leading-none">
+          <h2 className="text-[12px] font-extrabold text-foreground tracking-widest uppercase leading-none">
             {vehicle.plateNumber}
           </h2>
           <p className="text-[10px] text-foreground-muted leading-tight mt-0.5 truncate">

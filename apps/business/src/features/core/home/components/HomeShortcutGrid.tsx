@@ -36,7 +36,7 @@ export function HomeShortcutGrid({ favorites }: HomeShortcutGridProps) {
             </div>
 
             {/* Title + description */}
-            <p className="text-[13px] font-semibold text-foreground leading-tight">{label}</p>
+            <p className="text-[12px] font-semibold text-foreground leading-tight">{label}</p>
             <p className="mt-1 text-[11px] text-foreground-muted leading-snug line-clamp-2">{desc}</p>
           </Link>
         );

@@ -150,7 +150,7 @@ export function HandoversFeature() {
                   <div>
                     <div className="flex justify-between items-start gap-2 mb-2.5">
                       <div className="flex flex-col min-w-0">
-                        <span className="font-semibold text-[13px] text-foreground truncate" title={contract.contractNumber}>{contract.contractNumber}</span>
+                        <span className="font-semibold text-[12px] text-foreground truncate" title={contract.contractNumber}>{contract.contractNumber}</span>
                         <span className="text-[12px] text-muted-foreground truncate" title={contract.customer?.name}>{contract.customer?.name}</span>
                       </div>
                       <span className="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 shrink-0 border border-blue-100 dark:border-blue-800/30">

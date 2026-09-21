@@ -246,13 +246,13 @@ export function RentalVehiclesFeature() {
                 onCheckedChange={() => setSelectedIds([])}
                 className="w-4 h-4 data-[state=checked]:bg-muted-foreground data-[state=checked]:border-muted-foreground"
               />
-              <span className="text-[13px] font-medium text-muted-foreground">{selectedIds.length} kendaraan terpilih</span>
+              <span className="text-[12px] font-medium text-muted-foreground">{selectedIds.length} kendaraan terpilih</span>
             </div>
             <Button
               variant="destructive"
               onClick={handleOpenTracking}
               disabled={selectedIds.length === 0}
-              className="px-8 md:px-12 h-full rounded-none text-[13px] font-medium gap-1.5 shadow-none hover:bg-danger/90 transition-colors"
+              className="px-8 md:px-12 h-full rounded-none text-[12px] font-medium gap-1.5 shadow-none hover:bg-danger/90 transition-colors"
             >
               <MapPin className="w-3.5 h-3.5" />
               Buka Lokasi

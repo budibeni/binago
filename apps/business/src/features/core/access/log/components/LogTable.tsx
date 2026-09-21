@@ -17,7 +17,7 @@ function buildColumns(t: any): DataTableColumnDef<CardLog>[] {
       cell: ({ row }) => {
         const date = new Date(row.original.timestamp);
         return (
-          <span suppressHydrationWarning className="text-[13px] text-foreground-muted font-mono">
+          <span suppressHydrationWarning className="text-[12px] text-foreground-muted font-mono">
             {date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })}
             {' '}
             {date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
@@ -42,7 +42,7 @@ function buildColumns(t: any): DataTableColumnDef<CardLog>[] {
       enableSorting: true,
       size: 170,
       cell: ({ row }) => (
-        <span className="text-[13px] font-mono text-foreground-muted">{row.original.cardUid}</span>
+        <span className="text-[12px] font-mono text-foreground-muted">{row.original.cardUid}</span>
       ),
     },
     {
@@ -54,7 +54,7 @@ function buildColumns(t: any): DataTableColumnDef<CardLog>[] {
       cell: ({ row }) => {
         const d = row.original;
         return (
-          <span className="text-[13px] text-foreground">
+          <span className="text-[12px] text-foreground">
             {d.holderName ?? '-'}
           </span>
         );
@@ -68,9 +68,9 @@ function buildColumns(t: any): DataTableColumnDef<CardLog>[] {
       size: 120,
       cell: ({ row }) => {
         const d = row.original;
-        if (!d.holderType) return <span className="text-[13px] text-foreground-muted/50">-</span>;
+        if (!d.holderType) return <span className="text-[12px] text-foreground-muted/50">-</span>;
         return (
-          <span className="text-[13px] text-info">
+          <span className="text-[12px] text-info">
             {d.holderType === 'DRIVER' ? t.holder.driver : t.holder.personel}
           </span>
         );
@@ -90,7 +90,7 @@ function buildColumns(t: any): DataTableColumnDef<CardLog>[] {
           case 'CHECKER': label = t.activity.checker; break;
           case 'ENGINE_AUTH': label = t.activity.engineAuth; break;
         }
-        return <span className="text-[13px] text-foreground-muted">{label}</span>;
+        return <span className="text-[12px] text-foreground-muted">{label}</span>;
       },
     },
     {
@@ -101,8 +101,8 @@ function buildColumns(t: any): DataTableColumnDef<CardLog>[] {
       size: 140,
       cell: ({ row }) => {
         const d = row.original;
-        if (!d.vehicleId) return <span className="text-[13px] text-foreground-muted/50">-</span>;
-        return <span className="text-[13px] text-foreground">{d.vehiclePlateNumber}</span>;
+        if (!d.vehicleId) return <span className="text-[12px] text-foreground-muted/50">-</span>;
+        return <span className="text-[12px] text-foreground">{d.vehiclePlateNumber}</span>;
       },
     },
     {
@@ -116,7 +116,7 @@ function buildColumns(t: any): DataTableColumnDef<CardLog>[] {
         return (
           <div className="flex items-center gap-1.5">
             <span className={cn('h-1.5 w-1.5 rounded-full', isSuccess ? 'bg-success' : 'bg-danger')} />
-            <span className="text-[13px] text-foreground-muted">
+            <span className="text-[12px] text-foreground-muted">
               {isSuccess ? t.status.success : t.status.failed}
             </span>
           </div>
@@ -130,7 +130,7 @@ function buildColumns(t: any): DataTableColumnDef<CardLog>[] {
       enableSorting: false,
       size: 220,
       cell: ({ row }) => (
-        <span className="text-[13px] text-foreground-muted block truncate max-w-[200px]" title={row.original.message || ''}>
+        <span className="text-[12px] text-foreground-muted block truncate max-w-[200px]" title={row.original.message || ''}>
           {row.original.message || '-'}
         </span>
       ),

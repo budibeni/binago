@@ -133,7 +133,7 @@ export function CustomerForm({
         <FormCard
           title={t.fieldCustomerType || "Tipe & Status"}
           description="Pilih tipe pelanggan dan status keaktifannya."
-          icon={<Settings className="w-5 h-5 text-muted-foreground" />}
+          icon={<Settings className="w-5 h-5 text-purple-500" />}
           columns={2}
         >
           <InputSelect
@@ -164,7 +164,7 @@ export function CustomerForm({
         <FormCard
           title={type === 'INDIVIDUAL' ? "Informasi Identitas" : "Informasi Perusahaan"}
           description={type === 'INDIVIDUAL' ? "Data diri resmi sesuai KTP." : "Informasi legal entitas perusahaan."}
-          icon={type === 'INDIVIDUAL' ? <User className="w-5 h-5 text-muted-foreground" /> : <Building className="w-5 h-5 text-muted-foreground" />}
+          icon={type === 'INDIVIDUAL' ? <User className="w-5 h-5 text-danger" /> : <Building className="w-5 h-5 text-danger" />}
           columns={2}
         >
           <div className="col-span-1 group-data-[layout=default]/form:md:col-span-2 group-data-[layout=fullscreen]/form:md:col-span-2">
@@ -227,7 +227,7 @@ export function CustomerForm({
         <FormCard
           title="Informasi Alamat"
           description="Alamat domisili atau alamat operasional perusahaan."
-          icon={<MapPin className="w-5 h-5 text-muted-foreground" />}
+          icon={<MapPin className="w-5 h-5 text-blue-500" />}
           columns={2}
         >
           <div className="col-span-1 group-data-[layout=default]/form:md:col-span-2 group-data-[layout=fullscreen]/form:md:col-span-2">
@@ -270,7 +270,7 @@ export function CustomerForm({
         <FormCard
           title="Informasi Kontak"
           description="Nomor telepon dan email untuk keperluan komunikasi."
-          icon={<Phone className="w-5 h-5 text-muted-foreground" />}
+          icon={<Phone className="w-5 h-5 text-green-500" />}
         >
           <InputPhone
             label={t.fieldPhone}
@@ -293,7 +293,7 @@ export function CustomerForm({
           <FormCard
             title={t.tabSim || "Lisensi & Pekerjaan"}
             description="Detail lisensi berkendara."
-            icon={<FileText className="w-5 h-5 text-muted-foreground" />}
+            icon={<FileText className="w-5 h-5 text-indigo-500" />}
             columns={2}
           >
             <div className="col-span-1 group-data-[layout=default]/form:md:col-span-2 group-data-[layout=fullscreen]/form:md:col-span-2">
@@ -323,7 +323,7 @@ export function CustomerForm({
           <FormCard
             title={t.tabPic || "Informasi PIC"}
             description="Penanggung jawab atau representatif dari perusahaan."
-            icon={<Briefcase className="w-5 h-5 text-muted-foreground" />}
+            icon={<Briefcase className="w-5 h-5 text-indigo-500" />}
             columns={2}
           >
             <div className="col-span-1 group-data-[layout=default]/form:md:col-span-2 group-data-[layout=fullscreen]/form:md:col-span-2">

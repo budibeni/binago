@@ -88,7 +88,7 @@ function buildColumns(
       size: 160,
       cell: ({ row }) => (
         <div className="flex flex-col min-w-0">
-          <span className="font-medium text-[13px] truncate">{row.original.id}</span>
+          <span className="font-medium text-[12px] truncate">{row.original.id}</span>
           <span className="text-[12px] text-muted-foreground truncate">{row.original.contract?.contractNumber || row.original.contractId}</span>
         </div>
       ),
@@ -100,10 +100,10 @@ function buildColumns(
       size: 190,
       cell: ({ row }) => {
         const cust = row.original.customer;
-        if (!cust) return <span className="text-muted-foreground text-[13px]">-</span>;
+        if (!cust) return <span className="text-muted-foreground text-[12px]">-</span>;
         return (
           <div className="flex flex-col min-w-0">
-            <span className="font-medium text-[13px] text-foreground truncate">{cust.name}</span>
+            <span className="font-medium text-[12px] text-foreground truncate">{cust.name}</span>
             <span className="text-[12px] text-muted-foreground truncate capitalize">{cust.type.toLowerCase()}</span>
           </div>
         );
@@ -116,10 +116,10 @@ function buildColumns(
       size: 200,
       cell: ({ row }) => {
         const cv = row.original.vehicle?.coreVehicle;
-        if (!cv) return <span className="text-muted-foreground text-[13px]">-</span>;
+        if (!cv) return <span className="text-muted-foreground text-[12px]">-</span>;
         return (
           <div className="flex flex-col min-w-0">
-            <span className="font-medium text-[13px] text-foreground truncate">{cv.brand} {cv.vehicleName}</span>
+            <span className="font-medium text-[12px] text-foreground truncate">{cv.brand} {cv.vehicleName}</span>
             <span className="text-[12px] text-muted-foreground truncate">{cv.plateNumber}</span>
           </div>
         );
@@ -132,7 +132,7 @@ function buildColumns(
       size: 150,
       cell: ({ row }) => (
         <div className="flex flex-col min-w-0">
-          <span className="font-medium text-[13px] text-foreground">{formatShortDate(row.original.handoverAt)}</span>
+          <span className="font-medium text-[12px] text-foreground">{formatShortDate(row.original.handoverAt)}</span>
           <span className="text-[12px] text-muted-foreground">{formatTime(row.original.handoverAt)}</span>
         </div>
       ),
@@ -148,14 +148,14 @@ function buildColumns(
         if (addr) {
           return (
             <div className="flex flex-col min-w-0">
-              <span className="text-[13px] text-foreground truncate" title={addr}>{addr.split(',')[0] || addr}</span>
+              <span className="text-[12px] text-foreground truncate" title={addr}>{addr.split(',')[0] || addr}</span>
               <span className="text-[12px] text-muted-foreground truncate" title={addr}>{addr.includes(',') ? addr.substring(addr.indexOf(',') + 1).trim() : latLng}</span>
             </div>
           );
         }
         return (
           <div className="flex flex-col min-w-0">
-            <span className="text-[13px] text-foreground truncate">Koordinat Map</span>
+            <span className="text-[12px] text-foreground truncate">Koordinat Map</span>
             <span className="text-[12px] text-muted-foreground truncate">{latLng}</span>
           </div>
         );
@@ -167,7 +167,7 @@ function buildColumns(
       header: 'ODOMETER AWAL',
       size: 140,
       cell: ({ row }) => (
-        <div className="text-[13px] font-medium">
+        <div className="text-[12px] font-medium">
           {new Intl.NumberFormat('id-ID').format(row.original.odometerStart)} KM
         </div>
       )
@@ -178,7 +178,7 @@ function buildColumns(
       header: 'KONDISI',
       size: 130,
       cell: ({ row }) => (
-        <div className="text-[13px]">
+        <div className="text-[12px]">
           {getConditionLabel(row.original.vehicleCondition)}
         </div>
       )

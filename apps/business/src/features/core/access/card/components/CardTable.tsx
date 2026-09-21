@@ -65,7 +65,7 @@ function buildColumns(
       cell: ({ row }) => (
         <button
           type="button"
-          className="font-bold text-primary hover:underline underline-offset-2 focus:outline-none text-[13px] tracking-wider uppercase whitespace-nowrap"
+          className="font-bold text-primary hover:underline underline-offset-2 focus:outline-none text-[12px] tracking-wider uppercase whitespace-nowrap"
           onClick={() => onViewDetail?.(row.original)}
         >
           {row.original.name}
@@ -81,7 +81,7 @@ function buildColumns(
       cell: ({ row }) => {
         const type = row.original.type;
         return (
-          <span className="text-[13px] text-info">{type}</span>
+          <span className="text-[12px] text-info">{type}</span>
         );
       },
     },
@@ -97,7 +97,7 @@ function buildColumns(
         return (
           <div className="flex items-center gap-1.5">
             <span className={cn('h-1.5 w-1.5 rounded-full', isActive ? 'bg-success' : 'bg-danger')} />
-            <span className="text-[13px] text-foreground-muted">
+            <span className="text-[12px] text-foreground-muted">
               {t.status[status as keyof typeof t.status] ?? status}
             </span>
           </div>
@@ -111,9 +111,9 @@ function buildColumns(
       accessorFn: (row) => row.holderType ?? '-',
       cell: ({ row }) => {
         const type = row.original.holderType;
-        if (!type) return <span className="text-[13px] text-foreground-muted/50">-</span>;
+        if (!type) return <span className="text-[12px] text-foreground-muted/50">-</span>;
         return (
-          <span className="text-[13px] text-foreground">
+          <span className="text-[12px] text-foreground">
             {type === 'DRIVER' ? t.form.valDriver : type === 'PERSONEL' ? t.form.valPersonel : t.form.valNone}
           </span>
         );
@@ -130,7 +130,7 @@ function buildColumns(
         const holderName = d.holderName ?? '-';
         const hasHolder = !!d.holderId;
         return (
-          <span className={cn('text-[13px]', hasHolder ? 'text-foreground font-medium' : 'text-foreground-muted italic')}>
+          <span className={cn('text-[12px]', hasHolder ? 'text-foreground font-medium' : 'text-foreground-muted italic')}>
             {holderName}
           </span>
         );
@@ -145,7 +145,7 @@ function buildColumns(
       size: 200,
       cell: ({ row }) => {
         const purposes = row.original.purposes;
-        if (!purposes || purposes.length === 0) return <span className="text-[13px] text-foreground-muted/50">-</span>;
+        if (!purposes || purposes.length === 0) return <span className="text-[12px] text-foreground-muted/50">-</span>;
         return (
           <div className="flex flex-wrap gap-1">
             {purposes.map(p => (
@@ -167,7 +167,7 @@ function buildColumns(
       enableSorting: true,
       size: 200,
       cell: ({ row }) => (
-        <span className="text-[13px] font-mono text-foreground-muted">
+        <span className="text-[12px] font-mono text-foreground-muted">
           {row.original.uid}
         </span>
       ),
@@ -179,7 +179,7 @@ function buildColumns(
       enableSorting: false,
       size: 200,
       cell: ({ row }) => (
-        <span className="text-[13px] text-foreground-muted block truncate max-w-[180px]" title={row.original.notes || ''}>
+        <span className="text-[12px] text-foreground-muted block truncate max-w-[180px]" title={row.original.notes || ''}>
           {row.original.notes || '-'}
         </span>
       ),
@@ -191,7 +191,7 @@ function buildColumns(
       enableSorting: true,
       size: 150,
       cell: ({ row }) => (
-        <span suppressHydrationWarning className="text-[13px] text-foreground-muted">
+        <span suppressHydrationWarning className="text-[12px] text-foreground-muted">
           {new Date(row.original.updatedAt).toLocaleDateString('id-ID', {
             day: '2-digit', month: 'short', year: 'numeric',
           })}

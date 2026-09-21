@@ -144,7 +144,7 @@ function buildColumns(
           
         return (
           <div className="whitespace-nowrap">
-            <span className={cn("text-[13px] font-medium", textClass)}>{label}</span>
+            <span className={cn("text-[12px] font-medium", textClass)}>{label}</span>
           </div>
         );
       },
@@ -204,12 +204,12 @@ export function ContractList({
       emptyDescription="Belum ada kontrak rental yang dibuat."
       toolbarActions={
         <div className="flex items-center gap-2">
-          <Button onClick={onAdd} variant="destructive" className="h-8 gap-1.5 text-[13px] font-medium shadow-none">
+          <Button onClick={onAdd} variant="destructive" className="h-8 gap-1.5 text-[12px] font-medium shadow-none">
             <Plus className="w-3.5 h-3.5" />
             <span className="hidden sm:inline-block">{labels.addContract || 'Tambah'}</span>
           </Button>
           {onToggleStats && (
-            <Button variant="outline" onClick={onToggleStats} className="h-8 gap-1.5 text-[13px] font-medium shadow-none">
+            <Button variant="outline" onClick={onToggleStats} className="h-8 gap-1.5 text-[12px] font-medium shadow-none">
               {showStats ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
               <span className="hidden sm:inline-block">Ringkasan</span>
             </Button>

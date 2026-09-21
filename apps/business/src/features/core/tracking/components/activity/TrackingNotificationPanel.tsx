@@ -137,7 +137,7 @@ export function TrackingNotificationPanel({ open, onClose, locale = 'id', visibl
           {filteredNotifications.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center text-foreground-muted p-8">
               <Bell className="h-8 w-8 mb-3 opacity-20" />
-              <p className="text-[13px] font-medium">{tTrackingLocal.notifications.none}</p>
+              <p className="text-[12px] font-medium">{tTrackingLocal.notifications.none}</p>
             </div>
           ) : (
             <div className="divide-y divide-border">

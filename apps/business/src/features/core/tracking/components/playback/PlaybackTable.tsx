@@ -27,7 +27,7 @@ function StatusBadge({ speed }: { speed: number }) {
   return (
     <div className="flex items-center gap-1.5">
       <div className={cn("h-1.5 w-1.5 rounded-full shrink-0", isDriving ? "bg-emerald-500" : "bg-blue-500")} />
-      <span className="text-[13px] text-foreground-muted truncate">{isDriving ? 'Berjalan' : 'Parkir'}</span>
+      <span className="text-[12px] text-foreground-muted truncate">{isDriving ? 'Berjalan' : 'Parkir'}</span>
     </div>
   );
 }

@@ -88,7 +88,7 @@ function buildColumns(
         <button
           type="button"
           onClick={() => onViewDetail(row.original)}
-          className="font-bold text-primary hover:underline underline-offset-2 text-[13px] tracking-wider uppercase focus:outline-none"
+          className="font-bold text-primary hover:underline underline-offset-2 text-[12px] tracking-wider uppercase focus:outline-none"
         >
           {row.original.name}
         </button>
@@ -124,7 +124,7 @@ function buildColumns(
       id: 'assignedVehiclePlate',
       header: labels.colVehicle,
       accessorFn: (row) => row.assignedVehiclePlate || '-',
-      cell: ({ getValue }) => <span className="font-semibold text-[13px] text-foreground tracking-wider uppercase">{getValue() as string}</span>,
+      cell: ({ getValue }) => <span className="font-semibold text-[12px] text-foreground tracking-wider uppercase">{getValue() as string}</span>,
       enableSorting: true,
       size: 140,
     },
@@ -161,7 +161,7 @@ function buildColumns(
       id: 'groupName',
       header: labels.colGroup,
       accessorFn: (row) => row.groupName || '-',
-      cell: ({ getValue }) => <span className="text-[13px] text-info">{getValue() as string}</span>,
+      cell: ({ getValue }) => <span className="text-[12px] text-info">{getValue() as string}</span>,
       enableSorting: true,
       size: 150,
     },
@@ -169,7 +169,7 @@ function buildColumns(
       id: 'placement',
       header: labels.colPlacement,
       accessorFn: (row) => row.placement,
-      cell: ({ getValue }) => <span className="text-[13px] text-foreground-muted">{getValue() as string}</span>,
+      cell: ({ getValue }) => <span className="text-[12px] text-foreground-muted">{getValue() as string}</span>,
       enableSorting: true,
       size: 150,
     },
@@ -177,7 +177,7 @@ function buildColumns(
       id: 'licenseNumber',
       header: labels.colLicenseNo,
       accessorFn: (row) => row.licenseNumber,
-      cell: ({ getValue }) => <span className="text-[13px] text-foreground-muted">{getValue() as string}</span>,
+      cell: ({ getValue }) => <span className="text-[12px] text-foreground-muted">{getValue() as string}</span>,
       enableSorting: true,
       size: 160,
     },
@@ -185,7 +185,7 @@ function buildColumns(
       id: 'licenseExpiry',
       header: labels.colLicenseExpiry,
       accessorFn: (row) => row.licenseExpiry || '-',
-      cell: ({ getValue }) => <span className="text-[13px] tabular-nums text-foreground-muted">{getValue() as string}</span>,
+      cell: ({ getValue }) => <span className="text-[12px] tabular-nums text-foreground-muted">{getValue() as string}</span>,
       enableSorting: true,
       size: 150,
     },
@@ -193,7 +193,7 @@ function buildColumns(
       id: 'phone',
       header: labels.colPhone,
       accessorFn: (row) => row.phone,
-      cell: ({ getValue }) => <span className="text-[13px] tabular-nums text-foreground-muted">{getValue() as string}</span>,
+      cell: ({ getValue }) => <span className="text-[12px] tabular-nums text-foreground-muted">{getValue() as string}</span>,
       enableSorting: true,
       size: 140,
     },
@@ -201,7 +201,7 @@ function buildColumns(
       id: 'email',
       header: labels.colEmail,
       accessorFn: (row) => row.email,
-      cell: ({ getValue }) => <span className="text-[13px] text-foreground-muted">{getValue() as string}</span>,
+      cell: ({ getValue }) => <span className="text-[12px] text-foreground-muted">{getValue() as string}</span>,
       enableSorting: true,
       size: 180,
     },
@@ -209,7 +209,7 @@ function buildColumns(
       id: 'address',
       header: labels.colAddress,
       accessorFn: (row) => row.address,
-      cell: ({ getValue }) => <span className="text-[13px] text-foreground-muted">{getValue() as string}</span>,
+      cell: ({ getValue }) => <span className="text-[12px] text-foreground-muted">{getValue() as string}</span>,
       enableSorting: true,
       size: 250,
     },
@@ -217,7 +217,7 @@ function buildColumns(
       id: 'ktpNumber',
       header: labels.colKtp,
       accessorFn: (row) => row.ktpNumber,
-      cell: ({ getValue }) => <span className="text-[13px] tabular-nums text-foreground-muted">{getValue() as string}</span>,
+      cell: ({ getValue }) => <span className="text-[12px] tabular-nums text-foreground-muted">{getValue() as string}</span>,
       enableSorting: true,
       size: 160,
     },
@@ -225,7 +225,7 @@ function buildColumns(
       id: 'placeOfBirth',
       header: labels.colPob,
       accessorFn: (row) => row.placeOfBirth || '-',
-      cell: ({ getValue }) => <span className="text-[13px] text-foreground-muted">{getValue() as string}</span>,
+      cell: ({ getValue }) => <span className="text-[12px] text-foreground-muted">{getValue() as string}</span>,
       enableSorting: true,
       size: 150,
     },
@@ -233,7 +233,7 @@ function buildColumns(
       id: 'dateOfBirth',
       header: labels.colDob,
       accessorFn: (row) => row.dateOfBirth || '-',
-      cell: ({ getValue }) => <span className="text-[13px] tabular-nums text-foreground-muted">{getValue() as string}</span>,
+      cell: ({ getValue }) => <span className="text-[12px] tabular-nums text-foreground-muted">{getValue() as string}</span>,
       enableSorting: true,
       size: 140,
     },
@@ -241,7 +241,7 @@ function buildColumns(
       id: 'joinDate',
       header: labels.colJoinDate,
       accessorFn: (row) => row.joinDate || '-',
-      cell: ({ getValue }) => <span className="text-[13px] tabular-nums text-foreground-muted">{getValue() as string}</span>,
+      cell: ({ getValue }) => <span className="text-[12px] tabular-nums text-foreground-muted">{getValue() as string}</span>,
       enableSorting: true,
       size: 140,
     }
@@ -305,7 +305,7 @@ export function DriverTable({
       emptyDescription={labels.emptyDescription}
       toolbarActions={
         onAdd ? (
-          <Button variant="destructive" onClick={onAdd} className="h-8 gap-1.5 text-[13px] font-medium shadow-none">
+          <Button variant="destructive" onClick={onAdd} className="h-8 gap-1.5 text-[12px] font-medium shadow-none">
             <Plus className="h-3.5 w-3.5" />
             <span className="hidden sm:inline-block">{labels.addDriver}</span>
           </Button>

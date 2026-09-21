@@ -23,7 +23,7 @@ function StatusBadge({ status, label }: { status: VehicleStatus; label: string }
   return (
     <div className="flex items-center gap-1.5">
       <div className={cn("h-1.5 w-1.5 rounded-full shrink-0", colorClass)} />
-      <span className="text-[13px] text-foreground-muted truncate">{label}</span>
+      <span className="text-[12px] text-foreground-muted truncate">{label}</span>
     </div>
   );
 }

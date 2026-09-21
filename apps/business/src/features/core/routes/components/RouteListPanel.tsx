@@ -178,7 +178,7 @@ export function RouteListPanel({
           <Button
             variant="destructive"
             onClick={onCreateNew}
-            className="h-8 gap-1.5 text-[13px] font-medium shadow-none"
+            className="h-8 gap-1.5 text-[12px] font-medium shadow-none"
           >
             <Plus className="h-3.5 w-3.5" />
             <span className="hidden sm:inline-block">{t.addBtn}</span>

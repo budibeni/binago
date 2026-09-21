@@ -227,7 +227,7 @@ export function RentalVehicleForm({
                         type="button"
                         onClick={() => setPricingType('CATEGORY')}
                         className={cn(
-                          "flex-1 py-2.5 px-3 border rounded-lg text-[13px] font-medium transition-colors text-center",
+                          "flex-1 py-2.5 px-3 border rounded-lg text-[12px] font-medium transition-colors text-center",
                           pricingType === 'CATEGORY' 
                             ? "bg-primary/10 text-primary border-primary" 
                             : "bg-background text-foreground hover:bg-muted border-border"
@@ -239,7 +239,7 @@ export function RentalVehicleForm({
                         type="button"
                         onClick={() => setPricingType('INDEPENDENT')}
                         className={cn(
-                          "flex-1 py-2.5 px-3 border rounded-lg text-[13px] font-medium transition-colors text-center",
+                          "flex-1 py-2.5 px-3 border rounded-lg text-[12px] font-medium transition-colors text-center",
                           pricingType === 'INDEPENDENT' 
                             ? "bg-primary/10 text-primary border-primary" 
                             : "bg-background text-foreground hover:bg-muted border-border"

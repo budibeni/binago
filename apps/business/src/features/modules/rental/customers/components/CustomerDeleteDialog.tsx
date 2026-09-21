@@ -29,7 +29,7 @@ export function CustomerDeleteDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange} title={labels.confirmDelete}>
       <div className="py-2">
-        <p className="text-[13px] text-foreground-muted">
+        <p className="text-[12px] text-foreground-muted">
           {labels.confirmDeleteDesc} <br />
           <strong className="text-foreground">{customer.name}</strong> ({customer.code})
         </p>

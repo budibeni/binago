@@ -27,7 +27,7 @@ function InfoRow({ icon: Icon, label, value, highlight }: {
       <div className="min-w-0 flex-1">
         <p className="text-[10px] text-foreground-muted uppercase tracking-wider font-semibold mb-0.5">{label}</p>
         <p className={cn(
-          'text-[13px] font-medium text-foreground truncate',
+          'text-[12px] font-medium text-foreground truncate',
           highlight && 'text-warning-600 dark:text-warning-400 font-semibold',
         )}>
           {value ?? '-'}

@@ -365,7 +365,7 @@ export function VehicleForm({
                   <item.icon className="w-3.5 h-3.5" />
                   <span className="text-[10px] uppercase font-semibold tracking-wider">{item.label}</span>
                 </div>
-                <span className="text-[13px] font-bold text-foreground truncate">{item.value || '-'}</span>
+                <span className="text-[12px] font-bold text-foreground truncate">{item.value || '-'}</span>
               </div>
             ))}
           </div>

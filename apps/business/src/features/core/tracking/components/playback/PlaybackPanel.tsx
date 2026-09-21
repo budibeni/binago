@@ -371,7 +371,7 @@ export function PlaybackPanel({
               value={vehicleSearch}
               onChange={(e) => setVehicleSearch(e.target.value)}
               placeholder={tTracking.playbackSearchPlaceholder}
-              className="w-full h-10 rounded-md border border-border bg-surface pl-9 pr-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-primary transition-colors "
+              className="w-full h-10 rounded-md border border-border bg-surface pl-9 pr-3 text-[12px] focus:outline-none focus:ring-1 focus:ring-primary transition-colors "
             />
           </div>
           <div className="flex flex-col max-h-[300px] overflow-y-auto border border-border rounded-md">
@@ -379,7 +379,7 @@ export function PlaybackPanel({
               v.plateNumber.toLowerCase().includes(vehicleSearch.toLowerCase()) ||
               (v.driverName?.toLowerCase() || '').includes(vehicleSearch.toLowerCase())
             ).length === 0 ? (
-              <div className="px-4 py-8 text-center text-[13px] text-foreground-muted">
+              <div className="px-4 py-8 text-center text-[12px] text-foreground-muted">
                 {tTracking.playbackNoVehicle}
               </div>
             ) : (
