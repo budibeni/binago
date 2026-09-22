@@ -554,6 +554,14 @@ export const dictionaries = {
       addVehicle: 'Tambah',
       exportFilename: 'kendaraan-rental-adatrack',
       
+      // Panel
+      panelTop: 'Atas',
+      panelRight: 'Kanan',
+      panelBottom: 'Bawah',
+      panelLeft: 'Kiri',
+      hidePanel: 'Sembunyikan',
+      layoutToggleTitle: 'Ubah Posisi Panel',
+      
       // Filter & Status
       filterStatus: 'Status',
       filterAll: 'Semua',
@@ -695,7 +703,7 @@ export const dictionaries = {
       statusActive: 'Berjalan',
       statusCompleted: 'Selesai',
       statusCancelled: 'Dibatalkan',
-      addContract: 'Buat Kontrak Rental',
+      addContract: 'Tambah',
       editContract: 'Edit Kontrak',
       printContract: 'Print Kontrak',
       searchPlaceholder: 'Cari...',
@@ -1329,6 +1337,14 @@ export const dictionaries = {
       addVehicle: 'Add',
       exportFilename: 'rental-fleet-adatrack',
       
+      // Panel
+      panelTop: 'Top',
+      panelRight: 'Right',
+      panelBottom: 'Bottom',
+      panelLeft: 'Left',
+      hidePanel: 'Hide',
+      layoutToggleTitle: 'Toggle Panel Position',
+      
       // Filter & Status
       filterStatus: 'Status',
       filterAll: 'All',
@@ -1469,7 +1485,7 @@ export const dictionaries = {
       statusActive: 'Active',
       statusCompleted: 'Completed',
       statusCancelled: 'Cancelled',
-      addContract: 'Create Rental Contract',
+      addContract: 'Add',
       editContract: 'Edit Contract',
       printContract: 'Print Contract',
       searchPlaceholder: 'Search...',

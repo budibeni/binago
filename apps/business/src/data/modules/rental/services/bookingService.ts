@@ -13,6 +13,7 @@ export interface CreateBookingPayload {
   rentalType: RentalType;
   rateType: RateType;
   deposit: number;
+  driverFee?: number;
   paymentMethod?: string;
   pickupLocation?: string;
   dropoffLocation?: string;
@@ -173,7 +174,8 @@ class BookingService {
     });
 
     const bookingNumber = this.generateBookingNumber();
-    const remainingAmount = Math.max(totalAmount - (data.deposit || 0), 0);
+    const finalTotal = totalAmount + (data.driverFee || 0);
+    const remainingAmount = Math.max(finalTotal - (data.deposit || 0), 0);
 
     return bookingRepository.createBooking({
       bookingNumber,
@@ -183,9 +185,10 @@ class BookingService {
       duration,
       rentalType: data.rentalType,
       rateType: data.rateType,
-      totalAmount,
+      totalAmount: finalTotal,
       deposit: data.deposit || 0,
       remainingAmount,
+      driverFee: data.driverFee,
       paymentMethod: data.paymentMethod,
       pickupLocation: data.pickupLocation,
       dropoffLocation: data.dropoffLocation,

@@ -28,7 +28,7 @@ export function BookingSelectModal({
     return bookings.filter(r => 
       r.bookingNumber.toLowerCase().includes(s) ||
       r.customer?.name.toLowerCase().includes(s) ||
-      r.vehicle?.coreVehicle?.plateNumber.toLowerCase().includes(s)
+      r.items?.some(item => item.vehicle?.coreVehicle?.plateNumber.toLowerCase().includes(s))
     );
   }, [bookings, search]);
 
@@ -88,7 +88,10 @@ export function BookingSelectModal({
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground font-semibold mb-1">Kendaraan</p>
-                    <p className="text-sm font-medium truncate">{r.vehicle?.coreVehicle?.plateNumber}</p>
+                    <p className="text-sm font-medium truncate">
+                      {r.items?.length || 0} Unit 
+                      {r.items && r.items.length > 0 ? ` (${r.items[0].vehicle?.coreVehicle?.plateNumber}${r.items.length > 1 ? ', ...' : ''})` : ''}
+                    </p>
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground font-semibold mb-1">Periode & Total</p>

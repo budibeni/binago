@@ -17,12 +17,16 @@ export interface RentalContract {
 
   contractDate: string;
 
+  startDate: string;
+  endDate: string;
+
   rentalType: 'SELF_DRIVE' | 'WITH_DRIVER';
   rateType: 'DAILY' | 'WEEKLY' | 'MONTHLY';
 
   totalAmount: number;
   deposit: number;
   remainingAmount: number;
+  driverFee?: number;
 
   notes?: string;
   terms?: string;

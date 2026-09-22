@@ -9,19 +9,30 @@ import { contractService } from '@/data/modules/rental/services/contractService'
 import type { RentalContract, ContractStatusFilter } from './types/contract';
 import { ContractList } from './components/ContractList';
 import { ContractView } from './components/ContractView';
+import { ContractPrintModal } from './components/ContractPrintModal';
 import { ContractCreateFeature } from './ContractCreateFeature';
 import { ContractEditFeature } from './ContractEditFeature';
 import { HandoverFeature } from '../handover/HandoverFeature';
 import { ReturnFeature } from '../returns/ReturnFeature';
 import { cn } from '@adatrack/utils';
-import type { DataTableFilterConfig } from '@adatrack/ui';
+import { PanelShell, type DataTableFilterConfig } from '@adatrack/ui';
 
-function StatCard({ label, value, colorClass }: { label: string, value: number, colorClass: string }) {
+function StatCard({ label, value, colorClass, icon: Icon }: { label: string, value: number, colorClass: string, icon?: React.ElementType }) {
+  const textColorClass = colorClass.replace(/bg-/g, 'text-');
+  
   return (
-    <div className="flex flex-col p-2.5 rounded-md border border-border bg-card shadow-sm relative overflow-hidden transition-all hover:shadow-md">
-      <div className={cn("absolute left-0 top-0 bottom-0 w-1", colorClass)} />
-      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider ml-1">{label}</span>
-      <span className="text-xl font-bold mt-0.5 ml-1">{value}</span>
+    <div className="flex items-center justify-between p-3 rounded-none border border-border/80 bg-background transition-colors hover:border-border">
+      <div className="flex items-center gap-2.5">
+        {Icon ? (
+          <div className={cn("p-1.5 rounded-md bg-neutral-100 dark:bg-neutral-800", textColorClass)}>
+            <Icon className="w-3.5 h-3.5" />
+          </div>
+        ) : (
+          <div className={cn("w-2 h-2 rounded-full", colorClass)} />
+        )}
+        <span className="text-[11px] font-semibold text-foreground-muted tracking-tight">{label}</span>
+      </div>
+      <span className="text-sm font-bold text-foreground">{value}</span>
     </div>
   );
 }
@@ -39,9 +50,11 @@ export function ContractsFeature() {
   const [statusFilter, setStatusFilter] = useState<ContractStatusFilter>('all');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [showStats, setShowStats] = useState(true);
+  const [panelSide, setPanelSide] = useState<'left' | 'right' | 'top' | 'bottom'>('top');
   
-  const [selectedContract, setSelectedContract] = React.useState<RentalContract | null>(null);
-  const [drawerOpen, setDrawerOpen] = React.useState(false);
+  const [selectedContract, setSelectedContract] = useState<RentalContract | null>(null);
+  const [printContract, setPrintContract] = useState<RentalContract | null>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const [isCreateOpen, setIsCreateOpen] = React.useState(false);
   const [editId, setEditId] = React.useState<string | null>(null);
@@ -109,7 +122,7 @@ export function ContractsFeature() {
   };
 
   const handlePrint = (c: RentalContract) => {
-    window.open(`/rental/contracts/${c.id}/print`, '_blank');
+    setPrintContract(c);
   };
   
   const handleConfirm = async (c: RentalContract) => {
@@ -188,30 +201,58 @@ export function ContractsFeature() {
     ],
   }), [statusFilter, labels]);
 
+  const renderStatsPanel = () => {
+    if (!showStats) return null;
+    
+    const panelLabels = (t as any).rentalVehicles || {};
+
+    return (
+      <PanelShell
+        title="Ringkasan"
+        side={panelSide}
+        isOpen={showStats}
+        onClose={() => setShowStats(false)}
+        onOpen={() => setShowStats(true)}
+        collapsedTitle="RINGKASAN"
+        onSideChange={setPanelSide}
+        labels={{
+          top: panelLabels.panelTop || 'Atas',
+          right: panelLabels.panelRight || 'Kanan',
+          bottom: panelLabels.panelBottom || 'Bawah',
+          left: panelLabels.panelLeft || 'Kiri',
+          hide: panelLabels.hidePanel || 'Sembunyikan',
+          layoutToggleTitle: panelLabels.layoutToggleTitle || 'Ubah Posisi Panel',
+        }}
+        className={cn(
+          "shrink-0 bg-white dark:bg-background z-10",
+          (panelSide === 'top' || panelSide === 'bottom') ? "w-full" : "w-80 min-w-80 h-full"
+        )}
+      >
+        <div className={cn("gap-2.5 p-3", (panelSide === 'top' || panelSide === 'bottom') ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6" : "flex flex-col h-full")}>
+          <StatCard label={labels.summaryTotal || 'Total'} value={stats.total} colorClass="bg-foreground" icon={List} />
+          <StatCard label={labels.statusDraft || 'Draft'} value={stats.draft} colorClass="bg-neutral-500" icon={FileText} />
+          <StatCard label={labels.statusConfirmed || 'Dikonfirmasi'} value={stats.confirmed} colorClass="bg-blue-500" icon={CheckCircle2} />
+          <StatCard label={labels.statusActive || 'Berjalan'} value={stats.active} colorClass="bg-success" icon={Activity} />
+          <StatCard label={labels.statusCompleted || 'Selesai'} value={stats.completed} colorClass="bg-neutral-500 dark:bg-neutral-400" icon={CheckCircle2} />
+          <StatCard label={labels.statusCancelled || 'Batal'} value={stats.cancelled} colorClass="bg-danger" icon={XCircle} />
+        </div>
+      </PanelShell>
+    );
+  };
+
   return (
-    <div className="flex flex-col h-full w-full bg-background items-center overflow-hidden relative">
-      <div className="w-full h-full flex flex-col min-h-0 space-y-0 pb-0">
-        
-        {/* Elegant Stats Ribbon (Dashboard Style) */}
+    <div className={cn("flex h-full w-full bg-background overflow-hidden relative", (panelSide === 'top' || panelSide === 'bottom') ? 'flex-col' : 'flex-row')}>
+      
+      {/* Render panel first if top or left */}
+      {(panelSide === 'top' || panelSide === 'left') && renderStatsPanel()}
+
+      <div className="flex-1 min-h-0 min-w-0 w-full relative flex flex-col">
         {errorMsg && (
-          <div className="w-full bg-red-100 text-red-600 p-4 font-mono text-sm">
+          <div className="w-full bg-red-100 text-red-600 p-4 font-mono text-sm shrink-0">
             ERROR: {errorMsg}
           </div>
         )}
         
-        {showStats && (
-          <div className="w-full px-4 pt-4 md:px-6 md:pt-6 bg-background animate-in slide-in-from-top-2 fade-in duration-200">
-            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
-              <StatCard label={labels.summaryTotal || 'Total'} value={stats.total} colorClass="bg-foreground" />
-              <StatCard label={labels.statusDraft || 'Draft'} value={stats.draft} colorClass="bg-neutral-500" />
-              <StatCard label={labels.statusConfirmed || 'Dikonfirmasi'} value={stats.confirmed} colorClass="bg-blue-500" />
-              <StatCard label={labels.statusActive || 'Berjalan'} value={stats.active} colorClass="bg-success" />
-              <StatCard label={labels.statusCompleted || 'Selesai'} value={stats.completed} colorClass="bg-neutral-500 dark:bg-neutral-400" />
-              <StatCard label={labels.statusCancelled || 'Batal'} value={stats.cancelled} colorClass="bg-danger" />
-            </div>
-          </div>
-        )}
-
         <div className="flex-1 min-h-0 w-full relative">
           <ContractList
             data={filteredData}
@@ -231,8 +272,10 @@ export function ContractsFeature() {
             dtLabels={dtLabels}
           />
         </div>
-
       </div>
+
+      {/* Render panel last if bottom or right */}
+      {(panelSide === 'bottom' || panelSide === 'right') && renderStatsPanel()}
 
       <ContractView
         contract={selectedContract}
@@ -245,6 +288,12 @@ export function ContractsFeature() {
         onCancel={handleCancel}
         onHandover={handleHandover}
         onReturn={handleReturn}
+      />
+
+      <ContractPrintModal
+        contract={printContract}
+        open={!!printContract}
+        onClose={() => setPrintContract(null)}
       />
 
       <ContractCreateFeature

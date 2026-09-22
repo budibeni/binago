@@ -178,7 +178,7 @@ export function ContractPrintFeature({ contractId }: ContractPrintFeatureProps) 
             <div><span className="text-neutral-500 font-semibold inline-block w-32">Tanggal Mulai:</span> <span className="font-medium">{formatDate(contract.startDate)}</span></div>
             <div><span className="text-neutral-500 font-semibold inline-block w-32">Tanggal Selesai:</span> <span className="font-medium">{formatDate(contract.endDate)}</span></div>
             <div><span className="text-neutral-500 font-semibold inline-block w-32">Durasi:</span> <span className="font-medium">{contract.duration} Hari</span></div>
-            <div><span className="text-neutral-500 font-semibold inline-block w-32">Tipe Rental:</span> <span className="font-medium">{contract.rentalType === 'SELF_DRIVE' ? 'Lepas Kunci' : 'Dengan Driver'}</span></div>
+            <div><span className="text-neutral-500 font-semibold inline-block w-32">Tipe Rental:</span> <span className="font-medium">{contract.rentalType === 'SELF_DRIVE' ? 'Lepas Kunci' : 'Dengan Pengemudi'}</span></div>
           </div>
         </div>
 

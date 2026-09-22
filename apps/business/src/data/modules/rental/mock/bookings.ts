@@ -378,4 +378,34 @@ export const mockBookings: Booking[] = [
       }
     ]
   }
+  ,
+  {
+    "id": "res-015",
+    "bookingNumber": "RES-2608-015",
+    "customerId": "cust-ind-006",
+    "rentalType": "SELF_DRIVE",
+    "totalAmount": 1000000,
+    "deposit": 500000,
+    "remainingAmount": 500000,
+    "status": "CONFIRMED",
+    "createdAt": "2026-08-25T12:00:00.000Z",
+    "updatedAt": "2026-08-28T12:00:00.000Z",
+    "startDate": "2026-08-30T12:00:00.000Z",
+    "endDate": "2026-09-01T12:00:00.000Z",
+    "duration": 2,
+    "rateType": "DAILY",
+    "items": [
+      {
+        "id": "res-015-item-1",
+        "bookingId": "res-015",
+        "vehicleId": "veh-015",
+        "startDate": "2026-08-30T12:00:00.000Z",
+        "endDate": "2026-09-01T12:00:00.000Z",
+        "duration": 2,
+        "rateType": "DAILY",
+        "rateSnapshot": 500000,
+        "subtotal": 1000000
+      }
+    ]
+  }
 ];

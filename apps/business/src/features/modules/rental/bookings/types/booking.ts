@@ -35,6 +35,7 @@ export interface Booking {
   totalAmount: number;
   deposit: number;
   remainingAmount: number;
+  driverFee?: number;
   status: BookingStatus;
   paymentMethod?: string;
   pickupLocation?: string;
@@ -69,7 +70,7 @@ export const getBookingFormSchema = (t: Record<string, any>) => z.object({
   paymentMethod: z.string().optional(),
   rateType: z.enum(['DAILY', 'WEEKLY', 'MONTHLY']).optional(),
   deposit: z.number().optional(),
-  needDriver: z.boolean().optional(),
+  driverFee: z.number().optional(),
   needDelivery: z.boolean().optional(),
   needFuel: z.boolean().optional(),
   needInsurance: z.boolean().optional(),

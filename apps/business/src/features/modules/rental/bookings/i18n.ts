@@ -4,9 +4,9 @@ export const bookingDictionaries = {
   id: {
     title: 'Booking Rental',
     createTitle: 'Buat Booking',
-    pageSubtitle: 'Kelola pemesanan kendaraan dan reservasi rental Anda.',
+    pageSubtitle: 'Kelola pemesanan kendaraan dan booking rental Anda.',
     searchPlaceholder: 'Cari...',
-    addBooking: 'Buat Booking',
+    addBooking: 'Tambah',
     
     // Status
     statusPending: 'Menunggu Konfirmasi',
@@ -27,7 +27,7 @@ export const bookingDictionaries = {
     reset: 'Reset',
     
     // Table
-    colNo: 'NO. RESERVASI',
+    colNo: 'NO. BOOKING',
     colCustomer: 'PELANGGAN',
     colVehicle: 'KENDARAAN',
     colRentalDate: 'TANGGAL SEWA',
@@ -63,7 +63,7 @@ export const bookingDictionaries = {
     fieldRentalType: 'Tipe Rental',
     
     rentalTypeSelfDrive: 'Lepas Kunci',
-    rentalTypeWithDriver: 'Dengan Driver',
+    rentalTypeWithDriver: 'Dengan Pengemudi',
     
     fieldDailyRate: 'Tarif Harian',
     fieldWeeklyRate: 'Tarif Mingguan',
@@ -78,9 +78,9 @@ export const bookingDictionaries = {
     paymentCard: 'Kartu Kredit',
     
     fieldNotes: 'Catatan',
-    notesPlaceholder: 'Tulis catatan reservasi (opsional)...',
+    notesPlaceholder: 'Tulis catatan booking (opsional)...',
     fieldAdditionalNeeds: 'Layanan Ekstra',
-    needDriver: 'Pakai Supir',
+    needDriver: 'Pakai Pengemudi',
     needDelivery: 'Layanan Antar-Jemput',
     needFuel: 'BBM Termasuk (Full to Full)',
     needInsurance: 'Asuransi Kendaraan',
@@ -91,15 +91,16 @@ export const bookingDictionaries = {
     // Form Actions
     cancel: 'Batal',
     save: 'Simpan Booking',
+    cancelBooking: 'Batalkan',
     
     // Messages
     createSuccess: 'Booking berhasil dibuat.',
     updateSuccess: 'Booking berhasil diperbarui.',
-    overlapError: 'Kendaraan sudah memiliki reservasi pada periode tersebut.',
+    overlapError: 'Kendaraan sudah memiliki booking pada periode tersebut.',
     
     // Empty State
     emptyTitle: 'Belum ada Booking',
-    emptyDesc: 'Belum ada data reservasi kendaraan.',
+    emptyDesc: 'Belum ada data booking kendaraan.',
     noResultTitle: 'Booking tidak ditemukan',
     noResultDesc: 'Coba sesuaikan kata kunci atau filter pencarian Anda.',
 
@@ -117,7 +118,7 @@ export const bookingDictionaries = {
     createTitle: 'Create Booking',
     pageSubtitle: 'Manage your vehicle bookings and rental bookings.',
     searchPlaceholder: 'Search...',
-    addBooking: 'Create Booking',
+    addBooking: 'Add',
     
     // Status
     statusPending: 'Pending Confirmation',
@@ -202,6 +203,7 @@ export const bookingDictionaries = {
     // Form Actions
     cancel: 'Cancel',
     save: 'Save Booking',
+    cancelBooking: 'Cancel',
     
     // Messages
     createSuccess: 'Booking created successfully.',

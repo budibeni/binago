@@ -22,7 +22,6 @@ export interface BookingFormData {
   deposit: number;
   paymentMethod?: string;
   notes: string;
-  needDriver?: boolean;
   needDelivery?: boolean;
   needFuel?: boolean;
   needInsurance?: boolean;
@@ -52,7 +51,6 @@ const DEFAULT_FORM_DATA: BookingFormData = {
   deposit: 0,
   paymentMethod: 'TRANSFER',
   notes: '',
-  needDriver: false,
   needDelivery: false,
   needFuel: false,
   needInsurance: false,
@@ -118,8 +116,8 @@ export function BookingForm({
       
       total += rate * multiplier;
     });
-    return total;
-  }, [selectedVehicles, formData.duration, formData.rateType]);
+    return total + (formData.driverFee || 0);
+  }, [selectedVehicles, formData.duration, formData.rateType, formData.driverFee]);
 
   const remainingAmount = useMemo(() => {
     return Math.max(totalAmount - (formData.deposit || 0), 0);
@@ -148,7 +146,7 @@ export function BookingForm({
       open={open}
       onOpenChange={onOpenChange}
       title={isEditing ? 'Edit Booking' : t.addBooking}
-      subtitle="Masukkan informasi detail reservasi."
+      subtitle="Masukkan informasi detail booking."
       onCancel={onCancel}
       cancelText={t.cancel || 'Batal'}
       onSave={() => handleSubmit()}
@@ -160,18 +158,60 @@ export function BookingForm({
         {/* 1. INFORMASI UTAMA */}
         <FormCard title={t.sectionGeneral} description="Pilih pelanggan dan tipe rental." icon={<User className="w-5 h-5 text-muted-foreground" />}>
           <div className="flex flex-col gap-6">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <InputSelect
-                  label={t.fieldCustomer}
-                  value={formData.customerId || ''}
-                  onChange={(val) => handleChange('customerId', val)}
-                  placeholder={t.searchCustomerPlaceholder}
-                  options={customers.map(c => ({ value: c.id, label: `${c.name} - ${c.phone}` }))}
-                  error={errors.customerId}
-                  required
-                />
+            <div>
+              <InputSelect
+                label={t.fieldCustomer}
+                value={formData.customerId || ''}
+                onChange={(val) => handleChange('customerId', val)}
+                placeholder={t.searchCustomerPlaceholder}
+                options={customers.map(c => ({ value: c.id, label: `${c.name} - ${c.phone}` }))}
+                error={errors.customerId}
+                required
+              />
+            </div>
+
+            {selectedCustomer ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-y-5 gap-x-4 p-4 bg-neutral-50 dark:bg-neutral-900/50 rounded-lg border border-border/30 -mt-2">
+                <div>
+                  <p className="text-[10px] text-muted-foreground font-semibold mb-1">Tipe Pelanggan</p>
+                  <p className="text-sm font-bold text-primary">{selectedCustomer.type === 'COMPANY' ? 'Perusahaan' : 'Individu'}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-muted-foreground font-semibold mb-1">Nama {selectedCustomer.type === 'COMPANY' ? 'Perusahaan' : 'Lengkap'}</p>
+                  <p className="text-sm font-bold">{selectedCustomer.name}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-muted-foreground font-semibold mb-1">Nomor Telepon</p>
+                  <p className="text-sm font-bold">{selectedCustomer.phone}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-muted-foreground font-semibold mb-1">Email</p>
+                  <p className="text-sm font-bold">{selectedCustomer.email || '-'}</p>
+                </div>
+                {selectedCustomer.type === 'INDIVIDUAL' ? (
+                  <div>
+                    <p className="text-[10px] text-muted-foreground font-semibold mb-1">NIK (KTP)</p>
+                    <p className="text-sm font-bold">{(selectedCustomer as any).nik || '-'}</p>
+                  </div>
+                ) : (
+                  <div>
+                    <p className="text-[10px] text-muted-foreground font-semibold mb-1">PIC (Penanggung Jawab)</p>
+                    <p className="text-sm font-bold">{(selectedCustomer as any).picName || '-'} ({(selectedCustomer as any).picPhone || '-'})</p>
+                  </div>
+                )}
+                <div>
+                  <p className="text-[10px] text-muted-foreground font-semibold mb-1">Alamat</p>
+                  <p className="text-sm font-bold line-clamp-1" title={selectedCustomer.address}>{selectedCustomer.address || '-'}</p>
+                </div>
               </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center p-6 bg-neutral-50 dark:bg-neutral-900/30 rounded-lg border border-dashed border-border/60 -mt-2 text-center h-[160px]">
+                <p className="text-sm text-muted-foreground font-medium">Belum ada pelanggan yang dipilih</p>
+                <p className="text-[11px] text-muted-foreground mt-1">Silakan cari dan pilih pelanggan terlebih dahulu.</p>
+              </div>
+            )}
+
+            <div className="grid grid-cols-2 gap-4">
               <div>
                 <InputSelect
                   label={t.fieldRentalType}
@@ -186,23 +226,6 @@ export function BookingForm({
                 />
               </div>
             </div>
-
-            {selectedCustomer && (
-              <div className="grid grid-cols-3 gap-4 p-4 bg-neutral-50 dark:bg-neutral-900/50 rounded-lg border border-border/30 -mt-2">
-                <div>
-                  <p className="text-[10px] text-muted-foreground font-semibold mb-1">Nama Pelanggan</p>
-                  <p className="text-sm font-bold">{selectedCustomer.name}</p>
-                </div>
-                <div>
-                  <p className="text-[10px] text-muted-foreground font-semibold mb-1">Nomor Telepon</p>
-                  <p className="text-sm font-bold">{selectedCustomer.phone}</p>
-                </div>
-                <div>
-                  <p className="text-[10px] text-muted-foreground font-semibold mb-1">Email</p>
-                  <p className="text-sm font-bold">{selectedCustomer.email || '-'}</p>
-                </div>
-              </div>
-            )}
           </div>
         </FormCard>
 
@@ -343,8 +366,16 @@ export function BookingForm({
                 label={t.fieldDeposit}
                 value={formData.deposit || 0}
                 onChange={(val) => handleChange('deposit', val !== null ? val : 0)}
-                prefixIcon={<span className="text-muted-foreground text-sm font-medium">Rp</span>}
                 placeholder="0"
+              />
+            </div>
+            <div className="col-span-1">
+              <InputDecimal
+                label="Biaya Pengemudi"
+                value={formData.driverFee || 0}
+                onChange={(val) => handleChange('driverFee', val !== null ? val : 0)}
+                placeholder="0"
+                disabled={formData.rentalType !== 'WITH_DRIVER'}
               />
             </div>
             <div className="col-span-1">
@@ -368,19 +399,16 @@ export function BookingForm({
             <InputMultiCheckbox
               label={t.fieldAdditionalNeeds}
               value={[
-                formData.needDriver ? 'driver' : '',
                 formData.needDelivery ? 'delivery' : '',
                 formData.needFuel ? 'fuel' : '',
                 formData.needInsurance ? 'insurance' : ''
               ].filter(Boolean)}
               onChange={(val) => {
-                handleChange('needDriver', val.includes('driver'));
                 handleChange('needDelivery', val.includes('delivery'));
                 handleChange('needFuel', val.includes('fuel'));
                 handleChange('needInsurance', val.includes('insurance'));
               }}
               options={[
-                { value: 'driver', label: t.needDriver || 'Pakai Supir' },
                 { value: 'delivery', label: t.needDelivery || 'Layanan Antar-Jemput' },
                 { value: 'fuel', label: t.needFuel || 'BBM Termasuk (Full to Full)' },
                 { value: 'insurance', label: t.needInsurance || 'Asuransi Kendaraan' }
@@ -400,8 +428,8 @@ export function BookingForm({
         </FormCard>
       </div>
 
-      {/* RINGKASAN RESERVASI */}
-      <FormCard title={t.sectionSummary} description="Cek kembali detail reservasi sebelum menyimpan." icon={<ClipboardList className="w-5 h-5 text-muted-foreground" />} className="group-data-[layout=default]/form:lg:col-span-2 group-data-[layout=dialog]/form:lg:col-span-2 group-data-[layout=fullscreen]/form:lg:col-span-2">
+      {/* RINGKASAN BOOKING */}
+      <FormCard title={t.sectionSummary} description="Cek kembali detail booking sebelum menyimpan." icon={<ClipboardList className="w-5 h-5 text-muted-foreground" />} className="group-data-[layout=default]/form:lg:col-span-2 group-data-[layout=dialog]/form:lg:col-span-2 group-data-[layout=fullscreen]/form:lg:col-span-2">
         <div className="flex flex-col md:flex-row group-data-[layout=drawer]/form:!flex-col gap-6">
           <div className="flex-1 flex flex-col gap-2">
             <div className="grid grid-cols-[100px_1fr] gap-2">
@@ -435,6 +463,12 @@ export function BookingForm({
               <span className="text-sm text-muted-foreground">Total Estimasi</span>
               <span className="text-sm font-semibold">{formatCurrency(totalAmount)}</span>
             </div>
+            {(formData.driverFee || 0) > 0 && (
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm text-muted-foreground">Biaya Pengemudi</span>
+                <span className="text-sm font-semibold">{formatCurrency(formData.driverFee || 0)}</span>
+              </div>
+            )}
             <div className="flex justify-between items-center mb-6">
               <span className="text-sm text-muted-foreground">Deposit</span>
               <span className="text-sm font-semibold">{formatCurrency(formData.deposit || 0)}</span>

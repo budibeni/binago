@@ -65,7 +65,7 @@ export function BookingCreateFeature({ open, onOpenChange, onSuccess }: BookingC
       onSuccess();
 
     } catch (err: any) {
-      alert(err.message || 'Terjadi kesalahan saat menyimpan reservasi');
+      alert(err.message || 'Terjadi kesalahan saat menyimpan booking');
     } finally {
       setIsSubmitting(false);
     }

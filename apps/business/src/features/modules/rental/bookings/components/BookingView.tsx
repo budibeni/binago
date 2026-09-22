@@ -12,8 +12,8 @@ interface BookingViewProps {
   onClose: () => void;
   labels: Record<string, any>;
   onEdit: (booking: Booking) => void;
-  onDelete: (booking: Booking) => void;
   onConfirm: (booking: Booking) => void;
+  onCancel: (booking: Booking) => void;
 }
 
 export function BookingView({
@@ -24,6 +24,7 @@ export function BookingView({
   onEdit,
   onDelete,
   onConfirm,
+  onCancel,
 }: BookingViewProps) {
   if (!booking) return null;
 
@@ -73,6 +74,18 @@ export function BookingView({
       title="Detail Booking"
       onEdit={() => onEdit(booking)}
       onDelete={() => onDelete(booking)}
+      extraFooterActions={
+        (booking.status === 'PENDING' || booking.status === 'CONFIRMED') ? (
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => onCancel(booking)}
+            className="h-7 text-xs px-3 text-neutral-600 border-neutral-300 hover:bg-neutral-100"
+          >
+            {labels.cancelBooking || 'Batalkan'}
+          </Button>
+        ) : null
+      }
     >
       <div className="flex-1 overflow-y-auto bg-neutral-50/30 dark:bg-neutral-950/20">
         
@@ -205,6 +218,12 @@ export function BookingView({
                   <span className="text-[11px] text-muted-foreground font-semibold uppercase tracking-wider">Total Biaya</span>
                   <span className="text-xs font-bold text-foreground">{formatCurrency(booking.totalAmount || 0)}</span>
                 </div>
+                {(booking.driverFee || 0) > 0 && (
+                  <div className="flex justify-between items-center pb-2.5 border-b border-border/40">
+                    <span className="text-[11px] text-muted-foreground font-semibold uppercase tracking-wider">Biaya Pengemudi</span>
+                    <span className="text-xs font-bold text-foreground">{formatCurrency(booking.driverFee || 0)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between items-center pb-2.5 border-b border-border/40">
                   <span className="text-[11px] text-muted-foreground font-semibold uppercase tracking-wider">Uang Muka (Deposit)</span>
                   <span className="text-xs font-bold text-foreground">{formatCurrency(booking.deposit || 0)}</span>

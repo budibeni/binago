@@ -64,7 +64,7 @@ export const contractService = {
     return bookings.filter(r => !usedBookingIds.has(r.id));
   },
 
-  createContract: async (data: Omit<RentalContract, 'id' | 'contractNumber' | 'createdAt' | 'updatedAt' | 'customer' | 'booking'>): Promise<RentalContract> => {
+  createContract: async (data: { bookingId: string; contractDate: string; notes?: string; terms?: string }): Promise<RentalContract> => {
     // 1. Validation - check if booking is CONFIRMED
     const booking = await bookingService.getBookingById(data.bookingId);
     if (!booking) {
@@ -82,7 +82,19 @@ export const contractService = {
 
     // 3. Create the contract
     const newContract = await contractRepository.createContract({
-      ...data,
+      bookingId: data.bookingId,
+      customerId: booking.customerId,
+      contractDate: data.contractDate,
+      startDate: booking.startDate,
+      endDate: booking.endDate,
+      rentalType: booking.rentalType,
+      rateType: booking.rateType,
+      totalAmount: booking.totalAmount,
+      deposit: booking.deposit,
+      remainingAmount: booking.remainingAmount,
+      driverFee: booking.driverFee,
+      notes: data.notes || '-',
+      terms: data.terms || '',
       status: 'DRAFT', // Always start as DRAFT
     });
     

@@ -25,7 +25,7 @@ function StatCard({ label, value, colorClass, icon: Icon }: { label: string, val
   const textColorClass = colorClass.replace(/bg-/g, 'text-');
   
   return (
-    <div className="flex items-center justify-between p-3 rounded-lg border border-border/80 bg-background transition-colors hover:border-border">
+    <div className="flex items-center justify-between p-3 rounded-none border border-border/80 bg-background transition-colors hover:border-border">
       <div className="flex items-center gap-2.5">
         {Icon ? (
           <div className={cn("p-1.5 rounded-md bg-neutral-100 dark:bg-neutral-800", textColorClass)}>
@@ -208,12 +208,54 @@ export function RentalVehiclesFeature() {
 
   const [isFilterOpen, setIsFilterOpen] = React.useState(false);
   const [showStats, setShowStats] = React.useState(true);
+  const [panelSide, setPanelSide] = React.useState<'left' | 'right' | 'top' | 'bottom'>('top');
+
+  const renderStatsPanel = () => {
+    if (!showStats) return null;
+    
+    return (
+      <PanelShell
+      title="Ringkasan"
+      side={panelSide}
+      isOpen={showStats}
+      onClose={() => setShowStats(false)}
+      onOpen={() => setShowStats(true)}
+      collapsedTitle="RINGKASAN"
+      onSideChange={setPanelSide}
+      labels={{
+        top: labels.panelTop || 'Atas',
+        right: labels.panelRight || 'Kanan',
+        bottom: labels.panelBottom || 'Bawah',
+        left: labels.panelLeft || 'Kiri',
+        hide: labels.hidePanel || 'Sembunyikan',
+        layoutToggleTitle: labels.layoutToggleTitle || 'Ubah Posisi Panel',
+      }}
+      className={cn(
+        "shrink-0 bg-white dark:bg-background z-10",
+        (panelSide === 'top' || panelSide === 'bottom') ? "w-full" : "w-80 min-w-80 h-full"
+      )}
+    >
+      <div className={cn("gap-2.5 p-3", (panelSide === 'top' || panelSide === 'bottom') ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6" : "flex flex-col h-full")}>
+        <StatCard label="Total Kendaraan" value={stats.all} colorClass="bg-foreground" icon={CarFront} />
+        <StatCard label={labels.statusReady || 'Siap'} value={stats.ready} colorClass="bg-success" icon={CheckCircle2} />
+        <StatCard label={labels.statusReserved || 'Dipesan'} value={stats.reserved} colorClass="bg-warning" icon={Calendar} />
+        <StatCard label={labels.statusRented || 'Disewa'} value={stats.rented} colorClass="bg-primary" icon={User} />
+        <StatCard label={labels.statusMaintenance || 'Perawatan'} value={stats.maintenance} colorClass="bg-purple-500" icon={Wrench} />
+        <StatCard label={labels.statusUnavailable || 'Tidak Tersedia'} value={stats.unavailable} colorClass="bg-neutral-500 dark:bg-neutral-400" icon={Ban} />
+      </div>
+    </PanelShell>
+    );
+  };
 
   return (
-    <div className="flex flex-row h-full w-full bg-background overflow-hidden relative">
+    <div className={cn("flex h-full w-full bg-background overflow-hidden relative", (panelSide === 'top' || panelSide === 'bottom') ? 'flex-col' : 'flex-row')}>
       
-      {/* Left Column (Table + Bottom Action Bar) */}
-      <div className="flex-1 flex flex-col min-w-0 h-full">
+      {/* Render panel first if top or left */}
+      {(panelSide === 'top' || panelSide === 'left') && renderStatsPanel()}
+
+
+      {/* Main Section (Table + Bottom Action Bar) */}
+      <div className="flex-1 flex flex-col min-w-0 min-h-0">
 
         {/* Main Table */}
         <div className="flex-1 min-h-0 min-w-0 relative">
@@ -268,25 +310,8 @@ export function RentalVehiclesFeature() {
         )}
       </div>
 
-      {/* Panel Shell for Stats (Now spanning full height) */}
-        <PanelShell
-          title="Ringkasan"
-          side="right"
-          isOpen={showStats}
-          onClose={() => setShowStats(false)}
-          onOpen={() => setShowStats(true)}
-          collapsedTitle="RINGKASAN"
-          className="w-80 min-w-80 shrink-0 h-full bg-gray-50 dark:bg-gray-900/40"
-        >
-          <div className="flex flex-col gap-2.5 p-4">
-            <StatCard label="Total Kendaraan" value={stats.all} colorClass="bg-foreground" icon={CarFront} />
-            <StatCard label={labels.statusReady || 'Siap'} value={stats.ready} colorClass="bg-success" icon={CheckCircle2} />
-            <StatCard label={labels.statusReserved || 'Dipesan'} value={stats.reserved} colorClass="bg-warning" icon={Calendar} />
-            <StatCard label={labels.statusRented || 'Disewa'} value={stats.rented} colorClass="bg-primary" icon={User} />
-            <StatCard label={labels.statusMaintenance || 'Perawatan'} value={stats.maintenance} colorClass="bg-purple-500" icon={Wrench} />
-            <StatCard label={labels.statusUnavailable || 'Tidak Tersedia'} value={stats.unavailable} colorClass="bg-neutral-500 dark:bg-neutral-400" icon={Ban} />
-          </div>
-        </PanelShell>
+      {/* Render panel last if bottom or right */}
+      {(panelSide === 'bottom' || panelSide === 'right') && renderStatsPanel()}
 
       <VehicleSelectionDialog
         open={selectionDialogOpen}

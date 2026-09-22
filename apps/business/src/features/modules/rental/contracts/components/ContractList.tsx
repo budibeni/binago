@@ -208,12 +208,6 @@ export function ContractList({
             <Plus className="w-3.5 h-3.5" />
             <span className="hidden sm:inline-block">{labels.addContract || 'Tambah'}</span>
           </Button>
-          {onToggleStats && (
-            <Button variant="outline" onClick={onToggleStats} className="h-8 gap-1.5 text-[12px] font-medium shadow-none">
-              {showStats ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-              <span className="hidden sm:inline-block">Ringkasan</span>
-            </Button>
-          )}
         </div>
       }
     />

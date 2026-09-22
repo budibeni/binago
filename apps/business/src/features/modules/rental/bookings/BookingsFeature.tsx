@@ -12,14 +12,24 @@ import { BookingCreateFeature } from './BookingCreateFeature';
 import { getBookingTranslation } from './i18n';
 import { cn } from '@adatrack/utils';
 import { trackingNavigationService } from '@/features/core/tracking/services/trackingNavigationService';
-import type { DataTableFilterConfig } from '@adatrack/ui';
+import { PanelShell, type DataTableFilterConfig } from '@adatrack/ui';
 
-function StatCard({ label, value, colorClass }: { label: string, value: number, colorClass: string }) {
+function StatCard({ label, value, colorClass, icon: Icon }: { label: string, value: number, colorClass: string, icon?: React.ElementType }) {
+  const textColorClass = colorClass.replace(/bg-/g, 'text-');
+  
   return (
-    <div className="flex flex-col p-2.5 rounded-md border border-border bg-card shadow-sm relative overflow-hidden transition-all hover:shadow-md">
-      <div className={cn("absolute left-0 top-0 bottom-0 w-1", colorClass)} />
-      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider ml-1">{label}</span>
-      <span className="text-xl font-bold mt-0.5 ml-1">{value}</span>
+    <div className="flex items-center justify-between p-3 rounded-none border border-border/80 bg-background transition-colors hover:border-border">
+      <div className="flex items-center gap-2.5">
+        {Icon ? (
+          <div className={cn("p-1.5 rounded-md bg-neutral-100 dark:bg-neutral-800", textColorClass)}>
+            <Icon className="w-3.5 h-3.5" />
+          </div>
+        ) : (
+          <div className={cn("w-2 h-2 rounded-full", colorClass)} />
+        )}
+        <span className="text-[11px] font-semibold text-foreground-muted tracking-tight">{label}</span>
+      </div>
+      <span className="text-sm font-bold text-foreground">{value}</span>
     </div>
   );
 }
@@ -38,6 +48,7 @@ export function BookingsFeature() {
   const [statusFilter, setStatusFilter] = useState<BookingStatusFilter>('all');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [showStats, setShowStats] = useState(true);
+  const [panelSide, setPanelSide] = useState<'left' | 'right' | 'top' | 'bottom'>('top');
 
   // Modals
   const [detailBooking, setDetailBooking] = useState<Booking | null>(null);
@@ -115,7 +126,21 @@ export function BookingsFeature() {
       }
       alert('Booking berhasil dikonfirmasi');
     } catch (error) {
-      alert(error instanceof Error ? error.message : 'Gagal mengonfirmasi reservasi');
+      alert(error instanceof Error ? error.message : 'Gagal mengonfirmasi booking');
+    }
+  };
+
+  const handleCancel = async (booking: Booking) => {
+    try {
+      await bookingService.updateBookingStatus(booking.id, 'CANCELLED');
+      const data = await bookingService.getBookings();
+      setBookings(data);
+      if (detailBooking?.id === booking.id) {
+        setDetailBooking({ ...booking, status: 'CANCELLED' });
+      }
+      alert('Booking berhasil dibatalkan');
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Gagal membatalkan booking');
     }
   };
 
@@ -163,56 +188,83 @@ export function BookingsFeature() {
     ],
   }), [statusFilter, labels]);
 
-  return (
-    <div className="flex flex-col h-full w-full bg-background p-0 items-center overflow-hidden">
-      <div className="w-full flex-1 flex flex-col min-h-0 space-y-0 pb-0">
-
-        {/* Elegant Stats Ribbon (Dashboard Style) */}
-        {showStats && (
-          <div className="w-full px-4 pt-4 md:px-6 md:pt-6 bg-background animate-in slide-in-from-top-2 fade-in duration-200">
-            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
-              <StatCard label={labels.summaryTotal || 'Total Booking'} value={stats.all} colorClass="bg-foreground" />
-              <StatCard label={labels.statusPending || 'Menunggu'} value={stats.pending} colorClass="bg-amber-500" />
-              <StatCard label={labels.statusConfirmed || 'Dikonfirmasi'} value={stats.confirmed} colorClass="bg-blue-500" />
-              <StatCard label={labels.statusActive || 'Aktif'} value={stats.active} colorClass="bg-success" />
-              <StatCard label={labels.statusCompleted || 'Selesai'} value={stats.completed} colorClass="bg-neutral-500" />
-              <StatCard label={labels.statusCancelled || 'Batal'} value={stats.cancelled} colorClass="bg-danger" />
-            </div>
-          </div>
+  const renderStatsPanel = () => {
+    if (!showStats) return null;
+    
+    return (
+      <PanelShell
+        title="Ringkasan"
+        side={panelSide}
+        isOpen={showStats}
+        onClose={() => setShowStats(false)}
+        onOpen={() => setShowStats(true)}
+        collapsedTitle="RINGKASAN"
+        onSideChange={setPanelSide}
+        labels={{
+          top: labels.panelTop || 'Atas',
+          right: labels.panelRight || 'Kanan',
+          bottom: labels.panelBottom || 'Bawah',
+          left: labels.panelLeft || 'Kiri',
+          hide: labels.hidePanel || 'Sembunyikan',
+          layoutToggleTitle: labels.layoutToggleTitle || 'Ubah Posisi Panel',
+        }}
+        className={cn(
+          "shrink-0 bg-white dark:bg-background z-10",
+          (panelSide === 'top' || panelSide === 'bottom') ? "w-full" : "w-80 min-w-80 h-full"
         )}
-
-        {/* Main Table */}
-        <div className="flex-1 min-h-0 w-full relative">
-          <BookingList
-            data={filteredData}
-            labels={labels}
-            searchValue={search}
-            onSearchChange={setSearch}
-            onAdd={() => setIsCreateOpen(true)}
-            onView={handleView}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-            onOpenMap={handleOpenMapSingle}
-            filterConfig={filterConfig}
-            isFilterOpen={isFilterOpen}
-            onFilterOpenChange={setIsFilterOpen}
-            showStats={showStats}
-            onToggleStats={() => setShowStats(!showStats)}
-            dtLabels={dtLabels}
-            className="border-none shadow-none"
-          />
+      >
+        <div className={cn("gap-2.5 p-3", (panelSide === 'top' || panelSide === 'bottom') ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6" : "flex flex-col h-full")}>
+          <StatCard label={labels.summaryTotal || 'Total Booking'} value={stats.all} colorClass="bg-foreground" icon={List} />
+          <StatCard label={labels.statusPending || 'Menunggu'} value={stats.pending} colorClass="bg-amber-500" icon={Clock} />
+          <StatCard label={labels.statusConfirmed || 'Dikonfirmasi'} value={stats.confirmed} colorClass="bg-blue-500" icon={CheckCircle2} />
+          <StatCard label={labels.statusActive || 'Aktif'} value={stats.active} colorClass="bg-success" icon={Car} />
+          <StatCard label={labels.statusCompleted || 'Selesai'} value={stats.completed} colorClass="bg-neutral-500" icon={CheckCircle2} />
+          <StatCard label={labels.statusCancelled || 'Batal'} value={stats.cancelled} colorClass="bg-danger" icon={XCircle} />
         </div>
+      </PanelShell>
+    );
+  };
 
+  return (
+    <div className={cn("flex h-full w-full bg-background overflow-hidden relative", (panelSide === 'top' || panelSide === 'bottom') ? 'flex-col' : 'flex-row')}>
+      
+      {/* Render panel first if top or left */}
+      {(panelSide === 'top' || panelSide === 'left') && renderStatsPanel()}
+
+      {/* Main Table */}
+      <div className="flex-1 min-h-0 min-w-0 w-full relative border-none">
+        <BookingList
+          data={filteredData}
+          labels={labels}
+          searchValue={search}
+          onSearchChange={setSearch}
+          onAdd={() => setIsCreateOpen(true)}
+          onView={handleView}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onOpenMap={handleOpenMapSingle}
+          filterConfig={filterConfig}
+          isFilterOpen={isFilterOpen}
+          onFilterOpenChange={setIsFilterOpen}
+          showStats={showStats}
+          onToggleStats={() => setShowStats(!showStats)}
+          dtLabels={dtLabels}
+          className="border-none shadow-none"
+        />
       </div>
+
+      {/* Render panel last if bottom or right */}
+      {(panelSide === 'bottom' || panelSide === 'right') && renderStatsPanel()}
 
       <BookingView
         booking={detailBooking}
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         labels={labels}
-        onEdit={handleEdit}
+        onEdit={(b) => { setDrawerOpen(false); handleEdit(b); }}
         onDelete={handleDelete}
         onConfirm={handleConfirm}
+        onCancel={handleCancel}
       />
 
       <BookingCreateFeature

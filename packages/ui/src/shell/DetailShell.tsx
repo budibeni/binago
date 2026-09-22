@@ -37,6 +37,9 @@ export interface DetailShellProps {
 
   /** Presentation layout */
   layout?: 'default' | 'dialog' | 'drawer' | 'fullscreen';
+  
+  /** Additional actions to render in the footer (e.g. Cancel buttons) */
+  extraFooterActions?: React.ReactNode;
 }
 
 export function DetailShell({
@@ -50,6 +53,7 @@ export function DetailShell({
   onDelete,
   deleteLabel,
   layout = 'drawer',
+  extraFooterActions,
 }: DetailShellProps) {
   const uiConfig = useUIConfig();
   
@@ -128,7 +132,7 @@ export function DetailShell({
   );
 
   const renderFooter = () => {
-    if (!onEdit && !onDelete) return null;
+    if (!onEdit && !onDelete && !extraFooterActions) return null;
     return (
       <div className="flex items-center justify-between px-4 md:px-6 py-2 bg-background border-t border-border shadow-sm shrink-0">
         {onEdit ? (
@@ -143,17 +147,21 @@ export function DetailShell({
           </Button>
         ) : <div />}
 
-        {onDelete && (
-          <Button 
-            size="sm"
-            variant="outline" 
-            onClick={onDelete} 
-            leftIcon={<Trash2 className="h-3.5 w-3.5" />}
-            className="h-7 text-xs px-3 text-danger border-danger/30 hover:bg-danger/10 hover:text-danger focus-visible:ring-danger"
-          >
-            {finalDeleteLabel}
-          </Button>
-        )}
+        <div className="flex items-center gap-2">
+          {extraFooterActions}
+          
+          {onDelete && (
+            <Button 
+              size="sm"
+              variant="outline" 
+              onClick={onDelete} 
+              leftIcon={<Trash2 className="h-3.5 w-3.5" />}
+              className="h-7 text-xs px-3 text-danger border-danger/30 hover:bg-danger/10 hover:text-danger focus-visible:ring-danger"
+            >
+              {finalDeleteLabel}
+            </Button>
+          )}
+        </div>
       </div>
     );
   };

@@ -103,11 +103,13 @@ function buildColumns(
       accessorFn: (row) => row.bookingNumber,
       header: labels.colNo,
       enableSorting: true,
-      size: 150,
+      size: 160,
+      meta: { fixedWidth: true },
       cell: ({ row }) => (
         <span 
           onClick={() => onView(row.original)}
-          className="font-medium text-foreground hover:text-primary hover:underline cursor-pointer transition-colors whitespace-nowrap"
+          className="font-medium text-foreground hover:text-primary hover:underline cursor-pointer transition-colors block truncate"
+          title={row.original.bookingNumber}
         >
           {row.original.bookingNumber}
         </span>
@@ -119,7 +121,13 @@ function buildColumns(
       accessorFn: (row) => row.customer?.name || '-',
       header: labels.colCustomer,
       enableSorting: true,
-      size: 180,
+      size: 200,
+      meta: { fixedWidth: true },
+      cell: ({ row }) => (
+        <span className="block truncate" title={row.original.customer?.name || '-'}>
+          {row.original.customer?.name || '-'}
+        </span>
+      ),
     },
     // --- Kendaraan (diperluas) ---
     {
@@ -154,6 +162,50 @@ function buildColumns(
       enableSorting: true,
       size: 140,
     },
+    // --- Biaya Pengemudi ---
+    {
+      id: 'driverFee',
+      accessorFn: (row) => formatCurrency(row.driverFee || 0),
+      header: 'Biaya Pengemudi',
+      enableSorting: true,
+      size: 150,
+    },
+    // --- Deposit ---
+    {
+      id: 'deposit',
+      accessorFn: (row) => formatCurrency(row.deposit || 0),
+      header: 'Deposit / DP',
+      enableSorting: true,
+      size: 140,
+    },
+    // --- Sisa Tagihan ---
+    {
+      id: 'remainingAmount',
+      accessorFn: (row) => formatCurrency(row.remainingAmount || 0),
+      header: 'Sisa Tagihan',
+      enableSorting: true,
+      size: 140,
+      cell: ({ row }) => {
+        const val = row.original.remainingAmount || 0;
+        return (
+          <span className={val > 0 ? "font-semibold text-danger" : "font-medium text-muted-foreground"}>
+            {formatCurrency(val)}
+          </span>
+        );
+      }
+    },
+    // --- Dasar Tarif ---
+    {
+      id: 'rateType',
+      accessorKey: 'rateType',
+      header: 'Dasar Tarif',
+      enableSorting: true,
+      size: 130,
+      cell: ({ row }) => {
+        const r = row.original.rateType;
+        return r === 'DAILY' ? 'Harian' : r === 'WEEKLY' ? 'Mingguan' : 'Bulanan';
+      }
+    },
     // --- Tipe Rental ---
     {
       id: 'rentalType',
@@ -161,7 +213,7 @@ function buildColumns(
       header: labels.colRentalType || 'Tipe Rental',
       enableSorting: true,
       size: 140,
-      cell: ({ row }) => row.original.rentalType === 'SELF_DRIVE' ? 'Lepas Kunci' : 'Dengan Supir',
+      cell: ({ row }) => row.original.rentalType === 'SELF_DRIVE' ? 'Lepas Kunci' : 'Dengan Pengemudi',
     },
     // --- Pembayaran ---
     {
@@ -226,6 +278,9 @@ function buildColumns(
 }
 
 const DEFAULT_COLUMN_VISIBILITY = {
+  driverFee: false,
+  deposit: false,
+  rateType: false,
   rentalType: false,
   paymentMethod: false,
   pickupLocation: false,
@@ -269,7 +324,7 @@ export function BookingList({
       // Search
       searchValue={searchValue}
       onSearchChange={onSearchChange}
-      searchPlaceholder={labels.searchPlaceholder || "Cari reservasi..."}
+      searchPlaceholder={labels.searchPlaceholder || "Cari booking..."}
       // Filter
       filterConfig={filterConfig}
       isFilterOpen={isFilterOpen}
@@ -286,12 +341,6 @@ export function BookingList({
             <Button variant="destructive" onClick={onAdd} className="h-8 gap-1.5 text-[12px] font-medium shadow-none">
               <Plus className="h-3.5 w-3.5" />
               <span className="hidden sm:inline-block">{labels.addBooking || 'Tambah'}</span>
-            </Button>
-          )}
-          {onToggleStats && (
-            <Button variant="outline" onClick={onToggleStats} className="h-8 gap-1.5 text-[12px] font-medium shadow-none">
-              {showStats ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
-              <span className="hidden sm:inline-block">Ringkasan</span>
             </Button>
           )}
         </div>

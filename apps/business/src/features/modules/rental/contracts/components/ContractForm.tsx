@@ -69,16 +69,7 @@ export function ContractForm({
 
       await onSubmit({
         bookingId: selectedRes.id,
-        customerId: selectedRes.customerId,
         contractDate: new Date(contractDate).toISOString(),
-        
-        // Snapshot fields from booking
-        rentalType: selectedRes.rentalType,
-        rateType: selectedRes.rateType,
-        totalAmount: selectedRes.totalAmount,
-        deposit: selectedRes.deposit,
-        remainingAmount: selectedRes.remainingAmount,
-        
         notes,
         terms,
       });
@@ -95,8 +86,8 @@ export function ContractForm({
   const displayTotal = isEditing ? contract?.totalAmount : selectedRes?.totalAmount;
   const displayDeposit = isEditing ? contract?.deposit : selectedRes?.deposit;
   const displayRemaining = isEditing ? (contract!.totalAmount - contract!.deposit) : selectedRes?.remainingAmount;
-  const displayStartDate = displayRes?.startDate;
-  const displayEndDate = displayRes?.endDate;
+  const displayStartDate = isEditing ? contract?.startDate : displayRes?.startDate;
+  const displayEndDate = isEditing ? contract?.endDate : displayRes?.endDate;
 
   if (!isEditing && !selectedRes) {
     return (
@@ -278,7 +269,7 @@ export function ContractForm({
                           </div>
                           <div>
                             <p className="text-[11px] text-muted-foreground font-semibold">Tipe Sewa</p>
-                            <p className="text-sm font-medium">{displayRentalType === 'SELF_DRIVE' ? 'Lepas Kunci' : 'Dengan Driver'}</p>
+                            <p className="text-sm font-medium">{displayRentalType === 'SELF_DRIVE' ? 'Lepas Kunci' : 'Dengan Pengemudi'}</p>
                           </div>
                           <div>
                             <p className="text-[11px] text-muted-foreground font-semibold">Mulai</p>
