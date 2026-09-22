@@ -16,7 +16,7 @@ import type { VehiclePricingSelection } from '@/data/modules/rental/services/pri
 import { Button, Card } from '@adatrack/ui';
 import type { DataTableFilterConfig } from '@adatrack/ui';
 import { Plus } from 'lucide-react';
-import type { RateType } from '../reservations/types/reservation';
+import type { RateType } from '../bookings/types/booking';
 
 export function PricingCategoryFeature() {
   const locale = useBusinessLocale();

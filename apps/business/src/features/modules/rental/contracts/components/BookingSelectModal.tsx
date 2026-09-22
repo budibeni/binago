@@ -3,34 +3,34 @@
 import React from 'react';
 import { Dialog } from '@adatrack/ui';
 import { Search } from 'lucide-react';
-import type { Reservation } from '@/features/modules/rental/reservations/types/reservation';
+import type { Booking } from '@/features/modules/rental/bookings/types/booking';
 
-interface ReservationSelectModalProps {
+interface BookingSelectModalProps {
   open: boolean;
   onClose: () => void;
-  reservations: Reservation[];
-  onSelect: (r: Reservation) => void;
+  bookings: Booking[];
+  onSelect: (r: Booking) => void;
   labels: Record<string, string>;
 }
 
-export function ReservationSelectModal({
+export function BookingSelectModal({
   open,
   onClose,
-  reservations,
+  bookings,
   onSelect,
   labels,
-}: ReservationSelectModalProps) {
+}: BookingSelectModalProps) {
   const [search, setSearch] = React.useState('');
 
   const filtered = React.useMemo(() => {
-    if (!search) return reservations;
+    if (!search) return bookings;
     const s = search.toLowerCase();
-    return reservations.filter(r => 
-      r.reservationNumber.toLowerCase().includes(s) ||
+    return bookings.filter(r => 
+      r.bookingNumber.toLowerCase().includes(s) ||
       r.customer?.name.toLowerCase().includes(s) ||
       r.vehicle?.coreVehicle?.plateNumber.toLowerCase().includes(s)
     );
-  }, [reservations, search]);
+  }, [bookings, search]);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(value);
@@ -45,8 +45,8 @@ export function ReservationSelectModal({
     <Dialog 
       open={open} 
       onOpenChange={(val) => !val && onClose()}
-      title={labels.selectReservation || 'Pilih Reservasi'}
-      description={labels.selectReservationSubtitle || 'Pilih reservasi yang sudah dikonfirmasi untuk dibuatkan kontrak.'}
+      title={labels.selectBooking || 'Pilih Booking'}
+      description={labels.selectBookingSubtitle || 'Pilih reservasi yang sudah dikonfirmasi untuk dibuatkan kontrak.'}
       className="max-w-4xl"
     >
       <div className="mt-4 relative mb-4">
@@ -63,7 +63,7 @@ export function ReservationSelectModal({
       <div className="max-h-[60vh] overflow-y-auto">
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-48 text-muted-foreground">
-            <p className="text-sm font-medium">Reservasi tidak ditemukan</p>
+            <p className="text-sm font-medium">Booking tidak ditemukan</p>
             <p className="text-xs mt-1">Coba sesuaikan kata kunci pencarian Anda.</p>
           </div>
         ) : (
@@ -79,8 +79,8 @@ export function ReservationSelectModal({
               >
                 <div className="flex-1 min-w-0 grid grid-cols-1 md:grid-cols-4 gap-4">
                   <div>
-                    <p className="text-xs text-muted-foreground font-semibold mb-1">No. Reservasi</p>
-                    <p className="text-sm font-bold truncate">{r.reservationNumber}</p>
+                    <p className="text-xs text-muted-foreground font-semibold mb-1">No. Booking</p>
+                    <p className="text-sm font-bold truncate">{r.bookingNumber}</p>
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground font-semibold mb-1">Pelanggan</p>

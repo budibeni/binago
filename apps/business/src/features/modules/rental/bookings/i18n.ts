@@ -1,12 +1,12 @@
 import type { Locale } from '@adatrack/types';
 
-export const reservationDictionaries = {
+export const bookingDictionaries = {
   id: {
-    title: 'Reservasi Rental',
-    createTitle: 'Buat Reservasi',
+    title: 'Booking Rental',
+    createTitle: 'Buat Booking',
     pageSubtitle: 'Kelola pemesanan kendaraan dan reservasi rental Anda.',
     searchPlaceholder: 'Cari...',
-    addReservation: 'Buat Reservasi',
+    addBooking: 'Buat Booking',
     
     // Status
     statusPending: 'Menunggu Konfirmasi',
@@ -17,11 +17,11 @@ export const reservationDictionaries = {
     statusAll: 'Semua Status',
     
     // Summary Cards
-    summaryTotal: 'Semua Reservasi',
+    summaryTotal: 'Semua Booking',
     
     // Filters
     filterStatus: 'Status',
-    filterReservationDate: 'Tanggal Reservasi',
+    filterBookingDate: 'Tanggal Booking',
     filterRentalDate: 'Tanggal Sewa',
     selectDate: 'Pilih tanggal',
     reset: 'Reset',
@@ -44,7 +44,7 @@ export const reservationDictionaries = {
     sectionTimeLocation: 'Waktu & Lokasi',
     sectionPricing: 'Detail Pembayaran',
     sectionAdditional: 'Kebutuhan Tambahan',
-    sectionSummary: 'Ringkasan Reservasi',
+    sectionSummary: 'Ringkasan Booking',
     
     // Form Fields
     fieldCustomer: 'Pelanggan',
@@ -90,17 +90,17 @@ export const reservationDictionaries = {
     
     // Form Actions
     cancel: 'Batal',
-    save: 'Simpan Reservasi',
+    save: 'Simpan Booking',
     
     // Messages
-    createSuccess: 'Reservasi berhasil dibuat.',
-    updateSuccess: 'Reservasi berhasil diperbarui.',
+    createSuccess: 'Booking berhasil dibuat.',
+    updateSuccess: 'Booking berhasil diperbarui.',
     overlapError: 'Kendaraan sudah memiliki reservasi pada periode tersebut.',
     
     // Empty State
-    emptyTitle: 'Belum ada Reservasi',
+    emptyTitle: 'Belum ada Booking',
     emptyDesc: 'Belum ada data reservasi kendaraan.',
-    noResultTitle: 'Reservasi tidak ditemukan',
+    noResultTitle: 'Booking tidak ditemukan',
     noResultDesc: 'Coba sesuaikan kata kunci atau filter pencarian Anda.',
 
     validation: {
@@ -113,11 +113,11 @@ export const reservationDictionaries = {
     }
   },
   en: {
-    title: 'Rental Reservations',
-    createTitle: 'Create Reservation',
-    pageSubtitle: 'Manage your vehicle bookings and rental reservations.',
+    title: 'Rental Bookings',
+    createTitle: 'Create Booking',
+    pageSubtitle: 'Manage your vehicle bookings and rental bookings.',
     searchPlaceholder: 'Search...',
-    addReservation: 'Create Reservation',
+    addBooking: 'Create Booking',
     
     // Status
     statusPending: 'Pending Confirmation',
@@ -128,11 +128,11 @@ export const reservationDictionaries = {
     statusAll: 'All Statuses',
     
     // Summary Cards
-    summaryTotal: 'All Reservations',
+    summaryTotal: 'All Bookings',
     
     // Filters
     filterStatus: 'Status',
-    filterReservationDate: 'Reservation Date',
+    filterBookingDate: 'Booking Date',
     filterRentalDate: 'Rental Date',
     selectDate: 'Select date',
     reset: 'Reset',
@@ -155,7 +155,7 @@ export const reservationDictionaries = {
     sectionTimeLocation: 'Time & Location',
     sectionPricing: 'Pricing & Payment',
     sectionAdditional: 'Additional Needs',
-    sectionSummary: 'Reservation Summary',
+    sectionSummary: 'Booking Summary',
     
     // Form Fields
     fieldCustomer: 'Customer',
@@ -189,7 +189,7 @@ export const reservationDictionaries = {
     paymentCard: 'Credit Card',
     
     fieldNotes: 'Notes',
-    notesPlaceholder: 'Write reservation notes (optional)...',
+    notesPlaceholder: 'Write booking notes (optional)...',
     fieldAdditionalNeeds: 'Extra Services',
     needDriver: 'Include Driver',
     needDelivery: 'Delivery & Pickup Service',
@@ -201,17 +201,17 @@ export const reservationDictionaries = {
     
     // Form Actions
     cancel: 'Cancel',
-    save: 'Save Reservation',
+    save: 'Save Booking',
     
     // Messages
-    createSuccess: 'Reservation created successfully.',
-    updateSuccess: 'Reservation updated successfully.',
-    overlapError: 'Vehicle already has a reservation for the selected period.',
+    createSuccess: 'Booking created successfully.',
+    updateSuccess: 'Booking updated successfully.',
+    overlapError: 'Vehicle already has a booking for the selected period.',
     
     // Empty State
-    emptyTitle: 'No Reservations',
-    emptyDesc: 'There are no reservation data yet.',
-    noResultTitle: 'Reservation not found',
+    emptyTitle: 'No Bookings',
+    emptyDesc: 'There are no booking data yet.',
+    noResultTitle: 'Booking not found',
     noResultDesc: 'Try adjusting your keywords or search filters.',
 
     validation: {
@@ -225,6 +225,6 @@ export const reservationDictionaries = {
   }
 };
 
-export function getReservationTranslation(locale: Locale = 'id') {
-  return reservationDictionaries[locale] || reservationDictionaries.id;
+export function getBookingTranslation(locale: Locale = 'id') {
+  return bookingDictionaries[locale] || bookingDictionaries.id;
 }

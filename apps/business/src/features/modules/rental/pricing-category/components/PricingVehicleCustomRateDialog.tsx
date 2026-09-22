@@ -1,6 +1,6 @@
 import React from 'react';
 import { Input, Label, FormShell } from '@adatrack/ui';
-import type { RateType } from '../../reservations/types/reservation';
+import type { RateType } from '../../bookings/types/booking';
 
 export interface PricingVehicleCustomRateDialogProps {
   open: boolean;

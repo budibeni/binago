@@ -117,7 +117,7 @@ function buildNavigation(locale: Locale): NavGroup[] {
         { id: 'rentalCustomers', label: t.nav.customers, href: '/rental/customers', icon: Users },
         { id: 'pricingCategory', label: (t.nav as any).pricingCategory || 'Kategori Tarif', href: '/rental/pricing-category', icon: Tag },
         { id: 'rentalVehicles', label: t.nav.rentalVehicles, href: '/rental/vehicles', icon: CarFront },
-        { id: 'reservations', label: t.nav.reservations, href: '/rental/reservations', icon: CalendarClock },
+        { id: 'bookings', label: t.nav.bookings, href: '/rental/bookings', icon: CalendarClock },
         { id: 'rentalContracts', label: t.nav.rentalContracts, href: '/rental/contracts', icon: FileSignature },
         { id: 'handovers', label: t.nav.handovers, href: '/rental/handovers', icon: Key },
         { id: 'returns', label: t.nav.returns, href: '/rental/returns', icon: Undo2 },

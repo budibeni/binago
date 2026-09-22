@@ -9,14 +9,14 @@ import {
   DataTable, 
 } from '@adatrack/ui';
 import type { DataTableColumnDef, DataTableFilterConfig } from '@adatrack/ui';
-import type { Reservation, ReservationStatus } from '../types/reservation';
+import type { Booking, BookingStatus } from '../types/booking';
 
-interface ReservationListProps {
-  data: Reservation[];
+interface BookingListProps {
+  data: Booking[];
   labels: Record<string, any>;
-  onView: (r: Reservation) => void;
-  onEdit: (r: Reservation) => void;
-  onDelete: (r: Reservation) => void;
+  onView: (r: Booking) => void;
+  onEdit: (r: Booking) => void;
+  onDelete: (r: Booking) => void;
   searchValue: string;
   onSearchChange: (value: string) => void;
   onAdd: () => void;
@@ -30,7 +30,7 @@ interface ReservationListProps {
   dtLabels?: any;
 }
 
-const getStatusColor = (status: ReservationStatus) => {
+const getStatusColor = (status: BookingStatus) => {
   switch (status) {
     case 'PENDING':   return 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400';
     case 'CONFIRMED': return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400';
@@ -41,7 +41,7 @@ const getStatusColor = (status: ReservationStatus) => {
   }
 };
 
-const getStatusLabel = (status: ReservationStatus, labels: Record<string, any>) => {
+const getStatusLabel = (status: BookingStatus, labels: Record<string, any>) => {
   switch (status) {
     case 'PENDING':   return labels.statusPending;
     case 'CONFIRMED': return labels.statusConfirmed;
@@ -70,11 +70,11 @@ const formatShortDate = (dateStr: string) => {
 
 function buildColumns(
   labels: Record<string, any>,
-  onView: (r: Reservation) => void,
-  onEdit: (r: Reservation) => void,
-  onDelete: (r: Reservation) => void,
+  onView: (r: Booking) => void,
+  onEdit: (r: Booking) => void,
+  onDelete: (r: Booking) => void,
   onOpenMap: (vehicleId: string) => void
-): DataTableColumnDef<Reservation>[] {
+): DataTableColumnDef<Booking>[] {
   return [
     {
       id: 'actions',
@@ -97,10 +97,10 @@ function buildColumns(
         );
       },
     },
-    // --- Nomor Reservasi ---
+    // --- Nomor Booking ---
     {
       id: 'no',
-      accessorFn: (row) => row.reservationNumber,
+      accessorFn: (row) => row.bookingNumber,
       header: labels.colNo,
       enableSorting: true,
       size: 150,
@@ -109,7 +109,7 @@ function buildColumns(
           onClick={() => onView(row.original)}
           className="font-medium text-foreground hover:text-primary hover:underline cursor-pointer transition-colors whitespace-nowrap"
         >
-          {row.original.reservationNumber}
+          {row.original.bookingNumber}
         </span>
       ),
     },
@@ -125,9 +125,14 @@ function buildColumns(
     {
       id: 'vehicle',
       accessorFn: (row) => {
-        const cv = row.vehicle?.coreVehicle;
-        if (!cv) return '-';
-        return `${cv.plateNumber} - ${cv.brand} ${cv.vehicleName}`;
+        const count = row.items?.length || 0;
+        if (count === 0) return '-';
+        if (count === 1) {
+          const cv = row.items[0].vehicle?.coreVehicle;
+          if (!cv) return '1 Kendaraan';
+          return `${cv.plateNumber} - ${cv.brand} ${cv.vehicleName}`;
+        }
+        return `${count} Kendaraan`;
       },
       header: labels.colVehicle,
       enableSorting: true,
@@ -192,7 +197,7 @@ function buildColumns(
         </span>
       ),
     },
-    // --- Status Reservasi ---
+    // --- Status Booking ---
     {
       id: 'status',
       accessorKey: 'status',
@@ -227,7 +232,7 @@ const DEFAULT_COLUMN_VISIBILITY = {
   notes: false,
 };
 
-export function ReservationList({
+export function BookingList({
   data,
   labels,
   onView,
@@ -244,14 +249,14 @@ export function ReservationList({
   onToggleStats,
   className,
   dtLabels
-}: ReservationListProps) {
+}: BookingListProps) {
   const columns = React.useMemo(
     () => buildColumns(labels, onView, onEdit, onDelete, onOpenMap),
     [labels, onView, onEdit, onDelete, onOpenMap],
   );
 
   return (
-    <DataTable<Reservation>
+    <DataTable<Booking>
       data={data}
       columns={columns}
       // Capabilities
@@ -271,7 +276,7 @@ export function ReservationList({
       onFilterOpenChange={onFilterOpenChange}
       // UI Slots
       className={className}
-      exportFilename="Data_Reservasi_Rental"
+      exportFilename="Data_Booking_Rental"
       labels={dtLabels}
       emptyTitle={labels.emptyTitle}
       emptyDescription={labels.emptyDesc}
@@ -280,7 +285,7 @@ export function ReservationList({
           {onAdd && (
             <Button variant="destructive" onClick={onAdd} className="h-8 gap-1.5 text-[12px] font-medium shadow-none">
               <Plus className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline-block">{labels.addReservation || 'Tambah'}</span>
+              <span className="hidden sm:inline-block">{labels.addBooking || 'Tambah'}</span>
             </Button>
           )}
           {onToggleStats && (

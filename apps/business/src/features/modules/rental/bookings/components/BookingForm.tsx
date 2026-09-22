@@ -1,19 +1,19 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { User, Car, Calendar, DollarSign, FileText, ClipboardList } from 'lucide-react';
-import { Button, FormShell, FormCard, InputSelect, InputDateTime, InputDecimal, InputString, InputTextarea, InputCheckbox, InputMultiCheckbox, useForm } from '@adatrack/ui';
+import { User, Car, Calendar, DollarSign, FileText, ClipboardList, Trash2, Plus } from 'lucide-react';
+import { Button, FormShell, FormCard, InputSelect, InputDateTime, InputDecimal, InputString, InputTextarea, InputMultiCheckbox, useForm } from '@adatrack/ui';
 import type { Customer } from '@/features/modules/rental/customers/types/customer';
 import type { RentalVehicle } from '@/features/modules/rental/vehicles/types/rentalVehicle';
-import type { RateType, RentalType, Reservation } from '../types/reservation';
-import { getReservationFormSchema } from '../types/reservation';
+import type { RateType, RentalType } from '../types/booking';
+import { getBookingFormSchema } from '../types/booking';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
-import { getReservationTranslation } from '../i18n';
+import { getBookingTranslation } from '../i18n';
 
-export interface ReservationFormData {
+export interface BookingFormData {
   id?: string;
   customerId: string;
-  vehicleId: string;
+  vehicleIds: string[];
   startDate: string;
   endDate: string;
   duration: number;
@@ -30,20 +30,20 @@ export interface ReservationFormData {
   dropoffLocation?: string;
 }
 
-interface ReservationFormProps {
-  initialData?: Partial<ReservationFormData>;
+interface BookingFormProps {
+  initialData?: Partial<BookingFormData>;
   customers: Customer[];
   vehicles: RentalVehicle[];
-  onSubmit: (data: ReservationFormData) => void;
+  onSubmit: (data: BookingFormData) => void;
   onCancel: () => void;
   layout?: 'default' | 'drawer' | 'dialog' | 'fullscreen';
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }
 
-const DEFAULT_FORM_DATA: ReservationFormData = {
+const DEFAULT_FORM_DATA: BookingFormData = {
   customerId: '',
-  vehicleId: '',
+  vehicleIds: [],
   startDate: '',
   endDate: '',
   duration: 1,
@@ -60,7 +60,7 @@ const DEFAULT_FORM_DATA: ReservationFormData = {
   dropoffLocation: '',
 };
 
-export function ReservationForm({
+export function BookingForm({
   initialData,
   customers,
   vehicles,
@@ -69,25 +69,28 @@ export function ReservationForm({
   layout = 'default',
   open,
   onOpenChange,
-}: ReservationFormProps) {
+}: BookingFormProps) {
   const locale = useBusinessLocale();
-  const t = getReservationTranslation(locale);
+  const t = getBookingTranslation(locale);
   const isEditing = !!initialData?.id;
 
-  const { formData, errors, isSubmitting, handleChange, handleSubmit, setFormData } = useForm<ReservationFormData>({
+  const { formData, errors, isSubmitting, handleChange, handleSubmit, setFormData } = useForm<BookingFormData>({
     initialData: initialData ? { ...DEFAULT_FORM_DATA, ...initialData } : DEFAULT_FORM_DATA,
     resetOn: [open],
-    schema: getReservationFormSchema(t.validation || {}),
+    schema: getBookingFormSchema(t.validation || {}),
     onSubmit: async (data) => {
       await new Promise(r => setTimeout(r, 800)); // simulate API
-      onSubmit(data as ReservationFormData);
+      onSubmit(data as BookingFormData);
     },
   });
 
   const selectedCustomer = useMemo(() => customers.find(c => c.id === formData.customerId), [customers, formData.customerId]);
-  const selectedVehicle = useMemo(() => vehicles.find(v => v.vehicleId === formData.vehicleId || v.id === formData.vehicleId), [vehicles, formData.vehicleId]);
 
-  // Derived state calculations based on dates and rate
+  const selectedVehicles = useMemo(() => {
+    return (formData.vehicleIds || []).map(id => vehicles.find(v => v.vehicleId === id || v.id === id)).filter(Boolean) as RentalVehicle[];
+  }, [vehicles, formData.vehicleIds]);
+
+  // Derived state calculations based on dates
   React.useEffect(() => {
     if (formData.startDate && formData.endDate) {
       const start = new Date(formData.startDate);
@@ -95,26 +98,48 @@ export function ReservationForm({
       const diffTime = Math.abs(end.getTime() - start.getTime());
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
       if (diffDays !== formData.duration) {
-        setFormData(prev => ({ ...prev, duration: diffDays }));
+        setFormData(prev => ({ ...prev, duration: Math.max(diffDays, 1) }));
       }
     }
   }, [formData.startDate, formData.endDate, setFormData]);
 
   const totalAmount = useMemo(() => {
-    if (!selectedVehicle) return 0;
+    if (selectedVehicles.length === 0) return 0;
     const duration = formData.duration || 1;
-    let rate = selectedVehicle.dailyRate;
-    if (formData.rateType === 'WEEKLY') rate = selectedVehicle.weeklyRate || (selectedVehicle.dailyRate * 7);
-    if (formData.rateType === 'MONTHLY') rate = selectedVehicle.monthlyRate || (selectedVehicle.dailyRate * 30);
-    return rate * duration;
-  }, [selectedVehicle, formData.duration, formData.rateType]);
+    let total = 0;
+    selectedVehicles.forEach(vehicle => {
+      let rate = vehicle.dailyRate;
+      if (formData.rateType === 'WEEKLY') rate = vehicle.weeklyRate || (vehicle.dailyRate * 7);
+      if (formData.rateType === 'MONTHLY') rate = vehicle.monthlyRate || (vehicle.dailyRate * 30);
+      
+      let multiplier = duration;
+      if (formData.rateType === 'WEEKLY') multiplier = Math.ceil(duration / 7);
+      if (formData.rateType === 'MONTHLY') multiplier = Math.ceil(duration / 30);
+      
+      total += rate * multiplier;
+    });
+    return total;
+  }, [selectedVehicles, formData.duration, formData.rateType]);
 
   const remainingAmount = useMemo(() => {
-    return totalAmount - (formData.deposit || 0);
+    return Math.max(totalAmount - (formData.deposit || 0), 0);
   }, [totalAmount, formData.deposit]);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(value);
+  };
+
+  const [selectedVehicleToAdd, setSelectedVehicleToAdd] = React.useState<string>('');
+  
+  const handleAddVehicle = () => {
+    if (selectedVehicleToAdd && !formData.vehicleIds.includes(selectedVehicleToAdd)) {
+      handleChange('vehicleIds', [...(formData.vehicleIds || []), selectedVehicleToAdd]);
+      setSelectedVehicleToAdd('');
+    }
+  };
+
+  const handleRemoveVehicle = (vehicleId: string) => {
+    handleChange('vehicleIds', (formData.vehicleIds || []).filter(v => v !== vehicleId));
   };
 
   return (
@@ -122,7 +147,7 @@ export function ReservationForm({
       layout={layout}
       open={open}
       onOpenChange={onOpenChange}
-      title={isEditing ? 'Edit Reservasi' : t.addReservation}
+      title={isEditing ? 'Edit Booking' : t.addBooking}
       subtitle="Masukkan informasi detail reservasi."
       onCancel={onCancel}
       cancelText={t.cancel || 'Batal'}
@@ -133,10 +158,10 @@ export function ReservationForm({
     >
       <div className="flex flex-col gap-6">
         {/* 1. INFORMASI UTAMA */}
-        <FormCard title={t.sectionGeneral} description="Pilih pelanggan, kendaraan, dan tipe rental." icon={<User className="w-5 h-5 text-muted-foreground" />}>
+        <FormCard title={t.sectionGeneral} description="Pilih pelanggan dan tipe rental." icon={<User className="w-5 h-5 text-muted-foreground" />}>
           <div className="flex flex-col gap-6">
-            <div className="flex items-end gap-3">
-              <div className="flex-1">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
                 <InputSelect
                   label={t.fieldCustomer}
                   value={formData.customerId || ''}
@@ -144,37 +169,6 @@ export function ReservationForm({
                   placeholder={t.searchCustomerPlaceholder}
                   options={customers.map(c => ({ value: c.id, label: `${c.name} - ${c.phone}` }))}
                   error={errors.customerId}
-                  required
-                />
-              </div>
-            </div>
-
-            {selectedCustomer && (
-              <div className="grid grid-cols-3 gap-4 p-4 bg-neutral-50 dark:bg-neutral-900/50 rounded-lg border border-border/30 -mt-2">
-                <div>
-                  <p className="text-[10px] text-muted-foreground font-semibold mb-1">Nama Pelanggan</p>
-                  <p className="text-sm font-bold">{selectedCustomer.name}</p>
-                </div>
-                <div>
-                  <p className="text-[10px] text-muted-foreground font-semibold mb-1">Nomor Telepon</p>
-                  <p className="text-sm font-bold">{selectedCustomer.phone}</p>
-                </div>
-                <div>
-                  <p className="text-[10px] text-muted-foreground font-semibold mb-1">Email</p>
-                  <p className="text-sm font-bold">{selectedCustomer.email || '-'}</p>
-                </div>
-              </div>
-            )}
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <InputSelect
-                  label={t.fieldVehicle}
-                  value={formData.vehicleId || ''}
-                  onChange={(val) => handleChange('vehicleId', val)}
-                  placeholder={t.selectVehiclePlaceholder}
-                  options={vehicles.filter(v => v.status === 'READY' || v.status === 'RESERVED' || v.vehicleId === formData.vehicleId).map(v => ({ value: v.vehicleId, label: `${v.coreVehicle.plateNumber} - ${v.coreVehicle.brand} ${v.coreVehicle.vehicleName}` }))}
-                  error={errors.vehicleId}
                   required
                 />
               </div>
@@ -193,19 +187,19 @@ export function ReservationForm({
               </div>
             </div>
 
-            {selectedVehicle && (
-              <div className="grid grid-cols-4 gap-4 p-4 bg-neutral-50 dark:bg-neutral-900/50 rounded-lg border border-border/30 -mt-2">
+            {selectedCustomer && (
+              <div className="grid grid-cols-3 gap-4 p-4 bg-neutral-50 dark:bg-neutral-900/50 rounded-lg border border-border/30 -mt-2">
                 <div>
-                  <p className="text-[10px] text-muted-foreground font-semibold mb-1">Plat Nomor</p>
-                  <p className="text-sm font-bold">{selectedVehicle.coreVehicle.plateNumber}</p>
-                </div>
-                <div className="col-span-2">
-                  <p className="text-[10px] text-muted-foreground font-semibold mb-1">Merk / Model</p>
-                  <p className="text-sm font-bold">{selectedVehicle.coreVehicle.brand} {selectedVehicle.coreVehicle.vehicleName} {selectedVehicle.coreVehicle.year}</p>
+                  <p className="text-[10px] text-muted-foreground font-semibold mb-1">Nama Pelanggan</p>
+                  <p className="text-sm font-bold">{selectedCustomer.name}</p>
                 </div>
                 <div>
-                  <p className="text-[10px] text-muted-foreground font-semibold mb-1">Kilometer</p>
-                  <p className="text-sm font-bold">{selectedVehicle.currentOdometer.toLocaleString('id-ID')} km</p>
+                  <p className="text-[10px] text-muted-foreground font-semibold mb-1">Nomor Telepon</p>
+                  <p className="text-sm font-bold">{selectedCustomer.phone}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-muted-foreground font-semibold mb-1">Email</p>
+                  <p className="text-sm font-bold">{selectedCustomer.email || '-'}</p>
                 </div>
               </div>
             )}
@@ -250,9 +244,71 @@ export function ReservationForm({
       </div>
 
       <div className="flex flex-col gap-6">
-        {/* 3. DETAIL PEMBAYARAN */}
-        <FormCard title={t.sectionPricing} description="Detail tarif sewa dan total biaya." icon={<DollarSign className="w-5 h-5 text-muted-foreground" />}>
-          <div className="grid grid-cols-3 gap-4 mb-4">
+        {/* 3. KENDARAAN & PEMBAYARAN */}
+        <FormCard title="Kendaraan & Pembayaran" description="Tambahkan kendaraan yang akan disewa dan atur metode pembayaran." icon={<Car className="w-5 h-5 text-muted-foreground" />}>
+          <div className="flex flex-col gap-4 mb-6">
+            <label className="text-sm font-bold text-foreground">Daftar Kendaraan</label>
+            <div className="flex items-end gap-2">
+              <div className="flex-1">
+                <InputSelect
+                  value={selectedVehicleToAdd}
+                  onChange={setSelectedVehicleToAdd}
+                  placeholder="Pilih Kendaraan..."
+                  options={vehicles
+                    .filter(v => (v.status === 'READY' || v.status === 'RESERVED') && !formData.vehicleIds.includes(v.vehicleId))
+                    .map(v => ({ value: v.vehicleId, label: `${v.coreVehicle.plateNumber} - ${v.coreVehicle.brand} ${v.coreVehicle.vehicleName}` }))}
+                />
+              </div>
+              <Button type="button" onClick={handleAddVehicle} disabled={!selectedVehicleToAdd} variant="secondary">
+                <Plus className="w-4 h-4 mr-1" /> Tambah
+              </Button>
+            </div>
+            {errors.vehicleIds && <p className="text-xs text-danger">{errors.vehicleIds}</p>}
+
+            {selectedVehicles.length > 0 ? (
+              <div className="border border-border/40 rounded-lg overflow-hidden mt-2">
+                <table className="w-full text-sm text-left">
+                  <thead className="bg-neutral-50 dark:bg-neutral-900 border-b border-border/40 text-xs text-muted-foreground">
+                    <tr>
+                      <th className="px-4 py-2 font-medium">Kendaraan</th>
+                      <th className="px-4 py-2 font-medium">Tarif</th>
+                      <th className="px-4 py-2 font-medium text-right">Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border/40">
+                    {selectedVehicles.map(v => {
+                       let rate = v.dailyRate;
+                       if (formData.rateType === 'WEEKLY') rate = v.weeklyRate || (v.dailyRate * 7);
+                       if (formData.rateType === 'MONTHLY') rate = v.monthlyRate || (v.dailyRate * 30);
+                       
+                       return (
+                        <tr key={v.vehicleId} className="hover:bg-neutral-50/50 dark:hover:bg-neutral-900/50">
+                          <td className="px-4 py-2">
+                            <p className="font-semibold">{v.coreVehicle.plateNumber}</p>
+                            <p className="text-[11px] text-muted-foreground">{v.coreVehicle.brand} {v.coreVehicle.vehicleName}</p>
+                          </td>
+                          <td className="px-4 py-2 font-medium">
+                            {formatCurrency(rate)}
+                          </td>
+                          <td className="px-4 py-2 text-right">
+                            <Button type="button" variant="ghost" size="icon" onClick={() => handleRemoveVehicle(v.vehicleId)} className="h-8 w-8 text-danger hover:text-danger hover:bg-danger/10">
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="p-4 border border-dashed border-border/60 rounded-lg text-center text-sm text-muted-foreground mt-2">
+                Belum ada kendaraan yang ditambahkan.
+              </div>
+            )}
+          </div>
+
+          <div className="grid grid-cols-3 gap-4 mb-4 pt-4 border-t border-border/30">
             <div>
               <InputSelect
                 label={t.fieldUsedRate}
@@ -268,7 +324,7 @@ export function ReservationForm({
             <div>
               <InputString
                 label={t.fieldDuration}
-                value={`${formData.duration} hari`}
+                value={`${formData.duration} ${formData.rateType === 'WEEKLY' ? 'minggu' : formData.rateType === 'MONTHLY' ? 'bulan' : 'hari'}`}
                 onChange={() => { }}
                 disabled
               />
@@ -354,7 +410,7 @@ export function ReservationForm({
             </div>
             <div className="grid grid-cols-[100px_1fr] gap-2">
               <span className="text-sm text-muted-foreground">Kendaraan</span>
-              <span className="text-sm font-semibold">{selectedVehicle ? `${selectedVehicle.coreVehicle.plateNumber} - ${selectedVehicle.coreVehicle.brand} ${selectedVehicle.coreVehicle.vehicleName}` : '-'}</span>
+              <span className="text-sm font-semibold">{selectedVehicles.length > 0 ? `${selectedVehicles.length} unit` : '-'}</span>
             </div>
             <div className="grid grid-cols-[100px_1fr] gap-2">
               <span className="text-sm text-muted-foreground">Periode</span>

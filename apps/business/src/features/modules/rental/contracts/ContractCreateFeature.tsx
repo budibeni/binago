@@ -8,7 +8,7 @@ import { ChevronLeft } from 'lucide-react';
 
 import { ContractForm } from './components/ContractForm';
 import { contractService } from '@/data/modules/rental/services/contractService';
-import type { Reservation } from '@/features/modules/rental/reservations/types/reservation';
+import type { Booking } from '@/features/modules/rental/bookings/types/booking';
 import type { RentalContract } from './types/contract';
 
 interface ContractCreateFeatureProps {
@@ -23,23 +23,23 @@ export function ContractCreateFeature({ open, onOpenChange, onSuccess }: Contrac
   const t = getTranslation(locale);
   const labels = (t as any).rentalContractFeature || {};
 
-  const [availableReservations, setAvailableReservations] = React.useState<Reservation[]>([]);
+  const [availableBookings, setAvailableBookings] = React.useState<Booking[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   React.useEffect(() => {
-    const fetchReservations = async () => {
+    const fetchBookings = async () => {
       try {
-        const data = await contractService.getAvailableReservationsForContract();
-        setAvailableReservations(data);
+        const data = await contractService.getAvailableBookingsForContract();
+        setAvailableBookings(data);
       } catch (error) {
-        console.error('Failed to load reservations for contract', error);
+        console.error('Failed to load bookings for contract', error);
       } finally {
         setLoading(false);
       }
     };
     if (open) {
-      fetchReservations();
+      fetchBookings();
     }
   }, [open]);
 
@@ -62,7 +62,7 @@ export function ContractCreateFeature({ open, onOpenChange, onSuccess }: Contrac
 
   return (
     <ContractForm
-      availableReservations={availableReservations}
+      availableBookings={availableBookings}
       labels={labels}
       onSubmit={handleSubmit}
       onCancel={handleCancel}

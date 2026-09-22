@@ -4,12 +4,12 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Calendar, Clock, CheckCircle2, Car, XCircle, List, MapPin, ChevronRight, Eye, EyeOff } from 'lucide-react';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
-import { reservationService } from '@/data/modules/rental/services/reservationService';
-import type { Reservation, ReservationStatusFilter } from './types/reservation';
-import { ReservationList } from './components/ReservationList';
-import { ReservationView } from './components/ReservationView';
-import { ReservationCreateFeature } from './ReservationCreateFeature';
-import { getReservationTranslation } from './i18n';
+import { bookingService } from '@/data/modules/rental/services/bookingService';
+import type { Booking, BookingStatusFilter } from './types/booking';
+import { BookingList } from './components/BookingList';
+import { BookingView } from './components/BookingView';
+import { BookingCreateFeature } from './BookingCreateFeature';
+import { getBookingTranslation } from './i18n';
 import { cn } from '@adatrack/utils';
 import { trackingNavigationService } from '@/features/core/tracking/services/trackingNavigationService';
 import type { DataTableFilterConfig } from '@adatrack/ui';
@@ -24,66 +24,66 @@ function StatCard({ label, value, colorClass }: { label: string, value: number, 
   );
 }
 
-export function ReservationsFeature() {
+export function BookingsFeature() {
   const router = useRouter();
   const locale = useBusinessLocale();
-  const t = getReservationTranslation(locale);
+  const t = getBookingTranslation(locale);
   const labels = t;
 
-  const [reservations, setReservations] = useState<Reservation[]>([]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Filters
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState<ReservationStatusFilter>('all');
+  const [statusFilter, setStatusFilter] = useState<BookingStatusFilter>('all');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [showStats, setShowStats] = useState(true);
 
   // Modals
-  const [detailReservation, setDetailReservation] = useState<Reservation | null>(null);
+  const [detailBooking, setDetailBooking] = useState<Booking | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   useEffect(() => {
     let mounted = true;
-    const fetchReservations = async () => {
+    const fetchBookings = async () => {
       try {
         setLoading(true);
-        const data = await reservationService.getReservations();
-        if (mounted) setReservations(data);
+        const data = await bookingService.getBookings();
+        if (mounted) setBookings(data);
       } catch (error) {
-        console.error('Failed to load reservations:', error);
+        console.error('Failed to load bookings:', error);
       } finally {
         if (mounted) setLoading(false);
       }
     };
-    fetchReservations();
+    fetchBookings();
     return () => { mounted = false; };
   }, []);
 
   const stats = useMemo(() => ({
-    all:       reservations.length,
-    pending:   reservations.filter(r => r.status === 'PENDING').length,
-    confirmed: reservations.filter(r => r.status === 'CONFIRMED').length,
-    active:    reservations.filter(r => r.status === 'ACTIVE').length,
-    completed: reservations.filter(r => r.status === 'COMPLETED').length,
-    cancelled: reservations.filter(r => r.status === 'CANCELLED').length,
-  }), [reservations]);
+    all:       bookings.length,
+    pending:   bookings.filter(r => r.status === 'PENDING').length,
+    confirmed: bookings.filter(r => r.status === 'CONFIRMED').length,
+    active:    bookings.filter(r => r.status === 'ACTIVE').length,
+    completed: bookings.filter(r => r.status === 'COMPLETED').length,
+    cancelled: bookings.filter(r => r.status === 'CANCELLED').length,
+  }), [bookings]);
 
   const filteredData = useMemo(() => {
-    return reservations.filter(r => {
+    return bookings.filter(r => {
       if (statusFilter !== 'all' && r.status !== statusFilter) return false;
       if (search) {
         const q = search.toLowerCase();
-        const noMatch   = r.reservationNumber.toLowerCase().includes(q);
+        const noMatch   = r.bookingNumber.toLowerCase().includes(q);
         const nameMatch = r.customer?.name?.toLowerCase().includes(q);
-        const plateMatch = r.vehicle?.coreVehicle?.plateNumber?.toLowerCase().includes(q);
+        const plateMatch = r.items?.some(item => item.vehicle?.coreVehicle?.plateNumber?.toLowerCase().includes(q));
         if (!noMatch && !nameMatch && !plateMatch) return false;
       }
       return true;
     });
-  }, [reservations, statusFilter, search]);
+  }, [bookings, statusFilter, search]);
 
   const handleOpenMapSingle = (vehicleId: string) => {
     trackingNavigationService.navigateToTracking(router, {
@@ -92,28 +92,28 @@ export function ReservationsFeature() {
     });
   };
 
-  const handleView = (reservation: Reservation) => {
-    setDetailReservation(reservation);
+  const handleView = (booking: Booking) => {
+    setDetailBooking(booking);
     setDrawerOpen(true);
   };
 
-  const handleEdit = (reservation: Reservation) => {
-    console.log('Edit', reservation.id);
+  const handleEdit = (booking: Booking) => {
+    console.log('Edit', booking.id);
   };
 
-  const handleDelete = (reservation: Reservation) => {
-    console.log('Delete', reservation.id);
+  const handleDelete = (booking: Booking) => {
+    console.log('Delete', booking.id);
   };
 
-  const handleConfirm = async (reservation: Reservation) => {
+  const handleConfirm = async (booking: Booking) => {
     try {
-      await reservationService.updateReservationStatus(reservation.id, 'CONFIRMED');
-      const data = await reservationService.getReservations();
-      setReservations(data);
-      if (detailReservation?.id === reservation.id) {
-        setDetailReservation({ ...reservation, status: 'CONFIRMED' });
+      await bookingService.updateBookingStatus(booking.id, 'CONFIRMED');
+      const data = await bookingService.getBookings();
+      setBookings(data);
+      if (detailBooking?.id === booking.id) {
+        setDetailBooking({ ...booking, status: 'CONFIRMED' });
       }
-      alert('Reservasi berhasil dikonfirmasi');
+      alert('Booking berhasil dikonfirmasi');
     } catch (error) {
       alert(error instanceof Error ? error.message : 'Gagal mengonfirmasi reservasi');
     }
@@ -141,7 +141,7 @@ export function ReservationsFeature() {
 
   const filterConfig: DataTableFilterConfig = useMemo(() => ({
     state: { status: statusFilter === 'all' ? '' : statusFilter },
-    onStateChange: (state) => setStatusFilter((state.status as ReservationStatusFilter) || 'all'),
+    onStateChange: (state) => setStatusFilter((state.status as BookingStatusFilter) || 'all'),
     onClearAll: () => setStatusFilter('all'),
     labels: {
       title: 'Filter',
@@ -171,7 +171,7 @@ export function ReservationsFeature() {
         {showStats && (
           <div className="w-full px-4 pt-4 md:px-6 md:pt-6 bg-background animate-in slide-in-from-top-2 fade-in duration-200">
             <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
-              <StatCard label={labels.summaryTotal || 'Total Reservasi'} value={stats.all} colorClass="bg-foreground" />
+              <StatCard label={labels.summaryTotal || 'Total Booking'} value={stats.all} colorClass="bg-foreground" />
               <StatCard label={labels.statusPending || 'Menunggu'} value={stats.pending} colorClass="bg-amber-500" />
               <StatCard label={labels.statusConfirmed || 'Dikonfirmasi'} value={stats.confirmed} colorClass="bg-blue-500" />
               <StatCard label={labels.statusActive || 'Aktif'} value={stats.active} colorClass="bg-success" />
@@ -183,7 +183,7 @@ export function ReservationsFeature() {
 
         {/* Main Table */}
         <div className="flex-1 min-h-0 w-full relative">
-          <ReservationList
+          <BookingList
             data={filteredData}
             labels={labels}
             searchValue={search}
@@ -205,8 +205,8 @@ export function ReservationsFeature() {
 
       </div>
 
-      <ReservationView
-        reservation={detailReservation}
+      <BookingView
+        booking={detailBooking}
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         labels={labels}
@@ -215,13 +215,13 @@ export function ReservationsFeature() {
         onConfirm={handleConfirm}
       />
 
-      <ReservationCreateFeature
+      <BookingCreateFeature
         open={isCreateOpen}
         onOpenChange={setIsCreateOpen}
         onSuccess={async () => {
           setIsCreateOpen(false);
-          const newData = await reservationService.getReservations();
-          setReservations(newData);
+          const newData = await bookingService.getBookings();
+          setBookings(newData);
         }}
       />
     </div>

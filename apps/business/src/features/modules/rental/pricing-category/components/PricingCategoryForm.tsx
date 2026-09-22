@@ -3,7 +3,7 @@
 import React from 'react';
 import { FormShell, FormCard, InputString, InputNumber, InputSelect, InputTextarea } from '@adatrack/ui';
 import { Layers, Banknote } from 'lucide-react';
-import type { RateType } from '../../reservations/types/reservation';
+import type { RateType } from '../../bookings/types/booking';
 import type { RentalPricingCategory, PricingCategoryStatus } from '../types/pricing';
 
 export interface PricingCategoryFormData {

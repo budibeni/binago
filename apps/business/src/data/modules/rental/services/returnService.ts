@@ -17,12 +17,12 @@ const populateRelations = async (ret: RentalReturn): Promise<RentalReturn> => {
     const customer = customerRepository.getById(ret.customerId);
     if (customer) result.customer = customer;
 
-    const enrichedVehicle = rentalVehicleService.getRentalVehicleByVehicleId(ret.vehicleId);
+    const enrichedVehicle = await rentalVehicleService.getRentalVehicleByVehicleId(ret.vehicleId);
     if (enrichedVehicle) {
       result.vehicle = enrichedVehicle;
     }
 
-    const handover = await handoverRepository.getHandoverByContractId(ret.contractId);
+    const handover = await handoverRepository.getHandoverByBookingItemId(ret.contractId, ret.bookingItemId);
     if (handover) result.handover = handover;
   } catch (error) {
     console.error('Error populating relations for return', error);
@@ -43,23 +43,32 @@ export const returnService = {
     return populateRelations(ret);
   },
 
-  getReturnByContractId: async (contractId: string): Promise<RentalReturn | undefined> => {
-    const ret = await returnRepository.getReturnByContractId(contractId);
+  getReturnByBookingItemId: async (contractId: string, bookingItemId: string): Promise<RentalReturn | undefined> => {
+    const ret = await returnRepository.getReturnByBookingItemId(contractId, bookingItemId);
     if (!ret) return undefined;
     return populateRelations(ret);
   },
 
-  /** Returns Contract ACTIVE that have a Handover but no Return yet */
+  /** Returns Contract ACTIVE/COMPLETED that have a Handover but no Return yet */
   getEligibleContracts: async (): Promise<RentalContract[]> => {
     const allContracts = await contractService.getContracts();
-    const activeContracts = allContracts.filter(c => c.status === 'ACTIVE');
+    const activeContracts = allContracts.filter(c => c.status === 'ACTIVE' || c.status === 'COMPLETED');
 
     const eligible: RentalContract[] = [];
     for (const contract of activeContracts) {
-      const handover = await handoverRepository.getHandoverByContractId(contract.id);
-      if (!handover) continue; // Must have handover
-      const existing = await returnRepository.getReturnByContractId(contract.id);
-      if (!existing) eligible.push(contract);
+      if (!contract.booking) continue;
+      
+      let hasPendingItems = false;
+      for (const item of contract.booking.items) {
+        const handover = await handoverRepository.getHandoverByBookingItemId(contract.id, item.id);
+        if (!handover) continue; // Must have handover
+        const existingReturn = await returnRepository.getReturnByBookingItemId(contract.id, item.id);
+        if (!existingReturn) {
+          hasPendingItems = true;
+          break;
+        }
+      }
+      if (hasPendingItems) eligible.push(contract);
     }
     return eligible;
   },
@@ -71,18 +80,18 @@ export const returnService = {
     const contract = await contractService.getContractById(data.contractId);
     if (!contract) throw new Error('Kontrak tidak ditemukan.');
 
-    // 2. Contract must be ACTIVE
-    if (contract.status !== 'ACTIVE') {
+    // 2. Contract must be ACTIVE or COMPLETED
+    if (contract.status !== 'ACTIVE' && contract.status !== 'COMPLETED') {
       throw new Error('Kontrak ini belum dapat diproses untuk pengembalian.');
     }
 
-    // 3. Contract must have Handover
-    const handover = await handoverRepository.getHandoverByContractId(data.contractId);
-    if (!handover) throw new Error('Kontrak ini belum memiliki data serah terima.');
+    // 3. Contract item must have Handover
+    const handover = await handoverRepository.getHandoverByBookingItemId(data.contractId, data.bookingItemId);
+    if (!handover) throw new Error('Kendaraan ini belum memiliki data serah terima.');
 
     // 4. No duplicate Return
-    const existing = await returnRepository.getReturnByContractId(data.contractId);
-    if (existing) throw new Error('Kontrak ini sudah memiliki data pengembalian.');
+    const existing = await returnRepository.getReturnByBookingItemId(data.contractId, data.bookingItemId);
+    if (existing) throw new Error('Kendaraan ini sudah dikembalikan.');
 
     // 5. Odometer validation
     if (data.odometerEnd < handover.odometerStart) {
@@ -92,8 +101,23 @@ export const returnService = {
     // 6. Create Return record
     const newReturn = await returnRepository.createReturn(data);
 
-    // 7. Contract ACTIVE → COMPLETED
-    await contractService.updateContractStatus(data.contractId, 'COMPLETED');
+    // 7. Check if all items are returned, if so mark contract as COMPLETED
+    let allReturned = true;
+    for (const item of contract.booking?.items || []) {
+      const hndv = await handoverRepository.getHandoverByBookingItemId(contract.id, item.id);
+      if (hndv) {
+        const ret = await returnRepository.getReturnByBookingItemId(contract.id, item.id);
+        // Compare with newReturn ID as it might not be indexed perfectly depending on execution
+        if (!ret && item.id !== data.bookingItemId) {
+          allReturned = false;
+          break;
+        }
+      }
+    }
+
+    if (allReturned && contract.status === 'ACTIVE') {
+      await contractService.updateContractStatus(data.contractId, 'COMPLETED');
+    }
 
     // 8. Rental Vehicle RENTED → READY
     const vehicleProfile = rentalVehicleRepository.getByVehicleId(data.vehicleId);

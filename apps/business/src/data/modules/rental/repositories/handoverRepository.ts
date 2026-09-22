@@ -16,6 +16,10 @@ class HandoverRepository {
     return this.handovers.find(h => h.contractId === contractId);
   }
 
+  async getHandoverByBookingItemId(contractId: string, bookingItemId: string): Promise<RentalHandover | undefined> {
+    return this.handovers.find(h => h.contractId === contractId && h.bookingItemId === bookingItemId);
+  }
+
   async createHandover(data: Omit<RentalHandover, 'id' | 'createdAt' | 'updatedAt'>): Promise<RentalHandover> {
     const newHandover: RentalHandover = {
       ...data,

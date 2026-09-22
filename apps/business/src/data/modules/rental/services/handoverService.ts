@@ -19,7 +19,7 @@ const populateRelations = async (handover: RentalHandover): Promise<RentalHandov
       result.customer = customer;
     }
 
-    const enrichedVehicle = rentalVehicleService.getRentalVehicleByVehicleId(handover.vehicleId);
+    const enrichedVehicle = await rentalVehicleService.getRentalVehicleByVehicleId(handover.vehicleId);
     if (enrichedVehicle) {
       result.vehicle = enrichedVehicle;
     }
@@ -43,20 +43,30 @@ export const handoverService = {
     return populateRelations(handover);
   },
 
-  getHandoverByContractId: async (contractId: string): Promise<RentalHandover | undefined> => {
-    const handover = await handoverRepository.getHandoverByContractId(contractId);
+  getHandoverByBookingItemId: async (contractId: string, bookingItemId: string): Promise<RentalHandover | undefined> => {
+    const handover = await handoverRepository.getHandoverByBookingItemId(contractId, bookingItemId);
     if (!handover) return undefined;
     return populateRelations(handover);
   },
 
   getEligibleContracts: async (): Promise<RentalContract[]> => {
     const allContracts = await contractService.getContracts();
-    const confirmedContracts = allContracts.filter(c => c.status === 'CONFIRMED');
+    const confirmedContracts = allContracts.filter(c => c.status === 'CONFIRMED' || c.status === 'ACTIVE');
     
     const eligibleContracts: RentalContract[] = [];
     for (const contract of confirmedContracts) {
-      const existing = await handoverRepository.getHandoverByContractId(contract.id);
-      if (!existing) {
+      if (!contract.booking) continue;
+      
+      let hasPendingItems = false;
+      for (const item of contract.booking.items) {
+        const existing = await handoverRepository.getHandoverByBookingItemId(contract.id, item.id);
+        if (!existing) {
+          hasPendingItems = true;
+          break;
+        }
+      }
+      
+      if (hasPendingItems) {
         eligibleContracts.push(contract);
       }
     }
@@ -66,9 +76,9 @@ export const handoverService = {
 
   createHandover: async (data: Omit<RentalHandover, 'id' | 'createdAt' | 'updatedAt'>): Promise<RentalHandover> => {
     // 1. Cek duplikasi
-    const existing = await handoverRepository.getHandoverByContractId(data.contractId);
+    const existing = await handoverRepository.getHandoverByBookingItemId(data.contractId, data.bookingItemId);
     if (existing) {
-      throw new Error('Kontrak ini sudah memiliki serah terima yang aktif.');
+      throw new Error('Kendaraan ini sudah diserahterimakan.');
     }
 
     // 2. Load Contract & Validasi Status
@@ -76,8 +86,8 @@ export const handoverService = {
     if (!contract) {
       throw new Error('Kontrak tidak ditemukan.');
     }
-    if (contract.status !== 'CONFIRMED') {
-      throw new Error('Serah terima hanya dapat dilakukan pada kontrak berstatus CONFIRMED.');
+    if (contract.status !== 'CONFIRMED' && contract.status !== 'ACTIVE') {
+      throw new Error('Serah terima hanya dapat dilakukan pada kontrak berstatus CONFIRMED atau ACTIVE.');
     }
 
     // 3. Validasi Lokasi
@@ -91,7 +101,8 @@ export const handoverService = {
     }
 
     // Validation against previous odometer
-    const vehicle = contract.vehicle;
+    const item = contract.booking?.items.find(i => i.id === data.bookingItemId);
+    const vehicle = await rentalVehicleService.getRentalVehicleByVehicleId(data.vehicleId);
     if (vehicle && vehicle.currentOdometer > data.odometerStart) {
       throw new Error('Nilai odometer tidak boleh lebih kecil dari pembacaan sebelumnya.');
     }
@@ -99,8 +110,10 @@ export const handoverService = {
     // 5. Simpan Handover (Snapshot)
     const newHandover = await handoverRepository.createHandover(data);
 
-    // 6. Update Contract Status -> ACTIVE
-    await contractService.updateContractStatus(contract.id, 'ACTIVE');
+    // 6. Update Contract Status -> ACTIVE (jika masih CONFIRMED)
+    if (contract.status === 'CONFIRMED') {
+      await contractService.updateContractStatus(contract.id, 'ACTIVE');
+    }
 
     // 7. Update Rental Vehicle Status -> RENTED
     if (vehicle) {

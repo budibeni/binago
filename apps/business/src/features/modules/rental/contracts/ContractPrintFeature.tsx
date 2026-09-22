@@ -66,7 +66,7 @@ export function ContractPrintFeature({ contractId }: ContractPrintFeatureProps) 
     });
   };
 
-  const res = contract.reservation;
+  const res = contract.booking;
 
   return (
     <div className="min-h-screen bg-neutral-100 dark:bg-neutral-900 pb-12 print:bg-white print:pb-0">

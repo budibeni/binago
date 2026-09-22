@@ -1,8 +1,9 @@
 import React from 'react';
-import { Card, Button, Checkbox, FormShell, FormCard, InputString, InputNumber, InputTextarea, Label } from '@adatrack/ui';
+import { Card, Button, Checkbox, FormShell, FormCard, InputString, InputNumber, InputTextarea, Label, InputSelect } from '@adatrack/ui';
 import { MapPin, Car, Fuel, Wrench, CheckSquare, Clock } from 'lucide-react';
 import type { RentalContract } from '../../contracts/types/contract';
 import type { RentalHandover } from '../types/handover';
+import type { BookingItem } from '../../bookings/types/booking';
 
 interface HandoverFormProps {
   contract: RentalContract;
@@ -16,14 +17,24 @@ interface HandoverFormProps {
 }
 
 export function HandoverForm({ contract, labels, onSubmit, onCancel, isSubmitting, layout = 'default', open, onOpenChange }: HandoverFormProps) {
+  const [selectedItemId, setSelectedItemId] = React.useState<string>(contract.booking?.items?.[0]?.id || '');
+  
+  const selectedItem = React.useMemo(() => {
+    return contract.booking?.items?.find(i => i.id === selectedItemId);
+  }, [contract, selectedItemId]);
+
   const [latitude, setLatitude] = React.useState<number | null>(null);
   const [longitude, setLongitude] = React.useState<number | null>(null);
   const [address, setAddress] = React.useState('');
   
-  const defaultOdometer = contract.vehicle?.currentOdometer || 0;
-  const [odometer, setOdometer] = React.useState<number>(defaultOdometer);
+  const defaultOdometer = selectedItem?.vehicle?.currentOdometer || 0;
+  const [odometer, setOdometer] = React.useState<number>(0);
   const [odometerSource, setOdometerSource] = React.useState<'VEHICLE' | 'TRACKING' | 'MANUAL'>('VEHICLE');
   
+  React.useEffect(() => {
+    setOdometer(defaultOdometer);
+  }, [defaultOdometer]);
+
   const [fuelLevel, setFuelLevel] = React.useState<RentalHandover['fuelLevel']>('HALF');
   const [condition, setCondition] = React.useState<RentalHandover['vehicleCondition']>('GOOD');
   const [notes, setNotes] = React.useState('');
@@ -57,6 +68,10 @@ export function HandoverForm({ contract, labels, onSubmit, onCancel, isSubmittin
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!selectedItemId) {
+      alert('Silakan pilih kendaraan.');
+      return;
+    }
     if (!latitude || !longitude) {
       alert(labels.errorLocationRequired || 'Lokasi serah terima wajib diambil.');
       return;
@@ -68,8 +83,9 @@ export function HandoverForm({ contract, labels, onSubmit, onCancel, isSubmittin
     
     onSubmit({
       contractId: contract.id,
+      bookingItemId: selectedItemId,
       customerId: contract.customerId,
-      vehicleId: contract.vehicleId,
+      vehicleId: selectedItem!.vehicleId,
       handoverAt: new Date().toISOString(),
       handoverLatitude: latitude,
       handoverLongitude: longitude,
@@ -95,12 +111,12 @@ export function HandoverForm({ contract, labels, onSubmit, onCancel, isSubmittin
         cancelProps={{ disabled: isSubmitting }}
         cancelText={labels.btnCancel}
         saveText={isSubmitting ? 'Menyimpan...' : labels.btnSave}
-        saveProps={{ disabled: isSubmitting }}
+        saveProps={{ disabled: isSubmitting || !selectedItemId }}
         isSubmitting={isSubmitting}
       >
         <div className="space-y-6">
       
-      {/* Contract & Vehicle Info */}
+      {/* Contract Info */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <FormCard title={labels.sectionContract}>
             <div className="grid grid-cols-2 gap-4">
@@ -115,17 +131,18 @@ export function HandoverForm({ contract, labels, onSubmit, onCancel, isSubmittin
             </div>
         </FormCard>
 
-        <FormCard title={labels.sectionVehicleInfo}>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-[11px] font-semibold text-muted-foreground uppercase mb-1">Plat Nomor</p>
-                <p className="text-sm font-bold">{contract.vehicle?.coreVehicle?.plateNumber}</p>
-              </div>
-              <div>
-                <p className="text-[11px] font-semibold text-muted-foreground uppercase mb-1">Kendaraan</p>
-                <p className="text-sm font-bold">{contract.vehicle?.coreVehicle?.brand} {contract.vehicle?.coreVehicle?.vehicleName}</p>
-              </div>
-            </div>
+        <FormCard title="Pilih Kendaraan">
+          <InputSelect
+            label="Kendaraan"
+            value={selectedItemId}
+            onChange={setSelectedItemId}
+            options={(contract.booking?.items || []).map(item => ({
+              value: item.id,
+              label: `${item.vehicle?.coreVehicle?.plateNumber} - ${item.vehicle?.coreVehicle?.brand} ${item.vehicle?.coreVehicle?.vehicleName}`
+            }))}
+            placeholder="Pilih kendaraan yang diserahterimakan"
+            required
+          />
         </FormCard>
       </div>
 

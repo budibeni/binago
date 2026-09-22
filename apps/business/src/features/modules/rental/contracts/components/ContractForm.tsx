@@ -3,13 +3,13 @@
 import React from 'react';
 import { Button, Checkbox, FormShell, FormCard, InputDateTime, InputTextarea, InputSelect } from '@adatrack/ui';
 import { Search, User, Car, Calendar, DollarSign, Info } from 'lucide-react';
-import type { Reservation } from '@/features/modules/rental/reservations/types/reservation';
+import type { Booking } from '@/features/modules/rental/bookings/types/booking';
 import type { RentalContract } from '../types/contract';
-import { ReservationSelectModal } from './ReservationSelectModal';
+import { BookingSelectModal } from './BookingSelectModal';
 
 interface ContractFormProps {
   contract?: RentalContract; // If present, it's Edit Mode
-  availableReservations?: Reservation[]; // Required for Create Mode
+  availableBookings?: Booking[]; // Required for Create Mode
   labels: Record<string, string>;
   onSubmit: (data: Partial<RentalContract>) => Promise<void>;
   onCancel: () => void;
@@ -21,7 +21,7 @@ interface ContractFormProps {
 
 export function ContractForm({
   contract,
-  availableReservations = [],
+  availableBookings = [],
   labels,
   onSubmit,
   onCancel,
@@ -34,7 +34,7 @@ export function ContractForm({
 
   // Create Mode state
   const [modalOpen, setModalOpen] = React.useState(false);
-  const [selectedRes, setSelectedRes] = React.useState<Reservation | null>(null);
+  const [selectedRes, setSelectedRes] = React.useState<Booking | null>(null);
   
   // Shared Form State
   const [contractDate, setContractDate] = React.useState<string>(contract?.contractDate?.slice(0, 16) || new Date().toISOString().slice(0, 16));
@@ -68,19 +68,13 @@ export function ContractForm({
       if (!agreed) return;
 
       await onSubmit({
-        reservationId: selectedRes.id,
+        bookingId: selectedRes.id,
         customerId: selectedRes.customerId,
-        vehicleId: selectedRes.vehicleId,
         contractDate: new Date(contractDate).toISOString(),
         
-        // Snapshot fields from reservation
-        startDate: selectedRes.startDate,
-        endDate: selectedRes.endDate,
-        duration: selectedRes.duration,
+        // Snapshot fields from booking
         rentalType: selectedRes.rentalType,
         rateType: selectedRes.rateType,
-        rate: selectedRes.rateType === 'DAILY' ? selectedRes.dailyRate : selectedRes.rateType === 'WEEKLY' ? selectedRes.weeklyRate : selectedRes.monthlyRate,
-        subtotal: selectedRes.totalAmount,
         totalAmount: selectedRes.totalAmount,
         deposit: selectedRes.deposit,
         remainingAmount: selectedRes.remainingAmount,
@@ -92,19 +86,17 @@ export function ContractForm({
   };
 
   // Derive display values based on mode
-  const displayRes = isEditing ? contract?.reservation : selectedRes;
+  const displayRes = isEditing ? contract?.booking : selectedRes;
   const displayCustomer = isEditing ? contract?.customer : selectedRes?.customer;
-  const displayVehicle = isEditing ? contract?.vehicle : selectedRes?.vehicle;
   
-  const displayDuration = isEditing ? contract?.duration : selectedRes?.duration;
+  const displayDuration = displayRes?.duration;
   const displayRentalType = isEditing ? contract?.rentalType : selectedRes?.rentalType;
   const displayRateType = isEditing ? contract?.rateType : selectedRes?.rateType;
-  const displayRate = isEditing ? contract?.rate : (selectedRes?.rateType === 'DAILY' ? selectedRes.dailyRate : selectedRes?.rateType === 'WEEKLY' ? selectedRes.weeklyRate : selectedRes?.monthlyRate);
   const displayTotal = isEditing ? contract?.totalAmount : selectedRes?.totalAmount;
   const displayDeposit = isEditing ? contract?.deposit : selectedRes?.deposit;
   const displayRemaining = isEditing ? (contract!.totalAmount - contract!.deposit) : selectedRes?.remainingAmount;
-  const displayStartDate = isEditing ? contract?.startDate : selectedRes?.startDate;
-  const displayEndDate = isEditing ? contract?.endDate : selectedRes?.endDate;
+  const displayStartDate = displayRes?.startDate;
+  const displayEndDate = displayRes?.endDate;
 
   if (!isEditing && !selectedRes) {
     return (
@@ -121,23 +113,23 @@ export function ContractForm({
       >
         <div className="max-w-2xl mx-auto flex flex-col gap-6 p-4 lg:p-6">
           <FormCard 
-            title="Pilih Reservasi" 
+            title="Pilih Booking" 
             description="Pilih reservasi yang sudah dikonfirmasi untuk dibuatkan kontrak rental."
             icon={<Search className="w-5 h-5 text-muted-foreground" />}
           >
             <div className="flex items-center gap-3">
               <div className="flex-1">
                 <InputSelect
-                  label="Cari Reservasi"
+                  label="Cari Booking"
                   value=""
                   onChange={(val) => {
-                    const res = availableReservations.find(r => r.id === val);
+                    const res = availableBookings.find(r => r.id === val);
                     if (res) setSelectedRes(res);
                   }}
                   placeholder="Pilih reservasi..."
-                  options={availableReservations.map(r => ({
+                  options={availableBookings.map(r => ({
                     value: r.id,
-                    label: `${r.reservationNumber} - ${r.customer?.name} (${r.vehicle?.coreVehicle?.plateNumber})`
+                    label: `${r.bookingNumber} - ${r.customer?.name} (${r.items?.length || 0} Kendaraan)`
                   }))}
                 />
               </div>
@@ -167,7 +159,7 @@ export function ContractForm({
         
         {!isEditing ? (
               <FormCard 
-                title="Pilih Reservasi" 
+                title="Pilih Booking" 
                 description="Pilih reservasi yang sudah dikonfirmasi untuk dibuatkan kontrak rental."
                 action={
                   <Button 
@@ -177,7 +169,7 @@ export function ContractForm({
                     className="bg-neutral-50 hover:bg-neutral-100"
                   >
                     <Search className="w-4 h-4 mr-2" />
-                    {selectedRes ? 'Ganti Reservasi' : 'Cari Reservasi'}
+                    {selectedRes ? 'Ganti Booking' : 'Cari Booking'}
                   </Button>
                 }
               >
@@ -185,8 +177,8 @@ export function ContractForm({
                   <div className="mt-6 border border-border rounded-lg p-4 bg-neutral-50/50 dark:bg-neutral-900/30">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                       <div>
-                        <p className="text-xs font-semibold text-muted-foreground uppercase mb-1">No. Reservasi</p>
-                        <p className="font-bold text-primary">{selectedRes.reservationNumber}</p>
+                        <p className="text-xs font-semibold text-muted-foreground uppercase mb-1">No. Booking</p>
+                        <p className="font-bold text-primary">{selectedRes.bookingNumber}</p>
                       </div>
                       <div>
                         <p className="text-xs font-semibold text-muted-foreground uppercase mb-1">Pelanggan</p>
@@ -195,8 +187,7 @@ export function ContractForm({
                       </div>
                       <div>
                         <p className="text-xs font-semibold text-muted-foreground uppercase mb-1">Kendaraan</p>
-                        <p className="font-semibold">{selectedRes.vehicle?.coreVehicle?.plateNumber}</p>
-                        <p className="text-xs text-muted-foreground">{selectedRes.vehicle?.coreVehicle?.brand} {selectedRes.vehicle?.coreVehicle?.vehicleName}</p>
+                        <p className="font-semibold">{selectedRes.items?.length || 0} Kendaraan</p>
                       </div>
                       <div>
                         <p className="text-xs font-semibold text-muted-foreground uppercase mb-1">Periode</p>
@@ -210,13 +201,13 @@ export function ContractForm({
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormCard
-                  title="Informasi Reservasi"
+                  title="Informasi Booking"
                   icon={<Info className="w-5 h-5 text-primary" />}
                 >
                   <div className="space-y-4">
                     <div>
-                      <p className="text-xs text-muted-foreground font-semibold mb-1">No. Reservasi</p>
-                      <p className="text-sm font-medium">{displayRes?.reservationNumber || '-'}</p>
+                      <p className="text-xs text-muted-foreground font-semibold mb-1">No. Booking</p>
+                      <p className="text-sm font-medium">{displayRes?.bookingNumber || '-'}</p>
                     </div>
                     
                     <div className="bg-neutral-50 dark:bg-neutral-900 rounded-lg p-3 border border-border">
@@ -234,29 +225,24 @@ export function ContractForm({
                 </FormCard>
 
                 <FormCard
-                  title="Kendaraan"
+                  title="Daftar Kendaraan"
                   icon={<Car className="w-5 h-5 text-primary" />}
                 >
-                  <div className="flex gap-4 items-start">
-                    <div className="w-24 h-24 bg-neutral-100 dark:bg-neutral-800 rounded-lg border border-border shrink-0 flex items-center justify-center">
-                      <Car className="w-8 h-8 text-neutral-400" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-bold text-lg text-primary truncate">{displayVehicle?.coreVehicle?.plateNumber}</h4>
-                      <p className="text-sm text-muted-foreground font-medium mb-2 truncate">
-                        {displayVehicle?.coreVehicle?.brand} {displayVehicle?.coreVehicle?.vehicleName} ({displayVehicle?.coreVehicle?.year})
-                      </p>
-                      <div className="grid grid-cols-2 gap-2 mt-3">
-                        <div className="bg-neutral-50 dark:bg-neutral-900 px-2 py-1.5 rounded border border-border">
-                          <p className="text-[10px] text-muted-foreground uppercase font-bold">Warna</p>
-                          <p className="text-xs font-semibold">{(displayVehicle?.coreVehicle as any)?.color || '-'}</p>
+                  <div className="space-y-3">
+                    {displayRes?.items?.map((item) => (
+                      <div key={item.id} className="flex gap-4 items-start pb-3 border-b border-border/40 last:border-0 last:pb-0">
+                        <div className="w-16 h-16 bg-neutral-100 dark:bg-neutral-800 rounded-lg border border-border shrink-0 flex items-center justify-center">
+                          <Car className="w-6 h-6 text-neutral-400" />
                         </div>
-                        <div className="bg-neutral-50 dark:bg-neutral-900 px-2 py-1.5 rounded border border-border">
-                          <p className="text-[10px] text-muted-foreground uppercase font-bold">KM Saat Ini</p>
-                          <p className="text-xs font-semibold">{displayVehicle?.currentOdometer?.toLocaleString('id-ID')} KM</p>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-bold text-sm text-primary truncate">{item.vehicle?.coreVehicle?.plateNumber}</h4>
+                          <p className="text-xs text-muted-foreground font-medium mb-1 truncate">
+                            {item.vehicle?.coreVehicle?.brand} {item.vehicle?.coreVehicle?.vehicleName}
+                          </p>
+                          <p className="text-xs font-semibold">{formatCurrency(item.subtotal)}</p>
                         </div>
                       </div>
-                    </div>
+                    ))}
                   </div>
                 </FormCard>
               </div>
@@ -271,7 +257,7 @@ export function ContractForm({
                       <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">Data Terkunci (Snapshot)</p>
                       <p className="text-xs text-amber-700/80 dark:text-amber-400/80 mt-1">
                         Data periode, tarif, dan total tagihan disalin dari reservasi dan tidak dapat diubah pada tahap pembuatan kontrak. 
-                        Jika ada perubahan, harap sesuaikan di menu Reservasi terlebih dahulu.
+                        Jika ada perubahan, harap sesuaikan di menu Booking terlebih dahulu.
                       </p>
                     </div>
                   </div>
@@ -310,8 +296,8 @@ export function ContractForm({
                             <p className="text-sm font-medium">{displayRateType}</p>
                           </div>
                           <div>
-                            <p className="text-[11px] text-muted-foreground font-semibold">Tarif Digunakan</p>
-                            <p className="text-sm font-medium">{formatCurrency(displayRate || 0)}</p>
+                            <p className="text-[11px] text-muted-foreground font-semibold">Jumlah Kendaraan</p>
+                            <p className="text-sm font-medium">{displayRes?.items?.length || 0} Unit</p>
                           </div>
                         </div>
 
@@ -407,10 +393,10 @@ export function ContractForm({
       </FormShell>
 
       {!isEditing && (
-        <ReservationSelectModal
+        <BookingSelectModal
           open={modalOpen}
           onClose={() => setModalOpen(false)}
-          reservations={availableReservations || []}
+          bookings={availableBookings || []}
           onSelect={setSelectedRes}
           labels={labels}
         />

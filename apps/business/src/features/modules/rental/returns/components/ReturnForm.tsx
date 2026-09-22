@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Button, Checkbox, Label, FormShell, FormCard, InputString, InputNumber, InputDecimal, InputDateTime, InputTextarea } from '@adatrack/ui';
+import { Button, Checkbox, Label, FormShell, FormCard, InputString, InputNumber, InputDecimal, InputTextarea, InputSelect } from '@adatrack/ui';
 import { MapPin, Car, Gauge, Fuel, CheckSquare, AlertTriangle, DollarSign, Clock } from 'lucide-react';
 import type { RentalContract } from '../../contracts/types/contract';
 import type { RentalHandover } from '../../handover/types/handover';
@@ -9,7 +9,7 @@ import type { RentalReturn } from '../types/return';
 
 interface ReturnFormProps {
   contract: RentalContract;
-  handover: RentalHandover;
+  handovers: RentalHandover[];
   onSubmit: (data: Omit<RentalReturn, 'id' | 'createdAt' | 'updatedAt'>) => void;
   onCancel: () => void;
   isSubmitting: boolean;
@@ -37,7 +37,17 @@ const getConditionLabel = (c: string) => {
 const formatDate = (d: string) =>
   new Date(d).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
 
-export function ReturnForm({ contract, handover, onSubmit, onCancel, isSubmitting, layout = 'default', open, onOpenChange }: ReturnFormProps) {
+export function ReturnForm({ contract, handovers, onSubmit, onCancel, isSubmitting, layout = 'default', open, onOpenChange }: ReturnFormProps) {
+  const [selectedHandoverId, setSelectedHandoverId] = React.useState<string>(handovers[0]?.id || '');
+
+  const handover = React.useMemo(() => {
+    return handovers.find(h => h.id === selectedHandoverId) || handovers[0];
+  }, [handovers, selectedHandoverId]);
+
+  const selectedItem = React.useMemo(() => {
+    return contract.booking?.items?.find(i => i.id === handover.bookingItemId);
+  }, [contract, handover]);
+
   const [returnedAt, setReturnedAt] = React.useState(
     new Date().toISOString().slice(0, 16)
   );
@@ -66,11 +76,16 @@ export function ReturnForm({ contract, handover, onSubmit, onCancel, isSubmittin
 
   const [notes, setNotes] = React.useState('');
 
+  React.useEffect(() => {
+    setOdometerEnd(handover.odometerStart);
+    setEquipmentEnd({ ...handover.equipmentChecklist });
+  }, [handover]);
+
   // Computed
   const distanceUsed = Math.max(0, odometerEnd - handover.odometerStart);
 
   const returnDateTime = new Date(returnedAt);
-  const endDate = new Date(contract.endDate);
+  const endDate = new Date(contract.booking?.endDate || contract.contractDate); // Fallback if missing
   const lateMs = returnDateTime.getTime() - endDate.getTime();
   const lateHours = lateMs > 0 ? Math.ceil(lateMs / (1000 * 60 * 60)) : 0;
 
@@ -117,8 +132,9 @@ export function ReturnForm({ contract, handover, onSubmit, onCancel, isSubmittin
 
     onSubmit({
       contractId: contract.id,
+      bookingItemId: handover.bookingItemId,
       customerId: contract.customerId,
-      vehicleId: contract.vehicleId,
+      vehicleId: selectedItem!.vehicleId,
       returnedAt: new Date(returnedAt).toISOString(),
       returnLatitude: latitude,
       returnLongitude: longitude,
@@ -137,7 +153,7 @@ export function ReturnForm({ contract, handover, onSubmit, onCancel, isSubmittin
     });
   };
 
-  const coreVehicle = contract.vehicle?.coreVehicle;
+  const coreVehicle = selectedItem?.vehicle?.coreVehicle;
 
   return (
     <form onSubmit={handleSubmit} className="w-full h-full relative">
@@ -154,7 +170,7 @@ export function ReturnForm({ contract, handover, onSubmit, onCancel, isSubmittin
         <div className="space-y-6">
 
       {/* SECTION 1: Contract Info */}
-      <FormCard title="Informasi Kontrak" icon={<Car className="w-5 h-5 text-primary" />}>
+      <FormCard title="Informasi Kontrak & Kendaraan" icon={<Car className="w-5 h-5 text-primary" />}>
         <div className="p-4 grid grid-cols-2 md:grid-cols-3 gap-4">
           <div>
             <p className="text-[10px] uppercase font-bold text-muted-foreground mb-1">No. Kontrak</p>
@@ -164,21 +180,20 @@ export function ReturnForm({ contract, handover, onSubmit, onCancel, isSubmittin
             <p className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Pelanggan</p>
             <p className="text-sm font-bold">{contract.customer?.name || '-'}</p>
           </div>
-          <div>
-            <p className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Kendaraan</p>
-            <p className="text-sm font-bold">{coreVehicle?.brand} {coreVehicle?.vehicleName}</p>
-          </div>
-          <div>
-            <p className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Plat Nomor</p>
-            <p className="text-sm font-bold">{coreVehicle?.plateNumber || '-'}</p>
-          </div>
-          <div>
-            <p className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Tanggal Mulai</p>
-            <p className="text-sm">{formatDate(contract.startDate)}</p>
-          </div>
-          <div>
-            <p className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Jatuh Tempo</p>
-            <p className="text-sm font-bold text-danger">{formatDate(contract.endDate)}</p>
+          <div className="col-span-2 md:col-span-3 mt-2">
+            <InputSelect
+              label="Pilih Kendaraan yang Dikembalikan"
+              value={selectedHandoverId}
+              onChange={setSelectedHandoverId}
+              options={handovers.map(h => {
+                const itm = contract.booking?.items?.find(i => i.id === h.bookingItemId);
+                return {
+                  value: h.id,
+                  label: itm ? `${itm.vehicle?.coreVehicle?.plateNumber} - ${itm.vehicle?.coreVehicle?.brand} ${itm.vehicle?.coreVehicle?.vehicleName}` : h.bookingItemId
+                };
+              })}
+              required
+            />
           </div>
         </div>
       </FormCard>

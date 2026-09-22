@@ -16,6 +16,10 @@ class ReturnRepository {
     return this.returns.find(r => r.contractId === contractId);
   }
 
+  async getReturnByBookingItemId(contractId: string, bookingItemId: string): Promise<RentalReturn | undefined> {
+    return this.returns.find(r => r.contractId === contractId && r.bookingItemId === bookingItemId);
+  }
+
   async createReturn(data: Omit<RentalReturn, 'id' | 'createdAt' | 'updatedAt'>): Promise<RentalReturn> {
     const now = new Date().toISOString();
     const newReturn: RentalReturn = {

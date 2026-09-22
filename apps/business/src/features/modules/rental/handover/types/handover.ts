@@ -7,6 +7,7 @@ export interface RentalHandover {
   id: string;
 
   contractId: string;
+  bookingItemId: string;
   customerId: string;
   vehicleId: string; // CORE Vehicle ID (e.g. 'veh-001')
 

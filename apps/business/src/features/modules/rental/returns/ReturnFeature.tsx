@@ -18,7 +18,7 @@ interface ReturnFeatureProps {
 
 export function ReturnFeature({ contractId, open, onOpenChange, onSuccess }: ReturnFeatureProps) {
   const [contract, setContract] = React.useState<RentalContract | null>(null);
-  const [handover, setHandover] = React.useState<RentalHandover | null>(null);
+  const [handovers, setHandovers] = React.useState<RentalHandover[]>([]);
   const [loading, setLoading] = React.useState(false);
   const [errorMsg, setErrorMsg] = React.useState('');
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -34,25 +34,27 @@ export function ReturnFeature({ contractId, open, onOpenChange, onSuccess }: Ret
           setErrorMsg('Kontrak tidak ditemukan.');
           return;
         }
-        if (data.status !== 'ACTIVE') {
-          setErrorMsg('Kontrak ini belum dapat diproses untuk pengembalian. Status kontrak harus ACTIVE.');
+        if (data.status !== 'ACTIVE' && data.status !== 'COMPLETED') {
+          setErrorMsg('Kontrak ini belum dapat diproses untuk pengembalian. Status kontrak harus ACTIVE atau COMPLETED.');
           return;
         }
 
-        const existingReturn = await returnService.getReturnByContractId(contractId);
-        if (existingReturn) {
-          setErrorMsg('Kontrak ini sudah memiliki data pengembalian.');
-          return;
+        const loadedHandovers: RentalHandover[] = [];
+        for (const item of data.booking?.items || []) {
+          const existingReturn = await returnService.getReturnByBookingItemId(contractId, item.id);
+          if (!existingReturn) {
+            const hnd = await handoverRepository.getHandoverByBookingItemId(contractId, item.id);
+            if (hnd) loadedHandovers.push(hnd);
+          }
         }
 
-        const hnd = await handoverRepository.getHandoverByContractId(contractId);
-        if (!hnd) {
-          setErrorMsg('Kontrak ini belum memiliki data serah terima.');
+        if (loadedHandovers.length === 0) {
+          setErrorMsg('Semua kendaraan di kontrak ini sudah dikembalikan atau belum diserahterimakan.');
           return;
         }
 
         setContract(data);
-        setHandover(hnd);
+        setHandovers(loadedHandovers);
       } catch (err: any) {
         setErrorMsg(err.message || 'Gagal memuat data kontrak.');
       } finally {
@@ -79,12 +81,12 @@ export function ReturnFeature({ contractId, open, onOpenChange, onSuccess }: Ret
     onOpenChange(false);
   };
 
-  if (!contract || !handover) return null;
+  if (!contract || handovers.length === 0) return null;
 
   return (
     <ReturnForm
       contract={contract}
-      handover={handover}
+      handovers={handovers}
       onSubmit={handleSubmit}
       onCancel={handleCancel}
       isSubmitting={isSubmitting}

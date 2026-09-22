@@ -1,6 +1,6 @@
 import type { Customer } from '@/features/modules/rental/customers/types/customer';
 import type { RentalVehicle } from '@/features/modules/rental/vehicles/types/rentalVehicle';
-import type { Reservation } from '@/features/modules/rental/reservations/types/reservation';
+import type { Booking } from '@/features/modules/rental/bookings/types/booking';
 
 export type ContractStatus =
   | 'DRAFT'
@@ -12,23 +12,15 @@ export type ContractStatus =
 export interface RentalContract {
   id: string;
   contractNumber: string;
-  reservationId: string;
+  bookingId: string;
   customerId: string;
-  vehicleId: string; // CORE Vehicle ID (e.g. 'veh-001')
 
   contractDate: string;
-
-  startDate: string;
-  endDate: string;
-  duration: number;
 
   rentalType: 'SELF_DRIVE' | 'WITH_DRIVER';
   rateType: 'DAILY' | 'WEEKLY' | 'MONTHLY';
 
-  rate: number;
-  subtotal: number;
   totalAmount: number;
-
   deposit: number;
   remainingAmount: number;
 
@@ -42,8 +34,7 @@ export interface RentalContract {
   
   // Relations (populated for UI)
   customer?: Customer;
-  vehicle?: RentalVehicle;
-  reservation?: Reservation;
+  booking?: Booking;
 }
 
 export type ContractStatusFilter = 'all' | ContractStatus;

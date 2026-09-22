@@ -84,12 +84,12 @@ export function ContractView({
         <div className="flex-1 overflow-y-auto p-4 md:p-5">
           <div className="flex flex-col gap-4 max-w-4xl mx-auto">
             
-            {/* Info Kontrak & Reservasi */}
+            {/* Info Kontrak & Booking */}
             <div className="bg-neutral-50 dark:bg-neutral-900/50 p-4 rounded-xl border border-border">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-[11px] font-semibold text-muted-foreground uppercase mb-0.5">{labels.colReservationNo || 'No. Reservasi'}</p>
-                  <p className="text-sm font-bold text-primary">{contract.reservationId}</p>
+                  <p className="text-[11px] font-semibold text-muted-foreground uppercase mb-0.5">{labels.colBookingNo || 'No. Booking'}</p>
+                  <p className="text-sm font-bold text-primary">{contract.bookingId}</p>
                 </div>
                 <div>
                   <p className="text-[11px] font-semibold text-muted-foreground uppercase mb-0.5">{labels.fieldContractDate || 'Tanggal Kontrak'}</p>

@@ -6,7 +6,7 @@ import type {
   VehiclePricingAssignment,
   VehicleRateOverride
 } from '../../../../features/modules/rental/pricing-category/types/pricing';
-import type { RateType } from '../../../../features/modules/rental/reservations/types/reservation';
+import type { RateType } from '../../../../features/modules/rental/bookings/types/booking';
 import { rentalVehicleService } from './vehicleService';
 import type { RentalVehicle } from '../../../../features/modules/rental/vehicles/types/rentalVehicle';
 

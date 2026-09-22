@@ -16,7 +16,7 @@ export const contractRepository = {
         result = result.filter(
           (c) =>
             c.contractNumber.toLowerCase().includes(searchLower) ||
-            c.reservationId.toLowerCase().includes(searchLower)
+            c.bookingId.toLowerCase().includes(searchLower)
         );
       }
       
@@ -33,18 +33,18 @@ export const contractRepository = {
     return contracts.find((c) => c.id === id);
   },
   
-  getContractByReservationId: async (reservationId: string): Promise<RentalContract | undefined> => {
+  getContractByBookingId: async (bookingId: string): Promise<RentalContract | undefined> => {
     await new Promise((resolve) => setTimeout(resolve, 300));
-    return contracts.find((c) => c.reservationId === reservationId);
+    return contracts.find((c) => c.bookingId === bookingId);
   },
 
-  createContract: async (contract: Omit<RentalContract, 'id' | 'contractNumber' | 'createdAt' | 'updatedAt' | 'customer' | 'vehicle' | 'reservation'>): Promise<RentalContract> => {
+  createContract: async (contract: Omit<RentalContract, 'id' | 'contractNumber' | 'createdAt' | 'updatedAt' | 'customer' | 'booking'>): Promise<RentalContract> => {
     await new Promise((resolve) => setTimeout(resolve, 300));
     
-    // Check for duplicate contract by reservation ID
-    const existing = contracts.find((c) => c.reservationId === contract.reservationId);
+    // Check for duplicate contract by booking ID
+    const existing = contracts.find((c) => c.bookingId === contract.bookingId);
     if (existing) {
-      throw new Error('Reservation already has a contract');
+      throw new Error('Booking already has a contract');
     }
 
     const newId = `ctr-${Date.now()}`;

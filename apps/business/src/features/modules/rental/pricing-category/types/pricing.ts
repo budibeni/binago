@@ -1,4 +1,4 @@
-import type { RateType } from '../../reservations/types/reservation';
+import type { RateType } from '../../bookings/types/booking';
 
 export type PricingCategoryStatus = 'ACTIVE' | 'INACTIVE';
 

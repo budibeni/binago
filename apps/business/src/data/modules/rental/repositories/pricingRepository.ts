@@ -10,7 +10,7 @@ import {
   mockVehicleRateOverrides, 
   mockVehiclePricingAssignments 
 } from '../mock/pricing';
-import type { RateType } from '../../../../features/modules/rental/reservations/types/reservation';
+import type { RateType } from '../../../../features/modules/rental/bookings/types/booking';
 
 let pricingCategorysData = [...mockPricingCategory];
 let rentalRatesData = [...mockRentalRates];

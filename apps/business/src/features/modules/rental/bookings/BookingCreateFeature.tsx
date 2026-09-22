@@ -2,25 +2,25 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { ReservationForm, type ReservationFormData } from './components/ReservationForm';
-import { getReservationTranslation } from './i18n';
+import { BookingForm, type BookingFormData } from './components/BookingForm';
+import { getBookingTranslation } from './i18n';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
-import { reservationService } from '@/data/modules/rental/services/reservationService';
+import { bookingService } from '@/data/modules/rental/services/bookingService';
 import { rentalVehicleService } from '@/data/modules/rental/services/vehicleService';
 import { rentalCustomerService as customerService } from '@/data/modules/rental/services/customerService';
 import type { Customer } from '@/features/modules/rental/customers/types/customer';
 import type { RentalVehicle } from '@/features/modules/rental/vehicles/types/rentalVehicle';
 
-interface ReservationCreateFeatureProps {
+interface BookingCreateFeatureProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
 }
 
-export function ReservationCreateFeature({ open, onOpenChange, onSuccess }: ReservationCreateFeatureProps) {
+export function BookingCreateFeature({ open, onOpenChange, onSuccess }: BookingCreateFeatureProps) {
   const router = useRouter();
   const locale = useBusinessLocale();
-  const t = getReservationTranslation(locale);
+  const t = getBookingTranslation(locale);
 
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [vehicles, setVehicles] = useState<RentalVehicle[]>([]);
@@ -40,12 +40,12 @@ export function ReservationCreateFeature({ open, onOpenChange, onSuccess }: Rese
     fetchData();
   }, []);
 
-  const handleSubmit = async (formData: ReservationFormData) => {
+  const handleSubmit = async (formData: BookingFormData) => {
 
     try {
       setIsSubmitting(true);
 
-      await reservationService.createReservation({
+      await bookingService.createBooking({
         customerId: formData.customerId,
         vehicleId: formData.vehicleId,
         startDate: formData.startDate,
@@ -61,7 +61,7 @@ export function ReservationCreateFeature({ open, onOpenChange, onSuccess }: Rese
         notes: formData.notes
       });
 
-      alert(t.createSuccess || 'Reservasi berhasil dibuat.');
+      alert(t.createSuccess || 'Booking berhasil dibuat.');
       onSuccess();
 
     } catch (err: any) {
@@ -72,7 +72,7 @@ export function ReservationCreateFeature({ open, onOpenChange, onSuccess }: Rese
   };
 
   return (
-    <ReservationForm
+    <BookingForm
       customers={customers}
       vehicles={vehicles}
       onSubmit={handleSubmit}

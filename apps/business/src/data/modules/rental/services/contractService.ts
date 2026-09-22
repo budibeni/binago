@@ -1,7 +1,7 @@
 import type { RentalContract, ContractFilters, ContractStatus } from '@/features/modules/rental/contracts/types/contract';
-import type { Reservation } from '@/features/modules/rental/reservations/types/reservation';
+import type { Booking } from '@/features/modules/rental/bookings/types/booking';
 import { contractRepository } from '../repositories/contractRepository';
-import { reservationService } from './reservationService';
+import { bookingService } from './bookingService';
 import { customerRepository } from '../repositories/customerRepository';
 import { rentalVehicleService } from './vehicleService';
 
@@ -9,19 +9,14 @@ const populateRelations = async (contract: RentalContract): Promise<RentalContra
   const result = { ...contract };
   
   try {
-    const reservation = await reservationService.getReservationById(contract.reservationId);
-    if (reservation) {
-      result.reservation = reservation;
+    const booking = await bookingService.getBookingById(contract.bookingId);
+    if (booking) {
+      result.booking = booking;
     }
     
     const customer = customerRepository.getById(contract.customerId);
     if (customer) {
       result.customer = customer;
-    }
-
-    const enrichedVehicle = rentalVehicleService.getRentalVehicleByVehicleId(contract.vehicleId);
-    if (enrichedVehicle) {
-      result.vehicle = enrichedVehicle;
     }
   } catch (error) {
     console.error('Error populating relations for contract', error);
@@ -42,9 +37,8 @@ export const contractService = {
       const s = filters.search.toLowerCase();
       return populated.filter(c => 
         c.contractNumber.toLowerCase().includes(s) ||
-        c.reservationId.toLowerCase().includes(s) ||
-        c.customer?.name.toLowerCase().includes(s) ||
-        c.vehicle?.coreVehicle?.plateNumber.toLowerCase().includes(s)
+        c.bookingId.toLowerCase().includes(s) ||
+        c.customer?.name.toLowerCase().includes(s)
       );
     }
     
@@ -57,33 +51,33 @@ export const contractService = {
     return populateRelations(contract);
   },
 
-  getAvailableReservationsForContract: async (): Promise<Reservation[]> => {
-    // Get all CONFIRMED reservations
-    const allReservations = await reservationService.getReservations();
-    const reservations = allReservations.filter(r => r.status === 'CONFIRMED');
+  getAvailableBookingsForContract: async (): Promise<Booking[]> => {
+    // Get all CONFIRMED bookings
+    const allBookings = await bookingService.getBookings();
+    const bookings = allBookings.filter(r => r.status === 'CONFIRMED');
     
-    // Get all contracts to find which reservations already have a contract
+    // Get all contracts to find which bookings already have a contract
     const allContracts = await contractRepository.getContracts();
-    const usedReservationIds = new Set(allContracts.map(c => c.reservationId));
+    const usedBookingIds = new Set(allContracts.map(c => c.bookingId));
     
     // Filter out those that already have a contract
-    return reservations.filter(r => !usedReservationIds.has(r.id));
+    return bookings.filter(r => !usedBookingIds.has(r.id));
   },
 
-  createContract: async (data: Omit<RentalContract, 'id' | 'contractNumber' | 'createdAt' | 'updatedAt' | 'customer' | 'vehicle' | 'reservation'>): Promise<RentalContract> => {
-    // 1. Validation - check if reservation is CONFIRMED
-    const reservation = await reservationService.getReservationById(data.reservationId);
-    if (!reservation) {
-      throw new Error('Reservation not found');
+  createContract: async (data: Omit<RentalContract, 'id' | 'contractNumber' | 'createdAt' | 'updatedAt' | 'customer' | 'booking'>): Promise<RentalContract> => {
+    // 1. Validation - check if booking is CONFIRMED
+    const booking = await bookingService.getBookingById(data.bookingId);
+    if (!booking) {
+      throw new Error('Booking not found');
     }
-    if (reservation.status !== 'CONFIRMED') {
+    if (booking.status !== 'CONFIRMED') {
       throw new Error('Hanya reservasi berstatus CONFIRMED yang dapat dibuatkan kontrak');
     }
 
     // 2. Duplicate prevention - checked inside repository, but double check here
-    const existing = await contractRepository.getContractByReservationId(data.reservationId);
+    const existing = await contractRepository.getContractByBookingId(data.bookingId);
     if (existing) {
-      throw new Error('Reservasi ini sudah memiliki kontrak.');
+      throw new Error('Booking ini sudah memiliki kontrak.');
     }
 
     // 3. Create the contract
@@ -127,8 +121,8 @@ export const contractService = {
 
     // Protect certain fields from being overridden directly from UI
     const protectedFields = [
-      'customerId', 'vehicleId', 'reservationId', 'startDate', 'endDate', 
-      'duration', 'rentalType', 'rateType', 'rate', 'subtotal', 
+      'customerId', 'bookingId', 
+      'rentalType', 'rateType', 
       'totalAmount', 'deposit', 'remainingAmount', 'status'
     ];
 

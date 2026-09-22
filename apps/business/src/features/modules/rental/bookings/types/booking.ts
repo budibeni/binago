@@ -2,29 +2,40 @@ import type { Customer } from '@/features/modules/rental/customers/types/custome
 import type { RentalVehicle } from '@/features/modules/rental/vehicles/types/rentalVehicle';
 import { z } from 'zod';
 
-export type ReservationStatus = 'PENDING' | 'CONFIRMED' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
+export type BookingStatus = 'PENDING' | 'CONFIRMED' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
 
 export type RentalType = 'SELF_DRIVE' | 'WITH_DRIVER';
 
 export type RateType = 'DAILY' | 'WEEKLY' | 'MONTHLY';
 
-export interface Reservation {
+export interface BookingItem {
   id: string;
-  reservationNumber: string;
-  customerId: string;
-  vehicleId: string; // CORE Vehicle ID (e.g. 'veh-001')
+  bookingId: string;
+  vehicleId: string; // CORE Vehicle ID
   startDate: string; // ISO String
   endDate: string; // ISO String
   duration: number; // in days
+  rateType: RateType;
+  rateSnapshot: number; // Snapshot of the resolved rate
+  subtotal: number;
+  
+  // Relations (populated for UI)
+  vehicle?: RentalVehicle;
+}
+
+export interface Booking {
+  id: string;
+  bookingNumber: string;
+  customerId: string;
+  startDate: string; // ISO String (Main period)
+  endDate: string; // ISO String (Main period)
+  duration: number; // in days
   rentalType: RentalType;
   rateType: RateType;
-  dailyRate: number;
-  weeklyRate: number;
-  monthlyRate: number;
   totalAmount: number;
   deposit: number;
   remainingAmount: number;
-  status: ReservationStatus;
+  status: BookingStatus;
   paymentMethod?: string;
   pickupLocation?: string;
   dropoffLocation?: string;
@@ -32,23 +43,24 @@ export interface Reservation {
   createdAt: string;
   updatedAt: string;
   
+  items: BookingItem[];
+  
   // Relations (populated for UI)
   customer?: Customer;
-  vehicle?: RentalVehicle;
 }
 
-export type ReservationStatusFilter = 'all' | ReservationStatus;
+export type BookingStatusFilter = 'all' | BookingStatus;
 
-export interface ReservationFilters {
+export interface BookingFilters {
   search: string;
-  status: ReservationStatusFilter;
+  status: BookingStatusFilter;
   startDate?: string;
   endDate?: string;
 }
 
-export const getReservationFormSchema = (t: Record<string, any>) => z.object({
+export const getBookingFormSchema = (t: Record<string, any>) => z.object({
   customerId: z.string().min(1, t.customerRequired || 'Pelanggan wajib dipilih'),
-  vehicleId: z.string().min(1, t.vehicleRequired || 'Kendaraan wajib dipilih'),
+  vehicleIds: z.array(z.string()).min(1, t.vehicleRequired || 'Pilih minimal satu kendaraan'),
   startDate: z.string().min(1, t.startDateRequired || 'Tanggal mulai wajib diisi'),
   endDate: z.string().min(1, t.endDateRequired || 'Tanggal selesai wajib diisi'),
   rentalType: z.enum(['SELF_DRIVE', 'WITH_DRIVER'], t.rentalTypeRequired || 'Tipe rental wajib dipilih'),
