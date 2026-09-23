@@ -9,11 +9,32 @@ export const metadata: Metadata = {
   description: 'ADATRACK Personal - Aplikasi Pelacakan Kendaraan Pribadi',
 };
 
+import { cookies } from 'next/headers';
+import type { UserInfo } from '@adatrack/types';
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const cookieStore = cookies();
+  const userProfileCookie = cookieStore.get('user_profile')?.value;
+  let user: UserInfo | undefined = undefined;
+
+  if (userProfileCookie) {
+    try {
+      const parsed = JSON.parse(userProfileCookie);
+      user = {
+        name: parsed.name || parsed.email || 'User',
+        email: parsed.email || '',
+        role: parsed.role || 'User',
+        initials: (parsed.name || parsed.email || 'U').substring(0, 2).toUpperCase(),
+      };
+    } catch (e) {
+      console.error('Failed to parse user profile', e);
+    }
+  }
+
   return (
     <html lang="id" suppressHydrationWarning>
       <body className="min-h-screen bg-surface text-foreground font-sans antialiased">
@@ -28,7 +49,7 @@ export default function RootLayout({
             `,
           }}
         />
-        <PersonalShellLayout>
+        <PersonalShellLayout user={user}>
           {children}
         </PersonalShellLayout>
       </body>

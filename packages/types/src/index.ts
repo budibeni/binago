@@ -66,3 +66,6 @@ export interface UserInfo {
   avatarUrl?: string;
   initials?: string;
 }
+
+// --- API Types -------------------------------------
+export * from './api';

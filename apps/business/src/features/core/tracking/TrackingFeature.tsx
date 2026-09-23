@@ -21,6 +21,8 @@ import { LiveTable } from './components/live/LiveTable';
 import { TrackingNotificationPanel } from './components/activity/TrackingNotificationPanel';
 import { trackingService } from '@/data/services/trackingService';
 import { trackingNavigationService } from './services/trackingNavigationService';
+import { useLiveTracking } from './hooks/useLiveTracking';
+import { api } from '@adatrack/utils';
 import type { MockPlaybackData } from './data/mockTrackingData';
 import { getTranslation } from '../../../i18n';
 import { useBusinessLocale } from '../../../components/BusinessShellLayout';
@@ -153,17 +155,21 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
   const pendingAutoLoadRef = React.useRef<{ vehicleId: string; startDate: Date } | null>(null);
   const initializedRef = React.useRef(false);
 
+  const { vehicles: liveVehicles, loading: liveLoading } = useLiveTracking();
+
   // -- Initialize from Navigation State (sessionStorage) --
   React.useEffect(() => {
     if (typeof window === 'undefined') return;
     if (initializedRef.current) return;
+    if (liveLoading) return; // Wait for initial load
     
     const navState = trackingNavigationService.getState();
     if (!navState) {
       // Default: no state, show all live vehicles
       if (selectedVehicleIds.length === 0) {
-        setSelectedVehicleIds(trackingService.getLiveVehicles().map((v) => v.id));
+        setSelectedVehicleIds(liveVehicles.map((v) => v.id));
       }
+      initializedRef.current = true;
       return;
     }
 
@@ -174,7 +180,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
     if (navState.vehicleIds && navState.vehicleIds.length > 0) {
       setSelectedVehicleIds(navState.vehicleIds);
     } else {
-      setSelectedVehicleIds(trackingService.getLiveVehicles().map((v) => v.id));
+      setSelectedVehicleIds(liveVehicles.map((v) => v.id));
     }
 
     const vId = navState.vehicleId;
@@ -207,7 +213,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
     setTimeout(() => {
       trackingNavigationService.clearState();
     }, 100);
-  }, []);
+  }, [liveLoading, liveVehicles]);
 
   // Keep refs in sync
   React.useEffect(() => { playbackDataRef.current = playbackData; }, [playbackData]);
@@ -216,7 +222,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
   // --- Computed ----------------------------------------------------------------
   const allVehiclesUnfiltered = React.useMemo(() => {
     const q = search.toLowerCase().trim();
-    return trackingService.getLiveVehicles().filter((v) => {
+    return liveVehicles.filter((v) => {
       const matchStatus = statusFilter === 'all' || v.status === statusFilter;
       const matchSearch =
         !q ||
@@ -357,7 +363,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
   }, []);
 
   const handleSelectAll = React.useCallback((checked: boolean) => {
-    setSelectedVehicleIds(checked ? trackingService.getLiveVehicles().map((v) => v.id) : []);
+    setSelectedVehicleIds(checked ? liveVehicles.map((v) => v.id) : []);
   }, []);
 
   // â"€â"€ Playback handlers â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
@@ -382,19 +388,28 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
     stopTimer();
   }, [stopTimer]);
 
-  const handleLoadHistory = React.useCallback(() => {
+  const handleLoadHistory = React.useCallback(async () => {
     if (!playbackVehicleId) return;
     stopTimer();
     setPlaybackState({ status: 'loading', totalDuration: 0, currentTime: 0 });
     setPlaybackData(null);
     setPlaybackPointIndex(0);
-    setTimeout(() => {
+    
+    try {
       const startDatetime = new Date(`${dateRange.startDate}T${dateRange.startTime}:00`);
-      const data = trackingService.getPlaybackData(playbackVehicleId, startDatetime);
+      const endDatetime = new Date(`${dateRange.endDate}T${dateRange.endTime}:00`);
+      const res = await api.get<MockPlaybackData>(`/vehicles/${playbackVehicleId}/history`, {
+        params: { start: startDatetime.toISOString(), end: endDatetime.toISOString() }
+      });
+      const data = (res as any).data || res;
       setPlaybackData(data);
       playbackDataRef.current = data;
-      setPlaybackState({ status: 'ready', totalDuration: data.totalDurationSecs, currentTime: 0 });
-    }, 1200);
+      setPlaybackState({ status: 'ready', totalDuration: data.totalDurationSecs || 0, currentTime: 0 });
+    } catch (err) {
+      console.error('Failed to load playback data', err);
+      setPlaybackState({ status: 'idle', totalDuration: 0, currentTime: 0 });
+      alert('Failed to load history');
+    }
   }, [playbackVehicleId, dateRange, stopTimer]);
 
   // -- Auto-load history when navigated from Handover Map button --
@@ -408,12 +423,20 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
     setPlaybackState({ status: 'loading', totalDuration: 0, currentTime: 0 });
     setPlaybackData(null);
     setPlaybackPointIndex(0);
-    setTimeout(() => {
-      const data = trackingService.getPlaybackData(pending.vehicleId, pending.startDate);
-      setPlaybackData(data);
-      playbackDataRef.current = data;
-      setPlaybackState({ status: 'ready', totalDuration: data.totalDurationSecs, currentTime: 0 });
-    }, 1200);
+    
+    api.get<MockPlaybackData>(`/vehicles/${pending.vehicleId}/history`, {
+      params: { start: pending.startDate.toISOString() }
+    })
+      .then(res => {
+        const data = (res as any).data || res;
+        setPlaybackData(data);
+        playbackDataRef.current = data;
+        setPlaybackState({ status: 'ready', totalDuration: data.totalDurationSecs || 0, currentTime: 0 });
+      })
+      .catch(err => {
+        console.error('Failed to auto-load playback data', err);
+        setPlaybackState({ status: 'idle', totalDuration: 0, currentTime: 0 });
+      });
   }, [playbackVehicleId, stopTimer]);
 
   const handlePlay = React.useCallback(() => {
@@ -516,7 +539,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
                 onDateRangeChange={setDateRange}
                 selectedVehicleId={playbackVehicleId}
                 onVehicleChange={handlePlaybackVehicleChange}
-                vehicles={trackingService.getLiveVehicles()}
+                vehicles={liveVehicles}
                 onLoad={handleLoadHistory}
                 isLoading={playbackState.status === 'loading'}
               />
@@ -698,7 +721,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
           aria-hidden={mode !== 'playback' || view !== 'map'}
         >
           <PlaybackPanel
-            vehicles={trackingService.getLiveVehicles()}
+            vehicles={liveVehicles}
             selectedVehicleId={playbackVehicleId}
             dateRange={dateRange}
             playbackState={playbackState}
@@ -745,7 +768,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
           aria-hidden={mode !== 'live' || !selectedVehicleId}
         >
           <VehicleOverviewPanel
-            vehicle={trackingService.getLiveVehicles().find(v => v.id === selectedVehicleId) || null}
+            vehicle={liveVehicles.find(v => v.id === selectedVehicleId) || null}
             onClose={() => setSelectedVehicleId(null)}
             locale={locale}
             onShareLocation={() => console.log('Share clicked', selectedVehicleId)}

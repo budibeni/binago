@@ -50,6 +50,7 @@ interface CustomerTableProps {
   onAdd?: () => void;
   className?: string;
   dtLabels?: DataTableLabels;
+  isLoading?: boolean;
 }
 
 function buildColumns(
@@ -206,6 +207,7 @@ export function CustomerTable({
   onAdd,
   className,
   dtLabels,
+  isLoading,
 }: CustomerTableProps) {
   const columns = React.useMemo(
     () => buildColumns(labels, onViewDetail, onEdit, onDelete),
@@ -216,6 +218,7 @@ export function CustomerTable({
     <DataTable<Customer>
       className={className}
       data={data}
+      isLoading={isLoading}
       columns={columns}
       // Capabilities
       searchable

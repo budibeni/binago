@@ -13,7 +13,7 @@ import type { Customer, CustomerStatusFilter, CustomerTypeFilter } from './types
 import type { DataTableFilterConfig } from '@adatrack/ui';
 import { Button } from '@adatrack/ui';
 import { Plus, List, Building, User } from 'lucide-react';
-import { cn } from '@adatrack/utils';
+import { cn, api, useApi } from '@adatrack/utils';
 
 function computeCounts(search: string) {
   const base = rentalCustomerService.getCustomers({ search });
@@ -52,19 +52,24 @@ export function CustomersFeature() {
   const [isCreateOpen, setIsCreateOpen] = React.useState(false);
   const [editId, setEditId] = React.useState<string | null>(null);
 
-  // Force re-render on data change
-  const [dataVersion, setDataVersion] = React.useState(0);
-  const refreshData = () => setDataVersion(v => v + 1);
+  const { data, loading, mutate } = useApi<Customer[]>('/rental/customers', {
+    params: { search, status: statusFilter, type: typeFilter }
+  });
 
-  const filteredCustomers = React.useMemo(
-    () => rentalCustomerService.getCustomers({ search, status: statusFilter, type: typeFilter }),
-    [search, statusFilter, typeFilter, dataVersion],
-  );
+  const filteredCustomers = React.useMemo(() => data || [], [data]);
 
-  const counts = React.useMemo(
-    () => computeCounts(search),
-    [search, dataVersion],
-  );
+  const counts = React.useMemo(() => {
+    const base = data || [];
+    return {
+      all: base.length,
+      individual: base.filter((c: Customer) => c.type === 'INDIVIDUAL').length,
+      company: base.filter((c: Customer) => c.type === 'COMPANY').length,
+      active: base.filter((c: Customer) => c.status === 'ACTIVE').length,
+      inactive: base.filter((c: Customer) => c.status === 'INACTIVE').length,
+    };
+  }, [data]);
+
+  const refreshData = () => mutate();
 
   const handleViewDetail = React.useCallback((customer: Customer) => {
     setDetailCustomer(customer);
@@ -87,8 +92,12 @@ export function CustomersFeature() {
 
 
 
-  const handleConfirmDelete = (id: string) => {
-    rentalCustomerService.deleteCustomer(id);
+  const handleConfirmDelete = async (id: string) => {
+    try {
+      await api.delete(`/rental/customers/${id}`);
+    } catch (e) {
+      console.error(e);
+    }
     setDeleteOpen(false);
     refreshData();
   };
@@ -172,6 +181,7 @@ export function CustomersFeature() {
       <div className="flex-1 min-h-0 overflow-y-auto p-0">
         <CustomerTable
           data={filteredCustomers}
+          isLoading={loading}
           labels={tableLabels}
           onViewDetail={handleViewDetail}
           onEdit={handleEdit}

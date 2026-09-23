@@ -61,6 +61,7 @@ interface VehicleTableProps {
   onAdd?: () => void;
   className?: string;
   dtLabels?: DataTableLabels;
+  isLoading?: boolean;
 }
 
 function getStatusBadge(status: Vehicle['status'], labels: VehicleTableLabels) {
@@ -328,6 +329,7 @@ export function VehicleTable({
   onAdd,
   className,
   dtLabels,
+  isLoading,
 }: VehicleTableProps) {
   const columns = React.useMemo(
     () => buildColumns(labels, onViewDetail, onEdit, onTrack, onDelete),
@@ -339,6 +341,7 @@ export function VehicleTable({
       className={className}
       data={data}
       columns={columns}
+      isLoading={isLoading}
       // Capabilities
       searchable
       sortable

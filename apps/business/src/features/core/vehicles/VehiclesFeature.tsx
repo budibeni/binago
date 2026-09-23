@@ -10,6 +10,8 @@ import { trackingNavigationService } from '../tracking/services/trackingNavigati
 import { VehicleTable } from './components/VehicleTable';
 import { VehicleView } from './components/VehicleView';
 import { VehicleForm } from './components/VehicleForm';
+import { useVehicles } from './hooks/useVehicles';
+import { api } from '@adatrack/utils';
 import type { Vehicle, VehicleStatusFilter } from './types/vehicle';
 import type { DataTableFilterConfig, DataTableLabels } from '@adatrack/ui';
 
@@ -43,10 +45,7 @@ export function VehiclesFeature() {
   const [editVehicle, setEditVehicle] = React.useState<Vehicle | null>(null);
 
   // ===========================================================================
-  const filteredVehicles = React.useMemo(
-    () => vehicleService.getVehicles({ search, status: statusFilter, groupIds: selectedGroupIds }),
-    [search, statusFilter, selectedGroupIds],
-  );
+  const { vehicles: filteredVehicles, loading } = useVehicles({ search, status: statusFilter, groupIds: selectedGroupIds });
 
   // statusCounts removed
 
@@ -72,9 +71,16 @@ export function VehiclesFeature() {
     });
   }, [router]);
 
-  const handleDelete = React.useCallback((vehicle: Vehicle) => {
-    // TODO: confirmation dialog (Task 06 scope terbatas - hanya placeholder)
-    console.log('Delete vehicle:', vehicle.id);
+  const handleDelete = React.useCallback(async (vehicle: Vehicle) => {
+    if (confirm(`Are you sure you want to delete vehicle ${vehicle.plateNumber}?`)) {
+      try {
+        await api.delete(`/vehicles/${vehicle.id}`);
+        window.location.reload();
+      } catch (err) {
+        console.error('Failed to delete vehicle', err);
+        alert('Failed to delete vehicle');
+      }
+    }
   }, []);
 
   // Filter toggle/clear logic is now handled by DataTableFilterPanel internally via onStateChange
@@ -237,6 +243,7 @@ export function VehiclesFeature() {
           onFilterOpenChange={setIsFilterOpen}
           onAdd={undefined}
           dtLabels={dtLabels}
+          isLoading={loading}
         />
       </div>
 
@@ -260,8 +267,20 @@ export function VehiclesFeature() {
               setEditVehicle(null);
             }
           }}
-          onSave={(data) => {
-            console.log('Saved vehicle:', data);
+          onSave={async (data) => {
+            try {
+              if (data.id) {
+                await api.put(`/vehicles/${data.id}`, data);
+              } else {
+                await api.post('/vehicles', data);
+              }
+              // Ideally refetch here. To refetch, useVehicles would need a refetch function.
+              // We'll just reload the page for simplicity or rely on state.
+              window.location.reload();
+            } catch (err) {
+              console.error('Failed to save vehicle', err);
+              alert('Failed to save vehicle');
+            }
             setEditVehicle(null);
           }}
           onCancel={() => {

@@ -238,10 +238,18 @@ export function useBusinessLocale() {
   return React.useContext(BusinessLocaleContext);
 }
 
-export function BusinessShellLayout({ children }: { children: React.ReactNode }) {
+import { logout } from '../app/actions/auth';
+
+export function BusinessShellLayout({ children, user }: { children: React.ReactNode, user?: UserInfo }) {
   const [locale, setLocale] = React.useState<Locale>('id');
   const [theme, setTheme] = React.useState<'light' | 'dark'>('light');
   const currentPath = usePathname() || '/';
+
+  const currentUser = user || DUMMY_USER;
+
+  const handleLogout = async () => {
+    await logout();
+  };
 
   React.useEffect(() => {
     try {
@@ -306,6 +314,22 @@ export function BusinessShellLayout({ children }: { children: React.ReactNode })
     breadcrumbItems.push({ label: t.nav.home });
   }
 
+  const isAuthRoute = currentPath.startsWith('/login') || currentPath.startsWith('/register');
+
+  if (isAuthRoute) {
+    return (
+      <UIProvider config={{ 
+        cancelText: t.common.cancel, 
+        saveText: t.common.save,
+        detailTitle: (t.common as any).detailTitle || 'Detail',
+        editText: (t.common as any).editText || 'Edit',
+        deleteText: (t.common as any).deleteText || 'Hapus',
+      }}>
+        {children}
+      </UIProvider>
+    );
+  }
+
   return (
     <UIProvider config={{ 
       cancelText: t.common.cancel, 
@@ -320,11 +344,12 @@ export function BusinessShellLayout({ children }: { children: React.ReactNode })
         bottomNavigation={buildBottomNavigation(locale)}
         currentPath={currentPath}
         breadcrumbItems={breadcrumbItems}
-        user={DUMMY_USER}
+        user={currentUser}
         currentLocale={locale}
         onLocaleChange={handleLocaleChange}
         currentTheme={theme}
         onThemeChange={handleThemeChange}
+        onLogoutClick={handleLogout}
         userMenuLabels={t.userMenu}
       >
         <ShareLocationProvider>

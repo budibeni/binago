@@ -10,68 +10,12 @@ export interface TrackingNotificationPanelProps {
   onClose?: () => void;
 }
 
-type NotificationCategory = 'all' | 'alarm_vehicle' | 'maintenance' | 'operation';
-
-const mockNotifications = [
-  {
-    id: '1',
-    category: 'alarm_vehicle',
-    type: 'alert',
-    title: 'Overspeed Alert',
-    message: 'B 9027 PU exceeded speed limit (85 km/h)',
-    timestamp: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
-    vehicleId: 'veh-001',
-  },
-  {
-    id: '2',
-    category: 'geofence',
-    type: 'info',
-    title: 'Geofence Entry',
-    message: 'B 9329 PYX entered "Warehouse Jakarta"',
-    timestamp: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
-    vehicleId: 'veh-002',
-  },
-  {
-    id: '3',
-    category: 'alarm_vehicle',
-    type: 'warning',
-    title: 'Device Offline',
-    message: 'B 9062 PYX has been offline for 2 hours',
-    timestamp: new Date(Date.now() - 1000 * 60 * 120).toISOString(),
-    vehicleId: 'veh-003',
-  },
-  {
-    id: '4',
-    category: 'sensor',
-    type: 'warning',
-    title: 'Low Fuel Sensor',
-    message: 'B 9481 JYY fuel level is below 15%',
-    timestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
-    vehicleId: 'veh-004',
-  },
-  {
-    id: '5',
-    category: 'maintenance',
-    type: 'info',
-    title: 'Service Reminder',
-    message: 'B 9091 UXY is due for routine oil change',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
-    vehicleId: 'veh-005',
-  },
-  {
-    id: '6',
-    category: 'operation',
-    type: 'info',
-    title: 'Trip Completed',
-    message: 'B 9666 JYX completed delivery trip to Bandung',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 3).toISOString(),
-    vehicleId: 'veh-006',
-  },
-];
+import { useLiveNotifications } from '../../hooks/useLiveNotifications';
 
 export function TrackingNotificationPanel({ open, onClose, locale = 'id', visibleVehicleIds }: TrackingNotificationPanelProps) {
   const [activeTab, setActiveTab] = useState<'all' | 'alarm_vehicle' | 'maintenance' | 'operation'>('all');
   const tTrackingLocal = getTrackingTranslation(locale);
+  const { notifications } = useLiveNotifications();
 
   const tabs = [
     { id: 'all', label: tTrackingLocal.notifications.all },
@@ -80,7 +24,7 @@ export function TrackingNotificationPanel({ open, onClose, locale = 'id', visibl
     { id: 'operation', label: tTrackingLocal.notifications.operation, icon: <Clock className="h-3.5 w-3.5" /> },
   ] as const;
 
-  const filteredNotifications = mockNotifications.filter((notif) => {
+  const filteredNotifications = notifications.filter((notif) => {
     const matchesTab = activeTab === 'all' || notif.category === activeTab;
     const matchesVehicle = !visibleVehicleIds || visibleVehicleIds.includes(notif.vehicleId);
     return matchesTab && matchesVehicle;

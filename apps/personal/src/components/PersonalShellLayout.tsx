@@ -34,9 +34,19 @@ export function usePersonalLocale() {
   return React.useContext(PersonalLocaleContext);
 }
 
-export function PersonalShellLayout({ children }: { children: React.ReactNode }) {
+import { usePathname } from 'next/navigation';
+import { logout } from '../app/actions/auth';
+
+export function PersonalShellLayout({ children, user }: { children: React.ReactNode, user?: UserInfo }) {
   const [locale, setLocale] = React.useState<Locale>('id');
   const [theme, setTheme] = React.useState<'light' | 'dark'>('light');
+  const currentPath = usePathname() || '/';
+
+  const currentUser = user || DUMMY_USER;
+
+  const handleLogout = async () => {
+    await logout();
+  };
 
   React.useEffect(() => {
     try {
@@ -65,16 +75,31 @@ export function PersonalShellLayout({ children }: { children: React.ReactNode })
   const t = getTranslation(locale);
   const navigation = buildNavigation(locale);
 
+  const isAuthRoute = currentPath.startsWith('/login') || currentPath.startsWith('/register');
+
+  if (isAuthRoute) {
+    return (
+      <NotificationProvider>
+        <ShareLocationProvider>
+          <PersonalLocaleContext.Provider value={locale}>
+            {children}
+          </PersonalLocaleContext.Provider>
+        </ShareLocationProvider>
+      </NotificationProvider>
+    );
+  }
+
   return (
     <NotificationProvider>
       <ShareLocationProvider>
         <PersonalAppShell
           navigation={navigation}
-          user={DUMMY_USER}
+          user={currentUser}
           currentLocale={locale}
           onLocaleChange={setLocale}
           currentTheme={theme}
           onThemeChange={handleThemeChange}
+          onLogoutClick={handleLogout}
           userMenuLabels={t.userMenu}
         >
           <PersonalLocaleContext.Provider value={locale}>

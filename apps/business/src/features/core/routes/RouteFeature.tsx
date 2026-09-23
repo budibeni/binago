@@ -3,11 +3,12 @@
 import React, { useState } from 'react';
 import type { Locale } from '@adatrack/types';
 import { Route } from './types';
-import { routeService, geofenceService, groupService } from '@/data/services';
+import { geofenceService, groupService } from '@/data/services';
 import { RouteListView } from './components/RouteListView';
 import { RouteEditorView } from './components/RouteEditorView';
 import { getRouteTranslation } from './i18n';
-
+import { useRoutes } from './hooks/useRoutes';
+import { api } from '@adatrack/utils';
 import { useSearchParams } from 'next/navigation';
 
 interface RouteFeatureProps {
@@ -19,7 +20,7 @@ export function RouteFeature({ locale = 'id' }: RouteFeatureProps) {
   const searchParams = useSearchParams();
   const initialRouteId = searchParams?.get('routeId') || undefined;
 
-  const [routes, setRoutes] = useState<Route[]>(() => routeService.getRoutes());
+  const { routes, loading } = useRoutes();
   const [selectedRouteId, setSelectedRouteId] = useState<string | undefined>(initialRouteId);
   const [isEditing, setIsEditing] = useState(false);
 
@@ -37,33 +38,30 @@ export function RouteFeature({ locale = 'id' }: RouteFeatureProps) {
     setIsEditing(true);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm(t.delete.description)) {
-      setRoutes(routes.filter((r) => r.id !== id));
-      if (selectedRouteId === id) {
-        setSelectedRouteId(undefined);
-        setIsEditing(false);
+      try {
+        await api.delete(`/routes/${id}`);
+        window.location.reload();
+      } catch (err) {
+        console.error('Failed to delete route', err);
+        alert('Failed to delete route');
       }
     }
   };
 
-  const handleSave = (route: Partial<Route>) => {
-    const now = new Date().toISOString();
-
-    if (route.id) {
-      setRoutes(routes.map((r) => (r.id === route.id ? { ...r, ...route, updatedAt: now } as Route : r)));
-    } else {
-      const newRoute: Route = {
-        ...route as Route,
-        id: `rt-${Date.now()}`,
-        createdAt: now,
-        updatedAt: now,
-      };
-      setRoutes([newRoute, ...routes]);
-      setSelectedRouteId(newRoute.id);
+  const handleSave = async (route: Partial<Route>) => {
+    try {
+      if (route.id) {
+        await api.put(`/routes/${route.id}`, route);
+      } else {
+        await api.post('/routes', route);
+      }
+      window.location.reload();
+    } catch (err) {
+      console.error('Failed to save route', err);
+      alert('Failed to save route');
     }
-
-    setIsEditing(false);
   };
 
   const handleCancelEdit = () => {
@@ -88,17 +86,21 @@ export function RouteFeature({ locale = 'id' }: RouteFeatureProps) {
 
   return (
     <div className="relative w-full overflow-hidden" style={{ height: 'calc(100dvh - 52px)' }}>
-      <RouteListView
-        routes={routes}
-        geofences={geofenceService.getGeofences()}
-        groups={groupService.getRouteGroups()}
-        selectedRouteId={selectedRouteId}
-        onSelectRoute={handleSelectRoute}
-        onCreateNew={handleCreateNew}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        locale={locale}
-      />
+      {loading ? (
+        <div className="p-4">Loading routes...</div>
+      ) : (
+        <RouteListView
+          routes={routes}
+          geofences={geofenceService.getGeofences()}
+          groups={groupService.getRouteGroups()}
+          selectedRouteId={selectedRouteId}
+          onSelectRoute={handleSelectRoute}
+          onCreateNew={handleCreateNew}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          locale={locale}
+        />
+      )}
     </div>
   );
 }

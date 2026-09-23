@@ -17,11 +17,32 @@ export const metadata: Metadata = {
   description: 'ADATRACK Business - Platform Manajemen Armada dan Logistik',
 };
 
+import { cookies } from 'next/headers';
+import type { UserInfo } from '@adatrack/types';
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const cookieStore = cookies();
+  const userProfileCookie = cookieStore.get('user_profile')?.value;
+  let user: UserInfo | undefined = undefined;
+
+  if (userProfileCookie) {
+    try {
+      const parsed = JSON.parse(userProfileCookie);
+      user = {
+        name: parsed.name || parsed.email || 'User',
+        email: parsed.email || '',
+        role: parsed.role || 'User',
+        initials: (parsed.name || parsed.email || 'U').substring(0, 2).toUpperCase(),
+      };
+    } catch (e) {
+      console.error('Failed to parse user profile', e);
+    }
+  }
+
   return (
     <html lang="id" suppressHydrationWarning className={roboto.variable}>
       <body className="min-h-screen bg-surface text-foreground font-sans antialiased">
@@ -36,7 +57,7 @@ export default function RootLayout({
             `,
           }}
         />
-        <BusinessShellLayout>
+        <BusinessShellLayout user={user}>
           {children}
         </BusinessShellLayout>
       </body>

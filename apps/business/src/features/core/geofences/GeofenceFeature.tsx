@@ -6,6 +6,8 @@ import { GeofenceEditorView } from './components/GeofenceEditorView';
 import { geofenceService } from '@/data/services';
 import type { Geofence } from './types';
 import { type GeofenceLocale, getGeofencesTranslation } from './i18n';
+import { useGeofences } from './hooks/useGeofences';
+import { api } from '@adatrack/utils';
 
 type GeofenceView = 'list' | 'create' | 'edit';
 
@@ -16,7 +18,7 @@ interface GeofenceFeatureProps {
 export function GeofenceFeature({ locale = 'id' }: GeofenceFeatureProps) {
   const t = getGeofencesTranslation(locale);
   const [view, setView] = useState<GeofenceView>('list');
-  const [geofences, setGeofences] = useState<Geofence[]>(() => geofenceService.getGeofences());
+  const { geofences, loading } = useGeofences();
   const [editingGeofence, setEditingGeofence] = useState<Geofence | null>(null);
 
   const handleAdd = () => {
@@ -29,32 +31,29 @@ export function GeofenceFeature({ locale = 'id' }: GeofenceFeatureProps) {
     setView('edit');
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm(t.confirmDelete)) {
-      setGeofences((prev) => prev.filter((g) => g.id !== id));
+      try {
+        await api.delete(`/geofences/${id}`);
+        window.location.reload();
+      } catch (err) {
+        console.error('Failed to delete geofence', err);
+        alert('Failed to delete geofence');
+      }
     }
   };
 
-  const handleSave = (data: Partial<Geofence>) => {
-    if (view === 'edit' && editingGeofence) {
-      setGeofences((prev) =>
-        prev.map((g) =>
-          g.id === editingGeofence.id
-            ? ({ ...g, ...data, updatedAt: new Date().toISOString() } as Geofence)
-            : g,
-        ),
-      );
-    } else {
-      const newGeofence: Geofence = {
-        id: `gf-${Date.now()}`,
-        name: data.name || '',
-        description: data.description,
-        status: (data.status as 'active' | 'inactive') ?? 'active',
-        geometry: data.geometry!,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-      setGeofences((prev) => [newGeofence, ...prev]);
+  const handleSave = async (data: Partial<Geofence>) => {
+    try {
+      if (view === 'edit' && editingGeofence) {
+        await api.put(`/geofences/${editingGeofence.id}`, data);
+      } else {
+        await api.post('/geofences', data);
+      }
+      window.location.reload();
+    } catch (err) {
+      console.error('Failed to save geofence', err);
+      alert('Failed to save geofence');
     }
     setView('list');
   };
@@ -74,14 +73,18 @@ export function GeofenceFeature({ locale = 'id' }: GeofenceFeatureProps) {
 
   return (
     <div className="relative w-full overflow-hidden" style={{ height: 'calc(100dvh - 52px)' }}>
-      <GeofenceListView
-        geofences={geofences}
-        groups={geofenceService.getGeofenceGroups()}
-        onAdd={handleAdd}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        locale={locale}
-      />
+      {loading ? (
+        <div className="p-4">Loading geofences...</div>
+      ) : (
+        <GeofenceListView
+          geofences={geofences}
+          groups={geofenceService.getGeofenceGroups()}
+          onAdd={handleAdd}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          locale={locale}
+        />
+      )}
     </div>
   );
 }

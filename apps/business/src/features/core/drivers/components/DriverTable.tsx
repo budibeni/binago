@@ -50,6 +50,7 @@ interface DriverTableProps {
   onFilterOpenChange: (open: boolean) => void;
   className?: string;
   dtLabels?: any;
+  isLoading?: boolean;
 }
 
 function buildColumns(
@@ -196,6 +197,7 @@ export function DriverTable({
   onFilterOpenChange,
   className,
   dtLabels,
+  isLoading,
 }: DriverTableProps) {
   const columns = React.useMemo(() => buildColumns(labels, onViewDetail, onEdit, onDelete), [labels, onViewDetail, onEdit, onDelete]);
 
@@ -204,6 +206,7 @@ export function DriverTable({
       className={className}
       data={data}
       columns={columns}
+      isLoading={isLoading}
       // Capabilities
       searchable
       sortable

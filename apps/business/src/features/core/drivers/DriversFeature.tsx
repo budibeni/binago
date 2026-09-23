@@ -7,6 +7,8 @@ import { driverService, vehicleService, groupService } from '@/data/services';
 import { DriverTable } from './components/DriverTable';
 import { DriverView } from './components/DriverView';
 import { DriverForm } from './components/DriverForm';
+import { useDrivers } from './hooks/useDrivers';
+import { api } from '@adatrack/utils';
 import type { Driver, DriverStatusFilter } from './types/driver';
 import { useRouter } from 'next/navigation';
 
@@ -33,10 +35,11 @@ export function DriversFeature() {
   const [editDriver, setEditDriver] = React.useState<Driver | null>(null);
 
   // --- Filtered Data -----------------------------------------------------------
+  const { drivers: fetchedDrivers, loading } = useDrivers({ search, status: statusFilter, groupIds: selectedGroupIds });
+  
   const filteredDrivers = React.useMemo(() => {
-    const filtered = driverService.getDrivers(search, statusFilter, selectedGroupIds);
     // Enrich with plate number & group name
-    return filtered.map(driver => {
+    return fetchedDrivers.map(driver => {
       let enriched = { ...driver };
       
       if (driver.assignedVehicleId) {
@@ -55,7 +58,7 @@ export function DriversFeature() {
       
       return enriched;
     });
-  }, [search, selectedGroupIds]);
+  }, [fetchedDrivers]);
 
   // --- Handlers ----------------------------------------------------------------
   const handleViewDetail = React.useCallback((driver: Driver) => {
@@ -68,8 +71,16 @@ export function DriversFeature() {
     setEditDriver(driver);
   }, []);
 
-  const handleDelete = React.useCallback((driver: Driver) => {
-    console.log('Delete driver:', driver.id);
+  const handleDelete = React.useCallback(async (driver: Driver) => {
+    if (confirm(`Are you sure you want to delete driver ${driver.name}?`)) {
+      try {
+        await api.delete(`/drivers/${driver.id}`);
+        window.location.reload();
+      } catch (err) {
+        console.error('Failed to delete driver', err);
+        alert('Failed to delete driver');
+      }
+    }
   }, []);
 
   const handleAdd = React.useCallback(() => {
@@ -188,6 +199,7 @@ export function DriversFeature() {
           isFilterOpen={isFilterOpen}
           onFilterOpenChange={setIsFilterOpen}
           dtLabels={dtLabels}
+          isLoading={loading}
         />
       </div>
 
@@ -215,8 +227,18 @@ export function DriversFeature() {
             setIsFormOpen(false);
             setEditDriver(null);
           }}
-          onSave={(data) => {
-            console.log('Saved driver:', data);
+          onSave={async (data) => {
+            try {
+              if (data.id) {
+                await api.put(`/drivers/${data.id}`, data);
+              } else {
+                await api.post('/drivers', data);
+              }
+              window.location.reload();
+            } catch (err) {
+              console.error('Failed to save driver', err);
+              alert('Failed to save driver');
+            }
             setIsFormOpen(false);
             setEditDriver(null);
           }}
