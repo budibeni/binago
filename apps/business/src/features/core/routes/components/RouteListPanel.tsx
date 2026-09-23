@@ -38,7 +38,7 @@ export function RouteListPanel({
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
   
   const [expandedGroups, setExpandedGroups] = React.useState<Record<string, boolean>>(() =>
-    Object.fromEntries(groups.map((g) => [g.id, false]))
+    Object.fromEntries(groups.map((g: any) => [g.id, false]))
   );
 
   const toggleGroup = (groupId: string) => {
@@ -67,7 +67,7 @@ export function RouteListPanel({
   const filteredGroups = groups.map(g => ({
     ...g,
     routes: groupMap.get(g.id) || []
-  })).filter(g => g.routes.length > 0 || !search);
+  } as { id: string; name: string; routes: Route[] })).filter(g => g.routes.length > 0 || !search);
 
   const getLocationLabel = (loc: RouteLocation) => {
     if (loc.type === 'geofence' && loc.geofenceId) {
@@ -283,7 +283,7 @@ export function RouteListPanel({
                   </div>
                   {isExpanded && group.routes.length > 0 && (
                     <div className="flex flex-col border-t border-border bg-[#fafafa] dark:bg-neutral-950 p-1 space-y-0.5">
-                      {group.routes.map(route => <RouteListItem key={route.id} route={route} />)}
+                      {group.routes.map((route: Route) => <RouteListItem key={route.id} route={route} />)}
                     </div>
                   )}
                 </div>

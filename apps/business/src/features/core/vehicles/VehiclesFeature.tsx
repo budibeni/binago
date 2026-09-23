@@ -45,7 +45,7 @@ export function VehiclesFeature() {
   const [editVehicle, setEditVehicle] = React.useState<Vehicle | null>(null);
 
   // ===========================================================================
-  const { vehicles: filteredVehicles, loading } = useVehicles({ search, status: statusFilter as string, groupIds: selectedGroupIds });
+  const { vehicles: filteredVehicles, loading } = useVehicles({ search, status: statusFilter?.length ? statusFilter.join(',') : undefined, groupIds: selectedGroupIds });
 
   // statusCounts removed
 
