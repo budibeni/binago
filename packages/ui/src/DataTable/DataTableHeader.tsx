@@ -50,10 +50,10 @@ export function DataTableHeader<TData extends RowData = RowData>({
                     minWidth: header.column.getSize(),
                     maxWidth: header.column.getSize(),
                   } : {}),
-                  ...(isPinned === 'left' || isPinned === 'start'
-                    ? { left: `${header.column.getStart('left')}px` }
-                    : isPinned === 'right' || isPinned === 'end'
-                    ? { right: `${header.column.getAfter('right')}px` }
+                  ...(isPinned === 'start'
+                    ? { left: `${header.column.getStart('start')}px` }
+                    : isPinned === 'end'
+                    ? { right: `${header.column.getAfter('end')}px` }
                     : {}),
                 }}
               >

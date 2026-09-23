@@ -160,40 +160,6 @@ importers:
         specifier: ^5.3.3
         version: 5.9.3
 
-  packages/geofences:
-    dependencies:
-      '@adatrack/maps':
-        specifier: workspace:*
-        version: link:../maps
-      '@adatrack/types':
-        specifier: workspace:*
-        version: link:../types
-      '@adatrack/ui':
-        specifier: workspace:*
-        version: link:../ui
-      '@adatrack/utils':
-        specifier: workspace:*
-        version: link:../utils
-      lucide-react:
-        specifier: ^1.31.0
-        version: 1.31.0(react@18.3.1)
-    devDependencies:
-      '@types/react':
-        specifier: ^18.2.0
-        version: 18.3.31
-      '@types/react-dom':
-        specifier: ^18.2.0
-        version: 18.3.7(@types/react@18.3.31)
-      react:
-        specifier: ^18.2.0
-        version: 18.3.1
-      react-dom:
-        specifier: ^18.2.0
-        version: 18.3.1(react@18.3.1)
-      typescript:
-        specifier: ^5.3.3
-        version: 5.9.3
-
   packages/maps:
     dependencies:
       '@adatrack/types':
@@ -316,6 +282,12 @@ importers:
         specifier: ^2.2.1
         version: 2.6.1
     devDependencies:
+      '@types/react':
+        specifier: ^18.2.0
+        version: 18.3.31
+      react:
+        specifier: ^18.2.0
+        version: 18.3.1
       typescript:
         specifier: ^5.3.3
         version: 5.9.3

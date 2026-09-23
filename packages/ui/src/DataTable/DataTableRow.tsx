@@ -45,10 +45,10 @@ export function DataTableRow<TData extends RowData = RowData>({
                 minWidth: cell.column.getSize(),
                 maxWidth: cell.column.getSize(),
               } : {}),
-              ...(isPinned === 'left' || isPinned === 'start'
-                ? { left: `${cell.column.getStart('left')}px` }
-                : isPinned === 'right' || isPinned === 'end'
-                ? { right: `${cell.column.getAfter('right')}px` }
+              ...(isPinned === 'start'
+                ? { left: `${cell.column.getStart('start')}px` }
+                : isPinned === 'end'
+                ? { right: `${cell.column.getAfter('end')}px` }
                 : {}),
             }}
           >
