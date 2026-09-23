@@ -11,7 +11,7 @@ export interface GroupData {
   name: string;
   description: string;
   memberCount: number;
-  type: 'vehicle' | 'driver' | 'geofence';
+  type: 'vehicle' | 'driver' | 'geofence' | 'route';
 }
 
 export const mockVehicleGroups: GroupData[] = groupService.getVehicleGroups();
