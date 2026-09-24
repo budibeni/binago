@@ -58,9 +58,8 @@ function useVehicleOptions(open: boolean, currentImei?: string) {
       setGroups(vehicleService.getVehicleGroups().map(g => ({ value: g.id, label: g.name })));
       setDrivers(driverService.getDrivers().map(d => ({ value: d.id, label: d.name })));
       
-      fetch('/api/v1/gps/available')
-        .then(res => res.json())
-        .then(data => {
+      api.get('/gps/available')
+        .then((data: any) => {
             const items = Array.isArray(data) ? data : data?.data || [];
             const imeiOptions = items.map((device: any) => ({
                 value: device.imei,
