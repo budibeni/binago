@@ -68,9 +68,6 @@ function useVehicleOptions(open: boolean, currentImei?: string | null) {
                 value: device.imei,
                 label: `${device.imei} - ${device.device_brand || device.protocol || 'Unknown'}`
             }));
-                value: device.imei,
-                label: `${device.imei} - ${device.protocol || 'Unknown'}`
-            }));
             if (currentImei && !imeiOptions.find((o: any) => o.value === currentImei)) {
                 imeiOptions.unshift({ value: currentImei, label: `${currentImei} (Current)` });
             }
@@ -132,7 +129,7 @@ export function VehicleForm({
     if (selected) {
       handleChange('gpsDeviceBrand', selected.device_brand || '');
       handleChange('gpsDeviceType', selected.device_model || '');
-      handleChange('simCardNumber', selected.sim_number || '');
+      handleChange('deviceSimNumber', selected.sim_number || '');
     }
   };
 
