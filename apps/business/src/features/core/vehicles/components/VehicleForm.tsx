@@ -220,13 +220,22 @@ export function VehicleForm({
             label={tF.lblVehicleId}
             value={formData.vehicleId || ''}
             onChange={(val) => handleChange('vehicleId', val)}
-            disabled
           />
           <InputDate
             label={tF.lblGpsInstallDate}
             value={formData.gpsInstallDate || ''}
             onChange={(val) => handleChange('gpsInstallDate', val)}
-            disabled
+          />
+          <InputSelect
+            label={tF.lblImei}
+            value={formData.deviceImei || ''}
+            onChange={handleImeiChange}
+            options={availableImeis}
+          />
+          <InputString
+            label={tF.lblSimCard}
+            value={formData.deviceSimNumber || ''}
+            onChange={(val) => handleChange('deviceSimNumber', val)}
           />
           <InputString
             label={tF.lblGpsDeviceBrand}
@@ -238,18 +247,6 @@ export function VehicleForm({
             label={tF.lblGpsDeviceType}
             value={formData.gpsDeviceType || ''}
             onChange={(val) => handleChange('gpsDeviceType', val)}
-            disabled
-          />
-          <InputSelect
-            label={tF.lblImei}
-            value={formData.deviceImei || ''}
-            onChange={(val) => handleChange('deviceImei', val)}
-            options={availableImeis}
-          />
-          <InputString
-            label={tF.lblSimCard}
-            value={formData.deviceSimNumber || ''}
-            onChange={(val) => handleChange('deviceSimNumber', val)}
             disabled
           />
         </FormCard>
