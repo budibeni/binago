@@ -8,9 +8,10 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1
 export async function login(formData: FormData) {
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
+  const company_code = formData.get('company_code') as string;
 
-  if (!email || !password) {
-    return { error: 'Email and password are required' };
+  if (!email || !password || !company_code) {
+    return { error: 'email, password, and company_code are required' };
   }
 
   try {
@@ -19,7 +20,7 @@ export async function login(formData: FormData) {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, password, company_code }),
     });
 
     const data = await res.json();
