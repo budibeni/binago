@@ -10,17 +10,22 @@ export async function login(formData: FormData) {
   const password = formData.get('password') as string;
   const company_code = formData.get('company_code') as string;
 
-  if (!email || !password || !company_code) {
-    return { error: 'email, password, and company_code are required' };
+  if (!email || !password) {
+    return { error: 'Email and password are required' };
   }
 
   try {
+    const body: any = { email, password };
+    if (company_code) {
+      body.company_code = company_code;
+    }
+
     const res = await fetch(`${API_URL}/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ email, password, company_code }),
+      body: JSON.stringify(body),
     });
 
     const data = await res.json();
@@ -29,8 +34,17 @@ export async function login(formData: FormData) {
       return { error: data.message || data.error || 'Invalid credentials' };
     }
 
+    if (data.status === 'multiple_companies') {
+      return { 
+        multiple_companies: true, 
+        companies: data.data.companies,
+        email, 
+        password 
+      };
+    }
+
     if (data.status === 'success' && data.data?.token) {
-      const token = data.data.token;
+const token = data.data.token;
       const user = data.data.user;
 
       // Store token in cookie
