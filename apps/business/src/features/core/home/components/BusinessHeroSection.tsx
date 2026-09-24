@@ -3,7 +3,7 @@
 import React from 'react';
 import { Truck, TrendingUp, AlertTriangle, Route } from 'lucide-react';
 import { homeService } from '@/data/services';
-import { useBusinessLocale } from '../../../../components/BusinessShellLayout';
+import { useBusinessLocale, useBusinessUser } from '../../../../components/BusinessShellLayout';
 import { getTranslation } from '../../../../i18n';
 
 interface MetricCardProps {
@@ -31,6 +31,8 @@ export function BusinessHeroSection() {
   const locale = useBusinessLocale();
   const t = getTranslation(locale);
   const h = t.home;
+  const user = useBusinessUser();
+  const displayName = user?.name && user.name !== 'User' && user.name !== user.email ? user.name : user?.email?.split('@')[0] || 'Pengguna';
 
   return (
     <div className="relative overflow-hidden rounded-2xl bg-neutral-900 px-8 pt-8 pb-6 w-full">
@@ -53,7 +55,7 @@ export function BusinessHeroSection() {
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-white/60 mb-1">{h.heroGreeting}</p>
           <h1 className="text-3xl font-bold text-white leading-tight mb-3">
-            Budi Setiawan!
+            {displayName}!
           </h1>
           <p className="text-sm text-white/60 max-w-sm leading-relaxed">
             {h.heroSubtitle}

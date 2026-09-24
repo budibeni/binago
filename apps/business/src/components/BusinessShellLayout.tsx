@@ -233,6 +233,11 @@ function buildBottomNavigation(locale: Locale): NavItem[] {
 }
 
 export const BusinessLocaleContext = React.createContext<Locale>('id');
+export const BusinessUserContext = React.createContext<UserInfo | undefined>(undefined);
+
+export function useBusinessUser() {
+  return React.useContext(BusinessUserContext);
+}
 
 export function useBusinessLocale() {
   return React.useContext(BusinessLocaleContext);
@@ -353,9 +358,11 @@ export function BusinessShellLayout({ children, user }: { children: React.ReactN
         userMenuLabels={t.userMenu}
       >
         <ShareLocationProvider>
-          <BusinessLocaleContext.Provider value={locale}>
+          <BusinessUserContext.Provider value={currentUser}>
+        <BusinessLocaleContext.Provider value={locale}>
             {children}
           </BusinessLocaleContext.Provider>
+        </BusinessUserContext.Provider>
         </ShareLocationProvider>
       </AppShell>
     </UIProvider>
