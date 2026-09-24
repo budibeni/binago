@@ -8,23 +8,10 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1
 export async function login(formData: FormData) {
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
-  let company_code = formData.get('company_code') as string;
+  const company_code = formData.get('company_code') as string;
 
-  if (!email || !password) {
-    return { error: 'email and password are required' };
-  }
-
-  // Extract company code from email domain if not explicitly provided
-  // e.g., admin@tesst001.local -> TESST001
-  if (!company_code && email.includes('@')) {
-    const domainPart = email.split('@')[1];
-    if (domainPart) {
-      company_code = domainPart.split('.')[0].toUpperCase();
-    }
-  }
-
-  if (!company_code) {
-    return { error: 'Could not determine company code from email' };
+  if (!email || !password || !company_code) {
+    return { error: 'email, password, and company_code are required' };
   }
 
   try {
