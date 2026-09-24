@@ -48,18 +48,34 @@ const DEFAULT_VEHICLE = {
   notes: ''
 } as unknown as Vehicle;
 
-function useVehicleOptions(open: boolean) {
+function useVehicleOptions(open: boolean, currentImei?: string) {
   const [groups, setGroups] = React.useState<{ value: string, label: string }[]>([]);
   const [drivers, setDrivers] = React.useState<{ value: string, label: string }[]>([]);
+  const [availableImeis, setAvailableImeis] = React.useState<{ value: string, label: string }[]>([]);
 
   React.useEffect(() => {
     if (open) {
       setGroups(vehicleService.getVehicleGroups().map(g => ({ value: g.id, label: g.name })));
       setDrivers(driverService.getDrivers().map(d => ({ value: d.id, label: d.name })));
+      
+      fetch('/api/v1/gps/available')
+        .then(res => res.json())
+        .then(data => {
+            const items = Array.isArray(data) ? data : data?.data || [];
+            const imeiOptions = items.map((device: any) => ({
+                value: device.imei,
+                label: `${device.imei} - ${device.protocol || 'Unknown'}`
+            }));
+            if (currentImei && !imeiOptions.find((o: any) => o.value === currentImei)) {
+                imeiOptions.unshift({ value: currentImei, label: `${currentImei} (Current)` });
+            }
+            setAvailableImeis(imeiOptions);
+        })
+        .catch(err => console.error("Failed to fetch available IMEIs", err));
     }
-  }, [open]);
+  }, [open, currentImei]);
 
-  return { groups, drivers };
+  return { groups, drivers, availableImeis };
 }
 
 interface VehicleFormProps {
@@ -103,7 +119,7 @@ export function VehicleForm({
     }
   });
 
-  const { groups, drivers } = useVehicleOptions(open);
+  const { groups, drivers, availableImeis } = useVehicleOptions(open, vehicle?.deviceImei);
 
   return (
     <FormShell
@@ -209,11 +225,11 @@ export function VehicleForm({
             onChange={(val) => handleChange('gpsDeviceType', val)}
             disabled
           />
-          <InputString
+          <InputSelect
             label={tF.lblImei}
             value={formData.deviceImei || ''}
             onChange={(val) => handleChange('deviceImei', val)}
-            disabled
+            options={availableImeis}
           />
           <InputString
             label={tF.lblSimCard}
