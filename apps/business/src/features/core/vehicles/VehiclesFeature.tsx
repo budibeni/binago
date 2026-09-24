@@ -43,6 +43,7 @@ export function VehiclesFeature() {
   const [drawerOpen, setDrawerOpen] = React.useState(false);
 
   const [editVehicle, setEditVehicle] = React.useState<Vehicle | null>(null);
+  const [isAddOpen, setIsAddOpen] = React.useState(false);
 
   // ===========================================================================
   const { vehicles: filteredVehicles, loading } = useVehicles({ search, status: statusFilter?.length ? statusFilter.join(',') : undefined, groupIds: selectedGroupIds });
@@ -57,6 +58,10 @@ export function VehiclesFeature() {
 
   const handleCloseDrawer = React.useCallback(() => {
     setDrawerOpen(false);
+  }, []);
+
+  const handleAdd = React.useCallback(() => {
+    setIsAddOpen(true);
   }, []);
 
   const handleEdit = React.useCallback((vehicle: Vehicle) => {
@@ -232,6 +237,7 @@ export function VehiclesFeature() {
         <VehicleTable
           data={filteredVehicles}
           labels={tableLabels}
+          onAdd={handleAdd}
           onViewDetail={handleViewDetail}
           onEdit={handleEdit}
           onTrack={handleTrack}
@@ -258,13 +264,14 @@ export function VehiclesFeature() {
         onTrack={handleTrack}
       />
 
-      {!!editVehicle && (
+      {(!!editVehicle || isAddOpen) && (
         <VehicleForm
-          vehicle={editVehicle}
-          open={!!editVehicle}
+          vehicle={editVehicle || null}
+          open={!!editVehicle || isAddOpen}
           onOpenChange={(open) => {
             if (!open) {
               setEditVehicle(null);
+              setIsAddOpen(false);
             }
           }}
           onSave={async (data) => {
