@@ -43,8 +43,8 @@ export async function login(formData: FormData) {
       };
     }
 
-    if (data.status === 'success' && data.data?.token) {
-const token = data.data.token;
+    if (data.status === 'success' && (data.data?.token || data.data?.access_token)) {
+const token = data.data?.token || data.data?.access_token;
       const user = data.data.user;
 
       // Store token in cookie
