@@ -12,6 +12,7 @@ import {
 } from '@adatrack/ui';
 import { getVehicleFormSchema, type Vehicle } from '../types/vehicle';
 import { vehicleService, driverService } from '@/data/services';
+import { api } from '@adatrack/utils';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
 import { getVehiclesTranslation } from '../i18n';
 const VEHICLE_CATEGORY_OPTIONS = [
@@ -48,7 +49,7 @@ const DEFAULT_VEHICLE = {
   notes: ''
 } as unknown as Vehicle;
 
-function useVehicleOptions(open: boolean, currentImei?: string) {
+function useVehicleOptions(open: boolean, currentImei?: string | null) {
   const [groups, setGroups] = React.useState<{ value: string, label: string }[]>([]);
   const [drivers, setDrivers] = React.useState<{ value: string, label: string }[]>([]);
   const [availableImeis, setAvailableImeis] = React.useState<{ value: string, label: string }[]>([]);
@@ -70,7 +71,7 @@ function useVehicleOptions(open: boolean, currentImei?: string) {
             }
             setAvailableImeis(imeiOptions);
         })
-        .catch(err => console.error("Failed to fetch available IMEIs", err));
+        .catch((err: any) => console.error("Failed to fetch available IMEIs", err));
     }
   }, [open, currentImei]);
 

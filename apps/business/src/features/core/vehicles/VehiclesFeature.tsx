@@ -247,7 +247,6 @@ export function VehiclesFeature() {
           filterConfig={filterConfig}
           isFilterOpen={isFilterOpen}
           onFilterOpenChange={setIsFilterOpen}
-          onAdd={undefined}
           dtLabels={dtLabels}
           isLoading={loading}
         />
