@@ -50,19 +50,24 @@ const DEFAULT_VEHICLE = {
 } as unknown as Vehicle;
 
 function useVehicleOptions(open: boolean, currentImei?: string | null) {
-  const [groups, setGroups] = React.useState<{ value: string, label: string }[]>([]);
+    const [groups, setGroups] = React.useState<{ value: string, label: string }[]>([]);
   const [drivers, setDrivers] = React.useState<{ value: string, label: string }[]>([]);
   const [availableImeis, setAvailableImeis] = React.useState<{ value: string, label: string }[]>([]);
+  const [rawDevices, setRawDevices] = React.useState<any[]>([]);
 
   React.useEffect(() => {
     if (open) {
       setGroups(vehicleService.getVehicleGroups().map(g => ({ value: g.id, label: g.name })));
       setDrivers(driverService.getDrivers().map(d => ({ value: d.id, label: d.name })));
       
-      api.get('/gps/available')
+            api.get(`/gps/available${currentImei ? `?current_imei=${currentImei}` : ''}`)
         .then((data: any) => {
             const items = Array.isArray(data) ? data : data?.data || [];
+            setRawDevices(items);
             const imeiOptions = items.map((device: any) => ({
+                value: device.imei,
+                label: `${device.imei} - ${device.device_brand || device.protocol || 'Unknown'}`
+            }));
                 value: device.imei,
                 label: `${device.imei} - ${device.protocol || 'Unknown'}`
             }));
@@ -75,7 +80,7 @@ function useVehicleOptions(open: boolean, currentImei?: string | null) {
     }
   }, [open, currentImei]);
 
-  return { groups, drivers, availableImeis };
+  return { groups, drivers, availableImeis, rawDevices };
 }
 
 interface VehicleFormProps {
@@ -119,7 +124,17 @@ export function VehicleForm({
     }
   });
 
-  const { groups, drivers, availableImeis } = useVehicleOptions(open, vehicle?.deviceImei);
+  const { groups, drivers, availableImeis, rawDevices } = useVehicleOptions(open, vehicle?.deviceImei);
+
+  const handleImeiChange = (val: string) => {
+    handleChange('deviceImei', val);
+    const selected = rawDevices.find((d: any) => d.imei === val);
+    if (selected) {
+      handleChange('gpsDeviceBrand', selected.device_brand || '');
+      handleChange('gpsDeviceType', selected.device_model || '');
+      handleChange('simCardNumber', selected.sim_number || '');
+    }
+  };
 
   return (
     <FormShell
