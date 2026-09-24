@@ -34,13 +34,14 @@ export function usePersonalLocale() {
   return React.useContext(PersonalLocaleContext);
 }
 
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { logout } from '../app/actions/auth';
 
 export function PersonalShellLayout({ children, user }: { children: React.ReactNode, user?: UserInfo }) {
   const [locale, setLocale] = React.useState<Locale>('id');
   const [theme, setTheme] = React.useState<'light' | 'dark'>('light');
   const currentPath = usePathname() || '/';
+  const router = useRouter();
 
   const currentUser = user || DUMMY_USER;
 

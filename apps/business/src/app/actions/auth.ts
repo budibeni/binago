@@ -53,7 +53,7 @@ const token = data.data?.token || data.data?.access_token;
         value: token,
         httpOnly: false, // Must be readable by client api.ts to send in Authorization header
         path: '/',
-        secure: process.env.NODE_ENV === 'production',
+        secure: process.env.NODE_ENV === 'production' && process.env.NEXT_PUBLIC_API_URL?.startsWith('https'),
         maxAge: 60 * 60 * 24 * 7, // 1 week
       });
 
@@ -64,7 +64,7 @@ const token = data.data?.token || data.data?.access_token;
         value: JSON.stringify(user),
         httpOnly: false,
         path: '/',
-        secure: process.env.NODE_ENV === 'production',
+        secure: process.env.NODE_ENV === 'production' && process.env.NEXT_PUBLIC_API_URL?.startsWith('https'),
         maxAge: 60 * 60 * 24 * 7,
       });
       

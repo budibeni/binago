@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   Home,
   Map,
@@ -249,6 +249,7 @@ export function BusinessShellLayout({ children, user }: { children: React.ReactN
   const [locale, setLocale] = React.useState<Locale>('id');
   const [theme, setTheme] = React.useState<'light' | 'dark'>('light');
   const currentPath = usePathname() || '/';
+  const router = useRouter();
 
   const currentUser = user || DUMMY_USER;
 
@@ -348,6 +349,7 @@ export function BusinessShellLayout({ children, user }: { children: React.ReactN
         navigation={navigation}
         bottomNavigation={buildBottomNavigation(locale)}
         currentPath={currentPath}
+        onNavigate={(href) => router.push(href)}
         breadcrumbItems={breadcrumbItems}
         user={currentUser}
         currentLocale={locale}
