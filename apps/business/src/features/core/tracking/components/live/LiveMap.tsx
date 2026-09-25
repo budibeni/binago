@@ -159,6 +159,12 @@ export function LiveMap({ vehicles, selectedVehicleId, visibleVehicleIds = [], o
         playbackParkingEvents={playbackParkingEvents}
         className="w-full h-full border-0 rounded-none min-h-0"
       />
+      {/* DEBUG OVERLAY */}
+      <div className="absolute top-0 left-0 z-50 bg-black/80 text-green-400 p-2 m-2 font-mono text-xs rounded border border-green-500 pointer-events-none">
+        <div>Total Vehicles: {vehicles.length}</div>
+        <div>Visible IDs: {visibleVehicleIds.join(', ')}</div>
+        <div>Selected ID (focusedId): {internalSelectedId || 'null'}</div>
+      </div>
     </div>
   );
 }

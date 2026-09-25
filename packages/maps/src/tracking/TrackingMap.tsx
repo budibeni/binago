@@ -129,17 +129,15 @@ function TrackingMapInner<T>({
   // Sync focusedEntityId with controlled focusedId prop
   useEffect(() => {
     if (focusedId === undefined || !map) return;
-    if (focusedId !== focusedEntityId) {
-      setFocusedEntityId(focusedId);
-      if (focusedId) {
-        const entity = entities.find((e) => getId(e) === focusedId);
-        if (entity) {
-          const pos = getPosition(entity);
-          flyTo({ lat: pos.lat, lng: pos.lng });
-        }
+    setFocusedEntityId(focusedId);
+    if (focusedId) {
+      const entity = entities.find((e) => getId(e) === focusedId);
+      if (entity) {
+        const pos = getPosition(entity);
+        flyTo({ lat: pos.lat, lng: pos.lng });
       }
     }
-  }, [focusedId, map, entities, getId, flyTo, focusedEntityId]);
+  }, [focusedId, map, entities, getId, flyTo]);
 
   // Marker style state
   const [markerStyle, setMarkerStyle] = useState<'default' | 'custom'>(renderMarker ? 'custom' : 'default');
