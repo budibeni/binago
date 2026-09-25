@@ -211,7 +211,7 @@ function ParkingMarkerWithPopup({
                 <InfoRow
                   icon={Gauge}
                   label={tTracking.playbackOdometer}
-                  value={`${event.odometer.toLocaleString('id-ID', { minimumFractionDigits: 1 })} km`}
+                  value={`${(event.odometer || 0).toLocaleString('id-ID', { minimumFractionDigits: 1 })} km`}
                 />
               </div>
 

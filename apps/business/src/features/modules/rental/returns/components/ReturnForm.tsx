@@ -98,7 +98,7 @@ export function ReturnForm({ contract, handover, onSubmit, onCancel, isSubmittin
   const handleOdometerChange = (val: number) => {
     setOdometerEnd(val);
     if (val < handover.odometerStart) {
-      setOdometerError(`Odometer akhir tidak boleh lebih kecil dari odometer awal (${handover.odometerStart.toLocaleString('id-ID')} KM).`);
+      setOdometerError(`Odometer akhir tidak boleh lebih kecil dari odometer awal (${(handover.odometerStart || 0).toLocaleString('id-ID')} KM).`);
     } else {
       setOdometerError('');
     }
@@ -260,7 +260,7 @@ export function ReturnForm({ contract, handover, onSubmit, onCancel, isSubmittin
         <div className="p-4 grid grid-cols-1 sm:grid-cols-3 gap-6">
           <div className="p-4 bg-neutral-50 dark:bg-neutral-900/50 rounded-xl border border-border">
             <p className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Odometer Awal (Serah Terima)</p>
-            <p className="text-xl font-bold">{handover.odometerStart.toLocaleString('id-ID')}</p>
+            <p className="text-xl font-bold">{(handover.odometerStart || 0).toLocaleString('id-ID')}</p>
             <p className="text-xs text-muted-foreground">KM</p>
           </div>
           <div>
@@ -276,7 +276,7 @@ export function ReturnForm({ contract, handover, onSubmit, onCancel, isSubmittin
           </div>
           <div className="p-4 bg-primary/5 dark:bg-primary/10 rounded-xl border border-primary/20">
             <p className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Jarak Tempuh</p>
-            <p className="text-xl font-bold text-primary">{distanceUsed.toLocaleString('id-ID')}</p>
+            <p className="text-xl font-bold text-primary">{(distanceUsed || 0).toLocaleString('id-ID')}</p>
             <p className="text-xs text-muted-foreground">KM</p>
           </div>
         </div>
@@ -456,15 +456,15 @@ export function ReturnForm({ contract, handover, onSubmit, onCancel, isSubmittin
         <div className="p-4 grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
           <div className="flex justify-between">
             <span className="text-muted-foreground">Odometer Awal</span>
-            <span className="font-medium">{handover.odometerStart.toLocaleString('id-ID')} KM</span>
+            <span className="font-medium">{(handover.odometerStart || 0).toLocaleString('id-ID')} KM</span>
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">Odometer Akhir</span>
-            <span className="font-medium">{odometerEnd.toLocaleString('id-ID')} KM</span>
+            <span className="font-medium">{(odometerEnd || 0).toLocaleString('id-ID')} KM</span>
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">Jarak Tempuh</span>
-            <span className="font-bold text-primary">{distanceUsed.toLocaleString('id-ID')} KM</span>
+            <span className="font-bold text-primary">{(distanceUsed || 0).toLocaleString('id-ID')} KM</span>
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">Keterlambatan</span>

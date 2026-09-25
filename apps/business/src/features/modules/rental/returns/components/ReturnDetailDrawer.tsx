@@ -108,8 +108,8 @@ export function ReturnDetailDrawer({ ret, open, onClose }: ReturnDetailDrawerPro
                 </div>
                 <div className="grid grid-cols-3 border-b border-border text-sm">
                   <div className="p-2 text-muted-foreground">Odometer</div>
-                  <div className="p-2 border-l border-border font-medium">{handover.odometerStart.toLocaleString('id-ID')} KM</div>
-                  <div className="p-2 border-l border-border font-medium">{ret.odometerEnd.toLocaleString('id-ID')} KM</div>
+                  <div className="p-2 border-l border-border font-medium">{(handover.odometerStart || 0).toLocaleString('id-ID')} KM</div>
+                  <div className="p-2 border-l border-border font-medium">{(ret.odometerEnd || 0).toLocaleString('id-ID')} KM</div>
                 </div>
                 <div className="grid grid-cols-3 border-b border-border text-sm">
                   <div className="p-2 text-muted-foreground">BBM</div>
@@ -125,7 +125,7 @@ export function ReturnDetailDrawer({ ret, open, onClose }: ReturnDetailDrawerPro
               {distanceUsed !== null && (
                 <div className="mt-3 p-3 bg-primary/5 dark:bg-primary/10 rounded-lg border border-primary/20 flex justify-between text-sm">
                   <span className="font-bold text-muted-foreground">Total Jarak Tempuh</span>
-                  <span className="font-bold text-primary">{distanceUsed.toLocaleString('id-ID')} KM</span>
+                  <span className="font-bold text-primary">{(distanceUsed || 0).toLocaleString('id-ID')} KM</span>
                 </div>
               )}
             </section>

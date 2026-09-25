@@ -157,14 +157,14 @@ export function VehicleView({ vehicle, open, onClose, labels, onEdit, onDelete, 
             <InfoRow icon={User} label="Pengemudi" value={vehicle.driverName || labels.noDriver} />
             <InfoRow icon={Car} label="Grup" value={vehicle.groupName} />
             <InfoRow icon={Cpu} label="IMEI Device" value={vehicle.deviceImei || labels.noDevice} />
-            <InfoRow icon={Gauge} label="Odometer" value={`${vehicle.odometer.toLocaleString('id-ID')} km`} />
+            <InfoRow icon={Gauge} label="Odometer" value={`${(vehicle.odometer || vehicle.odometer_km || 0).toLocaleString('id-ID')} km`} />
             <InfoRow icon={Clock} label="Update Terakhir" value={formatDateTime(vehicle.lastUpdate)} />
           </div>
 
           {/* Section: Maintenance */}
           <SectionHeader icon={Wrench} title={labels.detailMaintenance} />
           <div className="rounded-lg border border-border/60 bg-neutral-50/30 dark:bg-neutral-900/20 px-3">
-            <InfoRow icon={Wrench} label="Servis Terakhir" value={`${vehicle.lastServiceKm.toLocaleString('id-ID')} km`} />
+            <InfoRow icon={Wrench} label="Servis Terakhir" value={`${(vehicle.lastServiceKm || 0).toLocaleString('id-ID')} km`} />
 
             {/* Service progress */}
             <div className="py-2.5 border-b border-border/60">
@@ -180,7 +180,7 @@ export function VehicleView({ vehicle, open, onClose, labels, onEdit, onDelete, 
                     'text-[13px] font-medium',
                     isServiceDue ? 'text-warning-600 dark:text-warning-400 font-semibold' : 'text-foreground',
                   )}>
-                    {vehicle.nextServiceKm.toLocaleString('id-ID')} km
+                    {(vehicle.nextServiceKm || 0).toLocaleString('id-ID')} km
                   </p>
                 </div>
                 {isServiceDue && (
