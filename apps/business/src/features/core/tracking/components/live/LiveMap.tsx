@@ -110,9 +110,10 @@ export function LiveMap({ vehicles, selectedVehicleId, visibleVehicleIds = [], o
         // Marker Presentation
         getLabel={(v) => v.plateNumber}
         getIcon={(v) => {
-          const isMinibus = v.vehicleType?.toLowerCase().includes('minibus')
-            || v.vehicleType?.toLowerCase().includes('hiace')
-            || v.vehicleType?.toLowerCase().includes('bus');
+          const typeStr = v.vehicleType?.toLowerCase() || '';
+          const isMinibus = typeStr.includes('minibus')
+            || typeStr.includes('hiace')
+            || typeStr.includes('bus');
           return isMinibus ? <Bus className="w-5 h-5" /> : <Truck className="w-5 h-5" />;
         }}
 

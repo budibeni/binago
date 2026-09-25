@@ -11,9 +11,10 @@ export interface VehicleMarkerProps {
 }
 
 export function VehicleMarker({ vehicle, selected, onClick }: VehicleMarkerProps) {
-  const isMinibus = vehicle.vehicleType?.toLowerCase().includes('minibus')
-    || vehicle.vehicleType?.toLowerCase().includes('hiace')
-    || vehicle.vehicleType?.toLowerCase().includes('bus');
+  const typeStr = vehicle.vehicleType?.toLowerCase() || '';
+  const isMinibus = typeStr.includes('minibus')
+    || typeStr.includes('hiace')
+    || typeStr.includes('bus');
   
   // Selection vs Status: Marker icon color ONLY reflects selection state like in Personal.
   const markerClasses = selected
