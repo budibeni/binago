@@ -13,7 +13,7 @@ import {
 } from '@adatrack/ui';
 import { CardModel, CardType, CardStatus } from '../types/card';
 import type { getCardTranslation } from '../i18n';
-import { driverService } from '@/data/services/driverService';
+import { useDrivers } from '@/features/core/drivers/hooks/useDrivers';
 import { personelService } from '@/data/core/access/personel/services/personelService';
 
 type CardTranslation = ReturnType<typeof getCardTranslation>;
@@ -149,7 +149,7 @@ export function CardForm({ card, open, onOpenChange, onSave, onCancel, activeAss
               label={t.form.labelHolder}
               value={formData.holderId || ''}
               onChange={(val) => handleChange('holderId', val as string)}
-              options={driverService.getDrivers().filter(d =>
+              options={apiDrivers.filter(d =>
                 !activeAssignments.has(d.id) || d.id === card.holderId
               ).map(d => ({ value: d.id, label: d.name }))}
             />

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { cardService } from '@/data/core/access/card/services/cardService';
-import { driverService } from '@/data/services/driverService';
+import { useDrivers } from '@/features/core/drivers/hooks/useDrivers';
 import { personelService } from '@/data/core/access/personel/services/personelService';
 import { CardModel } from './types/card';
 import { CardTable } from './components/CardTable';
@@ -53,7 +53,7 @@ export function CardFeature() {
       let holderSubtitle = '';
 
       if (c.holderType === 'DRIVER' && c.holderId) {
-        const d = driverService.getDriverById(c.holderId);
+        const d = apiDrivers.find(d => d.id === c.holderId);
         holderName = d ? d.name : 'Unknown Driver';
         holderSubtitle = t.form.valDriver;
       } else if (c.holderType === 'PERSONEL' && c.holderId) {

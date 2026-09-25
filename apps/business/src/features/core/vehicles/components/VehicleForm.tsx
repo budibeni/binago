@@ -11,7 +11,8 @@ import {
   useForm
 } from '@adatrack/ui';
 import { getVehicleFormSchema, type Vehicle } from '../types/vehicle';
-import { vehicleService, driverService } from '@/data/services';
+import { vehicleService } from '@/data/services';
+import { useDrivers } from '@/features/core/drivers/hooks/useDrivers';
 import { api } from '@adatrack/utils';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
 import { getVehiclesTranslation } from '../i18n';
@@ -58,7 +59,7 @@ function useVehicleOptions(open: boolean, currentImei?: string | null) {
   React.useEffect(() => {
     if (open) {
       setGroups(vehicleService.getVehicleGroups().map(g => ({ value: g.id, label: g.name })));
-      setDrivers(driverService.getDrivers().map(d => ({ value: d.id, label: d.name })));
+      setDrivers(apiDrivers.map(d => ({ value: d.id, label: d.name })));
       
             api.get(`/gps/available${currentImei ? `?current_imei=${currentImei}` : ''}`)
         .then((data: any) => {
