@@ -54,6 +54,7 @@ export function useRoutes(filters?: { search?: string; status?: string; groupId?
               destination: destination as any,
               stops,
               status: r.status === 'active' ? 'active' : 'inactive',
+              groupId: r.groupId ? String(r.groupId) : undefined,
               createdAt: new Date().toISOString(),
               updatedAt: new Date().toISOString(),
             };

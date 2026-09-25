@@ -37,6 +37,7 @@ export function useGeofences(filters?: { search?: string; status?: string; group
               description: '-',
               geometry: geometry,
               status: 'active',
+              groupId: g.groupId ? String(g.groupId) : undefined,
               createdAt: new Date().toISOString(),
               updatedAt: new Date().toISOString(),
             };
