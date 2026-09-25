@@ -64,14 +64,15 @@ interface VehicleTableProps {
   isLoading?: boolean;
 }
 
-function getStatusBadge(status: Vehicle['status'], labels: VehicleTableLabels) {
-  const map = {
-    driving: { label: labels.statusDriving, variant: 'success' as const },
-    idle: { label: labels.statusIdle, variant: 'warning' as const },
-    parking: { label: labels.statusParking, variant: 'default' as const },
-    offline: { label: labels.statusOffline, variant: 'danger' as const },
+function getStatusBadge(status: string, labels: VehicleTableLabels) {
+  const map: Record<string, { label: string; variant: 'success' | 'warning' | 'default' | 'danger' }> = {
+    driving: { label: labels.statusDriving || 'Driving', variant: 'success' },
+    idle: { label: labels.statusIdle || 'Idle', variant: 'warning' },
+    parking: { label: labels.statusParking || 'Parking', variant: 'default' },
+    offline: { label: labels.statusOffline || 'Offline', variant: 'danger' },
+    active: { label: 'Active', variant: 'success' },
   };
-  const cfg = map[status];
+  const cfg = map[status] || { label: status || 'Unknown', variant: 'default' };
   return <Badge variant={cfg.variant} dot>{cfg.label}</Badge>;
 }
 

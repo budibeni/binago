@@ -46,14 +46,15 @@ interface VehicleViewProps {
 
 // â"€â"€â"€ Status Config â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
-function getStatusConfig(status: Vehicle['status'], labels: VehicleViewProps['labels']) {
-  const map = {
-    driving: { label: labels.statusDriving, variant: 'success' as const },
-    idle: { label: labels.statusIdle, variant: 'warning' as const },
-    parking: { label: labels.statusParking, variant: 'default' as const },
-    offline: { label: labels.statusOffline, variant: 'danger' as const },
+function getStatusConfig(status: string, labels: VehicleViewProps['labels']) {
+  const map: Record<string, { label: string; variant: 'success' | 'warning' | 'default' | 'danger' }> = {
+    driving: { label: labels.statusDriving || 'Driving', variant: 'success' },
+    idle: { label: labels.statusIdle || 'Idle', variant: 'warning' },
+    parking: { label: labels.statusParking || 'Parking', variant: 'default' },
+    offline: { label: labels.statusOffline || 'Offline', variant: 'danger' },
+    active: { label: 'Active', variant: 'success' },
   };
-  return map[status];
+  return map[status] || { label: status || 'Unknown', variant: 'default' };
 }
 
 function getCategoryLabel(cat: Vehicle['vehicleCategory']): string {
