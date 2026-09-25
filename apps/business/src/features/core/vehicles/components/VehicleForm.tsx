@@ -51,6 +51,7 @@ const DEFAULT_VEHICLE = {
 } as unknown as Vehicle;
 
 function useVehicleOptions(open: boolean, currentImei?: string | null) {
+  const { drivers: apiDrivers } = useDrivers();
     const [groups, setGroups] = React.useState<{ value: string, label: string }[]>([]);
   const [drivers, setDrivers] = React.useState<{ value: string, label: string }[]>([]);
   const [availableImeis, setAvailableImeis] = React.useState<{ value: string, label: string }[]>([]);

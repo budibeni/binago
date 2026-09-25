@@ -321,7 +321,8 @@ export function RentalVehiclesFeature() {
           availablePricingCategory={pricingCategorys}
           onCancel={() => setEditId(null)}
           onSave={(data) => {
-            // TODO: dispatch edit save
+            // Rental API not ready yet. Mocking save for now.
+            console.log('Saved vehicle', data);
             setEditId(null);
             setDataVersion(prev => prev + 1);
           }}

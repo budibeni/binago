@@ -95,7 +95,7 @@ export function GeofenceFeature({ locale = 'id' }: GeofenceFeatureProps) {
       ) : (
         <GeofenceListView
           geofences={geofences}
-          groups={geofenceService.getGeofenceGroups()}
+          groups={[]}
           onAdd={handleAdd}
           onEdit={handleEdit}
           onDelete={handleDelete}

@@ -3,12 +3,14 @@
 import React from 'react';
 import { getDriversTranslation } from './i18n';
 import { useBusinessLocale } from '../../../components/BusinessShellLayout';
-import { driverService, vehicleService, groupService } from '@/data/services';
+// Use hooks instead of mock services
 import { DriverTable } from './components/DriverTable';
 import { DriverView } from './components/DriverView';
 import { DriverForm } from './components/DriverForm';
 import { useDrivers } from './hooks/useDrivers';
+import { useVehicles } from '@/features/core/vehicles/hooks/useVehicles';
 import { api } from '@adatrack/utils';
+import { groupService } from '@/data/services';
 import type { Driver, DriverStatusFilter } from './types/driver';
 import { useRouter } from 'next/navigation';
 
@@ -35,7 +37,9 @@ export function DriversFeature() {
   const [editDriver, setEditDriver] = React.useState<Driver | null>(null);
 
   // --- Filtered Data -----------------------------------------------------------
-  const { drivers: fetchedDrivers, loading } = useDrivers({ search, status: statusFilter, groupIds: selectedGroupIds });
+  const { drivers: fetchedDrivers, loading: driversLoading } = useDrivers({ search, status: statusFilter, groupIds: selectedGroupIds });
+  const { vehicles: apiVehicles } = useVehicles();
+  const loading = driversLoading;
   
   const filteredDrivers = React.useMemo(() => {
     // Enrich with plate number & group name
@@ -43,14 +47,14 @@ export function DriversFeature() {
       let enriched = { ...driver };
       
       if (driver.assignedVehicleId) {
-        const vehicle = vehicleService.getVehicles().find(v => v.id === driver.assignedVehicleId);
+        const vehicle = apiVehicles.find(v => v.id === driver.assignedVehicleId);
         if (vehicle) {
           enriched.assignedVehiclePlate = vehicle.plateNumber;
         }
       }
       
       if (driver.groupId) {
-        const group = groupService.getDriverGroups().find(g => g.id === driver.groupId);
+        const group = groupService.getDriverGroups().find((g: any) => g.id === driver.groupId);
         if (group) {
           enriched.groupName = group.name;
         }
@@ -171,7 +175,7 @@ export function DriversFeature() {
         id: 'groupIds',
         label: tD.filterGroup,
         type: 'pills-multi' as const,
-        options: groupService.getDriverGroups().map(g => ({
+        options: ([] as any[]).map(g => ({
           value: g.id,
           label: g.name
         }))

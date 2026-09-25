@@ -106,7 +106,7 @@ export function GeofenceEditorView({
                 onChange={(val) => setFormData({ ...formData, groupId: val === 'none' ? '' : val })}
                 options={[
                   { value: 'none', label: `-- ${t.unassigned} --` },
-                  ...geofenceService.getGeofenceGroups().map(group => ({ value: group.id, label: group.name }))
+                  ...([] as any[]).map(group => ({ value: group.id, label: group.name }))
                 ]}
               />
 

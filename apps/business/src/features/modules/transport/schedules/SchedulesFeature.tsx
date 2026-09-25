@@ -216,7 +216,8 @@ export function SchedulesFeature() {
             setEditId(null);
           }}
           onSave={(data) => {
-            // TODO: call service to save
+            // Transport API not ready yet. Mocking save for now.
+            console.log('Saved schedule', data);
             setIsCreateOpen(false);
             setEditId(null);
             // Refresh data

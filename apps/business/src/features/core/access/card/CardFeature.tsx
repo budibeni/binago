@@ -15,6 +15,7 @@ import type { DataTableFilterConfig } from '@adatrack/ui';
 export function CardFeature() {
   const locale = useBusinessLocale();
   const t = getCardTranslation(locale);
+  const { drivers: apiDrivers } = useDrivers();
   const [data, setData] = React.useState<CardModel[]>([]);
 
   // Table state

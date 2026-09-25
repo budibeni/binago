@@ -230,7 +230,8 @@ export function CustomersFeature() {
             setEditId(null);
           }}
           onSave={(data) => {
-            // TODO: dispatch save logic
+            // Rental API not ready yet. Mocking save for now.
+            console.log('Saved customer', data);
             setIsCreateOpen(false);
             setEditId(null);
             refreshData();

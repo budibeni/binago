@@ -35,6 +35,7 @@ interface CardFormProps {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function CardForm({ card, open, onOpenChange, onSave, onCancel, activeAssignments, layout = 'drawer', t }: CardFormProps) {
+  const { drivers: apiDrivers } = useDrivers();
   const { formData, errors, isSubmitting, handleChange, handleSubmit } = useForm<CardModel>({
     initialData: card,
     resetOn: [open, card],
