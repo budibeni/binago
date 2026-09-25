@@ -264,8 +264,23 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
     });
   }, [liveVehicles, search, statusFilter]);
 
+  const [allGroups, setAllGroups] = React.useState<{ id: string; name: string }[]>([]);
+
+  React.useEffect(() => {
+    import('@/data/services').then(({ groupService }) => {
+      groupService.getVehicleGroups().then(groups => setAllGroups(groups)).catch(console.error);
+    });
+  }, []);
+
   const groupedVehicles = React.useMemo(() => {
     const groupsMap = new globalThis.Map<string, { id: string; name: string; vehicles: TrackingVehicle[] }>();
+    
+    // First, initialize all known groups from API (even if empty)
+    allGroups.forEach(g => {
+      groupsMap.set(g.id, { id: g.id, name: g.name, vehicles: [] });
+    });
+
+    // Then distribute vehicles into groups
     allVehiclesUnfiltered.forEach((v) => {
       const gId = v.groupId || 'all';
       if (!groupsMap.has(gId)) {
@@ -273,8 +288,9 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
       }
       groupsMap.get(gId)!.vehicles.push(v);
     });
+
     return Array.from(groupsMap.values()).sort((a, b) => a.name.localeCompare(b.name));
-  }, [allVehiclesUnfiltered]);
+  }, [allVehiclesUnfiltered, allGroups]);
 
   // -- Playback derived state --------------------------------------------------
   const playbackTrack = React.useMemo(() => {
