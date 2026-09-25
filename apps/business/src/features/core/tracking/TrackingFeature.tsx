@@ -264,6 +264,18 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
     });
   }, [liveVehicles, search, statusFilter]);
 
+  const groupedVehicles = React.useMemo(() => {
+    const groupsMap = new Map<string, { id: string; name: string; vehicles: any[] }>();
+    allVehiclesUnfiltered.forEach((v) => {
+      const gId = v.groupId || 'all';
+      if (!groupsMap.has(gId)) {
+        groupsMap.set(gId, { id: gId, name: v.groupName || 'Tanpa Grup', vehicles: [] });
+      }
+      groupsMap.get(gId)!.vehicles.push(v);
+    });
+    return Array.from(groupsMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+  }, [allVehiclesUnfiltered]);
+
   // -- Playback derived state --------------------------------------------------
   const playbackTrack = React.useMemo(() => {
     if (!playbackData) return undefined;
@@ -880,11 +892,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
         >
           {isVehicleListVisible ? (
             <VehicleList
-              groups={[{
-                id: 'all',
-                name: 'Semua Kendaraan',
-                vehicles: liveVehicles
-              }]}
+              groups={groupedVehicles}
               selectedVehicleId={selectedVehicleId}
               selectedVehicleIds={selectedVehicleIds}
               search={search}
