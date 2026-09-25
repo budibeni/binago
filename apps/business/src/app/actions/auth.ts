@@ -50,7 +50,7 @@ const token = data.data?.token || data.data?.access_token;
       cookies().set({
         name: 'access_token',
         value: token,
-        httpOnly: true,
+        httpOnly: false, // Set to false so client-side WebSocket can read it
         path: '/',
         secure: process.env.NODE_ENV === 'production' && process.env.NEXT_PUBLIC_API_URL?.startsWith('https'),
         maxAge: 60 * 60 * 24 * 7, // 1 week
