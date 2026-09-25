@@ -101,6 +101,7 @@ export function LiveMap({ vehicles, selectedVehicleId, visibleVehicleIds = [], o
         entities={vehicles}
         selectedIds={visibleVehicleIds}
         initialFocusedId={initialFocusedVehicleId}
+        enableClustering={false}
 
         // Resolvers
         getId={(v) => v.id}
