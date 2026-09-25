@@ -113,11 +113,11 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
           const res: any = await api.get(`/vehicles/${id}/history`, {
             params: { from: startDatetime.toISOString(), to: endDatetime.toISOString() }
           });
-          const positions = res?.data?.data || res?.data || [];
+          const positions = res?.data?.points || res?.data?.data?.points || [];
           
           const points = positions.map((p: any) => ({
             lat: p.lat,
-            lng: p.lon
+            lng: p.lng || p.lon
           }));
           allPoints = [...allPoints, ...points];
         } catch (err) {
@@ -444,15 +444,15 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
       const res: any = await api.get(`/vehicles/${playbackVehicleId}/history`, {
         params: { from: startDatetime.toISOString(), to: endDatetime.toISOString() }
       });
-      const positions = res?.data?.data || res?.data || [];
+      const positions = res?.data?.points || res?.data?.data?.points || [];
       
       const points = positions.map((p: any) => ({
         lat: p.lat,
-        lng: p.lon,
+        lng: p.lng || p.lon,
         speed: p.speed,
         heading: p.heading || 0,
         timestamp: p.timestamp,
-        odometer: 0,
+        odometer: p.odometer || 0,
       }));
       
       const totalDurationSecs = points.length > 0 ? (new Date(points[points.length-1].timestamp).getTime() - new Date(points[0].timestamp).getTime()) / 1000 : 0;
