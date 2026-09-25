@@ -13,23 +13,37 @@ export function useLiveTracking() {
       .then((res) => {
         if (isMounted) {
           const rawData = Array.isArray(res) ? res : (res.data || []);
-          const mapped: TrackingVehicle[] = rawData.map((v: any) => ({
-            id: String(v.id),
-            plateNumber: v.plate_number || v.imei,
-            driverName: v.driver_name || null,
-            groupId: 'all',
-            groupName: 'Semua Kendaraan',
-            status: v.status || 'offline',
-            speed: v.live_state?.speed || 0,
-            location: {
-              lat: v.live_state?.latitude || -6.2,
-              lng: v.live_state?.longitude || 106.8,
-              address: v.live_state?.address || 'Unknown'
-            },
-            lastUpdate: v.live_state?.timestamp || new Date().toISOString(),
-            acc: v.live_state?.ignition,
-            gpsSerialNumber: v.imei,
-          }));
+
+          const mapped: TrackingVehicle[] = rawData.map((v: any) => {
+            const acc = v.live_state?.ignition !== undefined ? v.live_state.ignition : v.acc_status;
+            const speed = v.live_state?.speed !== undefined ? v.live_state.speed : (v.speed || 0);
+            
+            let computedStatus: 'driving' | 'idle' | 'parking' | 'offline' = 'offline';
+            if (acc) {
+                computedStatus = speed > 0 ? 'driving' : 'idle';
+            } else if (acc === false) {
+                computedStatus = 'parking';
+            }
+            
+            return {
+              id: String(v.id),
+              plateNumber: v.plate_number || v.imei,
+              driverName: v.driver_name || null,
+              groupId: 'all',
+              groupName: 'Semua Kendaraan',
+              status: computedStatus,
+              speed: speed,
+              location: {
+                lat: v.live_state?.latitude || v.lat || -6.2,
+                lng: v.live_state?.longitude || v.lon || 106.8,
+                address: v.live_state?.address || v.address || 'Unknown'
+              },
+              lastUpdate: v.live_state?.timestamp || v.timestamp || new Date().toISOString(),
+              acc: acc,
+              gpsSerialNumber: v.imei,
+            };
+          });
+
           setVehicles(mapped);
         }
       })
@@ -49,18 +63,43 @@ export function useLiveTracking() {
   useEffect(() => {
     wsClient.connect();
 
-    const handleVehicleUpdate = (update: Partial<TrackingVehicle> & { id: string }) => {
+
+    const handleVehicleUpdate = (update: any) => {
       setVehicles((prev) => {
-        const index = prev.findIndex(v => v.id === update.id);
+        // update has imei, lat, lon, speed, acc
+        const index = prev.findIndex(v => v.gpsSerialNumber === update.imei || v.plateNumber === update.imei);
         if (index > -1) {
           const newVehicles = [...prev];
-          newVehicles[index] = { ...newVehicles[index], ...update };
+          const oldV = newVehicles[index];
+          
+          let computedStatus = oldV.status;
+          const acc = update.acc !== undefined ? update.acc : oldV.acc;
+          const speed = update.speed !== undefined ? update.speed : oldV.speed;
+          
+          if (acc) {
+              computedStatus = speed > 0 ? 'driving' : 'idle';
+          } else if (acc === false) {
+              computedStatus = 'parking';
+          }
+          
+          newVehicles[index] = { 
+            ...oldV, 
+            status: computedStatus,
+            speed: speed,
+            acc: acc,
+            location: {
+              ...oldV.location,
+              lat: update.lat !== undefined ? update.lat : oldV.location.lat,
+              lng: update.lon !== undefined ? update.lon : oldV.location.lng,
+            },
+            lastUpdate: update.timestamp || new Date().toISOString(),
+          };
           return newVehicles;
         }
-        // If we don't have it, maybe we should fetch or ignore. For now, ignore.
         return prev;
       });
     };
+
 
     wsClient.on('VEHICLE_UPDATE', handleVehicleUpdate);
 
