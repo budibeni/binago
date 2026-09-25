@@ -27,7 +27,7 @@ import type { MockPlaybackData } from './data/mockTrackingData';
 import { getTranslation } from '../../../i18n';
 import { useBusinessLocale } from '../../../components/BusinessShellLayout';
 import { getTrackingTranslation } from './i18n';
-import type { StatusFilter, DateRange, PlaybackState, TrackingView } from './types/tracking';
+import type { StatusFilter, DateRange, PlaybackState, TrackingView, TrackingVehicle } from './types/tracking';
 import type { Locale } from '@adatrack/types';
 
 // â"€â"€â"€ Mode â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
@@ -265,7 +265,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
   }, [liveVehicles, search, statusFilter]);
 
   const groupedVehicles = React.useMemo(() => {
-    const groupsMap = new Map<string, { id: string; name: string; vehicles: any[] }>();
+    const groupsMap = new globalThis.Map<string, { id: string; name: string; vehicles: TrackingVehicle[] }>();
     allVehiclesUnfiltered.forEach((v) => {
       const gId = v.groupId || 'all';
       if (!groupsMap.has(gId)) {
