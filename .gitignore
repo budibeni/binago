@@ -26,3 +26,9 @@ pnpm-debug.log*
 
 # typescript
 *.tsbuildinfo
+
+# Security & Audit Fixes
+*.py
+*.bak
+*.sh
+
