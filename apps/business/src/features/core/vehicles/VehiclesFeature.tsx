@@ -281,6 +281,7 @@ export function VehiclesFeature() {
                 make: data.brand || data.vehicleName,
                 model: data.vehicleCategory || '',
                 driver_id: data.driverId || null,
+                group_id: data.groupId && data.groupId !== 'all' ? parseInt(data.groupId, 10) : null,
               };
               
               if (data.id) {

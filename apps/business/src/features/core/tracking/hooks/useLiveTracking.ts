@@ -29,8 +29,8 @@ export function useLiveTracking() {
               id: String(v.id),
               plateNumber: v.plate_number || v.imei,
               driverName: v.driver_name || null,
-              groupId: v.group_id ? String(v.group_id) : 'all',
-              groupName: v.group_name || 'Semua Kendaraan',
+              groupId: v.group_id ? String(v.group_id) : 'unassigned',
+              groupName: v.group_name || 'Tanpa Grup',
               status: computedStatus,
               speed: speed,
               location: {
