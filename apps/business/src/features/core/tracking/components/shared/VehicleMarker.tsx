@@ -16,10 +16,10 @@ export function VehicleMarker({ vehicle, selected, onClick }: VehicleMarkerProps
     || typeStr.includes('hiace')
     || typeStr.includes('bus');
   
-  // Selection vs Status: Marker icon color ONLY reflects selection state like in Personal.
+  // Make it highly visible for debugging
   const markerClasses = selected
-    ? 'bg-accent text-accent-foreground border-white shadow-md shadow-accent/20 z-10'
-    : 'bg-background text-foreground-muted border-border shadow-sm';
+    ? 'bg-red-500 text-white border-2 border-red-700 shadow-lg shadow-red-500/50 z-50'
+    : 'bg-blue-500 text-white border-2 border-blue-700 shadow-md z-40';
 
   return (
     <MapMarker

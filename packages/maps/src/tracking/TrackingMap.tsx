@@ -73,6 +73,8 @@ export interface TrackingMapProps<T> {
   playbackParkingEvents?: { lat: number; lng: number }[];
   /** Optional children rendered inside MapProvider for accessing map context */
   children?: React.ReactNode;
+  /** ID entitas yang difokuskan (opsional dikendalikan oleh parent) */
+  focusedId?: string | null;
   /** ID entitas yang langsung difokuskan (popup terbuka) saat map pertama kali dimount */
   initialFocusedId?: string;
 }
@@ -100,6 +102,7 @@ function TrackingMapInner<T>({
   playbackPassedTrack,
   playbackParkingEvents,
   children,
+  focusedId,
   initialFocusedId,
 }: TrackingMapProps<T>) {
   const [basemap, setBasemap] = useState<BasemapId>('standard');
@@ -122,6 +125,21 @@ function TrackingMapInner<T>({
       panTo({ lat: pos.lat, lng: pos.lng });
     }
   }, [initialFocusedId, map, entities, getId, panTo]);
+
+  // Sync focusedEntityId with controlled focusedId prop
+  useEffect(() => {
+    if (focusedId === undefined || !map) return;
+    if (focusedId !== focusedEntityId) {
+      setFocusedEntityId(focusedId);
+      if (focusedId) {
+        const entity = entities.find((e) => getId(e) === focusedId);
+        if (entity) {
+          const pos = getPosition(entity);
+          panTo({ lat: pos.lat, lng: pos.lng });
+        }
+      }
+    }
+  }, [focusedId, map, entities, getId, panTo, focusedEntityId]);
 
   // Marker style state
   const [markerStyle, setMarkerStyle] = useState<'default' | 'custom'>(renderMarker ? 'custom' : 'default');
