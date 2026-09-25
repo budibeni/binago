@@ -49,7 +49,9 @@ export function DriverForm({
 
   React.useEffect(() => {
     if (open) {
-      setGroups(groupService.getDriverGroups().map(group => ({ value: group.id, label: group.name })));
+      groupService.getDriverGroups()
+        .then(res => setGroups(res.map(group => ({ value: group.id, label: group.name }))))
+        .catch(console.error);
     }
   }, [open]);
 

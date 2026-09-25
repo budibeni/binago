@@ -17,6 +17,7 @@ export interface HeatmapMapProps {
   dateRange: DateRange;
   statusFilter: 'driving' | 'idle' | 'parking';
   isGenerating: boolean;
+  heatmapData?: { lat: number; lng: number }[];
 }
 
 const HEATMAP_SOURCE = 'tracking-heatmap-source';
@@ -64,45 +65,30 @@ function HeatmapLayer({
   selectedVehicleIds,
   dateRange,
   statusFilter,
-  isGenerating
+  isGenerating,
+  heatmapData
 }: HeatmapMapProps) {
   const map = useInternalMap();
   const [data, setData] = useState<GeoJSON.FeatureCollection<GeoJSON.Point> | null>(null);
 
-  // Generate dummy heatmap data based on filters
   useEffect(() => {
-    if (isGenerating) {
-      // Simulate API call to fetch heatmap data
-      const timer = setTimeout(() => {
-        const points: GeoJSON.Feature<GeoJSON.Point>[] = [];
-        const count = selectedVehicleIds.length > 0 ? 200 : 2000;
-        
-        // Generate random points around Jakarta
-        for (let i = 0; i < count; i++) {
-          
-          points.push({
-            type: 'Feature',
-            properties: {
-              weight: Math.random() * 5,
-            },
-            geometry: {
-              type: 'Point',
-              coordinates: [
-                106.816666 + (Math.random() - 0.5) * 0.2, // lng
-                -6.200000 + (Math.random() - 0.5) * 0.2,  // lat
-              ],
-            },
-          });
+    if (heatmapData) {
+      const points: GeoJSON.Feature<GeoJSON.Point>[] = heatmapData.map(pt => ({
+        type: 'Feature',
+        properties: { weight: 1 },
+        geometry: {
+          type: 'Point',
+          coordinates: [pt.lng, pt.lat]
         }
-        
-        setData({
-          type: 'FeatureCollection',
-          features: points,
-        });
-      }, 1000);
-      return () => clearTimeout(timer);
+      }));
+      setData({
+        type: 'FeatureCollection',
+        features: points,
+      });
+    } else {
+      setData({ type: 'FeatureCollection', features: [] });
     }
-  }, [isGenerating, selectedVehicleIds, dateRange, statusFilter]);
+  }, [heatmapData]);
 
   const updateSource = useCallback(() => {
     if (!map || !map.isStyleLoaded()) return;

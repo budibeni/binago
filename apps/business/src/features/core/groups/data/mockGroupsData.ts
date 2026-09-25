@@ -13,7 +13,3 @@ export interface GroupData {
   memberCount: number;
   type: 'vehicle' | 'driver' | 'geofence' | 'route';
 }
-
-export const mockVehicleGroups: GroupData[] = groupService.getVehicleGroups();
-export const mockDriverGroups: GroupData[] = groupService.getDriverGroups();
-export const mockGeofenceGroups: GroupData[] = groupService.getGeofenceGroups();

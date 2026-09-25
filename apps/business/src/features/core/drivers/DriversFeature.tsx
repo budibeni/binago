@@ -40,6 +40,11 @@ export function DriversFeature() {
   const { drivers: fetchedDrivers, loading: driversLoading } = useDrivers({ search, status: statusFilter, groupIds: selectedGroupIds });
   const { vehicles: apiVehicles } = useVehicles();
   const loading = driversLoading;
+
+  const [driverGroups, setDriverGroups] = React.useState<any[]>([]);
+  React.useEffect(() => {
+    groupService.getDriverGroups().then(setDriverGroups).catch(console.error);
+  }, []);
   
   const filteredDrivers = React.useMemo(() => {
     // Enrich with plate number & group name
@@ -54,7 +59,7 @@ export function DriversFeature() {
       }
       
       if (driver.groupId) {
-        const group = groupService.getDriverGroups().find((g: any) => g.id === driver.groupId);
+        const group = driverGroups.find((g: any) => g.id === driver.groupId);
         if (group) {
           enriched.groupName = group.name;
         }
@@ -62,7 +67,7 @@ export function DriversFeature() {
       
       return enriched;
     });
-  }, [fetchedDrivers]);
+  }, [fetchedDrivers, apiVehicles, driverGroups]);
 
   // --- Handlers ----------------------------------------------------------------
   const handleViewDetail = React.useCallback((driver: Driver) => {

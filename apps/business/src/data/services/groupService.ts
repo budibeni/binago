@@ -2,23 +2,47 @@
  * Group Service
  */
 
+import { api } from '@adatrack/utils';
 import type { GroupData } from '@/features/core/groups/data/mockGroupsData';
-import { groupRepository } from '../repositories/groupRepository';
 
 export const groupService = {
-  getVehicleGroups(): GroupData[] {
-    return groupRepository.getVehicleGroups();
+  async getVehicleGroups(): Promise<GroupData[]> {
+    const res: any = await api.get('/groups');
+    return (res.data || res).map((g: any) => ({
+      id: g.id.toString(),
+      name: g.name,
+      description: g.description || '',
+      unitCount: 0
+    }));
   },
 
-  getDriverGroups(): GroupData[] {
-    return groupRepository.getDriverGroups();
+  async getDriverGroups(): Promise<GroupData[]> {
+    const res: any = await api.get('/groups');
+    return (res.data || res).map((g: any) => ({
+      id: g.id.toString(),
+      name: g.name,
+      description: g.description || '',
+      unitCount: 0
+    }));
   },
 
-  getGeofenceGroups(): GroupData[] {
-    return groupRepository.getGeofenceGroups();
+  async getGeofenceGroups(): Promise<GroupData[]> {
+    const res: any = await api.get('/groups');
+    return (res.data || res).map((g: any) => ({
+      id: g.id.toString(),
+      name: g.name,
+      description: g.description || '',
+      unitCount: 0
+    }));
   },
 
-  getRouteGroups(): GroupData[] {
-    return groupRepository.getRouteGroups();
+  async getRouteGroups(): Promise<GroupData[]> {
+    const res: any = await api.get('/groups');
+    return (res.data || res).map((g: any) => ({
+      id: g.id.toString(),
+      name: g.name,
+      description: g.description || '',
+      unitCount: 0
+    }));
   },
 };

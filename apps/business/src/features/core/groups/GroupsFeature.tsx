@@ -24,14 +24,24 @@ export function GroupsFeature({ locale }: GroupsFeatureProps) {
   const t = getTranslation(locale);
   const tGroups = t.groups;
 
-  const currentTabData = React.useMemo(() => {
-    switch (activeType) {
-      case 'vehicles': return groupService.getVehicleGroups();
-      case 'drivers': return groupService.getDriverGroups();
-      case 'geofences': return groupService.getGeofenceGroups();
-      case 'routes': return groupService.getRouteGroups();
-      default: return [];
-    }
+  const [currentTabData, setCurrentTabData] = useState<any[]>([]);
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      try {
+        let data: any[] = [];
+        switch (activeType) {
+          case 'vehicles': data = await groupService.getVehicleGroups(); break;
+          case 'drivers': data = await groupService.getDriverGroups(); break;
+          case 'geofences': data = await groupService.getGeofenceGroups(); break;
+          case 'routes': data = await groupService.getRouteGroups(); break;
+        }
+        setCurrentTabData(data);
+      } catch (err) {
+        console.error('Failed to fetch groups', err);
+      }
+    };
+    fetchData();
   }, [activeType]);
 
   const tableLabels = {

@@ -1,4 +1,3 @@
-export * from './groups';
 export * from './drivers';
 export * from './devices';
 export * from './vehicles';

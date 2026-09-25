@@ -1,5 +1,4 @@
 import { getDriverById } from './drivers';
-import { getGroupById } from './groups';
 import { getDeviceById } from './devices';
 
 const baseVehicles = [
@@ -607,7 +606,7 @@ const baseVehicles = [
 
 export const mockVehicles = baseVehicles.map(v => {
   const driver = getDriverById(v.driverId);
-  const group = getGroupById(v.groupId);
+  const group = { name: "Mock Group" };
   const device = getDeviceById(v.deviceId);
 
   return {

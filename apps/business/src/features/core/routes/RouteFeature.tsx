@@ -23,6 +23,11 @@ export function RouteFeature({ locale = 'id' }: RouteFeatureProps) {
   const { routes, loading } = useRoutes();
   const [selectedRouteId, setSelectedRouteId] = useState<string | undefined>(initialRouteId);
   const [isEditing, setIsEditing] = useState(false);
+  const [routeGroups, setRouteGroups] = useState<any[]>([]);
+
+  React.useEffect(() => {
+    groupService.getRouteGroups().then(setRouteGroups).catch(console.error);
+  }, []);
 
   const handleSelectRoute = (id: string | undefined) => {
     setSelectedRouteId(id);
@@ -92,7 +97,7 @@ export function RouteFeature({ locale = 'id' }: RouteFeatureProps) {
         <RouteEditorView
           initialData={selectedRoute}
           geofences={geofenceService.getGeofences()}
-          groups={groupService.getRouteGroups()}
+          groups={routeGroups}
           onSave={handleSave}
           onCancel={handleCancelEdit}
           locale={locale}
@@ -109,7 +114,7 @@ export function RouteFeature({ locale = 'id' }: RouteFeatureProps) {
         <RouteListView
           routes={routes}
           geofences={geofenceService.getGeofences()}
-          groups={groupService.getRouteGroups()}
+          groups={routeGroups}
           selectedRouteId={selectedRouteId}
           onSelectRoute={handleSelectRoute}
           onCreateNew={handleCreateNew}

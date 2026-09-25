@@ -6,7 +6,7 @@
  */
 
 import type { Vehicle, VehicleGroup } from '@/features/core/vehicles/types/vehicle';
-import { mockVehicles as centralVehicles, mockVehicleGroups, mockTrackingState } from '../mock';
+import { mockVehicles as centralVehicles, mockTrackingState } from '../mock';
 
 // --- Repository Interface ------------------------------------------------------
 
@@ -45,7 +45,7 @@ class MockVehicleRepository implements VehicleRepository {
   }
 
   getGroups(): VehicleGroup[] {
-    return mockVehicleGroups as VehicleGroup[];
+    return [];
   }
 }
 

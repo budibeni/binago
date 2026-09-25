@@ -59,10 +59,14 @@ function useVehicleOptions(open: boolean, currentImei?: string | null) {
 
   React.useEffect(() => {
     if (open) {
-      setGroups(vehicleService.getVehicleGroups().map(g => ({ value: g.id, label: g.name })));
+      import('@/data/services').then(({ groupService }) => {
+        groupService.getVehicleGroups()
+          .then(res => setGroups(res.map((g: any) => ({ value: g.id, label: g.name }))))
+          .catch(console.error);
+      });
       setDrivers(apiDrivers.map(d => ({ value: d.id, label: d.name })));
       
-            api.get(`/gps/available${currentImei ? `?current_imei=${currentImei}` : ''}`)
+      api.get(`/gps/available${currentImei ? `?current_imei=${currentImei}` : ''}`)
         .then((data: any) => {
             const items = Array.isArray(data) ? data : data?.data || [];
             setRawDevices(items);
@@ -77,7 +81,7 @@ function useVehicleOptions(open: boolean, currentImei?: string | null) {
         })
         .catch((err: any) => console.error("Failed to fetch available IMEIs", err));
     }
-  }, [open, currentImei]);
+  }, [open, currentImei, apiDrivers]);
 
   return { groups, drivers, availableImeis, rawDevices };
 }

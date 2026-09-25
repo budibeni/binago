@@ -94,13 +94,44 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
     endTime: '23:59',
   });
   const [isGeneratingHeatmap, setIsGeneratingHeatmap] = React.useState(false);
+  const [heatmapData, setHeatmapData] = React.useState<{ lat: number, lng: number }[]>([]);
 
-  const handleGenerateHeatmap = React.useCallback(() => {
+  const handleGenerateHeatmap = React.useCallback(async () => {
     setIsGeneratingHeatmap(true);
-    setTimeout(() => {
+    setHeatmapData([]);
+    
+    try {
+      const startDatetime = new Date(`${heatmapDateRange.startDate}T${heatmapDateRange.startTime}:00`);
+      const endDatetime = new Date(`${heatmapDateRange.endDate}T${heatmapDateRange.endTime}:00`);
+      
+      const idsToFetch = selectedVehicleIds.slice(0, 5); // Avoid too many requests
+      
+      let allPoints: { lat: number, lng: number }[] = [];
+      
+      await Promise.all(idsToFetch.map(async (id) => {
+        try {
+          const res: any = await api.get(`/vehicles/${id}/history`, {
+            params: { from: startDatetime.toISOString(), to: endDatetime.toISOString() }
+          });
+          const positions = res?.data?.data || res?.data || [];
+          
+          const points = positions.map((p: any) => ({
+            lat: p.lat,
+            lng: p.lon
+          }));
+          allPoints = [...allPoints, ...points];
+        } catch (err) {
+          console.error(`Failed to load history for heatmap for vehicle ${id}`, err);
+        }
+      }));
+      
+      setHeatmapData(allPoints);
+    } catch (err) {
+      console.error('Failed to generate heatmap', err);
+    } finally {
       setIsGeneratingHeatmap(false);
-    }, 1200);
-  }, []);
+    }
+  }, [heatmapDateRange, selectedVehicleIds]);
 
   // ─── Parking state ──────────────────────────────────────────────────────────
   const [parkingMinDuration, setParkingMinDuration] = React.useState<number>(15);
@@ -398,10 +429,28 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
     try {
       const startDatetime = new Date(`${dateRange.startDate}T${dateRange.startTime}:00`);
       const endDatetime = new Date(`${dateRange.endDate}T${dateRange.endTime}:00`);
-      const res = await api.get<MockPlaybackData>(`/vehicles/${playbackVehicleId}/history`, {
-        params: { start: startDatetime.toISOString(), end: endDatetime.toISOString() }
+      const res: any = await api.get(`/vehicles/${playbackVehicleId}/history`, {
+        params: { from: startDatetime.toISOString(), to: endDatetime.toISOString() }
       });
-      const data = (res as any).data || res;
+      const positions = res?.data?.data || res?.data || [];
+      
+      const points = positions.map((p: any) => ({
+        lat: p.lat,
+        lng: p.lon,
+        speed: p.speed,
+        heading: p.heading || 0,
+        timestamp: p.timestamp,
+        odometer: 0,
+      }));
+      
+      const totalDurationSecs = points.length > 0 ? (new Date(points[points.length-1].timestamp).getTime() - new Date(points[0].timestamp).getTime()) / 1000 : 0;
+      
+      const data: any = {
+        vehicleId: playbackVehicleId,
+        points,
+        totalDurationSecs: totalDurationSecs || 0,
+      };
+      
       setPlaybackData(data);
       playbackDataRef.current = data;
       setPlaybackState({ status: 'ready', totalDuration: data.totalDurationSecs || 0, currentTime: 0 });
@@ -703,6 +752,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
                 dateRange={heatmapDateRange}
                 statusFilter={heatmapStatusFilter}
                 isGenerating={isGeneratingHeatmap}
+                heatmapData={heatmapData}
               />
             </div>
 
