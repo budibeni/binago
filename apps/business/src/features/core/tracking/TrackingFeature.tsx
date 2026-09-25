@@ -830,7 +830,11 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
         >
           {isVehicleListVisible ? (
             <VehicleList
-              groups={trackingService.getLiveVehicleGroups()}
+              groups={[{
+                id: 'all',
+                name: 'Semua Kendaraan',
+                vehicles: liveVehicles
+              }]}
               selectedVehicleId={selectedVehicleId}
               selectedVehicleIds={selectedVehicleIds}
               search={search}

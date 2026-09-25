@@ -9,14 +9,32 @@ export function useLiveTracking() {
   // Initial fetch
   useEffect(() => {
     let isMounted = true;
-    api.get<TrackingVehicle[]>('/tracking/live')
-      .then((data) => {
+    api.get<any>('/vehicles')
+      .then((res) => {
         if (isMounted) {
-          setVehicles(Array.isArray(data) ? data : (data as any).data || []);
+          const rawData = Array.isArray(res) ? res : (res.data || []);
+          const mapped: TrackingVehicle[] = rawData.map((v: any) => ({
+            id: String(v.id),
+            plateNumber: v.plate_number || v.imei,
+            driverName: v.driver_name || null,
+            groupId: 'all',
+            groupName: 'Semua Kendaraan',
+            status: v.status || 'offline',
+            speed: v.live_state?.speed || 0,
+            location: {
+              lat: v.live_state?.latitude || -6.2,
+              lng: v.live_state?.longitude || 106.8,
+              address: v.live_state?.address || 'Unknown'
+            },
+            lastUpdate: v.live_state?.timestamp || new Date().toISOString(),
+            acc: v.live_state?.ignition,
+            gpsSerialNumber: v.imei,
+          }));
+          setVehicles(mapped);
         }
       })
       .catch((err) => {
-        console.warn('Failed to fetch initial live tracking, using empty array or fallback', err);
+        console.warn('Failed to fetch initial live tracking', err);
       })
       .finally(() => {
         if (isMounted) setLoading(false);
