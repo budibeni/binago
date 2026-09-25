@@ -16,11 +16,37 @@ export function useVehicles(filters?: { search?: string; status?: string; groupI
     if (filters?.status) queryParams.status = filters.status;
     if (filters?.groupIds?.length) queryParams.groupIds = filters.groupIds.join(',');
 
-    api.get<Vehicle[]>('/vehicles', { params: queryParams })
-      .then((data) => {
+    api.get<any>('/vehicles', { params: queryParams })
+      .then((res) => {
         if (isMounted) {
           // If response is nested in data.data or directly an array
-          setVehicles(Array.isArray(data) ? data : (data as any).data || []);
+          const rawData = Array.isArray(res) ? res : (res.data || []);
+          const mapped: Vehicle[] = rawData.map((v: any) => ({
+            id: String(v.id),
+            plateNumber: v.plate_number || '-',
+            vehicleName: v.model || v.make || '-',
+            vehicleCategory: 'other',
+            brand: v.make || '-',
+            year: 0,
+            fuelType: 'solar',
+            groupId: 'all',
+            groupName: 'Semua Kendaraan',
+            driverId: null,
+            driverName: null,
+            deviceImei: v.imei || '-',
+            deviceSimNumber: '-',
+            status: v.status || 'offline',
+            odometer: v.odometer_km || 0,
+            lastServiceKm: 0,
+            nextServiceKm: 0,
+            lastUpdate: v.live_state?.timestamp || new Date().toISOString(),
+            registrationExpiry: new Date().toISOString(),
+            kirExpiry: new Date().toISOString(),
+            color: '-',
+            fuelCapacity: 0,
+            notes: '-',
+          }));
+          setVehicles(mapped);
           setError(null);
         }
       })
