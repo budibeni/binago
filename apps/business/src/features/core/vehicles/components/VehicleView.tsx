@@ -157,7 +157,7 @@ export function VehicleView({ vehicle, open, onClose, labels, onEdit, onDelete, 
             <InfoRow icon={User} label="Pengemudi" value={vehicle.driverName || labels.noDriver} />
             <InfoRow icon={Car} label="Grup" value={vehicle.groupName} />
             <InfoRow icon={Cpu} label="IMEI Device" value={vehicle.deviceImei || labels.noDevice} />
-            <InfoRow icon={Gauge} label="Odometer" value={`${(vehicle.odometer || vehicle.odometer_km || 0).toLocaleString('id-ID')} km`} />
+            <InfoRow icon={Gauge} label="Odometer" value={`${(vehicle.odometer || 0).toLocaleString('id-ID')} km`} />
             <InfoRow icon={Clock} label="Update Terakhir" value={formatDateTime(vehicle.lastUpdate)} />
           </div>
 
