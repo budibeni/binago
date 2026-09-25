@@ -108,7 +108,7 @@ function TrackingMapInner<T>({
   const [basemap, setBasemap] = useState<BasemapId>('standard');
   const [viewport, setViewport] = useState({ center: { lat: -6.2, lng: 106.816667 }, zoom: 12 });
   const mapContainerRef = useRef<HTMLDivElement>(null);
-  const { fitBounds, panTo } = useMapActions();
+  const { fitBounds, flyTo } = useMapActions();
 
   const map = useInternalMap();
 
@@ -122,9 +122,9 @@ function TrackingMapInner<T>({
     const entity = entities.find((e) => getId(e) === initialFocusedId);
     if (entity) {
       const pos = getPosition(entity);
-      panTo({ lat: pos.lat, lng: pos.lng });
+      flyTo({ lat: pos.lat, lng: pos.lng });
     }
-  }, [initialFocusedId, map, entities, getId, panTo]);
+  }, [initialFocusedId, map, entities, getId, flyTo]);
 
   // Sync focusedEntityId with controlled focusedId prop
   useEffect(() => {
@@ -135,11 +135,11 @@ function TrackingMapInner<T>({
         const entity = entities.find((e) => getId(e) === focusedId);
         if (entity) {
           const pos = getPosition(entity);
-          panTo({ lat: pos.lat, lng: pos.lng });
+          flyTo({ lat: pos.lat, lng: pos.lng });
         }
       }
     }
-  }, [focusedId, map, entities, getId, panTo, focusedEntityId]);
+  }, [focusedId, map, entities, getId, flyTo, focusedEntityId]);
 
   // Marker style state
   const [markerStyle, setMarkerStyle] = useState<'default' | 'custom'>(renderMarker ? 'custom' : 'default');
@@ -292,7 +292,7 @@ function TrackingMapInner<T>({
           const onClickEntity = () => {
             setFocusedEntityId(id);
             const pos = getPosition(entity);
-            panTo({ lat: pos.lat, lng: pos.lng });
+            flyTo({ lat: pos.lat, lng: pos.lng });
           };
 
           return (
