@@ -2,7 +2,8 @@
 
 import React, { useEffect, useCallback } from 'react';
 import { useInternalMap, useStyleLoadCallback } from '@adatrack/maps';
-import { geofenceService, routeService } from '@/data/services';
+import { useGeofences } from '../../../geofences/hooks/useGeofences';
+import { useRoutes } from '../../../routes/hooks/useRoutes';
 
 export interface PlaybackMapLayersProps {
   selectedGeofenceIds: string[];
@@ -21,6 +22,8 @@ const BEFORE_LAYER_ID = 'playback-route-layer';
 
 export function PlaybackMapLayers({ selectedGeofenceIds, selectedRouteIds }: PlaybackMapLayersProps) {
   const map = useInternalMap();
+  const { geofences } = useGeofences();
+  const { routes } = useRoutes();
 
   const updateSources = useCallback(() => {
     if (!map || !map.isStyleLoaded()) return;
@@ -28,21 +31,20 @@ export function PlaybackMapLayers({ selectedGeofenceIds, selectedRouteIds }: Pla
     // --- Update Geofence Source ---
     const geofenceSource = map.getSource(GEOFENCE_SOURCE) as any;
     if (geofenceSource) {
-      const activeGeofences = geofenceService.getGeofences().filter(gf => selectedGeofenceIds.includes(gf.id));
+      const activeGeofences = geofences.filter(gf => selectedGeofenceIds.includes(gf.id));
       const geofenceFeatures: any[] = activeGeofences.map(gf => {
         let geometry: GeoJSON.Geometry;
-        if (gf.geometry.type === 'polygon') {
+        if (gf.geometry.type === 'polygon' || gf.geometry.type === 'rectangle') {
           geometry = {
             type: 'Polygon',
-            coordinates: [gf.geometry.coordinates.map(c => [c.lng, c.lat])]
+            coordinates: [gf.geometry.coordinates.map(c => [c.lng || (c as any).lon, c.lat])]
           };
         } else if (gf.geometry.type === 'multiline') {
           geometry = {
             type: 'LineString',
-            coordinates: gf.geometry.coordinates.map(c => [c.lng, c.lat])
+            coordinates: gf.geometry.coordinates.map(c => [c.lng || (c as any).lon, c.lat])
           };
         } else {
-          // Fallback, though we know mock has polygon and multiline
           geometry = { type: 'Point', coordinates: [0,0] }; 
         }
         
@@ -62,15 +64,25 @@ export function PlaybackMapLayers({ selectedGeofenceIds, selectedRouteIds }: Pla
     // --- Update Route Source ---
     const routeSource = map.getSource(ROUTE_SOURCE) as any;
     if (routeSource) {
-      const activeRoutes = routeService.getRoutes().filter(rt => selectedRouteIds.includes(rt.id) && rt.plannedPath);
+      const activeRoutes = routes.filter(rt => selectedRouteIds.includes(rt.id));
       const routeFeatures: any[] = activeRoutes.map(rt => {
         let geometry: GeoJSON.Geometry = { type: 'Point', coordinates: [0,0] };
-        if (rt.plannedPath?.type === 'multiline') {
+        
+        // Routes from useRoutes might not have plannedPath yet, but they have stops and origin/dest
+        // Wait, useRoutes currently maps it to origin, destination, stops. We need to draw the line!
+        // For playback we just need a line. If they have stops, we can draw a straight line through stops.
+        const points = [];
+        if (rt.origin) points.push([rt.origin.longitude || (rt.origin as any).lng || 0, rt.origin.latitude || (rt.origin as any).lat || 0]);
+        if (rt.stops) rt.stops.forEach((s: any) => points.push([s.location.longitude || s.location.lng || 0, s.location.latitude || s.location.lat || 0]));
+        if (rt.destination) points.push([rt.destination.longitude || (rt.destination as any).lng || 0, rt.destination.latitude || (rt.destination as any).lat || 0]);
+
+        if (points.length > 1) {
           geometry = {
             type: 'LineString',
-            coordinates: rt.plannedPath.coordinates.map(c => [c.lng, c.lat])
+            coordinates: points
           };
         }
+
         return {
           type: 'Feature',
           properties: { id: rt.id, name: rt.name },
@@ -83,7 +95,7 @@ export function PlaybackMapLayers({ selectedGeofenceIds, selectedRouteIds }: Pla
         features: routeFeatures
       });
     }
-  }, [map, selectedGeofenceIds, selectedRouteIds]);
+  }, [map, selectedGeofenceIds, selectedRouteIds, geofences, routes]);
 
   const registerLayers = useCallback(() => {
     if (!map) return;

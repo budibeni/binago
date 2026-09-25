@@ -4,9 +4,10 @@ import React, { useState, useMemo } from 'react';
 import { Search, ChevronRight, ChevronLeft } from 'lucide-react';
 import { Checkbox } from '@adatrack/ui';
 import { cn } from '@adatrack/utils';
-import { geofenceService, routeService } from '@/data/services';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
 import { getTranslation } from '@/i18n';
+import { useGeofences } from '../../../geofences/hooks/useGeofences';
+import { useRoutes } from '../../../routes/hooks/useRoutes';
 
 export interface PlaybackMapLayerPanelProps {
   selectedGeofenceIds: string[];
@@ -39,12 +40,15 @@ export function PlaybackMapLayerPanel({
   const locale = useBusinessLocale() || 'id';
   const tTracking = getTranslation(locale).tracking;
 
+  const { geofences } = useGeofences();
+  const { routes } = useRoutes();
+
   // --- Geofence Logic ---
   const filteredGeofences = useMemo(() => {
     const q = geoSearch.toLowerCase().trim();
-    if (!q) return geofenceService.getGeofences();
-    return geofenceService.getGeofences().filter(gf => gf.name.toLowerCase().includes(q));
-  }, [geoSearch]);
+    if (!q) return geofences;
+    return geofences.filter(gf => gf.name.toLowerCase().includes(q));
+  }, [geoSearch, geofences]);
 
   const geoTotalPages = Math.max(1, Math.ceil(filteredGeofences.length / geoItemsPerPage));
   const currentGeoPage = Math.min(geoPage, geoTotalPages);
@@ -57,9 +61,9 @@ export function PlaybackMapLayerPanel({
   // --- Route Logic ---
   const filteredRoutes = useMemo(() => {
     const q = routeSearch.toLowerCase().trim();
-    if (!q) return routeService.getRoutes();
-    return routeService.getRoutes().filter(rt => rt.name.toLowerCase().includes(q));
-  }, [routeSearch]);
+    if (!q) return routes;
+    return routes.filter(rt => rt.name.toLowerCase().includes(q));
+  }, [routeSearch, routes]);
 
   const routeTotalPages = Math.max(1, Math.ceil(filteredRoutes.length / routeItemsPerPage));
   const currentRoutePage = Math.min(routePage, routeTotalPages);
