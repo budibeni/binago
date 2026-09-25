@@ -14,6 +14,7 @@ class WebSocketClient {
 
   private getToken(): string | null {
     if (typeof window !== 'undefined') {
+      if ((window as any).__WS_TOKEN__) return (window as any).__WS_TOKEN__;
       const match = document.cookie.match(new RegExp('(^| )access_token=([^;]+)'));
       if (match) return match[2];
       return localStorage.getItem('access_token');

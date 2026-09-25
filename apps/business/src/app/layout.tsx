@@ -43,6 +43,8 @@ export default function RootLayout({
     }
   }
 
+  const tokenCookie = cookieStore.get('access_token')?.value;
+
   return (
     <html lang="id" suppressHydrationWarning className={roboto.variable}>
       <body className="min-h-screen bg-surface text-foreground font-sans antialiased">
@@ -53,6 +55,7 @@ export default function RootLayout({
                 if (localStorage.getItem('adatrack.theme') === 'dark') {
                   document.documentElement.classList.add('dark');
                 }
+                ${tokenCookie ? `window.__WS_TOKEN__ = "${tokenCookie}";` : ''}
               } catch (e) {}
             `,
           }}
