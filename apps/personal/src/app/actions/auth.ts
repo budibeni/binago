@@ -38,7 +38,7 @@ export async function login(formData: FormData) {
         value: token,
         httpOnly: true, // Must be readable by client api.ts to send in Authorization header
         path: '/',
-        secure: process.env.NODE_ENV === 'production',
+        secure: process.env.NODE_ENV === 'production' && process.env.NEXT_PUBLIC_API_URL?.startsWith('https'),
         maxAge: 60 * 60 * 24 * 7, // 1 week
       });
 
