@@ -231,7 +231,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
         (v.driverName?.toLowerCase().includes(q) ?? false);
       return matchStatus && matchSearch;
     });
-  }, [search, statusFilter]);
+  }, [liveVehicles, search, statusFilter]);
 
   // -- Playback derived state --------------------------------------------------
   const playbackTrack = React.useMemo(() => {
