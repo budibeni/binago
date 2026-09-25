@@ -273,6 +273,15 @@ export function BusinessShellLayout({ children, user }: { children: React.ReactN
     } catch (e) {
       console.warn('localStorage error', e);
     }
+
+      const handleUnauthorized = () => {
+        logout().then(() => {
+          window.location.href = '/login';
+        });
+      };
+      window.addEventListener('auth:unauthorized', handleUnauthorized);
+
+    return () => window.removeEventListener('auth:unauthorized', handleUnauthorized);
   }, []);
 
   const handleThemeChange = React.useCallback((newTheme: 'light' | 'dark') => {
@@ -284,6 +293,15 @@ export function BusinessShellLayout({ children, user }: { children: React.ReactN
     } catch (e) {
       console.warn('localStorage error', e);
     }
+
+      const handleUnauthorized = () => {
+        logout().then(() => {
+          window.location.href = '/login';
+        });
+      };
+      window.addEventListener('auth:unauthorized', handleUnauthorized);
+
+    return () => window.removeEventListener('auth:unauthorized', handleUnauthorized);
   }, []);
 
   const handleLocaleChange = React.useCallback((newLocale: Locale) => {
@@ -293,6 +311,15 @@ export function BusinessShellLayout({ children, user }: { children: React.ReactN
     } catch (e) {
       console.warn('localStorage error', e);
     }
+
+      const handleUnauthorized = () => {
+        logout().then(() => {
+          window.location.href = '/login';
+        });
+      };
+      window.addEventListener('auth:unauthorized', handleUnauthorized);
+
+    return () => window.removeEventListener('auth:unauthorized', handleUnauthorized);
   }, []);
 
   const t = getTranslation(locale);
