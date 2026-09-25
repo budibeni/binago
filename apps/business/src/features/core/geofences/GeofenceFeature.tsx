@@ -43,13 +43,30 @@ export function GeofenceFeature({ locale = 'id' }: GeofenceFeatureProps) {
     }
   };
 
+
+
   const handleSave = async (data: Partial<Geofence>) => {
     try {
-      if (view === 'edit' && editingGeofence) {
-        await api.put(`/geofences/${editingGeofence.id}`, data);
-      } else {
-        await api.post('/geofences', data);
+      let areaType = 'polygon';
+      let boundaryPoints: any[] = [];
+      
+      if (data.geometry?.type === 'polygon' || data.geometry?.type === 'rectangle' || data.geometry?.type === 'multiline') {
+          boundaryPoints = data.geometry.coordinates;
       }
+      
+      const payload = {
+        name: data.name,
+        area_type: areaType,
+        boundary_points: boundaryPoints,
+      };
+      
+      if (view === 'edit' && editingGeofence) {
+        await api.put(`/geofences/${editingGeofence.id}`, payload);
+      } else {
+        await api.post('/geofences', payload);
+      }
+
+
       window.location.reload();
     } catch (err) {
       console.error('Failed to save geofence', err);

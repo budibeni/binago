@@ -50,13 +50,30 @@ export function RouteFeature({ locale = 'id' }: RouteFeatureProps) {
     }
   };
 
+
   const handleSave = async (route: Partial<Route>) => {
     try {
-      if (route.id) {
-        await api.put(`/routes/${route.id}`, route);
-      } else {
-        await api.post('/routes', route);
+      const waypoints = [];
+      if (route.origin) waypoints.push({ lat: route.origin.latitude, lon: route.origin.longitude, address: route.origin.address });
+      if (route.stops) {
+          route.stops.forEach(s => {
+              waypoints.push({ lat: s.location.latitude, lon: s.location.longitude, address: s.location.address });
+          });
       }
+      if (route.destination) waypoints.push({ lat: route.destination.latitude, lon: route.destination.longitude, address: route.destination.address });
+      
+      const payload = {
+        name: route.name,
+        waypoints: waypoints,
+        status: route.status,
+      };
+
+      if (route.id) {
+        await api.put(`/routes/${route.id}`, payload);
+      } else {
+        await api.post('/routes', payload);
+      }
+
       window.location.reload();
     } catch (err) {
       console.error('Failed to save route', err);

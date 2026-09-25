@@ -227,13 +227,23 @@ export function DriversFeature() {
             setIsFormOpen(false);
             setEditDriver(null);
           }}
+
           onSave={async (data) => {
             try {
+              const payload = {
+                name: data.name,
+                phone: data.phone,
+                email: data.email,
+                license_number: data.licenseNumber,
+                license_type: 'SIM B1', // default or mapped if exists
+              };
+              
               if (data.id) {
-                await api.put(`/drivers/${data.id}`, data);
+                await api.put(`/drivers/${data.id}`, payload);
               } else {
-                await api.post('/drivers', data);
+                await api.post('/drivers', payload);
               }
+
               window.location.reload();
             } catch (err) {
               console.error('Failed to save driver', err);

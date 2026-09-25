@@ -19,7 +19,27 @@ export function useDrivers(filters?: { search?: string; status?: string; groupId
     api.get<Driver[]>('/drivers', { params: queryParams })
       .then((data) => {
         if (isMounted) {
-          setDrivers(Array.isArray(data) ? data : (data as any).data || []);
+
+          const rawData = Array.isArray(data) ? data : (data as any).data || [];
+          const mapped: Driver[] = rawData.map((d: any) => ({
+            id: String(d.id),
+            name: d.name || '-',
+            phone: d.phone || '-',
+            email: d.email || '-',
+            address: '-',
+            ktpNumber: '-',
+            placeOfBirth: '-',
+            dateOfBirth: new Date().toISOString(),
+            joinDate: new Date().toISOString(),
+            placement: '-',
+            licenseNumber: d.license_number || '-',
+            licenseExpiry: d.license_expiry || new Date().toISOString(),
+            status: 'active',
+            performanceScore: 100,
+            history: [],
+          }));
+          setDrivers(mapped);
+
           setError(null);
         }
       })

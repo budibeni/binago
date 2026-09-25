@@ -19,7 +19,31 @@ export function useGeofences(filters?: { search?: string; status?: string; group
     api.get<Geofence[]>('/geofences', { params: queryParams })
       .then((data) => {
         if (isMounted) {
-          setGeofences(Array.isArray(data) ? data : (data as any).data || []);
+
+
+          const rawData = Array.isArray(data) ? data : (data as any).data || [];
+          const mapped: Geofence[] = rawData.map((g: any) => {
+            let geometry: any = { type: 'polygon', coordinates: [] };
+            
+            if (g.area_type === 'polygon' && g.boundary_points) {
+                geometry = { type: 'polygon', coordinates: g.boundary_points };
+            } else if (g.boundary_points) {
+                geometry = { type: 'polygon', coordinates: g.boundary_points };
+            }
+            
+            return {
+              id: String(g.id),
+              name: g.name || '-',
+              description: '-',
+              geometry: geometry,
+              status: 'active',
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            };
+          });
+          setGeofences(mapped);
+
+
           setError(null);
         }
       })
