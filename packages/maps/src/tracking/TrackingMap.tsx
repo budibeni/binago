@@ -124,7 +124,7 @@ function TrackingMapInner<T>({
   }, [initialFocusedId, map, entities, getId, panTo]);
 
   // Marker style state
-  const [markerStyle, setMarkerStyle] = useState<'default' | 'custom'>('default');
+  const [markerStyle, setMarkerStyle] = useState<'default' | 'custom'>(renderMarker ? 'custom' : 'default');
 
   // Clustering states
   const [bounds, setBounds] = useState<[number, number, number, number] | undefined>(undefined);
