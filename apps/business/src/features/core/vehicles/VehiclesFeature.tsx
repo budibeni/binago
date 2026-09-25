@@ -275,10 +275,18 @@ export function VehiclesFeature() {
           }}
           onSave={async (data) => {
             try {
+              const payload = {
+                imei: data.deviceImei,
+                plate_number: data.plateNumber,
+                make: data.brand || data.vehicleName,
+                model: data.vehicleCategory || '',
+                driver_id: data.driverId || null,
+              };
+              
               if (data.id) {
-                await api.put(`/vehicles/${data.id}`, data);
+                await api.put(`/vehicles/${data.id}`, payload);
               } else {
-                await api.post('/vehicles', data);
+                await api.post('/vehicles', payload);
               }
               // Ideally refetch here. To refetch, useVehicles would need a refetch function.
               // We'll just reload the page for simplicity or rely on state.
