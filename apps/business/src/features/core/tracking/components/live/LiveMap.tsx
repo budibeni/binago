@@ -156,7 +156,8 @@ export function LiveMap({ vehicles, selectedVehicleId, visibleVehicleIds = [], o
         locale={locale}
         playbackTrack={playbackTrack}
         playbackPassedTrack={playbackPassedTrack}
-        playbackParkingEvents={playbackParkingEvents}
+        className="w-full h-full border-0 rounded-none min-h-0"
+      />
     </div>
   );
 }
