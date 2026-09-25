@@ -32,3 +32,5 @@ pnpm-debug.log*
 *.bak
 *.sh
 
+.env*
+!.env.example

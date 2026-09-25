@@ -41,12 +41,6 @@ import type { NavGroup, NavItem, UserInfo, Locale } from '@adatrack/types';
 import { getTranslation } from '../i18n';
 import { ShareLocationProvider } from '../features/core/sharing/context/ShareLocationContext';
 
-const DUMMY_USER: UserInfo = {
-  name: 'Budi Setiawan',
-  email: 'budi.setiawan@adatrack.id',
-  role: 'Super Admin',
-  initials: 'BS',
-};
 
 function buildNavigation(locale: Locale): NavGroup[] {
   const t = getTranslation(locale);
@@ -251,7 +245,13 @@ export function BusinessShellLayout({ children, user }: { children: React.ReactN
   const currentPath = usePathname() || '/';
   const router = useRouter();
 
-  const currentUser = user || DUMMY_USER;
+  const currentUser = user;
+
+  React.useEffect(() => {
+    if (!currentUser && !currentPath.startsWith('/login') && !currentPath.startsWith('/register')) {
+      window.location.href = '/login';
+    }
+  }, [currentUser, currentPath]);
 
   const handleLogout = async () => {
     await logout();
@@ -274,13 +274,13 @@ export function BusinessShellLayout({ children, user }: { children: React.ReactN
       console.warn('localStorage error', e);
     }
 
-      const handleUnauthorized = () => {
-        logout().then(() => {
-          window.location.href = '/login';
-        });
-      };
-      window.addEventListener('auth:unauthorized', handleUnauthorized);
 
+    const handleUnauthorized = () => {
+      logout().then(() => {
+        window.location.href = '/login';
+      });
+    };
+    window.addEventListener('auth:unauthorized', handleUnauthorized);
     return () => window.removeEventListener('auth:unauthorized', handleUnauthorized);
   }, []);
 
@@ -294,14 +294,6 @@ export function BusinessShellLayout({ children, user }: { children: React.ReactN
       console.warn('localStorage error', e);
     }
 
-      const handleUnauthorized = () => {
-        logout().then(() => {
-          window.location.href = '/login';
-        });
-      };
-      window.addEventListener('auth:unauthorized', handleUnauthorized);
-
-    return () => window.removeEventListener('auth:unauthorized', handleUnauthorized);
   }, []);
 
   const handleLocaleChange = React.useCallback((newLocale: Locale) => {
@@ -312,14 +304,6 @@ export function BusinessShellLayout({ children, user }: { children: React.ReactN
       console.warn('localStorage error', e);
     }
 
-      const handleUnauthorized = () => {
-        logout().then(() => {
-          window.location.href = '/login';
-        });
-      };
-      window.addEventListener('auth:unauthorized', handleUnauthorized);
-
-    return () => window.removeEventListener('auth:unauthorized', handleUnauthorized);
   }, []);
 
   const t = getTranslation(locale);
@@ -348,6 +332,8 @@ export function BusinessShellLayout({ children, user }: { children: React.ReactN
   }
 
   const isAuthRoute = currentPath.startsWith('/login') || currentPath.startsWith('/register');
+
+  if (!currentUser && !isAuthRoute) return null;
 
   if (isAuthRoute) {
     return (

@@ -29,8 +29,8 @@ export default function LoginPage() {
       setLoading(false);
     } else if (result?.multiple_companies) {
       setCompanies(result.companies);
-      setEmail(result.email);
-      setPassword(result.password);
+      setEmail(formData.get("email") as string);
+      setPassword(formData.get("password") as string);
       setLoading(false);
     }
   };

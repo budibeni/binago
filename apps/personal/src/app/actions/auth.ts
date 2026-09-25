@@ -36,9 +36,9 @@ export async function login(formData: FormData) {
       cookies().set({
         name: 'access_token',
         value: token,
-        httpOnly: false, // Must be readable by client api.ts to send in Authorization header
+        httpOnly: true, // Must be readable by client api.ts to send in Authorization header
         path: '/',
-        secure: process.env.NODE_ENV === 'production' && process.env.NEXT_PUBLIC_API_URL?.startsWith('https'),
+        secure: process.env.NODE_ENV === 'production',
         maxAge: 60 * 60 * 24 * 7, // 1 week
       });
 

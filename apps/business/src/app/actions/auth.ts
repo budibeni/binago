@@ -38,9 +38,8 @@ export async function login(formData: FormData) {
       return { 
         multiple_companies: true, 
         companies: data.data.companies,
-        email, 
-        password 
-      };
+              };
+
     }
 
     if (data.status === 'success' && (data.data?.token || data.data?.access_token)) {
@@ -51,9 +50,9 @@ const token = data.data?.token || data.data?.access_token;
       cookies().set({
         name: 'access_token',
         value: token,
-        httpOnly: false, // Must be readable by client api.ts to send in Authorization header
+        httpOnly: true,
         path: '/',
-        secure: process.env.NODE_ENV === 'production' && process.env.NEXT_PUBLIC_API_URL?.startsWith('https'),
+        secure: process.env.NODE_ENV === 'production',
         maxAge: 60 * 60 * 24 * 7, // 1 week
       });
 

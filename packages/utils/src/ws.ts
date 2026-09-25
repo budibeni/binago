@@ -36,7 +36,7 @@ class WebSocketClient {
       this.ws = new WebSocket(wsUrl.toString());
 
       this.ws.onopen = () => {
-        console.log('[WebSocket] Connected');
+        if (process.env.NODE_ENV !== "production") console.log('[WebSocket] Connected');
         this.reconnectAttempts = 0;
       };
 
@@ -52,7 +52,7 @@ class WebSocketClient {
       };
 
       this.ws.onclose = () => {
-        console.log('[WebSocket] Disconnected');
+        if (process.env.NODE_ENV !== "production") console.log('[WebSocket] Disconnected');
         this.handleReconnect();
       };
 
@@ -69,7 +69,7 @@ class WebSocketClient {
     if (this.reconnectAttempts < this.maxReconnectAttempts) {
       this.reconnectAttempts++;
       const delay = this.baseReconnectDelay * Math.pow(2, this.reconnectAttempts - 1);
-      console.log(`[WebSocket] Reconnecting in ${delay}ms...`);
+      if (process.env.NODE_ENV !== "production") console.log(`[WebSocket] Reconnecting in ${delay}ms...`);
       setTimeout(() => this.connect(), delay);
     } else {
       console.error('[WebSocket] Max reconnect attempts reached');

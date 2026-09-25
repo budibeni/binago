@@ -1,4 +1,6 @@
-import { NextResponse } from "next/server";
+const fs = require('fs');
+
+const middlewareContent = `import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
@@ -15,7 +17,7 @@ export function middleware(request: NextRequest) {
 
     const headers = new Headers(request.headers);
     if (token) {
-      headers.set("Authorization", `Bearer ${token}`);
+      headers.set("Authorization", \`Bearer \${token}\`);
     }
 
     return NextResponse.rewrite(backendUrl, {
@@ -44,3 +46,7 @@ export const config = {
     "/((?!_next/static|_next/image|favicon.ico).*)"
   ],
 };
+`;
+
+fs.writeFileSync('apps/business/src/middleware.ts', middlewareContent);
+fs.writeFileSync('apps/personal/src/middleware.ts', middlewareContent);
