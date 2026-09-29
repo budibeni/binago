@@ -37,8 +37,8 @@ export function useLiveTracking() {
               status: computedStatus,
               speed: speed,
               location: {
-                lat: v.live_state?.latitude ?? v.lat ?? -6.2,
-                lng: v.live_state?.longitude ?? v.lon ?? 106.8,
+                lat: (v.live_state?.latitude || v.lat) || -6.2,
+                lng: (v.live_state?.longitude || v.lon) || 106.8,
                 address: v.live_state?.address || v.address || 'Unknown'
               },
               lastUpdate: v.live_state?.timestamp || v.timestamp || new Date().toISOString(),
@@ -95,8 +95,8 @@ export function useLiveTracking() {
             acc: acc,
             location: {
               ...oldV.location,
-              lat: update.lat !== undefined ? update.lat : oldV.location.lat,
-              lng: update.lon !== undefined ? update.lon : oldV.location.lng,
+              lat: (update.lat || oldV.location.lat) || -6.2,
+              lng: (update.lon || oldV.location.lng) || 106.8,
             },
             lastUpdate: update.timestamp || new Date().toISOString(),
           };

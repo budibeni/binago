@@ -1,8 +1,8 @@
-FROM node:20-alpine AS base
+FROM node:20-slim AS base
+ENV NODE_OPTIONS="--dns-result-order=ipv4first"
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
-RUN apk add --no-cache libc6-compat
 
 FROM base AS builder
 WORKDIR /app
