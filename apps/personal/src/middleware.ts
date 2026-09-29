@@ -7,22 +7,73 @@ export function middleware(request: NextRequest) {
 
   // Reverse Proxy for API requests
   if (request.nextUrl.pathname.startsWith("/api/proxy/")) {
-    const backendPath = request.nextUrl.pathname.replace("/api/proxy", "");
-    const backendUrl = new URL(
-      backendPath + request.nextUrl.search,
-      process.env.NEXT_PUBLIC_API_URL || "http://localhost:8088"
-    );
+    try {
+      const backendPath = request.nextUrl.pathname.replace("/api/proxy", "");
+      
+      let targetOrigin = "http://localhost:8080";
+      
+      // Safely parse NEXT_PUBLIC_API_URL
+      const configuredUrl = process.env.NEXT_PUBLIC_API_URL;
+      if (configuredUrl) {
+         try {
+            // Check if it's absolute
+            if (configuredUrl.startsWith("http")) {
+               const urlObj = new URL(configuredUrl);
+               targetOrigin = urlObj.origin;
+            } else {
+               // It's relative, assume we are proxying to the same host
+               targetOrigin = request.nextUrl.origin;
+            }
+         } catch (e) {
+            targetOrigin = "http://localhost:8080";
+         }
+      }
 
-    const headers = new Headers(request.headers);
-    if (token) {
-      headers.set("Authorization", `Bearer ${token}`);
+      // Map of routes to api-vehicle (port 8084)
+      const vehicleRoutes = [
+        "/api/v1/vehicles",
+        "/api/v1/geofences",
+        "/api/v1/routes",
+        "/api/v1/speed-configs",
+        "/api/v1/notification-preferences",
+        "/api/v1/alerts",
+        "/api/v1/fuel-configs",
+        "/api/v1/media",
+        "/api/v1/access",
+        "/api/v1/drivers",
+        "/api/v1/share-links",
+        "/api/v1/groups",
+        "/api/v1/assets",
+        "/api/v1/organizations",
+        "/api/v1/integrations"
+      ];
+      
+      const isVehicleRoute = vehicleRoutes.some(route => backendPath.startsWith(route));
+      
+      // Local Docker logic
+      if (isVehicleRoute && targetOrigin.includes("service-websocket")) {
+        targetOrigin = "http://api-vehicle:8084";
+      }
+
+      const backendUrl = new URL(
+        backendPath + request.nextUrl.search,
+        targetOrigin
+      );
+
+      const headers = new Headers(request.headers);
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
+      }
+
+      return NextResponse.rewrite(backendUrl, {
+        request: {
+          headers,
+        },
+      });
+    } catch (error) {
+      console.error("Middleware Proxy Error:", error);
+      return new NextResponse(JSON.stringify({ error: "Proxy Error" }), { status: 500 });
     }
-
-    return NextResponse.rewrite(backendUrl, {
-      request: {
-        headers,
-      },
-    });
   }
 
   // Auth Guard
