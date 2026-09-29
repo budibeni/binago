@@ -238,7 +238,13 @@ export function VehicleForm({
           <InputString
             label={tF.lblSimCard}
             value={formData.deviceSimNumber || ''}
-            onChange={(val) => handleChange('deviceSimNumber', val)}
+            onChange={(val) => {
+              if (val && !val.startsWith('+') && val.trim() !== '') {
+                val = '+' + val;
+              }
+              handleChange('deviceSimNumber', val);
+            }}
+            placeholder="e.g. +62812345678"
           />
           <InputString
             label={tF.lblGpsDeviceBrand}

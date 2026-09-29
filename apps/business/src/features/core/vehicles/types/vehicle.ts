@@ -75,7 +75,7 @@ export const getVehicleFormSchema = (t: Record<string, string>) => z.object({
   groupId: z.string().min(1, t.groupRequired || 'Grup kendaraan wajib dipilih'),
   driverId: z.string().nullable().optional(),
   deviceImei: z.string().nullable().optional(),
-  deviceSimNumber: z.string().nullable().optional(),
+  deviceSimNumber: z.string().refine(val => !val || val.startsWith('+'), { message: "Harus diawali simbol + (kode negara)" }).nullable().optional(),
   vehicleId: z.string().optional(),
   gpsDeviceBrand: z.string().optional(),
   gpsDeviceType: z.string().optional(),
