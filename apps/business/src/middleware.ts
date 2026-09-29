@@ -9,8 +9,8 @@ export function middleware(request: NextRequest) {
   if (request.nextUrl.pathname.startsWith("/api/proxy/")) {
     const backendPath = request.nextUrl.pathname.replace("/api/proxy", "");
     
-    // Simple API Gateway Logic
-    let targetBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api/v1";
+    // Default origin is service-websocket on port 8080
+    let targetOrigin = "http://localhost:8080";
     
     // Map of routes to api-vehicle (port 8084)
     const vehicleRoutes = [
@@ -31,16 +31,14 @@ export function middleware(request: NextRequest) {
       "/api/v1/integrations"
     ];
     
-    // Check if the path matches api-vehicle routes
     const isVehicleRoute = vehicleRoutes.some(route => backendPath.startsWith(route));
     if (isVehicleRoute && process.env.NODE_ENV !== "production") {
-      targetBaseUrl = "http://api-vehicle:8084/api/v1";
-      // In Docker, host resolves to 'api-vehicle'
+      targetOrigin = "http://api-vehicle:8084";
     }
 
     const backendUrl = new URL(
-      backendPath.replace("/api/v1", "") + request.nextUrl.search,
-      targetBaseUrl
+      backendPath + request.nextUrl.search,
+      targetOrigin
     );
 
     const headers = new Headers(request.headers);
