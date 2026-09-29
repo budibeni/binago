@@ -111,7 +111,12 @@ export function VehicleForm({
 
 
   const { formData, errors, isSubmitting, handleChange, handleSubmit } = useForm<Vehicle>({
-    initialData: vehicle || DEFAULT_VEHICLE,
+    initialData: vehicle ? {
+      ...vehicle,
+      deviceSimNumber: (vehicle.deviceSimNumber && !vehicle.deviceSimNumber.startsWith('+') && vehicle.deviceSimNumber.trim() !== '')
+        ? '+' + vehicle.deviceSimNumber
+        : vehicle.deviceSimNumber
+    } : DEFAULT_VEHICLE,
     resetOn: [open, vehicle],
     schema: getVehicleFormSchema(tV.validation || {}),
     onSubmit: async (data) => {
