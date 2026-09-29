@@ -278,10 +278,20 @@ export function VehiclesFeature() {
               const payload = {
                 imei: data.deviceImei,
                 plate_number: data.plateNumber,
-                make: data.brand || data.vehicleName,
-                model: data.vehicleCategory || '',
+                make: data.brand || '',
+                model: data.model || '',
                 driver_id: data.driverId || null,
                 group_id: data.groupId && data.groupId !== 'all' ? parseInt(data.groupId, 10) : null,
+                vehicle_name: data.vehicleName,
+                category: data.vehicleCategory,
+                year: data.year || null,
+                fuel_type: data.fuelType,
+                color: data.color,
+                fuel_capacity: data.fuelCapacity || null,
+                stnk_expiry: data.registrationExpiry || null,
+                kir_expiry: data.kirExpiry || null,
+                notes: data.notes || '',
+                gps_install_date: data.gpsInstallDate || null,
               };
               
               if (data.id) {
