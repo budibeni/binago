@@ -302,9 +302,25 @@ function RouteMapInner({
 
       // 3. Render Planned Path
       const pathData: GeoJSON.FeatureCollection = { type: 'FeatureCollection', features: [] };
-      if (selectedRoute?.plannedPath && editorMode === 'idle') {
-        const pathFeature = geometryToGeoJSON(selectedRoute.plannedPath);
-        pathData.features.push(pathFeature as any);
+      if (selectedRoute && editorMode === 'idle') {
+        if (selectedRoute.plannedPath) {
+          const pathFeature = geometryToGeoJSON(selectedRoute.plannedPath);
+          pathData.features.push(pathFeature as any);
+        } else {
+          const points = [];
+          routeLocs.forEach(({ loc }) => {
+            if (loc.type === 'coordinate' && loc.longitude && loc.latitude) {
+              points.push([loc.longitude, loc.latitude]);
+            }
+          });
+          if (points.length > 1) {
+            pathData.features.push({
+              type: 'Feature',
+              properties: {},
+              geometry: { type: 'LineString', coordinates: points }
+            } as any);
+          }
+        }
       }
 
       if (!map.getSource(pathSourceId)) {
