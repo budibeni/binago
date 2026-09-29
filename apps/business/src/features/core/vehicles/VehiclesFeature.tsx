@@ -279,7 +279,7 @@ export function VehiclesFeature() {
                 imei: data.deviceImei,
                 plate_number: data.plateNumber,
                 make: data.brand || '',
-                model: data.model || '',
+                model: '',
                 driver_id: data.driverId || null,
                 group_id: data.groupId && data.groupId !== 'all' ? parseInt(data.groupId, 10) : null,
                 vehicle_name: data.vehicleName,
