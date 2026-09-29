@@ -19,6 +19,7 @@ interface GpsDeviceFormProps {
 export function GpsDeviceForm({ device, open, onOpenChange, onSave }: GpsDeviceFormProps) {
   const isEdit = !!device;
   const [companies, setCompanies] = useState<{value: string, label: string}[]>([]);
+  const [simCards, setSimCards] = useState<any[]>([]);
   
   useEffect(() => {
     if (open) {
@@ -28,19 +29,38 @@ export function GpsDeviceForm({ device, open, onOpenChange, onSave }: GpsDeviceF
           setCompanies(data.map((c: any) => ({ value: c.code, label: c.name })));
         })
         .catch(console.error);
+
+      api.get('/admin/sim-cards')
+        .then((res: any) => {
+          const data = res.data || res || [];
+          setSimCards(data);
+        })
+        .catch(console.error);
     }
   }, [open]);
 
-  const { formData, errors, isSubmitting, handleChange, handleSubmit } = useForm({
-    initialData: device || { imei: '', sim_number: '', protocol: '', company_code: '' },
+  const simCardOptions = [
+    { value: '', label: 'Manual Input / None' },
+    ...simCards.map((s: any) => ({ value: s.iccid, label: `${s.iccid} - ${s.phone_number}` }))
+  ];
+
+  const { formData, errors, isSubmitting, handleChange, handleSubmit, setFormData } = useForm({
+    initialData: device || { imei: '', sim_number: '', protocol: '', company_code: '', iccid: '' },
     onSubmit: async (data: any) => {
       try {
+        const payload = {
+          imei: data.imei,
+          device_brand: data.device_brand || '',
+          device_model: data.device_model || '',
+          sim_number: data.sim_number,
+          protocol: data.protocol,
+          iccid: data.iccid ? data.iccid : null
+        };
+
         if (!isEdit) {
-          await api.post('/admin/gps-devices', {
-            imei: data.imei,
-            sim_number: data.sim_number,
-            protocol: data.protocol
-          });
+          await api.post('/admin/gps-devices', payload);
+        } else {
+          await api.put(`/admin/gps-devices/${data.imei}`, payload);
         }
         
         if (data.company_code) {
@@ -57,12 +77,22 @@ export function GpsDeviceForm({ device, open, onOpenChange, onSave }: GpsDeviceF
     }
   });
 
+  const handleSimCardChange = (iccid: string) => {
+    handleChange('iccid', iccid);
+    if (iccid) {
+      const selectedSim = simCards.find(s => s.iccid === iccid);
+      if (selectedSim) {
+        setFormData((prev: any) => ({ ...prev, sim_number: selectedSim.phone_number }));
+      }
+    }
+  };
+
   return (
     <FormShell
       open={open}
       onOpenChange={onOpenChange}
-      title={isEdit ? 'Assign Device' : 'Add Device'}
-      subtitle={isEdit ? 'Assign GPS device to a company' : 'Register a new GPS device'}
+      title={isEdit ? 'Edit Device' : 'Add Device'}
+      subtitle={isEdit ? 'Update GPS device details' : 'Register a new GPS device'}
       onCancel={() => onOpenChange(false)}
       onSave={() => handleSubmit()}
       isSubmitting={isSubmitting}
@@ -80,17 +110,23 @@ export function GpsDeviceForm({ device, open, onOpenChange, onSave }: GpsDeviceF
           disabled={isEdit}
           required
         />
+        <InputSelect
+          label="IoT SIM Card (Optional)"
+          value={formData.iccid || ''}
+          onChange={handleSimCardChange}
+          options={simCardOptions}
+          helpText="Pilih dari daftar IoT SIM Cards, atau biarkan kosong untuk input manual."
+        />
         <InputString
           label="SIM Number"
           value={formData.sim_number || ''}
           onChange={(val) => handleChange('sim_number', val)}
-          disabled={isEdit}
+          helpText="Jika memilih IoT SIM Card, nomor otomatis terisi."
         />
         <InputString
           label="Protocol"
           value={formData.protocol || ''}
           onChange={(val) => handleChange('protocol', val)}
-          disabled={isEdit}
         />
         <InputSelect
           label="Assign Company"
