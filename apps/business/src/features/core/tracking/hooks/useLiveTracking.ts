@@ -15,13 +15,16 @@ export function useLiveTracking() {
           const rawData = Array.isArray(res) ? res : (res.data || []);
 
           const mapped: TrackingVehicle[] = rawData.map((v: any) => {
-            const acc = v.live_state?.ignition !== undefined ? v.live_state.ignition : v.acc_status;
+            const rawAcc = v.live_state?.ignition !== undefined ? v.live_state.ignition : v.acc_status;
+            const acc = rawAcc === 1 || rawAcc === true || rawAcc === '1' || rawAcc === 'true';
             const speed = v.live_state?.speed !== undefined ? v.live_state.speed : (v.speed || 0);
             
             let computedStatus: 'driving' | 'idle' | 'parking' | 'offline' = 'offline';
-            if (acc) {
-                computedStatus = speed > 0 ? 'driving' : 'idle';
-            } else if (acc === false) {
+            if (acc && speed > 0) {
+                computedStatus = 'driving';
+            } else if (acc) {
+                computedStatus = 'idle';
+            } else if (rawAcc !== undefined && rawAcc !== null) {
                 computedStatus = 'parking';
             }
             
@@ -73,12 +76,15 @@ export function useLiveTracking() {
           const oldV = newVehicles[index];
           
           let computedStatus = oldV.status;
-          const acc = update.acc !== undefined ? update.acc : oldV.acc;
+          const rawAcc = update.acc !== undefined ? update.acc : (update.acc_status !== undefined ? update.acc_status : oldV.acc);
+          const acc = rawAcc === 1 || rawAcc === true || rawAcc === '1' || rawAcc === 'true';
           const speed = update.speed !== undefined ? update.speed : oldV.speed;
           
-          if (acc) {
-              computedStatus = speed > 0 ? 'driving' : 'idle';
-          } else if (acc === false) {
+          if (acc && speed > 0) {
+              computedStatus = 'driving';
+          } else if (acc) {
+              computedStatus = 'idle';
+          } else if (rawAcc !== undefined && rawAcc !== null) {
               computedStatus = 'parking';
           }
           
