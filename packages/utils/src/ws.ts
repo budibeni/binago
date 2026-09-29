@@ -44,8 +44,9 @@ class WebSocketClient {
       this.ws.onmessage = (event) => {
         try {
           const payload = JSON.parse(event.data);
-          if (payload.type && this.handlers.has(payload.type)) {
-            this.handlers.get(payload.type)!.forEach(handler => handler(payload.data));
+          const eventType = payload.event || payload.type;
+          if (eventType && this.handlers.has(eventType)) {
+            this.handlers.get(eventType)!.forEach(handler => handler(payload.data || payload));
           }
         } catch (err) {
           console.error('[WebSocket] Failed to parse message', err);
