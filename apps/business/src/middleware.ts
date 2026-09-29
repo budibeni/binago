@@ -9,8 +9,10 @@ export function middleware(request: NextRequest) {
   if (request.nextUrl.pathname.startsWith("/api/proxy/")) {
     const backendPath = request.nextUrl.pathname.replace("/api/proxy", "");
     
-    // Default origin is service-websocket on port 8080
-    let targetOrigin = "http://localhost:8080";
+    // Parse the configured API URL to get its origin
+    const defaultBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api/v1";
+    const defaultUrlObj = new URL(defaultBaseUrl);
+    let targetOrigin = defaultUrlObj.origin;
     
     // Map of routes to api-vehicle (port 8084)
     const vehicleRoutes = [
@@ -31,8 +33,11 @@ export function middleware(request: NextRequest) {
       "/api/v1/integrations"
     ];
     
+    // Override ONLY for local docker development where traffic needs to be split.
+    // If the origin is 'service-websocket', we know we are running in the local Docker compose network.
+    // On Coolify (production), Traefik handles routing so we leave targetOrigin as is.
     const isVehicleRoute = vehicleRoutes.some(route => backendPath.startsWith(route));
-    if (isVehicleRoute && process.env.NODE_ENV !== "production") {
+    if (isVehicleRoute && targetOrigin.includes("service-websocket")) {
       targetOrigin = "http://api-vehicle:8084";
     }
 
