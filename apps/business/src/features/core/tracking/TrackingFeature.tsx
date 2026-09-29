@@ -113,7 +113,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
           const res: any = await api.get(`/vehicles/${id}/history`, {
             params: { from: startDatetime.toISOString(), to: endDatetime.toISOString() }
           });
-          const positions = res?.data?.points || res?.data?.data?.points || [];
+          const positions = res?.points || res?.data?.points || res?.data?.data?.points || [];
           
           const points = positions.map((p: any) => ({
             lat: p.lat,
@@ -460,7 +460,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
       const res: any = await api.get(`/vehicles/${playbackVehicleId}/history`, {
         params: { from: startDatetime.toISOString(), to: endDatetime.toISOString() }
       });
-      const positions = res?.data?.points || res?.data?.data?.points || [];
+      const positions = res?.points || res?.data?.points || res?.data?.data?.points || [];
       
       const points = positions.map((p: any) => ({
         lat: p.lat,
