@@ -15,7 +15,43 @@ import { useLiveNotifications } from '../../hooks/useLiveNotifications';
 export function TrackingNotificationPanel({ open, onClose, locale = 'id', visibleVehicleIds }: TrackingNotificationPanelProps) {
   const [activeTab, setActiveTab] = useState<'all' | 'alarm_vehicle' | 'maintenance' | 'operation'>('all');
   const tTrackingLocal = getTrackingTranslation(locale);
-  const { notifications } = useLiveNotifications();
+  const { notifications: liveNotifs } = useLiveNotifications();
+  const [historicalNotifs, setHistoricalNotifs] = useState<any[]>([]);
+
+  React.useEffect(() => {
+    // Fetch historical alerts when panel opens
+    const fetchHistoricalAlerts = async () => {
+      if (!visibleVehicleIds || visibleVehicleIds.length === 0) return;
+      
+      try {
+        const { api } = await import('@adatrack/utils');
+        let allAlerts: any[] = [];
+        
+        for (const vid of visibleVehicleIds) {
+          const res = await api.get('/vehicles/' + vid + '/alerts');
+          const data = (res as any)?.data?.data || (res as any)?.data || [];
+          allAlerts = [...allAlerts, ...data];
+        }
+        
+        // Sort descending
+        allAlerts.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+        setHistoricalNotifs(allAlerts);
+      } catch (err) {
+        console.error('Failed to fetch historical alerts', err);
+      }
+    };
+    
+    fetchHistoricalAlerts();
+  }, [visibleVehicleIds]);
+
+  // Combine live and historical, deduplicate by ID
+  const allNotifications = React.useMemo(() => {
+    const combined = [...liveNotifs, ...historicalNotifs];
+    const unique = combined.filter((v, i, a) => a.findIndex(t => (t.id === v.id)) === i);
+    unique.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+    return unique;
+  }, [liveNotifs, historicalNotifs]);
+
 
   const tabs = [
     { id: 'all', label: tTrackingLocal.notifications.all },
@@ -24,7 +60,7 @@ export function TrackingNotificationPanel({ open, onClose, locale = 'id', visibl
     { id: 'operation', label: tTrackingLocal.notifications.operation, icon: <Clock className="h-3.5 w-3.5" /> },
   ] as const;
 
-  const filteredNotifications = notifications.filter((notif) => {
+  const filteredNotifications = allNotifications.filter((notif) => {
     const matchesTab = activeTab === 'all' || notif.category === activeTab;
     const matchesVehicle = !visibleVehicleIds || visibleVehicleIds.includes(notif.vehicleId);
     return matchesTab && matchesVehicle;
