@@ -56,6 +56,7 @@ export interface TrackingVehicle {
   gpsSerialNumber?: string;  // GPS device serial number
   alarmEvent?: string;       // Latest alarm/event
   isLocationShared?: boolean; // Whether the vehicle's location is currently being shared
+  hasTelemetry?: boolean;    // Whether the vehicle has valid telemetry data
 }
 
 // --- Vehicle Group -------------------------------------------------------------

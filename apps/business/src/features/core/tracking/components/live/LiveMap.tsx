@@ -86,19 +86,24 @@ export function LiveMap({ vehicles, selectedVehicleId, visibleVehicleIds = [], o
     setInternalSelectedId(selectedVehicleId || null);
   }, [selectedVehicleId]);
 
+  const vehiclesWithTelemetry = useMemo(
+    () => vehicles.filter((v) => v.hasTelemetry !== false),
+    [vehicles]
+  );
+
   const entityOptions: MapEntityOption[] = useMemo(
     () =>
-      vehicles.map((v) => ({
+      vehiclesWithTelemetry.map((v) => ({
         id: v.id,
         label: `${v.plateNumber}${v.driverName ? ` · ${v.driverName}` : ''}`,
       })),
-    [vehicles],
+    [vehiclesWithTelemetry],
   );
 
   return (
     <div className="w-full h-full relative">
       <TrackingMap<TrackingVehicle>
-        entities={vehicles}
+        entities={vehiclesWithTelemetry}
         selectedIds={visibleVehicleIds}
         initialFocusedId={initialFocusedVehicleId}
         focusedId={internalSelectedId}

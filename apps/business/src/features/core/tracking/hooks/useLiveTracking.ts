@@ -28,6 +28,10 @@ export function useLiveTracking() {
                 computedStatus = 'parking';
             }
             
+            const rawLat = v.live_state?.latitude || v.lat;
+            const rawLon = v.live_state?.longitude || v.lon;
+            const hasTelemetry = rawLat !== undefined && rawLat !== null && rawLat !== 0;
+
             return {
               id: String(v.id),
               plateNumber: v.plate_number || v.imei,
@@ -37,13 +41,14 @@ export function useLiveTracking() {
               status: computedStatus,
               speed: speed,
               location: {
-                lat: (v.live_state?.latitude || v.lat) || -6.2,
-                lng: (v.live_state?.longitude || v.lon) || 106.8,
+                lat: rawLat || -6.2,
+                lng: rawLon || 106.8,
                 address: v.live_state?.address || v.address || 'Unknown'
               },
               lastUpdate: v.live_state?.timestamp || v.timestamp || new Date().toISOString(),
               acc: acc,
               gpsSerialNumber: v.imei,
+              hasTelemetry: hasTelemetry,
             };
           });
 
@@ -88,6 +93,11 @@ export function useLiveTracking() {
               computedStatus = 'parking';
           }
           
+          const rawLat = update.lat || oldV.location.lat;
+          const rawLon = update.lon || oldV.location.lng;
+          // Ensure we don't accidentally mark as NO telemetry if it had telemetry before and the update just didn't include lat
+          const hasTelemetry = (rawLat !== undefined && rawLat !== null && rawLat !== 0) || oldV.hasTelemetry;
+
           newVehicles[index] = { 
             ...oldV, 
             status: computedStatus,
@@ -95,10 +105,11 @@ export function useLiveTracking() {
             acc: acc,
             location: {
               ...oldV.location,
-              lat: (update.lat || oldV.location.lat) || -6.2,
-              lng: (update.lon || oldV.location.lng) || 106.8,
+              lat: rawLat || -6.2,
+              lng: rawLon || 106.8,
             },
             lastUpdate: update.timestamp || new Date().toISOString(),
+            hasTelemetry: hasTelemetry,
           };
           return newVehicles;
         }
