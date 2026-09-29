@@ -23,7 +23,11 @@ class APIClient {
 
   // Token management can be handled by interceptors or explicitly passed
   private getToken(): string | null {
-    return null; // Token handled by HttpOnly cookie and Middleware proxy
+    if (typeof window !== 'undefined') {
+      const match = document.cookie.match(new RegExp('(^| )access_token=([^;]+)'));
+      if (match) return match[2];
+    }
+    return null;
   }
 
   async request<T>(endpoint: string, options: FetchOptions = {}): Promise<T> {
@@ -31,13 +35,21 @@ class APIClient {
 
     let url = `${this.baseURL}${endpoint}`;
     
-    // Proxy client-side requests through Next.js middleware
+    // Proxy client-side requests through Next.js middleware ONLY on local environment
     if (typeof window !== 'undefined') {
-      if (url.startsWith('http')) {
-        const urlObj = new URL(url);
-        url = `/api/proxy${urlObj.pathname}`;
+      const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      
+      if (isLocal) {
+        if (url.startsWith('http')) {
+          const urlObj = new URL(url);
+          url = `/api/proxy${urlObj.pathname}`;
+        } else {
+          url = `/api/proxy${endpoint.startsWith('/') ? endpoint : '/' + endpoint}`;
+        }
       } else {
-        url = `/api/proxy${endpoint.startsWith('/') ? endpoint : '/' + endpoint}`;
+        // In production (Coolify), ensure the URL is relative if it's the same origin
+        // Or if NEXT_PUBLIC_API_URL is already correctly configured, just use it.
+        // If NEXT_PUBLIC_API_URL is '/api/v1', url is already correct.
       }
     }
     

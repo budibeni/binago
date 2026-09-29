@@ -36,7 +36,7 @@ export async function login(formData: FormData) {
       cookies().set({
         name: 'access_token',
         value: token,
-        httpOnly: true, // Must be readable by client api.ts to send in Authorization header
+        httpOnly: false, // Must be readable by client api.ts to send in Authorization header
         path: '/',
         secure: process.env.NODE_ENV === 'production' && process.env.NEXT_PUBLIC_API_URL?.startsWith('https'),
         maxAge: 60 * 60 * 24 * 7, // 1 week
