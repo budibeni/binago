@@ -307,7 +307,7 @@ function RouteMapInner({
           const pathFeature = geometryToGeoJSON(selectedRoute.plannedPath);
           pathData.features.push(pathFeature as any);
         } else {
-          const points = [];
+          const points: number[][] = [];
           routeLocs.forEach(({ loc }) => {
             if (loc.type === 'coordinate' && loc.longitude && loc.latitude) {
               points.push([loc.longitude, loc.latitude]);
