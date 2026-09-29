@@ -115,10 +115,7 @@ export function useDataTable<TData extends RowData = RowData>(
       globalFilter,
       columnVisibility,
       columnPinning,
-      pagination: {
-        pageIndex,
-        pageSize,
-      },
+      pagination: pagination ? { pageIndex, pageSize } : { pageIndex: 0, pageSize: 999999 },
     },
     onSortingChange: (updater) => {
       const next = typeof updater === 'function' ? updater(sorting) : updater;
