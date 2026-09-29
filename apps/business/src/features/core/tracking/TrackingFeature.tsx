@@ -84,7 +84,6 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
   const timerRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
   const playbackDataRef = React.useRef<MockPlaybackData | null>(null);
   const playbackSpeedRef = React.useRef(1);
-  const playbackPointIndexRef = React.useRef(0);
 
   // ─── Heatmap state ──────────────────────────────────────────────────────────
   const [heatmapStatusFilter, setHeatmapStatusFilter] = React.useState<'driving' | 'idle' | 'parking'>('driving');
@@ -250,7 +249,6 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
   // Keep refs in sync
   React.useEffect(() => { playbackDataRef.current = playbackData; }, [playbackData]);
   React.useEffect(() => { playbackSpeedRef.current = playbackSpeed; }, [playbackSpeed]);
-  React.useEffect(() => { playbackPointIndexRef.current = playbackPointIndex; }, [playbackPointIndex]);
 
   // --- Computed ----------------------------------------------------------------
   const allVehiclesUnfiltered = React.useMemo(() => {
@@ -445,7 +443,6 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
   const handleClearPlayback = React.useCallback(() => {
     setPlaybackState({ status: 'idle', totalDuration: 0, currentTime: 0 });
     setPlaybackData(null);
-    playbackPointIndexRef.current = 0;
     setPlaybackPointIndex(0);
     stopTimer();
   }, [stopTimer]);
@@ -455,7 +452,6 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
     stopTimer();
     setPlaybackState({ status: 'loading', totalDuration: 0, currentTime: 0 });
     setPlaybackData(null);
-    playbackPointIndexRef.current = 0;
     setPlaybackPointIndex(0);
     
     try {
@@ -464,7 +460,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
       const res: any = await api.get(`/vehicles/${playbackVehicleId}/history`, {
         params: { from: startDatetime.toISOString(), to: endDatetime.toISOString() }
       });
-      const positions = res?.points || res?.data?.points || res?.data?.data?.points || res?.data || [];
+      const positions = res?.points || res?.data?.points || res?.data?.data?.points || [];
       
       const points = positions.map((p: any) => ({
         lat: p.lat,
@@ -503,7 +499,6 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
     stopTimer();
     setPlaybackState({ status: 'loading', totalDuration: 0, currentTime: 0 });
     setPlaybackData(null);
-    playbackPointIndexRef.current = 0;
     setPlaybackPointIndex(0);
     
     api.get<MockPlaybackData>(`/vehicles/${pending.vehicleId}/history`, {
@@ -521,52 +516,44 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
       });
   }, [playbackVehicleId, stopTimer]);
 
-  const handlePlay = React.useCallback(() => {
+      const handlePlay = React.useCallback(() => {
     stopTimer();
-    const data = playbackDataRef.current;
-    if (!data || data.points.length === 0) return;
 
-    const isAtEnd = playbackPointIndexRef.current >= data.points.length - 1;
-    if (isAtEnd) {
-      playbackPointIndexRef.current = 0;
-      setPlaybackPointIndex(0);
-    }
+    setPlaybackPointIndex((prevIdx) => {
+      const data = playbackDataRef.current;
+      if (data && prevIdx >= data.points.length - 1) {
+        return 0;
+      }
+      return prevIdx;
+    });
 
-    setPlaybackState((prev: PlaybackState) => {
+    setPlaybackState((prev) => {
       if (prev.status !== 'ready' && prev.status !== 'paused') return prev;
-      const shouldResetTime = isAtEnd || (prev.totalDuration > 0 && prev.currentTime >= prev.totalDuration);
-      return {
-        ...prev,
-        status: 'playing' as const,
-        currentTime: shouldResetTime ? 0 : prev.currentTime,
-      };
+      const isFinished = prev.currentTime >= prev.totalDuration && prev.totalDuration > 0;
+      return { ...prev, status: 'playing', currentTime: isFinished ? 0 : prev.currentTime };
     });
 
     timerRef.current = setInterval(() => {
-      const currentData = playbackDataRef.current;
-      if (!currentData || currentData.points.length === 0) return;
+      const data = playbackDataRef.current;
+      if (!data) return;
       const speed = playbackSpeedRef.current;
 
-      const prev = playbackPointIndexRef.current;
-      const next = Math.min(prev + speed, currentData.points.length - 1);
-      const isEnd = next >= currentData.points.length - 1;
-
-      playbackPointIndexRef.current = next;
-      setPlaybackPointIndex(next);
-
-      setPlaybackState((ps: PlaybackState) => {
-        if (ps.status !== 'playing') return ps;
-        const currentTime = isEnd ? ps.totalDuration : next * 15;
-        return {
-          ...ps,
-          status: isEnd ? 'ready' as const : 'playing' as const,
-          currentTime,
-        };
+      setPlaybackPointIndex((prevIdx) => {
+        const nextIdx = Math.min(prevIdx + speed, data.points.length - 1);
+        
+        setPlaybackState((ps) => {
+          // Remove the status check here! It causes race conditions if state hasn't flushed.
+          // If the timer is running, we are playing.
+          
+          if (nextIdx >= data.points.length - 1) {
+            stopTimer();
+            return { ...ps, status: 'ready', currentTime: ps.totalDuration };
+          }
+          return { ...ps, status: 'playing', currentTime: nextIdx * 15 };
+        });
+        
+        return nextIdx;
       });
-
-      if (isEnd) {
-        stopTimer();
-      }
     }, 200);
   }, [stopTimer]);
 
@@ -577,8 +564,6 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
 
   const handleStop = React.useCallback(() => {
     stopTimer();
-    playbackPointIndexRef.current = 0;
-    setPlaybackPointIndex(0);
     setPlaybackState((prev: PlaybackState) => ({ ...prev, status: 'ready' as const, currentTime: 0 }));
   }, [stopTimer]);
 
@@ -588,7 +573,6 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
     const targetTime = (progress / 100) * data.totalDurationSecs;
     const targetIndex = Math.round(targetTime / 15);
     const clampedIndex = Math.min(Math.max(0, targetIndex), data.points.length - 1);
-    playbackPointIndexRef.current = clampedIndex;
     setPlaybackPointIndex(clampedIndex);
     setPlaybackState((prev: PlaybackState) => ({
       ...prev,
