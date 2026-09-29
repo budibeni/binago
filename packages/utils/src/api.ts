@@ -35,21 +35,15 @@ class APIClient {
 
     let url = `${this.baseURL}${endpoint}`;
     
-    // Proxy client-side requests through Next.js middleware ONLY on local environment
+    // Proxy client-side requests through Next.js middleware (REQUIRED for both local and Coolify)
+    // because the Next.js server acts as an API gateway that routes to the correct internal Docker containers
+    // (e.g., api-vehicle:8084 vs service-websocket:8080)
     if (typeof window !== 'undefined') {
-      const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-      
-      if (isLocal) {
-        if (url.startsWith('http')) {
-          const urlObj = new URL(url);
-          url = `/api/proxy${urlObj.pathname}`;
-        } else {
-          url = `/api/proxy${endpoint.startsWith('/') ? endpoint : '/' + endpoint}`;
-        }
+      if (url.startsWith('http')) {
+        const urlObj = new URL(url);
+        url = `/api/proxy${urlObj.pathname}`;
       } else {
-        // In production (Coolify), ensure the URL is relative if it's the same origin
-        // Or if NEXT_PUBLIC_API_URL is already correctly configured, just use it.
-        // If NEXT_PUBLIC_API_URL is '/api/v1', url is already correct.
+        url = `/api/proxy${endpoint.startsWith('/') ? endpoint : '/' + endpoint}`;
       }
     }
     

@@ -50,9 +50,13 @@ export function middleware(request: NextRequest) {
       
       const isVehicleRoute = vehicleRoutes.some(route => backendPath.startsWith(route));
       
-      // Local Docker logic
-      if (isVehicleRoute && targetOrigin.includes("service-websocket")) {
+      // Route internally in Docker
+      // In both Local and Coolify Docker environments, api-vehicle is an internal service
+      if (isVehicleRoute) {
         targetOrigin = "http://api-vehicle:8084";
+      } else if (targetOrigin === "http://localhost:8080") {
+        // Fallback for auth routes if local
+        targetOrigin = "http://service-websocket:8080";
       }
 
       const backendUrl = new URL(
