@@ -93,10 +93,12 @@ export function useLiveTracking() {
               computedStatus = 'parking';
           }
           
-          const rawLat = update.lat || oldV.location.lat;
-          const rawLon = update.lon || oldV.location.lng;
-          // Ensure we don't accidentally mark as NO telemetry if it had telemetry before and the update just didn't include lat
-          const hasTelemetry = (rawLat !== undefined && rawLat !== null && rawLat !== 0) || oldV.hasTelemetry;
+          const rawLat = update.lat !== undefined ? update.lat : oldV.location.lat;
+          const rawLon = update.lon !== undefined ? update.lon : oldV.location.lng;
+          
+          // Only mark as having telemetry if the update brings real coordinates, or if it already had it
+          const updateHasLat = update.lat !== undefined && update.lat !== null && update.lat !== 0;
+          const hasTelemetry = updateHasLat || oldV.hasTelemetry;
 
           newVehicles[index] = { 
             ...oldV, 
