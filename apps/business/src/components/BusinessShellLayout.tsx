@@ -249,7 +249,7 @@ export function BusinessShellLayout({ children, user }: { children: React.ReactN
 
   React.useEffect(() => {
     if (!currentUser && !currentPath.startsWith('/login') && !currentPath.startsWith('/register')) {
-      window.location.href = '/login';
+      logout().catch(console.error);
     }
   }, [currentUser, currentPath]);
 
@@ -277,7 +277,7 @@ export function BusinessShellLayout({ children, user }: { children: React.ReactN
 
     const handleUnauthorized = () => {
       logout().then(() => {
-        window.location.href = '/login';
+        
       });
     };
     window.addEventListener('auth:unauthorized', handleUnauthorized);
