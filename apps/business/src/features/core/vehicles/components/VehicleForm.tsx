@@ -244,12 +244,14 @@ export function VehicleForm({
             label={tF.lblSimCard}
             value={formData.deviceSimNumber || ''}
             onChange={(val) => {
+              // Not strictly needed anymore if readonly, but kept for completeness
               if (val && !val.startsWith('+') && val.trim() !== '') {
                 val = '+' + val;
               }
               handleChange('deviceSimNumber', val);
             }}
             placeholder="e.g. +62812345678"
+            readOnly
           />
           <InputString
             label={tF.lblGpsDeviceBrand}
