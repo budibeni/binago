@@ -12,7 +12,7 @@ interface DriverFormProps {
   driver: Driver | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSave: (data: Partial<Driver>) => void;
+  onSave: (data: Partial<Driver>) => Promise<void> | void;
   onCancel: () => void;
   layout?: 'default' | 'drawer' | 'dialog' | 'fullscreen';
 }
@@ -60,8 +60,8 @@ export function DriverForm({
     resetOn: [open, driver],
     schema: getDriverFormSchema(tD.validation || {}),
     onSubmit: async (data) => {
-      await new Promise((r) => setTimeout(r, 800));
-      onSave(data);
+      
+      await onSave(data);
     },
   });
 

@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { ConfirmDialog, toast } from '@adatrack/ui';
 import { getDriversTranslation } from './i18n';
 import { useBusinessLocale } from '../../../components/BusinessShellLayout';
 // Use hooks instead of mock services
@@ -35,9 +36,10 @@ export function DriversFeature() {
 
   const [isFormOpen, setIsFormOpen] = React.useState(false);
   const [editDriver, setEditDriver] = React.useState<Driver | null>(null);
+  const [driverToDelete, setDriverToDelete] = React.useState<Driver | null>(null);
 
   // --- Filtered Data -----------------------------------------------------------
-  const { drivers: fetchedDrivers, loading: driversLoading } = useDrivers({ search, status: statusFilter, groupIds: selectedGroupIds });
+  const { drivers: fetchedDrivers, loading: driversLoading, refetch } = useDrivers({ search, status: statusFilter, groupIds: selectedGroupIds });
   const { vehicles: apiVehicles } = useVehicles();
   const loading = driversLoading;
 
@@ -80,17 +82,22 @@ export function DriversFeature() {
     setEditDriver(driver);
   }, []);
 
-  const handleDelete = React.useCallback(async (driver: Driver) => {
-    if (confirm(`Are you sure you want to delete driver ${driver.name}?`)) {
-      try {
-        await api.delete(`/drivers/${driver.id}`);
-        window.location.reload();
-      } catch (err) {
-        console.error('Failed to delete driver', err);
-        alert('Failed to delete driver');
-      }
-    }
+  const handleDelete = React.useCallback((driver: Driver) => {
+    setDrawerOpen(false);
+    setDriverToDelete(driver);
   }, []);
+
+  const confirmDelete = React.useCallback(async () => {
+    if (!driverToDelete) return;
+    try {
+      await api.delete(`/drivers/${driverToDelete.id}`);
+      toast.success('Driver deleted successfully');
+      refetch();
+    } catch (err) {
+      console.error('Failed to delete driver', err);
+      toast.error('Failed to delete driver');
+    }
+  }, [driverToDelete, refetch]);
 
   const handleAdd = React.useCallback(() => {
     setIsFormOpen(true);
@@ -249,20 +256,30 @@ export function DriversFeature() {
               
               if (data.id) {
                 await api.put(`/drivers/${data.id}`, payload);
+                toast.success('Driver updated successfully');
               } else {
                 await api.post('/drivers', payload);
+                toast.success('Driver created successfully');
               }
 
-              window.location.reload();
+              refetch();
+              setIsFormOpen(false);
+              setEditDriver(null);
             } catch (err) {
               console.error('Failed to save driver', err);
-              alert('Failed to save driver');
+              toast.error('Failed to save driver');
+              throw err; // So DriverForm stops submitting state
             }
-            setIsFormOpen(false);
-            setEditDriver(null);
           }}
         />
       )}
+      <ConfirmDialog
+        open={!!driverToDelete}
+        onOpenChange={(open) => !open && setDriverToDelete(null)}
+        title="Delete Driver"
+        description={`Are you sure you want to delete ${driverToDelete?.name}? This action cannot be undone.`}
+        onConfirm={confirmDelete}
+      />
     </div>
   );
 }

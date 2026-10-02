@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { ConfirmDialog, toast } from '@adatrack/ui';
 import { GeofenceListView } from './components/GeofenceListView';
 import { GeofenceEditorView } from './components/GeofenceEditorView';
 import { geofenceService } from '@/data/services';
@@ -18,8 +19,9 @@ interface GeofenceFeatureProps {
 export function GeofenceFeature({ locale = 'id' }: GeofenceFeatureProps) {
   const t = getGeofencesTranslation(locale);
   const [view, setView] = useState<GeofenceView>('list');
-  const { geofences, loading } = useGeofences();
+  const { geofences, loading, refetch } = useGeofences();
   const [editingGeofence, setEditingGeofence] = useState<Geofence | null>(null);
+  const [geofenceToDelete, setGeofenceToDelete] = useState<string | null>(null);
 
   const handleAdd = () => {
     setEditingGeofence(null);
@@ -31,15 +33,19 @@ export function GeofenceFeature({ locale = 'id' }: GeofenceFeatureProps) {
     setView('edit');
   };
 
-  const handleDelete = async (id: string) => {
-    if (confirm(t.confirmDelete)) {
-      try {
-        await api.delete(`/geofences/${id}`);
-        window.location.reload();
-      } catch (err) {
-        console.error('Failed to delete geofence', err);
-        alert('Failed to delete geofence');
-      }
+  const handleDelete = (id: string) => {
+    setGeofenceToDelete(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!geofenceToDelete) return;
+    try {
+      await api.delete(`/geofences/${geofenceToDelete}`);
+      toast.success('Geofence deleted successfully');
+      refetch();
+    } catch (err) {
+      console.error('Failed to delete geofence', err);
+      toast.error('Failed to delete geofence');
     }
   };
 
@@ -62,17 +68,19 @@ export function GeofenceFeature({ locale = 'id' }: GeofenceFeatureProps) {
       
       if (view === 'edit' && editingGeofence) {
         await api.put(`/geofences/${editingGeofence.id}`, payload);
+        toast.success('Geofence updated successfully');
       } else {
         await api.post('/geofences', payload);
+        toast.success('Geofence created successfully');
       }
 
-
-      window.location.reload();
+      refetch();
+      setView('list');
     } catch (err) {
       console.error('Failed to save geofence', err);
-      alert('Failed to save geofence');
+      toast.error('Failed to save geofence');
+      throw err;
     }
-    setView('list');
   };
 
   if (view === 'create' || view === 'edit') {
@@ -102,6 +110,13 @@ export function GeofenceFeature({ locale = 'id' }: GeofenceFeatureProps) {
           locale={locale}
         />
       )}
+      <ConfirmDialog
+        open={!!geofenceToDelete}
+        onOpenChange={(open) => !open && setGeofenceToDelete(null)}
+        title="Delete Geofence"
+        description="Are you sure you want to delete this geofence? This action cannot be undone."
+        onConfirm={confirmDelete}
+      />
     </div>
   );
 }

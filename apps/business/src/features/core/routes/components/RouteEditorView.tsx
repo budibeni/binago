@@ -13,7 +13,7 @@ interface RouteEditorViewProps {
   initialData?: Route;
   geofences: Geofence[];
   groups?: any[]; // using any[] or GroupData[] (we can just use any to avoid importing GroupData if we don't have to)
-  onSave: (route: Partial<Route>) => void;
+  onSave: (route: Partial<Route>) => Promise<void> | void;
   onCancel: () => void;
   locale?: Locale;
 }
@@ -79,25 +79,30 @@ export function RouteEditorView({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!validate()) return;
     
     // Filter out stops that have invalid locations
     const validStops = stops.filter(s => isLocationValid(s.location));
 
-    onSave({
-      id: initialData?.id,
-      name,
-      description,
-      groupId: groupId || undefined,
-      origin,
-      destination,
-      stops: validStops,
-      plannedDistance,
-      estimatedDuration,
-      status,
-      plannedPath: editorGeometry || undefined
-    });
+    setIsSubmitting(true);
+    try {
+      await onSave({
+        id: initialData?.id,
+        name,
+        description,
+        groupId: groupId || undefined,
+        origin,
+        destination,
+        stops: validStops,
+        plannedDistance,
+        estimatedDuration,
+        status,
+        plannedPath: editorGeometry || undefined
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleMapClick = (lat: number, lng: number) => {
@@ -410,7 +415,8 @@ export function RouteEditorView({
             type="button" 
             variant="primary" 
             size="sm" 
-            onClick={handleSave} 
+            onClick={handleSave}
+            loading={isSubmitting} 
             disabled={!name.trim() || !isLocationValid(origin) || !isLocationValid(destination)}
             className="bg-danger hover:bg-danger/90 text-white min-w-[100px]"
           >

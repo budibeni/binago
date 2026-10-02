@@ -13,7 +13,7 @@ import { type GeofenceLocale, getGeofencesTranslation } from '../i18n';
 interface GeofenceEditorViewProps {
   geofence: Geofence | null;
   onCancel: () => void;
-  onSave: (data: Partial<Geofence>) => void;
+  onSave: (data: Partial<Geofence>) => Promise<void> | void;
   locale?: GeofenceLocale;
 }
 
@@ -43,12 +43,17 @@ export function GeofenceEditorView({
     }
   }, [drawMode]);
 
-  const handleSave = () => {
-    onSave({
-      ...formData,
-      status: formData.status as 'active' | 'inactive',
-      geometry: currentGeometry ?? geofence?.geometry,
-    });
+  const handleSave = async () => {
+    setIsSubmitting(true);
+    try {
+      await onSave({
+        ...formData,
+        status: formData.status as 'active' | 'inactive',
+        geometry: currentGeometry ?? geofence?.geometry,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const isGeometryValid = !!currentGeometry;
@@ -265,6 +270,7 @@ export function GeofenceEditorView({
             variant="primary"
             size="sm"
             onClick={handleSave}
+            loading={isSubmitting}
             disabled={!isFormValid}
             className="bg-danger hover:bg-danger/90 text-white min-w-[100px]"
           >

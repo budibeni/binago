@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
+import { ConfirmDialog, toast } from '@adatrack/ui';
+import { api } from '@adatrack/utils';
 import { Plus, Truck, UserRound, MapPinned, Route } from 'lucide-react';
 import { getTranslation } from '../../../i18n';
 import { groupService } from '@/data/services';
@@ -21,13 +23,13 @@ export function GroupsFeature({ locale }: GroupsFeatureProps) {
   const [isViewOpen, setIsViewOpen] = useState(false);
   const [editGroup, setEditGroup] = useState<any>(null); // any used temporarily to avoid strict type imports, will be casted.
   const [detailGroup, setDetailGroup] = useState<any>(null);
+  const [groupToDelete, setGroupToDelete] = useState<any>(null);
   const t = getTranslation(locale);
   const tGroups = t.groups;
 
   const [currentTabData, setCurrentTabData] = useState<any[]>([]);
 
-  React.useEffect(() => {
-    const fetchData = async () => {
+  const fetchData = React.useCallback(async () => {
       try {
         let data: any[] = [];
         switch (activeType) {
@@ -40,9 +42,11 @@ export function GroupsFeature({ locale }: GroupsFeatureProps) {
       } catch (err) {
         console.error('Failed to fetch groups', err);
       }
-    };
-    fetchData();
   }, [activeType]);
+
+  React.useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const tableLabels = {
     searchPlaceholder: tGroups.table.searchPlaceholder,
@@ -71,12 +75,39 @@ export function GroupsFeature({ locale }: GroupsFeatureProps) {
   };
   
   const handleDelete = (group: any) => {
-    console.log('Delete group:', group.id);
+    setGroupToDelete(group);
+  };
+
+  const confirmDelete = async () => {
+    if (!groupToDelete) return;
+    try {
+      await api.delete(`/groups/${groupToDelete.id}`);
+      toast.success('Group deleted successfully');
+      fetchData();
+    } catch (err) {
+      console.error('Failed to delete group', err);
+      toast.error('Failed to delete group');
+    } finally {
+      setGroupToDelete(null);
+    }
   };
   
-  const handleSave = (data: any) => {
-    console.log('Save group:', data);
-    setIsFormOpen(false);
+  const handleSave = async (data: any) => {
+    try {
+      if (data.id) {
+        await api.put(`/groups/${data.id}`, data);
+        toast.success('Group updated successfully');
+      } else {
+        await api.post('/groups', data);
+        toast.success('Group created successfully');
+      }
+      fetchData();
+      setIsFormOpen(false);
+    } catch (err) {
+      console.error('Failed to save group', err);
+      toast.error('Failed to save group');
+      throw err;
+    }
   };
 
   const getDefaultTypeSingular = () => {
@@ -161,6 +192,13 @@ export function GroupsFeature({ locale }: GroupsFeatureProps) {
         onClose={() => setIsViewOpen(false)}
         onEdit={handleEdit}
         onDelete={handleDelete}
+      />
+      <ConfirmDialog
+        open={!!groupToDelete}
+        onOpenChange={(open) => !open && setGroupToDelete(null)}
+        title="Delete Group"
+        description={`Are you sure you want to delete the group ${groupToDelete?.name}? This action cannot be undone.`}
+        onConfirm={confirmDelete}
       />
     </div>
   );

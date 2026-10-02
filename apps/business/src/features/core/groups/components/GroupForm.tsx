@@ -18,7 +18,7 @@ interface GroupFormProps {
   group: GroupData | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSave: (data: Partial<GroupData>) => void;
+  onSave: (data: Partial<GroupData>) => Promise<void> | void;
   onCancel: () => void;
   layout?: 'default' | 'drawer' | 'dialog' | 'fullscreen';
   defaultType?: GroupType;
@@ -49,8 +49,8 @@ export function GroupForm({
     schema: getGroupFormSchema(),
     onSubmit: async (data) => {
       // simulate api delay
-      await new Promise(r => setTimeout(r, 500));
-      onSave(data);
+      
+      await onSave(data);
     },
   });
 

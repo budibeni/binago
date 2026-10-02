@@ -1,5 +1,6 @@
 'use client';
 import React, { createContext, useContext } from 'react';
+import { Toaster } from 'sonner';
 
 export interface UIConfig {
   cancelText?: string;
@@ -24,8 +25,11 @@ export interface UIProviderProps {
   children: React.ReactNode;
 }
 
-export const UIProvider = ({ config, children }: UIProviderProps) => (
-  <UIConfigContext.Provider value={config}>
-    {children}
-  </UIConfigContext.Provider>
-);
+export const UIProvider = ({ config, children }: UIProviderProps) => {
+  return (
+    <UIConfigContext.Provider value={config}>
+      {children}
+      <Toaster position="top-right" richColors closeButton />
+    </UIConfigContext.Provider>
+  );
+};

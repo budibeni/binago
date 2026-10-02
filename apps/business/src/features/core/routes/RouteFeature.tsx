@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { ConfirmDialog, toast } from '@adatrack/ui';
 import type { Locale } from '@adatrack/types';
 import { Route } from './types';
 import { geofenceService, groupService } from '@/data/services';
@@ -20,9 +21,10 @@ export function RouteFeature({ locale = 'id' }: RouteFeatureProps) {
   const searchParams = useSearchParams();
   const initialRouteId = searchParams?.get('routeId') || undefined;
 
-  const { routes, loading } = useRoutes();
+  const { routes, loading, refetch } = useRoutes();
   const [selectedRouteId, setSelectedRouteId] = useState<string | undefined>(initialRouteId);
   const [isEditing, setIsEditing] = useState(false);
+  const [routeToDelete, setRouteToDelete] = useState<string | null>(null);
   const [routeGroups, setRouteGroups] = useState<any[]>([]);
 
   React.useEffect(() => {
@@ -43,15 +45,19 @@ export function RouteFeature({ locale = 'id' }: RouteFeatureProps) {
     setIsEditing(true);
   };
 
-  const handleDelete = async (id: string) => {
-    if (confirm(t.delete.description)) {
-      try {
-        await api.delete(`/routes/${id}`);
-        window.location.reload();
-      } catch (err) {
-        console.error('Failed to delete route', err);
-        alert('Failed to delete route');
-      }
+  const handleDelete = (id: string) => {
+    setRouteToDelete(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!routeToDelete) return;
+    try {
+      await api.delete(`/routes/${routeToDelete}`);
+      toast.success('Route deleted successfully');
+      refetch();
+    } catch (err) {
+      console.error('Failed to delete route', err);
+      toast.error('Failed to delete route');
     }
   };
 
@@ -123,6 +129,13 @@ export function RouteFeature({ locale = 'id' }: RouteFeatureProps) {
           locale={locale}
         />
       )}
+      <ConfirmDialog
+        open={!!routeToDelete}
+        onOpenChange={(open) => !open && setRouteToDelete(null)}
+        title="Delete Route"
+        description="Are you sure you want to delete this route? This action cannot be undone."
+        onConfirm={confirmDelete}
+      />
     </div>
   );
 }
