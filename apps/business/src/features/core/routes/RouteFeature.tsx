@@ -76,7 +76,11 @@ export function RouteFeature({ locale = 'id' }: RouteFeatureProps) {
       const payload = {
         name: route.name,
         waypoints: waypoints,
-        status: route.status,
+        status: route.status || 'active',
+        description: route.description || '',
+        group_id: route.groupId ? parseInt(route.groupId.toString(), 10) : undefined,
+        planned_distance: route.plannedDistance,
+        estimated_duration: route.estimatedDuration,
       };
 
       if (route.id) {

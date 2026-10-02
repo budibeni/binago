@@ -64,6 +64,9 @@ export function GeofenceFeature({ locale = 'id' }: GeofenceFeatureProps) {
         name: data.name,
         area_type: areaType,
         boundary_points: boundaryPoints,
+        group_id: data.groupId ? parseInt(data.groupId.toString(), 10) : undefined,
+        description: data.description || '',
+        status: data.status || 'active',
       };
       
       if (view === 'edit' && editingGeofence) {
