@@ -42,9 +42,9 @@ import { getTranslation } from '../i18n';
 import { ShareLocationProvider } from '../features/core/sharing/context/ShareLocationContext';
 
 
-function buildNavigation(locale: Locale): NavGroup[] {
+function buildNavigation(locale: Locale, userRole?: string): NavGroup[] {
   const t = getTranslation(locale);
-  return [
+  const allGroups: NavGroup[] = [
     {
       id: 'main',
       title: t.navGroup.main,
@@ -217,6 +217,20 @@ function buildNavigation(locale: Locale): NavGroup[] {
       ],
     },
   ];
+
+  const role = (userRole || '').toLowerCase();
+  const alwaysOpen = ['main', 'master', 'administration'];
+
+  return allGroups.filter(group => {
+    if (group.id && alwaysOpen.includes(group.id)) return true;
+    if (role === 'superadmin' || role === 'admin') return true;
+    if (group.id && role === group.id.toLowerCase()) return true;
+    
+    // Fallback: if role matches some specific patterns or if it's completely empty?
+    // According to requirements: only B2B uses role access, and specific modules are locked.
+    // So if it's not in alwaysOpen and they don't have the role, hide it.
+    return false;
+  });
 }
 
 function buildBottomNavigation(locale: Locale): NavItem[] {
@@ -309,7 +323,7 @@ export function BusinessShellLayout({ children, user }: { children: React.ReactN
   }, []);
 
   const t = getTranslation(locale);
-  const navigation = buildNavigation(locale);
+  const navigation = buildNavigation(locale, currentUser?.role);
 
   const breadcrumbItems: { label: string; href?: string }[] = [];
   let foundItem = null;
