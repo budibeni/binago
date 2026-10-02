@@ -117,7 +117,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
           
           const points = positions.map((p: any) => ({
             lat: p.lat,
-            lng: p.lng || p.lon
+            lng: p.lng ?? p.lon
           }));
           allPoints = [...allPoints, ...points];
         } catch (err) {
@@ -464,11 +464,11 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
       
       const points = positions.map((p: any) => ({
         lat: p.lat,
-        lng: p.lng || p.lon,
-        speed: p.speed,
-        heading: p.heading || 0,
+        lng: p.lng ?? p.lon,
+        speed: p.speed ?? 0,
+        heading: p.heading ?? 0,
         timestamp: p.timestamp,
-        odometer: p.odometer || 0,
+        odometer: p.odometer ?? 0,
       }));
       
       const totalDurationSecs = points.length > 0 ? (new Date(points[points.length-1].timestamp).getTime() - new Date(points[0].timestamp).getTime()) / 1000 : 0;
