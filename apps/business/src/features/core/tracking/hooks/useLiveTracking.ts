@@ -28,9 +28,12 @@ export function useLiveTracking() {
                 computedStatus = 'parking';
             }
             
-            const rawLat = v.live_state?.latitude || v.lat;
-            const rawLon = v.live_state?.longitude || v.lon;
-            const hasTelemetry = rawLat !== undefined && rawLat !== null && rawLat !== 0;
+            const rawLat = v.live_state?.latitude ?? v.lat;
+            const rawLon = v.live_state?.longitude ?? v.lon;
+            
+            const isValidLat = rawLat !== undefined && rawLat !== null && Number(rawLat) !== 0;
+            const isValidLon = rawLon !== undefined && rawLon !== null && Number(rawLon) !== 0;
+            const hasTelemetry = isValidLat && isValidLon;
 
             return {
               id: String(v.id),
@@ -41,8 +44,8 @@ export function useLiveTracking() {
               status: computedStatus,
               speed: speed,
               location: {
-                lat: rawLat || -6.2,
-                lng: rawLon || 106.8,
+                lat: hasTelemetry ? Number(rawLat) : -6.2,
+                lng: hasTelemetry ? Number(rawLon) : 106.8,
                 address: v.live_state?.address || v.address || 'Unknown'
               },
               lastUpdate: v.live_state?.timestamp || v.timestamp || new Date().toISOString(),
@@ -93,11 +96,14 @@ export function useLiveTracking() {
               computedStatus = 'parking';
           }
           
-          const rawLat = update.lat !== undefined ? update.lat : oldV.location.lat;
-          const rawLon = update.lon !== undefined ? update.lon : oldV.location.lng;
+          const rawLat = update.lat ?? oldV.location.lat;
+          const rawLon = update.lon ?? oldV.location.lng;
+          
+          const isValidLat = rawLat !== undefined && rawLat !== null && Number(rawLat) !== 0;
+          const isValidLon = rawLon !== undefined && rawLon !== null && Number(rawLon) !== 0;
+          const updateHasLat = isValidLat && isValidLon;
           
           // Only mark as having telemetry if the update brings real coordinates, or if it already had it
-          const updateHasLat = update.lat !== undefined && update.lat !== null && update.lat !== 0;
           const hasTelemetry = updateHasLat || oldV.hasTelemetry;
 
           newVehicles[index] = { 
@@ -107,8 +113,8 @@ export function useLiveTracking() {
             acc: acc,
             location: {
               ...oldV.location,
-              lat: rawLat || -6.2,
-              lng: rawLon || 106.8,
+              lat: hasTelemetry ? Number(rawLat) : -6.2,
+              lng: hasTelemetry ? Number(rawLon) : 106.8,
             },
             lastUpdate: update.timestamp || new Date().toISOString(),
             hasTelemetry: hasTelemetry,

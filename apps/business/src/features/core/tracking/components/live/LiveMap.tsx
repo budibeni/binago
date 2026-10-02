@@ -87,7 +87,12 @@ export function LiveMap({ vehicles, selectedVehicleId, visibleVehicleIds = [], o
   }, [selectedVehicleId]);
 
   const vehiclesWithTelemetry = useMemo(
-    () => vehicles.filter((v) => v.hasTelemetry !== false),
+    () => vehicles.filter((v) => {
+      if (v.hasTelemetry === false) return false;
+      if (v.location.lat === -6.2 && v.location.lng === 106.8) return false;
+      if (v.location.lat === 0 && v.location.lng === 0) return false;
+      return true;
+    }),
     [vehicles]
   );
 
