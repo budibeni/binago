@@ -252,6 +252,14 @@ export function DriversFeature() {
                 email: data.email,
                 license_number: data.licenseNumber,
                 license_type: 'SIM B1', // default or mapped if exists
+                ktp_number: data.ktpNumber,
+                place_of_birth: data.placeOfBirth,
+                date_of_birth: data.dateOfBirth,
+                address: data.address,
+                placement: data.placement,
+                join_date: data.joinDate,
+                group_id: data.groupId ? parseInt(data.groupId.toString(), 10) : undefined,
+                license_expiry: data.licenseExpiry,
               };
               
               if (data.id) {
