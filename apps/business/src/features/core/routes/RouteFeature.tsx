@@ -4,7 +4,8 @@ import React, { useState } from 'react';
 import { ConfirmDialog, toast } from '@adatrack/ui';
 import type { Locale } from '@adatrack/types';
 import { Route } from './types';
-import { geofenceService, groupService } from '@/data/services';
+import { groupService } from '@/data/services';
+import { useGeofences } from '../geofences/hooks/useGeofences';
 import { RouteListView } from './components/RouteListView';
 import { RouteEditorView } from './components/RouteEditorView';
 import { getRouteTranslation } from './i18n';
@@ -20,6 +21,7 @@ export function RouteFeature({ locale = 'id' }: RouteFeatureProps) {
   const t = getRouteTranslation(locale);
   const searchParams = useSearchParams();
   const initialRouteId = searchParams?.get('routeId') || undefined;
+  const { geofences } = useGeofences();
 
   const { routes, loading, refetch } = useRoutes();
   const [selectedRouteId, setSelectedRouteId] = useState<string | undefined>(initialRouteId);
@@ -106,7 +108,7 @@ export function RouteFeature({ locale = 'id' }: RouteFeatureProps) {
       <div className="relative w-full overflow-hidden" style={{ height: 'calc(100dvh - 52px)' }}>
         <RouteEditorView
           initialData={selectedRoute}
-          geofences={geofenceService.getGeofences()}
+          geofences={geofences}
           groups={routeGroups}
           onSave={handleSave}
           onCancel={handleCancelEdit}
@@ -123,7 +125,7 @@ export function RouteFeature({ locale = 'id' }: RouteFeatureProps) {
       ) : (
         <RouteListView
           routes={routes}
-          geofences={geofenceService.getGeofences()}
+          geofences={geofences}
           groups={routeGroups}
           selectedRouteId={selectedRouteId}
           onSelectRoute={handleSelectRoute}
