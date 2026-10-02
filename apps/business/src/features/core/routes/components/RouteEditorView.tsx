@@ -306,7 +306,7 @@ export function RouteEditorView({
               {/* Origin */}
               <div className="relative z-10 pl-6 pb-4">
                 <div className="absolute left-[7px] top-1 h-2.5 w-2.5 rounded-full border-2 border-blue-500 bg-background" />
-                <Label className="font-semibold text-xs text-blue-600 dark:text-blue-400">{t.origin}</Label>
+                <Label required className="font-semibold text-xs text-blue-600 dark:text-blue-400">{t.origin}</Label>
                 {renderLocationPicker('origin', origin, setOrigin, errors.origin)}
               </div>
 
@@ -337,7 +337,7 @@ export function RouteEditorView({
               {/* Destination */}
               <div className="relative z-10 pl-6">
                 <div className="absolute left-[7px] top-1 h-2.5 w-2.5 rounded-full border-2 border-emerald-500 bg-background" />
-                <Label className="font-semibold text-xs text-emerald-600 dark:text-emerald-400">{t.destination}</Label>
+                <Label required className="font-semibold text-xs text-emerald-600 dark:text-emerald-400">{t.destination}</Label>
                 {renderLocationPicker('destination', destination, setDestination, errors.destination)}
               </div>
             </div>

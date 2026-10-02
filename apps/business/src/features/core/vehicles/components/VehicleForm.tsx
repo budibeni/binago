@@ -236,6 +236,7 @@ export function VehicleForm({
           />
           <InputSelect
             label={tF.lblImei}
+            required
             value={formData.deviceImei || ''}
             onChange={handleImeiChange}
             options={availableImeis}

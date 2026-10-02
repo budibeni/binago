@@ -67,6 +67,7 @@ export function GroupForm({
       <FormCard title="Informasi Dasar">
         <InputString
           label="Nama Grup"
+          required
           value={formData.name || ''}
           onChange={(v) => handleChange('name', v)}
           error={errors.name}
