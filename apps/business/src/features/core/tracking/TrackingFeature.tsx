@@ -111,9 +111,9 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
       await Promise.all(idsToFetch.map(async (id) => {
         try {
           const res: any = await api.get(`/vehicles/${id}/history`, {
-            params: { from: startDatetime.toISOString(), to: endDatetime.toISOString() }
+            params: { start: startDatetime.toISOString(), end: endDatetime.toISOString() }
           });
-          const positions = res?.points || res?.data?.points || res?.data?.data?.points || [];
+          const positions = Array.isArray(res) ? res : (res?.points || res?.data?.points || res?.data?.data?.points || []);
           
           const points = positions.map((p: any) => ({
             lat: p.lat,
@@ -458,9 +458,9 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
       const startDatetime = new Date(`${dateRange.startDate}T${dateRange.startTime}:00`);
       const endDatetime = new Date(`${dateRange.endDate}T${dateRange.endTime}:00`);
       const res: any = await api.get(`/vehicles/${playbackVehicleId}/history`, {
-        params: { from: startDatetime.toISOString(), to: endDatetime.toISOString() }
+        params: { start: startDatetime.toISOString(), end: endDatetime.toISOString() }
       });
-      const positions = res?.points || res?.data?.points || res?.data?.data?.points || [];
+      const positions = Array.isArray(res) ? res : (res?.points || res?.data?.points || res?.data?.data?.points || []);
       
       const points = positions.map((p: any) => ({
         lat: p.lat,

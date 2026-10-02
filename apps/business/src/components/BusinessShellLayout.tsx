@@ -276,8 +276,10 @@ export function BusinessShellLayout({ children, user }: { children: React.ReactN
 
 
     const handleUnauthorized = () => {
-      logout().then(() => {
-        
+      logout().catch(() => {
+        // Ignore redirect errors thrown by server actions
+      }).finally(() => {
+        window.location.href = '/login';
       });
     };
     window.addEventListener('auth:unauthorized', handleUnauthorized);
