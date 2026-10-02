@@ -36,6 +36,7 @@ export function GeofenceEditorView({
   const [drawMode, setDrawMode] = useState<'polygon' | 'rectangle' | 'multiline'>('polygon');
   const [editorMode, setEditorMode] = useState<'idle' | 'draw_polygon' | 'draw_rectangle' | 'draw_multiline' | 'edit'>('idle');
   const [currentGeometry, setCurrentGeometry] = useState<MapGeometry | null>(geofence?.geometry || null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (editorMode !== 'idle' || !currentGeometry) {

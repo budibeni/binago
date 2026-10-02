@@ -41,6 +41,7 @@ export function RouteEditorView({
   const [status, setStatus] = useState<'active'|'inactive'>(initialData?.status || 'active');
 
   const [errors, setErrors] = useState<{name?: string; origin?: string; destination?: string}>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [editorMode, setEditorMode] = useState<MapInteractionMode>('idle');
   const [editorGeometry, setEditorGeometry] = useState<MapGeometry | null>(initialData?.plannedPath || null);
