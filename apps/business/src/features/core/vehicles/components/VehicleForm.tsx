@@ -134,6 +134,22 @@ export function VehicleForm({
 
   const { groups, drivers, availableImeis, rawDevices } = useVehicleOptions(open, vehicle?.deviceImei);
 
+  const handleStringChange = (field: keyof Vehicle, val: string) => {
+    let formattedVal = val;
+    
+    // Only alphanumeric (no spaces/symbols) for plateNumber and vehicleId
+    if (field === 'plateNumber' || field === 'vehicleId') {
+      formattedVal = formattedVal.replace(/[^a-zA-Z0-9]/g, '');
+    }
+
+    // Uppercase all string inputs except notes
+    if (field !== 'notes') {
+      formattedVal = formattedVal.toUpperCase();
+    }
+
+    handleChange(field, formattedVal as any);
+  };
+
   const handleImeiChange = (val: string) => {
     handleChange('deviceImei', val);
     const selected = rawDevices.find((d: any) => d.imei === val);
@@ -167,14 +183,14 @@ export function VehicleForm({
           <InputString
             label={tF.lblPlateNumber}
             value={formData.plateNumber || ''}
-            onChange={(val) => handleChange('plateNumber', val)}
+            onChange={(val) => handleStringChange('plateNumber', val)}
             error={errors.plateNumber}
             required
           />
           <InputString
             label={tF.lblVehicleName}
             value={formData.vehicleName || ''}
-            onChange={(val) => handleChange('vehicleName', val)}
+            onChange={(val) => handleStringChange('vehicleName', val)}
             error={errors.vehicleName}
             required
           />
@@ -182,7 +198,7 @@ export function VehicleForm({
           <InputString
             label={tF.lblBrand}
             value={formData.brand || ''}
-            onChange={(val) => handleChange('brand', val)}
+            onChange={(val) => handleStringChange('brand', val)}
           />
           <InputNumber
             label={tF.lblYear}
@@ -192,7 +208,7 @@ export function VehicleForm({
           <InputString
             label={tF.lblColor}
             value={formData.color || ''}
-            onChange={(val) => handleChange('color', val)}
+            onChange={(val) => handleStringChange('color', val)}
           />
 
           <InputSelect
@@ -227,7 +243,7 @@ export function VehicleForm({
           <InputString
             label={tF.lblVehicleId}
             value={formData.vehicleId || ''}
-            onChange={(val) => handleChange('vehicleId', val)}
+            onChange={(val) => handleStringChange('vehicleId', val)}
           />
           <InputDate
             label={tF.lblGpsInstallDate}
