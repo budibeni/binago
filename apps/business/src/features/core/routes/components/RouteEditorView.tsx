@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Route, RouteStop, RouteLocation, MapInteractionMode, ActiveLocationTarget } from '../types';
 import { Geofence } from '../../geofences/types';
-import { Button, Input, Label, InputString, InputNumber, InputSelect } from '@adatrack/ui';
+import { Button, Input, Label, InputString, InputNumber, InputSelect, toast } from '@adatrack/ui';
 import { getRouteTranslation } from '../i18n';
 import type { Locale } from '@adatrack/types';
-import { MapGeometry } from '@adatrack/maps';
-import { PenTool, Trash2, Plus, MapPin, ChevronUp, ChevronDown } from 'lucide-react';
+import { MapGeometry, defaultNominatimSearch } from '@adatrack/maps';
+import { PenTool, Trash2, Plus, MapPin, ChevronUp, ChevronDown, Search } from 'lucide-react';
 import { RouteMap } from './RouteMap';
 import { cn } from '@adatrack/utils';
 
@@ -48,6 +48,33 @@ export function RouteEditorView({
   
   const [activeLocationTarget, setActiveLocationTarget] = useState<ActiveLocationTarget>(null);
   const [isExpanded, setIsExpanded] = useState(true);
+
+  const [isSearchingAddress, setIsSearchingAddress] = useState<Record<string, boolean>>({});
+
+  const handleSearchAddress = async (targetId: string, address: string, onChange: (val: RouteLocation) => void, currentLoc: RouteLocation) => {
+    if (!address || !address.trim()) return;
+    setIsSearchingAddress(prev => ({ ...prev, [targetId]: true }));
+    try {
+      const results = await defaultNominatimSearch(address);
+      if (results && results.length > 0) {
+        const first = results[0];
+        onChange({
+          ...currentLoc,
+          address: first.label,
+          latitude: first.lat,
+          longitude: first.lng,
+          radius: currentLoc.radius || 100
+        });
+        toast.success('Lokasi berhasil ditemukan');
+      } else {
+        toast.error('Lokasi tidak ditemukan');
+      }
+    } catch (err) {
+      toast.error('Gagal mencari lokasi');
+    } finally {
+      setIsSearchingAddress(prev => ({ ...prev, [targetId]: false }));
+    }
+  };
 
   const handleAddStop = () => {
     setStops([
@@ -175,12 +202,25 @@ export function RouteEditorView({
           />
         ) : (
           <div className="space-y-2 border border-neutral-200 dark:border-neutral-800 rounded-md p-3 bg-white dark:bg-neutral-900 shadow-sm">
-            <Input 
-              placeholder={t.addressPlaceholder} 
-              value={loc.address || ''} 
-              onChange={(e) => onChange({ ...loc, address: e.target.value })}
-              className="h-8 text-xs"
-            />
+            <div className="flex gap-2">
+              <Input 
+                placeholder={t.addressPlaceholder} 
+                value={loc.address || ''} 
+                onChange={(e) => onChange({ ...loc, address: e.target.value })}
+                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleSearchAddress(targetId as string, loc.address || '', onChange, loc); } }}
+                className="flex-1 h-8 text-xs"
+              />
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => handleSearchAddress(targetId as string, loc.address || '', onChange, loc)}
+                disabled={isSearchingAddress[targetId as string] || !loc.address?.trim()}
+                className="h-8 w-8 p-0 shrink-0"
+                title="Cari Alamat"
+              >
+                <Search className={`w-4 h-4 ${isSearchingAddress[targetId as string] ? 'animate-pulse text-blue-500' : ''}`} />
+              </Button>
+            </div>
             <div className="flex gap-2 items-center">
               <Button 
                 variant={isSelecting ? "primary" : "outline"} 
