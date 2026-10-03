@@ -78,7 +78,6 @@ export function getRentalContractPrintData(contract: RentalContract) {
     remainingAmount: formatCurrency(contract.remainingAmount),
     driverFee: formatCurrency(contract.driverFee),
     notes: contract.notes || '-',
-    terms: contract.terms || '-',
   };
 
   return {

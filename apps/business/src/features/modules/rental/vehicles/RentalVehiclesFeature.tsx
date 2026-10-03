@@ -211,8 +211,6 @@ export function RentalVehiclesFeature() {
   const [panelSide, setPanelSide] = React.useState<'left' | 'right' | 'top' | 'bottom'>('top');
 
   const renderStatsPanel = () => {
-    if (!showStats) return null;
-    
     return (
       <PanelShell
       title="Ringkasan"

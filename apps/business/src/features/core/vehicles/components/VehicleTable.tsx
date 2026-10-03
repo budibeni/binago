@@ -68,6 +68,7 @@ interface VehicleTableLabels {
 }
 
 interface VehicleTableProps {
+  labels: VehicleTableLabels;
   data: Vehicle[];
   onViewDetail: (vehicle: Vehicle) => void;
   onEdit: (vehicle: Vehicle) => void;
@@ -423,7 +424,7 @@ function buildColumns(
     {
               id: 'assetNumber',
               accessorKey: 'assetNumber',
-              header: labels.colAssetNumber || labels.colAsset || 'No Asset',
+              header: (labels as any).colAssetNumber || (labels as any).colAsset || 'No Asset',
               enableSorting: true,
               size: 130,
               cell: ({ row }) => (
@@ -445,7 +446,7 @@ function buildColumns(
     {
               id: 'notes',
               accessorKey: 'notes',
-              header: labels.fieldNotes || labels.detailNotes || 'Catatan',
+              header: (labels as any).fieldNotes || (labels as any).detailNotes || 'Catatan',
               enableSorting: false,
               size: 200,
               cell: ({ row }) => (

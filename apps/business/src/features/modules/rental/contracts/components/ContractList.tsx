@@ -103,9 +103,14 @@ function buildColumns(
     {
       id: 'vehicle',
       accessorFn: (row) => {
-        const cv = row.vehicle?.coreVehicle;
-        if (!cv) return '-';
-        return `${cv.plateNumber} - ${cv.brand} ${cv.vehicleName}`;
+        const items = row.booking?.items || [];
+        if (items.length === 0) return '-';
+        if (items.length === 1) {
+          const cv = items[0].vehicle?.coreVehicle;
+          if (!cv) return '-';
+          return `${cv.plateNumber} - ${cv.brand} ${cv.vehicleName}`;
+        }
+        return `${items.length} Kendaraan`;
       },
       header: labels.colVehicle || 'Kendaraan',
       enableSorting: true,

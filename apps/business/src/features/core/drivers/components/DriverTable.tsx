@@ -103,8 +103,8 @@ function buildColumns(
       accessorFn: (row) => row.status,
       cell: ({ row }) => {
         const s = row.original.status;
-        let variant: 'default' | 'destructive' | 'warning' | 'success' | 'outline' | 'secondary' = 'secondary';
-        let label = s;
+        let variant: 'default' | 'danger' | 'warning' | 'success' | 'outline' = 'default';
+        let label: string = s;
         if (s === 'active') {
           variant = 'success';
           label = 'Aktif';

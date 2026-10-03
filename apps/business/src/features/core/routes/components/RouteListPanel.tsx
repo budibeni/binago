@@ -283,7 +283,7 @@ export function RouteListPanel({
                   </div>
                   {isExpanded && group.routes.length > 0 && (
                     <div className="flex flex-col border-t border-border bg-[#fafafa] dark:bg-neutral-950 p-1 space-y-0.5">
-                      {group.routes.map(route => <RouteListItem key={route.id} route={route} />)}
+                      {group.routes.map((route: Route) => <RouteListItem key={route.id} route={route} />)}
                     </div>
                   )}
                 </div>
@@ -301,7 +301,7 @@ export function RouteListPanel({
                   </span>
                 </div>
                 <div className="flex flex-col bg-[#fafafa] dark:bg-neutral-950 p-1 space-y-0.5">
-                  {unassignedRoutes.map(route => <RouteListItem key={route.id} route={route} />)}
+                  {unassignedRoutes.map((route: Route) => <RouteListItem key={route.id} route={route} />)}
                 </div>
               </div>
             )}

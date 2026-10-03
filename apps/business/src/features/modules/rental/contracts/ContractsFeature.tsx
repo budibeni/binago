@@ -99,7 +99,7 @@ export function ContractsFeature() {
         const q = search.toLowerCase();
         const noMatch = c.contractNumber?.toLowerCase()?.includes(q) || false;
         const nameMatch = c.customer?.name?.toLowerCase()?.includes(q) || false;
-        const plateMatch = c.vehicle?.coreVehicle?.plateNumber?.toLowerCase()?.includes(q) || false;
+        const plateMatch = c.booking?.items?.some(item => item.vehicle?.coreVehicle?.plateNumber?.toLowerCase()?.includes(q)) || false;
         if (!noMatch && !nameMatch && !plateMatch) return false;
       }
       return true;
@@ -202,8 +202,6 @@ export function ContractsFeature() {
   }), [statusFilter, labels]);
 
   const renderStatsPanel = () => {
-    if (!showStats) return null;
-    
     const panelLabels = (t as any).rentalVehicles || {};
 
     return (

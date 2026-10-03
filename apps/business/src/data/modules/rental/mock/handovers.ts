@@ -3,6 +3,7 @@ import type { RentalHandover } from '@/features/modules/rental/handover/types/ha
 export const mockHandovers: RentalHandover[] = [
   {
     "id": "HND-2026-001",
+    "bookingItemId": "item-mock",
     "contractId": "ctr-001",
     "customerId": "cust-ind-001",
     "vehicleId": "veh-001",
@@ -30,6 +31,7 @@ export const mockHandovers: RentalHandover[] = [
   },
   {
     "id": "HND-2026-002",
+    "bookingItemId": "item-mock",
     "contractId": "ctr-002",
     "customerId": "cust-ind-002",
     "vehicleId": "veh-002",
@@ -57,6 +59,7 @@ export const mockHandovers: RentalHandover[] = [
   },
   {
     "id": "HND-2026-003",
+    "bookingItemId": "item-mock",
     "contractId": "ctr-003",
     "customerId": "cust-ind-003",
     "vehicleId": "veh-003",
@@ -84,6 +87,7 @@ export const mockHandovers: RentalHandover[] = [
   },
   {
     "id": "HND-2026-004",
+    "bookingItemId": "item-mock",
     "contractId": "ctr-004",
     "customerId": "cust-ind-004",
     "vehicleId": "veh-004",
@@ -111,6 +115,7 @@ export const mockHandovers: RentalHandover[] = [
   },
   {
     "id": "HND-2026-005",
+    "bookingItemId": "item-mock",
     "contractId": "ctr-005",
     "customerId": "cust-ind-005",
     "vehicleId": "veh-005",
@@ -138,6 +143,7 @@ export const mockHandovers: RentalHandover[] = [
   },
   {
     "id": "HND-2026-006",
+    "bookingItemId": "item-mock",
     "contractId": "ctr-009",
     "customerId": "cust-ind-001",
     "vehicleId": "veh-011",
@@ -165,6 +171,7 @@ export const mockHandovers: RentalHandover[] = [
   },
   {
     "id": "HND-2026-007",
+    "bookingItemId": "item-mock",
     "contractId": "ctr-010",
     "customerId": "cust-ind-002",
     "vehicleId": "veh-012",
@@ -192,6 +199,7 @@ export const mockHandovers: RentalHandover[] = [
   },
   {
     "id": "HND-2026-008",
+    "bookingItemId": "item-mock",
     "contractId": "ctr-011",
     "customerId": "cust-ind-003",
     "vehicleId": "veh-013",

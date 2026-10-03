@@ -81,7 +81,6 @@ const defaultHtml = `
 </ol>
 <table class="form-table">
   <tbody>
-    <tr><td><p>Ketentuan Khusus</p></td><td><p>:</p></td><td><p>{{contract.terms}}</p></td></tr>
     <tr><td><p>Catatan Tambahan</p></td><td><p>:</p></td><td><p>{{contract.notes}}</p></td></tr>
   </tbody>
 </table>
@@ -158,6 +157,27 @@ export const templateService = {
 
       mockTemplates.push(newTemplate);
       resolve(newTemplate);
+    });
+  },
+
+  updateContractTemplate: async (id: string, name: string, contentHtml: string): Promise<DocumentTemplate> => {
+    return new Promise((resolve, reject) => {
+      if (id === DEFAULT_RENTAL_CONTRACT_TEMPLATE.id) {
+        return reject(new Error('Template default tidak dapat diubah.'));
+      }
+      
+      const idx = mockTemplates.findIndex(t => t.id === id);
+      if (idx === -1) {
+        return reject(new Error('Template tidak ditemukan.'));
+      }
+      
+      mockTemplates[idx] = {
+        ...mockTemplates[idx],
+        name,
+        contentHtml,
+        updatedAt: new Date().toISOString()
+      };
+      resolve(mockTemplates[idx]);
     });
   },
 

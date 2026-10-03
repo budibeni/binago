@@ -291,7 +291,7 @@ export function ContractView({
           <div className="rounded-2xl border border-border/60 bg-background overflow-hidden mb-6">
             <div className="px-4 py-3 flex items-center gap-2 border-b border-border/40 bg-neutral-50/50 dark:bg-neutral-900/30">
               <FileText className="w-3.5 h-3.5 text-muted-foreground" />
-              <h3 className="text-[11px] font-bold text-foreground uppercase tracking-widest">{labels.sectionTerms || 'Syarat & Ketentuan'}</h3>
+              <h3 className="text-[11px] font-bold text-foreground uppercase tracking-widest">{labels.sectionNotes || 'Catatan Tambahan'}</h3>
             </div>
             <div className="p-3.5 flex flex-col gap-3.5">
               {contract.notes && (
@@ -299,13 +299,8 @@ export function ContractView({
                   <InfoItem label="Catatan" value={<span className="italic leading-relaxed text-muted-foreground">{contract.notes}</span>} />
                 </div>
               )}
-              {contract.terms && (
-                <div className={cn(contract.notes ? "pt-3 border-t border-border/40" : "")}>
-                  <InfoItem label="Syarat & Ketentuan" value={<span className="leading-relaxed text-muted-foreground whitespace-pre-wrap">{contract.terms}</span>} />
-                </div>
-              )}
-              {!contract.notes && !contract.terms && (
-                <div className="text-xs text-muted-foreground italic">Tidak ada catatan atau syarat & ketentuan</div>
+              {!contract.notes && (
+                <div className="text-xs text-muted-foreground italic">Tidak ada catatan tambahan</div>
               )}
             </div>
           </div>

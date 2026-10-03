@@ -25,7 +25,7 @@ export async function buildRentalVehicleContext(coreVehicleId: string, locale: L
     if (rentalVehicle.status === 'RENTED' || rentalVehicle.status === 'RESERVED') {
       const allContracts = await contractService.getContracts();
       const activeContract = allContracts.find(c => 
-        c.vehicleId === coreVehicleId && 
+        c.booking?.items?.some(item => item.vehicleId === coreVehicleId) && 
         (c.status === 'ACTIVE' || c.status === 'CONFIRMED')
       );
 
@@ -49,15 +49,16 @@ export async function buildRentalVehicleContext(coreVehicleId: string, locale: L
           type: 'date' 
         });
         
+        const targetItem = activeContract.booking?.items?.find(item => item.vehicleId === coreVehicleId);
+        const vehicleRate = targetItem?.rateSnapshot || 0;
+        
         const rateLabel = activeContract.rateType === 'DAILY' ? (isEn ? 'day' : 'hari') : activeContract.rateType === 'WEEKLY' ? (isEn ? 'week' : 'minggu') : (isEn ? 'month' : 'bulan');
         data.push({ 
           label: isEn ? 'Rate' : 'Tarif', 
-          value: new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(activeContract.rate) + ` / ${rateLabel}`,
+          value: new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(vehicleRate) + ` / ${rateLabel}`,
           type: 'currency' 
         });
-
-        // 6. Cari Handover data untuk mendapatkan Odometer dan Serah Terima
-        const latestHandover = await handoverService.getHandoverByContractId(activeContract.id);
+        const latestHandover = await handoverService.getHandoverByBookingItemId(activeContract.id, targetItem?.id ?? '');
         
         if (latestHandover) {
           data.push({ 

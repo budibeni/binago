@@ -41,11 +41,7 @@ export function HandoverFeature({ contractId, open, onOpenChange, onSuccess }: H
           setErrorMsg(labels.errorInvalidContract || 'Kontrak ini tidak dapat diproses untuk serah terima.');
           return;
         }
-        const existing = await handoverService.getHandoverByContractId(contractId);
-        if (existing) {
-          setErrorMsg('Kontrak ini sudah memiliki serah terima.');
-          return;
-        }
+
         setContract(data);
       } catch (err: any) {
         setErrorMsg(err.message || 'Gagal memuat data kontrak.');

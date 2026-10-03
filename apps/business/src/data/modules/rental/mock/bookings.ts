@@ -407,5 +407,701 @@ export const mockBookings: Booking[] = [
         "subtotal": 1000000
       }
     ]
+  },
+  {
+    "id": "res-016",
+    "bookingNumber": "RES-2609-016",
+    "customerId": "cust-ind-005",
+    "rentalType": "SELF_DRIVE",
+    "totalAmount": 1500000,
+    "deposit": 500000,
+    "remainingAmount": 1000000,
+    "status": "CONFIRMED",
+    "createdAt": "2026-09-01T12:00:00.000Z",
+    "updatedAt": "2026-09-02T12:00:00.000Z",
+    "startDate": "2026-10-17T08:00:00.000Z",
+    "endDate": "2026-10-19T08:00:00.000Z",
+    "duration": 2,
+    "rateType": "DAILY",
+    "items": [
+      {
+        "id": "res-016-item-1",
+        "bookingId": "res-016",
+        "vehicleId": "veh-002",
+        "startDate": "2026-10-17T08:00:00.000Z",
+        "endDate": "2026-10-19T08:00:00.000Z",
+        "duration": 2,
+        "rateType": "DAILY",
+        "rateSnapshot": 750000,
+        "subtotal": 1500000
+      }
+    ]
+  },
+    {
+    "id": "res-017",
+    "bookingNumber": "RES-2609-017",
+    "customerId": "cust-ind-006",
+    "rentalType": "WITH_DRIVER",
+    "totalAmount": 2500000,
+    "deposit": 500000,
+    "remainingAmount": 2000000,
+    "status": "CONFIRMED",
+    "createdAt": "2026-09-01T12:00:00.000Z",
+    "updatedAt": "2026-09-02T12:00:00.000Z",
+    "startDate": "2026-10-18T08:00:00.000Z",
+    "endDate": "2026-10-20T08:00:00.000Z",
+    "duration": 2,
+    "rateType": "DAILY",
+    "items": [
+      {
+        "id": "res-017-item-1",
+        "bookingId": "res-017",
+        "vehicleId": "veh-003",
+        "startDate": "2026-10-18T08:00:00.000Z",
+        "endDate": "2026-10-20T08:00:00.000Z",
+        "duration": 2,
+        "rateType": "DAILY",
+        "rateSnapshot": 1250000,
+        "subtotal": 2500000
+      }
+    ]
+  },
+    {
+    "id": "res-018",
+    "bookingNumber": "RES-2609-018",
+    "customerId": "cust-ind-001",
+    "rentalType": "SELF_DRIVE",
+    "totalAmount": 1500000,
+    "deposit": 500000,
+    "remainingAmount": 1000000,
+    "status": "ACTIVE",
+    "createdAt": "2026-09-01T12:00:00.000Z",
+    "updatedAt": "2026-09-02T12:00:00.000Z",
+    "startDate": "2026-10-19T08:00:00.000Z",
+    "endDate": "2026-10-21T08:00:00.000Z",
+    "duration": 2,
+    "rateType": "DAILY",
+    "items": [
+      {
+        "id": "res-018-item-1",
+        "bookingId": "res-018",
+        "vehicleId": "veh-004",
+        "startDate": "2026-10-19T08:00:00.000Z",
+        "endDate": "2026-10-21T08:00:00.000Z",
+        "duration": 2,
+        "rateType": "DAILY",
+        "rateSnapshot": 750000,
+        "subtotal": 1500000
+      }
+    ]
+  },
+    {
+    "id": "res-019",
+    "bookingNumber": "RES-2609-019",
+    "customerId": "cust-ind-002",
+    "rentalType": "WITH_DRIVER",
+    "totalAmount": 2500000,
+    "deposit": 500000,
+    "remainingAmount": 2000000,
+    "status": "CONFIRMED",
+    "createdAt": "2026-09-01T12:00:00.000Z",
+    "updatedAt": "2026-09-02T12:00:00.000Z",
+    "startDate": "2026-10-20T08:00:00.000Z",
+    "endDate": "2026-10-22T08:00:00.000Z",
+    "duration": 2,
+    "rateType": "DAILY",
+    "items": [
+      {
+        "id": "res-019-item-1",
+        "bookingId": "res-019",
+        "vehicleId": "veh-005",
+        "startDate": "2026-10-20T08:00:00.000Z",
+        "endDate": "2026-10-22T08:00:00.000Z",
+        "duration": 2,
+        "rateType": "DAILY",
+        "rateSnapshot": 1250000,
+        "subtotal": 2500000
+      }
+    ]
+  },
+    {
+    "id": "res-020",
+    "bookingNumber": "RES-2609-020",
+    "customerId": "cust-ind-003",
+    "rentalType": "SELF_DRIVE",
+    "totalAmount": 1500000,
+    "deposit": 500000,
+    "remainingAmount": 1000000,
+    "status": "CONFIRMED",
+    "createdAt": "2026-09-01T12:00:00.000Z",
+    "updatedAt": "2026-09-02T12:00:00.000Z",
+    "startDate": "2026-10-21T08:00:00.000Z",
+    "endDate": "2026-10-23T08:00:00.000Z",
+    "duration": 2,
+    "rateType": "DAILY",
+    "items": [
+      {
+        "id": "res-020-item-1",
+        "bookingId": "res-020",
+        "vehicleId": "veh-006",
+        "startDate": "2026-10-21T08:00:00.000Z",
+        "endDate": "2026-10-23T08:00:00.000Z",
+        "duration": 2,
+        "rateType": "DAILY",
+        "rateSnapshot": 750000,
+        "subtotal": 1500000
+      }
+    ]
+  },
+    {
+    "id": "res-021",
+    "bookingNumber": "RES-2609-021",
+    "customerId": "cust-ind-004",
+    "rentalType": "WITH_DRIVER",
+    "totalAmount": 2500000,
+    "deposit": 500000,
+    "remainingAmount": 2000000,
+    "status": "PENDING",
+    "createdAt": "2026-09-01T12:00:00.000Z",
+    "updatedAt": "2026-09-02T12:00:00.000Z",
+    "startDate": "2026-10-22T08:00:00.000Z",
+    "endDate": "2026-10-24T08:00:00.000Z",
+    "duration": 2,
+    "rateType": "DAILY",
+    "items": [
+      {
+        "id": "res-021-item-1",
+        "bookingId": "res-021",
+        "vehicleId": "veh-007",
+        "startDate": "2026-10-22T08:00:00.000Z",
+        "endDate": "2026-10-24T08:00:00.000Z",
+        "duration": 2,
+        "rateType": "DAILY",
+        "rateSnapshot": 1250000,
+        "subtotal": 2500000
+      }
+    ]
+  },
+    {
+    "id": "res-022",
+    "bookingNumber": "RES-2609-022",
+    "customerId": "cust-ind-005",
+    "rentalType": "SELF_DRIVE",
+    "totalAmount": 1500000,
+    "deposit": 500000,
+    "remainingAmount": 1000000,
+    "status": "CONFIRMED",
+    "createdAt": "2026-09-01T12:00:00.000Z",
+    "updatedAt": "2026-09-02T12:00:00.000Z",
+    "startDate": "2026-10-23T08:00:00.000Z",
+    "endDate": "2026-10-25T08:00:00.000Z",
+    "duration": 2,
+    "rateType": "DAILY",
+    "items": [
+      {
+        "id": "res-022-item-1",
+        "bookingId": "res-022",
+        "vehicleId": "veh-008",
+        "startDate": "2026-10-23T08:00:00.000Z",
+        "endDate": "2026-10-25T08:00:00.000Z",
+        "duration": 2,
+        "rateType": "DAILY",
+        "rateSnapshot": 750000,
+        "subtotal": 1500000
+      }
+    ]
+  },
+    {
+    "id": "res-023",
+    "bookingNumber": "RES-2609-023",
+    "customerId": "cust-ind-006",
+    "rentalType": "WITH_DRIVER",
+    "totalAmount": 2500000,
+    "deposit": 500000,
+    "remainingAmount": 2000000,
+    "status": "CONFIRMED",
+    "createdAt": "2026-09-01T12:00:00.000Z",
+    "updatedAt": "2026-09-02T12:00:00.000Z",
+    "startDate": "2026-10-24T08:00:00.000Z",
+    "endDate": "2026-10-26T08:00:00.000Z",
+    "duration": 2,
+    "rateType": "DAILY",
+    "items": [
+      {
+        "id": "res-023-item-1",
+        "bookingId": "res-023",
+        "vehicleId": "veh-009",
+        "startDate": "2026-10-24T08:00:00.000Z",
+        "endDate": "2026-10-26T08:00:00.000Z",
+        "duration": 2,
+        "rateType": "DAILY",
+        "rateSnapshot": 1250000,
+        "subtotal": 2500000
+      }
+    ]
+  },
+    {
+    "id": "res-024",
+    "bookingNumber": "RES-2609-024",
+    "customerId": "cust-ind-001",
+    "rentalType": "SELF_DRIVE",
+    "totalAmount": 1500000,
+    "deposit": 500000,
+    "remainingAmount": 1000000,
+    "status": "ACTIVE",
+    "createdAt": "2026-09-01T12:00:00.000Z",
+    "updatedAt": "2026-09-02T12:00:00.000Z",
+    "startDate": "2026-10-25T08:00:00.000Z",
+    "endDate": "2026-10-27T08:00:00.000Z",
+    "duration": 2,
+    "rateType": "DAILY",
+    "items": [
+      {
+        "id": "res-024-item-1",
+        "bookingId": "res-024",
+        "vehicleId": "veh-010",
+        "startDate": "2026-10-25T08:00:00.000Z",
+        "endDate": "2026-10-27T08:00:00.000Z",
+        "duration": 2,
+        "rateType": "DAILY",
+        "rateSnapshot": 750000,
+        "subtotal": 1500000
+      }
+    ]
+  },
+    {
+    "id": "res-025",
+    "bookingNumber": "RES-2609-025",
+    "customerId": "cust-ind-002",
+    "rentalType": "WITH_DRIVER",
+    "totalAmount": 2500000,
+    "deposit": 500000,
+    "remainingAmount": 2000000,
+    "status": "CONFIRMED",
+    "createdAt": "2026-09-01T12:00:00.000Z",
+    "updatedAt": "2026-09-02T12:00:00.000Z",
+    "startDate": "2026-10-26T08:00:00.000Z",
+    "endDate": "2026-10-28T08:00:00.000Z",
+    "duration": 2,
+    "rateType": "DAILY",
+    "items": [
+      {
+        "id": "res-025-item-1",
+        "bookingId": "res-025",
+        "vehicleId": "veh-011",
+        "startDate": "2026-10-26T08:00:00.000Z",
+        "endDate": "2026-10-28T08:00:00.000Z",
+        "duration": 2,
+        "rateType": "DAILY",
+        "rateSnapshot": 1250000,
+        "subtotal": 2500000
+      }
+    ]
+  },
+    {
+    "id": "res-026",
+    "bookingNumber": "RES-2609-026",
+    "customerId": "cust-ind-003",
+    "rentalType": "SELF_DRIVE",
+    "totalAmount": 1500000,
+    "deposit": 500000,
+    "remainingAmount": 1000000,
+    "status": "CONFIRMED",
+    "createdAt": "2026-09-01T12:00:00.000Z",
+    "updatedAt": "2026-09-02T12:00:00.000Z",
+    "startDate": "2026-10-27T08:00:00.000Z",
+    "endDate": "2026-10-29T08:00:00.000Z",
+    "duration": 2,
+    "rateType": "DAILY",
+    "items": [
+      {
+        "id": "res-026-item-1",
+        "bookingId": "res-026",
+        "vehicleId": "veh-012",
+        "startDate": "2026-10-27T08:00:00.000Z",
+        "endDate": "2026-10-29T08:00:00.000Z",
+        "duration": 2,
+        "rateType": "DAILY",
+        "rateSnapshot": 750000,
+        "subtotal": 1500000
+      }
+    ]
+  },
+    {
+    "id": "res-027",
+    "bookingNumber": "RES-2609-027",
+    "customerId": "cust-ind-004",
+    "rentalType": "WITH_DRIVER",
+    "totalAmount": 2500000,
+    "deposit": 500000,
+    "remainingAmount": 2000000,
+    "status": "PENDING",
+    "createdAt": "2026-09-01T12:00:00.000Z",
+    "updatedAt": "2026-09-02T12:00:00.000Z",
+    "startDate": "2026-10-28T08:00:00.000Z",
+    "endDate": "2026-10-30T08:00:00.000Z",
+    "duration": 2,
+    "rateType": "DAILY",
+    "items": [
+      {
+        "id": "res-027-item-1",
+        "bookingId": "res-027",
+        "vehicleId": "veh-013",
+        "startDate": "2026-10-28T08:00:00.000Z",
+        "endDate": "2026-10-30T08:00:00.000Z",
+        "duration": 2,
+        "rateType": "DAILY",
+        "rateSnapshot": 1250000,
+        "subtotal": 2500000
+      }
+    ]
+  },
+    {
+    "id": "res-028",
+    "bookingNumber": "RES-2609-028",
+    "customerId": "cust-ind-005",
+    "rentalType": "SELF_DRIVE",
+    "totalAmount": 1500000,
+    "deposit": 500000,
+    "remainingAmount": 1000000,
+    "status": "CONFIRMED",
+    "createdAt": "2026-09-01T12:00:00.000Z",
+    "updatedAt": "2026-09-02T12:00:00.000Z",
+    "startDate": "2026-10-01T08:00:00.000Z",
+    "endDate": "2026-10-03T08:00:00.000Z",
+    "duration": 2,
+    "rateType": "DAILY",
+    "items": [
+      {
+        "id": "res-028-item-1",
+        "bookingId": "res-028",
+        "vehicleId": "veh-014",
+        "startDate": "2026-10-01T08:00:00.000Z",
+        "endDate": "2026-10-03T08:00:00.000Z",
+        "duration": 2,
+        "rateType": "DAILY",
+        "rateSnapshot": 750000,
+        "subtotal": 1500000
+      }
+    ]
+  },
+    {
+    "id": "res-029",
+    "bookingNumber": "RES-2609-029",
+    "customerId": "cust-ind-006",
+    "rentalType": "WITH_DRIVER",
+    "totalAmount": 2500000,
+    "deposit": 500000,
+    "remainingAmount": 2000000,
+    "status": "CONFIRMED",
+    "createdAt": "2026-09-01T12:00:00.000Z",
+    "updatedAt": "2026-09-02T12:00:00.000Z",
+    "startDate": "2026-10-02T08:00:00.000Z",
+    "endDate": "2026-10-04T08:00:00.000Z",
+    "duration": 2,
+    "rateType": "DAILY",
+    "items": [
+      {
+        "id": "res-029-item-1",
+        "bookingId": "res-029",
+        "vehicleId": "veh-015",
+        "startDate": "2026-10-02T08:00:00.000Z",
+        "endDate": "2026-10-04T08:00:00.000Z",
+        "duration": 2,
+        "rateType": "DAILY",
+        "rateSnapshot": 1250000,
+        "subtotal": 2500000
+      }
+    ]
+  },
+    {
+    "id": "res-030",
+    "bookingNumber": "RES-2609-030",
+    "customerId": "cust-ind-001",
+    "rentalType": "SELF_DRIVE",
+    "totalAmount": 1500000,
+    "deposit": 500000,
+    "remainingAmount": 1000000,
+    "status": "ACTIVE",
+    "createdAt": "2026-09-01T12:00:00.000Z",
+    "updatedAt": "2026-09-02T12:00:00.000Z",
+    "startDate": "2026-10-03T08:00:00.000Z",
+    "endDate": "2026-10-05T08:00:00.000Z",
+    "duration": 2,
+    "rateType": "DAILY",
+    "items": [
+      {
+        "id": "res-030-item-1",
+        "bookingId": "res-030",
+        "vehicleId": "veh-001",
+        "startDate": "2026-10-03T08:00:00.000Z",
+        "endDate": "2026-10-05T08:00:00.000Z",
+        "duration": 2,
+        "rateType": "DAILY",
+        "rateSnapshot": 750000,
+        "subtotal": 1500000
+      }
+    ]
+  },
+    {
+    "id": "res-031",
+    "bookingNumber": "RES-2609-031",
+    "customerId": "cust-ind-002",
+    "rentalType": "WITH_DRIVER",
+    "totalAmount": 2500000,
+    "deposit": 500000,
+    "remainingAmount": 2000000,
+    "status": "CONFIRMED",
+    "createdAt": "2026-09-01T12:00:00.000Z",
+    "updatedAt": "2026-09-02T12:00:00.000Z",
+    "startDate": "2026-10-04T08:00:00.000Z",
+    "endDate": "2026-10-06T08:00:00.000Z",
+    "duration": 2,
+    "rateType": "DAILY",
+    "items": [
+      {
+        "id": "res-031-item-1",
+        "bookingId": "res-031",
+        "vehicleId": "veh-002",
+        "startDate": "2026-10-04T08:00:00.000Z",
+        "endDate": "2026-10-06T08:00:00.000Z",
+        "duration": 2,
+        "rateType": "DAILY",
+        "rateSnapshot": 1250000,
+        "subtotal": 2500000
+      }
+    ]
+  },
+    {
+    "id": "res-032",
+    "bookingNumber": "RES-2609-032",
+    "customerId": "cust-ind-003",
+    "rentalType": "SELF_DRIVE",
+    "totalAmount": 1500000,
+    "deposit": 500000,
+    "remainingAmount": 1000000,
+    "status": "CONFIRMED",
+    "createdAt": "2026-09-01T12:00:00.000Z",
+    "updatedAt": "2026-09-02T12:00:00.000Z",
+    "startDate": "2026-10-05T08:00:00.000Z",
+    "endDate": "2026-10-07T08:00:00.000Z",
+    "duration": 2,
+    "rateType": "DAILY",
+    "items": [
+      {
+        "id": "res-032-item-1",
+        "bookingId": "res-032",
+        "vehicleId": "veh-003",
+        "startDate": "2026-10-05T08:00:00.000Z",
+        "endDate": "2026-10-07T08:00:00.000Z",
+        "duration": 2,
+        "rateType": "DAILY",
+        "rateSnapshot": 750000,
+        "subtotal": 1500000
+      }
+    ]
+  },
+    {
+    "id": "res-033",
+    "bookingNumber": "RES-2609-033",
+    "customerId": "cust-ind-004",
+    "rentalType": "WITH_DRIVER",
+    "totalAmount": 2500000,
+    "deposit": 500000,
+    "remainingAmount": 2000000,
+    "status": "PENDING",
+    "createdAt": "2026-09-01T12:00:00.000Z",
+    "updatedAt": "2026-09-02T12:00:00.000Z",
+    "startDate": "2026-10-06T08:00:00.000Z",
+    "endDate": "2026-10-08T08:00:00.000Z",
+    "duration": 2,
+    "rateType": "DAILY",
+    "items": [
+      {
+        "id": "res-033-item-1",
+        "bookingId": "res-033",
+        "vehicleId": "veh-004",
+        "startDate": "2026-10-06T08:00:00.000Z",
+        "endDate": "2026-10-08T08:00:00.000Z",
+        "duration": 2,
+        "rateType": "DAILY",
+        "rateSnapshot": 1250000,
+        "subtotal": 2500000
+      }
+    ]
+  },
+    {
+    "id": "res-034",
+    "bookingNumber": "RES-2609-034",
+    "customerId": "cust-ind-005",
+    "rentalType": "SELF_DRIVE",
+    "totalAmount": 1500000,
+    "deposit": 500000,
+    "remainingAmount": 1000000,
+    "status": "CONFIRMED",
+    "createdAt": "2026-09-01T12:00:00.000Z",
+    "updatedAt": "2026-09-02T12:00:00.000Z",
+    "startDate": "2026-10-07T08:00:00.000Z",
+    "endDate": "2026-10-09T08:00:00.000Z",
+    "duration": 2,
+    "rateType": "DAILY",
+    "items": [
+      {
+        "id": "res-034-item-1",
+        "bookingId": "res-034",
+        "vehicleId": "veh-005",
+        "startDate": "2026-10-07T08:00:00.000Z",
+        "endDate": "2026-10-09T08:00:00.000Z",
+        "duration": 2,
+        "rateType": "DAILY",
+        "rateSnapshot": 750000,
+        "subtotal": 1500000
+      }
+    ]
+  },
+    {
+    "id": "res-035",
+    "bookingNumber": "RES-2609-035",
+    "customerId": "cust-ind-006",
+    "rentalType": "WITH_DRIVER",
+    "totalAmount": 2500000,
+    "deposit": 500000,
+    "remainingAmount": 2000000,
+    "status": "CONFIRMED",
+    "createdAt": "2026-09-01T12:00:00.000Z",
+    "updatedAt": "2026-09-02T12:00:00.000Z",
+    "startDate": "2026-10-08T08:00:00.000Z",
+    "endDate": "2026-10-10T08:00:00.000Z",
+    "duration": 2,
+    "rateType": "DAILY",
+    "items": [
+      {
+        "id": "res-035-item-1",
+        "bookingId": "res-035",
+        "vehicleId": "veh-006",
+        "startDate": "2026-10-08T08:00:00.000Z",
+        "endDate": "2026-10-10T08:00:00.000Z",
+        "duration": 2,
+        "rateType": "DAILY",
+        "rateSnapshot": 1250000,
+        "subtotal": 2500000
+      }
+    ]
+  },
+    {
+    "id": "res-036",
+    "bookingNumber": "RES-2609-036",
+    "customerId": "cust-ind-001",
+    "rentalType": "SELF_DRIVE",
+    "totalAmount": 1500000,
+    "deposit": 500000,
+    "remainingAmount": 1000000,
+    "status": "ACTIVE",
+    "createdAt": "2026-09-01T12:00:00.000Z",
+    "updatedAt": "2026-09-02T12:00:00.000Z",
+    "startDate": "2026-10-09T08:00:00.000Z",
+    "endDate": "2026-10-11T08:00:00.000Z",
+    "duration": 2,
+    "rateType": "DAILY",
+    "items": [
+      {
+        "id": "res-036-item-1",
+        "bookingId": "res-036",
+        "vehicleId": "veh-007",
+        "startDate": "2026-10-09T08:00:00.000Z",
+        "endDate": "2026-10-11T08:00:00.000Z",
+        "duration": 2,
+        "rateType": "DAILY",
+        "rateSnapshot": 750000,
+        "subtotal": 1500000
+      }
+    ]
+  },
+    {
+    "id": "res-037",
+    "bookingNumber": "RES-2609-037",
+    "customerId": "cust-ind-002",
+    "rentalType": "WITH_DRIVER",
+    "totalAmount": 2500000,
+    "deposit": 500000,
+    "remainingAmount": 2000000,
+    "status": "CONFIRMED",
+    "createdAt": "2026-09-01T12:00:00.000Z",
+    "updatedAt": "2026-09-02T12:00:00.000Z",
+    "startDate": "2026-10-10T08:00:00.000Z",
+    "endDate": "2026-10-12T08:00:00.000Z",
+    "duration": 2,
+    "rateType": "DAILY",
+    "items": [
+      {
+        "id": "res-037-item-1",
+        "bookingId": "res-037",
+        "vehicleId": "veh-008",
+        "startDate": "2026-10-10T08:00:00.000Z",
+        "endDate": "2026-10-12T08:00:00.000Z",
+        "duration": 2,
+        "rateType": "DAILY",
+        "rateSnapshot": 1250000,
+        "subtotal": 2500000
+      }
+    ]
+  },
+    {
+    "id": "res-038",
+    "bookingNumber": "RES-2609-038",
+    "customerId": "cust-ind-003",
+    "rentalType": "SELF_DRIVE",
+    "totalAmount": 1500000,
+    "deposit": 500000,
+    "remainingAmount": 1000000,
+    "status": "CONFIRMED",
+    "createdAt": "2026-09-01T12:00:00.000Z",
+    "updatedAt": "2026-09-02T12:00:00.000Z",
+    "startDate": "2026-10-11T08:00:00.000Z",
+    "endDate": "2026-10-13T08:00:00.000Z",
+    "duration": 2,
+    "rateType": "DAILY",
+    "items": [
+      {
+        "id": "res-038-item-1",
+        "bookingId": "res-038",
+        "vehicleId": "veh-009",
+        "startDate": "2026-10-11T08:00:00.000Z",
+        "endDate": "2026-10-13T08:00:00.000Z",
+        "duration": 2,
+        "rateType": "DAILY",
+        "rateSnapshot": 750000,
+        "subtotal": 1500000
+      }
+    ]
+  },
+    {
+    "id": "res-039",
+    "bookingNumber": "RES-2609-039",
+    "customerId": "cust-ind-004",
+    "rentalType": "WITH_DRIVER",
+    "totalAmount": 2500000,
+    "deposit": 500000,
+    "remainingAmount": 2000000,
+    "status": "PENDING",
+    "createdAt": "2026-09-01T12:00:00.000Z",
+    "updatedAt": "2026-09-02T12:00:00.000Z",
+    "startDate": "2026-10-12T08:00:00.000Z",
+    "endDate": "2026-10-14T08:00:00.000Z",
+    "duration": 2,
+    "rateType": "DAILY",
+    "items": [
+      {
+        "id": "res-039-item-1",
+        "bookingId": "res-039",
+        "vehicleId": "veh-010",
+        "startDate": "2026-10-12T08:00:00.000Z",
+        "endDate": "2026-10-14T08:00:00.000Z",
+        "duration": 2,
+        "rateType": "DAILY",
+        "rateSnapshot": 1250000,
+        "subtotal": 2500000
+      }
+    ]
   }
 ];

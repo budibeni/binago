@@ -47,6 +47,8 @@ export function ContractTemplatesFeature() {
 
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [previewTemplate, setPreviewTemplate] = useState<DocumentTemplate | null>(null);
+  const [editingTemplate, setEditingTemplate] = useState<DocumentTemplate | null>(null);
+  const [isCopying, setIsCopying] = useState(false);
 
   const fetchTemplates = useCallback(async () => {
     try {
@@ -66,13 +68,32 @@ export function ContractTemplatesFeature() {
   }, [fetchTemplates]);
 
   const handleCreateClick = () => {
+    setEditingTemplate(null);
+    setIsCopying(false);
+    setIsEditorOpen(true);
+  };
+
+  const handleCopyClick = (template: DocumentTemplate) => {
+    setEditingTemplate(template);
+    setIsCopying(true);
+    setIsEditorOpen(true);
+  };
+
+  const handleEditClick = (template: DocumentTemplate) => {
+    setEditingTemplate(template);
+    setIsCopying(false);
     setIsEditorOpen(true);
   };
 
   const handleEditorSave = async (name: string, contentHtml: string) => {
-    await templateService.createContractTemplate(name, contentHtml);
+    if (editingTemplate && !isCopying) {
+      await templateService.updateContractTemplate(editingTemplate.id, name, contentHtml);
+    } else {
+      await templateService.createContractTemplate(name, contentHtml);
+    }
     await fetchTemplates();
     setIsEditorOpen(false);
+    setEditingTemplate(null);
   };
 
   const handlePreview = async (template: DocumentTemplate) => {
@@ -107,6 +128,8 @@ export function ContractTemplatesFeature() {
         onActivate={handleActivate}
         onDeactivate={handleDeactivate}
         onDelete={handleDelete}
+        onCopy={handleCopyClick}
+        onEdit={handleEditClick}
       />
 
       <Dialog 
@@ -120,9 +143,13 @@ export function ContractTemplatesFeature() {
           {isEditorOpen && (
             <DocumentTemplateEditor
               documentType="RENTAL_CONTRACT"
-              initialContent={DEFAULT_RENTAL_CONTRACT_TEMPLATE.contentHtml}
+              initialContent={editingTemplate ? editingTemplate.contentHtml : DEFAULT_RENTAL_CONTRACT_TEMPLATE.contentHtml}
+              initialName={editingTemplate ? (isCopying ? `${editingTemplate.name} (Copy)` : editingTemplate.name) : 'Template Baru'}
               onSave={handleEditorSave}
-              onCancel={() => setIsEditorOpen(false)}
+              onCancel={() => {
+                setIsEditorOpen(false);
+                setEditingTemplate(null);
+              }}
             />
           )}
         </div>

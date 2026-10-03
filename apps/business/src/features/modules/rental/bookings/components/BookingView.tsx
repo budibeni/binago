@@ -22,7 +22,6 @@ export function BookingView({
   onClose,
   labels,
   onEdit,
-  onDelete,
   onConfirm,
   onCancel,
 }: BookingViewProps) {
@@ -73,7 +72,6 @@ export function BookingView({
       onOpenChange={(isOpen) => !isOpen && onClose()}
       title="Detail Booking"
       onEdit={() => onEdit(booking)}
-      onDelete={() => onDelete(booking)}
       extraFooterActions={
         (booking.status === 'PENDING' || booking.status === 'CONFIRMED') ? (
           <Button

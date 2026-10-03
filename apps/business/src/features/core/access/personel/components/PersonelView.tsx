@@ -109,7 +109,7 @@ export function PersonelView({ personel, open, onClose, onEdit, onDelete, labels
                 label={labels.phone} 
                 value={
                   <a 
-                    href={`https://wa.me/${personel.phone.replace(/[^0-9]/g, '')}`} 
+                    href={`https://wa.me/${personel.phone?.replace(/[^0-9]/g, '') || ''}`} 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="flex items-center gap-1.5 hover:underline decoration-border underline-offset-4 text-foreground"

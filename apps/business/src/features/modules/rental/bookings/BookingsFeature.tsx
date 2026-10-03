@@ -58,6 +58,14 @@ export function BookingsFeature() {
 
   useEffect(() => {
     let mounted = true;
+
+    // Parse initial search from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const q = urlParams.get('q');
+    if (q) {
+      setSearch(q);
+    }
+
     const fetchBookings = async () => {
       try {
         setLoading(true);
@@ -189,8 +197,6 @@ export function BookingsFeature() {
   }), [statusFilter, labels]);
 
   const renderStatsPanel = () => {
-    if (!showStats) return null;
-    
     return (
       <PanelShell
         title="Ringkasan"
@@ -201,12 +207,12 @@ export function BookingsFeature() {
         collapsedTitle="RINGKASAN"
         onSideChange={setPanelSide}
         labels={{
-          top: labels.panelTop || 'Atas',
-          right: labels.panelRight || 'Kanan',
-          bottom: labels.panelBottom || 'Bawah',
-          left: labels.panelLeft || 'Kiri',
-          hide: labels.hidePanel || 'Sembunyikan',
-          layoutToggleTitle: labels.layoutToggleTitle || 'Ubah Posisi Panel',
+          top: (labels as any).panelTop || 'Atas',
+          right: (labels as any).panelRight || 'Kanan',
+          bottom: (labels as any).panelBottom || 'Bawah',
+          left: (labels as any).panelLeft || 'Kiri',
+          hide: (labels as any).hidePanel || 'Sembunyikan',
+          layoutToggleTitle: (labels as any).layoutToggleTitle || 'Ubah Posisi Panel',
         }}
         className={cn(
           "shrink-0 bg-white dark:bg-background z-10",
@@ -262,7 +268,6 @@ export function BookingsFeature() {
         onClose={() => setDrawerOpen(false)}
         labels={labels}
         onEdit={(b) => { setDrawerOpen(false); handleEdit(b); }}
-        onDelete={handleDelete}
         onConfirm={handleConfirm}
         onCancel={handleCancel}
       />

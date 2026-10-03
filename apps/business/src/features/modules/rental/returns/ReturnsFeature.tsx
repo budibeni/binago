@@ -152,10 +152,11 @@ export function ReturnsFeature() {
                     </div>
                     <button
                       onClick={() => {
-                        if (contract.vehicle?.coreVehicle?.id) {
+                        const vehicleId = contract.booking?.items?.[0]?.vehicle?.coreVehicle?.id;
+                        if (vehicleId) {
                           trackingNavigationService.navigateToTracking(router, {
                             mode: 'live',
-                            vehicleId: contract.vehicle.coreVehicle.id
+                            vehicleId: vehicleId
                           });
                         }
                       }}
@@ -164,12 +165,12 @@ export function ReturnsFeature() {
                     >
                       <MapPin className="w-3.5 h-3.5 shrink-0" />
                       <span className="truncate hover:underline">
-                        {contract.vehicle?.coreVehicle?.brand} {contract.vehicle?.coreVehicle?.vehicleName} &bull; <span className="font-medium text-foreground/80">{contract.vehicle?.coreVehicle?.plateNumber}</span>
+                        {contract.booking?.items?.[0]?.vehicle?.coreVehicle?.brand} {contract.booking?.items?.[0]?.vehicle?.coreVehicle?.vehicleName} &bull; <span className="font-medium text-foreground/80">{contract.booking?.items?.[0]?.vehicle?.coreVehicle?.plateNumber}</span>
                       </span>
                     </button>
                     <div className="mb-4 space-y-1">
                       <p className="text-[11px] text-muted-foreground">
-                        Odometer: {contract.vehicle?.currentOdometer?.toLocaleString('id-ID') || '-'} KM
+                        Odometer: {contract.booking?.items?.[0]?.vehicle?.currentOdometer?.toLocaleString('id-ID') || '-'} KM
                       </p>
                       <p className="text-[11px] text-amber-600 dark:text-amber-400">
                         Jatuh Tempo: {contract.endDate ? new Date(contract.endDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-'}

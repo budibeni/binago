@@ -47,16 +47,11 @@ export function BookingCreateFeature({ open, onOpenChange, onSuccess }: BookingC
 
       await bookingService.createBooking({
         customerId: formData.customerId,
-        vehicleId: formData.vehicleId,
+        vehicleIds: formData.vehicleIds,
         startDate: formData.startDate,
         endDate: formData.endDate,
-        duration: formData.duration,
         rentalType: formData.rentalType,
         rateType: formData.rateType,
-        dailyRate: 0, // In real app, fetch from vehicle
-        weeklyRate: 0,
-        monthlyRate: 0,
-        totalAmount: 0, // calculate inside service or backend
         deposit: formData.deposit,
         notes: formData.notes
       });

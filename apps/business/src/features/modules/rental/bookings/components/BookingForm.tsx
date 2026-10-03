@@ -116,8 +116,8 @@ export function BookingForm({
       
       total += rate * multiplier;
     });
-    return total + (formData.driverFee || 0);
-  }, [selectedVehicles, formData.duration, formData.rateType, formData.driverFee]);
+    return total + ((formData as any).driverFee || 0);
+  }, [selectedVehicles, formData.duration, formData.rateType, (formData as any).driverFee]);
 
   const remainingAmount = useMemo(() => {
     return Math.max(totalAmount - (formData.deposit || 0), 0);
@@ -130,7 +130,7 @@ export function BookingForm({
   const [selectedVehicleToAdd, setSelectedVehicleToAdd] = React.useState<string>('');
   
   const handleAddVehicle = () => {
-    if (selectedVehicleToAdd && !formData.vehicleIds.includes(selectedVehicleToAdd)) {
+    if (selectedVehicleToAdd && !formData.vehicleIds?.includes(selectedVehicleToAdd)) {
       handleChange('vehicleIds', [...(formData.vehicleIds || []), selectedVehicleToAdd]);
       setSelectedVehicleToAdd('');
     }
@@ -278,7 +278,7 @@ export function BookingForm({
                   onChange={setSelectedVehicleToAdd}
                   placeholder="Pilih Kendaraan..."
                   options={vehicles
-                    .filter(v => (v.status === 'READY' || v.status === 'RESERVED') && !formData.vehicleIds.includes(v.vehicleId))
+                    .filter(v => (v.status === 'READY' || v.status === 'RESERVED') && !formData.vehicleIds?.includes(v.vehicleId))
                     .map(v => ({ value: v.vehicleId, label: `${v.coreVehicle.plateNumber} - ${v.coreVehicle.brand} ${v.coreVehicle.vehicleName}` }))}
                 />
               </div>
@@ -314,7 +314,7 @@ export function BookingForm({
                             {formatCurrency(rate)}
                           </td>
                           <td className="px-4 py-2 text-right">
-                            <Button type="button" variant="ghost" size="icon" onClick={() => handleRemoveVehicle(v.vehicleId)} className="h-8 w-8 text-danger hover:text-danger hover:bg-danger/10">
+                            <Button type="button" variant="ghost" onClick={() => handleRemoveVehicle(v.vehicleId)} className="h-8 w-8 text-danger hover:text-danger hover:bg-danger/10">
                               <Trash2 className="w-4 h-4" />
                             </Button>
                           </td>
@@ -372,8 +372,8 @@ export function BookingForm({
             <div className="col-span-1">
               <InputDecimal
                 label="Biaya Pengemudi"
-                value={formData.driverFee || 0}
-                onChange={(val) => handleChange('driverFee', val !== null ? val : 0)}
+                value={(formData as any).driverFee || 0}
+                onChange={(val) => handleChange('driverFee' as any, val !== null ? val : 0)}
                 placeholder="0"
                 disabled={formData.rentalType !== 'WITH_DRIVER'}
               />
@@ -463,10 +463,10 @@ export function BookingForm({
               <span className="text-sm text-muted-foreground">Total Estimasi</span>
               <span className="text-sm font-semibold">{formatCurrency(totalAmount)}</span>
             </div>
-            {(formData.driverFee || 0) > 0 && (
+            {((formData as any).driverFee || 0) > 0 && (
               <div className="flex justify-between items-center mb-2">
                 <span className="text-sm text-muted-foreground">Biaya Pengemudi</span>
-                <span className="text-sm font-semibold">{formatCurrency(formData.driverFee || 0)}</span>
+                <span className="text-sm font-semibold">{formatCurrency((formData as any).driverFee || 0)}</span>
               </div>
             )}
             <div className="flex justify-between items-center mb-6">

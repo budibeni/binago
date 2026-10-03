@@ -159,10 +159,11 @@ export function HandoversFeature() {
                     </div>
                     <button
                       onClick={() => {
-                        if (contract.vehicle?.coreVehicle?.id) {
+                        const vehicleId = contract.booking?.items?.[0]?.vehicle?.coreVehicle?.id;
+                        if (vehicleId) {
                           trackingNavigationService.navigateToTracking(router, {
                             mode: 'live',
-                            vehicleId: contract.vehicle.coreVehicle.id
+                            vehicleId: vehicleId
                           });
                         }
                       }}
@@ -171,7 +172,7 @@ export function HandoversFeature() {
                     >
                       <MapPin className="w-3.5 h-3.5 shrink-0" />
                       <span className="truncate hover:underline">
-                        {contract.vehicle?.coreVehicle?.brand} {contract.vehicle?.coreVehicle?.vehicleName} &bull; <span className="font-medium text-foreground/80">{contract.vehicle?.coreVehicle?.plateNumber}</span>
+                        {contract.booking?.items?.[0]?.vehicle?.coreVehicle?.brand} {contract.booking?.items?.[0]?.vehicle?.coreVehicle?.vehicleName} &bull; <span className="font-medium text-foreground/80">{contract.booking?.items?.[0]?.vehicle?.coreVehicle?.plateNumber}</span>
                       </span>
                     </button>
                   </div>

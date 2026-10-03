@@ -6,7 +6,7 @@ import {
   Button,
   Dialog,
 } from '@adatrack/ui';
-import { FileText, MoreVertical, Trash2, CheckCircle, XCircle, Eye, UploadCloud } from 'lucide-react';
+import { FileText, MoreVertical, Trash2, CheckCircle, XCircle, Eye, UploadCloud, Copy, Edit } from 'lucide-react';
 import { DocumentTemplate, DocumentType } from '../types';
 
 export interface DocumentTemplatePageProps {
@@ -20,6 +20,8 @@ export interface DocumentTemplatePageProps {
   onActivate: (template: DocumentTemplate) => Promise<void>;
   onDeactivate: (template: DocumentTemplate) => Promise<void>;
   onDelete: (template: DocumentTemplate) => Promise<void>;
+  onCopy?: (template: DocumentTemplate) => void;
+  onEdit?: (template: DocumentTemplate) => void;
 }
 
 export function DocumentTemplatePage({
@@ -32,10 +34,13 @@ export function DocumentTemplatePage({
   onPreview,
   onActivate,
   onDeactivate,
-  onDelete
+  onDelete,
+  onCopy,
+  onEdit
 }: DocumentTemplatePageProps) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [templateToDelete, setTemplateToDelete] = useState<DocumentTemplate | null>(null);
+  const [search, setSearch] = useState('');
 
   const columns = useMemo<DataTableColumnDef<DocumentTemplate>[]>(
     () => [
@@ -106,6 +111,29 @@ export function DocumentTemplatePage({
               >
                 <Eye className="w-4 h-4" />
               </Button>
+
+              {onCopy && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onCopy(template)}
+                  title="Duplikat Template"
+                >
+                  <Copy className="w-4 h-4" />
+                </Button>
+              )}
+
+              {onEdit && !template.isDefault && template.sourceType !== 'SYSTEM' && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                  onClick={() => onEdit(template)}
+                  title="Edit Template"
+                >
+                  <Edit className="w-4 h-4" />
+                </Button>
+              )}
               
               {template.status === 'INACTIVE' ? (
                 <Button
@@ -166,25 +194,28 @@ export function DocumentTemplatePage({
   );
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-start justify-between">
-        <div>
-          <h2 className="text-xl font-bold text-neutral-900">{title}</h2>
-          <p className="text-sm text-neutral-500 mt-1">{description}</p>
-        </div>
-        <Button onClick={onUploadClick} className="bg-blue-600 hover:bg-blue-700 text-white">
-          <FileText className="w-4 h-4 mr-2" />
-          Buat Template Baru
-        </Button>
-      </div>
-
-      <div className="bg-white rounded-lg border border-neutral-200 shadow-sm overflow-hidden">
+    <div className="flex flex-col h-full w-full">
+      <div className="flex-1 min-h-0 overflow-y-auto p-0">
         <DataTable
+          className="border-none shadow-none h-full"
           data={templates}
           columns={columns}
           isLoading={isLoading}
+          searchable
+          sortable
+          pagination
+          columnVisibility
+          searchValue={search}
+          onSearchChange={setSearch}
+          searchPlaceholder="Cari template..."
           emptyTitle="Tidak Ada Template"
           emptyDescription="Belum ada template dokumen yang tersedia."
+          toolbarActions={
+            <Button variant="destructive" onClick={onUploadClick} className="h-8 gap-1.5 text-[12px] font-medium shadow-none">
+              <FileText className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline-block">Buat Template Baru</span>
+            </Button>
+          }
         />
       </div>
 
