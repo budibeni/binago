@@ -28,7 +28,6 @@ export function HomeShortcutGrid({ favorites }: HomeShortcutGridProps) {
           <Link
             key={s.id}
             href={s.href}
-            prefetch={false}
             className="group relative block rounded-xl border border-border bg-background dark:bg-neutral-900 dark:border-neutral-800 p-4 hover:border-border-strong hover:shadow-sm transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400"
           >
             {/* Icon */}
