@@ -12,8 +12,10 @@ import { VehicleView } from './components/VehicleView';
 import { VehicleForm } from './components/VehicleForm';
 import { useVehicles } from './hooks/useVehicles';
 import { api } from '@adatrack/utils';
+import { toast } from '@adatrack/ui';
 import type { Vehicle, VehicleStatusFilter } from './types/vehicle';
 import type { DataTableFilterConfig, DataTableLabels } from '@adatrack/ui';
+import { ConfirmDialog } from '@adatrack/ui';
 
 // ===========================================================================
 
@@ -36,6 +38,8 @@ export function VehiclesFeature() {
   });
   const [isFilterOpen, setIsFilterOpen] = React.useState(false);
 
+  const [vehicleToDelete, setVehicleToDelete] = React.useState<Vehicle | null>(null);
+
   const statusFilter = filterState.status as VehicleStatusFilter;
   const selectedGroupIds = filterState.groupIds as string[];
 
@@ -46,7 +50,7 @@ export function VehiclesFeature() {
   const [isAddOpen, setIsAddOpen] = React.useState(false);
 
   // ===========================================================================
-  const { vehicles: filteredVehicles, loading } = useVehicles({ search, status: statusFilter?.length ? statusFilter.join(',') : undefined, groupIds: selectedGroupIds });
+  const { vehicles: filteredVehicles, loading, refetch } = useVehicles({ search, status: statusFilter?.length ? statusFilter.join(',') : undefined, groupIds: selectedGroupIds });
 
   // statusCounts removed
 
@@ -76,17 +80,23 @@ export function VehiclesFeature() {
     });
   }, [router]);
 
-  const handleDelete = React.useCallback(async (vehicle: Vehicle) => {
-    if (confirm(`Are you sure you want to delete vehicle ${vehicle.plateNumber}?`)) {
-      try {
-        await api.delete(`/vehicles/${vehicle.id}`);
-        window.location.reload();
-      } catch (err) {
-        console.error('Failed to delete vehicle', err);
-        alert('Failed to delete vehicle');
-      }
-    }
+  const handleDelete = React.useCallback((vehicle: Vehicle) => {
+    setVehicleToDelete(vehicle);
   }, []);
+
+  const confirmDelete = React.useCallback(async () => {
+    if (!vehicleToDelete) return;
+    try {
+      await api.delete(`/vehicles/${vehicleToDelete.id}`);
+      toast.success('Kendaraan berhasil dihapus');
+      refetch();
+    } catch (err) {
+      console.error('Failed to delete vehicle', err);
+      toast.error('Gagal menghapus kendaraan');
+    } finally {
+      setVehicleToDelete(null);
+    }
+  }, [vehicleToDelete, refetch]);
 
   // Filter toggle/clear logic is now handled by DataTableFilterPanel internally via onStateChange
 

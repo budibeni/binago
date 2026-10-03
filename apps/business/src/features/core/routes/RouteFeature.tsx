@@ -87,14 +87,17 @@ export function RouteFeature({ locale = 'id' }: RouteFeatureProps) {
 
       if (route.id) {
         await api.put(`/routes/${route.id}`, payload);
+        toast.success('Rute berhasil diperbarui');
       } else {
         await api.post('/routes', payload);
+        toast.success('Rute berhasil ditambahkan');
       }
 
-      window.location.reload();
+      refetch();
+      setIsEditing(false);
     } catch (err) {
       console.error('Failed to save route', err);
-      alert('Failed to save route');
+      toast.error('Gagal menyimpan rute');
     }
   };
 
