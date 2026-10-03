@@ -11,6 +11,9 @@ import {
   FileText,
   ShieldAlert,
   MonitorCog,
+  Contact,
+  CreditCard,
+  History,
 } from 'lucide-react';
 import React from 'react';
 
@@ -26,7 +29,7 @@ export interface ShortcutDef {
   href: string;
   icon: React.ElementType;
   color: IconColor;
-  translationKey: 'tracking' | 'vehicles' | 'drivers' | 'trips' | 'deliveries' | 'alerts' | 'geofences' | 'maintenance' | 'tasks' | 'reports' | 'incidents' | 'gpsDevices';
+  translationKey: 'tracking' | 'vehicles' | 'drivers' | 'trips' | 'deliveries' | 'alerts' | 'geofences' | 'maintenance' | 'tasks' | 'reports' | 'incidents' | 'gpsDevices' | 'personel' | 'card' | 'log';
 }
 
 export const BUSINESS_SHORTCUTS: ShortcutDef[] = [
@@ -42,4 +45,7 @@ export const BUSINESS_SHORTCUTS: ShortcutDef[] = [
   { id: 'reports',    href: '/reports',      icon: FileText,       color: { bg: 'bg-sky-50',     text: 'text-sky-600' },    translationKey: 'reports' },
   { id: 'incidents',  href: '/incidents',    icon: ShieldAlert,    color: { bg: 'bg-red-50',     text: 'text-red-600' },    translationKey: 'incidents' },
   { id: 'gpsDevices', href: '/gps-devices',  icon: MonitorCog,     color: { bg: 'bg-neutral-100',text: 'text-neutral-500' }, translationKey: 'gpsDevices' },
+  { id: 'personel',   href: '/personel',     icon: Contact,        color: { bg: 'bg-pink-50',    text: 'text-pink-500' },   translationKey: 'personel' },
+  { id: 'card',       href: '/card',         icon: CreditCard,     color: { bg: 'bg-fuchsia-50', text: 'text-fuchsia-500' }, translationKey: 'card' },
+  { id: 'log',        href: '/log',          icon: History,        color: { bg: 'bg-slate-50',   text: 'text-slate-500' },   translationKey: 'log' },
 ];

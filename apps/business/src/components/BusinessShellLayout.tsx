@@ -219,7 +219,7 @@ function buildNavigation(locale: Locale, userRole?: string): NavGroup[] {
   ];
 
   const role = (userRole || '').toLowerCase();
-  const alwaysOpen = ['main', 'master', 'administration'];
+  const alwaysOpen = ['main', 'master', 'access', 'administration'];
 
   return allGroups.filter(group => {
     if (group.id && alwaysOpen.includes(group.id)) return true;

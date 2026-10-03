@@ -214,6 +214,9 @@ export const dictionaries = {
         reports: { label: 'Laporan', desc: 'Lihat dan unduh laporan' },
         incidents: { label: 'Insiden', desc: 'Kelola insiden dan tindak lanjut' },
         gpsDevices: { label: 'GPS & Perangkat', desc: 'Kelola perangkat GPS dan sensor' },
+        personel: { label: 'Personel', desc: 'Kelola data personel dan staf' },
+        card: { label: 'Kartu Akses', desc: 'Kelola kartu RFID/NFC' },
+        log: { label: 'Riwayat Akses', desc: 'Lihat log akses kartu' },
       },
     },
 
@@ -892,6 +895,9 @@ export const dictionaries = {
         reports: { label: 'Reports', desc: 'View and download reports' },
         incidents: { label: 'Incidents', desc: 'Manage incidents and follow-up' },
         gpsDevices: { label: 'GPS & Devices', desc: 'Manage GPS devices and sensors' },
+        personel: { label: 'Personnel', desc: 'Manage personnel and staff data' },
+        card: { label: 'Access Cards', desc: 'Manage RFID/NFC cards' },
+        log: { label: 'Access Logs', desc: 'View card access logs' },
       },
     },
 
