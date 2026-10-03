@@ -6,7 +6,7 @@ import { login } from '@/app/actions/auth';
 export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [companies, setCompanies] = useState<string[] | null>(null);
+  const [companies, setCompanies] = useState<{code: string, name: string}[] | null>(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -80,10 +80,10 @@ export default function LoginPage() {
                 Your account is associated with multiple companies. Please select one:
               </p>
               <div className="space-y-2">
-                {companies.map((code) => (
-                  <label key={code} className="flex items-center space-x-3 p-3 border rounded-md cursor-pointer hover:bg-gray-50">
-                    <input type="radio" name="company_code" value={code} required className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300" />
-                    <span className="text-gray-900 font-medium">{code}</span>
+                {companies.map((comp) => (
+                  <label key={comp.code} className="flex items-center space-x-3 p-3 border rounded-md cursor-pointer hover:bg-gray-50">
+                    <input type="radio" name="company_code" value={comp.code} required className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300" />
+                    <span className="text-gray-900 font-medium">{comp.name}</span>
                   </label>
                 ))}
               </div>
