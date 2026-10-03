@@ -30,6 +30,7 @@ export function useVehicles(filters?: { search?: string; status?: string; groupI
         driverId: v.driver_id ? String(v.driver_id) : null,
         driverName: v.driver_name || null,
         deviceImei: v.imei || '-',
+        vehicleId: v.internal_id || '',
         deviceSimNumber: v.sim_number || '-',
         gpsDeviceBrand: v.device_brand || '',
         gpsDeviceType: v.device_type || '',

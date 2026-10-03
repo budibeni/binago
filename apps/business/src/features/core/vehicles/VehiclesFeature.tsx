@@ -302,6 +302,7 @@ export function VehiclesFeature() {
                 kir_expiry: data.kirExpiry || null,
                 notes: data.notes || '',
                 gps_install_date: data.gpsInstallDate || null,
+                internal_id: data.vehicleId || null,
               };
               
               if (data.id) {
