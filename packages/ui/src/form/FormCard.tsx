@@ -23,6 +23,11 @@ export interface FormCardProps extends React.HTMLAttributes<HTMLDivElement> {
   action?: React.ReactNode;
   
   /**
+   * Class name for the icon wrapper. Defaults to bg-danger/10 text-danger
+   */
+  iconWrapperClassName?: string;
+  
+  /**
    * Content of the card (usually form fields).
    */
   children: React.ReactNode;
@@ -39,7 +44,7 @@ export interface FormCardProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export const FormCard = React.forwardRef<HTMLDivElement, FormCardProps>(
-  ({ title, description, icon, action, children, className, contentClassName, columns = 1, ...props }, ref) => {
+  ({ title, description, icon, action, iconWrapperClassName, children, className, contentClassName, columns = 1, ...props }, ref) => {
     return (
       <div 
         ref={ref}
@@ -57,7 +62,7 @@ export const FormCard = React.forwardRef<HTMLDivElement, FormCardProps>(
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5 lg:mb-6 group-data-[layout=drawer]/form:!mb-2 group-data-[layout=dialog]/form:!mb-2 group-data-[layout=default]/form:!mb-2">
             <div className="flex items-start gap-3.5">
               {icon && (
-                <div className="w-9 h-9 rounded-xl bg-danger/10 text-danger flex items-center justify-center shrink-0">
+                <div className={cn("w-9 h-9 rounded-xl flex items-center justify-center shrink-0", iconWrapperClassName || "bg-danger/10 text-danger")}>
                   {icon}
                 </div>
               )}

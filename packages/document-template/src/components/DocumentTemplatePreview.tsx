@@ -19,6 +19,9 @@ export interface DocumentTemplatePreviewProps {
   orientation?: 'portrait' | 'landscape';
   /** Margin for the print layout */
   margin?: string;
+  /** Fallback title if template has no name */
+  titleFallback?: string;
+  labels?: Record<string, string>;
 }
 
 export function DocumentTemplatePreview({
@@ -28,11 +31,15 @@ export function DocumentTemplatePreview({
   data,
   paperSize = 'auto',
   orientation = 'portrait',
-  margin = '15mm'
+  margin = '15mm',
+  titleFallback = 'Dokumen',
+  labels = {}
 }: DocumentTemplatePreviewProps) {
   const [renderedHtml, setRenderedHtml] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const t = (key: string, fallback: string) => labels[key] || fallback;
 
   useEffect(() => {
     if (!open || !template?.contentHtml) {
@@ -55,7 +62,7 @@ export function DocumentTemplatePreview({
         }
       } catch (err: any) {
         if (isMounted) {
-          setError(err.message || 'Gagal merender dokumen.');
+          setError(err.message || t('errRender', 'Gagal merender dokumen.'));
           setRenderedHtml(null);
         }
       } finally {
@@ -79,7 +86,7 @@ export function DocumentTemplatePreview({
           <div className="flex items-start">
             <AlertCircle className="w-5 h-5 mr-3 mt-0.5" />
             <div>
-              <h3 className="font-semibold text-red-800">Error Merender Dokumen</h3>
+              <h3 className="font-semibold text-red-800">{t('errRenderTitle', 'Error Merender Dokumen')}</h3>
               <p className="mt-1 text-sm text-red-700">{error}</p>
             </div>
           </div>
@@ -88,7 +95,7 @@ export function DocumentTemplatePreview({
           onClick={onClose}
           className="mt-6 px-4 py-2 bg-neutral-200 hover:bg-neutral-300 text-neutral-800 rounded-md text-sm font-medium transition-colors"
         >
-          Tutup
+          {t('btnClose', 'Tutup')}
         </button>
       </div>
     );
@@ -98,7 +105,7 @@ export function DocumentTemplatePreview({
     return (
       <div className="fixed inset-0 z-[9999] bg-white flex flex-col items-center justify-center">
         <Spinner className="w-10 h-10 text-blue-600 mb-4" />
-        <p className="text-sm font-medium text-neutral-600">Sedang memproses dokumen...</p>
+        <p className="text-sm font-medium text-neutral-600">{t('lblProcessing', 'Sedang memproses dokumen...')}</p>
       </div>
     );
   }
@@ -191,7 +198,7 @@ export function DocumentTemplatePreview({
       <PrintShell
         open={open}
         onClose={onClose}
-        title={template?.name || 'Dokumen'}
+        title={template?.name || titleFallback}
         paperSize={paperSize}
         orientation={orientation}
         margin={margin}

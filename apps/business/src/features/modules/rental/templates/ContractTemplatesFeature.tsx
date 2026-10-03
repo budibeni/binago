@@ -1,9 +1,11 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { DocumentTemplatePage, DocumentTemplateEditor, DocumentTemplatePreview, type DocumentTemplate } from '@adatrack/document-template';
 import { templateService, DEFAULT_RENTAL_CONTRACT_TEMPLATE } from './api/templateService';
-import { Dialog } from '@adatrack/ui';
+import { FormShell } from '@adatrack/ui';
+import { useBusinessLocale } from '@/components/BusinessShellLayout';
+import { templateTranslations } from './i18n';
 
 const PREVIEW_MOCK_DATA = {
   company: {
@@ -41,14 +43,21 @@ const PREVIEW_MOCK_DATA = {
 };
 
 export function ContractTemplatesFeature() {
+  const locale = useBusinessLocale();
+  const t = templateTranslations[locale as keyof typeof templateTranslations] || templateTranslations.id;
+
   const [templates, setTemplates] = useState<DocumentTemplate[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const [isEditorOpen, setIsEditorOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [previewTemplate, setPreviewTemplate] = useState<DocumentTemplate | null>(null);
   const [editingTemplate, setEditingTemplate] = useState<DocumentTemplate | null>(null);
   const [isCopying, setIsCopying] = useState(false);
+
+  // Ref to trigger save from FormShell footer
+  const editorSaveRef = useRef<(() => Promise<void>) | null>(null);
 
   const fetchTemplates = useCallback(async () => {
     try {
@@ -57,7 +66,7 @@ export function ContractTemplatesFeature() {
       const data = await templateService.getContractTemplates();
       setTemplates(data);
     } catch (err: any) {
-      setError(err.message || 'Gagal memuat template.');
+      setError(err.message || t.errLoad);
     } finally {
       setLoading(false);
     }
@@ -96,6 +105,17 @@ export function ContractTemplatesFeature() {
     setEditingTemplate(null);
   };
 
+  const handleFormShellSave = async () => {
+    if (editorSaveRef.current) {
+      setIsSaving(true);
+      try {
+        await editorSaveRef.current();
+      } finally {
+        setIsSaving(false);
+      }
+    }
+  };
+
   const handlePreview = async (template: DocumentTemplate) => {
     setPreviewTemplate(template);
   };
@@ -115,45 +135,52 @@ export function ContractTemplatesFeature() {
     await fetchTemplates();
   };
 
+  const handleEditorCancel = () => {
+    setIsEditorOpen(false);
+    setEditingTemplate(null);
+  };
+
   return (
     <>
       <DocumentTemplatePage
-        title="Template Kontrak"
-        description="Kelola template dokumen kontrak rental yang digunakan saat pencetakan."
+        title={t.pageTitle}
+        description={t.pageSubtitle}
         templates={templates}
         documentType="RENTAL_CONTRACT"
         isLoading={loading}
-        onUploadClick={handleCreateClick} // Overriding "Upload" behavior with "Create"
+        onUploadClick={handleCreateClick}
         onPreview={handlePreview}
         onActivate={handleActivate}
         onDeactivate={handleDeactivate}
         onDelete={handleDelete}
         onCopy={handleCopyClick}
         onEdit={handleEditClick}
+        labels={t}
       />
 
-      <Dialog 
-        open={isEditorOpen} 
-        onOpenChange={setIsEditorOpen}
-        title="Buat Template Baru"
-        description="Desain template dokumen Anda menggunakan editor di bawah ini."
-        className="max-w-[100vw] w-screen h-screen rounded-none p-4 md:p-6 flex flex-col"
+      <FormShell
+        layout="default"
+        open={isEditorOpen}
+        onOpenChange={(open) => { if (!open) handleEditorCancel(); }}
+        title={editingTemplate && !isCopying ? t.editorTitleEdit : t.editorTitleNew}
+        onCancel={handleEditorCancel}
+        onSave={handleFormShellSave}
+        saveText={isSaving ? t.btnSaving : t.btnSave}
+        cancelText={t.btnCancel}
+        isSubmitting={isSaving}
       >
-        <div className="pt-2 flex-grow flex flex-col overflow-hidden">
-          {isEditorOpen && (
-            <DocumentTemplateEditor
-              documentType="RENTAL_CONTRACT"
-              initialContent={editingTemplate ? editingTemplate.contentHtml : DEFAULT_RENTAL_CONTRACT_TEMPLATE.contentHtml}
-              initialName={editingTemplate ? (isCopying ? `${editingTemplate.name} (Copy)` : editingTemplate.name) : 'Template Baru'}
-              onSave={handleEditorSave}
-              onCancel={() => {
-                setIsEditorOpen(false);
-                setEditingTemplate(null);
-              }}
-            />
-          )}
-        </div>
-      </Dialog>
+        {isEditorOpen && (
+          <DocumentTemplateEditor
+            documentType="RENTAL_CONTRACT"
+            initialContent={editingTemplate ? editingTemplate.contentHtml : DEFAULT_RENTAL_CONTRACT_TEMPLATE.contentHtml}
+            initialName={editingTemplate ? (isCopying ? `${editingTemplate.name} (Copy)` : editingTemplate.name) : t.defaultRentalContract}
+            onSave={handleEditorSave}
+            onSaveRef={editorSaveRef}
+            hideFooter={true}
+            labels={t}
+          />
+        )}
+      </FormShell>
 
       <DocumentTemplatePreview
         open={!!previewTemplate}
@@ -162,6 +189,7 @@ export function ContractTemplatesFeature() {
         }}
         template={previewTemplate}
         data={PREVIEW_MOCK_DATA}
+        titleFallback={t.previewTitle}
       />
     </>
   );

@@ -11,7 +11,6 @@ import { ContractList } from './components/ContractList';
 import { ContractView } from './components/ContractView';
 import { ContractPrintModal } from './components/ContractPrintModal';
 import { ContractCreateFeature } from './ContractCreateFeature';
-import { ContractEditFeature } from './ContractEditFeature';
 import { HandoverFeature } from '../handover/HandoverFeature';
 import { ReturnFeature } from '../returns/ReturnFeature';
 import { cn } from '@adatrack/utils';
@@ -57,7 +56,6 @@ export function ContractsFeature() {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const [isCreateOpen, setIsCreateOpen] = React.useState(false);
-  const [editId, setEditId] = React.useState<string | null>(null);
   const [handoverId, setHandoverId] = React.useState<string | null>(null);
   const [returnId, setReturnId] = React.useState<string | null>(null);
 
@@ -84,12 +82,11 @@ export function ContractsFeature() {
   // Statistics
   const stats = useMemo(() => {
     const total = contracts.length;
-    const draft = contracts.filter((c) => c.status === 'DRAFT').length;
-    const confirmed = contracts.filter((c) => c.status === 'CONFIRMED').length;
+    const issued = contracts.filter((c) => c.status === 'ISSUED').length;
     const active = contracts.filter((c) => c.status === 'ACTIVE').length;
     const completed = contracts.filter((c) => c.status === 'COMPLETED').length;
     const cancelled = contracts.filter((c) => c.status === 'CANCELLED').length;
-    return { total, draft, confirmed, active, completed, cancelled };
+    return { total, issued, active, completed, cancelled };
   }, [contracts]);
 
   const filteredData = useMemo(() => {
@@ -116,25 +113,12 @@ export function ContractsFeature() {
     setIsCreateOpen(true);
   };
 
-  const handleEdit = (c: RentalContract) => {
-    setDrawerOpen(false);
-    setEditId(c.id);
-  };
+
 
   const handlePrint = (c: RentalContract) => {
     setPrintContract(c);
   };
   
-  const handleConfirm = async (c: RentalContract) => {
-    try {
-      await contractService.updateContractStatus(c.id, 'CONFIRMED');
-      alert('Kontrak berhasil dikonfirmasi.');
-      fetchContracts();
-      setDrawerOpen(false);
-    } catch (error: any) {
-      alert(error.message || 'Gagal mengonfirmasi kontrak');
-    }
-  };
 
   const handleCancel = async (c: RentalContract) => {
     try {
@@ -150,11 +134,6 @@ export function ContractsFeature() {
   const handleHandover = (c: RentalContract) => {
     setDrawerOpen(false);
     setHandoverId(c.id);
-  };
-
-  const handleReturn = (c: RentalContract) => {
-    setDrawerOpen(false);
-    setReturnId(c.id);
   };
 
   const dtLabels = useMemo(() => {
@@ -191,8 +170,7 @@ export function ContractsFeature() {
         label: labels.filterStatus || 'Status',
         type: 'pills-single',
         options: [
-          { value: 'DRAFT', label: labels.statusDraft || 'Draft', colorClass: 'bg-neutral-500', activeClass: 'bg-neutral-500/15 border-neutral-500/40 text-neutral-500' },
-          { value: 'CONFIRMED', label: labels.statusConfirmed || 'Dikonfirmasi', colorClass: 'bg-blue-500', activeClass: 'bg-blue-500/15 border-blue-500/40 text-blue-500' },
+          { value: 'ISSUED', label: labels.statusIssued || 'Diterbitkan', colorClass: 'bg-blue-500', activeClass: 'bg-blue-500/15 border-blue-500/40 text-blue-500' },
           { value: 'ACTIVE', label: labels.statusActive || 'Berjalan', colorClass: 'bg-success', activeClass: 'bg-success/15 border-success/40 text-success' },
           { value: 'COMPLETED', label: labels.statusCompleted || 'Selesai', colorClass: 'bg-neutral-500', activeClass: 'bg-neutral-500/15 border-neutral-500/40 text-neutral-500' },
           { value: 'CANCELLED', label: labels.statusCancelled || 'Batal', colorClass: 'bg-danger', activeClass: 'bg-danger/15 border-danger/40 text-danger' },
@@ -228,8 +206,7 @@ export function ContractsFeature() {
       >
         <div className={cn("gap-2.5 p-3", (panelSide === 'top' || panelSide === 'bottom') ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6" : "flex flex-col h-full")}>
           <StatCard label={labels.summaryTotal || 'Total'} value={stats.total} colorClass="bg-foreground" icon={List} />
-          <StatCard label={labels.statusDraft || 'Draft'} value={stats.draft} colorClass="bg-neutral-500" icon={FileText} />
-          <StatCard label={labels.statusConfirmed || 'Dikonfirmasi'} value={stats.confirmed} colorClass="bg-blue-500" icon={CheckCircle2} />
+          <StatCard label={labels.statusIssued || 'Diterbitkan'} value={stats.issued} colorClass="bg-blue-500" icon={FileCheck} />
           <StatCard label={labels.statusActive || 'Berjalan'} value={stats.active} colorClass="bg-success" icon={Activity} />
           <StatCard label={labels.statusCompleted || 'Selesai'} value={stats.completed} colorClass="bg-neutral-500 dark:bg-neutral-400" icon={CheckCircle2} />
           <StatCard label={labels.statusCancelled || 'Batal'} value={stats.cancelled} colorClass="bg-danger" icon={XCircle} />
@@ -256,7 +233,6 @@ export function ContractsFeature() {
             data={filteredData}
             labels={labels}
             onView={handleView}
-            onEdit={handleEdit}
             onPrint={handlePrint}
             onHandover={handleHandover}
             searchValue={search}
@@ -280,12 +256,9 @@ export function ContractsFeature() {
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         labels={labels}
-        onEdit={(c) => { setDrawerOpen(false); handleEdit(c); }}
         onPrint={handlePrint}
-        onConfirm={handleConfirm}
         onCancel={handleCancel}
         onHandover={handleHandover}
-        onReturn={handleReturn}
       />
 
       <ContractPrintModal
@@ -299,18 +272,6 @@ export function ContractsFeature() {
         onOpenChange={setIsCreateOpen}
         onSuccess={() => {
           setIsCreateOpen(false);
-          fetchContracts();
-        }}
-      />
-
-      <ContractEditFeature
-        contractId={editId}
-        open={!!editId}
-        onOpenChange={(open) => {
-          if (!open) setEditId(null);
-        }}
-        onSuccess={() => {
-          setEditId(null);
           fetchContracts();
         }}
       />

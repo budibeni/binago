@@ -19,10 +19,10 @@ Halaman Kontrak Rental (`/rental/contracts`) berfungsi sebagai **pusat pengelola
 3. **Penyusunan Perjanjian Berbasis Template (`templateService`):** Menggunakan template dokumen HTML WYSIWYG yang dikelola di menu Template Kontrak untuk menghasilkan redaksi surat perjanjian yang rapi dan terstandarisasi.
 4. **Pratinjau & Cetak Dokumen Legalitas (`ContractPrintModal`):** Menyediakan fitur cetak langsung ke printer atau ekspor berkas PDF surat perjanjian sewa resmi dengan injeksi otomatis variabel dinamis (data perusahaan, pelanggan, daftar kendaraan, tabel biaya, dan kolom tanda tangan).
 5. **Siklus Status Kontrak (*Contract Lifecycle*):**
-   - **Draf (*DRAFT*):** Kontrak baru dibuat dan menunggu penandatanganan para pihak.
-   - **Aktif (*ACTIVE*):** Kontrak telah ditandatangani, unit kendaraan telah diserahterimakan, dan masa sewa sedang berjalan (armada berstatus `RENTED`).
-   - **Selesai (*COMPLETED*):** Seluruh armada sewa telah dikembalikan dalam kondisi baik dan kontrak ditutup.
-   - **Dihentikan Dini (*TERMINATED*):** Kontrak dihentikan sebelum masa berlaku berakhir karena pembatalan sepihak atau wanprestasi.
+   - **Diterbitkan (*ISSUED*):** Kontrak baru dibuat dari booking dan siap dilanjutkan ke proses serah terima armada.
+   - **Aktif (*ACTIVE*):** Unit kendaraan telah diserahterimakan kepada penyewa, dan masa sewa sedang berjalan (armada berstatus `RENTED`).
+   - **Selesai (*COMPLETED*):** Seluruh armada sewa telah dikembalikan dalam kondisi baik dan kontrak ditutup (selesai melalui BAST Pengembalian).
+   - **Batal (*CANCELLED*):** Kontrak dibatalkan sebelum unit armada diserahterimakan.
 6. **Gerbang Menuju Serah Terima & Pengembalian:** Menjadi induk alur operasional fisik untuk proses Serah Terima Armada (*Handover*) dan Pengembalian Armada (*Return*).
 
 ---
@@ -61,7 +61,7 @@ Halaman Kontrak Rental (`/rental/contracts`) berfungsi sebagai **pusat pengelola
 
 - **`ContractList.tsx`:**
   - Tabel data kontrak berbasis `@adatrack/ui` `DataTable`.
-  - **Kolom Data:** Nomor Kontrak, Nama Pelanggan, Tanggal Mulai, Tanggal Selesai, Jumlah Unit Sewa, Total Nilai Kontrak, Total Deposit, Status Kontrak (Badge DRAFT, ACTIVE, COMPLETED, TERMINATED), dan Menu Aksi.
+  - **Kolom Data:** Nomor Kontrak, Nama Pelanggan, Tanggal Mulai, Tanggal Selesai, Jumlah Unit Sewa, Total Nilai Kontrak, Total Deposit, Status Kontrak (Badge ISSUED, ACTIVE, COMPLETED, CANCELLED), dan Menu Aksi.
 - **`BookingSelectModal.tsx`:**
   - Modal dialog untuk memilih reservasi Booking yang berstatus `CONFIRMED` untuk dijadikan kontrak resmi.
 - **`ContractForm.tsx`:**
@@ -69,7 +69,8 @@ Halaman Kontrak Rental (`/rental/contracts`) berfungsi sebagai **pusat pengelola
 - **`ContractView.tsx`:**
   - Drawer detail lengkap menampilkan ringkasan hukum kontrak, tabel rincian seluruh kendaraan yang disewa, stempel waktu, dan tombol aksi cepat:
     - **Cetak Kontrak:** Membuka modal preview cetak surat perjanjian.
-    - **Serah Terima Unit:** Mengarahkan ke formulir inspeksi serah terima armada.
+    - **Serah Terima Unit:** Mengarahkan ke formulir inspeksi serah terima armada (hanya muncul saat status `ISSUED`).
+    - **Batalkan Kontrak:** Membatalkan kontrak sewa (hanya bisa dilakukan saat status `ISSUED`).
 - **`ContractPrintModal.tsx`:**
   - Modal dialog pratinjau dokumen surat perjanjian sewa resmi dengan rendering HTML TipTap yang disuntikkan data kontrak, siap untuk dicetak langsung (*Ctrl+P / window.print*) atau disimpan sebagai PDF.
 
@@ -78,7 +79,7 @@ Halaman Kontrak Rental (`/rental/contracts`) berfungsi sebagai **pusat pengelola
 ## 4. Model Data Teknis (`Contract` & `ContractItem`)
 
 ```ts
-export type ContractStatus = 'DRAFT' | 'ACTIVE' | 'COMPLETED' | 'TERMINATED';
+export type ContractStatus = 'ISSUED' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
 
 export interface ContractItem {
   id: string;                    // Format: cti-xxx
@@ -129,6 +130,7 @@ export interface Contract {
   - `activateContract(id)`: Mengubah status kontrak menjadi `ACTIVE` saat seluruh unit telah diserahterimakan dan mengubah status unit armada rental menjadi `RENTED`.
   - `completeContract(id)`: Menutup kontrak sewa menjadi `COMPLETED` setelah seluruh unit kembali diperiksa dan mengembalikan armada ke status `READY`.
   - `printContract(id)`: Menghasilkan HTML surat perjanjian yang siap dicetak menggunakan `templateService`.
+  - **Catatan:** Kontrak rental tidak dapat diedit setelah diterbitkan (ISSUED). Jika terdapat kesalahan, pengguna harus membatalkan kontrak tersebut (selama belum serah terima) dan menerbitkan ulang.
 
 ---
 

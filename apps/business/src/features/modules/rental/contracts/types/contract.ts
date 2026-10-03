@@ -3,8 +3,7 @@ import type { RentalVehicle } from '@/features/modules/rental/vehicles/types/ren
 import type { Booking } from '@/features/modules/rental/bookings/types/booking';
 
 export type ContractStatus =
-  | 'DRAFT'
-  | 'CONFIRMED'
+  | 'ISSUED'
   | 'ACTIVE'
   | 'COMPLETED'
   | 'CANCELLED';

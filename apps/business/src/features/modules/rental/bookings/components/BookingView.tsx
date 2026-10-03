@@ -11,9 +11,10 @@ interface BookingViewProps {
   open: boolean;
   onClose: () => void;
   labels: Record<string, any>;
-  onEdit: (booking: Booking) => void;
-  onConfirm: (booking: Booking) => void;
-  onCancel: (booking: Booking) => void;
+  onEdit?: (booking: Booking) => void;
+  onConfirm?: (booking: Booking) => void;
+  onCancel?: (booking: Booking) => void;
+  layout?: 'drawer' | 'dialog' | 'fullscreen';
 }
 
 export function BookingView({
@@ -24,6 +25,7 @@ export function BookingView({
   onEdit,
   onConfirm,
   onCancel,
+  layout = 'drawer',
 }: BookingViewProps) {
   if (!booking) return null;
 
@@ -71,9 +73,10 @@ export function BookingView({
       open={open}
       onOpenChange={(isOpen) => !isOpen && onClose()}
       title="Detail Booking"
-      onEdit={() => onEdit(booking)}
+      layout={layout}
+      onEdit={onEdit ? () => onEdit(booking) : undefined}
       extraFooterActions={
-        (booking.status === 'PENDING' || booking.status === 'CONFIRMED') ? (
+        (booking.status === 'PENDING' || booking.status === 'CONFIRMED') && onCancel ? (
           <Button
             size="sm"
             variant="outline"
@@ -99,7 +102,7 @@ export function BookingView({
         </div>
 
         {/* Quick Actions */}
-        {booking.status === 'PENDING' && (
+        {booking.status === 'PENDING' && onConfirm && (
           <div className="px-4 py-2.5 bg-background flex gap-2 border-b border-border/40">
             <Button 
               variant="outline" 

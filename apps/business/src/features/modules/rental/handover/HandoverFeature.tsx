@@ -37,7 +37,7 @@ export function HandoverFeature({ contractId, open, onOpenChange, onSuccess }: H
           setErrorMsg(labels.errorInvalidContract || 'Kontrak tidak ditemukan.');
           return;
         }
-        if (data.status !== 'CONFIRMED') {
+        if (data.status !== 'ISSUED') {
           setErrorMsg(labels.errorInvalidContract || 'Kontrak ini tidak dapat diproses untuk serah terima.');
           return;
         }

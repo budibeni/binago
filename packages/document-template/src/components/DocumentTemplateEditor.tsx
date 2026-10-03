@@ -33,6 +33,11 @@ export interface DocumentTemplateEditorProps {
   onSave: (name: string, contentHtml: string) => Promise<void>;
   onCancel?: () => void;
   documentType: string;
+  labels?: Record<string, string>;
+  /** Hide the internal footer (Cancel + Save buttons). Use when embedding in a FormShell. */
+  hideFooter?: boolean;
+  /** Ref that exposes the save handler to the parent. */
+  onSaveRef?: React.MutableRefObject<(() => Promise<void>) | null>;
 }
 
 const MenuBar = ({ editor }: { editor: any }) => {
@@ -41,7 +46,7 @@ const MenuBar = ({ editor }: { editor: any }) => {
   }
 
   return (
-    <div className="flex flex-wrap gap-2 p-2 border-b border-neutral-200 bg-neutral-50 rounded-t-md items-center">
+    <div className="flex flex-wrap gap-2 p-2 border-b border-border bg-neutral-50 dark:bg-neutral-900 rounded-t-md items-center">
       <Button
         type="button"
         variant="ghost"
@@ -62,8 +67,7 @@ const MenuBar = ({ editor }: { editor: any }) => {
       >
         <Redo className="w-4 h-4" />
       </Button>
-
-      <div className="w-px h-6 bg-neutral-300 mx-1" />
+      <div className="w-px h-6 bg-border mx-1" />
 
       <Button
         type="button"
@@ -105,8 +109,7 @@ const MenuBar = ({ editor }: { editor: any }) => {
       >
         <Strikethrough className="w-4 h-4" />
       </Button>
-
-      <div className="w-px h-6 bg-neutral-300 mx-1" />
+      <div className="w-px h-6 bg-border mx-1" />
 
       <Button
         type="button"
@@ -138,8 +141,7 @@ const MenuBar = ({ editor }: { editor: any }) => {
       >
         <Heading3 className="w-4 h-4" />
       </Button>
-
-      <div className="w-px h-6 bg-neutral-300 mx-1" />
+      <div className="w-px h-6 bg-border mx-1" />
 
       <Button
         type="button"
@@ -171,8 +173,7 @@ const MenuBar = ({ editor }: { editor: any }) => {
       >
         <AlignRight className="w-4 h-4" />
       </Button>
-
-      <div className="w-px h-6 bg-neutral-300 mx-1" />
+      <div className="w-px h-6 bg-border mx-1" />
 
       <Button
         type="button"
@@ -271,11 +272,42 @@ export function DocumentTemplateEditor({
   initialName = '',
   onSave,
   onCancel,
-  documentType
+  documentType,
+  labels = {},
+  hideFooter = false,
+  onSaveRef,
 }: DocumentTemplateEditorProps) {
   const [name, setName] = useState(initialName);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const t = (key: string, fallback: string) => labels[key] || fallback;
+
+  // Expose the save handler to the parent via ref
+  const handleSave = async () => {
+    if (!name.trim()) {
+      setError(t('errNameRequired', 'Nama template tidak boleh kosong.'));
+      return;
+    }
+    if (!editor) return;
+
+    try {
+      setIsSaving(true);
+      setError(null);
+      const htmlContent = editor.getHTML();
+      await onSave(name.trim(), htmlContent);
+    } catch (err: any) {
+      setError(err.message || t('errSave', 'Gagal menyimpan template.'));
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  React.useEffect(() => {
+    if (onSaveRef) {
+      onSaveRef.current = handleSave;
+    }
+  });
 
   const editor = useEditor({
     extensions: [
@@ -299,52 +331,33 @@ export function DocumentTemplateEditor({
     },
   });
 
-  const handleSave = async () => {
-    if (!name.trim()) {
-      setError('Nama template tidak boleh kosong.');
-      return;
-    }
-    if (!editor) return;
-
-    try {
-      setIsSaving(true);
-      setError(null);
-      const htmlContent = editor.getHTML();
-      await onSave(name.trim(), htmlContent);
-    } catch (err: any) {
-      setError(err.message || 'Gagal menyimpan template.');
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
   return (
     <div className="w-full h-full flex flex-col gap-2 overflow-hidden">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 bg-white p-3 rounded-lg border border-neutral-200 shadow-sm shrink-0">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 bg-background p-3 rounded-lg border border-border shadow-sm shrink-0">
         <div>
-          <label htmlFor="template-name" className="block text-sm font-semibold text-neutral-700 mb-1">
-            Nama Template <span className="text-red-500">*</span>
+          <label htmlFor="template-name" className="block text-sm font-semibold text-foreground mb-1">
+            {t('lblTemplateName', 'Nama Template')} <span className="text-red-500">*</span>
           </label>
           <input
             id="template-name"
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full text-sm border border-neutral-300 rounded-md px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Contoh: Kontrak Rental PT ABC"
+            className="w-full text-sm border border-input rounded-md px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary bg-background text-foreground"
+            placeholder={t('phTemplateName', 'Contoh: Kontrak Rental PT ABC')}
             disabled={isSaving}
             required
           />
         </div>
         <div>
-          <label className="block text-sm font-semibold text-neutral-700 mb-1">
-            Tipe Dokumen
+          <label className="block text-sm font-semibold text-foreground mb-1">
+            {t('lblDocType', 'Tipe Dokumen')}
           </label>
           <input
             type="text"
             value={documentType}
             disabled
-            className="w-full text-sm border border-neutral-300 rounded-md px-2 py-1.5 bg-neutral-100 text-neutral-500 cursor-not-allowed"
+            className="w-full text-sm border border-input rounded-md px-2 py-1.5 bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 cursor-not-allowed"
           />
         </div>
       </div>
@@ -355,11 +368,11 @@ export function DocumentTemplateEditor({
         </Alert>
       )}
 
-      <div className="flex flex-col flex-grow shadow-sm overflow-hidden border border-neutral-200 rounded-lg">
+      <div className="flex flex-col flex-grow shadow-sm overflow-hidden border border-border rounded-lg">
         <div className="shrink-0">
           <MenuBar editor={editor} />
         </div>
-        <div className="editor-container overflow-y-auto flex-grow bg-neutral-100 p-3 relative">
+        <div className="editor-container overflow-y-auto flex-grow bg-neutral-100 dark:bg-neutral-800 p-3 relative">
             <style dangerouslySetInnerHTML={{ __html: `
               .document-template-content, .tiptap, .ProseMirror {
                 font-family: "Times New Roman", Times, serif;
@@ -397,21 +410,23 @@ export function DocumentTemplateEditor({
         </div>
       </div>
 
-      <div className="flex items-center justify-end gap-3 mt-2 pt-2 border-t border-neutral-200 shrink-0">
-        {onCancel && (
-          <Button type="button" variant="outline" onClick={onCancel} disabled={isSaving}>
-            Batal
+      {!hideFooter && (
+        <div className="flex items-center justify-end gap-3 mt-2 pt-2 border-t border-border shrink-0">
+          {onCancel && (
+            <Button type="button" variant="outline" onClick={onCancel} disabled={isSaving}>
+              {t('btnCancel', 'Batal')}
+            </Button>
+          )}
+          <Button 
+            onClick={handleSave} 
+            disabled={!name.trim() || isSaving}
+            loading={isSaving}
+          >
+            <Save className="w-4 h-4 mr-2" />
+            {isSaving ? t('btnSaving', 'Menyimpan...') : t('btnSave', 'Simpan Template')}
           </Button>
-        )}
-        <Button 
-          onClick={handleSave} 
-          disabled={!name.trim() || isSaving}
-          loading={isSaving}
-        >
-          <Save className="w-4 h-4 mr-2" />
-          {isSaving ? 'Menyimpan...' : 'Simpan Template'}
-        </Button>
-      </div>
+        </div>
+      )}
     </div>
   );
 }

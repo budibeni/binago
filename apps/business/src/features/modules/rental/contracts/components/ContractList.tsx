@@ -14,7 +14,6 @@ interface ContractListProps {
   data: RentalContract[];
   labels: Record<string, string>;
   onView: (c: RentalContract) => void;
-  onEdit?: (c: RentalContract) => void;
   onPrint?: (c: RentalContract) => void;
   onHandover?: (c: RentalContract) => void;
   searchValue: string;
@@ -31,8 +30,7 @@ interface ContractListProps {
 
 const getStatusLabel = (status: ContractStatus, labels: Record<string, string>) => {
   switch (status) {
-    case 'DRAFT':     return labels.statusDraft || 'Draft';
-    case 'CONFIRMED': return labels.statusConfirmed || 'Dikonfirmasi';
+    case 'ISSUED': return labels.statusIssued || 'Diterbitkan';
     case 'ACTIVE':    return labels.statusActive || 'Berjalan';
     case 'COMPLETED': return labels.statusCompleted || 'Selesai';
     case 'CANCELLED': return labels.statusCancelled || 'Dibatalkan';
@@ -52,7 +50,6 @@ const formatShortDate = (dateStr: string) => {
 function buildColumns(
   labels: Record<string, string>,
   onView: (c: RentalContract) => void,
-  onEdit: ((c: RentalContract) => void) | undefined,
   onPrint: ((c: RentalContract) => void) | undefined,
   onHandover: ((c: RentalContract) => void) | undefined,
 ): DataTableColumnDef<RentalContract>[] {
@@ -141,8 +138,7 @@ function buildColumns(
         const label = getStatusLabel(s, labels);
         const textClass = 
           s === 'ACTIVE' ? 'text-success' :
-          s === 'DRAFT' ? 'text-neutral-500' :
-          s === 'CONFIRMED' ? 'text-blue-500' :
+          s === 'ISSUED' ? 'text-blue-500' :
           s === 'COMPLETED' ? 'text-neutral-500 dark:text-neutral-400' :
           s === 'CANCELLED' ? 'text-danger' :
           'text-neutral-500 dark:text-neutral-400';
@@ -163,7 +159,6 @@ export function ContractList({
   data,
   labels,
   onView,
-  onEdit,
   onPrint,
   onHandover,
   searchValue,
@@ -178,8 +173,8 @@ export function ContractList({
   dtLabels
 }: ContractListProps) {
   const columns = React.useMemo(
-    () => buildColumns(labels, onView, onEdit, onPrint, onHandover),
-    [labels, onView, onEdit, onPrint, onHandover],
+    () => buildColumns(labels, onView, onPrint, onHandover),
+    [labels, onView, onPrint, onHandover],
   );
 
   return (

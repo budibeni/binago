@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { getTranslation } from '@/i18n';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
+import { getContractDictionary } from './i18n';
 import { ChevronLeft } from 'lucide-react';
 
 import { ContractForm } from './components/ContractForm';
@@ -20,8 +20,7 @@ interface ContractEditFeatureProps {
 export function ContractEditFeature({ contractId, open, onOpenChange, onSuccess }: ContractEditFeatureProps) {
   const router = useRouter();
   const locale = useBusinessLocale();
-  const t = getTranslation(locale);
-  const labels = (t as any).rentalContractFeature || {};
+  const labels = getContractDictionary(locale);
 
   const [contract, setContract] = React.useState<RentalContract | null>(null);
   const [loading, setLoading] = React.useState(true);
@@ -40,8 +39,8 @@ export function ContractEditFeature({ contractId, open, onOpenChange, onSuccess 
           onOpenChange(false);
           return;
         }
-        if (data.status !== 'DRAFT') {
-          alert('Hanya kontrak berstatus DRAFT yang dapat diedit');
+        if (data.status !== 'ISSUED') {
+          alert('Hanya kontrak berstatus DITERBITKAN yang dapat diedit');
           onOpenChange(false);
           return;
         }

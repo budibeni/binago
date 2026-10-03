@@ -22,6 +22,7 @@ export interface DocumentTemplatePageProps {
   onDelete: (template: DocumentTemplate) => Promise<void>;
   onCopy?: (template: DocumentTemplate) => void;
   onEdit?: (template: DocumentTemplate) => void;
+  labels?: Record<string, string>;
 }
 
 export function DocumentTemplatePage({
@@ -36,25 +37,28 @@ export function DocumentTemplatePage({
   onDeactivate,
   onDelete,
   onCopy,
-  onEdit
+  onEdit,
+  labels = {}
 }: DocumentTemplatePageProps) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [templateToDelete, setTemplateToDelete] = useState<DocumentTemplate | null>(null);
   const [search, setSearch] = useState('');
 
+  const t = (key: string, fallback: string) => labels[key] || fallback;
+
   const columns = useMemo<DataTableColumnDef<DocumentTemplate>[]>(
     () => [
       {
         id: 'name',
-        header: 'Nama Template',
+        header: t('colName', 'Nama Template'),
         accessorKey: 'name',
         cell: ({ row }) => (
           <div className="flex items-center gap-2">
-            <FileText className="w-4 h-4 text-neutral-400" />
-            <span className="font-semibold text-neutral-800">{row.original.name}</span>
+            <FileText className="w-4 h-4 text-neutral-400 dark:text-neutral-500" />
+            <span className="font-semibold text-foreground">{row.original.name}</span>
             {row.original.isDefault && (
-              <Badge variant="default" className="text-xs ml-2 bg-neutral-100">
-                Default
+              <Badge variant="default" className="text-xs ml-2 bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200">
+                {t('badgeDefault', 'Default')}
               </Badge>
             )}
           </div>
@@ -62,43 +66,43 @@ export function DocumentTemplatePage({
       },
       {
         id: 'sourceType',
-        header: 'Sumber',
+        header: t('colSource', 'Sumber'),
         accessorKey: 'sourceType',
         cell: ({ row }) => (
           <Badge variant={row.original.sourceType === 'SYSTEM' ? 'info' : 'default'}>
-            {row.original.sourceType === 'SYSTEM' ? 'Sistem' : 'Kustom'}
+            {row.original.sourceType === 'SYSTEM' ? t('sourceSystem', 'Sistem') : t('sourceCustom', 'Kustom')}
           </Badge>
         ),
       },
       {
         id: 'status',
-        header: 'Status',
+        header: t('colStatus', 'Status'),
         accessorKey: 'status',
         cell: ({ row }) => (
           <Badge 
             variant={row.original.status === 'ACTIVE' ? 'success' : 'default'}
-            className={row.original.status === 'INACTIVE' ? 'bg-neutral-200 text-neutral-700 border-none' : ''}
+            className={row.original.status === 'INACTIVE' ? 'bg-neutral-200 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border-none' : ''}
           >
-            {row.original.status === 'ACTIVE' ? 'Aktif' : 'Nonaktif'}
+            {row.original.status === 'ACTIVE' ? t('statusActive', 'Aktif') : t('statusInactive', 'Nonaktif')}
           </Badge>
         ),
       },
       {
         id: 'updatedAt',
-        header: 'Diperbarui',
+        header: t('colUpdatedAt', 'Diperbarui'),
         accessorKey: 'updatedAt',
         cell: ({ row }) => {
           const date = new Date(row.original.updatedAt);
           return (
-            <span className="text-sm text-neutral-600">
-              {date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+            <span className="text-sm text-neutral-600 dark:text-neutral-400">
+              {date.toLocaleDateString(t('locale', 'id-ID'), { day: 'numeric', month: 'short', year: 'numeric' })}
             </span>
           );
         },
       },
       {
         id: 'actions',
-        header: 'Aksi',
+        header: t('colActions', 'Aksi'),
         cell: ({ row }) => {
           const template = row.original;
           return (
@@ -107,7 +111,7 @@ export function DocumentTemplatePage({
                 variant="ghost"
                 size="sm"
                 onClick={() => onPreview(template)}
-                title="Pratinjau Template"
+                title={t('btnPreview', 'Pratinjau Template')}
               >
                 <Eye className="w-4 h-4" />
               </Button>
@@ -117,7 +121,7 @@ export function DocumentTemplatePage({
                   variant="ghost"
                   size="sm"
                   onClick={() => onCopy(template)}
-                  title="Duplikat Template"
+                  title={t('btnDuplicate', 'Duplikat Template')}
                 >
                   <Copy className="w-4 h-4" />
                 </Button>
@@ -127,9 +131,9 @@ export function DocumentTemplatePage({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                  className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/30"
                   onClick={() => onEdit(template)}
-                  title="Edit Template"
+                  title={t('btnEdit', 'Edit Template')}
                 >
                   <Edit className="w-4 h-4" />
                 </Button>
@@ -139,17 +143,17 @@ export function DocumentTemplatePage({
                 <Button
                   variant="outline"
                   size="sm"
-                  className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                  className="text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 hover:bg-green-50 dark:hover:bg-green-900/30"
                   onClick={async () => {
                     setIsProcessing(true);
                     await onActivate(template);
                     setIsProcessing(false);
                   }}
                   disabled={isProcessing}
-                  title="Aktifkan Template"
+                  title={t('btnActivate', 'Aktifkan Template')}
                 >
                   <CheckCircle className="w-4 h-4 mr-1" />
-                  Aktifkan
+                  {t('lblActivate', 'Aktifkan')}
                 </Button>
               ) : (
                 // Only allow deactivation if it's not the default system template
@@ -158,17 +162,17 @@ export function DocumentTemplatePage({
                   <Button
                     variant="outline"
                     size="sm"
-                    className="text-orange-600 hover:text-orange-700 hover:bg-orange-50"
+                    className="text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 hover:bg-orange-50 dark:hover:bg-orange-900/30"
                     onClick={async () => {
                       setIsProcessing(true);
                       await onDeactivate(template);
                       setIsProcessing(false);
                     }}
                     disabled={isProcessing}
-                    title="Nonaktifkan Template"
+                    title={t('btnDeactivate', 'Nonaktifkan Template')}
                   >
                     <XCircle className="w-4 h-4 mr-1" />
-                    Nonaktifkan
+                    {t('lblDeactivate', 'Nonaktifkan')}
                   </Button>
                 )
               )}
@@ -177,10 +181,10 @@ export function DocumentTemplatePage({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                  className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/30"
                   onClick={() => setTemplateToDelete(template)}
                   disabled={isProcessing}
-                  title="Hapus Template"
+                  title={t('btnDelete', 'Hapus Template')}
                 >
                   <Trash2 className="w-4 h-4" />
                 </Button>
@@ -190,7 +194,7 @@ export function DocumentTemplatePage({
         },
       },
     ],
-    [onPreview, onActivate, onDeactivate, isProcessing]
+    [onPreview, onActivate, onDeactivate, isProcessing, labels]
   );
 
   return (
@@ -207,13 +211,13 @@ export function DocumentTemplatePage({
           columnVisibility
           searchValue={search}
           onSearchChange={setSearch}
-          searchPlaceholder="Cari template..."
-          emptyTitle="Tidak Ada Template"
-          emptyDescription="Belum ada template dokumen yang tersedia."
+          searchPlaceholder={t('searchPlaceholder', 'Cari template...')}
+          emptyTitle={t('emptyTitle', 'Tidak Ada Template')}
+          emptyDescription={t('emptyDesc', 'Belum ada template dokumen yang tersedia.')}
           toolbarActions={
             <Button variant="destructive" onClick={onUploadClick} className="h-8 gap-1.5 text-[12px] font-medium shadow-none">
               <FileText className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline-block">Buat Template Baru</span>
+              <span className="hidden sm:inline-block">{t('btnCreate', 'Buat Template Baru')}</span>
             </Button>
           }
         />
@@ -223,12 +227,12 @@ export function DocumentTemplatePage({
       <Dialog 
         open={!!templateToDelete} 
         onOpenChange={(open) => !open && setTemplateToDelete(null)}
-        title="Hapus Template?"
-        description={`Apakah Anda yakin ingin menghapus template ${templateToDelete?.name}? Tindakan ini tidak dapat dibatalkan.`}
+        title={t('confirmDeleteTitle', 'Hapus Template?')}
+        description={t('confirmDeleteDesc', `Apakah Anda yakin ingin menghapus template ${templateToDelete?.name}? Tindakan ini tidak dapat dibatalkan.`)}
       >
         <div className="flex justify-end gap-3 mt-4">
           <Button variant="outline" onClick={() => setTemplateToDelete(null)} disabled={isProcessing}>
-            Batal
+            {t('btnCancel', 'Batal')}
           </Button>
           <Button
             className="bg-red-600 hover:bg-red-700 text-white"
@@ -243,7 +247,7 @@ export function DocumentTemplatePage({
             disabled={isProcessing}
             loading={isProcessing}
           >
-            Ya, Hapus
+            {t('btnConfirmDelete', 'Ya, Hapus')}
           </Button>
         </div>
       </Dialog>

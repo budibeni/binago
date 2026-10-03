@@ -51,7 +51,7 @@ export const handoverService = {
 
   getEligibleContracts: async (): Promise<RentalContract[]> => {
     const allContracts = await contractService.getContracts();
-    const confirmedContracts = allContracts.filter(c => c.status === 'CONFIRMED' || c.status === 'ACTIVE');
+    const confirmedContracts = allContracts.filter(c => c.status === 'ISSUED' || c.status === 'ACTIVE');
     
     const eligibleContracts: RentalContract[] = [];
     for (const contract of confirmedContracts) {
@@ -86,8 +86,8 @@ export const handoverService = {
     if (!contract) {
       throw new Error('Kontrak tidak ditemukan.');
     }
-    if (contract.status !== 'CONFIRMED' && contract.status !== 'ACTIVE') {
-      throw new Error('Serah terima hanya dapat dilakukan pada kontrak berstatus CONFIRMED atau ACTIVE.');
+    if (contract.status !== 'ISSUED' && contract.status !== 'ACTIVE') {
+      throw new Error('Serah terima hanya dapat dilakukan pada kontrak berstatus ISSUED atau ACTIVE.');
     }
 
     // 3. Validasi Lokasi
@@ -110,8 +110,8 @@ export const handoverService = {
     // 5. Simpan Handover (Snapshot)
     const newHandover = await handoverRepository.createHandover(data);
 
-    // 6. Update Contract Status -> ACTIVE (jika masih CONFIRMED)
-    if (contract.status === 'CONFIRMED') {
+    // 6. Update Contract Status -> ACTIVE (jika masih ISSUED)
+    if (contract.status === 'ISSUED') {
       await contractService.updateContractStatus(contract.id, 'ACTIVE');
     }
 

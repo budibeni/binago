@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { getTranslation } from '@/i18n';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
+import { getContractDictionary } from './i18n';
 import { ChevronLeft } from 'lucide-react';
 
 import { ContractForm } from './components/ContractForm';
@@ -20,8 +20,7 @@ interface ContractCreateFeatureProps {
 export function ContractCreateFeature({ open, onOpenChange, onSuccess }: ContractCreateFeatureProps) {
   const router = useRouter();
   const locale = useBusinessLocale();
-  const t = getTranslation(locale);
-  const labels = (t as any).rentalContractFeature || {};
+  const labels = getContractDictionary(locale);
 
   const [availableBookings, setAvailableBookings] = React.useState<Booking[]>([]);
   const [loading, setLoading] = React.useState(true);
@@ -47,7 +46,7 @@ export function ContractCreateFeature({ open, onOpenChange, onSuccess }: Contrac
     setIsSubmitting(true);
     try {
       await contractService.createContract(data as any);
-      alert('Kontrak rental berhasil dibuat dengan status Draft.');
+      alert('Kontrak rental berhasil diterbitkan.');
       onSuccess();
     } catch (error: any) {
       alert(error.message || 'Terjadi kesalahan saat membuat kontrak.');

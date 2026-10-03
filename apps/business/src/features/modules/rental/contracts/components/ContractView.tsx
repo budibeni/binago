@@ -9,9 +9,7 @@ interface ContractDetailDrawerProps {
   open: boolean;
   onClose: () => void;
   labels: Record<string, string>;
-  onEdit?: (c: RentalContract) => void;
   onPrint?: (c: RentalContract) => void;
-  onConfirm?: (c: RentalContract) => void;
   onCancel?: (c: RentalContract) => void;
   onHandover?: (c: RentalContract) => void;
   onReturn?: (c: RentalContract) => void;
@@ -22,9 +20,7 @@ export function ContractView({
   open,
   onClose,
   labels,
-  onEdit,
   onPrint,
-  onConfirm,
   onCancel,
   onHandover,
   onReturn,
@@ -48,8 +44,7 @@ export function ContractView({
     let label = labels[`status${s.charAt(0).toUpperCase() + s.slice(1).toLowerCase()}`] || s;
     let colorClass = 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300';
     
-    if (s === 'DRAFT') colorClass = 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300';
-    else if (s === 'CONFIRMED') colorClass = 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400';
+    if (s === 'ISSUED') colorClass = 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400';
     else if (s === 'ACTIVE') colorClass = 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400';
     else if (s === 'CANCELLED') colorClass = 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400';
     else if (s === 'COMPLETED') colorClass = 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300';
@@ -75,19 +70,20 @@ export function ContractView({
       open={open}
       onOpenChange={(isOpen) => !isOpen && onClose()}
       title="Detail Kontrak Rental"
-      onEdit={contract.status === 'DRAFT' && onEdit ? () => onEdit(contract) : undefined}
+      leftFooterActions={
+        contract.status === 'ISSUED' && onCancel && (
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => onCancel(contract)}
+            className="h-7 text-xs px-3 text-danger border-danger/30 hover:bg-danger/10 hover:text-danger"
+          >
+            Batalkan Kontrak
+          </Button>
+        )
+      }
       extraFooterActions={
         <div className="flex items-center gap-2">
-          {contract.status === 'DRAFT' && onCancel && (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => onCancel(contract)}
-              className="h-7 text-xs px-3 text-danger border-danger/30 hover:bg-danger/10 hover:text-danger"
-            >
-              Batalkan Kontrak
-            </Button>
-          )}
           {onPrint && (
             <Button
               size="sm"
@@ -116,21 +112,7 @@ export function ContractView({
         </div>
 
         {/* Quick Actions */}
-        {contract.status === 'DRAFT' && onConfirm && (
-          <div className="px-4 py-2.5 bg-background flex gap-2 border-b border-border/40">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="flex-1 h-8 text-[11px] font-semibold hover:bg-success/5 hover:text-success hover:border-success/30 transition-all"
-              onClick={() => onConfirm(contract)}
-              leftIcon={<CheckCircle2 className="w-3.5 h-3.5" />}
-            >
-              Konfirmasi Kontrak
-            </Button>
-          </div>
-        )}
-        
-        {contract.status === 'CONFIRMED' && onHandover && (
+        {contract.status === 'ISSUED' && onHandover && (
           <div className="px-4 py-2.5 bg-background flex gap-2 border-b border-border/40">
             <Button 
               variant="outline" 
@@ -144,19 +126,7 @@ export function ContractView({
           </div>
         )}
 
-        {contract.status === 'ACTIVE' && onReturn && (
-          <div className="px-4 py-2.5 bg-background flex gap-2 border-b border-border/40">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="flex-1 h-8 text-[11px] font-semibold hover:bg-amber-600/5 hover:text-amber-600 hover:border-amber-600/30 transition-all"
-              onClick={() => onReturn(contract)}
-              leftIcon={<FileCheck className="w-3.5 h-3.5" />}
-            >
-              Pengembalian Kendaraan
-            </Button>
-          </div>
-        )}
+
 
         {/* Konten Utama */}
         <div className="p-4 flex flex-col gap-4">

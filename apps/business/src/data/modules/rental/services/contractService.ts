@@ -95,7 +95,7 @@ export const contractService = {
       driverFee: booking.driverFee,
       notes: data.notes || '-',
       terms: data.terms || '',
-      status: 'DRAFT', // Always start as DRAFT
+      status: 'ISSUED', // Starts directly as ISSUED
     });
     
     return populateRelations(newContract);
@@ -106,16 +106,16 @@ export const contractService = {
     if (!contract) throw new Error('Contract not found');
     
     // Business rule validations
-    if (status === 'CONFIRMED' && contract.status !== 'DRAFT') {
-      throw new Error('Hanya kontrak DRAFT yang dapat dikonfirmasi');
-    }
-    
-    if (status === 'ACTIVE' && contract.status !== 'CONFIRMED') {
-      throw new Error('Hanya kontrak CONFIRMED yang dapat diaktifkan (via Serah Terima)');
+    if (status === 'ACTIVE' && contract.status !== 'ISSUED') {
+      throw new Error('Hanya kontrak DITERBITKAN yang dapat diaktifkan (via Serah Terima)');
     }
     
     if (status === 'COMPLETED' && contract.status !== 'ACTIVE') {
       throw new Error('Hanya kontrak ACTIVE yang dapat diselesaikan (via Pengembalian)');
+    }
+    
+    if (status === 'CANCELLED' && contract.status !== 'ISSUED') {
+      throw new Error('Kontrak hanya dapat dibatalkan jika belum diserahterimakan');
     }
     
     // Transition
@@ -126,9 +126,8 @@ export const contractService = {
   updateContract: async (id: string, data: Partial<RentalContract>): Promise<RentalContract> => {
     const contract = await contractRepository.getContractById(id);
     if (!contract) throw new Error('Contract not found');
-
-    if (contract.status !== 'DRAFT') {
-      throw new Error('Hanya kontrak berstatus DRAFT yang dapat diedit');
+    if (contract.status !== 'ISSUED') {
+      throw new Error('Hanya kontrak berstatus DITERBITKAN yang dapat diedit');
     }
 
     // Protect certain fields from being overridden directly from UI

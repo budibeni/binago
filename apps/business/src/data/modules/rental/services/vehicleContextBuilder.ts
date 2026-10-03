@@ -26,7 +26,7 @@ export async function buildRentalVehicleContext(coreVehicleId: string, locale: L
       const allContracts = await contractService.getContracts();
       const activeContract = allContracts.find(c => 
         c.booking?.items?.some(item => item.vehicleId === coreVehicleId) && 
-        (c.status === 'ACTIVE' || c.status === 'CONFIRMED')
+        (c.status === 'ACTIVE' || c.status === 'ISSUED')
       );
 
       if (activeContract) {
