@@ -27,6 +27,28 @@ export const mockBookings: Booking[] = [
         "rateType": "DAILY",
         "rateSnapshot": 400000,
         "subtotal": 2000000
+      },
+      {
+        "id": "res-001-item-2",
+        "bookingId": "res-001",
+        "vehicleId": "veh-004",
+        "startDate": "2026-08-23T12:00:00.000Z",
+        "endDate": "2026-08-28T12:00:00.000Z",
+        "duration": 5,
+        "rateType": "DAILY",
+        "rateSnapshot": 400000,
+        "subtotal": 2000000
+      },
+      {
+        "id": "res-001-item-3",
+        "bookingId": "res-001",
+        "vehicleId": "veh-005",
+        "startDate": "2026-08-23T12:00:00.000Z",
+        "endDate": "2026-08-28T12:00:00.000Z",
+        "duration": 5,
+        "rateType": "DAILY",
+        "rateSnapshot": 400000,
+        "subtotal": 2000000
       }
     ]
   },

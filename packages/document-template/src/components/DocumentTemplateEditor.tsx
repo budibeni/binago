@@ -326,7 +326,7 @@ export function DocumentTemplateEditor({
     content: initialContent || '<p>Ketik dokumen Anda di sini...</p>',
     editorProps: {
       attributes: {
-        className: 'document-template-content focus:outline-none min-h-[400px] p-6 bg-white rounded-b-md border-x border-b border-neutral-200',
+        className: 'document-template-content focus:outline-none min-h-[600px] p-8 bg-white text-black',
       },
     },
   });
@@ -372,11 +372,12 @@ export function DocumentTemplateEditor({
         <div className="shrink-0">
           <MenuBar editor={editor} />
         </div>
-        <div className="editor-container overflow-y-auto flex-grow bg-neutral-100 dark:bg-neutral-800 p-3 relative">
+        <div className="editor-container overflow-y-auto flex-grow bg-white p-4 relative">
             <style dangerouslySetInnerHTML={{ __html: `
               .document-template-content, .tiptap, .ProseMirror {
                 font-family: "Times New Roman", Times, serif;
                 color: #000;
+                background-color: #fff;
                 line-height: 1.3;
                 font-size: 12pt;
               }
@@ -405,8 +406,16 @@ export function DocumentTemplateEditor({
               .tiptap table td, .tiptap table th { position: relative; }
               .tiptap table .column-resize-handle { position: absolute; right: -2px; top: 0; bottom: 0; width: 4px; z-index: 20; background-color: #adf; pointer-events: none; }
               .tiptap.resize-cursor { cursor: ew-resize; cursor: col-resize; }
+
+              /* Paper wrapper */
+              .editor-paper-wrapper .tiptap, .editor-paper-wrapper .ProseMirror {
+                background-color: #ffffff !important;
+                color: #000000 !important;
+              }
             `}} />
-            <EditorContent editor={editor} />
+            <div className="editor-paper-wrapper min-h-full">
+              <EditorContent editor={editor} />
+            </div>
         </div>
       </div>
 

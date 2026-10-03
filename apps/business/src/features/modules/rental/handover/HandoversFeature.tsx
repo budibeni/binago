@@ -1,18 +1,20 @@
 'use client';
 
 import React, { useEffect, useState, useMemo } from 'react';
-import { Key, FileText, ArrowRight, MapPin } from 'lucide-react';
+import { Key, FileText, ArrowRight, MapPin, Search, Check } from 'lucide-react';
 import { getTranslation } from '@/i18n';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
 import { trackingNavigationService } from '@/features/core/tracking/services/trackingNavigationService';
 import { useRouter } from 'next/navigation';
 import { handoverService } from '@/data/modules/rental/services/handoverService';
+import { buildRentalVehicleContext } from '@/data/modules/rental/services/vehicleContextBuilder';
 import type { RentalHandover } from './types/handover';
 import type { RentalContract } from '../contracts/types/contract';
 import { HandoverList } from './components/HandoverList';
 import { HandoverDetailDrawer } from './components/HandoverDetailDrawer';
-import { Button } from '@adatrack/ui';
-import Link from 'next/link';
+import { HandoverFeature } from './HandoverFeature';
+import { Button, PanelShell, DataTableSearch, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@adatrack/ui';
+import { cn } from '@adatrack/utils';
 
 export function HandoversFeature() {
   const router = useRouter();
@@ -22,6 +24,7 @@ export function HandoversFeature() {
   const [eligibleContracts, setEligibleContracts] = useState<RentalContract[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [eligibleSearch, setEligibleSearch] = useState('');
   
   // Filter state
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -30,6 +33,14 @@ export function HandoversFeature() {
   // Drawer & Dialog state
   const [selectedHandover, setSelectedHandover] = useState<RentalHandover | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+
+  // Panel state
+  const [panelSide, setPanelSide] = useState<'top'|'right'|'bottom'|'left'>('left');
+  const [showPanel, setShowPanel] = useState(true);
+
+  // Create Handover Drawer State
+  const [selectedContractId, setSelectedContractId] = useState<string | null>(null);
+  const [isHandoverOpen, setIsHandoverOpen] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -102,6 +113,46 @@ export function HandoversFeature() {
     });
   }, [handovers, search, filterState]);
 
+  const groupedHandovers = useMemo(() => {
+    const groups: Record<string, any> = {};
+    filteredData.forEach(h => {
+      if (!groups[h.contractId]) {
+        groups[h.contractId] = {
+          id: h.contractId,
+          contractId: h.contractId,
+          contract: h.contract,
+          customer: h.customer,
+          handoverAt: h.handoverAt,
+          handoverLatitude: h.handoverLatitude,
+          handoverLongitude: h.handoverLongitude,
+          handoverAddress: h.handoverAddress,
+          items: []
+        };
+      }
+      groups[h.contractId].items.push(h);
+    });
+    return Object.values(groups);
+  }, [filteredData]);
+
+  const filteredEligibleContracts = useMemo(() => {
+    if (!eligibleSearch) return eligibleContracts;
+    const s = eligibleSearch.toLowerCase();
+    return eligibleContracts.filter(c => {
+      if (c.contractNumber?.toLowerCase().includes(s)) return true;
+      if (c.customer?.name?.toLowerCase().includes(s)) return true;
+      if (c.booking?.items?.some(i => 
+        i.vehicle?.coreVehicle?.plateNumber?.toLowerCase().includes(s) ||
+        i.vehicle?.coreVehicle?.brand?.toLowerCase().includes(s) ||
+        i.vehicle?.coreVehicle?.vehicleName?.toLowerCase().includes(s)
+      )) return true;
+      return false;
+    });
+  }, [eligibleContracts, eligibleSearch]);
+
+  const handedOverItemIds = useMemo(() => {
+    return new Set(handovers.map(h => h.bookingItemId));
+  }, [handovers]);
+
   const openDetail = (handover: RentalHandover) => {
     setSelectedHandover(handover);
     setIsDetailOpen(true);
@@ -112,11 +163,168 @@ export function HandoversFeature() {
     setTimeout(() => setSelectedHandover(null), 300);
   };
 
+  const renderPanel = () => {
+    return (
+      <PanelShell
+        title="Siap Serah Terima"
+        side={panelSide}
+        isOpen={showPanel}
+        onClose={() => setShowPanel(false)}
+        onOpen={() => setShowPanel(true)}
+        collapsedTitle="SIAP SERAH TERIMA"
+        onSideChange={setPanelSide}
+        labels={{
+          top: 'Atas',
+          right: 'Kanan',
+          bottom: 'Bawah',
+          left: 'Kiri',
+          hide: 'Sembunyikan',
+          layoutToggleTitle: 'Ubah Posisi Panel',
+        }}
+        className={cn(
+          "shrink-0 bg-white dark:bg-background z-10",
+          (panelSide === 'top' || panelSide === 'bottom') ? "w-full" : "w-80 min-w-80 h-full"
+        )}
+      >
+        <div className={cn(
+          "p-4", 
+          (panelSide === 'top' || panelSide === 'bottom') ? "flex flex-row overflow-x-auto gap-4 items-start" : "flex flex-col gap-4 overflow-y-auto h-full"
+        )}>
+          
+          <div className={cn("shrink-0", (panelSide === 'top' || panelSide === 'bottom') ? "w-64" : "w-full")}>
+            <DataTableSearch
+              value={eligibleSearch}
+              onChange={setEligibleSearch}
+              placeholder="Cari..."
+              className="w-full"
+            />
+          </div>
+
+          {filteredEligibleContracts.length > 0 ? (
+            <>
+              {filteredEligibleContracts.map(contract => {
+                const isSelected = selectedContractId === contract.id && isHandoverOpen;
+                return (
+                <div key={contract.id} className={cn(
+                  "group relative border rounded-xl p-3 transition-all duration-200 flex flex-col justify-between shrink-0",
+                  "border-border bg-white dark:bg-neutral-900 hover:border-primary/40 hover:shadow-sm",
+                  (panelSide === 'top' || panelSide === 'bottom') ? "w-[280px]" : ""
+                )}>
+                  <div>
+                    <div className="flex justify-between items-start gap-2 mb-2.5">
+                      <div className="flex flex-col min-w-0">
+                        <span className="font-semibold text-[12px] text-foreground truncate" title={contract.contractNumber}>{contract.contractNumber}</span>
+                        <span className="text-[11px] text-muted-foreground truncate" title={contract.customer?.name}>{contract.customer?.name}</span>
+                      </div>
+                      <span className="text-[10px] font-medium text-muted-foreground shrink-0 mt-0.5">
+                        {new Date(contract.contractDate).toLocaleDateString(locale === 'id' ? 'id-ID' : 'en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      </span>
+                    </div>
+                    
+                    <div className="flex flex-wrap gap-1.5 mb-2.5 w-full">
+                      {(contract.booking?.items || []).map((item, idx) => {
+                        const isHandedOver = handedOverItemIds.has(item.id);
+                        return (
+                          <TooltipProvider key={item.id || idx}>
+                            <Tooltip delayDuration={200}>
+                              <TooltipTrigger asChild>
+                                <div
+                                  className={cn(
+                                    "flex items-center gap-1 px-1.5 py-0.5 text-[11px] font-semibold rounded border cursor-default transition-all",
+                                    isHandedOver 
+                                      ? "bg-success/10 text-success border-success/20 dark:bg-success/20 dark:border-success/30"
+                                      : "bg-neutral-100 dark:bg-neutral-800 text-muted-foreground border-transparent"
+                                  )}
+                                >
+                                  {isHandedOver && <Check className="w-3 h-3 shrink-0" />}
+                                  {item.vehicle?.coreVehicle?.plateNumber}
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p className="font-semibold">{item.vehicle?.coreVehicle?.brand} {item.vehicle?.coreVehicle?.vehicleName}</p>
+                                {isHandedOver && <p className="text-[10px] text-success font-medium mt-0.5">Sudah Diserahterimakan</p>}
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-2 mt-auto">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-7 w-7 p-0 shrink-0 shadow-none transition-all hover:border-primary/40 hover:text-primary"
+                      title="Lihat Lokasi Kendaraan"
+                      onClick={async () => {
+                        const vehicleIds = (contract.booking?.items || [])
+                          .map(i => i.vehicle?.coreVehicle?.id)
+                          .filter(Boolean) as string[];
+                        
+                        if (vehicleIds.length > 0) {
+                          if (vehicleIds.length === 1) {
+                            const vehicleId = vehicleIds[0];
+                            try {
+                              const ctx = await buildRentalVehicleContext(vehicleId, locale);
+                              if (ctx) {
+                                sessionStorage.setItem(`adatrack_vehicle_context_${locale}_${vehicleId}`, JSON.stringify(ctx));
+                              }
+                            } catch (e) {
+                              console.error('Failed to build context', e);
+                            }
+                            trackingNavigationService.navigateToTracking(router, {
+                              mode: 'live',
+                              vehicleId
+                            });
+                          } else {
+                            trackingNavigationService.navigateToTracking(router, {
+                              mode: 'live',
+                              vehicleIds
+                            });
+                          }
+                        }
+                      }}
+                    >
+                      <MapPin className="w-3.5 h-3.5" />
+                    </Button>
+                    <Button 
+                      variant={isSelected ? "primary" : "outline"}
+                      size="sm" 
+                      className={cn(
+                        "flex-1 h-7 px-2.5 text-[11px] font-semibold justify-between shadow-none transition-all",
+                        !isSelected && "group-hover:border-primary/40 group-hover:text-primary hover:bg-primary/5"
+                      )}
+                      onClick={() => {
+                        setSelectedContractId(contract.id);
+                        setIsHandoverOpen(true);
+                      }}
+                    >
+                      Proses Serah Terima
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
+                </div>
+              )})}
+            </>
+          ) : (
+            <div className="text-center w-full p-8 border border-dashed rounded-xl border-border text-muted-foreground text-sm flex flex-col items-center justify-center gap-2">
+              <FileText className="w-8 h-8 opacity-20" />
+              <span>Tidak ada kendaraan yang<br/>siap diserahterimakan</span>
+            </div>
+          )}
+        </div>
+      </PanelShell>
+    );
+  };
+
   return (
-    <div className="flex h-full w-full overflow-hidden bg-neutral-50/50 dark:bg-background">
+    <div className={cn("flex h-full w-full bg-background overflow-hidden relative", (panelSide === 'top' || panelSide === 'bottom') ? 'flex-col' : 'flex-row')}>
       
-      {/* SECTION B: RIWAYAT SERAH TERIMA (Left) */}
-      <div className="flex-1 min-w-0 flex flex-col min-h-0 overflow-y-auto p-0 border-r border-border bg-background">
+      {/* Render panel first if top or left */}
+      {(panelSide === 'top' || panelSide === 'left') && renderPanel()}
+
+      <div className="flex-1 min-w-0 flex flex-col min-h-0 overflow-y-auto p-0 bg-background relative">
         {loading ? (
           <div className="flex-1 flex items-center justify-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -124,7 +332,7 @@ export function HandoversFeature() {
         ) : (
           <HandoverList
             className="border-0 rounded-none"
-            data={filteredData}
+            data={groupedHandovers}
             searchValue={search}
             onSearchChange={setSearch}
             filterConfig={filterConfig}
@@ -135,64 +343,8 @@ export function HandoversFeature() {
         )}
       </div>
 
-      {/* SECTION A: SIAP SERAH TERIMA (Right) */}
-      <div className="w-[320px] shrink-0 min-h-0 flex flex-col overflow-y-auto bg-neutral-50/30 dark:bg-neutral-900/20">
-        <div className="p-4 space-y-4">
-          <h2 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-            <FileText className="w-3.5 h-3.5" />
-            Siap Serah Terima
-          </h2>
-
-          {eligibleContracts.length > 0 ? (
-            <div className="flex flex-col gap-4">
-              {eligibleContracts.map(contract => (
-                <div key={contract.id} className="group relative bg-white dark:bg-neutral-900 border border-border rounded-xl p-3.5 hover:border-primary/40 hover:shadow-sm transition-all duration-200 flex flex-col justify-between">
-                  <div>
-                    <div className="flex justify-between items-start gap-2 mb-2.5">
-                      <div className="flex flex-col min-w-0">
-                        <span className="font-semibold text-[12px] text-foreground truncate" title={contract.contractNumber}>{contract.contractNumber}</span>
-                        <span className="text-[12px] text-muted-foreground truncate" title={contract.customer?.name}>{contract.customer?.name}</span>
-                      </div>
-                      <span className="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 shrink-0 border border-blue-100 dark:border-blue-800/30">
-                        CONFIRMED
-                      </span>
-                    </div>
-                    <button
-                      onClick={() => {
-                        const vehicleId = contract.booking?.items?.[0]?.vehicle?.coreVehicle?.id;
-                        if (vehicleId) {
-                          trackingNavigationService.navigateToTracking(router, {
-                            mode: 'live',
-                            vehicleId: vehicleId
-                          });
-                        }
-                      }}
-                      className="flex items-center gap-1.5 text-[12px] text-muted-foreground hover:text-primary transition-colors mb-3 w-full text-left"
-                      title="Lihat Lokasi Terkini di Pemantauan"
-                    >
-                      <MapPin className="w-3.5 h-3.5 shrink-0" />
-                      <span className="truncate hover:underline">
-                        {contract.booking?.items?.[0]?.vehicle?.coreVehicle?.brand} {contract.booking?.items?.[0]?.vehicle?.coreVehicle?.vehicleName} &bull; <span className="font-medium text-foreground/80">{contract.booking?.items?.[0]?.vehicle?.coreVehicle?.plateNumber}</span>
-                      </span>
-                    </button>
-                  </div>
-                  <Link href={`/rental/contracts/${contract.id}/handover`} className="w-full">
-                    <Button variant="outline" size="sm" className="w-full h-8 px-3 text-[12px] font-medium justify-between shadow-none transition-all group-hover:border-primary/40 group-hover:text-primary">
-                      Proses Serah Terima
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </Button>
-                  </Link>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center p-8 border border-dashed rounded-xl border-border text-muted-foreground text-sm flex flex-col items-center justify-center gap-2">
-              <FileText className="w-8 h-8 opacity-20" />
-              <span>Tidak ada kendaraan yang<br/>siap diserahterimakan</span>
-            </div>
-          )}
-        </div>
-      </div>
+      {/* Render panel last if right or bottom */}
+      {(panelSide === 'right' || panelSide === 'bottom') && renderPanel()}
 
       <HandoverDetailDrawer
         open={isDetailOpen}
@@ -200,6 +352,15 @@ export function HandoversFeature() {
         handover={selectedHandover}
       />
 
+      <HandoverFeature
+        contractId={selectedContractId}
+        open={isHandoverOpen}
+        onOpenChange={setIsHandoverOpen}
+        onSuccess={() => {
+          setIsHandoverOpen(false);
+          loadData();
+        }}
+      />
     </div>
   );
 }

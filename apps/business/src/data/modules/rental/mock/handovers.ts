@@ -2,8 +2,8 @@ import type { RentalHandover } from '@/features/modules/rental/handover/types/ha
 
 export const mockHandovers: RentalHandover[] = [
   {
-    "id": "HND-2026-001",
-    "bookingItemId": "item-mock",
+    "id": "HND-2026-001-A",
+    "bookingItemId": "res-001-item-1",
     "contractId": "ctr-001",
     "customerId": "cust-ind-001",
     "vehicleId": "veh-001",
@@ -28,6 +28,34 @@ export const mockHandovers: RentalHandover[] = [
     "staffName": "Admin",
     "createdAt": "2026-08-23T12:00:00.000Z",
     "updatedAt": "2026-08-23T12:00:00.000Z"
+  },
+  {
+    "id": "HND-2026-001-B",
+    "bookingItemId": "res-001-item-2",
+    "contractId": "ctr-001",
+    "customerId": "cust-ind-001",
+    "vehicleId": "veh-004",
+    "handoverAt": "2026-08-23T12:15:00.000Z",
+    "handoverLatitude": -6.203729872026801,
+    "handoverLongitude": 106.87717269373181,
+    "handoverAddress": "Kantor Cabang Utama Jakarta",
+    "odometerStart": 8450,
+    "odometerSource": "VEHICLE",
+    "fuelLevel": "HALF",
+    "vehicleCondition": "MINOR_DAMAGE",
+    "equipmentChecklist": {
+      "stnk": true,
+      "spareTire": true,
+      "jack": true,
+      "toolkit": true,
+      "triangle": false,
+      "fireExtinguisher": true
+    },
+    "notes": "Ada lecet sedikit di bumper kiri depan",
+    "staffId": "usr-001",
+    "staffName": "Admin",
+    "createdAt": "2026-08-23T12:15:00.000Z",
+    "updatedAt": "2026-08-23T12:15:00.000Z"
   },
   {
     "id": "HND-2026-002",

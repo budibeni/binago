@@ -34,3 +34,4 @@ class HandoverRepository {
 }
 
 export const handoverRepository = new HandoverRepository();
+// force HMR 1

@@ -1,15 +1,28 @@
 'use client';
 
 import React from 'react';
-import { Eye, MapPin } from 'lucide-react';
+import { Eye, Car, Check } from 'lucide-react';
+import { cn } from '@adatrack/utils';
 import { useRouter } from 'next/navigation';
 import { Button, DataTable } from '@adatrack/ui';
 import type { DataTableColumnDef } from '@adatrack/ui';
 import { trackingNavigationService } from '@/features/core/tracking/services/trackingNavigationService';
 import type { RentalHandover } from '../types/handover';
 
+export interface HandoverGroup {
+  id: string; // group ID (contractId)
+  contractId: string;
+  contract?: any;
+  customer?: any;
+  handoverAt: string;
+  handoverAddress?: string;
+  handoverLatitude: number;
+  handoverLongitude: number;
+  items: RentalHandover[];
+}
+
 interface HandoverListProps {
-  data: RentalHandover[];
+  data: HandoverGroup[];
   searchValue: string;
   onSearchChange: (value: string) => void;
   onViewDetail: (handover: RentalHandover) => void;
@@ -43,7 +56,7 @@ const formatTime = (dateStr: string) => {
 function buildColumns(
   onViewDetail: (h: RentalHandover) => void,
   onViewMap: (h: RentalHandover) => void
-): DataTableColumnDef<RentalHandover>[] {
+): DataTableColumnDef<HandoverGroup>[] {
   return [
     {
       id: 'detail',
@@ -55,7 +68,7 @@ function buildColumns(
         <Button 
           variant="ghost" 
           size="sm" 
-          onClick={() => onViewDetail(row.original)} 
+          onClick={() => onViewDetail(row.original.items[0])} // just pass the first one for now, or change onViewDetail to handle group
           title="Detail Serah Terima" 
           className="h-7 w-7 p-0 flex items-center justify-center transition-colors text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 dark:text-neutral-600 dark:hover:text-neutral-300 dark:hover:bg-neutral-800"
         >
@@ -63,24 +76,7 @@ function buildColumns(
         </Button>
       ),
     },
-    {
-      id: 'map',
-      header: '',
-      size: 40,
-      enableHiding: false,
-      meta: { exportable: false, fixedWidth: true },
-      cell: ({ row }) => (
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={() => onViewMap(row.original)} 
-          title="Lihat Histori Map" 
-          className="h-7 w-7 p-0 flex items-center justify-center transition-colors text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 dark:text-neutral-600 dark:hover:text-neutral-300 dark:hover:bg-neutral-800"
-        >
-          <MapPin className="w-3.5 h-3.5" /> 
-        </Button>
-      ),
-    },
+
     {
       id: 'handoverInfo',
       accessorKey: 'id',
@@ -111,16 +107,30 @@ function buildColumns(
     },
     {
       id: 'vehicle',
-      accessorKey: 'vehicle.coreVehicle.plateNumber',
+      accessorKey: 'vehicleId',
       header: 'KENDARAAN',
       size: 200,
       cell: ({ row }) => {
-        const cv = row.original.vehicle?.coreVehicle;
-        if (!cv) return <span className="text-muted-foreground text-[12px]">-</span>;
         return (
-          <div className="flex flex-col min-w-0">
-            <span className="font-medium text-[12px] text-foreground truncate">{cv.brand} {cv.vehicleName}</span>
-            <span className="text-[12px] text-muted-foreground truncate">{cv.plateNumber}</span>
+          <div className="flex flex-wrap gap-1.5 min-w-0 py-1">
+            {row.original.items.map((item, idx) => {
+              const cv = item.vehicle?.coreVehicle;
+              if (!cv) return null;
+              return (
+                <div 
+                  key={idx}
+                  className={cn(
+                    "flex items-center gap-1.5 px-2 py-1 rounded-md border text-[11px] font-medium shadow-sm",
+                    "bg-muted/50 border-border text-muted-foreground cursor-pointer hover:bg-muted/80 transition-colors"
+                  )}
+                  onClick={() => onViewMap(item)}
+                  title="Klik untuk melihat histori tracking map"
+                >
+                  <Car className="w-3 h-3" />
+                  <span className="font-semibold">{cv.plateNumber}</span>
+                </div>
+              );
+            })}
           </div>
         );
       },
@@ -167,8 +177,13 @@ function buildColumns(
       header: 'ODOMETER AWAL',
       size: 140,
       cell: ({ row }) => (
-        <div className="text-[12px] font-medium">
-          {new Intl.NumberFormat('id-ID').format(row.original.odometerStart)} KM
+        <div className="flex flex-col gap-1 py-1">
+          {row.original.items.map((item, idx) => (
+             <span key={idx} className="text-[12px] font-medium whitespace-nowrap">
+               {row.original.items.length > 1 && <span className="text-muted-foreground mr-1">{item.vehicle?.coreVehicle?.plateNumber}:</span>}
+               {new Intl.NumberFormat('id-ID').format(item.odometerStart)} KM
+             </span>
+          ))}
         </div>
       )
     },
@@ -178,8 +193,53 @@ function buildColumns(
       header: 'KONDISI',
       size: 130,
       cell: ({ row }) => (
-        <div className="text-[12px]">
-          {getConditionLabel(row.original.vehicleCondition)}
+        <div className="flex flex-col gap-1 py-1">
+          {row.original.items.map((item, idx) => (
+            <span key={idx} className="text-[12px] whitespace-nowrap">
+              {row.original.items.length > 1 && <span className="text-muted-foreground mr-1">{item.vehicle?.coreVehicle?.plateNumber}:</span>}
+              {getConditionLabel(item.vehicleCondition)}
+            </span>
+          ))}
+        </div>
+      )
+    },
+    {
+      id: 'fuelLevel',
+      accessorKey: 'fuelLevel',
+      header: 'BBM AWAL',
+      size: 130,
+      cell: ({ row }) => (
+        <div className="flex flex-col gap-1 py-1">
+          {row.original.items.map((item, idx) => {
+            const fuel = item.fuelLevel;
+            const fuelLabel = fuel === 'EMPTY' ? 'Kosong' :
+                             fuel === 'QUARTER' ? '1/4' :
+                             fuel === 'HALF' ? '1/2' :
+                             fuel === 'THREE_QUARTER' ? '3/4' :
+                             fuel === 'FULL' ? 'Penuh' : '-';
+            return (
+              <span key={idx} className="text-[12px] whitespace-nowrap">
+                {row.original.items.length > 1 && <span className="text-muted-foreground mr-1">{item.vehicle?.coreVehicle?.plateNumber}:</span>}
+                {fuelLabel}
+              </span>
+            );
+          })}
+        </div>
+      )
+    },
+    {
+      id: 'notes',
+      accessorKey: 'notes',
+      header: 'CATATAN',
+      size: 200,
+      cell: ({ row }) => (
+        <div className="flex flex-col gap-1 py-1 min-w-0">
+          {row.original.items.map((item, idx) => (
+            <div key={idx} className="text-[12px] truncate text-muted-foreground" title={item.notes || '-'}>
+              {row.original.items.length > 1 && <span className="mr-1">{item.vehicle?.coreVehicle?.plateNumber}:</span>}
+              <span>{item.notes || '-'}</span>
+            </div>
+          ))}
         </div>
       )
     },
@@ -217,7 +277,7 @@ export function HandoverList({
   );
 
   return (
-    <DataTable<RentalHandover>
+    <DataTable<HandoverGroup>
       className={className}
       data={data}
       columns={columns}

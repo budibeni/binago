@@ -6,32 +6,32 @@ export interface FormCardProps extends React.HTMLAttributes<HTMLDivElement> {
    * Title of the card section.
    */
   title?: string;
-  
+
   /**
    * Optional description text below the title.
    */
   description?: string;
-  
+
   /**
    * Optional icon to display on the left of the title and description.
    */
   icon?: React.ReactNode;
-  
+
   /**
    * Optional action element to display on the right side of the header (e.g. a Button).
    */
   action?: React.ReactNode;
-  
+
   /**
    * Class name for the icon wrapper. Defaults to bg-danger/10 text-danger
    */
   iconWrapperClassName?: string;
-  
+
   /**
    * Content of the card (usually form fields).
    */
   children: React.ReactNode;
-  
+
   /**
    * Class name for the internal content container.
    */
@@ -46,7 +46,7 @@ export interface FormCardProps extends React.HTMLAttributes<HTMLDivElement> {
 export const FormCard = React.forwardRef<HTMLDivElement, FormCardProps>(
   ({ title, description, icon, action, iconWrapperClassName, children, className, contentClassName, columns = 1, ...props }, ref) => {
     return (
-      <div 
+      <div
         ref={ref}
         className={cn(
           "bg-white dark:bg-neutral-900 border border-border rounded-xl overflow-hidden",
@@ -86,11 +86,11 @@ export const FormCard = React.forwardRef<HTMLDivElement, FormCardProps>(
             )}
           </div>
         )}
-        <div 
+        <div
           className={cn(
-            columns === 1 
-              ? "flex flex-col gap-4 lg:gap-5 group-data-[layout=drawer]/form:!gap-2 group-data-[layout=dialog]/form:!gap-2 group-data-[layout=default]/form:!gap-2" 
-              : "grid grid-cols-1 gap-4 lg:gap-5 group-data-[layout=default]/form:md:grid-cols-2 group-data-[layout=fullscreen]/form:md:grid-cols-2 group-data-[layout=drawer]/form:!gap-2 group-data-[layout=dialog]/form:!gap-2 group-data-[layout=default]/form:!gap-2", 
+            columns === 1
+              ? "flex flex-col gap-4 lg:gap-5 group-data-[layout=drawer]/form:!gap-2 group-data-[layout=dialog]/form:!gap-2 group-data-[layout=default]/form:!gap-2"
+              : "grid grid-cols-1 gap-4 lg:gap-5 group-data-[layout=default]/form:md:grid-cols-2 group-data-[layout=fullscreen]/form:md:grid-cols-2 group-data-[layout=drawer]/form:!gap-2 group-data-[layout=dialog]/form:!gap-2 group-data-[layout=default]/form:!gap-2",
             contentClassName
           )}
         >
