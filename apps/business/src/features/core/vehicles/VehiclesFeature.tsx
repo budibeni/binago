@@ -290,14 +290,14 @@ export function VehiclesFeature() {
                 plate_number: data.plateNumber,
                 make: data.brand || '',
                 model: '',
-                driver_id: data.driverId || null,
-                group_id: data.groupId && data.groupId !== 'all' ? parseInt(data.groupId, 10) : null,
+                driver_id: data.driverId ? parseInt(data.driverId.toString(), 10) : null,
+                group_id: data.groupId && data.groupId !== 'all' ? parseInt(data.groupId.toString(), 10) : null,
                 vehicle_name: data.vehicleName,
                 category: data.vehicleCategory,
-                year: data.year || null,
+                year: data.year ? parseInt(data.year.toString(), 10) : null,
                 fuel_type: data.fuelType,
                 color: data.color,
-                fuel_capacity: data.fuelCapacity || null,
+                fuel_capacity: data.fuelCapacity ? parseFloat(data.fuelCapacity.toString()) : null,
                 stnk_expiry: data.registrationExpiry || null,
                 kir_expiry: data.kirExpiry || null,
                 notes: data.notes || '',
@@ -306,17 +306,19 @@ export function VehiclesFeature() {
               
               if (data.id) {
                 await api.put(`/vehicles/${data.id}`, payload);
+                toast.success('Kendaraan berhasil diperbarui');
               } else {
                 await api.post('/vehicles', payload);
+                toast.success('Kendaraan berhasil ditambahkan');
               }
-              // Ideally refetch here. To refetch, useVehicles would need a refetch function.
-              // We'll just reload the page for simplicity or rely on state.
-              window.location.reload();
-            } catch (err) {
+              
+              if (typeof refetch === 'function') refetch();
+              setIsAddOpen(false);
+              setEditVehicle(null);
+            } catch (err: any) {
               console.error('Failed to save vehicle', err);
-              alert('Failed to save vehicle');
+              toast.error(err.response?.data?.message || 'Gagal menyimpan kendaraan');
             }
-            setEditVehicle(null);
           }}
           onCancel={() => {
             setEditVehicle(null);

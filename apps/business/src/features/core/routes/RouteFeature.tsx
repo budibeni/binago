@@ -81,8 +81,8 @@ export function RouteFeature({ locale = 'id' }: RouteFeatureProps) {
         status: route.status || 'active',
         description: route.description || '',
         group_id: route.groupId ? parseInt(route.groupId.toString(), 10) : undefined,
-        planned_distance: route.plannedDistance,
-        estimated_duration: route.estimatedDuration,
+        planned_distance: route.plannedDistance ? parseFloat(route.plannedDistance.toString()) : undefined,
+        estimated_duration: route.estimatedDuration ? parseFloat(route.estimatedDuration.toString()) : undefined,
       };
 
       if (route.id) {
