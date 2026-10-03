@@ -42,7 +42,7 @@ import { getTranslation } from '../i18n';
 import { ShareLocationProvider } from '../features/core/sharing/context/ShareLocationContext';
 
 
-function buildNavigation(locale: Locale, userRole?: string): NavGroup[] {
+function buildNavigation(locale: Locale, userRole?: string, userModules?: string[]): NavGroup[] {
   const t = getTranslation(locale);
   const allGroups: NavGroup[] = [
     {
@@ -220,15 +220,46 @@ function buildNavigation(locale: Locale, userRole?: string): NavGroup[] {
 
   const role = (userRole || '').toLowerCase();
   const alwaysOpen = ['main', 'master', 'access', 'administration'];
+  
+  // Map frontend NavGroup IDs to backend module codes
+  const moduleMap: Record<string, string> = {
+    main: 'main',
+    master: 'master-data',
+    access: 'access',
+    asset: 'asset',
+    safety: 'safety',
+    analysis: 'analysis',
+    analytics: 'analysis', // Fallback for typo in some cases
+    administration: 'admin',
+    rental: 'industry',
+    transport: 'industry',
+    logistics: 'industry',
+    sales: 'industry',
+    fieldService: 'industry',
+    patrol: 'industry',
+    projectSite: 'industry'
+  };
+
+  const assignedModules = userModules || [];
 
   return allGroups.filter(group => {
-    if (group.id && alwaysOpen.includes(group.id)) return true;
-    if (role === 'superadmin' || role === 'admin') return true;
-    if (group.id && role === group.id.toLowerCase()) return true;
+    if (!group.id) return false;
     
-    // Fallback: if role matches some specific patterns or if it's completely empty?
-    // According to requirements: only B2B uses role access, and specific modules are locked.
-    // So if it's not in alwaysOpen and they don't have the role, hide it.
+    // 1. Always open modules for B2B
+    if (alwaysOpen.includes(group.id)) return true;
+    
+    // 2. Platform Admins see everything
+    if (role === 'superadmin' || role === 'admin') return true;
+    
+    // 3. Database assigned modules
+    const backendModuleCode = moduleMap[group.id];
+    if (backendModuleCode && assignedModules.includes(backendModuleCode)) {
+      return true;
+    }
+    
+    // Fallback for role-based legacy check if needed
+    if (role === group.id.toLowerCase()) return true;
+
     return false;
   });
 }
@@ -323,7 +354,7 @@ export function BusinessShellLayout({ children, user }: { children: React.ReactN
   }, []);
 
   const t = getTranslation(locale);
-  const navigation = buildNavigation(locale, currentUser?.role);
+  const navigation = buildNavigation(locale, currentUser?.role, currentUser?.modules);
 
   const breadcrumbItems: { label: string; href?: string }[] = [];
   let foundItem = null;
