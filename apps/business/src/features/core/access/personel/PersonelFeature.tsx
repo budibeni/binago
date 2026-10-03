@@ -1,6 +1,7 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { api } from '@adatrack/utils';
 import { getPersonelTranslation } from './i18n';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
 import { personelService } from '@/data/core/access/personel/services/personelService';
@@ -28,6 +29,25 @@ export function PersonelFeature() {
   const [drawerOpen, setDrawerOpen] = React.useState(false);
 
   const [isFormOpen, setIsFormOpen] = React.useState(false);
+  const [personelList, setPersonelList] = useState<Personel[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchPersonel = React.useCallback(async () => {
+    setLoading(true);
+    try {
+      const res: any = await api.get('/personel');
+      setPersonelList(res.data || []);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchPersonel();
+  }, []);
+
   const [editPersonel, setEditPersonel] = React.useState<Personel | null>(null);
 
   // Default filter configuration
@@ -63,12 +83,16 @@ export function PersonelFeature() {
 
   // --- Filtered Data -----------------------------------------------------------
   const filteredPersonel = React.useMemo(() => {
-    return personelService.getPersonel(search, statusFilter, typeFilter).map((p) => {
-      // Translate the type for display
+    return personelList.filter(p => {
+      if (search && !p.name.toLowerCase().includes(search.toLowerCase()) && !(p.nik && p.nik.toLowerCase().includes(search.toLowerCase()))) return false;
+      if (statusFilter && statusFilter !== 'all' && p.status !== statusFilter) return false;
+      if (typeFilter && typeFilter !== 'all' && p.personelType !== typeFilter) return false;
+      return true;
+    }).map((p) => {
       const translatedType = tP.types[p.personelType] || p.personelType;
       return { ...p, personelType: translatedType as any };
     });
-  }, [search, statusFilter, typeFilter, tP]);
+  }, [personelList, search, statusFilter, typeFilter, tP]);
 
   // --- Handlers ----------------------------------------------------------------
   const handleViewDetail = React.useCallback((personel: Personel) => {
@@ -81,11 +105,16 @@ export function PersonelFeature() {
     setEditPersonel(personel);
   }, []);
 
-  const handleDelete = React.useCallback((personel: Personel) => {
-    personelService.deletePersonel(personel.id);
-    setDrawerOpen(false);
-    setDetailPersonel(null);
-  }, []);
+  const handleDelete = React.useCallback(async (personel: Personel) => {
+    try {
+      await api.delete('/personel/' + personel.id);
+      fetchPersonel();
+      setDrawerOpen(false);
+      setDetailPersonel(null);
+    } catch(e) {
+      console.error(e);
+    }
+  }, [fetchPersonel]);
 
   const handleAdd = React.useCallback(() => {
     setIsFormOpen(true);
