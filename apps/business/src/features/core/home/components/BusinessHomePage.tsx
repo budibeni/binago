@@ -9,7 +9,7 @@ import { FavoriteManager, FavoriteSectionHeader, FavoriteEmptyState } from '@ada
 import { BUSINESS_SHORTCUTS } from '../data/shortcuts';
 
 const STORAGE_KEY = 'adatrack.business.favorites';
-const DEFAULT_FAVORITES = ['tracking', 'vehicles', 'drivers', 'deliveries', 'maintenance', 'gpsDevices'];
+const DEFAULT_FAVORITES = ['tracking', 'vehicles', 'drivers', 'geofences'];
 
 export function BusinessHomePage() {
   const locale = useBusinessLocale();
