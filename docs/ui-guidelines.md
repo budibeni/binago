@@ -16,9 +16,9 @@ Gunakan struktur:
 
 ```text
 Application Shell
-â"œâ"€â"€ Sidebar
-â"œâ"€â"€ Header
-â""â"€â"€ Content Area
+├── Sidebar
+├── Header
+└── Content Area
 ```
 
 Detail layout ditentukan pada Task Application Shell.

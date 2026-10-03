@@ -16,12 +16,8 @@ Flow:
 
 ```text
 Vehicle Detail
-    â†"
-Riwayat Perjalanan
-    â†"
-Pilih Perjalanan
-    â†"
-Playback
+    ↓
+Riwayat Perjalanan → Pilih Perjalanan → Playback
 ```
 
 Playback bukan tab dari Live Monitoring.

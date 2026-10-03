@@ -16,8 +16,8 @@ Struktur:
 
 ```text
 Pengaturan
-â"œâ"€â"€ Geofence
-â""â"€â"€ Notifikasi
+├── Geofence
+└── Notifikasi
 ```
 
 Keduanya bukan primary navigation.

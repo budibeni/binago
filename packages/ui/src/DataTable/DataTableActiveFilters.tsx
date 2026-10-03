@@ -16,7 +16,7 @@ export function DataTableActiveFilters({ config, labels: tableLabels, className 
   const { state, fields, onStateChange, onClearAll, labels } = config;
 
   // Derive active filters
-  const activeFilters: { fieldId: string; fieldLabel: string; value: string; optionLabel: string }[] = [];
+  const activeFilters: { fieldId: string; fieldLabel: string; value: string; optionLabel: React.ReactNode }[] = [];
 
   fields.forEach((field) => {
     const val = state[field.id];
@@ -79,7 +79,7 @@ export function DataTableActiveFilters({ config, labels: tableLabels, className 
           <button
             onClick={() => handleRemove(af.fieldId, af.value)}
             className="rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 p-0.5 transition-colors focus:outline-none"
-            aria-label={`Remove filter ${af.fieldLabel} ${af.optionLabel}`}
+            aria-label={`Remove filter ${af.fieldLabel} ${typeof af.optionLabel === 'string' ? af.optionLabel : af.value}`}
           >
             <X className="h-3 w-3" />
           </button>

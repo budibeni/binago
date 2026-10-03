@@ -8,12 +8,10 @@ Untuk Antigravity AI:
 
 ```text
 /AGENTS.md
-â†"
-/docs/README.md
-â†"
-Dokumentasi yang relevan
-â†"
-/docs/tasks/TASK-XX-*.md
+↓
+/docs/README.md → Dokumentasi arsitektur & panduan teknis yang relevan
+↓
+Spesifikasi halaman di /docs/business/core/ atau Task aktif di /docs/business/<modul>/tasks/
 ```
 
 `AGENTS.md` adalah instruksi utama untuk perilaku AI.  
@@ -36,32 +34,32 @@ deployment.md
 task-roadmap.md
 ```
 
-## Task
+## Dokumentasi Modul Domain Business
 
-Seluruh Task berada di:
+Tersedia di `/docs/business/`:
 
-```text
-/docs/tasks/
-```
+- [`docs/business/core/README.md`](docs/business/core/README.md) — Modul inti CORE (`apps/business/src/app`): Beranda (Home), Pemantauan (Tracking), Armada (Vehicles SSoT), Pengemudi (Drivers), Grup Armada (Groups), Geofence, Rute (Routes), serta Akses Fisik RFID (Card, Personel, Log).
+- [`docs/business/rental/README.md`](docs/business/rental/README.md) — Modul bisnis Rental Kendaraan: Pelanggan, Kategori Tarif, Kendaraan Rental, Booking, Kontrak Sewa, Template Kontrak (TipTap Editor), Serah Terima, Pengembalian, dan Laporan.
+- `docs/business/logistik/` — Modul bisnis Logistik & Distribusi.
 
-Urutan Task:
+## Dokumentasi Aplikasi Personal
 
-```text
-TASK-01-foundation.md
-TASK-02-design-system.md
-TASK-03-application-shell.md
-TASK-04-home.md
-TASK-05-tracking.md
-TASK-06-vehicles.md
-TASK-07-drivers.md
-TASK-08-deliveries.md
-TASK-09-maintenance.md
-TASK-10-devices.md
-TASK-11-geofences.md
-TASK-12-reports.md
-TASK-13-administration.md
-TASK-14-production-readiness.md
-```
+Tersedia di [`docs/personal/`](docs/personal/):
+- `adatrack-personal.md` — Spesifikasi fungsional dan arsitektur aplikasi ADATRACK Personal.
+- `tasks/` (`PERSONAL-01` s.d. `PERSONAL-07`) — Task pengembangan frontend Personal.
+
+## Task & Roadmap
+
+Daftar roadmap lengkap terangkum di [`docs/task-roadmap.md`](docs/task-roadmap.md).
+
+### 1. Dokumentasi Fitur CORE Operasional
+Seluruh fitur operasional CORE didokumentasikan di [`/docs/business/core/`](docs/business/core):
+- Home (`/`), Tracking (`/tracking`), Vehicles SSoT (`/vehicles`), Drivers (`/drivers`), Groups (`/groups`), Geofences (`/geofences`), Routes (`/routes`), Card (`/card`), Personel (`/personel`), Log (`/log`).
+
+### 2. Task Modul Bisnis Rental
+Task operasional modul Rental berada di [`/docs/business/rental/tasks/`](docs/business/rental/tasks):
+- `TASK-01-pelanggan.md` sampai `TASK-06-template-kontrak.md` (Completed)
+- `TASK-07-serah-terima.md` sampai `TASK-10-integrasi-rental.md` (Proposed)
 
 ## Prinsip project saat ini
 

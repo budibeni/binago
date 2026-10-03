@@ -24,45 +24,38 @@ Struktur utamanya:
 
 ```text
 ADATRACK/
-â"œâ"€â"€ AGENTS.md
-â"‚
-â""â"€â"€ docs/
-    â"œâ"€â"€ README.md
-    â"œâ"€â"€ project-overview.md
-    â"œâ"€â"€ architecture.md
-    â"œâ"€â"€ folder-structure.md
-    â"œâ"€â"€ development-rules.md
-    â"œâ"€â"€ business-rules.md
-    â"œâ"€â"€ design-system.md
-    â"œâ"€â"€ ui-guidelines.md
-    â"œâ"€â"€ database-design.md
-    â"œâ"€â"€ api-standard.md
-    â"œâ"€â"€ coding-standard.md
-    â"œâ"€â"€ deployment.md
-    â"œâ"€â"€ task-roadmap.md
-    â"‚
-    â""â"€â"€ tasks/
-        â"œâ"€â"€ TASK-01-foundation.md
-        â"œâ"€â"€ TASK-02-design-system.md
-        â"œâ"€â"€ TASK-03-application-shell.md
-        â"œâ"€â"€ TASK-04-home.md
-        â"œâ"€â"€ TASK-05-tracking.md
-        â"œâ"€â"€ TASK-06-vehicles.md
-        â"œâ"€â"€ TASK-07-drivers.md
-        â"œâ"€â"€ TASK-08-deliveries.md
-        â"œâ"€â"€ TASK-09-maintenance.md
-        â"œâ"€â"€ TASK-10-devices.md
-        â"œâ"€â"€ TASK-11-geofences.md
-        â"œâ"€â"€ TASK-12-reports.md
-        â"œâ"€â"€ TASK-13-administration.md
-        â""â"€â"€ TASK-14-production-readiness.md
+├── AGENTS.md
+│
+└── docs/
+    ├── README.md
+    ├── project-overview.md
+    ├── architecture.md
+    ├── folder-structure.md
+    ├── development-rules.md
+    ├── business-rules.md
+    ├── design-system.md
+    ├── ui-guidelines.md
+    ├── database-design.md
+    ├── api-standard.md
+    ├── coding-standard.md
+    ├── deployment.md
+    ├── task-roadmap.md
+    │
+    ├── business/
+    │   ├── core/ (00-home s.d. 09-log)
+    │   ├── rental/ (pages/, tasks/ TASK-01 s.d. TASK-10)
+    │   └── logistik/
+    │
+    └── personal/ (adatrack-personal.md, tasks/ PERSONAL-01 s.d. PERSONAL-07)
 ```
 
 ### Aturan lokasi dokumentasi
 
 1. Baca `/AGENTS.md` terlebih dahulu.
 2. Dokumentasi resmi project dicari di `/docs`.
-3. Task dicari di `/docs/tasks/`.
+3. Task dicari di direktori domain masing-masing:
+   - Modul Business: `/docs/business/<modul>/tasks/` (contoh: `/docs/business/rental/tasks/`)
+   - Modul Personal: `/docs/personal/tasks/`
 4. Jangan mencari atau membuat dokumentasi project di folder lain tanpa instruksi eksplisit.
 5. Jika AI dijalankan dari subdirectory, gunakan **root repository** sebagai acuan untuk menemukan `AGENTS.md` dan `/docs`.
 6. Jika dokumentasi yang dibutuhkan tidak ditemukan di `/docs`, jangan mengarang isinya. Laporkan kondisi tersebut.
@@ -191,29 +184,29 @@ Contoh:
 
 ```text
 features/
-â"œâ"€â"€ tracking/
-â"œâ"€â"€ vehicles/
-â"œâ"€â"€ drivers/
-â"œâ"€â"€ deliveries/
-â"œâ"€â"€ maintenance/
-â"œâ"€â"€ devices/
-â"œâ"€â"€ geofences/
-â"œâ"€â"€ reports/
-â""â"€â"€ administration/
+├── tracking/
+├── vehicles/
+├── drivers/
+├── deliveries/
+├── maintenance/
+├── devices/
+├── geofences/
+├── reports/
+└── administration/
 ```
 
 Label UI:
 
 ```text
-tracking       â†' Pemantauan
-vehicles       â†' Armada
-drivers        â†' Pengemudi
-deliveries     â†' Pengiriman
-maintenance    â†' Perawatan
-devices        â†' Perangkat
-geofences      â†' Geofence
-reports        â†' Laporan
-administration â†' Administrasi
+tracking → Pemantauan
+vehicles → Armada
+drivers → Pengemudi
+deliveries → Pengiriman
+maintenance → Perawatan
+devices → Perangkat
+geofences → Geofence
+reports → Laporan
+administration → Administrasi
 ```
 
 Jangan menggunakan Bahasa Indonesia untuk identifier teknis.
@@ -227,7 +220,7 @@ Gunakan urutan:
 ```text
 1. AGENTS.md
 2. Dokumentasi project yang relevan dari /docs
-3. Task aktif dari /docs/tasks/
+3. Task aktif dari direktori domain terkait (`/docs/business/<modul>/tasks/` atau `/docs/personal/tasks/`)
 4. Source code yang sudah ada
 ```
 
@@ -296,27 +289,19 @@ AI tidak boleh menentukan sendiri:
 Setiap Task:
 
 ```text
-Baca AGENTS.md
-â†"
-Identifikasi Task aktif
-â†"
+Baca AGENTS.md → Identifikasi Task aktif
+↓
 Baca dokumentasi relevan dari /docs
-â†"
-Baca Task aktif dari /docs/tasks/
-â†"
+↓
+Baca Task aktif dari direktori domain terkait
+↓
 Periksa source code
-â†"
+↓
 Buat implementation plan
-â†"
-Implementasi
-â†"
-Validation
-â†"
-Periksa Definition of Done
-â†"
-Completion Report
-â†"
-STOP
+↓
+Implementasi → Validation → Periksa Definition of Done
+↓
+Completion Report → STOP
 ```
 
 Planning wajib dilakukan sebelum coding, tetapi tidak perlu meminta approval jika masih dalam scope.
@@ -414,10 +399,8 @@ Prioritas:
 
 ```text
 Local state
-â†"
-Feature state
-â†"
-Shared/global state
+↓
+Feature state → Shared/global state
 ```
 
 Jangan menggunakan global state jika local/feature state cukup.
@@ -485,9 +468,9 @@ Jika architecture existing benar-benar tidak dapat memenuhi kebutuhan:
 
 ```text
 STOP
-â†' jelaskan masalah
-â†' jelaskan opsi
-â†' minta arahan
+↓ jelaskan masalah
+↓ jelaskan opsi
+↓ minta arahan
 ```
 
 ---

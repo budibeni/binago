@@ -15,13 +15,7 @@ Membangun detail kendaraan dan riwayat perjalanan sebagai kelanjutan dari Pemant
 Flow:
 
 ```text
-Pemantauan
-    â†"
-Pilih Kendaraan
-    â†"
-Vehicle Detail
-    â†"
-Riwayat Perjalanan
+Pemantauan → Pilih Kendaraan → Vehicle Detail → Riwayat Perjalanan
 ```
 
 ---
@@ -74,10 +68,8 @@ Contoh:
 
 ```text
 Riwayat Perjalanan
-      â†"
-Pilih Perjalanan
-      â†"
-Playback
+      ↓
+Pilih Perjalanan → Playback
 ```
 
 Implementasi Playback dikerjakan di PERSONAL-04.

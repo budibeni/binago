@@ -58,9 +58,9 @@ Perbedaan utama:
 
 ```text
 ADATRACK Business
-    â†"
+    ↓
 Enterprise / Fleet Management
-    â†"
+↓
 Data banyak
 Operasional
 Monitoring fleet
@@ -68,9 +68,9 @@ Management
 Reporting
 
 ADATRACK Personal
-    â†"
+    ↓
 Individual Vehicle Tracking
-    â†"
+    ↓
 Sederhana
 Personal
 Visual
@@ -173,8 +173,8 @@ ADATRACK
 dengan:
 
 ```text
-BINA â†' Hitam
-GO   â†' Merah
+BINA → Hitam
+GO → Merah
 ```
 
 ## 4.1 Brand Color
@@ -228,11 +228,7 @@ Mobile adalah baseline utama.
 Prioritas:
 
 ```text
-Mobile
-   â†"
-Tablet
-   â†"
-Desktop
+Mobile → Tablet → Desktop
 ```
 
 Namun mobile-first tidak berarti desktop hanya diperbesar dari layout mobile.
@@ -311,10 +307,10 @@ Struktur:
 
 ```text
 ADATRACK Personal
-â"‚
-â"œâ"€â"€ Pemantauan
-â"œâ"€â"€ Statistik
-â""â"€â"€ Pengaturan
+│
+├── Pemantauan
+├── Statistik
+└── Pengaturan
 ```
 
 ---
@@ -326,14 +322,14 @@ Pada mobile gunakan **Bottom Navigation**.
 Struktur:
 
 ```text
-â"Œâ"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"
-â"‚                                 â"‚
-â"‚           CONTENT               â"‚
-â"‚                                 â"‚
-â"‚                                 â"‚
-â"œâ"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"¤
-â"‚ Pemantauan â"‚ Statistik â"‚ Pengaturan â"‚
-â""â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"˜
+â"Œ─────────────────────────────────â"
+│                                 │
+│           CONTENT               │
+│                                 │
+│                                 │
+├─────────────────────────────────â"¤
+│ Pemantauan │ Statistik │ Pengaturan │
+└─────────────────────────────────â"˜
 ```
 
 Primary navigation harus selalu mudah dijangkau.
@@ -351,11 +347,11 @@ Pada desktop gunakan **Top Navigation**.
 Contoh:
 
 ```text
-â"Œâ"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"
-â"‚ ADATRACK Personal                                       â"‚
-â"‚                                                       â"‚
-â"‚ Pemantauan        Statistik        Pengaturan         â"‚
-â""â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"˜
+â"Œ───────────────────────────────────────────────────────â"
+│ ADATRACK Personal                                       │
+│                                                       │
+│ Pemantauan        Statistik        Pengaturan         │
+└───────────────────────────────────────────────────────â"˜
 ```
 
 Desktop Personal **tidak menggunakan Sidebar Business sebagai primary navigation**.
@@ -396,13 +392,7 @@ Aplikasi Personal tidak perlu menggunakan dashboard enterprise yang penuh dengan
 Prioritas:
 
 ```text
-User
- â†"
-Pemantauan
- â†"
-Kendaraan
- â†"
-Lokasi
+User → Pemantauan → Kendaraan → Lokasi
 ```
 
 ---
@@ -412,46 +402,26 @@ Lokasi
 Flow utama:
 
 ```text
-Login
-  â†"
-Pemantauan
-  â†"
-Pilih Kendaraan
-  â†"
-Detail Kendaraan
-  â†"
-Riwayat Perjalanan
-  â†"
-Playback
+Login → Pemantauan → Pilih Kendaraan → Detail Kendaraan → Riwayat Perjalanan → Playback
 ```
 
 Flow statistik:
 
 ```text
-Pemantauan
-  â†"
-Statistik
-  â†"
-Ringkasan
-  â†"
-Harian
-  â†"
-Mingguan
-  â†"
-Bulanan
+Pemantauan → Statistik → Ringkasan → Harian → Mingguan → Bulanan
 ```
 
 Flow pengaturan:
 
 ```text
 Pengaturan
-  â"œâ"€â"€ Kendaraan Saya
-  â"œâ"€â"€ Perangkat GPS
-  â"œâ"€â"€ Notifikasi
-  â"œâ"€â"€ Geofence
-  â"œâ"€â"€ Akun
-  â"œâ"€â"€ Bantuan
-  â""â"€â"€ Tentang Aplikasi
+  ├── Kendaraan Saya
+  ├── Perangkat GPS
+  ├── Notifikasi
+  ├── Geofence
+  ├── Akun
+  ├── Bantuan
+  └── Tentang Aplikasi
 ```
 
 ---
@@ -462,26 +432,26 @@ Struktur utama Personal:
 
 ```text
 ADATRACK Personal
-â"‚
-â"œâ"€â"€ Pemantauan
-â"‚   â"œâ"€â"€ VehicleList
-â"‚   â"œâ"€â"€ LiveMap
-â"‚   â""â"€â"€ VehicleDetail
-â"‚
-â"œâ"€â"€ Statistik
-â"‚   â"œâ"€â"€ Summary
-â"‚   â"œâ"€â"€ Daily
-â"‚   â"œâ"€â"€ Weekly
-â"‚   â""â"€â"€ Monthly
-â"‚
-â""â"€â"€ Pengaturan
-    â"œâ"€â"€ Kendaraan
-    â"œâ"€â"€ Perangkat GPS
-    â"œâ"€â"€ Notifikasi
-    â"œâ"€â"€ Geofence
-    â"œâ"€â"€ Akun
-    â"œâ"€â"€ Bantuan
-    â""â"€â"€ Tentang
+│
+├── Pemantauan
+│   ├── VehicleList
+│   ├── LiveMap
+│   └── VehicleDetail
+│
+├── Statistik
+│   ├── Summary
+│   ├── Daily
+│   ├── Weekly
+│   └── Monthly
+│
+└── Pengaturan
+    ├── Kendaraan
+    ├── Perangkat GPS
+    ├── Notifikasi
+    ├── Geofence
+    ├── Akun
+    ├── Bantuan
+    └── Tentang
 ```
 
 ---
@@ -494,8 +464,8 @@ Struktur utama:
 
 ```text
 Pemantauan
-â"œâ"€â"€ VehicleList
-â""â"€â"€ LiveMap
+├── VehicleList
+└── LiveMap
 ```
 
 VehicleList dan LiveMap merupakan component terpisah.
@@ -552,10 +522,8 @@ Flow:
 
 ```text
 Riwayat Perjalanan
-       â†"
-Pilih Perjalanan
-       â†"
-Playback
+       ↓
+Pilih Perjalanan → Playback
 ```
 
 Playback menampilkan:
@@ -615,7 +583,7 @@ Contoh:
 
 ```text
 07:12 - 07:48
-Rumah â†' Kantor
+Rumah → Kantor
 18,2 km
 36 menit
 ```
@@ -632,10 +600,10 @@ Struktur:
 
 ```text
 Statistik
-â"œâ"€â"€ Ringkasan
-â"œâ"€â"€ Harian
-â"œâ"€â"€ Mingguan
-â""â"€â"€ Bulanan
+├── Ringkasan
+├── Harian
+├── Mingguan
+└── Bulanan
 ```
 
 Statistik dapat menampilkan:
@@ -682,13 +650,13 @@ Struktur:
 
 ```text
 Pengaturan
-â"œâ"€â"€ Kendaraan Saya
-â"œâ"€â"€ Perangkat GPS
-â"œâ"€â"€ Notifikasi
-â"œâ"€â"€ Geofence
-â"œâ"€â"€ Akun
-â"œâ"€â"€ Bantuan
-â""â"€â"€ Tentang Aplikasi
+├── Kendaraan Saya
+├── Perangkat GPS
+├── Notifikasi
+├── Geofence
+├── Akun
+├── Bantuan
+└── Tentang Aplikasi
 ```
 
 Gunakan list/card yang sederhana.
@@ -784,10 +752,8 @@ Selama tahap frontend:
 
 ```text
 Page / Feature
-      â†"
-Dummy Data
-      â†"
-Component
+↓
+Dummy Data → Component
 ```
 
 Component tidak boleh memiliki dummy data sendiri.
@@ -993,15 +959,15 @@ Gunakan prinsip:
 
 ```text
 Generic
-   â†"
+   ↓
 packages/ui
 
 Business-specific
-   â†"
+   ↓
 apps/business
 
 Personal-specific
-   â†"
+   ↓
 apps/personal
 ```
 
@@ -1083,10 +1049,10 @@ Offline
 Status dapat menggunakan semantic color:
 
 ```text
-Driving  â†' success
-Idle     â†' warning
-Parking  â†' neutral
-Offline  â†' danger
+Driving  ↓ success
+Idle     ↓ warning
+Parking  ↓ neutral
+Offline  ↓ danger
 ```
 
 Warna semantic tidak menggantikan brand color.
@@ -1198,26 +1164,26 @@ Contoh:
 
 ```text
 apps/personal/src/
-â"‚
-â"œâ"€â"€ app/
-â"‚
-â"œâ"€â"€ components/
-â"‚
-â"œâ"€â"€ features/
-â"‚   â"œâ"€â"€ monitoring/
-â"‚   â"‚   â"œâ"€â"€ components/
-â"‚   â"‚   â"œâ"€â"€ data/
-â"‚   â"‚   â"œâ"€â"€ types/
-â"‚   â"‚   â""â"€â"€ ...
-â"‚   â"‚
-â"‚   â"œâ"€â"€ vehicle-detail/
-â"‚   â"œâ"€â"€ playback/
-â"‚   â"œâ"€â"€ statistics/
-â"‚   â"œâ"€â"€ settings/
-â"‚   â"œâ"€â"€ geofence/
-â"‚   â""â"€â"€ notifications/
-â"‚
-â""â"€â"€ i18n/
+│
+├── app/
+│
+├── components/
+│
+├── features/
+│   ├── monitoring/
+│   │   ├── components/
+│   │   ├── data/
+│   │   ├── types/
+│   │   └── ...
+│   │
+│   ├── vehicle-detail/
+│   ├── playback/
+│   ├── statistics/
+│   ├── settings/
+│   ├── geofence/
+│   └── notifications/
+│
+└── i18n/
 ```
 
 Jangan memasukkan business logic feature ke `app/` jika dapat ditempatkan dengan lebih tepat di `features/`.
@@ -1399,11 +1365,7 @@ Dokumentasi ini tidak berarti backend production harus dibuat.
 Selama tahap frontend:
 
 ```text
-UI
-â†"
-Mock Data
-â†"
-Component
+UI → Mock Data → Component
 ```
 
 Backend/API/database production hanya dikerjakan jika secara eksplisit masuk dalam task.
@@ -1548,11 +1510,11 @@ Pengalaman utama pengguna harus selalu kembali kepada tujuan utama:
 
 ```text
 "Di mana kendaraan saya?"
-        â†"
+        ↓
 "Apa statusnya?"
-        â†"
+        ↓
 "Apa yang terjadi hari ini?"
-        â†"
+        ↓
 "Bagaimana riwayat perjalanannya?"
 ```
 

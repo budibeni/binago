@@ -58,7 +58,7 @@ Aturan penggunaan:
 Prioritas:
 
 ```text
-local â†' feature â†' global
+local ↓ feature ↓ global
 ```
 
 Gunakan global state hanya jika diperlukan.

@@ -10,8 +10,8 @@ Jangan membuat abstraction sebelum ada kebutuhan.
 
 ```text
 ADATRACK Platform
-â"œâ"€â"€ Business
-â""â"€â"€ Personal
+├── Business
+└── Personal
 ```
 
 Application Business dan Personal terpisah.
@@ -22,16 +22,16 @@ Target struktur:
 
 ```text
 apps/
-â"œâ"€â"€ business/
-â""â"€â"€ personal/
+├── business/
+└── personal/
 
 packages/
-â"œâ"€â"€ ui/
-â"œâ"€â"€ design-system/
-â"œâ"€â"€ maps/
-â"œâ"€â"€ icons/
-â"œâ"€â"€ utils/
-â""â"€â"€ types/
+├── ui/
+├── design-system/
+├── maps/
+├── icons/
+├── utils/
+└── types/
 ```
 
 ## 4. Frontend Boundary
@@ -39,11 +39,7 @@ packages/
 Saat ini:
 
 ```text
-UI
-â†"
-Feature Logic
-â†"
-Dummy / Mock Data
+UI → Feature Logic → Dummy / Mock Data
 ```
 
 Backend integration akan dibuat pada pekerjaan terpisah.
