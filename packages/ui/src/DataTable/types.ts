@@ -43,7 +43,7 @@ export type DataTableInstance<TData extends RowData = RowData> =
 export type DataTableRowInstance<TData extends RowData = RowData> =
   Row<StockFeatures, TData>;
 
-export type DataTableFilterFieldType = 'pills-single' | 'pills-multi' | 'checkbox-group';
+export type DataTableFilterFieldType = 'pills-single' | 'pills-multi' | 'checkbox-group' | 'select';
 
 export interface DataTableExportConfig {
   filename?: string;

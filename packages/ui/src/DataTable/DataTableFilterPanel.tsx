@@ -154,6 +154,19 @@ export function DataTableFilterPanel({ config, isOpen, onClose, className }: Dat
                 })}
               </div>
             )}
+            {field.type === 'select' && (
+              <select
+                value={(localState[field.id] as string) || ''}
+                onChange={(e) => handleToggleSingle(field.id, e.target.value)}
+                className="w-full text-sm border-border bg-background rounded-md focus:ring-primary h-9 px-3 mt-1"
+              >
+                {field.options.map(opt => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            )}
           </div>
         ))}
       </div>

@@ -34,7 +34,7 @@ import {
   CalendarDays, HardHat, CheckCircle,
   Shield, UserCheck, Search, AlertTriangle, History,
   Building, FolderKanban,
-  Database, Tag
+  Database, Tag, BarChart2
 } from 'lucide-react';
 import { AppShell, UIProvider } from '@adatrack/ui';
 import type { NavGroup, NavItem, UserInfo, Locale } from '@adatrack/types';
@@ -124,7 +124,7 @@ function buildNavigation(locale: Locale): NavGroup[] {
         { id: 'monitoring', label: (t.nav as any).monitoring || 'Monitoring', href: '/rental/monitoring', icon: Activity },
         { id: 'returns', label: t.nav.returns, href: '/rental/returns', icon: Undo2 },
         { id: 'rentalPayments', label: (t.nav as any).rentalPayments || 'Pembayaran', href: '/rental/payments', icon: CreditCard },
-        { id: 'rentalReports', label: t.nav.rentalReports, href: '/rental/reports', icon: FileText },
+        { id: 'rentalProductivity', label: (t.nav as any).rentalProductivity || 'Produktivitas', href: '/rental/productivity', icon: BarChart2 },
       ],
     },
     {

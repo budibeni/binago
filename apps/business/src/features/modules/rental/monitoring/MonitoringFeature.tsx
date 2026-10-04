@@ -338,6 +338,9 @@ export function MonitoringFeature() {
           data={filteredVehicles}
           columns={columns}
           isLoading={loading}
+          pagination
+          sortable
+          columnVisibility
           searchValue={search}
           onSearchChange={setSearch}
           searchPlaceholder="Cari kendaraan, penyewa, no kontrak..."

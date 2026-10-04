@@ -4,10 +4,34 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { paymentService } from '@/data/modules/rental/services/paymentService';
 import type { RentalPayment, PaymentStatusFilter, PaymentTypeFilter, PaymentType, PaymentStage, PaymentMethod } from './types/payment';
 import { PAYMENT_TYPE_LABEL, PAYMENT_METHOD_LABEL, PAYMENT_STATUS_LABEL, PAYMENT_STAGE_LABEL } from './types/payment';
-import { DataTable, type DataTableColumnDef, type DataTableFilterConfig, Badge, Button } from '@adatrack/ui';
+import { DataTable, type DataTableColumnDef, type DataTableFilterConfig, Badge, Button, PanelShell } from '@adatrack/ui';
 import { getTranslation } from '@/i18n';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
-import { CheckCircle, XCircle, Trash2 } from 'lucide-react';
+import { CheckCircle, XCircle, Trash2, CalendarClock, Handshake, FileSignature, Undo2, CreditCard, Wallet, Banknote, ShieldCheck } from 'lucide-react';
+import { cn } from '@adatrack/utils';
+
+function StatCard({ label, value, colorClass, icon: Icon, desc }: { label: string, value: string | number, colorClass: string, icon?: React.ElementType, desc?: string }) {
+  const textColorClass = colorClass.replace(/bg-/g, 'text-');
+  
+  return (
+    <div className="flex items-center justify-between p-3 rounded-none border border-border/80 bg-background transition-colors hover:border-border">
+      <div className="flex flex-col gap-1">
+        <div className="flex items-center gap-2.5">
+          {Icon ? (
+            <div className={cn("p-1.5 rounded-md bg-neutral-100 dark:bg-neutral-800", textColorClass)}>
+              <Icon className="w-3.5 h-3.5" />
+            </div>
+          ) : (
+            <div className={cn("w-2 h-2 rounded-full", colorClass)} />
+          )}
+          <span className="text-[11px] font-semibold text-muted-foreground tracking-tight uppercase">{label}</span>
+        </div>
+        {desc && <span className="text-[9px] font-medium text-muted-foreground/80 pl-8 leading-none">{desc}</span>}
+      </div>
+      <span className="text-sm font-bold text-foreground">{value}</span>
+    </div>
+  );
+}
 
 export function AllPaymentsFeature() {
   const locale = useBusinessLocale();
@@ -19,6 +43,8 @@ export function AllPaymentsFeature() {
   const [typeFilter, setTypeFilter] = useState<PaymentTypeFilter>('all');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [mainTab, setMainTab] = useState<'transactions' | 'report'>('transactions');
+  const [panelSide, setPanelSide] = useState<'left' | 'right' | 'top' | 'bottom'>('top');
+  const [showStats, setShowStats] = useState(true);
 
   const fetchPayments = React.useCallback(async () => {
     setLoading(true);
@@ -315,76 +341,103 @@ export function AllPaymentsFeature() {
     ]
   };
 
-  return (
-    <div className="flex flex-col h-full w-full bg-background overflow-hidden relative">
-      
-      {/* SUMMARY WIDGET */}
-      <div className="shrink-0 p-4 border-b border-border/40 grid grid-cols-2 md:grid-cols-4 gap-3 bg-neutral-50/50 dark:bg-neutral-900/30">
-        <div className="bg-background rounded-xl p-3 border border-border/60 shadow-sm flex flex-col">
-          <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider mb-0.5">Booking</span>
-          <span className="text-base font-black text-foreground">Rp {summaryByStage.BOOKING.toLocaleString('id-ID')}</span>
-        </div>
-        <div className="bg-background rounded-xl p-3 border border-border/60 shadow-sm flex flex-col">
-          <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider mb-0.5">Serah Terima</span>
-          <span className="text-base font-black text-foreground">Rp {summaryByStage.HANDOVER.toLocaleString('id-ID')}</span>
-        </div>
-        <div className="bg-background rounded-xl p-3 border border-border/60 shadow-sm flex flex-col">
-          <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider mb-0.5">Masa Kontrak</span>
-          <span className="text-base font-black text-foreground">Rp {summaryByStage.CONTRACT.toLocaleString('id-ID')}</span>
-        </div>
-        <div className="bg-background rounded-xl p-3 border border-border/60 shadow-sm flex flex-col">
-          <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider mb-0.5">Pengembalian (Net)</span>
-          <span className="text-base font-black text-foreground">Rp {summaryByStage.RETURN.toLocaleString('id-ID')}</span>
-        </div>
-      </div>
-
-      {/* Main Tabs */}
-      <div className="flex px-4 border-b border-border/40 bg-background/50 backdrop-blur-sm sticky top-0 z-10 shrink-0">
-        <button
-          className={`px-4 py-3 text-sm font-semibold whitespace-nowrap border-b-2 transition-colors ${mainTab === 'transactions' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground hover:border-muted'}`}
-          onClick={() => setMainTab('transactions')}
-        >
-          Riwayat Transaksi
-        </button>
-        <button
-          className={`px-4 py-3 text-sm font-semibold whitespace-nowrap border-b-2 transition-colors ${mainTab === 'report' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground hover:border-muted'}`}
-          onClick={() => setMainTab('report')}
-        >
-          Laporan per Sewa
-        </button>
-      </div>
-
-      <div className="flex-1 min-h-0 min-w-0 w-full relative">
-        {mainTab === 'transactions' ? (
-          <DataTable
-            data={filteredData}
-            columns={columns}
-            isLoading={loading}
-            searchValue={search}
-            onSearchChange={setSearch}
-            isFilterOpen={isFilterOpen}
-            onFilterOpenChange={setIsFilterOpen}
-            filterConfig={filterConfig}
-            exportable
-            exportFilename="Riwayat_Transaksi_Pembayaran.csv"
-            columnVisibility
-          />
-        ) : (
-          <DataTable
-            data={groupedByBooking}
-            columns={reportColumns}
-            isLoading={loading}
-            searchValue={search}
-            onSearchChange={setSearch}
-            isFilterOpen={isFilterOpen}
-            onFilterOpenChange={setIsFilterOpen}
-            filterConfig={filterConfig}
-            exportable
-            exportFilename="Laporan_Keuangan_Sewa.csv"
-            columnVisibility
-          />
+  const renderStatsPanel = () => {
+    return (
+      <PanelShell
+        title="Ringkasan Penerimaan"
+        side={panelSide}
+        isOpen={showStats}
+        onClose={() => setShowStats(false)}
+        onOpen={() => setShowStats(true)}
+        collapsedTitle="RINGKASAN"
+        onSideChange={setPanelSide}
+        labels={{
+          top: 'Atas',
+          right: 'Kanan',
+          bottom: 'Bawah',
+          left: 'Kiri',
+          hide: 'Sembunyikan',
+          layoutToggleTitle: 'Ubah Posisi Panel',
+        }}
+        className={cn(
+          "shrink-0 bg-white dark:bg-background z-10 border-b border-border",
+          (panelSide === 'top' || panelSide === 'bottom') ? "w-full" : "w-80 min-w-80 h-full"
         )}
+      >
+        <div className={cn("gap-2.5 p-3 bg-neutral-50/50 dark:bg-neutral-900/20", (panelSide === 'top' || panelSide === 'bottom') ? "grid grid-cols-2 md:grid-cols-4" : "flex flex-col h-full")}>
+          <StatCard label="Booking" value={`Rp ${summaryByStage.BOOKING.toLocaleString('id-ID')}`} colorClass="bg-blue-500" icon={CalendarClock} desc="Saat Reservasi" />
+          <StatCard label="Serah Terima" value={`Rp ${summaryByStage.HANDOVER.toLocaleString('id-ID')}`} colorClass="bg-amber-500" icon={Handshake} desc="DP / Awal Sewa" />
+          <StatCard label="Masa Kontrak" value={`Rp ${summaryByStage.CONTRACT.toLocaleString('id-ID')}`} colorClass="bg-primary" icon={FileSignature} desc="Pelunasan Berkala" />
+          <StatCard label="Pengembalian (Net)" value={`Rp ${summaryByStage.RETURN.toLocaleString('id-ID')}`} colorClass="bg-emerald-500" icon={Undo2} desc="Setelah Denda/Refund" />
+        </div>
+      </PanelShell>
+    );
+  };
+
+  return (
+    <div className={cn("flex h-full w-full bg-background overflow-hidden relative", (panelSide === 'top' || panelSide === 'bottom') ? 'flex-col' : 'flex-row')}>
+      
+      {/* Render panel first if top or left */}
+      {(panelSide === 'top' || panelSide === 'left') && renderStatsPanel()}
+
+      <div className="flex-1 min-h-0 min-w-0 w-full relative flex flex-col">
+        {/* Main Tabs */}
+        <div className="flex px-4 border-b border-border bg-white dark:bg-background shrink-0 gap-4">
+          <button
+            className={`py-2.5 text-xs font-bold whitespace-nowrap border-b-[3px] transition-colors ${mainTab === 'transactions' ? 'border-danger text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground hover:border-muted'}`}
+            onClick={() => setMainTab('transactions')}
+          >
+            Riwayat Transaksi
+          </button>
+          <button
+            className={`py-2.5 text-xs font-bold whitespace-nowrap border-b-[3px] transition-colors ${mainTab === 'report' ? 'border-danger text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground hover:border-muted'}`}
+            onClick={() => setMainTab('report')}
+          >
+            Laporan per Sewa
+          </button>
+        </div>
+
+        <div className="flex-1 min-h-0 relative">
+          {mainTab === 'transactions' ? (
+            <DataTable
+              data={filteredData}
+              columns={columns}
+              isLoading={loading}
+              pagination
+              sortable
+              columnVisibility
+              searchValue={search}
+              onSearchChange={setSearch}
+              isFilterOpen={isFilterOpen}
+              onFilterOpenChange={setIsFilterOpen}
+              filterConfig={filterConfig}
+              exportable
+              exportFilename="Riwayat_Transaksi_Pembayaran.csv"
+              className="border-none shadow-none h-full"
+            />
+          ) : (
+            <DataTable
+              data={groupedByBooking}
+              columns={reportColumns}
+              isLoading={loading}
+              pagination
+              sortable
+              columnVisibility
+              searchValue={search}
+              onSearchChange={setSearch}
+              isFilterOpen={isFilterOpen}
+              onFilterOpenChange={setIsFilterOpen}
+              filterConfig={filterConfig}
+              exportable
+              exportFilename="Laporan_Keuangan_Sewa.csv"
+              className="border-none shadow-none h-full"
+            />
+          )}
+        </div>
       </div>
+
+      {/* Render panel last if bottom or right */}
+      {(panelSide === 'bottom' || panelSide === 'right') && renderStatsPanel()}
     </div>
   );
 }
