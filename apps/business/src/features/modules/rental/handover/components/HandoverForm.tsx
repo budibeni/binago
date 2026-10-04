@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Button, FormShell, FormCard, InputString, InputNumber, InputTextarea, Label, InputSelect, InputCheckbox } from '@adatrack/ui';
+import { Card, Button, FormShell, FormCard, InputNumber, InputTextarea, Label, InputSelect, InputCheckbox, InputDateTimeGps } from '@adatrack/ui';
 import { MapPin, Car, Fuel, Wrench, CheckSquare, Clock, FileText, StickyNote } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import type { RentalContract } from '../../contracts/types/contract';
@@ -34,6 +34,10 @@ export function HandoverForm({ contract, handedOverItemIds = [], labels, onSubmi
   }, [contract, handedOverItemIds, activeTab, selectedItemIds]);
 
   const [vehicleData, setVehicleData] = React.useState<Record<string, {
+    handoverAt: string,
+    latitude: number | null,
+    longitude: number | null,
+    address: string,
     odometer: number | null,
     fuelLevel: RentalHandover['fuelLevel'] | '',
     vehicleCondition: RentalHandover['vehicleCondition'] | '',
@@ -46,7 +50,15 @@ export function HandoverForm({ contract, handedOverItemIds = [], labels, onSubmi
       const pendingItems = contract.booking?.items?.filter(i => !handedOverItemIds.includes(i.id)) || [];
       pendingItems.forEach(item => {
         if (!newData[item.id]) {
+          const now = new Date();
+          now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+          const defaultHandoverAt = now.toISOString().slice(0, 16);
+
           newData[item.id] = {
+            handoverAt: defaultHandoverAt,
+            latitude: null,
+            longitude: null,
+            address: '',
             odometer: null,
             fuelLevel: '',
             vehicleCondition: '',
@@ -75,6 +87,10 @@ export function HandoverForm({ contract, handedOverItemIds = [], labels, onSubmi
         alert('Mohon lengkapi data Odometer, BBM, dan Kondisi untuk semua kendaraan yang dipilih.');
         return;
       }
+      if (!data.latitude || !data.longitude) {
+        alert('Lokasi serah terima wajib diambil untuk semua kendaraan yang dipilih.');
+        return;
+      }
     }
 
     const payload = selectedItemIds.map(id => {
@@ -85,10 +101,10 @@ export function HandoverForm({ contract, handedOverItemIds = [], labels, onSubmi
         bookingItemId: id,
         customerId: contract.customerId,
         vehicleId: item!.vehicleId,
-        handoverAt: new Date().toISOString(),
-        handoverLatitude: 0,
-        handoverLongitude: 0,
-        handoverAddress: '-',
+        handoverAt: new Date(data.handoverAt).toISOString(),
+        handoverLatitude: data.latitude!,
+        handoverLongitude: data.longitude!,
+        handoverAddress: data.address || '-',
         odometerStart: Number(data.odometer),
         odometerSource,
         fuelLevel: data.fuelLevel as RentalHandover['fuelLevel'],
@@ -215,7 +231,28 @@ export function HandoverForm({ contract, handedOverItemIds = [], labels, onSubmi
 
                     {isChecked ? (
                       <div className="flex flex-col gap-4 animate-in fade-in duration-300">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                          <InputDateTimeGps
+                            label="Waktu Serah Terima"
+                            value={vehicleData[activeTab]?.handoverAt}
+                            onChange={(v) => setVehicleData({ ...vehicleData, [activeTab]: { ...vehicleData[activeTab], handoverAt: v } })}
+                            latitude={vehicleData[activeTab]?.latitude}
+                            longitude={vehicleData[activeTab]?.longitude}
+                            onCoordinates={(lat, lng) => setVehicleData(prev => ({ ...prev, [activeTab]: { ...prev[activeTab], latitude: lat, longitude: lng } }))}
+                            showAddress={false}
+                            required
+                          />
+                          <InputTextarea
+                            id={`addr-${activeTab}`}
+                            label="Detail Alamat (Opsional)"
+                            value={vehicleData[activeTab]?.address}
+                            onChange={(v) => setVehicleData({ ...vehicleData, [activeTab]: { ...vehicleData[activeTab], address: v } })}
+                            placeholder="Cth: Area lobi..."
+                            rows={2}
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-border/50 pt-3">
                           <InputNumber
                             label="Odometer (km)"
                             value={vehicleData[activeTab]?.odometer ?? null}

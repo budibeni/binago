@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Button, FormShell, FormCard, InputNumber, InputSelect, InputTextarea, InputCheckbox, Label, InputDateTimeGps } from '@adatrack/ui';
-import { Car, FileText, StickyNote } from 'lucide-react';
+import { Car, FileText, StickyNote, Receipt } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import type { RentalContract } from '../../contracts/types/contract';
 import type { RentalHandover } from '../../handover/types/handover';
@@ -86,6 +86,8 @@ export function ReturnForm({ contract, handovers, onSubmit, onCancel, isSubmitti
 
 
   const [notes, setNotes] = React.useState('');
+  const [globalAdditionalFee, setGlobalAdditionalFee] = React.useState<number>(0);
+  const [globalDiscount, setGlobalDiscount] = React.useState<number>(0);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -142,6 +144,28 @@ export function ReturnForm({ contract, handovers, onSubmit, onCancel, isSubmitti
     // @ts-ignore
     onSubmit(payload);
   };
+
+  // --- Kalkulasi Ringkasan Biaya Akhir ---
+  const remainingContract = contract.remainingAmount || 0;
+  const deposit = contract.deposit || 0;
+
+  let totalLateFee = 0;
+  let totalDamageFee = 0;
+  let totalAdditional = 0;
+
+  selectedHandoverIds.forEach(id => {
+    const d = vehicleData[id];
+    if (d) {
+      totalLateFee += Number(d.lateFee) || 0;
+      totalDamageFee += (d.vehicleConditionEnd !== 'GOOD' ? Number(d.damageFee) : 0) || 0;
+      totalAdditional += Number(d.additionalCharges) || 0;
+    }
+  });
+
+  const totalPenalty = totalLateFee + totalDamageFee + totalAdditional;
+  const grandTotal = remainingContract + totalPenalty + globalAdditionalFee - globalDiscount - deposit;
+
+  const formatIDR = (val: number) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(val);
 
   return (
     <FormShell
@@ -283,8 +307,8 @@ export function ReturnForm({ contract, handovers, onSubmit, onCancel, isSubmitti
                           required
                         />
                         {/* Kanan */}
-                        <div className="flex flex-col gap-3 p-4 rounded-xl border border-slate-200/60 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
-                          <p className="text-[11px] uppercase font-bold text-slate-600 dark:text-slate-400">Biaya Tambahan</p>
+                        <div className="flex flex-col gap-3 p-4 rounded-xl border border-neutral-200/60 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/40">
+                          <p className="text-[11px] uppercase font-bold text-neutral-600 dark:text-neutral-400">Biaya Tambahan</p>
                           <InputNumber
                             label="Denda Keterlambatan (Rp)"
                             value={data.lateFee}
@@ -387,6 +411,105 @@ export function ReturnForm({ contract, handovers, onSubmit, onCancel, isSubmitti
                 </div>
               );
             })()}
+          </div>
+        </FormCard>
+
+        {/* SUMMARY: Ringkasan Biaya Akhir */}
+        <FormCard
+          title="Ringkasan Tagihan & Pelunasan"
+          description="Tambahkan potongan/biaya tambahan khusus untuk transaksi ini secara keseluruhan."
+          icon={<Receipt className="w-5 h-5" />}
+          iconWrapperClassName="text-amber-500"
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <InputNumber
+              label="Biaya Tambahan Transaksi (Rp)"
+              value={globalAdditionalFee}
+              onChange={(val) => setGlobalAdditionalFee(val || 0)}
+              placeholder="Cth: Biaya penjemputan, admin..."
+            />
+            <InputNumber
+              label="Potongan / Diskon Global (Rp)"
+              value={globalDiscount}
+              onChange={(val) => setGlobalDiscount(val || 0)}
+              placeholder="Cth: Diskon kompensasi..."
+            />
+          </div>
+
+          <div className="bg-neutral-50 dark:bg-neutral-900/50 rounded-xl border border-border p-5">
+            <div className="flex flex-col gap-3 text-sm">
+              <div className="flex justify-between items-center text-muted-foreground">
+                <span>Sisa Tagihan Kontrak Sewa</span>
+                <span className="font-medium text-foreground">{formatIDR(remainingContract)}</span>
+              </div>
+              
+              {totalLateFee > 0 && (
+                <div className="flex justify-between items-center text-muted-foreground">
+                  <span>Total Denda Keterlambatan</span>
+                  <span className="font-medium text-foreground">{formatIDR(totalLateFee)}</span>
+                </div>
+              )}
+              {totalDamageFee > 0 && (
+                <div className="flex justify-between items-center text-muted-foreground">
+                  <span>Total Biaya Perbaikan (Kerusakan)</span>
+                  <span className="font-medium text-foreground">{formatIDR(totalDamageFee)}</span>
+                </div>
+              )}
+              {totalAdditional > 0 && (
+                <div className="flex justify-between items-center text-muted-foreground">
+                  <span>Total Biaya Lainnya (Per Kendaraan)</span>
+                  <span className="font-medium text-foreground">{formatIDR(totalAdditional)}</span>
+                </div>
+              )}
+              {globalAdditionalFee > 0 && (
+                <div className="flex justify-between items-center text-muted-foreground">
+                  <span>Biaya Tambahan Transaksi (Global)</span>
+                  <span className="font-medium text-foreground">{formatIDR(globalAdditionalFee)}</span>
+                </div>
+              )}
+
+              {globalDiscount > 0 && (
+                <div className="flex justify-between items-center text-emerald-600 dark:text-emerald-400 mt-1">
+                  <span>Potongan / Diskon (Global)</span>
+                  <span className="font-medium">- {formatIDR(globalDiscount)}</span>
+                </div>
+              )}
+
+              {deposit > 0 && (
+                <div className="flex justify-between items-center text-emerald-600 dark:text-emerald-400 mt-1">
+                  <span>Deposit (Jaminan) yang Dipotong</span>
+                  <span className="font-medium">- {formatIDR(deposit)}</span>
+                </div>
+              )}
+
+              <div className="border-t border-border/50 my-2"></div>
+              
+              <div className="flex justify-between items-center">
+                <span className="font-bold text-base">Total Akhir</span>
+                <span className={cn(
+                  "font-bold text-lg",
+                  grandTotal > 0 ? "text-danger" : grandTotal < 0 ? "text-emerald-600 dark:text-emerald-400" : "text-foreground"
+                )}>
+                  {grandTotal < 0 ? `(Refund) ${formatIDR(Math.abs(grandTotal))}` : formatIDR(grandTotal)}
+                </span>
+              </div>
+
+              {grandTotal > 0 && (
+                <p className="text-xs text-danger/80 mt-1 text-right">
+                  *Pelanggan <b>Wajib Membayar</b> sejumlah Rp {grandTotal.toLocaleString('id-ID')}
+                </p>
+              )}
+              {grandTotal < 0 && (
+                <p className="text-xs text-emerald-600/80 dark:text-emerald-400/80 mt-1 text-right">
+                  *Perusahaan melakukan <b>Refund</b> sejumlah Rp {Math.abs(grandTotal).toLocaleString('id-ID')}
+                </p>
+              )}
+              {grandTotal === 0 && (
+                <p className="text-xs text-muted-foreground mt-1 text-right">
+                  *Pembayaran <b>LUNAS</b> (Tidak ada tagihan/refund).
+                </p>
+              )}
+            </div>
           </div>
         </FormCard>
 
