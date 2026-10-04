@@ -121,6 +121,7 @@ function buildNavigation(locale: Locale): NavGroup[] {
         { id: 'rentalContracts', label: t.nav.rentalContracts, href: '/rental/contracts', icon: FileSignature },
 
         { id: 'handovers', label: t.nav.handovers, href: '/rental/handovers', icon: Key },
+        { id: 'monitoring', label: (t.nav as any).monitoring || 'Monitoring', href: '/rental/monitoring', icon: Activity },
         { id: 'returns', label: t.nav.returns, href: '/rental/returns', icon: Undo2 },
         { id: 'rentalPayments', label: (t.nav as any).rentalPayments || 'Pembayaran', href: '/rental/payments', icon: CreditCard },
         { id: 'rentalReports', label: t.nav.rentalReports, href: '/rental/reports', icon: FileText },
