@@ -4,6 +4,7 @@ import React from 'react';
 import { Button, DetailShell } from '@adatrack/ui';
 import { User, Car, MapPin, Key, CheckCircle, Navigation, Info, FileText, StickyNote } from 'lucide-react';
 import { cn } from '@adatrack/utils';
+import { PaymentsFeature } from '../../payments/PaymentsFeature';
 import type { RentalHandover } from '../types/handover';
 
 interface HandoverGroup {
@@ -32,6 +33,7 @@ export function HandoverView({
   onClose,
   layout = 'drawer',
 }: HandoverViewProps) {
+  const [mainTab, setMainTab] = React.useState<'detail' | 'payment'>('detail');
   const [activeTab, setActiveTab] = React.useState<string>('');
 
   React.useEffect(() => {
@@ -101,7 +103,30 @@ export function HandoverView({
           </div>
         </div>
 
-        <div className="p-4 flex flex-col gap-4">
+        {/* Main Tabs */}
+        <div className="flex px-4 border-b border-border/40 bg-background/50 backdrop-blur-sm sticky top-0 z-10 pt-2">
+          <button
+            className={cn(
+              "px-4 py-3 text-sm font-semibold whitespace-nowrap border-b-2 transition-colors",
+              mainTab === 'detail' ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted"
+            )}
+            onClick={() => setMainTab('detail')}
+          >
+            Detail Handover
+          </button>
+          <button
+            className={cn(
+              "px-4 py-3 text-sm font-semibold whitespace-nowrap border-b-2 transition-colors",
+              mainTab === 'payment' ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted"
+            )}
+            onClick={() => setMainTab('payment')}
+          >
+            Pembayaran
+          </button>
+        </div>
+
+        {mainTab === 'detail' ? (
+          <div className="p-4 flex flex-col gap-4">
 
           {/* INFORMASI KONTRAK (Like HandoverForm) */}
           <div className="rounded-2xl border border-border/60 bg-background overflow-hidden">
@@ -262,6 +287,16 @@ export function HandoverView({
           </div>
 
         </div>
+        ) : (
+          <PaymentsFeature 
+            bookingId={contract?.bookingId || c.contractId}
+            customerId={customer?.id || ''}
+            totalAmount={contract?.totalAmount || 0}
+            deposit={contract?.deposit || 0}
+            remainingAmount={contract?.remainingAmount || 0}
+            defaultStage="HANDOVER"
+          />
+        )}
       </div>
     </DetailShell>
   );

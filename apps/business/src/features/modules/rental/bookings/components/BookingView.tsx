@@ -1,10 +1,11 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button, DetailShell } from '@adatrack/ui';
 import { User, Car, Calendar, DollarSign, FileText, CheckCircle2, ClipboardList, Clock, CreditCard, Tag } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import type { Booking } from '../types/booking';
+import { PaymentsFeature } from '../../payments/PaymentsFeature';
 
 interface BookingViewProps {
   booking: Booking | null;
@@ -27,6 +28,8 @@ export function BookingView({
   onCancel,
   layout = 'drawer',
 }: BookingViewProps) {
+  const [activeTab, setActiveTab] = useState<'detail' | 'payment'>('detail');
+
   if (!booking) return null;
 
   const formatCurrency = (value: number) => {
@@ -116,8 +119,35 @@ export function BookingView({
           </div>
         )}
 
+        {/* Tab Navigasi */}
+        <div className="flex border-b border-border/60 bg-background px-4">
+          <button
+            onClick={() => setActiveTab('detail')}
+            className={cn(
+              "px-4 py-3 text-xs font-bold transition-all border-b-2 relative",
+              activeTab === 'detail' 
+                ? "text-primary border-primary" 
+                : "text-muted-foreground border-transparent hover:text-foreground"
+            )}
+          >
+            Detail Booking
+          </button>
+          <button
+            onClick={() => setActiveTab('payment')}
+            className={cn(
+              "px-4 py-3 text-xs font-bold transition-all border-b-2 relative",
+              activeTab === 'payment' 
+                ? "text-primary border-primary" 
+                : "text-muted-foreground border-transparent hover:text-foreground"
+            )}
+          >
+            Pembayaran
+          </button>
+        </div>
+
         {/* Content Body */}
-        <div className="p-3 flex flex-col gap-3">
+        {activeTab === 'detail' ? (
+          <div className="p-3 flex flex-col gap-3">
 
           {/* INFORMASI PELANGGAN */}
           <div className="rounded-2xl border border-border/60 bg-background overflow-hidden">
@@ -225,20 +255,25 @@ export function BookingView({
                     <span className="text-xs font-bold text-foreground">{formatCurrency(booking.driverFee || 0)}</span>
                   </div>
                 )}
-                <div className="flex justify-between items-center pb-2.5 border-b border-border/40">
-                  <span className="text-[11px] text-muted-foreground font-semibold uppercase tracking-wider">Uang Muka (Deposit)</span>
-                  <span className="text-xs font-bold text-foreground">{formatCurrency(booking.deposit || 0)}</span>
-                </div>
                 <div className="flex justify-between items-center pt-1">
-                  <span className="text-xs font-bold text-danger uppercase tracking-wider">Sisa Tagihan</span>
-                  <span className="text-base font-bold text-danger">{formatCurrency(Math.max((booking.totalAmount || 0) - (booking.deposit || 0), 0))}</span>
+                  <span className="text-xs font-bold text-danger uppercase tracking-wider">Total Tagihan</span>
+                  <span className="text-base font-bold text-danger">{formatCurrency(booking.totalAmount || 0)}</span>
                 </div>
               </div>
 
             </div>
           </div>
-
-        </div>
+          </div>
+        ) : (
+          <PaymentsFeature 
+            bookingId={booking.id}
+            customerId={booking.customerId}
+            totalAmount={booking.totalAmount || 0}
+            deposit={booking.deposit || 0}
+            remainingAmount={Math.max((booking.totalAmount || 0) - (booking.deposit || 0), 0)}
+            defaultStage="BOOKING"
+          />
+        )}
       </div>
     </DetailShell>
   );

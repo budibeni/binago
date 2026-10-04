@@ -360,15 +360,7 @@ export function BookingForm({
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
-            <div className="col-span-1">
-              <InputDecimal
-                label={t.fieldDeposit}
-                value={formData.deposit || 0}
-                onChange={(val) => handleChange('deposit', val !== null ? val : 0)}
-                placeholder="0"
-              />
-            </div>
+          <div className="grid grid-cols-2 gap-4">
             <div className="col-span-1">
               <InputDecimal
                 label="Biaya Pengemudi"

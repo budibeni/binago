@@ -122,6 +122,7 @@ function buildNavigation(locale: Locale): NavGroup[] {
 
         { id: 'handovers', label: t.nav.handovers, href: '/rental/handovers', icon: Key },
         { id: 'returns', label: t.nav.returns, href: '/rental/returns', icon: Undo2 },
+        { id: 'rentalPayments', label: (t.nav as any).rentalPayments || 'Pembayaran', href: '/rental/payments', icon: CreditCard },
         { id: 'rentalReports', label: t.nav.rentalReports, href: '/rental/reports', icon: FileText },
       ],
     },

@@ -4,6 +4,7 @@ import React from 'react';
 import { Button, DetailShell } from '@adatrack/ui';
 import { User, Car, MapPin, Key, CheckCircle, Navigation, Info, FileText, StickyNote } from 'lucide-react';
 import { cn } from '@adatrack/utils';
+import { PaymentsFeature } from '../../payments/PaymentsFeature';
 import type { RentalReturn } from '../types/return';
 import type { ReturnGroup } from './ReturnList';
 
@@ -20,6 +21,7 @@ export function ReturnView({
   onClose,
   layout = 'drawer',
 }: ReturnViewProps) {
+  const [mainTab, setMainTab] = React.useState<'detail' | 'payment'>('detail');
   const [activeTab, setActiveTab] = React.useState<string>('');
 
   React.useEffect(() => {
@@ -27,6 +29,13 @@ export function ReturnView({
       setActiveTab(returnGroup.items[0].id);
     }
   }, [returnGroup]);
+
+  const totalAdditionalFees = React.useMemo(() => {
+    if (!returnGroup?.items) return 0;
+    return returnGroup.items.reduce((sum, item) => {
+      return sum + (item.lateFee || 0) + (item.damageFee || 0) + (item.additionalCharges || 0);
+    }, 0);
+  }, [returnGroup?.items]);
 
   if (!returnGroup) return null;
 
@@ -57,6 +66,8 @@ export function ReturnView({
   const contract = c.contract;
   const customer = c.customer;
   const isCompleted = c.status === 'COMPLETED';
+
+  const grandTotalAmount = (contract?.totalAmount || 0) + totalAdditionalFees;
 
   const InfoItem = ({ label, value, highlight = false, valueClassName }: { label: string, value: React.ReactNode, highlight?: boolean, valueClassName?: string }) => (
     <div className="flex flex-col gap-0.5">
@@ -89,7 +100,30 @@ export function ReturnView({
           </div>
         </div>
 
-        <div className="p-4 flex flex-col gap-4">
+        {/* Main Tabs */}
+        <div className="flex px-4 border-b border-border/40 bg-background/50 backdrop-blur-sm sticky top-0 z-10 pt-2">
+          <button
+            className={cn(
+              "px-4 py-3 text-sm font-semibold whitespace-nowrap border-b-2 transition-colors",
+              mainTab === 'detail' ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted"
+            )}
+            onClick={() => setMainTab('detail')}
+          >
+            Detail Pengembalian
+          </button>
+          <button
+            className={cn(
+              "px-4 py-3 text-sm font-semibold whitespace-nowrap border-b-2 transition-colors",
+              mainTab === 'payment' ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted"
+            )}
+            onClick={() => setMainTab('payment')}
+          >
+            Pembayaran
+          </button>
+        </div>
+
+        {mainTab === 'detail' ? (
+          <div className="p-4 flex flex-col gap-4">
 
           {/* INFORMASI KONTRAK */}
           <div className="rounded-2xl border border-border/60 bg-background overflow-hidden">
@@ -250,6 +284,24 @@ export function ReturnView({
           </div>
 
         </div>
+        ) : (
+          <div className="flex flex-col h-full">
+            {totalAdditionalFees > 0 && (
+              <div className="mx-4 mt-4 p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 rounded-xl flex justify-between items-center">
+                <span className="text-[11px] font-medium text-amber-800 dark:text-amber-400">Total Biaya Tambahan (Denda/Kerusakan/Dll)</span>
+                <span className="text-[13px] font-bold text-amber-900 dark:text-amber-300">+ Rp {totalAdditionalFees.toLocaleString('id-ID')}</span>
+              </div>
+            )}
+            <PaymentsFeature 
+              bookingId={contract?.bookingId || c.contractId}
+              customerId={customer?.id || ''}
+              totalAmount={grandTotalAmount}
+              deposit={contract?.deposit || 0}
+              remainingAmount={(contract?.remainingAmount || 0) + totalAdditionalFees}
+              defaultStage="RETURN"
+            />
+          </div>
+        )}
       </div>
     </DetailShell>
   );

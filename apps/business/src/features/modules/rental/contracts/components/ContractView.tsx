@@ -3,6 +3,7 @@ import { Button, DetailShell } from '@adatrack/ui';
 import { User, Car, Calendar, DollarSign, FileText, FileCheck, Info, CheckCircle, Printer, XCircle, CheckCircle2 } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import type { RentalContract } from '../types/contract';
+import { PaymentsFeature } from '../../payments/PaymentsFeature';
 
 interface ContractDetailDrawerProps {
   contract: RentalContract | null;
@@ -25,6 +26,8 @@ export function ContractView({
   onHandover,
   onReturn,
 }: ContractDetailDrawerProps) {
+  const [activeTab, setActiveTab] = React.useState<'detail' | 'payments'>('detail');
+
   if (!contract) return null;
 
   const formatCurrency = (value: number) => {
@@ -126,10 +129,31 @@ export function ContractView({
           </div>
         )}
 
-
+        {/* Tabs */}
+        <div className="flex px-4 bg-background border-b border-border/40">
+          <button
+            onClick={() => setActiveTab('detail')}
+            className={cn(
+              "px-4 py-3 text-[13px] font-bold border-b-2 transition-colors",
+              activeTab === 'detail' ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
+            )}
+          >
+            Detail Kontrak
+          </button>
+          <button
+            onClick={() => setActiveTab('payments')}
+            className={cn(
+              "px-4 py-3 text-[13px] font-bold border-b-2 transition-colors",
+              activeTab === 'payments' ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
+            )}
+          >
+            Pembayaran
+          </button>
+        </div>
 
         {/* Konten Utama */}
-        <div className="p-4 flex flex-col gap-4">
+        {activeTab === 'detail' ? (
+          <div className="p-4 flex flex-col gap-4">
 
           {/* INFORMASI UTAMA & BOOKING */}
           <div className="rounded-2xl border border-border/60 bg-background overflow-hidden">
@@ -245,13 +269,9 @@ export function ContractView({
                     <span className="text-xs font-bold text-foreground">{formatCurrency(contract.driverFee || 0)}</span>
                   </div>
                 )}
-                <div className="flex justify-between items-center pb-2.5 border-b border-border/40">
-                  <span className="text-[11px] text-muted-foreground font-semibold uppercase tracking-wider">Uang Muka (Deposit)</span>
-                  <span className="text-xs font-bold text-foreground">{formatCurrency(contract.deposit || 0)}</span>
-                </div>
                 <div className="flex justify-between items-center pt-1">
-                  <span className="text-xs font-bold text-danger uppercase tracking-wider">Sisa Tagihan</span>
-                  <span className="text-base font-bold text-danger">{formatCurrency(contract.remainingAmount || 0)}</span>
+                  <span className="text-xs font-bold text-danger uppercase tracking-wider">Total Tagihan</span>
+                  <span className="text-base font-bold text-danger">{formatCurrency(contract.totalAmount || 0)}</span>
                 </div>
               </div>
             </div>
@@ -274,8 +294,17 @@ export function ContractView({
               )}
             </div>
           </div>
-
-        </div>
+          </div>
+        ) : (
+          <PaymentsFeature 
+            bookingId={contract.bookingId}
+            customerId={contract.customerId}
+            totalAmount={contract.totalAmount || 0}
+            deposit={contract.deposit || 0}
+            remainingAmount={contract.remainingAmount || 0}
+            defaultStage="CONTRACT"
+          />
+        )}
       </div>
     </DetailShell>
   );
