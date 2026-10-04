@@ -95,6 +95,9 @@ export interface DataTableToolbarProps<TData extends RowData = RowData> {
   // Custom Actions (rendered on the far left)
   customActions?: React.ReactNode;
 
+  // Extra actions (rendered after the search input)
+  extraMiddleActions?: React.ReactNode;
+
   labels?: DataTableLabels;
 
   className?: string;
@@ -132,6 +135,7 @@ export function DataTableToolbar<TData extends RowData = RowData>({
   fetchState = 'idle',
   onRefresh,
   customActions,
+  extraMiddleActions,
   labels,
   className,
 }: DataTableToolbarProps<TData>) {
@@ -167,6 +171,7 @@ export function DataTableToolbar<TData extends RowData = RowData>({
             />
           </div>
         )}
+        {extraMiddleActions}
       </div>
 
       {/* Right area: utilities */}

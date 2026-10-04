@@ -7,6 +7,7 @@ export * from './InputDecimal';
 export * from './InputDate';
 export * from './InputTime';
 export * from './InputDateTime';
+export * from './InputDateTimeGps';
 export * from './InputSelect';
 export * from './InputMultiSelect';
 export * from './InputTextarea';

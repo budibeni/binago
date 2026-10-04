@@ -3,6 +3,7 @@
 import React from 'react';
 import { FileText, Plus, Car, Edit, Printer, MoreVertical, Eye, Trash2, EyeOff } from 'lucide-react';
 import { cn } from '@adatrack/utils';
+import Link from 'next/link';
 import { 
   Button, 
   DataTable, 
@@ -192,6 +193,14 @@ export function ContractList({
       searchValue={searchValue}
       onSearchChange={onSearchChange}
       searchPlaceholder={labels.searchPlaceholder || "Cari kontrak..."}
+      extraMiddleActions={
+        <Link href="/rental/templates/contracts">
+          <Button variant="outline" className="h-8 px-3 gap-2 text-[12px] font-medium border-border/80 text-foreground-muted hover:text-foreground">
+            <FileText className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline-block">Template</span>
+          </Button>
+        </Link>
+      }
       // Filter
       filterConfig={filterConfig}
       isFilterOpen={isFilterOpen}

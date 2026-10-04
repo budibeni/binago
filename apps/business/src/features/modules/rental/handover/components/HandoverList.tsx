@@ -18,6 +18,7 @@ export interface HandoverGroup {
   handoverAddress?: string;
   handoverLatitude: number;
   handoverLongitude: number;
+  status: 'PARTIAL' | 'COMPLETED';
   items: RentalHandover[];
 }
 
@@ -25,7 +26,7 @@ interface HandoverListProps {
   data: HandoverGroup[];
   searchValue: string;
   onSearchChange: (value: string) => void;
-  onViewDetail: (handover: RentalHandover) => void;
+  onViewDetail: (group: HandoverGroup) => void;
   className?: string;
   filterConfig?: any;
   isFilterOpen?: boolean;
@@ -54,7 +55,7 @@ const formatTime = (dateStr: string) => {
 };
 
 function buildColumns(
-  onViewDetail: (h: RentalHandover) => void,
+  onViewDetail: (group: HandoverGroup) => void,
   onViewMap: (h: RentalHandover) => void
 ): DataTableColumnDef<HandoverGroup>[] {
   return [
@@ -68,7 +69,7 @@ function buildColumns(
         <Button 
           variant="ghost" 
           size="sm" 
-          onClick={() => onViewDetail(row.original.items[0])} // just pass the first one for now, or change onViewDetail to handle group
+          onClick={() => onViewDetail(row.original as any)}
           title="Detail Serah Terima" 
           className="h-7 w-7 p-0 flex items-center justify-center transition-colors text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 dark:text-neutral-600 dark:hover:text-neutral-300 dark:hover:bg-neutral-800"
         >
@@ -76,7 +77,6 @@ function buildColumns(
         </Button>
       ),
     },
-
     {
       id: 'handoverInfo',
       accessorKey: 'id',
@@ -100,37 +100,7 @@ function buildColumns(
         return (
           <div className="flex flex-col min-w-0">
             <span className="font-medium text-[12px] text-foreground truncate">{cust.name}</span>
-            <span className="text-[12px] text-muted-foreground truncate capitalize">{cust.type.toLowerCase()}</span>
-          </div>
-        );
-      },
-    },
-    {
-      id: 'vehicle',
-      accessorKey: 'vehicleId',
-      header: 'KENDARAAN',
-      size: 200,
-      cell: ({ row }) => {
-        return (
-          <div className="flex flex-wrap gap-1.5 min-w-0 py-1">
-            {row.original.items.map((item, idx) => {
-              const cv = item.vehicle?.coreVehicle;
-              if (!cv) return null;
-              return (
-                <div 
-                  key={idx}
-                  className={cn(
-                    "flex items-center gap-1.5 px-2 py-1 rounded-md border text-[11px] font-medium shadow-sm",
-                    "bg-muted/50 border-border text-muted-foreground cursor-pointer hover:bg-muted/80 transition-colors"
-                  )}
-                  onClick={() => onViewMap(item)}
-                  title="Klik untuk melihat histori tracking map"
-                >
-                  <Car className="w-3 h-3" />
-                  <span className="font-semibold">{cv.plateNumber}</span>
-                </div>
-              );
-            })}
+            <span className="text-[12px] text-muted-foreground truncate capitalize">{cust.type?.toLowerCase() || '-'}</span>
           </div>
         );
       },
@@ -138,7 +108,7 @@ function buildColumns(
     {
       id: 'date',
       accessorKey: 'handoverAt',
-      header: 'TANGGAL & JAM',
+      header: 'TGL SERAH TERIMA',
       size: 150,
       cell: ({ row }) => (
         <div className="flex flex-col min-w-0">
@@ -148,101 +118,69 @@ function buildColumns(
       ),
     },
     {
-      id: 'location',
-      accessorKey: 'handoverAddress',
-      header: 'LOKASI',
-      size: 200,
+      id: 'status',
+      accessorKey: 'status',
+      header: 'STATUS',
+      size: 110,
       cell: ({ row }) => {
-        const addr = row.original.handoverAddress;
-        const latLng = `${row.original.handoverLatitude}, ${row.original.handoverLongitude}`;
-        if (addr) {
-          return (
-            <div className="flex flex-col min-w-0">
-              <span className="text-[12px] text-foreground truncate" title={addr}>{addr.split(',')[0] || addr}</span>
-              <span className="text-[12px] text-muted-foreground truncate" title={addr}>{addr.includes(',') ? addr.substring(addr.indexOf(',') + 1).trim() : latLng}</span>
-            </div>
-          );
-        }
+        const isCompleted = row.original.status === 'COMPLETED';
         return (
-          <div className="flex flex-col min-w-0">
-            <span className="text-[12px] text-foreground truncate">Koordinat Map</span>
-            <span className="text-[12px] text-muted-foreground truncate">{latLng}</span>
+          <div className={cn(
+            "inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold",
+            isCompleted 
+              ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400" 
+              : "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400"
+          )}>
+            {isCompleted ? 'Selesai' : 'Sebagian'}
+          </div>
+        );
+      }
+    },
+    {
+      id: 'vehicle',
+      accessorKey: 'vehicleId',
+      header: 'KENDARAAN',
+      size: 550,
+      minSize: 350,
+      cell: ({ row }) => {
+        return (
+          <div className="flex flex-wrap gap-1.5 py-1 min-w-[300px]">
+            {row.original.items.map((item, idx) => {
+              const cv = item.vehicle?.coreVehicle;
+              if (!cv) return null;
+              return (
+                <div 
+                  key={idx}
+                  className={cn(
+                    "inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium tracking-wide",
+                    "bg-slate-100 text-slate-700 cursor-pointer hover:bg-slate-200 transition-colors dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                  )}
+                  onClick={() => onViewMap(item)}
+                  title="Klik untuk melihat histori tracking map"
+                >
+                  {cv.plateNumber}
+                </div>
+              );
+            })}
           </div>
         );
       },
     },
     {
-      id: 'odometer',
-      accessorKey: 'odometerStart',
-      header: 'ODOMETER AWAL',
-      size: 140,
-      cell: ({ row }) => (
-        <div className="flex flex-col gap-1 py-1">
-          {row.original.items.map((item, idx) => (
-             <span key={idx} className="text-[12px] font-medium whitespace-nowrap">
-               {row.original.items.length > 1 && <span className="text-muted-foreground mr-1">{item.vehicle?.coreVehicle?.plateNumber}:</span>}
-               {new Intl.NumberFormat('id-ID').format(item.odometerStart)} KM
-             </span>
-          ))}
-        </div>
-      )
+      id: 'contractDate',
+      accessorKey: 'contract.contractDate',
+      header: 'TANGGAL KONTRAK',
+      size: 150,
+      cell: ({ row }) => {
+        const cDate = row.original.contract?.contractDate;
+        return (
+          <div className="flex flex-col min-w-0">
+            <span className="font-medium text-[12px] text-foreground">{formatShortDate(cDate)}</span>
+          </div>
+        );
+      }
     },
-    {
-      id: 'condition',
-      accessorKey: 'vehicleCondition',
-      header: 'KONDISI',
-      size: 130,
-      cell: ({ row }) => (
-        <div className="flex flex-col gap-1 py-1">
-          {row.original.items.map((item, idx) => (
-            <span key={idx} className="text-[12px] whitespace-nowrap">
-              {row.original.items.length > 1 && <span className="text-muted-foreground mr-1">{item.vehicle?.coreVehicle?.plateNumber}:</span>}
-              {getConditionLabel(item.vehicleCondition)}
-            </span>
-          ))}
-        </div>
-      )
-    },
-    {
-      id: 'fuelLevel',
-      accessorKey: 'fuelLevel',
-      header: 'BBM AWAL',
-      size: 130,
-      cell: ({ row }) => (
-        <div className="flex flex-col gap-1 py-1">
-          {row.original.items.map((item, idx) => {
-            const fuel = item.fuelLevel;
-            const fuelLabel = fuel === 'EMPTY' ? 'Kosong' :
-                             fuel === 'QUARTER' ? '1/4' :
-                             fuel === 'HALF' ? '1/2' :
-                             fuel === 'THREE_QUARTER' ? '3/4' :
-                             fuel === 'FULL' ? 'Penuh' : '-';
-            return (
-              <span key={idx} className="text-[12px] whitespace-nowrap">
-                {row.original.items.length > 1 && <span className="text-muted-foreground mr-1">{item.vehicle?.coreVehicle?.plateNumber}:</span>}
-                {fuelLabel}
-              </span>
-            );
-          })}
-        </div>
-      )
-    },
-    {
-      id: 'notes',
-      accessorKey: 'notes',
-      header: 'CATATAN',
-      size: 200,
-      cell: ({ row }) => (
-        <div className="flex flex-col gap-1 py-1 min-w-0">
-          {row.original.items.map((item, idx) => (
-            <div key={idx} className="text-[12px] truncate text-muted-foreground" title={item.notes || '-'}>
-              {row.original.items.length > 1 && <span className="mr-1">{item.vehicle?.coreVehicle?.plateNumber}:</span>}
-              <span>{item.notes || '-'}</span>
-            </div>
-          ))}
-        </div>
-      )
-    },
+    
   ];
 }
 

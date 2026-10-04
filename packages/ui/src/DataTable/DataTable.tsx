@@ -22,6 +22,7 @@ export function DataTable<TData extends RowData = RowData>(
     className,
     tableClassName,
     toolbarActions,
+    extraMiddleActions,
     exportFilename,
 
     // Status
@@ -117,6 +118,7 @@ export function DataTable<TData extends RowData = RowData>(
             hideToolbarLabels={hideToolbarLabels}
             onRefresh={onRefresh}
             customActions={toolbarActions}
+            extraMiddleActions={extraMiddleActions}
             labels={labels}
           />
         </div>

@@ -14,7 +14,7 @@ Dokumen ini menjadi konteks bersama bagi seluruh task halaman Rental. Task halam
 | 4 | Booking | `/rental/bookings` | TASK-04 | **COMPLETED** | Reservasi sewa multi-armada (1 Customer → N Items), validasi ketersediaan tanggal, dan snapshot tarif sewa. |
 | 5 | Kontrak Rental | `/rental/contracts` | TASK-05 | **COMPLETED** | Penerbitan dokumen hukum sewa dari Booking CONFIRMED, pemantauan masa sewa multi-armada, dan cetak kontrak. |
 | 6 | Template Kontrak | `/rental/templates` | TASK-06 | **COMPLETED** | Editor WYSIWYG TipTap HTML untuk mendesain format surat perjanjian sewa dengan tag variabel dinamis. |
-| 7 | Serah Terima | `/rental/contracts/[id]/handover` | TASK-07 | PROPOSED | Pencatatan serah terima fisik armada per unit (odometer awal, BBM, kondisi), mengaktifkan kontrak sewa. |
+| 7 | Serah Terima | `/rental/handovers` | TASK-07 | **COMPLETED** | Pencatatan serah terima fisik armada per unit (odometer awal, BBM, kondisi), mengaktifkan kontrak sewa. |
 | 8 | Pengembalian | `/rental/contracts/[id]/return` | TASK-08 | PROPOSED | Pencatatan pengembalian fisik armada per unit (odometer akhir, cek denda/kerusakan), menyelesaikan kontrak. |
 | 9 | Laporan Rental | `/rental/reports` | TASK-09 | PROPOSED | Analitik dan pelaporan utilisasi armada, pendapatan sewa, durasi sewa, dan tren operasional rental. |
 | 10 | Integrasi lintas halaman | — | TASK-10 | PROPOSED | Validasi alur menyeluruh (Customer → Booking → Kontrak → Handover → Return → Laporan) dan regression test. |

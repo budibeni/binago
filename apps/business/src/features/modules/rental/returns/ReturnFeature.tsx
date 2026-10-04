@@ -3,7 +3,7 @@
 import React from 'react';
 import { ReturnForm } from './components/ReturnForm';
 import { contractService } from '@/data/modules/rental/services/contractService';
-import { handoverRepository } from '@/data/modules/rental/repositories/handoverRepository';
+import { handoverService } from '@/data/modules/rental/services/handoverService';
 import { returnService } from '@/data/modules/rental/services/returnService';
 import type { RentalContract } from '../contracts/types/contract';
 import type { RentalHandover } from '../handover/types/handover';
@@ -43,7 +43,7 @@ export function ReturnFeature({ contractId, open, onOpenChange, onSuccess }: Ret
         for (const item of data.booking?.items || []) {
           const existingReturn = await returnService.getReturnByBookingItemId(contractId, item.id);
           if (!existingReturn) {
-            const hnd = await handoverRepository.getHandoverByBookingItemId(contractId, item.id);
+            const hnd = await handoverService.getHandoverByBookingItemId(contractId, item.id);
             if (hnd) loadedHandovers.push(hnd);
           }
         }
@@ -64,10 +64,12 @@ export function ReturnFeature({ contractId, open, onOpenChange, onSuccess }: Ret
     loadData();
   }, [contractId, open]);
 
-  const handleSubmit = async (data: Omit<RentalReturn, 'id' | 'createdAt' | 'updatedAt'>) => {
+  const handleSubmit = async (data: Omit<RentalReturn, 'id' | 'createdAt' | 'updatedAt'>[]) => {
     setIsSubmitting(true);
     try {
-      await returnService.createReturn(data);
+      for (const d of data) {
+        await returnService.createReturn(d);
+      }
       alert('Pengembalian kendaraan berhasil disimpan.');
       onSuccess();
     } catch (err: any) {

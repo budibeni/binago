@@ -119,7 +119,7 @@ function buildNavigation(locale: Locale): NavGroup[] {
         { id: 'rentalVehicles', label: t.nav.rentalVehicles, href: '/rental/vehicles', icon: CarFront },
         { id: 'bookings', label: t.nav.bookings, href: '/rental/bookings', icon: CalendarClock },
         { id: 'rentalContracts', label: t.nav.rentalContracts, href: '/rental/contracts', icon: FileSignature },
-        { id: 'rentalTemplates', label: (t.nav as any).rentalTemplates || 'Template Kontrak', href: '/rental/templates/contracts', icon: FileText },
+
         { id: 'handovers', label: t.nav.handovers, href: '/rental/handovers', icon: Key },
         { id: 'returns', label: t.nav.returns, href: '/rental/returns', icon: Undo2 },
         { id: 'rentalReports', label: t.nav.rentalReports, href: '/rental/reports', icon: FileText },
@@ -289,9 +289,14 @@ export function BusinessShellLayout({ children }: { children: React.ReactNode })
   let foundItem = null;
   let foundGroup = null;
 
+  let activePath = currentPath;
+  if (currentPath.startsWith('/rental/templates/contracts')) {
+    activePath = '/rental/contracts';
+  }
+
   for (const group of navigation) {
     for (const item of group.items) {
-      if (item.href === currentPath) {
+      if (item.href === activePath) {
         foundItem = item;
         foundGroup = group;
         break;
@@ -300,9 +305,13 @@ export function BusinessShellLayout({ children }: { children: React.ReactNode })
     if (foundItem) break;
   }
 
-  if (foundItem && currentPath !== '/') {
+  if (foundItem && activePath !== '/') {
     breadcrumbItems.push({ label: foundGroup?.title || '' });
-    breadcrumbItems.push({ label: foundItem.label });
+    breadcrumbItems.push({ label: foundItem.label, href: currentPath !== activePath ? activePath : undefined });
+    
+    if (currentPath.startsWith('/rental/templates/contracts')) {
+      breadcrumbItems.push({ label: 'Template' });
+    }
   } else {
     breadcrumbItems.push({ label: t.nav.home });
   }
@@ -319,7 +328,7 @@ export function BusinessShellLayout({ children }: { children: React.ReactNode })
         brandName="ADATRACK"
         navigation={navigation}
         bottomNavigation={buildBottomNavigation(locale)}
-        currentPath={currentPath}
+        currentPath={activePath}
         breadcrumbItems={breadcrumbItems}
         user={DUMMY_USER}
         currentLocale={locale}

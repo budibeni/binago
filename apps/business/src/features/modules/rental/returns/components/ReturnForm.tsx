@@ -1,8 +1,9 @@
 'use client';
 
 import React from 'react';
-import { Button, Checkbox, Label, FormShell, FormCard, InputString, InputNumber, InputDecimal, InputTextarea, InputSelect } from '@adatrack/ui';
-import { MapPin, Car, Gauge, Fuel, CheckSquare, AlertTriangle, DollarSign, Clock } from 'lucide-react';
+import { Button, FormShell, FormCard, InputNumber, InputSelect, InputTextarea, InputCheckbox, Label, InputDateTimeGps } from '@adatrack/ui';
+import { Car, FileText, StickyNote } from 'lucide-react';
+import { cn } from '@adatrack/utils';
 import type { RentalContract } from '../../contracts/types/contract';
 import type { RentalHandover } from '../../handover/types/handover';
 import type { RentalReturn } from '../types/return';
@@ -10,7 +11,7 @@ import type { RentalReturn } from '../types/return';
 interface ReturnFormProps {
   contract: RentalContract;
   handovers: RentalHandover[];
-  onSubmit: (data: Omit<RentalReturn, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  onSubmit: (data: Omit<RentalReturn, 'id' | 'createdAt' | 'updatedAt'>[]) => void;
   onCancel: () => void;
   isSubmitting: boolean;
   layout?: 'default' | 'drawer' | 'dialog' | 'fullscreen';
@@ -18,494 +19,394 @@ interface ReturnFormProps {
   onOpenChange?: (open: boolean) => void;
 }
 
-const FUEL_LEVELS: RentalHandover['fuelLevel'][] = ['EMPTY', 'QUARTER', 'HALF', 'THREE_QUARTER', 'FULL'];
-
-const FUEL_LABELS: Record<string, string> = {
-  EMPTY: 'Kosong',
-  QUARTER: '1/4',
-  HALF: '1/2',
-  THREE_QUARTER: '3/4',
-  FULL: 'Penuh',
-};
-
-const getConditionLabel = (c: string) => {
-  if (c === 'GOOD') return 'Baik';
-  if (c === 'MINOR_DAMAGE') return 'Kerusakan Ringan';
-  return 'Perlu Perbaikan';
-};
-
-const formatDate = (d: string) =>
-  new Date(d).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
-
 export function ReturnForm({ contract, handovers, onSubmit, onCancel, isSubmitting, layout = 'default', open, onOpenChange }: ReturnFormProps) {
-  const [selectedHandoverId, setSelectedHandoverId] = React.useState<string>(handovers[0]?.id || '');
+  const [selectedHandoverIds, setSelectedHandoverIds] = React.useState<string[]>([]);
+  const [activeTab, setActiveTab] = React.useState<string>('');
 
-  const handover = React.useMemo(() => {
-    return handovers.find(h => h.id === selectedHandoverId) || handovers[0];
-  }, [handovers, selectedHandoverId]);
+  const isSingleVehicle = handovers.length === 1;
 
-  const selectedItem = React.useMemo(() => {
-    return contract.booking?.items?.find(i => i.id === handover.bookingItemId);
-  }, [contract, handover]);
+  React.useEffect(() => {
+    if (handovers.length > 0 && !activeTab && selectedHandoverIds.length === 0) {
+      setActiveTab(handovers[0].id);
+      setSelectedHandoverIds(handovers.map(h => h.id));
+    }
+  }, [handovers, activeTab, selectedHandoverIds]);
 
-  const [returnedAt, setReturnedAt] = React.useState(
-    new Date().toISOString().slice(0, 16)
-  );
+  const [vehicleData, setVehicleData] = React.useState<Record<string, {
+    returnedAt: string,
+    latitude: number | null,
+    longitude: number | null,
+    address: string,
+    odometerEnd: number | null,
+    fuelLevelEnd: RentalHandover['fuelLevel'] | '',
+    vehicleConditionEnd: RentalHandover['vehicleCondition'] | '',
+    equipmentEnd: RentalHandover['equipmentChecklist'],
+    damageNotes: string,
+    damageFee: number,
+    lateFee: number,
+    additionalCharges: number,
+  }>>({});
 
-  const [latitude, setLatitude] = React.useState<number | null>(null);
-  const [longitude, setLongitude] = React.useState<number | null>(null);
-  const [address, setAddress] = React.useState('');
-  const [isLocating, setIsLocating] = React.useState(false);
+  React.useEffect(() => {
+    setVehicleData(prev => {
+      const newData = { ...prev };
+      handovers.forEach(h => {
+        if (!newData[h.id]) {
+          // Default to current time, formatted for input type="datetime-local"
+          const now = new Date();
+          now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+          const defaultReturnedAt = now.toISOString().slice(0, 16);
 
-  const [odometerEnd, setOdometerEnd] = React.useState<number>(handover.odometerStart);
-  const [odometerError, setOdometerError] = React.useState('');
+          newData[h.id] = {
+            returnedAt: defaultReturnedAt,
+            latitude: null,
+            longitude: null,
+            address: '',
+            odometerEnd: null,
+            fuelLevelEnd: '',
+            vehicleConditionEnd: '',
+            equipmentEnd: h.equipmentChecklist ? { ...h.equipmentChecklist } : {
+              stnk: false,
+              spareTire: false,
+              jack: false,
+              toolkit: false,
+              triangle: false,
+              fireExtinguisher: false,
+            },
+            damageNotes: '',
+            damageFee: 0,
+            lateFee: 0,
+            additionalCharges: 0,
+          };
+        }
+      });
+      return newData;
+    });
+  }, [handovers]);
 
-  const [fuelLevelEnd, setFuelLevelEnd] = React.useState<RentalHandover['fuelLevel']>('HALF');
-  const [vehicleConditionEnd, setVehicleConditionEnd] = React.useState<RentalHandover['vehicleCondition']>('GOOD');
-
-  const [equipmentEnd, setEquipmentEnd] = React.useState<RentalHandover['equipmentChecklist']>({
-    ...handover.equipmentChecklist,
-  });
-
-  const [hasDamage, setHasDamage] = React.useState(false);
-  const [damageNotes, setDamageNotes] = React.useState('');
-
-  const [lateFee, setLateFee] = React.useState(0);
-  const [damageFee, setDamageFee] = React.useState(0);
-  const [additionalCharges, setAdditionalCharges] = React.useState(0);
 
   const [notes, setNotes] = React.useState('');
 
-  React.useEffect(() => {
-    setOdometerEnd(handover.odometerStart);
-    setEquipmentEnd({ ...handover.equipmentChecklist });
-  }, [handover]);
-
-  // Computed
-  const distanceUsed = Math.max(0, odometerEnd - handover.odometerStart);
-
-  const returnDateTime = new Date(returnedAt);
-  const endDate = new Date(contract.booking?.endDate || contract.contractDate); // Fallback if missing
-  const lateMs = returnDateTime.getTime() - endDate.getTime();
-  const lateHours = lateMs > 0 ? Math.ceil(lateMs / (1000 * 60 * 60)) : 0;
-
-  const totalCharges = lateFee + damageFee + additionalCharges;
-
-  const handleGetLocation = () => {
-    if (!navigator.geolocation) {
-      alert('Geolocation tidak didukung oleh browser Anda.');
-      return;
-    }
-    setIsLocating(true);
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setLatitude(pos.coords.latitude);
-        setLongitude(pos.coords.longitude);
-        setIsLocating(false);
-      },
-      () => {
-        alert('Tidak dapat mengambil lokasi. Pastikan izin lokasi telah diberikan.');
-        setIsLocating(false);
-      }
-    );
-  };
-
-  const handleOdometerChange = (val: number) => {
-    setOdometerEnd(val);
-    if (val < handover.odometerStart) {
-      setOdometerError(`Odometer akhir tidak boleh lebih kecil dari odometer awal (${handover.odometerStart.toLocaleString('id-ID')} KM).`);
-    } else {
-      setOdometerError('');
-    }
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!latitude || !longitude) {
-      alert('Lokasi pengembalian wajib diambil terlebih dahulu.');
-      return;
-    }
-    if (odometerEnd < handover.odometerStart) {
-      alert('Odometer akhir tidak boleh lebih kecil dari odometer awal.');
+    if (selectedHandoverIds.length === 0) {
+      alert('Pilih minimal satu kendaraan untuk dikembalikan.');
       return;
     }
 
-    onSubmit({
-      contractId: contract.id,
-      bookingItemId: handover.bookingItemId,
-      customerId: contract.customerId,
-      vehicleId: selectedItem!.vehicleId,
-      returnedAt: new Date(returnedAt).toISOString(),
-      returnLatitude: latitude,
-      returnLongitude: longitude,
-      returnAddress: address,
-      odometerEnd,
-      fuelLevelEnd,
-      vehicleConditionEnd,
-      equipmentChecklistEnd: equipmentEnd,
-      damageNotes: hasDamage ? damageNotes : '',
-      additionalCharges: totalCharges,
-      lateFee,
-      damageFee,
-      notes,
-      staffId: 'usr-001',
-      staffName: 'Admin',
+    for (const id of selectedHandoverIds) {
+      const data = vehicleData[id];
+      const hnd = handovers.find(h => h.id === id);
+      if (!hnd) continue;
+
+      if (!data.latitude || !data.longitude) {
+        alert(`Lokasi pengembalian wajib diambil untuk kendaraan ${hnd.vehicle?.coreVehicle?.plateNumber || ''}.`);
+        return;
+      }
+      if (data.odometerEnd === null || data.fuelLevelEnd === '' || data.vehicleConditionEnd === '') {
+        alert(`Mohon lengkapi data Odometer, BBM, dan Kondisi untuk kendaraan ${hnd.vehicle?.coreVehicle?.plateNumber || ''}.`);
+        return;
+      }
+      if (data.odometerEnd < hnd.odometerStart) {
+        alert(`Odometer akhir tidak boleh lebih kecil dari odometer awal untuk kendaraan ${hnd.vehicle?.coreVehicle?.plateNumber || ''}.`);
+        return;
+      }
+    }
+
+    const payload = selectedHandoverIds.map(id => {
+      const hnd = handovers.find(h => h.id === id);
+      const data = vehicleData[id];
+      return {
+        contractId: contract.id,
+        bookingItemId: hnd!.bookingItemId,
+        customerId: contract.customerId,
+        vehicleId: hnd!.vehicleId,
+        returnedAt: new Date(data.returnedAt).toISOString(),
+        returnLatitude: data.latitude!,
+        returnLongitude: data.longitude!,
+        returnAddress: data.address || '-',
+        odometerEnd: Number(data.odometerEnd),
+        fuelLevelEnd: data.fuelLevelEnd as RentalHandover['fuelLevel'],
+        vehicleConditionEnd: data.vehicleConditionEnd as RentalHandover['vehicleCondition'],
+        equipmentChecklistEnd: data.equipmentEnd,
+        damageNotes: data.vehicleConditionEnd !== 'GOOD' ? data.damageNotes : '',
+        additionalCharges: Number(data.lateFee) + Number(data.damageFee) + Number(data.additionalCharges),
+        lateFee: Number(data.lateFee),
+        damageFee: Number(data.damageFee),
+        notes: notes,
+        staffId: 'usr-budi',
+        staffName: 'Budi Beni'
+      };
     });
+
+    // @ts-ignore
+    onSubmit(payload);
   };
 
-  const coreVehicle = selectedItem?.vehicle?.coreVehicle;
-
   return (
-    <form onSubmit={handleSubmit} className="w-full h-full relative">
-      <FormShell
-        layout={layout}
-        open={open}
-        onOpenChange={onOpenChange}
-        onCancel={onCancel}
-        cancelProps={{ disabled: isSubmitting }}
-        saveText={isSubmitting ? 'Menyimpan...' : 'Simpan Pengembalian'}
-        saveProps={{ disabled: isSubmitting || !!odometerError }}
-        isSubmitting={isSubmitting}
-      >
-        <div className="space-y-6">
+    <FormShell
+      layout={layout}
+      open={open}
+      onOpenChange={onOpenChange}
+      onSubmit={handleSubmit}
+      onCancel={onCancel}
+      cancelProps={{ disabled: isSubmitting }}
+      cancelText="Batal"
+      saveText={isSubmitting ? 'Menyimpan...' : 'Simpan Pengembalian'}
+      saveProps={{ disabled: isSubmitting || selectedHandoverIds.length === 0 }}
+      isSubmitting={isSubmitting}
+    >
+      <div className="flex flex-col gap-4">
 
-      {/* SECTION 1: Contract Info */}
-      <FormCard title="Informasi Kontrak & Kendaraan" icon={<Car className="w-5 h-5 text-primary" />}>
-        <div className="p-4 grid grid-cols-2 md:grid-cols-3 gap-4">
-          <div>
-            <p className="text-[10px] uppercase font-bold text-muted-foreground mb-1">No. Kontrak</p>
-            <p className="text-sm font-bold">{contract.contractNumber}</p>
-          </div>
-          <div>
-            <p className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Pelanggan</p>
-            <p className="text-sm font-bold">{contract.customer?.name || '-'}</p>
-          </div>
-          <div className="col-span-2 md:col-span-3 mt-2">
-            <InputSelect
-              label="Pilih Kendaraan yang Dikembalikan"
-              value={selectedHandoverId}
-              onChange={setSelectedHandoverId}
-              options={handovers.map(h => {
-                const itm = contract.booking?.items?.find(i => i.id === h.bookingItemId);
-                return {
-                  value: h.id,
-                  label: itm ? `${itm.vehicle?.coreVehicle?.plateNumber} - ${itm.vehicle?.coreVehicle?.brand} ${itm.vehicle?.coreVehicle?.vehicleName}` : h.bookingItemId
-                };
-              })}
-              required
-            />
-          </div>
-        </div>
-      </FormCard>
-
-      {/* SECTION 2: Waktu & Lokasi */}
-      <FormCard title="Waktu & Lokasi Pengembalian" icon={<MapPin className="w-5 h-5 text-primary" />}>
-        <div className="p-4 space-y-4">
-          <div>
-            <Label className="text-[10px] uppercase font-bold text-muted-foreground mb-1 block">
-              Tanggal & Waktu Pengembalian
-            </Label>
-            <input
-              type="datetime-local"
-              value={returnedAt}
-              onChange={(e) => setReturnedAt(e.target.value)}
-              className="w-full sm:w-64 rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-              required
-            />
-            {lateHours > 0 && (
-              <p className="text-xs text-amber-600 dark:text-amber-400 mt-1 flex items-center gap-1">
-                <Clock className="w-3 h-3" />
-                Terlambat {lateHours} jam dari jatuh tempo
+        {/* HEADER: Informasi Kontrak */}
+        <FormCard
+          title="Informasi Kontrak"
+          description="Rincian kontrak penyewaan yang menjadi dasar pengembalian."
+          icon={<FileText className="w-4 h-4 text-primary" />}
+          iconWrapperClassName="text-primary"
+        >
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div>
+              <p className="text-[13px] font-normal text-neutral-500 mb-1">Nomor Kontrak</p>
+              <p className="text-[13px] font-semibold text-foreground">{contract.contractNumber}</p>
+            </div>
+            <div>
+              <p className="text-[13px] font-normal text-neutral-500 mb-1">Pelanggan</p>
+              <p className="text-[13px] font-semibold text-foreground">{contract.customer?.name || '-'}</p>
+            </div>
+            <div>
+              <p className="text-[13px] font-normal text-neutral-500 mb-1">Periode Sewa</p>
+              <p className="text-[13px] font-semibold text-foreground">
+                {new Date(contract.startDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })} - {new Date(contract.endDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })}
               </p>
+            </div>
+            <div>
+              <p className="text-[13px] font-normal text-neutral-500 mb-1">Layanan</p>
+              <p className="text-[13px] font-semibold text-foreground">
+                {contract.rentalType === 'SELF_DRIVE' ? 'Lepas Kunci' : 'Dgn Sopir'} <span className="text-muted-foreground font-normal">({contract.rateType === 'DAILY' ? 'Harian' : contract.rateType === 'WEEKLY' ? 'Mingguan' : 'Bulanan'})</span>
+              </p>
+            </div>
+          </div>
+        </FormCard>
+
+        {/* KONTEN: Detail Kendaraan (Tabs) */}
+        <FormCard
+          title={isSingleVehicle ? "Detail Pengembalian" : "Detail Pengembalian (Pilih Tab)"}
+          description="Lengkapi data pengembalian untuk kendaraan di bawah ini."
+          icon={<Car className="w-5 h-5" />}
+          iconWrapperClassName="text-sky-500"
+        >
+          <div className="space-y-3">
+            {!isSingleVehicle && (
+              <div className="shrink-0 bg-background border-b border-border mb-3">
+                <div className="flex items-center overflow-x-auto hide-scrollbar">
+                  {handovers.map(h => {
+                    const id = h.id;
+                    const isSelected = activeTab === id;
+                    const isChecked = selectedHandoverIds.includes(id);
+
+                    return (
+                      <button
+                        key={id}
+                        type="button"
+                        onClick={() => setActiveTab(id)}
+                        className={cn(
+                          "px-4 h-[34px] text-xs font-semibold border-b-2 transition-colors focus:outline-none flex items-center gap-2 pt-[2px] whitespace-nowrap",
+                          isSelected ? 'border-b-danger text-foreground' : 'border-b-transparent text-muted-foreground hover:text-foreground'
+                        )}
+                      >
+                        <div className={cn("w-2 h-2 rounded-full", isChecked ? "bg-primary" : "bg-neutral-300")} />
+                        <Car className={cn("h-3.5 w-3.5", isSelected ? "text-sky-500 dark:text-sky-400" : "opacity-70")} />
+                        {h.vehicle?.coreVehicle?.plateNumber}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             )}
-          </div>
 
-          <div>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleGetLocation}
-              disabled={isLocating}
-              className="gap-2"
-            >
-              <MapPin className="w-4 h-4" />
-              {isLocating ? 'Mengambil lokasi...' : 'Ambil Lokasi Saat Ini'}
-            </Button>
-          </div>
+            {activeTab && vehicleData[activeTab] && (() => {
+              const h = handovers.find(i => i.id === activeTab);
+              const isChecked = selectedHandoverIds.includes(activeTab);
+              const data = vehicleData[activeTab];
 
-          {(latitude || longitude) && (
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <InputString
-                  id="latitude"
-                  label="Latitude"
-                  value={latitude !== null ? String(latitude) : ''}
-                  onChange={() => {}}
-                  readOnly
-                  className="bg-neutral-50 dark:bg-neutral-900/50"
-                />
-              </div>
-              <div>
-                <InputString
-                  id="longitude"
-                  label="Longitude"
-                  value={longitude !== null ? String(longitude) : ''}
-                  onChange={() => {}}
-                  readOnly
-                  className="bg-neutral-50 dark:bg-neutral-900/50"
-                />
-              </div>
-              <div className="col-span-2">
-                <InputTextarea
-                  id="address"
-                  label="Alamat (Opsional)"
-                  value={address}
-                  onChange={setAddress}
-                  placeholder="Masukkan alamat pengembalian"
-                  rows={2}
-                />
-              </div>
-            </div>
-          )}
-        </div>
-      </FormCard>
+              if (!h) return null;
 
-      {/* SECTION 3: Odometer */}
-      <FormCard title="Odometer" icon={<Gauge className="w-5 h-5 text-primary" />}>
-        <div className="p-4 grid grid-cols-1 sm:grid-cols-3 gap-6">
-          <div className="p-4 bg-neutral-50 dark:bg-neutral-900/50 rounded-xl border border-border">
-            <p className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Odometer Awal (Serah Terima)</p>
-            <p className="text-xl font-bold">{handover.odometerStart.toLocaleString('id-ID')}</p>
-            <p className="text-xs text-muted-foreground">KM</p>
-          </div>
-          <div>
-            <InputNumber
-              id="odometerEnd"
-              label="Odometer Akhir (KM)"
-              value={odometerEnd}
-              onChange={(val) => handleOdometerChange(val || 0)}
-              min={handover.odometerStart}
-              error={odometerError}
-              required
-            />
-          </div>
-          <div className="p-4 bg-primary/5 dark:bg-primary/10 rounded-xl border border-primary/20">
-            <p className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Jarak Tempuh</p>
-            <p className="text-xl font-bold text-primary">{distanceUsed.toLocaleString('id-ID')}</p>
-            <p className="text-xs text-muted-foreground">KM</p>
-          </div>
-        </div>
-      </FormCard>
-
-      {/* SECTION 4: BBM */}
-      <FormCard title="Bahan Bakar" icon={<Fuel className="w-5 h-5 text-primary" />}>
-        <div className="p-4 space-y-4">
-          <div className="flex items-center gap-3 p-3 bg-neutral-50 dark:bg-neutral-900/50 rounded-lg border border-border">
-            <span className="text-[10px] uppercase font-bold text-muted-foreground w-32 shrink-0">BBM Saat Serah Terima:</span>
-            <span className="font-bold text-sm">{FUEL_LABELS[handover.fuelLevel]}</span>
-          </div>
-          <div>
-            <Label className="text-[10px] uppercase font-bold text-muted-foreground mb-2 block">BBM Saat Pengembalian</Label>
-            <div className="flex flex-wrap gap-2">
-              {FUEL_LEVELS.map(lvl => (
-                <Button
-                  key={lvl}
-                  type="button"
-                  variant={fuelLevelEnd === lvl ? 'primary' : 'outline'}
-                  onClick={() => setFuelLevelEnd(lvl)}
-                >
-                  {FUEL_LABELS[lvl]}
-                </Button>
-              ))}
-            </div>
-          </div>
-        </div>
-      </FormCard>
-
-      {/* SECTION 5: Kondisi */}
-      <FormCard title="Kondisi Kendaraan" icon={<Car className="w-5 h-5 text-primary" />}>
-        <div className="p-4 space-y-4">
-          <div className="flex items-center gap-3 p-3 bg-neutral-50 dark:bg-neutral-900/50 rounded-lg border border-border">
-            <span className="text-[10px] uppercase font-bold text-muted-foreground w-32 shrink-0">Kondisi Awal:</span>
-            <span className="font-bold text-sm">{getConditionLabel(handover.vehicleCondition)}</span>
-          </div>
-          <div>
-            <Label className="text-[10px] uppercase font-bold text-muted-foreground mb-2 block">Kondisi Saat Pengembalian</Label>
-            <div className="flex flex-wrap gap-2">
-              {(['GOOD', 'MINOR_DAMAGE', 'NEEDS_REPAIR'] as const).map(cond => (
-                <Button
-                  key={cond}
-                  type="button"
-                  variant={vehicleConditionEnd === cond ? 'primary' : 'outline'}
-                  className={vehicleConditionEnd === cond ? (
-                    cond === 'GOOD' ? 'bg-success hover:bg-success/90' :
-                    cond === 'MINOR_DAMAGE' ? 'bg-amber-500 hover:bg-amber-600' :
-                    'bg-danger hover:bg-danger/90'
-                  ) : ''}
-                  onClick={() => setVehicleConditionEnd(cond)}
-                >
-                  {getConditionLabel(cond)}
-                </Button>
-              ))}
-            </div>
-          </div>
-        </div>
-      </FormCard>
-
-      {/* SECTION 6: Checklist */}
-      <FormCard title="Kelengkapan Kendaraan" icon={<CheckSquare className="w-5 h-5 text-primary" />}>
-        <div className="p-4">
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-            {Object.keys(equipmentEnd).map((key) => {
-              if (key === 'other') return null;
-              const wasAvailable = (handover.equipmentChecklist as any)[key];
               return (
-                <div key={key} className="flex items-center gap-2">
-                  <Checkbox
-                    id={`ret-eq-${key}`}
-                    checked={(equipmentEnd as any)[key]}
-                    onCheckedChange={(c) => setEquipmentEnd({ ...equipmentEnd, [key]: c === true })}
-                  />
-                  <Label htmlFor={`ret-eq-${key}`} className="text-sm capitalize cursor-pointer">
-                    {key.replace(/([A-Z])/g, ' $1').trim()}
-                    {!wasAvailable && (
-                      <span className="ml-1 text-xs text-amber-500">(tidak ada saat serah terima)</span>
-                    )}
-                  </Label>
+                <div className="flex flex-col gap-4 pt-1">
+                  {/* Header: Nama Kendaraan | Waktu Serah Terima | Checkbox */}
+                  <div className="flex items-center justify-between gap-3 pb-3 border-b border-border">
+                    <div className="min-w-0">
+                      <h5 className="font-bold text-sm">{h.vehicle?.coreVehicle?.plateNumber}</h5>
+                      <p className="text-xs text-muted-foreground">{h.vehicle?.coreVehicle?.brand} {h.vehicle?.coreVehicle?.vehicleName}</p>
+                    </div>
+                    <div className="flex items-center gap-3 shrink-0">
+                      <div className="flex flex-col items-end">
+                        <p className="text-[10px] font-medium text-sky-600 dark:text-sky-400 uppercase tracking-wider">Serah Terima</p>
+                        <p className="text-xs font-semibold text-sky-900 dark:text-sky-100">
+                          {new Date(h.handoverAt).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })}
+                        </p>
+                      </div>
+                      {!isSingleVehicle && (
+                        <div className="flex items-center gap-2 bg-primary/5 hover:bg-primary/10 border border-primary/20 px-3 py-2 rounded-lg transition-colors">
+                          <InputCheckbox
+                            label="Kembalikan kendaraan ini"
+                            value={isChecked}
+                            onChange={(checked) => {
+                              if (checked) setSelectedHandoverIds([...selectedHandoverIds, activeTab]);
+                              else setSelectedHandoverIds(selectedHandoverIds.filter(id => id !== activeTab));
+                            }}
+                            className="m-0"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {isChecked ? (
+                    <div className="flex flex-col gap-4 animate-in fade-in duration-300">
+
+                      {/* ROW 1: Kiri = Waktu Pengembalian, Kanan = Biaya Tambahan */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                        {/* Kiri */}
+                        <InputDateTimeGps
+                          label="Waktu Pengembalian"
+                          value={data.returnedAt}
+                          onChange={(v) => setVehicleData({ ...vehicleData, [activeTab]: { ...data, returnedAt: v } })}
+                          latitude={data.latitude}
+                          longitude={data.longitude}
+                          onCoordinates={(lat, lng) => setVehicleData(prev => ({ ...prev, [activeTab]: { ...prev[activeTab], latitude: lat, longitude: lng } }))}
+                          address={data.address}
+                          onAddressChange={(v) => setVehicleData({ ...vehicleData, [activeTab]: { ...data, address: v } })}
+                          addressLabel="Detail Alamat (Opsional)"
+                          addressPlaceholder="Cth: Area parkir basement B2..."
+                          required
+                        />
+                        {/* Kanan */}
+                        <div className="flex flex-col gap-3 p-4 rounded-xl border border-slate-200/60 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
+                          <p className="text-[11px] uppercase font-bold text-slate-600 dark:text-slate-400">Biaya Tambahan</p>
+                          <InputNumber
+                            label="Denda Keterlambatan (Rp)"
+                            value={data.lateFee}
+                            onChange={(val) => setVehicleData({ ...vehicleData, [activeTab]: { ...data, lateFee: val || 0 } })}
+                          />
+                          <InputNumber
+                            label="Biaya Lainnya (Rp)"
+                            value={data.additionalCharges}
+                            onChange={(val) => setVehicleData({ ...vehicleData, [activeTab]: { ...data, additionalCharges: val || 0 } })}
+                          />
+                        </div>
+                      </div>
+
+                      {/* ROW 2: Odometer, BBM, Kondisi */}
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-border/50 pt-3">
+                        <InputNumber
+                          label={`Odometer Akhir (KM) - Awal: ${h.odometerStart}`}
+                          value={data.odometerEnd}
+                          onChange={(val) => setVehicleData({ ...vehicleData, [activeTab]: { ...data, odometerEnd: val } })}
+                          min={h.odometerStart}
+                          placeholder="Contoh: 15500"
+                        />
+                        <InputSelect
+                          label="BBM Akhir"
+                          value={data.fuelLevelEnd}
+                          onChange={(val) => setVehicleData({ ...vehicleData, [activeTab]: { ...data, fuelLevelEnd: val as any } })}
+                          placeholder="Pilih Kondisi BBM"
+                          options={[
+                            { value: 'EMPTY', label: 'Kosong' },
+                            { value: 'QUARTER', label: '1/4' },
+                            { value: 'HALF', label: '1/2' },
+                            { value: 'THREE_QUARTER', label: '3/4' },
+                            { value: 'FULL', label: 'Penuh' },
+                          ]}
+                        />
+                        <InputSelect
+                          label="Kondisi Kendaraan"
+                          value={data.vehicleConditionEnd}
+                          onChange={(val) => setVehicleData({ ...vehicleData, [activeTab]: { ...data, vehicleConditionEnd: val as any } })}
+                          placeholder="Pilih Kondisi Kendaraan"
+                          options={[
+                            { value: 'GOOD', label: 'Baik' },
+                            { value: 'MINOR_DAMAGE', label: 'Kerusakan Ringan' },
+                            { value: 'NEEDS_REPAIR', label: 'Perlu Perbaikan' },
+                          ]}
+                        />
+                      </div>
+
+                      {/* ROW 3: Detail Kerusakan (jika ada) */}
+                      {data.vehicleConditionEnd && data.vehicleConditionEnd !== 'GOOD' && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in border-t border-border/50 pt-3">
+                          <InputTextarea
+                            label="Detail Kerusakan"
+                            value={data.damageNotes}
+                            onChange={(val) => setVehicleData({ ...vehicleData, [activeTab]: { ...data, damageNotes: val } })}
+                            placeholder="Deskripsikan kerusakan yang ditemukan..."
+                            rows={2}
+                          />
+                          <InputNumber
+                            label="Taksiran Biaya Perbaikan (Rp)"
+                            value={data.damageFee}
+                            onChange={(val) => setVehicleData({ ...vehicleData, [activeTab]: { ...data, damageFee: val || 0 } })}
+                          />
+                        </div>
+                      )}
+
+                      {/* ROW 4: Kelengkapan */}
+                      <div className="border-t border-border/50 pt-3">
+                        <Label className="text-[11px] uppercase font-semibold text-muted-foreground mb-2 block">Kelengkapan Kendaraan</Label>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                          {Object.keys(data.equipmentEnd || {}).map((key) => {
+                            if (key === 'other') return null;
+                            return (
+                              <div key={key} className="flex items-center">
+                                <InputCheckbox
+                                  id={`eq-${activeTab}-${key}`}
+                                  label={key.replace(/([A-Z])/g, ' $1').trim().replace(/^\w/, c => c.toUpperCase())}
+                                  value={(data.equipmentEnd as any)?.[key] || false}
+                                  onChange={(checked) => setVehicleData({
+                                    ...vehicleData,
+                                    [activeTab]: {
+                                      ...data,
+                                      equipmentEnd: { ...data.equipmentEnd, [key]: checked === true }
+                                    }
+                                  })}
+                                />
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                    </div>
+                  ) : (
+                    <div className="py-8 text-center bg-neutral-50 dark:bg-neutral-800/50 rounded-lg border border-dashed border-neutral-200 dark:border-neutral-700">
+                      <p className="text-sm text-muted-foreground">Kendaraan ini tidak dipilih untuk dikembalikan saat ini.</p>
+                      <p className="text-xs text-muted-foreground mt-1">Centang kotak di atas untuk memproses pengembaliannya.</p>
+                    </div>
+                  )}
                 </div>
               );
-            })}
+            })()}
           </div>
-        </div>
-      </FormCard>
+        </FormCard>
 
-      {/* SECTION 7: Kerusakan */}
-      <FormCard title="Kerusakan" icon={<AlertTriangle className="w-5 h-5 text-primary" />}>
-        <div className="p-4 space-y-4">
-          <div className="flex gap-3">
-            <Label className="text-sm font-medium">Ada kerusakan baru?</Label>
-            <div className="flex gap-2">
-              <Button
-                type="button"
-                variant={!hasDamage ? 'primary' : 'outline'}
-                onClick={() => setHasDamage(false)}
-              >
-                Tidak
-              </Button>
-              <Button
-                type="button"
-                variant={hasDamage ? 'primary' : 'outline'}
-                className={hasDamage ? 'bg-danger hover:bg-danger/90' : ''}
-                onClick={() => setHasDamage(true)}
-              >
-                Ya
-              </Button>
-            </div>
-          </div>
-          {hasDamage && (
-            <div>
-              <InputTextarea
-                id="damageNotes"
-                label="Deskripsi Kerusakan"
-                value={damageNotes}
-                onChange={setDamageNotes}
-                placeholder="Contoh: Bemper depan sebelah kanan tergores."
-                className="min-h-[80px]"
-              />
-            </div>
-          )}
-        </div>
-      </FormCard>
-
-      {/* SECTION 8: Biaya Tambahan */}
-      <FormCard title="Biaya Tambahan" icon={<DollarSign className="w-5 h-5 text-primary" />}>
-        <div className="p-4 space-y-4">
-          {lateHours > 0 && (
-            <div className="p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800 text-sm text-amber-700 dark:text-amber-400">
-              Pengembalian terlambat <strong>{lateHours} jam</strong>. Harap masukkan biaya keterlambatan.
-            </div>
-          )}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div>
-              <InputDecimal
-                id="lateFee"
-                label="Biaya Keterlambatan (Rp)"
-                value={lateFee}
-                onChange={(val) => setLateFee(val !== null ? val : 0)}
-                prefixIcon={<span className="text-muted-foreground text-sm font-medium">Rp</span>}
-                min={0}
-              />
-            </div>
-            <div>
-              <InputDecimal
-                id="damageFee"
-                label="Biaya Kerusakan (Rp)"
-                value={damageFee}
-                onChange={(val) => setDamageFee(val !== null ? val : 0)}
-                prefixIcon={<span className="text-muted-foreground text-sm font-medium">Rp</span>}
-                min={0}
-              />
-            </div>
-            <div>
-              <InputDecimal
-                id="additionalCharges"
-                label="Biaya Lainnya (Rp)"
-                value={additionalCharges}
-                onChange={(val) => setAdditionalCharges(val !== null ? val : 0)}
-                prefixIcon={<span className="text-muted-foreground text-sm font-medium">Rp</span>}
-                min={0}
-              />
-            </div>
-          </div>
-          <div className="flex items-center justify-between p-3 bg-neutral-50 dark:bg-neutral-900/50 rounded-lg border border-border">
-            <span className="text-sm font-bold">Total Biaya Tambahan</span>
-            <span className="text-lg font-bold text-primary">
-              {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(totalCharges)}
-            </span>
-          </div>
-        </div>
-      </FormCard>
-
-      {/* Summary Card */}
-      <FormCard title="Ringkasan Pengembalian" className="bg-primary/5 dark:bg-primary/10 border-primary/20 shadow-sm">
-        <div className="p-4 grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Odometer Awal</span>
-            <span className="font-medium">{handover.odometerStart.toLocaleString('id-ID')} KM</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Odometer Akhir</span>
-            <span className="font-medium">{odometerEnd.toLocaleString('id-ID')} KM</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Jarak Tempuh</span>
-            <span className="font-bold text-primary">{distanceUsed.toLocaleString('id-ID')} KM</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Keterlambatan</span>
-            <span className={lateHours > 0 ? 'font-bold text-amber-500' : 'font-medium'}>{lateHours > 0 ? `${lateHours} jam` : 'Tepat waktu'}</span>
-          </div>
-          <div className="flex justify-between col-span-2 border-t border-primary/20 pt-2 mt-1">
-            <span className="text-muted-foreground">Total Biaya Tambahan</span>
-            <span className="font-bold text-danger">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(totalCharges)}</span>
-          </div>
-        </div>
-      </FormCard>
-
-      {/* Notes */}
-      <FormCard title="Catatan">
-        <div className="p-4">
+        {/* FOOTER: Catatan */}
+        <FormCard
+          title="Catatan Keseluruhan"
+          description="Catatan tambahan secara keseluruhan jika ada."
+          icon={<StickyNote className="w-4 h-4 text-neutral-500" />}
+          iconWrapperClassName="text-neutral-500"
+        >
           <InputTextarea
             id="notes"
             value={notes}
             onChange={setNotes}
-            placeholder="Catatan tambahan terkait pengembalian (opsional)"
-            className="min-h-[80px]"
+            placeholder="Catatan tambahan terkait pengembalian keseluruhan (Opsional)..."
+            rows={3}
           />
-        </div>
-      </FormCard>
-        </div>
-      </FormShell>
-    </form>
+        </FormCard>
+
+      </div>
+    </FormShell>
   );
 }

@@ -1,43 +1,54 @@
 'use client';
 
 import React from 'react';
-import { Eye, MapPin } from 'lucide-react';
+import { Eye, Car, Check } from 'lucide-react';
+import { cn } from '@adatrack/utils';
 import { useRouter } from 'next/navigation';
 import { Button, DataTable } from '@adatrack/ui';
 import type { DataTableColumnDef } from '@adatrack/ui';
 import { trackingNavigationService } from '@/features/core/tracking/services/trackingNavigationService';
 import type { RentalReturn } from '../types/return';
 
+export interface ReturnGroup {
+  id: string; // group ID (contractId)
+  contractId: string;
+  contract?: any;
+  customer?: any;
+  returnedAt: string;
+  returnAddress?: string;
+  returnLatitude?: number;
+  returnLongitude?: number;
+  status: 'PARTIAL' | 'COMPLETED';
+  items: RentalReturn[];
+}
+
 interface ReturnListProps {
-  data: RentalReturn[];
+  data: ReturnGroup[];
   searchValue: string;
   onSearchChange: (value: string) => void;
-  onViewDetail: (ret: RentalReturn) => void;
+  onViewDetail: (group: ReturnGroup) => void;
   className?: string;
   filterConfig?: any;
   isFilterOpen?: boolean;
   onFilterOpenChange?: (open: boolean) => void;
 }
 
-const getConditionLabel = (c: string) => {
-  if (c === 'GOOD') return 'Baik';
-  if (c === 'MINOR_DAMAGE') return 'Kerusakan Ringan';
-  return 'Perlu Perbaikan';
+const formatShortDate = (dateStr: string) => {
+  if (!dateStr) return '-';
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
 };
 
-const formatShortDate = (d: string) =>
-  d ? new Date(d).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-';
-
-const formatTime = (d: string) =>
-  d ? new Date(d).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '-';
-
-const formatCurrency = (v: number) =>
-  new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(v || 0);
+const formatTime = (dateStr: string) => {
+  if (!dateStr) return '-';
+  const d = new Date(dateStr);
+  return d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+};
 
 function buildColumns(
-  onViewDetail: (r: RentalReturn) => void,
-  onViewMap: (r: RentalReturn) => void,
-): DataTableColumnDef<RentalReturn>[] {
+  onViewDetail: (group: ReturnGroup) => void,
+  onViewMap: (r: RentalReturn) => void
+): DataTableColumnDef<ReturnGroup>[] {
   return [
     {
       id: 'detail',
@@ -46,46 +57,26 @@ function buildColumns(
       enableHiding: false,
       meta: { exportable: false, fixedWidth: true },
       cell: ({ row }) => (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => onViewDetail(row.original)}
-          title="Detail Pengembalian"
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={() => onViewDetail(row.original as any)}
+          title="Detail Pengembalian" 
           className="h-7 w-7 p-0 flex items-center justify-center transition-colors text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 dark:text-neutral-600 dark:hover:text-neutral-300 dark:hover:bg-neutral-800"
         >
-          <Eye className="w-3.5 h-3.5" />
-        </Button>
-      ),
-    },
-    {
-      id: 'map',
-      header: '',
-      size: 40,
-      enableHiding: false,
-      meta: { exportable: false, fixedWidth: true },
-      cell: ({ row }) => (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => onViewMap(row.original)}
-          title="Lihat Histori Perjalanan"
-          className="h-7 w-7 p-0 flex items-center justify-center transition-colors text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 dark:text-neutral-600 dark:hover:text-neutral-300 dark:hover:bg-neutral-800"
-        >
-          <MapPin className="w-3.5 h-3.5" />
+          <Eye className="w-3.5 h-3.5" /> 
         </Button>
       ),
     },
     {
       id: 'returnInfo',
       accessorKey: 'id',
-      header: 'ID PENGEMBALIAN',
-      size: 170,
+      header: 'ID RETURN',
+      size: 160,
       cell: ({ row }) => (
         <div className="flex flex-col min-w-0">
           <span className="font-medium text-[12px] truncate">{row.original.id}</span>
-          <span className="text-[12px] text-muted-foreground truncate">
-            {row.original.contract?.contractNumber || row.original.contractId}
-          </span>
+          <span className="text-[12px] text-muted-foreground truncate">{row.original.contract?.contractNumber || row.original.contractId}</span>
         </div>
       ),
     },
@@ -100,29 +91,13 @@ function buildColumns(
         return (
           <div className="flex flex-col min-w-0">
             <span className="font-medium text-[12px] text-foreground truncate">{cust.name}</span>
-            <span className="text-[12px] text-muted-foreground truncate capitalize">{cust.type?.toLowerCase()}</span>
+            <span className="text-[12px] text-muted-foreground truncate capitalize">{cust.type?.toLowerCase() || '-'}</span>
           </div>
         );
       },
     },
     {
-      id: 'vehicle',
-      accessorKey: 'vehicle.coreVehicle.plateNumber',
-      header: 'KENDARAAN',
-      size: 200,
-      cell: ({ row }) => {
-        const cv = row.original.vehicle?.coreVehicle;
-        if (!cv) return <span className="text-muted-foreground text-[12px]">-</span>;
-        return (
-          <div className="flex flex-col min-w-0">
-            <span className="font-medium text-[12px] text-foreground truncate">{cv.brand} {cv.vehicleName}</span>
-            <span className="text-[12px] text-muted-foreground truncate">{cv.plateNumber}</span>
-          </div>
-        );
-      },
-    },
-    {
-      id: 'returnedAt',
+      id: 'date',
       accessorKey: 'returnedAt',
       header: 'TGL PENGEMBALIAN',
       size: 150,
@@ -134,69 +109,76 @@ function buildColumns(
       ),
     },
     {
-      id: 'odometer',
-      accessorKey: 'odometerEnd',
-      header: 'ODOMETER',
-      size: 150,
+      id: 'status',
+      accessorKey: 'status',
+      header: 'STATUS',
+      size: 110,
       cell: ({ row }) => {
-        const ret = row.original;
-        const distanceUsed = ret.handover
-          ? ret.odometerEnd - ret.handover.odometerStart
-          : null;
+        const isCompleted = row.original.status === 'COMPLETED';
         return (
-          <div className="flex flex-col min-w-0">
-            <span className="font-medium text-[12px] text-foreground">
-              {new Intl.NumberFormat('id-ID').format(ret.odometerEnd)} KM
-            </span>
-            {distanceUsed !== null && (
-              <span className="text-[12px] text-muted-foreground">
-                +{new Intl.NumberFormat('id-ID').format(distanceUsed)} KM
-              </span>
-            )}
+          <div className={cn(
+            "inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold",
+            isCompleted 
+              ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400" 
+              : "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400"
+          )}>
+            {isCompleted ? 'Selesai' : 'Sebagian'}
+          </div>
+        );
+      }
+    },
+    {
+      id: 'vehicle',
+      accessorKey: 'vehicleId',
+      header: 'KENDARAAN',
+      size: 550,
+      minSize: 350,
+      cell: ({ row }) => {
+        return (
+          <div className="flex flex-wrap gap-1.5 py-1 min-w-[300px]">
+            {row.original.items.map((item, idx) => {
+              const cv = item.vehicle?.coreVehicle;
+              if (!cv) return null;
+              return (
+                <div 
+                  key={idx}
+                  className={cn(
+                    "inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium tracking-wide",
+                    "bg-slate-100 text-slate-700 cursor-pointer hover:bg-slate-200 transition-colors dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                  )}
+                  onClick={() => onViewMap(item)}
+                  title="Klik untuk melihat histori tracking map"
+                >
+                  {cv.plateNumber}
+                </div>
+              );
+            })}
           </div>
         );
       },
     },
     {
-      id: 'condition',
-      accessorKey: 'vehicleConditionEnd',
-      header: 'KONDISI',
-      size: 140,
+      id: 'contractDate',
+      accessorKey: 'contract.contractDate',
+      header: 'TANGGAL KONTRAK',
+      size: 150,
       cell: ({ row }) => {
-        const cond = row.original.vehicleConditionEnd;
-        const colorClass = cond === 'GOOD'
-          ? 'bg-success/10 text-success'
-          : cond === 'MINOR_DAMAGE'
-          ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
-          : 'bg-danger/10 text-danger';
+        const cDate = row.original.contract?.contractDate;
         return (
-          <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${colorClass}`}>
-            {getConditionLabel(cond)}
-          </span>
+          <div className="flex flex-col min-w-0">
+            <span className="font-medium text-[12px] text-foreground">{formatShortDate(cDate)}</span>
+          </div>
         );
-      },
+      }
     },
-    {
-      id: 'charges',
-      accessorKey: 'additionalCharges',
-      header: 'BIAYA TAMBAHAN',
-      size: 140,
-      cell: ({ row }) => {
-        const charges = row.original.additionalCharges || 0;
-        return (
-          <span className={`text-[12px] font-medium ${charges > 0 ? 'text-danger' : 'text-muted-foreground'}`}>
-            {charges > 0 ? formatCurrency(charges) : '-'}
-          </span>
-        );
-      },
-    },
+    
   ];
 }
 
-export function ReturnList({ 
-  data, 
-  searchValue, 
-  onSearchChange, 
+export function ReturnList({
+  data,
+  searchValue,
+  onSearchChange,
   onViewDetail,
   className,
   filterConfig,
@@ -205,14 +187,14 @@ export function ReturnList({
 }: ReturnListProps) {
   const router = useRouter();
 
-  const handleViewMap = React.useCallback((ret: RentalReturn) => {
-    const handover = ret.handover;
-    if (!handover || !ret.vehicleId) return;
-    const startDate = new Date(handover.handoverAt).toISOString();
-    const endDate = new Date(ret.returnedAt).toISOString();
+  const handleViewMap = React.useCallback((r: RentalReturn) => {
+    const coreVehicleId = r.vehicleId;
+    if (!coreVehicleId || !r.returnedAt) return;
+    const startDate = new Date(r.returnedAt).toISOString();
+    const endDate = new Date().toISOString();
     trackingNavigationService.navigateToTracking(router, {
       mode: 'playback',
-      vehicleId: ret.vehicleId,
+      vehicleId: coreVehicleId,
       start: startDate,
       end: endDate
     });
@@ -224,7 +206,7 @@ export function ReturnList({
   );
 
   return (
-    <DataTable<RentalReturn>
+    <DataTable<ReturnGroup>
       className={className}
       data={data}
       columns={columns}

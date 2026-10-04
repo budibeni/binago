@@ -171,5 +171,6 @@ export interface DataTableProps<TData extends RowData = RowData> {
   className?: string;
   tableClassName?: string;
   toolbarActions?: ReactNode; // Secondary actions (e.g., Export, Add Button)
+  extraMiddleActions?: ReactNode; // Actions rendered after the search input
   exportFilename?: string;
 }

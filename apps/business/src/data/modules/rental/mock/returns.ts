@@ -3,7 +3,7 @@ import type { RentalReturn } from '@/features/modules/rental/returns/types/retur
 export const mockReturns: RentalReturn[] = [
   {
     "id": "RET-2026-001",
-    "bookingItemId": "item-mock",
+    "bookingItemId": "res-009-item-1",
     "contractId": "ctr-009",
     "customerId": "cust-ind-001",
     "vehicleId": "veh-011",
@@ -34,7 +34,7 @@ export const mockReturns: RentalReturn[] = [
   },
   {
     "id": "RET-2026-002",
-    "bookingItemId": "item-mock",
+    "bookingItemId": "res-010-item-1",
     "contractId": "ctr-010",
     "customerId": "cust-ind-002",
     "vehicleId": "veh-012",
@@ -65,7 +65,7 @@ export const mockReturns: RentalReturn[] = [
   },
   {
     "id": "RET-2026-003",
-    "bookingItemId": "item-mock",
+    "bookingItemId": "res-011-item-1",
     "contractId": "ctr-011",
     "customerId": "cust-ind-003",
     "vehicleId": "veh-013",
