@@ -111,6 +111,8 @@ Berada di `apps/business/src/data/modules/rental/`. Bertugas sebagai mesin data 
 export type CustomerType = 'INDIVIDUAL' | 'COMPANY';
 export type CustomerStatus = 'ACTIVE' | 'INACTIVE';
 
+
+
 export interface BaseCustomer {
   id: string;                    // Format: cust-xxx
   code: string;                  // Format: CUST-xxx
@@ -119,26 +121,51 @@ export interface BaseCustomer {
   email: string;
   phone: string;
   address: string;
-  city?: string;
+  city: string;
+  province: string;              // Provinsi
+  postalCode: string;            // Kode Pos
   status: CustomerStatus;
   createdAt: string;             // ISO 8601
   updatedAt: string;             // ISO 8601
+  balance?: CustomerBalance;     // Relasi 1-to-1 dengan rental_customer_balances
 }
 
 export interface IndividualCustomer extends BaseCustomer {
   type: 'INDIVIDUAL';
   nik: string;                   // Nomor KTP (16 digit)
-  sim: string;                   // Nomor SIM A/B
+  ktpPhoto: string;              // URL Foto KTP
+  birthPlace: string;            // Tempat Lahir
+  birthDate: string;             // Tanggal Lahir (YYYY-MM-DD)
+  simNumber: string;             // Nomor SIM A/B
+  simType: string;               // Tipe SIM (A, B1, dll)
+  simExpiredAt: string;          // Masa Berlaku SIM
+  simPhoto: string;              // URL Foto SIM
 }
 
 export interface CompanyCustomer extends BaseCustomer {
   type: 'COMPANY';
+  nib: string;                   // Nomor Induk Berusaha
   npwp: string;                  // Nomor Pokok Wajib Pajak Perusahaan
   picName: string;               // Nama Penanggung Jawab
+  picPosition: string;           // Jabatan PIC
   picPhone: string;              // Telepon Penanggung Jawab
+  picEmail: string;              // Email PIC
+  picNik: string;                // NIK PIC
+  picKtpPhoto: string;           // URL Foto KTP PIC
 }
 
+
 export type Customer = IndividualCustomer | CompanyCustomer;
+
+
+export interface CustomerBalance {
+  totalBilling: number;          // Total tagihan
+  totalPaid: number;             // Total lunas
+  totalOutstanding: number;      // Sisa piutang
+  totalRentals: number;          // Total transaksi sewa
+  lastRentalDate?: string;       // Tanggal sewa terakhir
+  lastPaymentDate?: string;      // Tanggal pembayaran terakhir
+}
 ```
 
 ---

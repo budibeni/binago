@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Star } from 'lucide-react';
-import { cn } from '@adatrack/utils';
+import { cn, formatNumber } from '@adatrack/utils';
 import { getDriversTranslation } from './i18n';
 import { useBusinessLocale } from '../../../components/BusinessShellLayout';
 import { driverService, vehicleService, groupService } from '@/data/services';
@@ -113,7 +113,7 @@ export function DriversFeature() {
   const dtLabels = React.useMemo(() => {
     const isEn = locale === 'en';
     return {
-      paginationShowing: (from: number, to: number, total: number) => isEn ? `Showing ${from}-${to} of ${total.toLocaleString('en-US')} items` : `Menampilkan ${from}-${to} dari ${total.toLocaleString('id-ID')} data`,
+      paginationShowing: (from: number, to: number, total: number) => isEn ? `Showing ${from}-${to} of ${total.toLocaleString('en-US')} items` : `Menampilkan ${from}-${to} dari ${formatNumber(total)} data`,
       paginationPerPage: isEn ? '/ page' : '/ halaman',
       toolbarRefresh: isEn ? 'Refresh' : 'Refresh',
       toolbarFilter: isEn ? 'Filter' : 'Filter',

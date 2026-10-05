@@ -3,7 +3,7 @@ import { cn } from '@adatrack/utils';
 import type { Size } from '@adatrack/types';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'destructive';
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'ghost-danger' | 'destructive';
   size?: Size;
   loading?: boolean;
   leftIcon?: React.ReactNode;
@@ -39,12 +39,15 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         'bg-transparent hover:bg-neutral-100 text-foreground focus-visible:ring-neutral-400',
       destructive:
         'bg-danger text-danger-foreground hover:bg-danger/90 focus-visible:ring-danger',
+      'ghost-danger':
+        'bg-transparent text-foreground-muted hover:bg-danger/10 hover:text-danger focus-visible:ring-danger cursor-pointer',
     };
 
     const sizes = {
       sm: 'h-8 px-3 text-sm',
       md: 'h-9 px-4 text-sm',
       lg: 'h-10 px-6 text-base',
+      icon: 'h-8 w-8 p-0 flex items-center justify-center rounded-full',
     };
 
     return (

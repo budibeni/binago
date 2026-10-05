@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { MapPin, Plus, MessageCircle, MoreVertical, Eye, EyeOff, Edit2, Trash2 } from 'lucide-react';
-import { cn } from '@adatrack/utils';
 import { 
   Button, 
   Badge, 
@@ -10,6 +9,7 @@ import {
 } from '@adatrack/ui';
 import type { DataTableColumnDef, DataTableFilterConfig } from '@adatrack/ui';
 import type { Booking, BookingStatus } from '../types/booking';
+import { cn, formatCurrency } from '@adatrack/utils';
 
 interface BookingListProps {
   data: Booking[];
@@ -52,16 +52,6 @@ const getStatusLabel = (status: BookingStatus, labels: Record<string, any>) => {
   }
 };
 
-const formatCurrency = (value: number) =>
-  new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(value);
-
-const formatDate = (dateStr: string) => {
-  const d = new Date(dateStr);
-  return d.toLocaleString('id-ID', {
-    day: '2-digit', month: 'short', year: 'numeric',
-    hour: '2-digit', minute: '2-digit',
-  });
-};
 
 const formatShortDate = (dateStr: string) => {
   const d = new Date(dateStr);

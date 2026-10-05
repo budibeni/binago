@@ -1,12 +1,12 @@
 'use client';
 
 import React from 'react';
-import { MoreVertical, Plus, Eye, Edit2, Trash2 } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { Button, DataTable } from '@adatrack/ui';
 import type { DataTableColumnDef, DataTableFilterConfig, DataTableLabels } from '@adatrack/ui';
 import type { Customer, CompanyCustomer } from '../types/customer';
 
-import { cn } from '@adatrack/utils';
+import { cn, formatCurrency } from '@adatrack/utils';
 
 interface CustomerTableLabels {
   colCode: string;
@@ -37,8 +37,6 @@ interface CustomerTableLabels {
   searchPlaceholder: string;
   exportFilename: string;
   actionDetail: string;
-  actionEdit: string;
-  actionDelete: string;
   addCustomer: string;
 }
 
@@ -46,8 +44,6 @@ interface CustomerTableProps {
   data: Customer[];
   labels: CustomerTableLabels;
   onViewDetail: (customer: Customer) => void;
-  onEdit: (customer: Customer) => void;
-  onDelete: (customer: Customer) => void;
   searchValue: string;
   onSearchChange: (value: string) => void;
   filterConfig: DataTableFilterConfig;
@@ -60,32 +56,9 @@ interface CustomerTableProps {
 
 function buildColumns(
   labels: CustomerTableLabels,
-  onViewDetail: (c: Customer) => void,
-  onEdit: (c: Customer) => void,
-  onDelete: (c: Customer) => void,
 ): DataTableColumnDef<Customer>[] {
   return [
-    {
-      id: 'actions',
-      header: '',
-      enableSorting: false,
-      size: 40,
-      meta: { fixedWidth: true },
-      cell: ({ row }) => {
-        const c = row.original;
-        return (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 w-8 p-0 flex items-center justify-center text-foreground-muted hover:text-primary hover:bg-primary/10 rounded-full"
-            onClick={() => onViewDetail(c)}
-            title={labels.actionDetail}
-          >
-            <Eye className="h-4 w-4" />
-          </Button>
-        );
-      },
-    },
+
     {
       id: 'customerName',
       accessorKey: 'name',
@@ -93,10 +66,7 @@ function buildColumns(
       enableSorting: true,
       size: 240,
       cell: ({ row }) => (
-        <span
-          onClick={() => onViewDetail(row.original)}
-          className="text-[12px] font-bold text-foreground hover:text-primary hover:underline cursor-pointer transition-colors whitespace-nowrap uppercase tracking-wider"
-        >
+        <span className="font-semibold text-foreground whitespace-nowrap">
           {row.original.name}
         </span>
       ),
@@ -108,7 +78,7 @@ function buildColumns(
       enableSorting: true,
       size: 120,
       cell: ({ row }) => (
-        <span className="text-[12px] font-mono text-foreground-muted">{row.original.code}</span>
+        <span >{row.original.code}</span>
       ),
     },
     {
@@ -118,7 +88,7 @@ function buildColumns(
       enableSorting: true,
       size: 120,
       cell: ({ row }) => (
-        <span className={cn('text-[12px]', row.original.type === 'COMPANY' ? 'text-info' : 'text-foreground-muted')}>
+        <span>
           {row.original.type === 'COMPANY' ? labels.typeCompany : labels.typeIndividual}
         </span>
       ),
@@ -134,7 +104,7 @@ function buildColumns(
         return (
           <div className="flex items-center gap-1.5">
             <span className={cn('h-1.5 w-1.5 rounded-full', isActive ? 'bg-success' : 'bg-danger')} />
-            <span className="text-[12px] text-foreground-muted">
+            <span >
               {isActive ? labels.statusActive : labels.statusInactive}
             </span>
           </div>
@@ -148,7 +118,7 @@ function buildColumns(
       enableSorting: false,
       size: 160,
       cell: ({ row }) => (
-        <span className="text-[12px] text-foreground">{row.original.phone}</span>
+        <span >{row.original.phone}</span>
       ),
     },
     {
@@ -158,7 +128,7 @@ function buildColumns(
       enableSorting: false,
       size: 200,
       cell: ({ row }) => (
-        <span className="text-[12px] text-foreground-muted">{row.original.email || '-'}</span>
+        <span >{row.original.email || '-'}</span>
       ),
     },
     {
@@ -167,9 +137,9 @@ function buildColumns(
       enableSorting: false,
       size: 180,
       cell: ({ row }) => {
-        if (row.original.type === 'INDIVIDUAL') return <span className="text-[12px] text-foreground-muted/50">-</span>;
+        if (row.original.type === 'INDIVIDUAL') return '-';
         const comp = row.original as CompanyCustomer;
-        return <span className="text-[12px] text-foreground">{comp.picName || '-'}</span>;
+        return <span >{comp.picName || '-'}</span>;
       },
     },
     {
@@ -178,7 +148,7 @@ function buildColumns(
       accessorFn: (row) => row.city,
       enableSorting: true,
       size: 130,
-      cell: ({ row }) => <span className="text-[12px] text-foreground">{row.original.city || '-'}</span>,
+      cell: ({ row }) => <span >{row.original.city || '-'}</span>,
     },
     {
       id: 'address',
@@ -186,7 +156,7 @@ function buildColumns(
       accessorFn: (row) => row.address,
       enableSorting: false,
       size: 200,
-      cell: ({ row }) => <span className="text-[12px] text-foreground-muted truncate block max-w-full" title={row.original.address}>{row.original.address || '-'}</span>,
+      cell: ({ row }) => <span className="truncate block max-w-full" title={row.original.address}>{row.original.address || '-'}</span>,
     },
     {
       id: 'billing',
@@ -198,8 +168,8 @@ function buildColumns(
         const val = row.original.balance?.totalBilling || 0;
         return (
           <div className="text-right w-full">
-            <span className="text-[12px] font-mono text-foreground-muted">
-              Rp {val.toLocaleString('id-ID')}
+            <span >
+              {formatCurrency(val)}
             </span>
           </div>
         );
@@ -215,8 +185,8 @@ function buildColumns(
         const val = row.original.balance?.totalPaid || 0;
         return (
           <div className="text-right w-full">
-            <span className="text-[12px] font-mono text-success">
-              Rp {val.toLocaleString('id-ID')}
+            <span >
+              {formatCurrency(val)}
             </span>
           </div>
         );
@@ -232,8 +202,8 @@ function buildColumns(
         const val = row.original.balance?.totalOutstanding || 0;
         return (
           <div className="text-right w-full">
-            <span className={cn('text-[12px] font-mono', val > 0 ? 'text-danger font-bold' : 'text-foreground-muted')}>
-              Rp {val.toLocaleString('id-ID')}
+            <span>
+              {formatCurrency(val)}
             </span>
           </div>
         );
@@ -247,9 +217,9 @@ function buildColumns(
       size: 140,
       cell: ({ row }) => {
         const val = row.original.balance?.lastRentalDate;
-        if (!val) return <span className="text-[12px] text-foreground-muted">-</span>;
+        if (!val) return '-';
         const d = new Date(val);
-        return <span className="text-[12px] text-foreground-muted">{d.toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' })}</span>;
+        return <span >{d.toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' })}</span>;
       },
     },
     {
@@ -260,9 +230,9 @@ function buildColumns(
       size: 140,
       cell: ({ row }) => {
         const val = row.original.balance?.lastPaymentDate;
-        if (!val) return <span className="text-[12px] text-foreground-muted">-</span>;
+        if (!val) return '-';
         const d = new Date(val);
-        return <span className="text-[12px] text-foreground-muted">{d.toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' })}</span>;
+        return <span >{d.toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' })}</span>;
       },
     },
     {
@@ -275,7 +245,7 @@ function buildColumns(
         const val = row.original.balance?.totalRentals || 0;
         return (
           <div className="text-right w-full">
-             <span className="text-[12px] text-foreground font-mono">{val}x</span>
+            <span >{val}x</span>
           </div>
         );
       },
@@ -298,8 +268,6 @@ export function CustomerTable({
   data,
   labels,
   onViewDetail,
-  onEdit,
-  onDelete,
   searchValue,
   onSearchChange,
   filterConfig,
@@ -310,8 +278,8 @@ export function CustomerTable({
   dtLabels,
 }: CustomerTableProps) {
   const columns = React.useMemo(
-    () => buildColumns(labels, onViewDetail, onEdit, onDelete),
-    [labels, onViewDetail, onEdit, onDelete],
+    () => buildColumns(labels),
+    [labels],
   );
 
   return (
@@ -319,6 +287,7 @@ export function CustomerTable({
       className={className}
       data={data}
       columns={columns}
+      onRowActionClick={onViewDetail}
       // Capabilities
       searchable
       sortable
@@ -343,7 +312,7 @@ export function CustomerTable({
       emptyDescription={labels.emptyDescription}
       toolbarActions={
         onAdd ? (
-          <Button variant="destructive" onClick={onAdd} className="h-8 gap-1.5 text-[12px] font-medium shadow-none">
+          <Button variant="destructive" onClick={onAdd} className="h-8 gap-1.5 font-medium shadow-none">
             <Plus className="h-3.5 w-3.5" />
             <span className="hidden sm:inline-block">{labels.addCustomer}</span>
           </Button>

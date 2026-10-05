@@ -3,10 +3,10 @@
 import React from 'react';
 import { Button, DetailShell } from '@adatrack/ui';
 import { User, Car, MapPin, Key, CheckCircle, Navigation, Info, FileText, StickyNote } from 'lucide-react';
-import { cn } from '@adatrack/utils';
 import { PaymentsFeature } from '../../payments/PaymentsFeature';
 import type { RentalReturn } from '../types/return';
 import type { ReturnGroup } from './ReturnList';
+import { cn, formatCurrency, formatDate, formatDateTime, formatNumber } from '@adatrack/utils';
 
 interface ReturnViewProps {
   returnGroup: ReturnGroup | null;
@@ -39,20 +39,8 @@ export function ReturnView({
 
   if (!returnGroup) return null;
 
-  const formatDate = (dateStr: string) => {
-    if (!dateStr) return '-';
-    return new Date(dateStr).toLocaleDateString('id-ID', {
-      year: 'numeric', month: 'long', day: 'numeric'
-    });
-  };
-
-  const formatDateTime = (dateStr: string) => {
-    if (!dateStr) return '-';
-    return new Date(dateStr).toLocaleString('id-ID', {
-      year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
-    });
-  };
-
+  
+  
   const getConditionLabel = (condition: string) => {
     switch (condition) {
       case 'GOOD': return 'Baik';
@@ -192,7 +180,7 @@ export function ReturnView({
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                     <InfoItem label="Tanggal & Jam" value={formatDateTime(item.returnedAt)} />
                     <InfoItem label="Petugas" value={item.staffName || '-'} />
-                    <InfoItem label="Odometer Akhir" value={new Intl.NumberFormat("id-ID").format(item.odometerEnd) + " KM"} />
+                    <InfoItem label="Odometer Akhir" value={formatNumber(item.odometerEnd) + " KM"} />
                     <InfoItem label="Level BBM" value={item.fuelLevelEnd} />
                     <InfoItem label="Kondisi" value={getConditionLabel(item.vehicleConditionEnd)} />
                   </div>
@@ -289,7 +277,7 @@ export function ReturnView({
             {totalAdditionalFees > 0 && (
               <div className="mx-4 mt-4 p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 rounded-xl flex justify-between items-center">
                 <span className="text-[11px] font-medium text-amber-800 dark:text-amber-400">Total Biaya Tambahan (Denda/Kerusakan/Dll)</span>
-                <span className="text-[13px] font-bold text-amber-900 dark:text-amber-300">+ Rp {totalAdditionalFees.toLocaleString('id-ID')}</span>
+                <span className="text-[13px] font-bold text-amber-900 dark:text-amber-300">+ {formatCurrency(totalAdditionalFees)}</span>
               </div>
             )}
             <PaymentsFeature 

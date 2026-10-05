@@ -3,7 +3,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Car, Star } from 'lucide-react';
-import { cn } from '@adatrack/utils';
+import { cn, formatNumber } from '@adatrack/utils';
 import { getTranslation } from '../../../i18n';
 import { useBusinessLocale } from '../../../components/BusinessShellLayout';
 import { vehicleService } from '@/data/services';
@@ -149,7 +149,7 @@ export function VehiclesFeature() {
   const dtLabels: DataTableLabels = React.useMemo(() => {
     const isEn = locale === 'en';
     return {
-      paginationShowing: (from: number, to: number, total: number) => isEn ? `Showing ${from}-${to} of ${total.toLocaleString('en-US')} items` : `Menampilkan ${from}-${to} dari ${total.toLocaleString('id-ID')} data`,
+      paginationShowing: (from: number, to: number, total: number) => isEn ? `Showing ${from}-${to} of ${total.toLocaleString('en-US')} items` : `Menampilkan ${from}-${to} dari ${formatNumber(total)} data`,
       paginationPerPage: isEn ? '/ page' : '/ halaman',
       toolbarRefresh: isEn ? 'Refresh' : 'Refresh',
       toolbarFilter: isEn ? 'Filter' : 'Filter',

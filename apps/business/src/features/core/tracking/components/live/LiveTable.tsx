@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
-import { cn } from '@adatrack/utils';
+import { cn, formatDate } from '@adatrack/utils';
 import type { TrackingVehicle, VehicleStatus } from '../../types/tracking';
 import { getTrackingTranslation } from '../../i18n';
 import { getTranslation } from '@/i18n';

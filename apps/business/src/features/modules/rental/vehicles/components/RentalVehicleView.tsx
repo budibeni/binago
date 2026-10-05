@@ -2,7 +2,7 @@ import React from 'react';
 import { Button, DetailShell } from '@adatrack/ui';
 import type { RentalVehicle } from '../types/rentalVehicle';
 import { Edit2, CheckCircle2, AlertCircle, X, Car, Tag, Calendar, User, MapPin, FileText, CreditCard, LogOut } from 'lucide-react';
-import { cn } from '@adatrack/utils';
+import { cn, formatCurrency, formatNumber } from '@adatrack/utils';
 
 interface RentalVehicleViewProps {
   open: boolean;
@@ -27,11 +27,7 @@ export function RentalVehicleView({
 
   const core = data.coreVehicle;
   
-  const formatCurrency = (value: number) => {
-    if (!value) return '-';
-    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(value);
-  };
-
+  
   const renderStatus = () => {
     const s = data.status;
     let label = '';
@@ -171,7 +167,7 @@ export function RentalVehicleView({
                     data.condition === 'NEEDS_REPAIR' ? 'Perlu Perbaikan' : '-'
                   } 
                 />
-                <InfoItem label="Odometer" value={data.currentOdometer ? `${data.currentOdometer.toLocaleString('id-ID')} km` : '-'} />
+                <InfoItem label="Odometer" value={data.currentOdometer ? `${formatNumber(data.currentOdometer)} km` : '-'} />
               </div>
 
               <div className="pt-3 border-t border-border/40">

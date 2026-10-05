@@ -3,7 +3,7 @@
 import React from 'react';
 import { Button, Badge } from '@adatrack/ui';
 import { Trash2, Plus, CreditCard, TrendingUp, TrendingDown, Wallet } from 'lucide-react';
-import { cn } from '@adatrack/utils';
+import { cn, formatCurrency } from '@adatrack/utils';
 import type { RentalPayment } from '../types/payment';
 import {
   PAYMENT_TYPE_LABEL,
@@ -34,7 +34,7 @@ const typeIcon: Record<string, React.ReactNode> = {
 };
 
 const formatIDR = (val: number) =>
-  new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(val);
+  formatCurrency(val);
 
 export function PaymentList({
   payments,

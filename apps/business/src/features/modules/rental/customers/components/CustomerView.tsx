@@ -12,7 +12,7 @@ import {
   CreditCard,
   Mail,
 } from 'lucide-react';
-import { cn } from '@adatrack/utils';
+import { cn, formatCurrency } from '@adatrack/utils';
 import { Badge, DetailShell } from '@adatrack/ui';
 import type { Customer, IndividualCustomer, CompanyCustomer } from '../types/customer';
 
@@ -138,16 +138,16 @@ export function CustomerView({
           >
             <InfoItem 
               label="Sisa Tagihan (Utang)" 
-              value={customer.balance?.totalOutstanding ? `Rp ${customer.balance.totalOutstanding.toLocaleString('id-ID')}` : 'Rp 0'} 
+              value={customer.balance?.totalOutstanding ? `${formatCurrency(customer.balance.totalOutstanding)}` : 'Rp 0'} 
               highlight={!!(customer.balance?.totalOutstanding && customer.balance.totalOutstanding > 0)} 
             />
             <InfoItem 
               label="Total Tagihan" 
-              value={customer.balance?.totalBilling ? `Rp ${customer.balance.totalBilling.toLocaleString('id-ID')}` : 'Rp 0'} 
+              value={customer.balance?.totalBilling ? `${formatCurrency(customer.balance.totalBilling)}` : 'Rp 0'} 
             />
             <InfoItem 
               label="Total Dibayar" 
-              value={customer.balance?.totalPaid ? `Rp ${customer.balance.totalPaid.toLocaleString('id-ID')}` : 'Rp 0'} 
+              value={customer.balance?.totalPaid ? `${formatCurrency(customer.balance.totalPaid)}` : 'Rp 0'} 
               valueClassName="text-success"
             />
             <InfoItem 

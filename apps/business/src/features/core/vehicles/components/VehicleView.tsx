@@ -21,7 +21,7 @@ import {
   Activity,
   RefreshCw,
 } from 'lucide-react';
-import { cn } from '@adatrack/utils';
+import { cn, formatDate, formatDateTime, formatNumber } from '@adatrack/utils';
 import { Badge, Button, DetailShell, SectionHeader } from '@adatrack/ui';
 import type { Vehicle } from '../types/vehicle';
 import { getTranslation } from '../../../../i18n';
@@ -79,18 +79,6 @@ function getFuelLabel(fuel: Vehicle['fuelType'], labels: any): string {
   return map[fuel];
 }
 
-function formatDate(iso: string, locale: string = 'id-ID'): string {
-  return new Date(iso).toLocaleDateString(locale, {
-    day: '2-digit', month: 'long', year: 'numeric',
-  });
-}
-
-function formatDateTime(iso: string, locale: string = 'id-ID'): string {
-  return new Date(iso).toLocaleString(locale, {
-    day: '2-digit', month: 'short', year: 'numeric',
-    hour: '2-digit', minute: '2-digit',
-  });
-}
 
 // ─── Main Component ─────────────────────────────────────────────────────────
 
@@ -209,7 +197,7 @@ export function VehicleView({ vehicle, open, onClose, onEdit, onDelete, onTrack 
             <CompactField label={labels.fieldCategory} value={getCategoryLabel(vehicle.vehicleCategory, labels)} />
             <CompactField label={labels.fieldBrandYear} value={`${vehicle.brand || '-'} - ${vehicle.year || '-'}`} />
             <CompactField label={labels.fieldColor} value={vehicle.color || '-'} />
-            <CompactField label={labels.fieldEngineCapacity} value={vehicle.engineCapacity ? `${vehicle.engineCapacity.toLocaleString('id-ID')} CC` : '-'} />
+            <CompactField label={labels.fieldEngineCapacity} value={vehicle.engineCapacity ? `${formatNumber(vehicle.engineCapacity)} CC` : '-'} />
             <CompactField label={labels.fieldAssetNumber} value={vehicle.assetNumber || '-'} />
             <CompactField label={labels.fieldSeats} value={vehicle.passengerCapacity ? `${vehicle.passengerCapacity}` : '-'} />
             <CompactField label={labels.fieldDimension} value={(vehicle.dimLength && vehicle.dimWidth && vehicle.dimHeight) ? `${vehicle.dimLength}m x ${vehicle.dimWidth}m x ${vehicle.dimHeight}m` : '-'} colSpan={2} />
@@ -231,14 +219,14 @@ export function VehicleView({ vehicle, open, onClose, onEdit, onDelete, onTrack 
           <SectionHeader icon={Wrench} title={labels.detailAdminMaint} />
           <div className="rounded-lg border border-border bg-neutral-50/30 dark:bg-neutral-900 px-3 py-2.5 flex flex-col gap-2.5">
             <div className="grid grid-cols-2 gap-x-3 gap-y-2.5">
-              <CompactField label={labels.fieldOdometer} value={`${(vehicle.odometer || 0).toLocaleString('id-ID')} km`} />
-              <CompactField label={labels.fieldLastService} value={`${(vehicle.lastServiceKm || 0).toLocaleString('id-ID')} km`} />
+              <CompactField label={labels.fieldOdometer} value={`${(vehicle.odometer || formatNumber(0))} km`} />
+              <CompactField label={labels.fieldLastService} value={`${(vehicle.lastServiceKm || formatNumber(0))} km`} />
             </div>
             {/* Service progress */}
             <div className="pt-2 border-t border-border/60">
               <div className="flex items-center justify-between mb-1.5">
                 <p className="text-[10px] text-foreground-muted uppercase tracking-wider font-semibold">
-                  {labels.fieldNextService}: <span className={cn("ml-1", isServiceDue ? 'text-danger font-bold' : 'text-foreground font-medium')}>{vehicle.nextServiceKm.toLocaleString('id-ID')} km</span>
+                  {labels.fieldNextService}: <span className={cn("ml-1", isServiceDue ? 'text-danger font-bold' : 'text-foreground font-medium')}>{formatNumber(vehicle.nextServiceKm)} km</span>
                 </p>
                 {isServiceDue && <AlertTriangle className="h-3.5 w-3.5 text-danger" />}
               </div>

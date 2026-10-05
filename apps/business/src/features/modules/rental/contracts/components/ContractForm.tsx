@@ -5,8 +5,8 @@ import { Button, FormShell, FormCard, InputDateTime, InputTextarea, Label } from
 import { Search, User, Car, Calendar, DollarSign, Info, FileText, CheckCircle2, ChevronRight, Hash, ClipboardList } from 'lucide-react';
 import type { Booking } from '@/features/modules/rental/bookings/types/booking';
 import type { RentalContract } from '../types/contract';
-import { cn } from '@adatrack/utils';
 import { BookingView } from '@/features/modules/rental/bookings/components/BookingView';
+import { cn, formatCurrency, formatDate } from '@adatrack/utils';
 
 interface ContractFormProps {
   contract?: RentalContract; // If present, it's Edit Mode
@@ -43,18 +43,8 @@ export function ContractForm({
   const [notes, setNotes] = React.useState<string>(contract?.notes || '');
   const [agreed, setAgreed] = React.useState(isEditing ? true : false);
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(value);
-  };
-
-  const formatDate = (dateStr: string) => {
-    if (!dateStr) return '-';
-    return new Date(dateStr).toLocaleString('id-ID', {
-      day: '2-digit', month: 'short', year: 'numeric',
-      hour: '2-digit', minute: '2-digit'
-    });
-  };
-
+  
+  
   const filteredBookings = React.useMemo(() => {
     if (!searchBooking) return availableBookings;
     const s = searchBooking.toLowerCase();

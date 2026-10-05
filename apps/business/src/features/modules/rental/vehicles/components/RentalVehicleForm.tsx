@@ -3,7 +3,7 @@
 import React from 'react';
 import { Button, Input, Label, FormShell, FormCard, InputSelect, InputDate, InputDecimal, InputString } from '@adatrack/ui';
 import { CarFront, FileText, Settings, ShieldCheck, FileSpreadsheet } from 'lucide-react';
-import { cn } from '@adatrack/utils';
+import { cn, formatCurrency } from '@adatrack/utils';
 import type { RentalPricingCategory } from '../../pricing-category/types/pricing';
 import type { RentalVehicle, RentalVehicleProfile, RentalEquipment, RentalStatus, RentalCondition } from '../types/rentalVehicle';
 import type { Vehicle } from '@/features/core/vehicles/types/vehicle';
@@ -312,7 +312,7 @@ export function RentalVehicleForm({
                       const daily = catRates.find(r => r.rateType === 'DAILY');
                       const weekly = catRates.find(r => r.rateType === 'WEEKLY');
                       const monthly = catRates.find(r => r.rateType === 'MONTHLY');
-                      const fmt = (n: number) => `Rp ${n.toLocaleString('id-ID')}`;
+                      const fmt = (n: number) => `${formatCurrency(n)}`;
                       return (
                         <div className="bg-gray-100 dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-3">
                           <div className="flex flex-col gap-0.5 mb-3">

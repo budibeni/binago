@@ -3,9 +3,9 @@
 import React from 'react';
 import { Button, DetailShell } from '@adatrack/ui';
 import { User, Car, MapPin, Key, CheckCircle, Navigation, Info, FileText, StickyNote } from 'lucide-react';
-import { cn } from '@adatrack/utils';
 import { PaymentsFeature } from '../../payments/PaymentsFeature';
 import type { RentalHandover } from '../types/handover';
+import { cn, formatDate, formatDateTime, formatNumber } from '@adatrack/utils';
 
 interface HandoverGroup {
   id: string; // group ID (contractId)
@@ -44,20 +44,8 @@ export function HandoverView({
 
   if (!handover) return null;
 
-  const formatDate = (dateStr: string) => {
-    if (!dateStr) return '-';
-    return new Date(dateStr).toLocaleDateString('id-ID', {
-      year: 'numeric', month: 'long', day: 'numeric'
-    });
-  };
-
-  const formatDateTime = (dateStr: string) => {
-    if (!dateStr) return '-';
-    return new Date(dateStr).toLocaleString('id-ID', {
-      year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
-    });
-  };
-
+  
+  
   const getConditionLabel = (condition: string) => {
     switch (condition) {
       case 'GOOD': return 'Baik';
@@ -195,7 +183,7 @@ export function HandoverView({
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                     <InfoItem label="Tanggal & Jam" value={formatDateTime(item.handoverAt)} />
                     <InfoItem label="Petugas" value={item.staffName || '-'} />
-                    <InfoItem label="Odometer Awal" value={new Intl.NumberFormat("id-ID").format(item.odometerStart) + " KM"} />
+                    <InfoItem label="Odometer Awal" value={formatNumber(item.odometerStart) + " KM"} />
                     <InfoItem label="Level BBM" value={item.fuelLevel} />
                     <InfoItem label="Kondisi" value={getConditionLabel(item.vehicleCondition)} />
                   </div>

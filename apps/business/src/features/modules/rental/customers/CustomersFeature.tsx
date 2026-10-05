@@ -13,7 +13,7 @@ import type { Customer, CustomerStatusFilter, CustomerTypeFilter } from './types
 import type { DataTableFilterConfig } from '@adatrack/ui';
 import { Button } from '@adatrack/ui';
 import { Plus, List, Building, User } from 'lucide-react';
-import { cn } from '@adatrack/utils';
+import { cn, formatNumber } from '@adatrack/utils';
 
 function computeCounts(search: string) {
   const base = rentalCustomerService.getCustomers({ search });
@@ -93,7 +93,7 @@ export function CustomersFeature() {
   const handleConfirmDelete = (id: string) => {
     rentalCustomerService.deleteCustomer(id);
     setDeleteOpen(false);
-    toast.success('Data pelanggan berhasil dihapus secara permanen.');
+    toast.success(tC.deleteSuccess);
     refreshData();
   };
 
@@ -164,7 +164,7 @@ export function CustomersFeature() {
     return {
       paginationShowing: (from: number, to: number, total: number) => isEn
         ? `Showing ${from}-${to} of ${total.toLocaleString('en-US')} items`
-        : `Menampilkan ${from}-${to} dari ${total.toLocaleString('id-ID')} data`,
+        : `Menampilkan ${from}-${to} dari ${formatNumber(total)} data`,
       paginationPerPage: isEn ? '/ page' : '/ halaman',
       toolbarFilter: 'Filter',
       toolbarColumns: isEn ? 'Columns' : 'Kolom',
@@ -184,8 +184,6 @@ export function CustomersFeature() {
           data={filteredCustomers}
           labels={tableLabels}
           onViewDetail={handleViewDetail}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
           searchValue={search}
           onSearchChange={setSearch}
           filterConfig={filterConfig}

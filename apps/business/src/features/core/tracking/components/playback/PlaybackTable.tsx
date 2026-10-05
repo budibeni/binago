@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
-import { cn } from '@adatrack/utils';
+import { cn, formatDate } from '@adatrack/utils';
 import { getTranslation } from '@/i18n';
 import { Maximize, Minimize, Calendar, ChevronDown, RefreshCw, MapPin } from 'lucide-react';
 import { DataTable, type DataTableColumnDef } from '@adatrack/ui';

@@ -8,6 +8,8 @@ import { GroupTable } from './components/GroupTable';
 import { GroupForm } from './components/GroupForm';
 import { GroupView } from './components/GroupView';
 import { Button, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@adatrack/ui';
+import { formatNumber } from '@adatrack/utils';
+
 
 export interface GroupsFeatureProps {
   locale: 'id' | 'en';
@@ -48,7 +50,7 @@ export function GroupsFeature({ locale }: GroupsFeatureProps) {
   const dtLabels = React.useMemo(() => {
     const isEn = locale === 'en';
     return {
-      paginationShowing: (from: number, to: number, total: number) => isEn ? `Showing ${from}-${to} of ${total.toLocaleString('en-US')} items` : `Menampilkan ${from}-${to} dari ${total.toLocaleString('id-ID')} data`,
+      paginationShowing: (from: number, to: number, total: number) => isEn ? `Showing ${from}-${to} of ${total.toLocaleString('en-US')} items` : `Menampilkan ${from}-${to} dari ${formatNumber(total)} data`,
       paginationPerPage: isEn ? '/ page' : '/ halaman',
       toolbarRefresh: isEn ? 'Refresh' : 'Refresh',
       toolbarFilter: isEn ? 'Filter' : 'Filter',

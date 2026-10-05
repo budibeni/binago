@@ -1,30 +1,16 @@
 import type { RentalContract } from '../types/contract';
 import type { BookingItem } from '../../bookings/types/booking';
+import { formatCurrency, formatDate, formatNumber } from '@adatrack/utils';
+
 
 /**
  * Builds the data object for the Document Template System to merge.
  */
 export function getRentalContractPrintData(contract: RentalContract) {
   // Format currency
-  const formatCurrency = (val: number | undefined) => {
-    if (val === undefined || val === null) return '-';
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      maximumFractionDigits: 0,
-    }).format(val);
-  };
-
+  
   // Format date
-  const formatDate = (dateStr: string | undefined) => {
-    if (!dateStr) return '-';
-    return new Date(dateStr).toLocaleDateString('id-ID', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-    });
-  };
-
+  
   // 1. Company Data (Dummy fallback as per requirement if no global company profile)
   const company = {
     name: 'PT. ADATRACK INDONESIA',
@@ -61,7 +47,7 @@ export function getRentalContractPrintData(contract: RentalContract) {
       brand: core?.brand || '-',
       model: core?.vehicleName || '-',
       plateNumber: core?.plateNumber || '-',
-      odometer: item.vehicle?.currentOdometer?.toLocaleString('id-ID') || '0',
+      odometer: item.vehicle?.currentOdometer ? formatNumber(item.vehicle.currentOdometer) : '0',
     };
   });
 

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { MoreVertical, Eye, Edit2, MapPin, Trash2, Plus, Search, Map, MoreHorizontal, ShieldAlert, Edit, Star } from 'lucide-react';
-import { cn } from '@adatrack/utils';
+import { cn, formatNumber } from '@adatrack/utils';
 import {
   Badge, Button,
   DataTable,
@@ -289,7 +289,7 @@ function buildColumns(
               header: labels.fieldOdometer || 'Odometer',
               enableSorting: true,
               size: 130,
-              cell: ({ row }) => <span className="text-[12px] tabular-nums text-foreground-muted">{row.original.odometer?.toLocaleString('id-ID') || '-'}</span>,
+              cell: ({ row }) => <span className="text-[12px] tabular-nums text-foreground-muted">{row.original.odometer ? formatNumber(row.original.odometer) : '-'}</span>,
             },
     {
               id: 'lastServiceKm',
@@ -297,7 +297,7 @@ function buildColumns(
               header: labels.fieldLastService || 'Servis Terakhir',
               enableSorting: true,
               size: 130,
-              cell: ({ row }) => <span className="text-[12px] tabular-nums text-foreground-muted">{row.original.lastServiceKm?.toLocaleString('id-ID') || '-'}</span>,
+              cell: ({ row }) => <span className="text-[12px] tabular-nums text-foreground-muted">{row.original.lastServiceKm ? formatNumber(row.original.lastServiceKm) : '-'}</span>,
             },
     {
               id: 'nextServiceKm',
@@ -305,7 +305,7 @@ function buildColumns(
               header: labels.fieldNextService || 'Servis Berikutnya',
               enableSorting: true,
               size: 130,
-              cell: ({ row }) => <span className="text-[12px] tabular-nums text-foreground-muted">{row.original.nextServiceKm?.toLocaleString('id-ID') || '-'}</span>,
+              cell: ({ row }) => <span className="text-[12px] tabular-nums text-foreground-muted">{row.original.nextServiceKm ? formatNumber(row.original.nextServiceKm) : '-'}</span>,
             },
     {
               id: 'registrationExpiry',

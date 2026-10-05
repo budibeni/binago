@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { cn } from '@adatrack/utils';
+import { cn, formatDate } from '@adatrack/utils';
 import { AlertTriangle, Info, MapPin, Wrench, Radio, Map as MapIcon, Car, Clock, Bell } from 'lucide-react';
 import { getTrackingTranslation } from '../../i18n';
 

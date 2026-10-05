@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Eye, Car, Check } from 'lucide-react';
-import { cn } from '@adatrack/utils';
+import { cn, formatTime } from '@adatrack/utils';
 import { useRouter } from 'next/navigation';
 import { Button, DataTable } from '@adatrack/ui';
 import type { DataTableColumnDef } from '@adatrack/ui';
@@ -48,11 +48,6 @@ const formatShortDate = (dateStr: string) => {
   return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
 };
 
-const formatTime = (dateStr: string) => {
-  if (!dateStr) return '-';
-  const d = new Date(dateStr);
-  return d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-};
 
 function buildColumns(
   onViewDetail: (group: HandoverGroup) => void,

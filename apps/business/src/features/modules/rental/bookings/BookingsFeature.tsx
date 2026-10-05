@@ -10,7 +10,7 @@ import { BookingList } from './components/BookingList';
 import { BookingView } from './components/BookingView';
 import { BookingCreateFeature } from './BookingCreateFeature';
 import { getBookingTranslation } from './i18n';
-import { cn } from '@adatrack/utils';
+import { cn, formatNumber } from '@adatrack/utils';
 import { trackingNavigationService } from '@/features/core/tracking/services/trackingNavigationService';
 import { PanelShell, type DataTableFilterConfig } from '@adatrack/ui';
 
@@ -154,7 +154,7 @@ export function BookingsFeature() {
   const dtLabels = useMemo(() => {
     const isEn = locale === 'en';
     return {
-      paginationShowing: (from: number, to: number, total: number) => isEn ? `Showing ${from}-${to} of ${total.toLocaleString('en-US')} items` : `Menampilkan ${from}-${to} dari ${total.toLocaleString('id-ID')} data`,
+      paginationShowing: (from: number, to: number, total: number) => isEn ? `Showing ${from}-${to} of ${total.toLocaleString('en-US')} items` : `Menampilkan ${from}-${to} dari ${formatNumber(total)} data`,
       paginationPerPage: isEn ? '/ page' : '/ halaman',
       toolbarRefresh: isEn ? 'Refresh' : 'Refresh',
       toolbarFilter: isEn ? 'Filter' : 'Filter',

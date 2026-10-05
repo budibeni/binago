@@ -2,7 +2,7 @@ import React from 'react';
 import { Button, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@adatrack/ui';
 import type { Departure, DepartureStatus } from '../types/departure';
 import { X, Calendar, Bus, Map, MapPin } from 'lucide-react';
-import { cn } from '@adatrack/utils';
+import { cn, formatDate } from '@adatrack/utils';
 
 interface DepartureDetailDrawerProps {
   open: boolean;
@@ -52,16 +52,7 @@ export function DepartureDetailDrawer({
     return <div className={cn("px-2.5 py-0.5 rounded text-[11px] font-semibold", colorClass)}>{label}</div>;
   };
 
-  const formatDate = (dateString: string) => {
-    try {
-      const d = new Date(dateString);
-      if (isNaN(d.getTime())) return dateString;
-      return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
-    } catch {
-      return dateString;
-    }
-  };
-
+  
   return (
     <>
       <div 

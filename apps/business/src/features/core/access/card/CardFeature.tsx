@@ -11,6 +11,8 @@ import { CardView } from './components/CardView';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
 import { getCardTranslation } from './i18n';
 import type { DataTableFilterConfig } from '@adatrack/ui';
+import { formatNumber } from '@adatrack/utils';
+
 
 export function CardFeature() {
   const locale = useBusinessLocale();
@@ -159,7 +161,7 @@ export function CardFeature() {
           t={t}
           exportFilename={`card-adatrack`}
           dtLabels={{
-            paginationShowing: (from: number, to: number, total: number) => locale === 'en' ? `Showing ${from}-${to} of ${total.toLocaleString('en-US')} items` : `Menampilkan ${from}-${to} dari ${total.toLocaleString('id-ID')} data`,
+            paginationShowing: (from: number, to: number, total: number) => locale === 'en' ? `Showing ${from}-${to} of ${total.toLocaleString('en-US')} items` : `Menampilkan ${from}-${to} dari ${formatNumber(total)} data`,
             paginationPerPage: locale === 'en' ? '/ page' : '/ halaman',
             toolbarFilter: 'Filter',
             toolbarColumns: locale === 'en' ? 'Columns' : 'Kolom',

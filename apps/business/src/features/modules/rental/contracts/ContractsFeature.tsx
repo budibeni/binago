@@ -13,7 +13,7 @@ import { ContractPrintModal } from './components/ContractPrintModal';
 import { ContractCreateFeature } from './ContractCreateFeature';
 import { HandoverFeature } from '../handover/HandoverFeature';
 import { ReturnFeature } from '../returns/ReturnFeature';
-import { cn } from '@adatrack/utils';
+import { cn, formatNumber } from '@adatrack/utils';
 import { PanelShell, type DataTableFilterConfig } from '@adatrack/ui';
 
 function StatCard({ label, value, colorClass, icon: Icon }: { label: string, value: number, colorClass: string, icon?: React.ElementType }) {
@@ -138,7 +138,7 @@ export function ContractsFeature() {
   const dtLabels = useMemo(() => {
     const isEn = locale === 'en';
     return {
-      paginationShowing: (from: number, to: number, total: number) => isEn ? `Showing ${from}-${to} of ${total.toLocaleString('en-US')} items` : `Menampilkan ${from}-${to} dari ${total.toLocaleString('id-ID')} data`,
+      paginationShowing: (from: number, to: number, total: number) => isEn ? `Showing ${from}-${to} of ${total.toLocaleString('en-US')} items` : `Menampilkan ${from}-${to} dari ${formatNumber(total)} data`,
       paginationPerPage: isEn ? '/ page' : '/ halaman',
       toolbarRefresh: isEn ? 'Refresh' : 'Refresh',
       toolbarFilter: isEn ? 'Filter' : 'Filter',

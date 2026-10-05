@@ -32,7 +32,7 @@ export function DataTableRow<TData extends RowData = RowData>({
           <td
             key={cell.id}
             className={cn(
-              'px-3 py-2 align-middle whitespace-nowrap',
+              'px-3 py-2 align-middle whitespace-nowrap text-[13px] text-foreground-muted',
               isPinned && 'sticky z-10 bg-white dark:bg-background group-hover:bg-neutral-50/80 dark:group-hover:bg-muted/20 transition-colors',
               (isPinned === 'start' || (isPinned as string) === 'left') &&
                 'shadow-[2px_0_4px_-1px_rgba(0,0,0,0.06)]',

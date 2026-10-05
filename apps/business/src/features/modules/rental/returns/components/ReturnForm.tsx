@@ -3,10 +3,10 @@
 import React from 'react';
 import { Button, FormShell, FormCard, InputNumber, InputSelect, InputTextarea, InputCheckbox, Label, InputDateTimeGps } from '@adatrack/ui';
 import { Car, FileText, StickyNote, Receipt } from 'lucide-react';
-import { cn } from '@adatrack/utils';
 import type { RentalContract } from '../../contracts/types/contract';
 import type { RentalHandover } from '../../handover/types/handover';
 import type { RentalReturn } from '../types/return';
+import { cn, formatCurrency } from '@adatrack/utils';
 
 interface ReturnFormProps {
   contract: RentalContract;
@@ -165,7 +165,7 @@ export function ReturnForm({ contract, handovers, onSubmit, onCancel, isSubmitti
   const totalPenalty = totalLateFee + totalDamageFee + totalAdditional;
   const grandTotal = remainingContract + totalPenalty + globalAdditionalFee - globalDiscount - deposit;
 
-  const formatIDR = (val: number) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(val);
+  const formatIDR = (val: number) => formatCurrency(val);
 
   return (
     <FormShell
@@ -496,12 +496,12 @@ export function ReturnForm({ contract, handovers, onSubmit, onCancel, isSubmitti
 
               {grandTotal > 0 && (
                 <p className="text-xs text-danger/80 mt-1 text-right">
-                  *Pelanggan <b>Wajib Membayar</b> sejumlah Rp {grandTotal.toLocaleString('id-ID')}
+                  *Pelanggan <b>Wajib Membayar</b> sejumlah {formatCurrency(grandTotal)}
                 </p>
               )}
               {grandTotal < 0 && (
                 <p className="text-xs text-emerald-600/80 dark:text-emerald-400/80 mt-1 text-right">
-                  *Perusahaan melakukan <b>Refund</b> sejumlah Rp {Math.abs(grandTotal).toLocaleString('id-ID')}
+                  *Perusahaan melakukan <b>Refund</b> sejumlah {formatCurrency(Math.abs(grandTotal))}
                 </p>
               )}
               {grandTotal === 0 && (

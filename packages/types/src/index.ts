@@ -12,7 +12,7 @@ export type AsyncStatus = 'idle' | 'loading' | 'success' | 'error';
 
 // --- TASK-02 Shared Types --------------------------
 
-export type Size = 'sm' | 'md' | 'lg';
+export type Size = 'sm' | 'md' | 'lg' | 'icon';
 
 export type Variant =
   | 'default'
@@ -20,7 +20,8 @@ export type Variant =
   | 'secondary'
   | 'destructive'
   | 'outline'
-  | 'ghost';
+  | 'ghost'
+  | 'ghost-danger';
 
 export type SemanticVariant = 'info' | 'success' | 'warning' | 'danger';
 

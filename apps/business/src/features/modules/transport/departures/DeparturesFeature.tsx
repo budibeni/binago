@@ -12,6 +12,8 @@ import { DepartureDetailDrawer } from './components/DepartureDetailDrawer';
 import { operationalScheduleService } from '@/data/modules/transport/services/scheduleService';
 import { trackingNavigationService } from '@/features/core/tracking/services/trackingNavigationService';
 import { buildTransportVehicleContext } from '@/data/modules/transport/services/vehicleContextBuilder';
+import { formatTime } from '@adatrack/utils';
+
 
 export function DeparturesFeature() {
   const locale = useBusinessLocale();
@@ -53,17 +55,7 @@ export function DeparturesFeature() {
     router.push(`/transport/checker`);
   };
 
-  const formatTime = (isoStr?: string) => {
-    if (!isoStr) return '-';
-    try {
-      const date = new Date(isoStr);
-      if (isNaN(date.getTime())) return isoStr; // Fallback to raw string if not ISO
-      return date.toLocaleTimeString(locale === 'en' ? 'en-US' : 'id-ID', { hour: '2-digit', minute: '2-digit' });
-    } catch {
-      return isoStr;
-    }
-  };
-
+  
   const handleCreateNew = () => {
     setFormError('');
     setIsFormOpen(true);

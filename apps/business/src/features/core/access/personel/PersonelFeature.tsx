@@ -8,6 +8,8 @@ import { PersonelTable } from './components/PersonelTable';
 import { PersonelView } from './components/PersonelView';
 import { PersonelForm } from './components/PersonelForm';
 import type { Personel, PersonelStatusFilter, PersonelTypeFilter } from './types/personel';
+import { formatNumber } from '@adatrack/utils';
+
 
 export function PersonelFeature() {
   const locale = useBusinessLocale();
@@ -119,7 +121,7 @@ export function PersonelFeature() {
   const dtLabels = React.useMemo(() => {
     const isEn = locale === 'en';
     return {
-      paginationShowing: (from: number, to: number, total: number) => isEn ? `Showing ${from}-${to} of ${total.toLocaleString('en-US')} items` : `Menampilkan ${from}-${to} dari ${total.toLocaleString('id-ID')} data`,
+      paginationShowing: (from: number, to: number, total: number) => isEn ? `Showing ${from}-${to} of ${total.toLocaleString('en-US')} items` : `Menampilkan ${from}-${to} dari ${formatNumber(total)} data`,
       paginationPerPage: isEn ? '/ page' : '/ halaman',
       toolbarRefresh: isEn ? 'Refresh' : 'Refresh',
       toolbarFilter: isEn ? 'Filter' : 'Filter',

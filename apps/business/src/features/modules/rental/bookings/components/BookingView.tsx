@@ -3,9 +3,9 @@
 import React, { useState } from 'react';
 import { Button, DetailShell } from '@adatrack/ui';
 import { User, Car, Calendar, DollarSign, FileText, CheckCircle2, ClipboardList, Clock, CreditCard, Tag } from 'lucide-react';
-import { cn } from '@adatrack/utils';
 import type { Booking } from '../types/booking';
 import { PaymentsFeature } from '../../payments/PaymentsFeature';
+import { cn, formatCurrency, formatDate } from '@adatrack/utils';
 
 interface BookingViewProps {
   booking: Booking | null;
@@ -32,19 +32,8 @@ export function BookingView({
 
   if (!booking) return null;
 
-  const formatCurrency = (value: number) => {
-    if (!value && value !== 0) return '-';
-    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(value);
-  };
-
-  const formatDate = (dateStr: string) => {
-    if (!dateStr) return '-';
-    return new Date(dateStr).toLocaleDateString('id-ID', {
-      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
-      hour: '2-digit', minute: '2-digit'
-    });
-  };
-
+  
+  
   const renderStatus = () => {
     const s = booking.status;
     let label = labels[`status${s.charAt(0).toUpperCase() + s.slice(1).toLowerCase()}`] || s;

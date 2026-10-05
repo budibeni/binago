@@ -113,6 +113,7 @@ export interface DataTableProps<TData extends RowData = RowData> {
   // Core
   data: TData[];
   columns: DataTableColumnDef<TData>[];
+  onRowActionClick?: (row: TData) => void;
 
   // Capabilities
   searchable?: boolean;

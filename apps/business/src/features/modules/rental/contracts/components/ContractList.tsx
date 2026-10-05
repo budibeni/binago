@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { FileText, Plus, Car, Edit, Printer, MoreVertical, Eye, Trash2, EyeOff } from 'lucide-react';
-import { cn } from '@adatrack/utils';
 import Link from 'next/link';
 import { 
   Button, 
@@ -10,6 +9,7 @@ import {
 } from '@adatrack/ui';
 import type { DataTableColumnDef, DataTableFilterConfig } from '@adatrack/ui';
 import type { RentalContract, ContractStatus } from '../types/contract';
+import { cn, formatCurrency } from '@adatrack/utils';
 
 interface ContractListProps {
   data: RentalContract[];
@@ -38,9 +38,6 @@ const getStatusLabel = (status: ContractStatus, labels: Record<string, string>) 
     default: return status;
   }
 };
-
-const formatCurrency = (value: number) =>
-  new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(value);
 
 const formatShortDate = (dateStr: string) => {
   if (!dateStr) return '-';

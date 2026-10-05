@@ -3,7 +3,7 @@ import { Button, Input, DetailShell } from '@adatrack/ui';
 import { Tag, Users, CarFront, X, Trash2, Search } from 'lucide-react';
 import type { RentalPricingCategory, RentalRate, VehiclePricingAssignment, VehicleRateOverride } from '../types/pricing';
 import type { RentalVehicle } from '../../vehicles/types/rentalVehicle';
-import { cn } from '@adatrack/utils';
+import { cn, formatCurrency } from '@adatrack/utils';
 
 export interface PricingCategoryDetailDrawerProps {
   open: boolean;
@@ -53,11 +53,7 @@ export function PricingCategoryDetailDrawer({
 
   if (!group) return null;
 
-  const formatCurrency = (value: number) => {
-    if (!value) return '-';
-    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(value);
-  };
-
+  
   const getRate = (type: string) => {
     const rate = rates.find(r => r.rateType === type);
     return rate ? formatCurrency(rate.amount) : '-';

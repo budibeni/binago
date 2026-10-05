@@ -3,7 +3,9 @@
 import React, { useState } from 'react';
 import type { RowData } from '@tanstack/react-table';
 import { cn } from '@adatrack/utils';
-import type { DataTableProps } from './types';
+import type { DataTableProps, DataTableColumnDef } from './types';
+import { Eye } from 'lucide-react';
+import { Button } from '../Button';
 import { useDataTable } from './useDataTable';
 import { DataTableHeader } from './DataTableHeader';
 import { DataTableBody } from './DataTableBody';
@@ -54,6 +56,9 @@ export function DataTable<TData extends RowData = RowData>(
 
     // i18n
     labels,
+    
+    // Action
+    onRowActionClick,
   } = props;
 
   // Internal panel state (uncontrolled)
@@ -79,7 +84,32 @@ export function DataTable<TData extends RowData = RowData>(
     }
   };
 
-  const table = useDataTable(props);
+  const enhancedColumns = React.useMemo(() => {
+    if (!onRowActionClick) return props.columns;
+    const actionCol: DataTableColumnDef<TData> = {
+      id: 'actions',
+      header: '',
+      enableSorting: false,
+      size: 40,
+      meta: { fixedWidth: true, pin: 'left' },
+      cell: ({ row }) => (
+        <Button
+          variant="ghost-danger"
+          size="icon"
+          onClick={() => onRowActionClick(row.original)}
+          title={labels?.actionDetail || 'Lihat Detail'}
+        >
+          <Eye className="h-4 w-4" strokeWidth={1.5} />
+        </Button>
+      ),
+    };
+    return [actionCol, ...props.columns];
+  }, [props.columns, onRowActionClick, labels?.actionDetail]);
+
+  const table = useDataTable({
+    ...props,
+    columns: enhancedColumns,
+  });
 
   const activeFilterCount = filterConfig
     ? Object.values(filterConfig.state).flat().filter(v => Boolean(v) && v !== 'all' && v !== 'ALL').length
@@ -130,7 +160,7 @@ export function DataTable<TData extends RowData = RowData>(
 
           {/* Table area */}
           <div className="flex-1 h-full overflow-auto">
-            <table className={cn('w-full text-left border-collapse text-[12px]', tableClassName)}>
+            <table className={cn('w-full text-left border-collapse text-[13px]', tableClassName)}>
               <DataTableHeader table={table} />
               <DataTableBody
                 table={table}

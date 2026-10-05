@@ -1,10 +1,10 @@
 import React from 'react';
 import { CheckCircle2, AlertCircle, Plus, FileText, MoreVertical, Eye, Edit2, MapPin, LogOut, EyeOff } from 'lucide-react';
-import { cn } from '@adatrack/utils';
 import { Button, Checkbox, DataTable } from '@adatrack/ui';
 import type { DataTableColumnDef, DataTableFilterConfig } from '@adatrack/ui';
 import type { RentalVehicle } from '../types/rentalVehicle';
 import type { RentalPricingCategory } from '../../pricing-category/types/pricing';
+import { cn, formatCurrency } from '@adatrack/utils';
 
 interface RentalVehicleTableProps {
   data: RentalVehicle[];
@@ -39,11 +39,7 @@ function buildColumns(
   dataList: RentalVehicle[],
   pricingCategorys: RentalPricingCategory[]
 ): DataTableColumnDef<RentalVehicle>[] {
-  const formatCurrency = (value: number) => {
-    if (value === 0) return '-';
-    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(value);
-  };
-
+  
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
       onSelectionChange(dataList.map(v => v.vehicleId));

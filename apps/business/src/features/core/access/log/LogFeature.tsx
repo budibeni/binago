@@ -7,6 +7,8 @@ import { logService } from '@/data/core/access/log/services/logService';
 import { CardLog, CardActivityType, CardLogStatus, HolderType } from './types/log';
 import { LogTable } from './components/LogTable';
 import type { DataTableFilterConfig } from '@adatrack/ui';
+import { formatNumber } from '@adatrack/utils';
+
 
 export default function LogFeature() {
   const locale = useBusinessLocale();
@@ -90,7 +92,7 @@ export default function LogFeature() {
           t={t}
           exportFilename="log-card-adatrack"
           dtLabels={{
-            paginationShowing: (from: number, to: number, total: number) => locale === 'en' ? `Showing ${from}-${to} of ${total.toLocaleString('en-US')} items` : `Menampilkan ${from}-${to} dari ${total.toLocaleString('id-ID')} data`,
+            paginationShowing: (from: number, to: number, total: number) => locale === 'en' ? `Showing ${from}-${to} of ${total.toLocaleString('en-US')} items` : `Menampilkan ${from}-${to} dari ${formatNumber(total)} data`,
             paginationPerPage: locale === 'en' ? '/ page' : '/ halaman',
             toolbarFilter: 'Filter',
             toolbarColumns: locale === 'en' ? 'Columns' : 'Kolom',

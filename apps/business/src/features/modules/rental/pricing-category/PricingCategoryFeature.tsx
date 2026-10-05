@@ -18,6 +18,8 @@ import { Button, Card } from '@adatrack/ui';
 import type { DataTableFilterConfig } from '@adatrack/ui';
 import { Plus } from 'lucide-react';
 import type { RateType } from '../bookings/types/booking';
+import { formatNumber } from '@adatrack/utils';
+
 
 export function PricingCategoryFeature() {
   const locale = useBusinessLocale();
@@ -216,7 +218,7 @@ export function PricingCategoryFeature() {
     return {
       paginationShowing: (from: number, to: number, total: number) => isEn
         ? `Showing ${from}-${to} of ${total.toLocaleString('en-US')} items`
-        : `Menampilkan ${from}-${to} dari ${total.toLocaleString('id-ID')} data`,
+        : `Menampilkan ${from}-${to} dari ${formatNumber(total)} data`,
       paginationPerPage: isEn ? '/ page' : '/ halaman',
       toolbarFilter: isEn ? 'Filter' : 'Filter',
       toolbarColumns: isEn ? 'Columns' : 'Kolom',

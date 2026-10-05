@@ -9,6 +9,8 @@ import type { RateType, RentalType } from '../types/booking';
 import { getBookingFormSchema } from '../types/booking';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
 import { getBookingTranslation } from '../i18n';
+import { formatCurrency } from '@adatrack/utils';
+
 
 export interface BookingFormData {
   id?: string;
@@ -123,10 +125,7 @@ export function BookingForm({
     return Math.max(totalAmount - (formData.deposit || 0), 0);
   }, [totalAmount, formData.deposit]);
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(value);
-  };
-
+  
   const [selectedVehicleToAdd, setSelectedVehicleToAdd] = React.useState<string>('');
   
   const handleAddVehicle = () => {

@@ -1,9 +1,9 @@
 import React from 'react';
 import { Button, DetailShell } from '@adatrack/ui';
 import { User, Car, Calendar, DollarSign, FileText, FileCheck, Info, CheckCircle, Printer, XCircle, CheckCircle2 } from 'lucide-react';
-import { cn } from '@adatrack/utils';
 import type { RentalContract } from '../types/contract';
 import { PaymentsFeature } from '../../payments/PaymentsFeature';
+import { cn, formatCurrency, formatDate } from '@adatrack/utils';
 
 interface ContractDetailDrawerProps {
   contract: RentalContract | null;
@@ -30,18 +30,8 @@ export function ContractView({
 
   if (!contract) return null;
 
-  const formatCurrency = (value: number) => {
-    if (!value && value !== 0) return '-';
-    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(value);
-  };
-
-  const formatDate = (dateStr: string) => {
-    if (!dateStr) return '-';
-    return new Date(dateStr).toLocaleDateString('id-ID', {
-      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
-    });
-  };
-
+  
+  
   const renderStatus = () => {
     const s = contract.status;
     let label = labels[`status${s.charAt(0).toUpperCase() + s.slice(1).toLowerCase()}`] || s;

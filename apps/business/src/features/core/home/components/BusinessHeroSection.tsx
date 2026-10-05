@@ -5,6 +5,8 @@ import { Truck, TrendingUp, AlertTriangle, Route } from 'lucide-react';
 import { homeService } from '@/data/services';
 import { useBusinessLocale } from '../../../../components/BusinessShellLayout';
 import { getTranslation } from '../../../../i18n';
+import { formatNumber } from '@adatrack/utils';
+
 
 interface MetricCardProps {
   icon: React.ElementType;
@@ -72,24 +74,24 @@ export function BusinessHeroSection() {
       <div className="relative z-10 mt-6 grid grid-cols-2 lg:grid-cols-4 gap-3">
         <MetricCard
           icon={Truck}
-          value={homeService.getMetricSummary().totalVehicles.toLocaleString('id-ID')}
+          value={formatNumber(homeService.getMetricSummary().totalVehicles)}
           label={h.metrics.totalVehicles}
         />
         <MetricCard
           icon={TrendingUp}
-          value={homeService.getMetricSummary().movingVehicles.toLocaleString('id-ID')}
+          value={formatNumber(homeService.getMetricSummary().movingVehicles)}
           label={h.metrics.movingVehicles}
           iconBg="bg-emerald-500/20"
         />
         <MetricCard
           icon={AlertTriangle}
-          value={homeService.getMetricSummary().activeAlerts.toLocaleString('id-ID')}
+          value={formatNumber(homeService.getMetricSummary().activeAlerts)}
           label={h.metrics.activeAlerts}
           iconBg="bg-amber-500/20"
         />
         <MetricCard
           icon={Route}
-          value={homeService.getMetricSummary().tripsToday.toLocaleString('id-ID')}
+          value={formatNumber(homeService.getMetricSummary().tripsToday)}
           label={h.metrics.tripsToday}
           iconBg="bg-blue-500/20"
         />

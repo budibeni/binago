@@ -8,7 +8,7 @@ import { DataTable, type DataTableColumnDef, type DataTableFilterConfig, Badge, 
 import { getTranslation } from '@/i18n';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
 import { CheckCircle, XCircle, Trash2, CalendarClock, Handshake, FileSignature, Undo2, CreditCard, Wallet, Banknote, ShieldCheck } from 'lucide-react';
-import { cn } from '@adatrack/utils';
+import { cn, formatCurrency, formatNumber } from '@adatrack/utils';
 
 function StatCard({ label, value, colorClass, icon: Icon, desc }: { label: string, value: string | number, colorClass: string, icon?: React.ElementType, desc?: string }) {
   const textColorClass = colorClass.replace(/bg-/g, 'text-');
@@ -242,7 +242,7 @@ export function AllPaymentsFeature() {
       meta: { align: 'right' },
       cell: ({ row, getValue }) => (
         <span className={row.original.type === 'REFUND' ? 'text-emerald-600 font-medium' : ''}>
-          {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(getValue() as number)}
+          {formatCurrency(getValue() as number)}
         </span>
       ),
     },
@@ -294,17 +294,17 @@ export function AllPaymentsFeature() {
     { id: 'customer', header: 'Pelanggan', accessorFn: (row) => row.customerName, size: 140, meta: { fixedWidth: true } },
     { id: 'duration', header: 'Durasi', accessorFn: (row) => row.duration, size: 70, meta: { align: 'center', fixedWidth: true }, cell: ({getValue}) => <span className="text-[11px]">{getValue() ? `${getValue()} Hari` : '-'}</span> },
     { id: 'totalVehicles', header: 'Jml Mobil', accessorFn: (row) => row.totalVehicles, size: 80, meta: { align: 'center', fixedWidth: true }, cell: ({getValue}) => <span className="text-[11px]">{getValue() ? `${getValue()} Unit` : '-'}</span> },
-    { id: 'totalTagihan', header: 'Tagihan Sewa', accessorFn: (row) => row.totalTagihan, size: 110, meta: { align: 'right', fixedWidth: true }, cell: ({getValue}) => <span className="font-semibold text-[11px]">{getValue() ? new Intl.NumberFormat('id-ID').format(getValue() as number) : '-'}</span> },
-    { id: 'BOOKING_FEE', header: 'Booking Fee', accessorFn: (row) => row.BOOKING_FEE, size: 90, meta: { align: 'right', fixedWidth: true }, cell: ({getValue}) => <span className="text-[11px]">{getValue() ? new Intl.NumberFormat('id-ID').format(getValue() as number) : '-'}</span> },
-    { id: 'DOWN_PAYMENT', header: 'DP', accessorFn: (row) => row.DOWN_PAYMENT, size: 90, meta: { align: 'right', fixedWidth: true }, cell: ({getValue}) => <span className="text-[11px]">{getValue() ? new Intl.NumberFormat('id-ID').format(getValue() as number) : '-'}</span> },
-    { id: 'RENTAL_PAYMENT', header: 'Pelunasan', accessorFn: (row) => row.RENTAL_PAYMENT, size: 100, meta: { align: 'right', fixedWidth: true }, cell: ({getValue}) => <span className="text-[11px]">{getValue() ? new Intl.NumberFormat('id-ID').format(getValue() as number) : '-'}</span> },
-    { id: 'ADDITIONAL_FEE', header: 'Denda/Extra', accessorFn: (row) => row.ADDITIONAL_FEE, size: 100, meta: { align: 'right', fixedWidth: true }, cell: ({getValue}) => <span className="text-[11px]">{getValue() ? new Intl.NumberFormat('id-ID').format(getValue() as number) : '-'}</span> },
-    { id: 'DEPOSIT', header: 'Deposit', accessorFn: (row) => row.DEPOSIT, size: 100, meta: { align: 'right', fixedWidth: true }, cell: ({getValue}) => <span className="text-[11px] text-amber-600">{getValue() ? new Intl.NumberFormat('id-ID').format(getValue() as number) : '-'}</span> },
-    { id: 'REFUND', header: 'Refund', accessorFn: (row) => row.REFUND, size: 100, meta: { align: 'right', fixedWidth: true }, cell: ({getValue}) => <span className="text-[11px] text-emerald-600 font-medium">{getValue() ? `-${new Intl.NumberFormat('id-ID').format(getValue() as number)}` : '-'}</span> },
-    { id: 'totalNet', header: 'Total Net', accessorFn: (row) => row.totalNet, size: 130, meta: { align: 'right', fixedWidth: true }, cell: ({getValue}) => <span className="font-bold text-sm text-emerald-700 dark:text-emerald-400">Rp {new Intl.NumberFormat('id-ID').format(getValue() as number)}</span> },
+    { id: 'totalTagihan', header: 'Tagihan Sewa', accessorFn: (row) => row.totalTagihan, size: 110, meta: { align: 'right', fixedWidth: true }, cell: ({getValue}) => <span className="font-semibold text-[11px]">{getValue() ? formatNumber(getValue() as number) : '-'}</span> },
+    { id: 'BOOKING_FEE', header: 'Booking Fee', accessorFn: (row) => row.BOOKING_FEE, size: 90, meta: { align: 'right', fixedWidth: true }, cell: ({getValue}) => <span className="text-[11px]">{getValue() ? formatNumber(getValue() as number) : '-'}</span> },
+    { id: 'DOWN_PAYMENT', header: 'DP', accessorFn: (row) => row.DOWN_PAYMENT, size: 90, meta: { align: 'right', fixedWidth: true }, cell: ({getValue}) => <span className="text-[11px]">{getValue() ? formatNumber(getValue() as number) : '-'}</span> },
+    { id: 'RENTAL_PAYMENT', header: 'Pelunasan', accessorFn: (row) => row.RENTAL_PAYMENT, size: 100, meta: { align: 'right', fixedWidth: true }, cell: ({getValue}) => <span className="text-[11px]">{getValue() ? formatNumber(getValue() as number) : '-'}</span> },
+    { id: 'ADDITIONAL_FEE', header: 'Denda/Extra', accessorFn: (row) => row.ADDITIONAL_FEE, size: 100, meta: { align: 'right', fixedWidth: true }, cell: ({getValue}) => <span className="text-[11px]">{getValue() ? formatNumber(getValue() as number) : '-'}</span> },
+    { id: 'DEPOSIT', header: 'Deposit', accessorFn: (row) => row.DEPOSIT, size: 100, meta: { align: 'right', fixedWidth: true }, cell: ({getValue}) => <span className="text-[11px] text-amber-600">{getValue() ? formatNumber(getValue() as number) : '-'}</span> },
+    { id: 'REFUND', header: 'Refund', accessorFn: (row) => row.REFUND, size: 100, meta: { align: 'right', fixedWidth: true }, cell: ({getValue}) => <span className="text-[11px] text-emerald-600 font-medium">{getValue() ? `-${formatNumber(getValue() as number)}` : '-'}</span> },
+    { id: 'totalNet', header: 'Total Net', accessorFn: (row) => row.totalNet, size: 130, meta: { align: 'right', fixedWidth: true }, cell: ({getValue}) => <span className="font-bold text-sm text-emerald-700 dark:text-emerald-400">Rp {formatNumber(getValue() as number)}</span> },
     { id: 'sisaTagihan', header: 'Sisa Tagihan', accessorFn: (row) => row.sisaTagihan, size: 110, meta: { align: 'right', fixedWidth: true }, cell: ({getValue}) => {
       const val = getValue() as number;
-      return <span className={`text-[11px] font-bold ${val > 0 ? 'text-danger' : 'text-muted-foreground'}`}>{val > 0 ? new Intl.NumberFormat('id-ID').format(val) : 'Lunas'}</span>;
+      return <span className={`text-[11px] font-bold ${val > 0 ? 'text-danger' : 'text-muted-foreground'}`}>{val > 0 ? formatNumber(val) : 'Lunas'}</span>;
     } },
   ];
 
@@ -365,10 +365,10 @@ export function AllPaymentsFeature() {
         )}
       >
         <div className={cn("gap-2.5 p-3 bg-neutral-50/50 dark:bg-neutral-900/20", (panelSide === 'top' || panelSide === 'bottom') ? "grid grid-cols-2 md:grid-cols-4" : "flex flex-col h-full")}>
-          <StatCard label="Booking" value={`Rp ${summaryByStage.BOOKING.toLocaleString('id-ID')}`} colorClass="bg-blue-500" icon={CalendarClock} desc="Saat Reservasi" />
-          <StatCard label="Serah Terima" value={`Rp ${summaryByStage.HANDOVER.toLocaleString('id-ID')}`} colorClass="bg-amber-500" icon={Handshake} desc="DP / Awal Sewa" />
-          <StatCard label="Masa Kontrak" value={`Rp ${summaryByStage.CONTRACT.toLocaleString('id-ID')}`} colorClass="bg-primary" icon={FileSignature} desc="Pelunasan Berkala" />
-          <StatCard label="Pengembalian (Net)" value={`Rp ${summaryByStage.RETURN.toLocaleString('id-ID')}`} colorClass="bg-emerald-500" icon={Undo2} desc="Setelah Denda/Refund" />
+          <StatCard label="Booking" value={`${formatCurrency(summaryByStage.BOOKING)}`} colorClass="bg-blue-500" icon={CalendarClock} desc="Saat Reservasi" />
+          <StatCard label="Serah Terima" value={`${formatCurrency(summaryByStage.HANDOVER)}`} colorClass="bg-amber-500" icon={Handshake} desc="DP / Awal Sewa" />
+          <StatCard label="Masa Kontrak" value={`${formatCurrency(summaryByStage.CONTRACT)}`} colorClass="bg-primary" icon={FileSignature} desc="Pelunasan Berkala" />
+          <StatCard label="Pengembalian (Net)" value={`${formatCurrency(summaryByStage.RETURN)}`} colorClass="bg-emerald-500" icon={Undo2} desc="Setelah Denda/Refund" />
         </div>
       </PanelShell>
     );

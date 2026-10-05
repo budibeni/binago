@@ -62,7 +62,7 @@ export const rentalCustomersDictionaries = {
     save: 'Simpan',
     createSuccess: 'Pelanggan berhasil ditambahkan.',
     updateSuccess: 'Data pelanggan berhasil diperbarui.',
-    deleteSuccess: 'Pelanggan berhasil dihapus.',
+    deleteSuccess: 'Data pelanggan berhasil dihapus secara permanen.',
     
     // Form Fields
     fieldCustomerType: 'Tipe Pelanggan',
@@ -167,7 +167,7 @@ export const rentalCustomersDictionaries = {
     save: 'Save',
     createSuccess: 'Customer added successfully.',
     updateSuccess: 'Customer data updated successfully.',
-    deleteSuccess: 'Customer deleted successfully.',
+    deleteSuccess: 'Customer data has been permanently deleted.',
     
     // Form Fields
     fieldCustomerType: 'Customer Type',
