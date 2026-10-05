@@ -66,7 +66,7 @@ function buildColumns(
       enableSorting: true,
       size: 240,
       cell: ({ row }) => (
-        <span className="font-semibold text-foreground whitespace-nowrap">
+        <span className="whitespace-nowrap">
           {row.original.name}
         </span>
       ),

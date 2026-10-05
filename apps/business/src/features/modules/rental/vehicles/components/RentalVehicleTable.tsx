@@ -81,27 +81,7 @@ function buildColumns(
       enableSorting: false,
       size: 40,
     },
-    {
-      id: 'actions',
-      header: '',
-      enableSorting: false,
-      size: 40,
-      meta: { fixedWidth: true },
-      cell: ({ row }) => {
-        const v = row.original;
-        return (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 w-8 p-0 flex items-center justify-center text-foreground-muted hover:text-primary hover:bg-primary/10 rounded-full"
-            onClick={() => onView(v)}
-            title="Detail"
-          >
-            <Eye className="h-4 w-4" />
-          </Button>
-        );
-      },
-    },
+
     {
       id: 'plateNumber',
       accessorFn: (v) => v.coreVehicle.plateNumber,
@@ -109,10 +89,7 @@ function buildColumns(
       enableSorting: true,
       size: 130,
       cell: ({ row }) => (
-        <span 
-          onClick={() => onView(row.original)}
-          className="font-medium text-foreground hover:text-primary hover:underline cursor-pointer transition-colors whitespace-nowrap"
-        >
+        <span className="uppercase tracking-wider">
           {row.original.coreVehicle.plateNumber}
         </span>
       ),
@@ -155,7 +132,7 @@ function buildColumns(
 
         return (
           <div className="whitespace-nowrap">
-            <span className={cn("text-[12px] font-medium", textClass)}>{label}</span>
+            <span className={textClass}>{label}</span>
           </div>
         );
       },
@@ -206,8 +183,7 @@ function buildColumns(
       size: 140,
       cell: ({ row }) => {
         const v = row.original;
-        if (v.dailyRate === 0) return <span className="text-muted-foreground">-</span>;
-        return <span className="text-[12px] font-medium">{formatCurrency(v.dailyRate)} / hari</span>;
+        return <span>{formatCurrency(v.dailyRate)} / hari</span>;
       },
     },
     {
@@ -233,7 +209,7 @@ function buildColumns(
         return (
           <div className="flex items-center gap-2">
             <span className={cn('h-1.5 w-1.5 shrink-0 rounded-full', isComplete ? 'bg-success' : 'bg-warning')} />
-            <span className="text-[12px] text-foreground-muted">
+            <span>
               {isComplete ? (labels.dataCompleteShort || 'Lengkap') : (labels.dataNotCompleteShort || 'Belum Lengkap')}
             </span>
             {!isComplete && (
@@ -279,6 +255,7 @@ export function RentalVehicleTable({
     <DataTable<RentalVehicle>
       data={data}
       columns={columns}
+      onRowActionClick={onView}
       // Capabilities
       searchable
       sortable

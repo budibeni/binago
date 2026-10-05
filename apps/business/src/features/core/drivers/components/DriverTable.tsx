@@ -63,35 +63,13 @@ function buildColumns(
 ): DataTableColumnDef<Driver>[] {
   return [
     {
-      id: 'actions',
-      header: '',
-      enableSorting: false,
-      size: 40,
-      meta: { fixedWidth: true, pin: 'left', className: 'w-[1%] px-1 whitespace-nowrap' },
-      cell: ({ row }) => (
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-8 w-8 p-0 flex items-center justify-center text-foreground-muted hover:text-primary hover:bg-primary/10 rounded-full"
-          onClick={() => onViewDetail(row.original)}
-          title="Detail"
-        >
-          <Eye className="h-4 w-4" />
-        </Button>
-      ),
-    },
-    {
       id: 'name',
       header: labels.colDriver,
       accessorFn: (row) => row.name,
       cell: ({ row }) => (
-        <button
-          type="button"
-          onClick={() => onViewDetail(row.original)}
-          className="font-bold text-primary hover:underline underline-offset-2 text-[12px] tracking-wider uppercase focus:outline-none"
-        >
+        <span className="font-semibold text-foreground uppercase tracking-wider">
           {row.original.name}
-        </button>
+        </span>
       ),
       enableSorting: true,
       size: 200,
@@ -281,6 +259,7 @@ export function DriverTable({
       className={className}
       data={data}
       columns={columns}
+      onRowActionClick={onViewDetail}
       // Capabilities
       searchable
       sortable

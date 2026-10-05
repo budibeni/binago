@@ -104,25 +104,6 @@ function buildColumns(
 ): DataTableColumnDef<Vehicle>[] {
   return [
     {
-              id: 'actions',
-              header: '',
-              enableSorting: false,
-              size: 40,
-              meta: { fixedWidth: true, pin: 'left', className: 'w-[1%] px-1 whitespace-nowrap' },
-              cell: ({ row }) => (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-8 w-8 p-0 flex items-center justify-center text-foreground-muted hover:text-primary hover:bg-primary/10 rounded-full"
-                  onClick={() => onViewDetail(row.original)}
-                  title="Detail"
-                  id={`vehicle-action-${row.original.id}`}
-                >
-                  <Eye className="h-4 w-4" />
-                </Button>
-              ),
-            },
-    {
               id: 'plateNumber',
               accessorKey: 'plateNumber',
               header: labels.colPlateNumber,
@@ -130,13 +111,9 @@ function buildColumns(
               size: 140,
               meta: { pin: 'left' },
               cell: ({ row }) => (
-                <button
-                  type="button"
-                  className="font-bold text-primary hover:underline underline-offset-2 text-[12px] tracking-wider uppercase focus:outline-none"
-                  onClick={() => onViewDetail(row.original)}
-                >
+                <span className="font-semibold text-foreground uppercase tracking-wider">
                   {row.original.plateNumber}
-                </button>
+                </span>
               ),
             },
     {
@@ -508,6 +485,7 @@ export function VehicleTable({
       className={className}
       data={data}
       columns={columns}
+      onRowActionClick={onViewDetail}
       // Capabilities
       searchable
       sortable

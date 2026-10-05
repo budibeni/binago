@@ -93,6 +93,7 @@ export interface DataTableLabels {
   toolbarFullscreen?: string;
   toolbarExitFullscreen?: string;
 
+  actionDetail?: string;
   // Active Filters
   activeFilterActive?: string;
   activeFilterClear?: string;
