@@ -60,4 +60,5 @@ export const getDriverFormSchema = (t: Record<string, string>) => z.object({
   licenseNumber: z.string().min(1, t.licenseRequired || 'Nomor SIM wajib diisi'),
   licenseExpiry: z.string().optional(),
   joinDate: z.string().optional(),
+  createUserAccount: z.boolean().optional(),
 });

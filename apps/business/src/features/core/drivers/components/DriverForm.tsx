@@ -23,6 +23,7 @@ const DEFAULT_DRIVER = {
   placeOfBirth: '',
   dateOfBirth: '',
   email: '',
+  createUserAccount: false,
   phone: '',
   address: '',
   placement: '',
@@ -167,6 +168,19 @@ export function DriverForm({
             onChange={(v) => handleChange('email', v)}
             error={errors.email}
           />
+          <div className="flex items-center space-x-2 mt-2">
+            <input
+              type="checkbox"
+              id="createUserAccount"
+              className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+              checked={formData.createUserAccount || false}
+              onChange={(e) => handleChange('createUserAccount', e.target.checked)}
+            />
+            <label htmlFor="createUserAccount" className="text-sm text-slate-600">
+              Buat akun login & kirim password (wajib ada email)
+            </label>
+          </div>
+
         </FormCard>
 
         {/* Lisensi & Pekerjaan Card */}
