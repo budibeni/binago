@@ -24,6 +24,14 @@ export const mockRentalCustomers: Customer[] = [
     simPhoto: '/images/dummy-sim.jpg',
     createdAt: '2024-01-10T10:00:00Z',
     updatedAt: '2024-01-10T10:00:00Z',
+    balance: {
+      totalBilling: 3000000,
+      totalPaid: 1500000.0,
+      totalOutstanding: 1500000.0,
+      totalRentals: 5,
+      lastRentalDate: '2024-09-15T10:00:00Z',
+      lastPaymentDate: '2024-09-16T10:00:00Z'
+    }
   },
   {
     id: 'cust-ind-002',
@@ -47,6 +55,14 @@ export const mockRentalCustomers: Customer[] = [
     simPhoto: '/images/dummy-sim.jpg',
     createdAt: '2024-01-11T11:00:00Z',
     updatedAt: '2024-01-11T11:00:00Z',
+    balance: {
+      totalBilling: 2500000,
+      totalPaid: 2500000,
+      totalOutstanding: 0,
+      totalRentals: 4,
+      lastRentalDate: '2024-09-15T10:00:00Z',
+      lastPaymentDate: '2024-09-16T10:00:00Z'
+    }
   },
   {
     id: 'cust-ind-003',
@@ -70,6 +86,14 @@ export const mockRentalCustomers: Customer[] = [
     simPhoto: '/images/dummy-sim.jpg',
     createdAt: '2024-01-12T09:30:00Z',
     updatedAt: '2024-02-15T14:20:00Z',
+    balance: {
+      totalBilling: 45000000,
+      totalPaid: 45000000,
+      totalOutstanding: 0,
+      totalRentals: 5,
+      lastRentalDate: '2024-09-15T10:00:00Z',
+      lastPaymentDate: '2024-09-16T10:00:00Z'
+    }
   },
   {
     id: 'cust-ind-004',
@@ -93,6 +117,14 @@ export const mockRentalCustomers: Customer[] = [
     simPhoto: '/images/dummy-sim.jpg',
     createdAt: '2024-02-01T08:15:00Z',
     updatedAt: '2024-02-01T08:15:00Z',
+    balance: {
+      totalBilling: 45000000,
+      totalPaid: 45000000,
+      totalOutstanding: 0,
+      totalRentals: 1,
+      lastRentalDate: '2024-09-15T10:00:00Z',
+      lastPaymentDate: '2024-09-16T10:00:00Z'
+    }
   },
   {
     id: 'cust-ind-005',
@@ -116,6 +148,14 @@ export const mockRentalCustomers: Customer[] = [
     simPhoto: '/images/dummy-sim.jpg',
     createdAt: '2024-02-10T10:45:00Z',
     updatedAt: '2024-02-10T10:45:00Z',
+    balance: {
+      totalBilling: 3000000,
+      totalPaid: 1500000.0,
+      totalOutstanding: 1500000.0,
+      totalRentals: 3,
+      lastRentalDate: '2024-09-15T10:00:00Z',
+      lastPaymentDate: '2024-09-16T10:00:00Z'
+    }
   },
   {
     id: 'cust-ind-006',
@@ -139,6 +179,14 @@ export const mockRentalCustomers: Customer[] = [
     simPhoto: '/images/dummy-sim.jpg',
     createdAt: '2024-02-15T13:20:00Z',
     updatedAt: '2024-02-15T13:20:00Z',
+    balance: {
+      totalBilling: 1500000,
+      totalPaid: 1500000,
+      totalOutstanding: 0,
+      totalRentals: 4,
+      lastRentalDate: '2024-09-15T10:00:00Z',
+      lastPaymentDate: '2024-09-16T10:00:00Z'
+    }
   },
   {
     id: 'cust-ind-007',
@@ -162,6 +210,14 @@ export const mockRentalCustomers: Customer[] = [
     simPhoto: '/images/dummy-sim.jpg',
     createdAt: '2024-03-01T09:00:00Z',
     updatedAt: '2024-03-01T09:00:00Z',
+    balance: {
+      totalBilling: 12000000,
+      totalPaid: 12000000,
+      totalOutstanding: 0,
+      totalRentals: 3,
+      lastRentalDate: '2024-09-15T10:00:00Z',
+      lastPaymentDate: '2024-09-16T10:00:00Z'
+    }
   },
   {
     id: 'cust-ind-008',
@@ -185,6 +241,14 @@ export const mockRentalCustomers: Customer[] = [
     simPhoto: '/images/dummy-sim.jpg',
     createdAt: '2024-03-10T15:30:00Z',
     updatedAt: '2024-04-01T10:15:00Z',
+    balance: {
+      totalBilling: 3000000,
+      totalPaid: 3000000,
+      totalOutstanding: 0,
+      totalRentals: 4,
+      lastRentalDate: '2024-09-15T10:00:00Z',
+      lastPaymentDate: '2024-09-16T10:00:00Z'
+    }
   },
   {
     id: 'cust-ind-009',
@@ -208,6 +272,14 @@ export const mockRentalCustomers: Customer[] = [
     simPhoto: '/images/dummy-sim.jpg',
     createdAt: '2024-04-05T11:20:00Z',
     updatedAt: '2024-04-05T11:20:00Z',
+    balance: {
+      totalBilling: 1500000,
+      totalPaid: 1500000,
+      totalOutstanding: 0,
+      totalRentals: 5,
+      lastRentalDate: '2024-09-15T10:00:00Z',
+      lastPaymentDate: '2024-09-16T10:00:00Z'
+    }
   },
   {
     id: 'cust-ind-010',
@@ -231,6 +303,14 @@ export const mockRentalCustomers: Customer[] = [
     simPhoto: '/images/dummy-sim.jpg',
     createdAt: '2024-04-15T14:40:00Z',
     updatedAt: '2024-04-15T14:40:00Z',
+    balance: {
+      totalBilling: 2500000,
+      totalPaid: 2500000,
+      totalOutstanding: 0,
+      totalRentals: 1,
+      lastRentalDate: '2024-09-15T10:00:00Z',
+      lastPaymentDate: '2024-09-16T10:00:00Z'
+    }
   },
 
   // COMPANY CUSTOMERS (10)
@@ -256,6 +336,14 @@ export const mockRentalCustomers: Customer[] = [
     picKtpPhoto: '/images/dummy-ktp.jpg',
     createdAt: '2023-11-01T08:00:00Z',
     updatedAt: '2023-11-01T08:00:00Z',
+    balance: {
+      totalBilling: 45000000,
+      totalPaid: 22500000.0,
+      totalOutstanding: 22500000.0,
+      totalRentals: 4,
+      lastRentalDate: '2024-09-15T10:00:00Z',
+      lastPaymentDate: '2024-09-16T10:00:00Z'
+    }
   },
   {
     id: 'cust-com-002',
@@ -279,6 +367,14 @@ export const mockRentalCustomers: Customer[] = [
     picKtpPhoto: '/images/dummy-ktp.jpg',
     createdAt: '2023-11-15T09:30:00Z',
     updatedAt: '2023-11-15T09:30:00Z',
+    balance: {
+      totalBilling: 3000000,
+      totalPaid: 3000000,
+      totalOutstanding: 0,
+      totalRentals: 5,
+      lastRentalDate: '2024-09-15T10:00:00Z',
+      lastPaymentDate: '2024-09-16T10:00:00Z'
+    }
   },
   {
     id: 'cust-com-003',
@@ -302,6 +398,14 @@ export const mockRentalCustomers: Customer[] = [
     picKtpPhoto: '/images/dummy-ktp.jpg',
     createdAt: '2023-12-01T10:15:00Z',
     updatedAt: '2023-12-01T10:15:00Z',
+    balance: {
+      totalBilling: 0,
+      totalPaid: 0,
+      totalOutstanding: 0,
+      totalRentals: 0,
+      lastRentalDate: undefined,
+      lastPaymentDate: undefined
+    }
   },
   {
     id: 'cust-com-004',
@@ -325,6 +429,14 @@ export const mockRentalCustomers: Customer[] = [
     picKtpPhoto: '/images/dummy-ktp.jpg',
     createdAt: '2023-12-10T11:45:00Z',
     updatedAt: '2024-05-01T08:00:00Z',
+    balance: {
+      totalBilling: 3000000,
+      totalPaid: 3000000,
+      totalOutstanding: 0,
+      totalRentals: 5,
+      lastRentalDate: '2024-09-15T10:00:00Z',
+      lastPaymentDate: '2024-09-16T10:00:00Z'
+    }
   },
   {
     id: 'cust-com-005',
@@ -348,6 +460,14 @@ export const mockRentalCustomers: Customer[] = [
     picKtpPhoto: '/images/dummy-ktp.jpg',
     createdAt: '2024-01-05T09:20:00Z',
     updatedAt: '2024-01-05T09:20:00Z',
+    balance: {
+      totalBilling: 12000000,
+      totalPaid: 12000000,
+      totalOutstanding: 0,
+      totalRentals: 5,
+      lastRentalDate: '2024-09-15T10:00:00Z',
+      lastPaymentDate: '2024-09-16T10:00:00Z'
+    }
   },
   {
     id: 'cust-com-006',
@@ -371,6 +491,14 @@ export const mockRentalCustomers: Customer[] = [
     picKtpPhoto: '/images/dummy-ktp.jpg',
     createdAt: '2024-02-20T10:30:00Z',
     updatedAt: '2024-02-20T10:30:00Z',
+    balance: {
+      totalBilling: 2500000,
+      totalPaid: 2500000,
+      totalOutstanding: 0,
+      totalRentals: 1,
+      lastRentalDate: '2024-09-15T10:00:00Z',
+      lastPaymentDate: '2024-09-16T10:00:00Z'
+    }
   },
   {
     id: 'cust-com-007',
@@ -394,6 +522,14 @@ export const mockRentalCustomers: Customer[] = [
     picKtpPhoto: '/images/dummy-ktp.jpg',
     createdAt: '2024-03-15T11:40:00Z',
     updatedAt: '2024-03-15T11:40:00Z',
+    balance: {
+      totalBilling: 2500000,
+      totalPaid: 2500000,
+      totalOutstanding: 0,
+      totalRentals: 1,
+      lastRentalDate: '2024-09-15T10:00:00Z',
+      lastPaymentDate: '2024-09-16T10:00:00Z'
+    }
   },
   {
     id: 'cust-com-008',
@@ -417,6 +553,14 @@ export const mockRentalCustomers: Customer[] = [
     picKtpPhoto: '/images/dummy-ktp.jpg',
     createdAt: '2024-04-10T13:50:00Z',
     updatedAt: '2024-04-10T13:50:00Z',
+    balance: {
+      totalBilling: 3000000,
+      totalPaid: 3000000,
+      totalOutstanding: 0,
+      totalRentals: 3,
+      lastRentalDate: '2024-09-15T10:00:00Z',
+      lastPaymentDate: '2024-09-16T10:00:00Z'
+    }
   },
   {
     id: 'cust-com-009',
@@ -440,6 +584,14 @@ export const mockRentalCustomers: Customer[] = [
     picKtpPhoto: '/images/dummy-ktp.jpg',
     createdAt: '2024-05-05T14:10:00Z',
     updatedAt: '2024-06-01T09:00:00Z',
+    balance: {
+      totalBilling: 45000000,
+      totalPaid: 45000000,
+      totalOutstanding: 0,
+      totalRentals: 1,
+      lastRentalDate: '2024-09-15T10:00:00Z',
+      lastPaymentDate: '2024-09-16T10:00:00Z'
+    }
   },
   {
     id: 'cust-com-010',
@@ -463,5 +615,13 @@ export const mockRentalCustomers: Customer[] = [
     picKtpPhoto: '/images/dummy-ktp.jpg',
     createdAt: '2024-06-15T15:20:00Z',
     updatedAt: '2024-06-15T15:20:00Z',
+    balance: {
+      totalBilling: 2500000,
+      totalPaid: 2500000,
+      totalOutstanding: 0,
+      totalRentals: 2,
+      lastRentalDate: '2024-09-15T10:00:00Z',
+      lastPaymentDate: '2024-09-16T10:00:00Z'
+    }
   },
 ];

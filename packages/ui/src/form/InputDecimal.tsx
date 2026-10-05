@@ -1,3 +1,4 @@
+'use client';
 import React, { useId, useState, useEffect } from 'react';
 import { Input } from '../Input';
 import { BaseField, BaseInputProps, formInputClass } from './BaseField';

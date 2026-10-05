@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import * as RadixDialog from '@radix-ui/react-dialog';
 import { MoreHorizontal, Layout, PanelRight, AppWindow, Maximize } from 'lucide-react';
@@ -173,6 +175,7 @@ export function FormShell({
         open={internalOpen} 
         onOpenChange={handleOpenChange}
         hideCloseButton={true}
+        preventOutsideClose={true}
         className="max-w-2xl p-0 overflow-hidden"
       >
         <div className={cn("flex flex-col max-h-[80vh] w-full", className)} data-layout={internalLayout}>
@@ -274,6 +277,7 @@ export function FormShell({
             'data-[state=closed]:slide-out-to-right-full data-[state=open]:slide-in-from-right',
             className
           )}
+          onPointerDownOutside={(e) => e.preventDefault()}
         >
           {/* Header */}
           <div className="flex items-center justify-between gap-2 px-3 py-1.5 md:px-4 md:py-2 border-b border-border bg-neutral-100 dark:bg-neutral-800 shrink-0 min-h-[40px]">

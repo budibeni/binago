@@ -27,6 +27,12 @@ export const rentalCustomersDictionaries = {
     colActiveVehicles: 'Kendaraan Aktif',
     colActiveContracts: 'Kontrak Aktif',
     colStatus: 'Status',
+    colBilling: 'Total Tagihan',
+    colPaid: 'Total Dibayar',
+    colLastRental: 'Sewa Terakhir',
+    colLastPayment: 'Bayar Terakhir',
+    colOutstanding: 'Sisa Tagihan',
+    colRentals: 'Jml Sewa',
     colActions: 'Aksi',
     
     // Empty state
@@ -50,7 +56,7 @@ export const rentalCustomersDictionaries = {
     actionEdit: 'Edit Pelanggan',
     actionDelete: 'Hapus',
     confirmDelete: 'Hapus Pelanggan',
-    confirmDeleteDesc: 'Apakah Anda yakin ingin menghapus pelanggan ini? Tindakan ini tidak dapat dibatalkan.',
+    confirmDeleteDesc: 'Data pelanggan ini akan dihapus secara permanen.',
     cancel: 'Batal',
     confirm: 'Hapus',
     save: 'Simpan',
@@ -126,6 +132,12 @@ export const rentalCustomersDictionaries = {
     colActiveVehicles: 'Active Vehicles',
     colActiveContracts: 'Active Contracts',
     colStatus: 'Status',
+    colBilling: 'Total Tagihan',
+    colPaid: 'Total Dibayar',
+    colLastRental: 'Sewa Terakhir',
+    colLastPayment: 'Bayar Terakhir',
+    colOutstanding: 'Sisa Tagihan',
+    colRentals: 'Jml Sewa',
     colActions: 'Actions',
     
     // Empty state
@@ -149,7 +161,7 @@ export const rentalCustomersDictionaries = {
     actionEdit: 'Edit Customer',
     actionDelete: 'Delete',
     confirmDelete: 'Delete Customer',
-    confirmDeleteDesc: 'Are you sure you want to delete this customer? This action cannot be undone.',
+    confirmDeleteDesc: 'This customer data will be permanently deleted.',
     cancel: 'Cancel',
     confirm: 'Delete',
     save: 'Save',

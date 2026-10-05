@@ -53,8 +53,8 @@ Menyimpan data identitas pelanggan rental (Single Source of Truth untuk Booking)
 | `total_billing` | DECIMAL | DEFAULT 0 | Total nilai tagihan seluruh transaksi sewa |
 | `total_paid` | DECIMAL | DEFAULT 0 | Total tagihan yang sudah dibayar (Lunas) |
 | `total_outstanding`| DECIMAL | DEFAULT 0 | Sisa piutang / utang belum lunas (`total_billing` - `total_paid`) |
-| `total_bookings`| INTEGER | DEFAULT 0 | Total frekuensi menyewa kendaraan |
-| `last_booking_date`| TIMESTAMP| NULL | Tanggal terakhir kali membuat Booking |
+| `total_rentals` | INTEGER | DEFAULT 0 | Total frekuensi sewa (Booking yang sukses menjadi Kontrak) |
+| `last_rental_date` | TIMESTAMP| NULL | Tanggal terakhir kali sewa berjalan (Handover) |
 | `last_payment_date`| TIMESTAMP| NULL | Tanggal terakhir kali melakukan pembayaran |
 
 ## 2. Kategori Tarif & Profil Armada

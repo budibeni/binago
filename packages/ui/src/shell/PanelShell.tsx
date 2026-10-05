@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 import { ChevronRight, ChevronLeft, ChevronUp, ChevronDown, X, List, PanelLeft, PanelRight, PanelTop, PanelBottom, MoreHorizontal, EyeOff } from 'lucide-react';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '../Dropdown';

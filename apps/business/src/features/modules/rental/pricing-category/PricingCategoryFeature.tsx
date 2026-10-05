@@ -4,6 +4,7 @@ import React from 'react';
 import { getTranslation } from '@/i18n';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
 import { pricingService } from '@/data/modules/rental/services/pricingService';
+import { useRouter } from 'next/navigation';
 import { rentalVehicleService } from '@/data/modules/rental/services/vehicleService';
 
 import type { RentalPricingCategory, RentalRate } from './types/pricing';
@@ -79,17 +80,14 @@ export function PricingCategoryFeature() {
     setGroups(enriched);
   }, [dataVersion, filterState]);
 
+  const router = useRouter();
+
   const handleAdd = () => {
-    setSelectedGroup(undefined);
-    setSelectedRates([]);
-    setFormOpen(true);
+    router.push('/rental/pricing-category/create');
   };
 
   const handleEdit = (group: EnrichedPricingCategory) => {
-    const rates = pricingService.getRatesByGroupId(group.id);
-    setSelectedGroup(group);
-    setSelectedRates(rates.map(r => ({ rateType: r.rateType, amount: r.amount })));
-    setFormOpen(true);
+    router.push(`/rental/pricing-category/edit/${group.id}`);
   };
 
   const handleDetail = (group: EnrichedPricingCategory) => {
@@ -249,14 +247,6 @@ export function PricingCategoryFeature() {
         />
       </div>
 
-      <PricingCategoryForm
-        open={formOpen}
-        onOpenChange={setFormOpen}
-        initialData={selectedGroup}
-        initialRates={selectedRates}
-        onSubmit={handleSubmitForm}
-        title={selectedGroup ? labels.formEditTitle : labels.formAddTitle}
-      />
 
       <PricingCategoryDetailDrawer
         open={detailOpen}

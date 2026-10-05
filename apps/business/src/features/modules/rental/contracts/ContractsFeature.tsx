@@ -55,7 +55,6 @@ export function ContractsFeature() {
   const [printContract, setPrintContract] = useState<RentalContract | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  const [isCreateOpen, setIsCreateOpen] = React.useState(false);
   const [handoverId, setHandoverId] = React.useState<string | null>(null);
   const [returnId, setReturnId] = React.useState<string | null>(null);
 
@@ -110,7 +109,7 @@ export function ContractsFeature() {
   };
 
   const handleAdd = () => {
-    setIsCreateOpen(true);
+    router.push('/rental/contracts/create');
   };
 
 
@@ -265,15 +264,6 @@ export function ContractsFeature() {
         contract={printContract}
         open={!!printContract}
         onClose={() => setPrintContract(null)}
-      />
-
-      <ContractCreateFeature
-        open={isCreateOpen}
-        onOpenChange={setIsCreateOpen}
-        onSuccess={() => {
-          setIsCreateOpen(false);
-          fetchContracts();
-        }}
       />
 
       <HandoverFeature

@@ -17,6 +17,12 @@ interface CustomerTableLabels {
   colAddress: string;
   colCity: string;
   colStatus: string;
+  colBilling: string;
+  colPaid: string;
+  colLastRental: string;
+  colLastPayment: string;
+  colOutstanding: string;
+  colRentals: string;
   colActions: string;
 
   typeIndividual: string;
@@ -182,6 +188,98 @@ function buildColumns(
       size: 200,
       cell: ({ row }) => <span className="text-[12px] text-foreground-muted truncate block max-w-full" title={row.original.address}>{row.original.address || '-'}</span>,
     },
+    {
+      id: 'billing',
+      header: labels.colBilling,
+      accessorFn: (row) => row.balance?.totalBilling || 0,
+      enableSorting: true,
+      size: 150,
+      cell: ({ row }) => {
+        const val = row.original.balance?.totalBilling || 0;
+        return (
+          <div className="text-right w-full">
+            <span className="text-[12px] font-mono text-foreground-muted">
+              Rp {val.toLocaleString('id-ID')}
+            </span>
+          </div>
+        );
+      },
+    },
+    {
+      id: 'paid',
+      header: labels.colPaid,
+      accessorFn: (row) => row.balance?.totalPaid || 0,
+      enableSorting: true,
+      size: 150,
+      cell: ({ row }) => {
+        const val = row.original.balance?.totalPaid || 0;
+        return (
+          <div className="text-right w-full">
+            <span className="text-[12px] font-mono text-success">
+              Rp {val.toLocaleString('id-ID')}
+            </span>
+          </div>
+        );
+      },
+    },
+    {
+      id: 'outstanding',
+      header: labels.colOutstanding,
+      accessorFn: (row) => row.balance?.totalOutstanding || 0,
+      enableSorting: true,
+      size: 150,
+      cell: ({ row }) => {
+        const val = row.original.balance?.totalOutstanding || 0;
+        return (
+          <div className="text-right w-full">
+            <span className={cn('text-[12px] font-mono', val > 0 ? 'text-danger font-bold' : 'text-foreground-muted')}>
+              Rp {val.toLocaleString('id-ID')}
+            </span>
+          </div>
+        );
+      },
+    },
+    {
+      id: 'lastRental',
+      header: labels.colLastRental,
+      accessorFn: (row) => row.balance?.lastRentalDate || '',
+      enableSorting: true,
+      size: 140,
+      cell: ({ row }) => {
+        const val = row.original.balance?.lastRentalDate;
+        if (!val) return <span className="text-[12px] text-foreground-muted">-</span>;
+        const d = new Date(val);
+        return <span className="text-[12px] text-foreground-muted">{d.toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' })}</span>;
+      },
+    },
+    {
+      id: 'lastPayment',
+      header: labels.colLastPayment,
+      accessorFn: (row) => row.balance?.lastPaymentDate || '',
+      enableSorting: true,
+      size: 140,
+      cell: ({ row }) => {
+        const val = row.original.balance?.lastPaymentDate;
+        if (!val) return <span className="text-[12px] text-foreground-muted">-</span>;
+        const d = new Date(val);
+        return <span className="text-[12px] text-foreground-muted">{d.toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' })}</span>;
+      },
+    },
+    {
+      id: 'rentals',
+      header: labels.colRentals,
+      accessorFn: (row) => row.balance?.totalRentals || 0,
+      enableSorting: true,
+      size: 110,
+      cell: ({ row }) => {
+        const val = row.original.balance?.totalRentals || 0;
+        return (
+          <div className="text-right w-full">
+             <span className="text-[12px] text-foreground font-mono">{val}x</span>
+          </div>
+        );
+      },
+    },
   ];
 }
 
@@ -190,6 +288,10 @@ const DEFAULT_COLUMN_VISIBILITY = {
   email: false,
   pic: false,
   address: false,
+  billing: false,
+  paid: false,
+  lastRental: false,
+  lastPayment: false,
 };
 
 export function CustomerTable({

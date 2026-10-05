@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useId, useEffect, useRef } from 'react';
 import { cn } from '@adatrack/utils';
 import { BaseField, BaseInputProps, formInputClass } from './BaseField';

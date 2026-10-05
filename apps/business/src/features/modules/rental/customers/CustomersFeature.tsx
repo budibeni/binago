@@ -7,7 +7,7 @@ import { useBusinessLocale } from '@/components/BusinessShellLayout';
 import { rentalCustomerService } from '@/data/modules/rental';
 import { CustomerTable } from './components/CustomerTable';
 import { CustomerView } from './components/CustomerView';
-import { CustomerDeleteDialog } from './components/CustomerDeleteDialog';
+import { ConfirmDialog, toast } from '@adatrack/ui';
 import { CustomerForm } from './components/CustomerForm';
 import type { Customer, CustomerStatusFilter, CustomerTypeFilter } from './types/customer';
 import type { DataTableFilterConfig } from '@adatrack/ui';
@@ -73,8 +73,11 @@ export function CustomersFeature() {
 
   const handleEdit = React.useCallback((customer: Customer) => {
     setDrawerOpen(false);
-    setEditId(customer.id);
-  }, []);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('adatrack_edit_customer_id', customer.id);
+    }
+    router.push(`/rental/customers/edit`);
+  }, [router]);
 
   const handleDelete = React.useCallback((customer: Customer) => {
     setDeleteCustomer(customer);
@@ -82,7 +85,7 @@ export function CustomersFeature() {
   }, []);
 
   const handleCreateNew = () => {
-    setIsCreateOpen(true);
+    router.push('/rental/customers/create');
   };
 
 
@@ -90,6 +93,7 @@ export function CustomersFeature() {
   const handleConfirmDelete = (id: string) => {
     rentalCustomerService.deleteCustomer(id);
     setDeleteOpen(false);
+    toast.success('Data pelanggan berhasil dihapus secara permanen.');
     refreshData();
   };
 
@@ -102,6 +106,12 @@ export function CustomersFeature() {
     colAddress: tC.colAddress,
     colCity: tC.colCity,
     colStatus: tC.colStatus,
+    colBilling: tC.colBilling,
+    colPaid: tC.colPaid,
+    colLastRental: tC.colLastRental,
+    colLastPayment: tC.colLastPayment,
+    colOutstanding: tC.colOutstanding,
+    colRentals: tC.colRentals,
     colActions: tC.colActions,
     typeIndividual: tC.typeIndividual,
     typeCompany: tC.typeCompany,
@@ -196,37 +206,26 @@ export function CustomersFeature() {
         onDelete={handleDelete}
       />
 
-      <CustomerDeleteDialog
-        customer={deleteCustomer}
+      <ConfirmDialog
         open={deleteOpen}
         onOpenChange={setDeleteOpen}
-        onConfirm={handleConfirmDelete}
-        labels={tC}
+        title={tC.confirmDelete}
+        description={
+          <div className="flex flex-col">
+            <span>{tC.confirmDeleteDesc}</span>
+            <div className="mt-3 text-center">
+              <strong className="text-danger text-[15px]">{deleteCustomer?.name}</strong> <span className="text-danger/80">({deleteCustomer?.code})</span>
+            </div>
+          </div>
+        }
+        confirmLabel={tC.confirm || 'Ya, Hapus'}
+        cancelLabel={tC.cancel || 'Batal'}
+        onConfirm={() => {
+          if (deleteCustomer) handleConfirmDelete(deleteCustomer.id);
+        }}
+        variant="danger"
       />
 
-      {(isCreateOpen || editId) && (
-        <CustomerForm
-          layout="default"
-          open={isCreateOpen || !!editId}
-          onOpenChange={(open) => {
-            if (!open) {
-              setIsCreateOpen(false);
-              setEditId(null);
-            }
-          }}
-          customer={editId ? filteredCustomers.find((c: any) => c.id === editId) || null : null}
-          onCancel={() => {
-            setIsCreateOpen(false);
-            setEditId(null);
-          }}
-          onSave={(data) => {
-            // TODO: dispatch save logic
-            setIsCreateOpen(false);
-            setEditId(null);
-            refreshData();
-          }}
-        />
-      )}
     </div>
   );
 }

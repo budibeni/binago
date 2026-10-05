@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 import { cn } from '@adatrack/utils';
 import type { Size } from '@adatrack/types';

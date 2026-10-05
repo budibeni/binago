@@ -20,7 +20,7 @@ Halaman Pelanggan (`/rental/customers`) berfungsi sebagai **Single Source of Tru
 2. **Pencarian Cepat & Filter Status:** Menyediakan pencarian teks instan (berdasarkan nama pelanggan, kode pelanggan, email, nomor telepon, atau NIK/NPWP) serta pemfilteran status (`ACTIVE`, `INACTIVE`) dan tipe pelanggan (`INDIVIDUAL`, `COMPANY`).
 3. **Pemeriksaan Profil Cepat (*Detail Drawer*):** Menyediakan laci detail samping (`CustomerView`) untuk memeriksa profil lengkap pelanggan, alamat domisili/kantor, kontak, dan riwayat penyewaan tanpa meninggalkan halaman tabel.
 4. **Pencegahan Redundansi Data (SSoT):** Menjadi acuan tunggal data penyewa bagi modul transaksi. Modul Booking dan Kontrak hanya menyimpan referensi `customerId` dan dilarang menduplikasi data master penyewa.
-5. **Konfirmasi Penghapusan Aman (`CustomerDeleteDialog`):** Menyediakan mekanisme proteksi modal dialog sebelum pelanggan dihapus dari sistem.
+5. **Konfirmasi Penghapusan Aman:** Menyediakan mekanisme proteksi konfirmasi secara ketat menggunakan komponen global sebelum pelanggan dihapus dari sistem.
 
 ---
 
@@ -72,14 +72,40 @@ Halaman Pelanggan (`/rental/customers`) berfungsi sebagai **Single Source of Tru
   - Untuk perusahaan: Menampilkan nomor NPWP, nama PIC, dan kontak PIC.
   - Menampilkan alamat lengkap, stempel waktu pendaftaran, dan tombol aksi ubah (*Edit*).
 - **`CustomerForm.tsx`:**
-  - Formulir modal pembuatan/penyuntingan data pelanggan.
-  - Form beradaptasi secara dinamis: Saat tipe `COMPANY` dipilih, kolom NIK/SIM disembunyikan dan digantikan kolom NPWP, Nama PIC, serta No Telepon PIC.
-- **`CustomerDeleteDialog.tsx`:**
-  - Dialog konfirmasi peringatan sebelum menghapus pelanggan dari master database.
+  - Formulir utama pengisian data pelanggan, beradaptasi secara dinamis antara tipe entitas (Perorangan/Perusahaan).
+- **`ConfirmDialog` (Global dari `@adatrack/ui`):**
+  - Menggantikan implementasi dialog lokal untuk peringatan sebelum penghapusan data secara permanen. Menampilkan peringatan tegas jika pengguna hendak menghapus data pelanggan.
 
 ---
 
-## 4. Model Data Teknis (`Customer`)
+## 4. Struktur Direktori & File
+
+Proyek memisahkan antara bagian **URL Routing**, **Features**, dan **Data/Mockups**.
+
+### A. Routing (Next.js App Router)
+Berada di `apps/business/src/app/(modules)/rental/customers/`. Bertugas memetakan URL ke komponen:
+- `page.tsx` → URL `/rental/customers` (Daftar Pelanggan)
+- `create/page.tsx` → URL `/rental/customers/create` (Form Penambahan)
+- `edit/page.tsx` → URL `/rental/customers/edit` (Form Penyuntingan, dengan ID dikelola via localStorage agar URL bersih)
+
+### B. Features & Components
+Berada di `apps/business/src/features/modules/rental/customers/`. Menyimpan komponen visual dan logika UI:
+- `CustomersFeature.tsx` (Root/gabungan tabel, filter, fungsi Hapus)
+- `CustomerCreateFeature.tsx` (Layout khusus halaman tambah)
+- `CustomerEditFeature.tsx` (Layout khusus halaman sunting)
+- `i18n.ts` (Terjemahan antarmuka spesifik modul pelanggan)
+- `components/CustomerTable.tsx`, `CustomerForm.tsx`, `CustomerView.tsx`
+- `types/customer.ts` (Definisi tipe data UI)
+
+### C. Data Layer & Mockups
+Berada di `apps/business/src/data/modules/rental/`. Bertugas sebagai mesin data di balik UI:
+- **Mockup Data:** `mock/customers.ts` (Kumpulan data dummy awal/database bayangan).
+- **Repositories:** `repositories/customerRepository.ts` (Logika baca/tulis/hapus memanipulasi *mock array*).
+- **Services:** `services/customerService.ts` (Menjembatani pemanggilan dari komponen UI ke repository).
+
+---
+
+## 5. Model Data Teknis (`Customer`)
 
 ```ts
 export type CustomerType = 'INDIVIDUAL' | 'COMPANY';
@@ -117,19 +143,7 @@ export type Customer = IndividualCustomer | CompanyCustomer;
 
 ---
 
-## 5. Service & Data Layer
-
-- **`customerService.ts`:**
-  - `getCustomers(filters)`: Mengambil daftar penyewa dengan pencarian dan filter.
-  - `getCustomerById(id)`: Mengambil data pelanggan tunggal.
-  - `createCustomer(data)`: Menyimpan data penyewa baru.
-  - `updateCustomer(id, data)`: Memperbarui profil penyewa.
-  - `deleteCustomer(id)`: Menghapus penyewa dari database lokal.
-- **`mockCustomers.ts`:** Kumpulan data dummy pelanggan individu dan perusahaan untuk pengujian antarmuka.
-
----
-
 ## 6. Status Verifikasi & Hasil
 
 - **Status:** COMPLETED
-- **Verifikasi:** Seluruh alur pendaftaran, pemilihan tipe individu vs korporasi, pemfilteran data, drawer rincian, dan konfirmasi hapus telah diuji dan berjalan normal pada Next.js dev server.
+- **Verifikasi:** Seluruh alur pendaftaran, pemilihan tipe individu vs korporasi, pemfilteran data, drawer rincian, perbaikan route edit URL bersih, dan konfirmasi hapus menggunakan UI Toaster telah diuji dan berjalan normal tanpa *error rendering* SSR pada Next.js.

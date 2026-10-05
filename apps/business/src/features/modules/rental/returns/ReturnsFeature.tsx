@@ -41,7 +41,6 @@ export function ReturnsFeature() {
 
   // Create Return Drawer State
   const [selectedContractId, setSelectedContractId] = useState<string | null>(null);
-  const [isReturnOpen, setIsReturnOpen] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -208,7 +207,7 @@ export function ReturnsFeature() {
           {filteredEligibleContracts.length > 0 ? (
             <>
               {filteredEligibleContracts.map(contract => {
-                const isSelected = selectedContractId === contract.id && isReturnOpen;
+                const isSelected = selectedContractId === contract.id;
                 return (
                   <div key={contract.id} className={cn(
                     "group relative border rounded-xl p-2.5 transition-all duration-200 flex flex-col justify-between shrink-0",
@@ -302,7 +301,7 @@ export function ReturnsFeature() {
                         )}
                         onClick={() => {
                           setSelectedContractId(contract.id);
-                          setIsReturnOpen(true);
+                          router.push(`/rental/returns/create?contractId=${contract.id}`);
                         }}
                       >
                         Proses Pengembalian
@@ -358,15 +357,6 @@ export function ReturnsFeature() {
         returnGroup={selectedReturnGroup}
       />
 
-      <ReturnFormFeature
-        contractId={selectedContractId}
-        open={isReturnOpen}
-        onOpenChange={setIsReturnOpen}
-        onSuccess={() => {
-          setIsReturnOpen(false);
-          loadData();
-        }}
-      />
     </div>
   );
 }

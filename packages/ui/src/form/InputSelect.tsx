@@ -1,3 +1,4 @@
+'use client';
 import React, { useId, useState, useMemo } from 'react';
 import { Search } from 'lucide-react';
 import { BaseField, BaseInputProps, formInputClass } from './BaseField';

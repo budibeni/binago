@@ -1,3 +1,4 @@
+'use client';
 import React, { useId, useState } from 'react';
 import { BaseField, BaseInputProps, formInputClass } from './BaseField';
 import { Popover, PopoverContent, PopoverTrigger } from '../Popover';

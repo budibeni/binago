@@ -10,7 +10,9 @@ export const dictionaries = {
       save: 'Simpan',
       detailTitle: 'Detail',
       editText: 'Edit',
+      edit: 'Edit',
       deleteText: 'Hapus',
+      add: 'Tambah',
     },
 
     // Navigation Labels
@@ -794,7 +796,9 @@ export const dictionaries = {
       save: 'Save',
       detailTitle: 'Details',
       editText: 'Edit',
+      edit: 'Edit',
       deleteText: 'Delete',
+      add: 'Add',
     },
 
     // Navigation Labels

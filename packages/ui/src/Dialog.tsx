@@ -13,6 +13,7 @@ export interface DialogProps {
   children: React.ReactNode;
   className?: string;
   hideCloseButton?: boolean;
+  preventOutsideClose?: boolean;
 }
 
 export const Dialog: React.FC<DialogProps> = ({
@@ -23,6 +24,7 @@ export const Dialog: React.FC<DialogProps> = ({
   children,
   className,
   hideCloseButton = false,
+  preventOutsideClose = false,
 }) => {
   return (
     <RadixDialog.Root open={open} onOpenChange={onOpenChange}>
@@ -38,6 +40,11 @@ export const Dialog: React.FC<DialogProps> = ({
             'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
             className,
           )}
+          onPointerDownOutside={(e) => {
+            if (preventOutsideClose) {
+              e.preventDefault();
+            }
+          }}
         >
           {(title || description || !hideCloseButton) && (
             <div className="flex items-start justify-between gap-4 mb-4">

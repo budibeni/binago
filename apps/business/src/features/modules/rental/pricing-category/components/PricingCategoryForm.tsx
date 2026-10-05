@@ -22,9 +22,10 @@ interface PricingCategoryFormProps {
   initialRates?: { rateType: RateType, amount: number }[];
   onSubmit: (data: PricingCategoryFormData) => void;
   title: string;
+  layout?: 'default' | 'drawer' | 'dialog' | 'fullscreen';
 }
 
-export function PricingCategoryForm({ open, onOpenChange, initialData, initialRates, onSubmit, title }: PricingCategoryFormProps) {
+export function PricingCategoryForm({ open, onOpenChange, initialData, initialRates, onSubmit, title, layout = 'drawer' }: PricingCategoryFormProps) {
   const getInitialRate = (type: RateType) => {
     if (!initialRates) return 0;
     const rate = initialRates.find(r => r.rateType === type);
@@ -73,7 +74,7 @@ export function PricingCategoryForm({ open, onOpenChange, initialData, initialRa
 
   return (
     <FormShell
-      layout="drawer"
+      layout={layout}
       open={open}
       onOpenChange={onOpenChange}
       title={title}

@@ -5,6 +5,15 @@ export type CustomerStatus = 'ACTIVE' | 'INACTIVE';
 export type CustomerStatusFilter = 'all' | 'ACTIVE' | 'INACTIVE';
 export type CustomerTypeFilter = 'all' | 'INDIVIDUAL' | 'COMPANY';
 
+export interface CustomerBalance {
+  totalBilling: number;
+  totalPaid: number;
+  totalOutstanding: number;
+  totalRentals: number;
+  lastRentalDate?: string;
+  lastPaymentDate?: string;
+}
+
 export interface BaseCustomer {
   id: string;
   code: string;
@@ -19,6 +28,7 @@ export interface BaseCustomer {
   postalCode: string;
   createdAt: string;
   updatedAt: string;
+  balance?: CustomerBalance;
 }
 
 export interface IndividualCustomer extends BaseCustomer {

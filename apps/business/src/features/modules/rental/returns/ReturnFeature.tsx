@@ -83,6 +83,32 @@ export function ReturnFeature({ contractId, open, onOpenChange, onSuccess }: Ret
     onOpenChange(false);
   };
 
+  if (loading) {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center h-full p-8 bg-neutral-50 dark:bg-neutral-950">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4" />
+        <p className="text-sm text-muted-foreground">Memuat data kontrak...</p>
+      </div>
+    );
+  }
+
+  if (errorMsg) {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center h-full p-8 bg-neutral-50 dark:bg-neutral-950">
+        <div className="text-danger mb-4 text-center">
+          <p className="font-bold">Gagal Memproses</p>
+          <p className="text-sm mt-1">{errorMsg}</p>
+        </div>
+        <button
+          onClick={handleCancel}
+          className="px-4 py-2 bg-neutral-200 dark:bg-neutral-800 text-sm font-medium rounded-md hover:bg-neutral-300 dark:hover:bg-neutral-700 transition-colors"
+        >
+          Kembali
+        </button>
+      </div>
+    );
+  }
+
   if (!contract || handovers.length === 0) return null;
 
   return (

@@ -4,6 +4,7 @@ import { Roboto } from 'next/font/google';
 import './globals.css';
 import '@adatrack/maps/styles.css';
 import { BusinessShellLayout } from '../components/BusinessShellLayout';
+import { Toaster } from '@adatrack/ui';
 
 const roboto = Roboto({
   weight: ['400', '500'],
@@ -39,6 +40,7 @@ export default function RootLayout({
         <BusinessShellLayout>
           {children}
         </BusinessShellLayout>
+        <Toaster />
       </body>
     </html>
   );

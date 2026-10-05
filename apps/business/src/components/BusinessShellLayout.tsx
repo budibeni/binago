@@ -294,6 +294,10 @@ export function BusinessShellLayout({ children }: { children: React.ReactNode })
   let activePath = currentPath;
   if (currentPath.startsWith('/rental/templates/contracts')) {
     activePath = '/rental/contracts';
+  } else if (currentPath.includes('/create')) {
+    activePath = currentPath.split('/create')[0];
+  } else if (currentPath.includes('/edit')) {
+    activePath = currentPath.split('/edit')[0];
   }
 
   for (const group of navigation) {
@@ -313,6 +317,12 @@ export function BusinessShellLayout({ children }: { children: React.ReactNode })
     
     if (currentPath.startsWith('/rental/templates/contracts')) {
       breadcrumbItems.push({ label: 'Template' });
+    }
+    
+    if (currentPath.includes('/create')) {
+      breadcrumbItems.push({ label: t.common?.add || 'Tambah' });
+    } else if (currentPath.includes('/edit')) {
+      breadcrumbItems.push({ label: t.common?.edit || 'Edit' });
     }
   } else {
     breadcrumbItems.push({ label: t.nav.home });

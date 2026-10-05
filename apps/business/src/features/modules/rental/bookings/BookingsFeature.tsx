@@ -54,7 +54,6 @@ export function BookingsFeature() {
   const [detailBooking, setDetailBooking] = useState<Booking | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -117,7 +116,7 @@ export function BookingsFeature() {
   };
 
   const handleEdit = (booking: Booking) => {
-    console.log('Edit', booking.id);
+    router.push(`/rental/bookings/edit/${booking.id}`);
   };
 
   const handleDelete = (booking: Booking) => {
@@ -244,7 +243,7 @@ export function BookingsFeature() {
           labels={labels}
           searchValue={search}
           onSearchChange={setSearch}
-          onAdd={() => setIsCreateOpen(true)}
+          onAdd={() => router.push('/rental/bookings/create')}
           onView={handleView}
           onEdit={handleEdit}
           onDelete={handleDelete}
@@ -272,15 +271,6 @@ export function BookingsFeature() {
         onCancel={handleCancel}
       />
 
-      <BookingCreateFeature
-        open={isCreateOpen}
-        onOpenChange={setIsCreateOpen}
-        onSuccess={async () => {
-          setIsCreateOpen(false);
-          const newData = await bookingService.getBookings();
-          setBookings(newData);
-        }}
-      />
     </div>
   );
 }
