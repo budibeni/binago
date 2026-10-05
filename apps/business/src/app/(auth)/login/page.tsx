@@ -25,7 +25,11 @@ export default function LoginPage() {
     const result = await login(formData);
     
     if (result?.error) {
-      setError(result.error);
+      if (typeof result.error === "object") {
+        setError(JSON.stringify(result.error));
+      } else {
+        setError(String(result.error));
+      }
       setLoading(false);
     } else if (result?.multiple_companies) {
       setCompanies(result.companies);
