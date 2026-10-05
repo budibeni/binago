@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Plus } from 'lucide-react';
-import { Button, DataTable } from '@adatrack/ui';
+import { Button, DataTable, PhoneLink, EmailLink } from '@adatrack/ui';
 import type { DataTableColumnDef, DataTableFilterConfig, DataTableLabels } from '@adatrack/ui';
 import type { Customer, CompanyCustomer } from '../types/customer';
 
@@ -23,6 +23,8 @@ interface CustomerTableLabels {
   colLastPayment: string;
   colOutstanding: string;
   colRentals: string;
+  colEmail?: string;
+  locale?: string;
   colActions: string;
 
   typeIndividual: string;
@@ -56,6 +58,7 @@ interface CustomerTableProps {
 
 function buildColumns(
   labels: CustomerTableLabels,
+  onViewDetail: (c: Customer) => void,
 ): DataTableColumnDef<Customer>[] {
   return [
 
@@ -64,11 +67,14 @@ function buildColumns(
       accessorKey: 'name',
       header: labels.colCustomer,
       enableSorting: true,
-      size: 240,
+      minSize: 200,
       cell: ({ row }) => (
-        <span className="whitespace-nowrap">
+        <button
+          onClick={() => onViewDetail(row.original)}
+          className="whitespace-nowrap text-inherit font-inherit hover:text-primary transition-colors hover:underline text-left"
+        >
           {row.original.name}
-        </span>
+        </button>
       ),
     },
     {
@@ -118,17 +124,17 @@ function buildColumns(
       enableSorting: false,
       size: 160,
       cell: ({ row }) => (
-        <span >{row.original.phone}</span>
+        <PhoneLink phone={row.original.phone} />
       ),
     },
     {
       id: 'email',
-      header: 'Email',
+      header: labels.colEmail || 'Email',
       accessorFn: (row) => row.email,
       enableSorting: false,
-      size: 200,
+      minSize: 250,
       cell: ({ row }) => (
-        <span >{row.original.email || '-'}</span>
+        <EmailLink email={row.original.email} />
       ),
     },
     {
@@ -155,15 +161,30 @@ function buildColumns(
       header: labels.colAddress,
       accessorFn: (row) => row.address,
       enableSorting: false,
-      size: 200,
       cell: ({ row }) => <span className="truncate block max-w-full" title={row.original.address}>{row.original.address || '-'}</span>,
+    },
+    {
+      id: 'rentals',
+      header: labels.colRentals,
+      accessorFn: (row) => row.balance?.totalRentals || 0,
+      enableSorting: true,
+      size: 110,
+      cell: ({ row }) => {
+        const val = row.original.balance?.totalRentals || 0;
+        return (
+          <div className="text-right w-full">
+            <span className="inline-flex items-center justify-center min-w-[2rem] px-1.5 py-0.5 rounded-md bg-neutral-100 dark:bg-neutral-800 text-foreground-muted font-medium text-[11px]">
+              {val}x
+            </span>
+          </div>
+        );
+      },
     },
     {
       id: 'billing',
       header: labels.colBilling,
       accessorFn: (row) => row.balance?.totalBilling || 0,
       enableSorting: true,
-      size: 150,
       cell: ({ row }) => {
         const val = row.original.balance?.totalBilling || 0;
         return (
@@ -180,7 +201,6 @@ function buildColumns(
       header: labels.colPaid,
       accessorFn: (row) => row.balance?.totalPaid || 0,
       enableSorting: true,
-      size: 150,
       cell: ({ row }) => {
         const val = row.original.balance?.totalPaid || 0;
         return (
@@ -197,7 +217,6 @@ function buildColumns(
       header: labels.colOutstanding,
       accessorFn: (row) => row.balance?.totalOutstanding || 0,
       enableSorting: true,
-      size: 150,
       cell: ({ row }) => {
         const val = row.original.balance?.totalOutstanding || 0;
         return (
@@ -219,7 +238,7 @@ function buildColumns(
         const val = row.original.balance?.lastRentalDate;
         if (!val) return '-';
         const d = new Date(val);
-        return <span >{d.toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' })}</span>;
+        return <span >{d.toLocaleDateString(labels.locale || 'id-ID', { year: 'numeric', month: 'short', day: 'numeric' })}</span>;
       },
     },
     {
@@ -232,24 +251,10 @@ function buildColumns(
         const val = row.original.balance?.lastPaymentDate;
         if (!val) return '-';
         const d = new Date(val);
-        return <span >{d.toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' })}</span>;
+        return <span >{d.toLocaleDateString(labels.locale || 'id-ID', { year: 'numeric', month: 'short', day: 'numeric' })}</span>;
       },
     },
-    {
-      id: 'rentals',
-      header: labels.colRentals,
-      accessorFn: (row) => row.balance?.totalRentals || 0,
-      enableSorting: true,
-      size: 110,
-      cell: ({ row }) => {
-        const val = row.original.balance?.totalRentals || 0;
-        return (
-          <div className="text-right w-full">
-            <span >{val}x</span>
-          </div>
-        );
-      },
-    },
+
   ];
 }
 
@@ -258,9 +263,6 @@ const DEFAULT_COLUMN_VISIBILITY = {
   email: false,
   pic: false,
   address: false,
-  billing: false,
-  paid: false,
-  lastRental: false,
   lastPayment: false,
 };
 
@@ -278,8 +280,8 @@ export function CustomerTable({
   dtLabels,
 }: CustomerTableProps) {
   const columns = React.useMemo(
-    () => buildColumns(labels),
-    [labels],
+    () => buildColumns(labels, onViewDetail),
+    [labels, onViewDetail],
   );
 
   return (

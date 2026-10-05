@@ -54,6 +54,8 @@ export function CustomersFeature() {
 
   // Force re-render on data change
   const [dataVersion, setDataVersion] = React.useState(0);
+  const editCustomer = React.useMemo(() => editId ? rentalCustomerService.getCustomerById(editId) : null, [editId, dataVersion]);
+
   const refreshData = () => setDataVersion(v => v + 1);
 
   const filteredCustomers = React.useMemo(
@@ -73,11 +75,9 @@ export function CustomersFeature() {
 
   const handleEdit = React.useCallback((customer: Customer) => {
     setDrawerOpen(false);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('adatrack_edit_customer_id', customer.id);
-    }
-    router.push(`/rental/customers/edit`);
-  }, [router]);
+    window.history.pushState(null, '', '/rental/customers/edit');
+    setEditId(customer.id);
+  }, []);
 
   const handleDelete = React.useCallback((customer: Customer) => {
     setDeleteCustomer(customer);
@@ -85,7 +85,8 @@ export function CustomersFeature() {
   }, []);
 
   const handleCreateNew = () => {
-    router.push('/rental/customers/create');
+    window.history.pushState(null, '', '/rental/customers/create');
+    setIsCreateOpen(true);
   };
 
 
@@ -98,6 +99,8 @@ export function CustomersFeature() {
   };
 
   const tableLabels = React.useMemo(() => ({
+    locale,
+    colEmail: locale === 'en' ? 'Email' : 'Email',
     colCode: tC.colCode,
     colCustomer: tC.colCustomer,
     colType: tC.colType,
@@ -223,6 +226,50 @@ export function CustomersFeature() {
         }}
         variant="danger"
       />
+
+      <CustomerForm
+        customer={null}
+        open={isCreateOpen}
+        onOpenChange={(open) => {
+          if (!open) window.history.pushState(null, '', '/rental/customers');
+          setIsCreateOpen(open);
+        }}
+        onCancel={() => {
+          window.history.pushState(null, '', '/rental/customers');
+          setIsCreateOpen(false);
+        }}
+        onSave={(data) => {
+          // Implement save
+          console.log('Saved new customer', data);
+          toast.success(tC.createSuccess || 'Pelanggan berhasil ditambahkan');
+          window.history.pushState(null, '', '/rental/customers');
+          setIsCreateOpen(false);
+          refreshData();
+        }}
+      />
+
+      {editCustomer && (
+        <CustomerForm
+          customer={editCustomer}
+          open={!!editId}
+          onOpenChange={(open) => {
+            if (!open) window.history.pushState(null, '', '/rental/customers');
+            if (!open) setEditId(null);
+          }}
+          onCancel={() => {
+            window.history.pushState(null, '', '/rental/customers');
+            setEditId(null);
+          }}
+          onSave={(data) => {
+            // Implement update
+            console.log('Updated customer', data);
+            toast.success(tC.updateSuccess || 'Pelanggan berhasil diperbarui');
+            window.history.pushState(null, '', '/rental/customers');
+            setEditId(null);
+            refreshData();
+          }}
+        />
+      )}
 
     </div>
   );

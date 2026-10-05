@@ -4,6 +4,7 @@ import React from 'react';
 import { flexRender } from '@tanstack/react-table';
 import { cn } from '@adatrack/utils';
 import type { RowData, DataTableRowInstance } from './types';
+import { CellErrorBoundary } from './CellErrorBoundary';
 
 export interface DataTableRowProps<TData extends RowData = RowData> {
   row: DataTableRowInstance<TData>;
@@ -31,6 +32,23 @@ export function DataTableRow<TData extends RowData = RowData>({
         const auxiliaryIds = ['actions', 'select', 'checkbox', 'no', 'number', 'index'];
         const firstPrimaryColIndex = cells.findIndex(c => !auxiliaryIds.includes(String(c.column.id).toLowerCase()));
         const isFirstPrimary = index === firstPrimaryColIndex;
+        
+        const hasSize = cell.column.columnDef.size !== undefined;
+        const hasMinSize = cell.column.columnDef.minSize !== undefined;
+        const hasMaxSize = cell.column.columnDef.maxSize !== undefined;
+        const isFixedWidth = (cell.column.columnDef.meta as any)?.fixedWidth || hasSize;
+
+        let widthStyle = {};
+        if (isFixedWidth) {
+          widthStyle = {
+            width: cell.column.getSize(),
+            minWidth: cell.column.getSize(),
+            maxWidth: cell.column.getSize(),
+          };
+        } else {
+          if (hasMinSize) widthStyle = { ...widthStyle, minWidth: cell.column.columnDef.minSize };
+          if (hasMaxSize) widthStyle = { ...widthStyle, maxWidth: cell.column.columnDef.maxSize };
+        }
 
         return (
           <td
@@ -46,11 +64,7 @@ export function DataTableRow<TData extends RowData = RowData>({
               (cell.column.columnDef.meta as any)?.className,
             )}
             style={{
-              ...((cell.column.columnDef.meta as any)?.fixedWidth ? {
-                width: cell.column.getSize(),
-                minWidth: cell.column.getSize(),
-                maxWidth: cell.column.getSize(),
-              } : {}),
+              ...widthStyle,
               ...((isPinned as string) === 'left' || isPinned === 'start'
                 ? { left: `${cell.column.getStart('left' as any)}px` }
                 : (isPinned as string) === 'right' || isPinned === 'end'
@@ -58,7 +72,15 @@ export function DataTableRow<TData extends RowData = RowData>({
                 : {}),
             }}
           >
-            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+            <CellErrorBoundary>
+              {(() => {
+                const rendered = flexRender(cell.column.columnDef.cell, cell.getContext());
+                if (rendered === null || rendered === undefined || rendered === '') {
+                  return <span className="text-foreground-muted/50">-</span>;
+                }
+                return rendered;
+              })()}
+            </CellErrorBoundary>
           </td>
         );
       })}

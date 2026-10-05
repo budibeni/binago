@@ -90,7 +90,7 @@ export function DataTable<TData extends RowData = RowData>(
       id: 'actions',
       header: '',
       enableSorting: false,
-      size: 40,
+      size: 50,
       meta: { fixedWidth: true, pin: 'left' },
       cell: ({ row }) => (
         <Button

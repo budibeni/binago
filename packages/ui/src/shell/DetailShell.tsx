@@ -137,25 +137,36 @@ export function DetailShell({
   );
 
   const renderFooter = () => {
-    if (!onEdit && !onDelete && !extraFooterActions && !leftFooterActions) return null;
     return (
       <div className="flex items-center justify-between px-4 md:px-6 py-2 bg-background border-t border-border shadow-sm shrink-0">
-        {onEdit ? (
-          <Button 
-            size="sm" 
-            variant="outline" 
-            onClick={onEdit} 
-            leftIcon={<Pencil className="h-3.5 w-3.5" />}
-            className="h-7 text-xs px-3 bg-background"
-          >
-            {finalEditLabel}
-          </Button>
-        ) : (
-          leftFooterActions ? <div className="flex items-center gap-2">{leftFooterActions}</div> : <div />
-        )}
+        <div className="flex items-center gap-2">
+          {leftFooterActions}
+          {!leftFooterActions && (
+            <Button 
+              size="sm" 
+              variant="outline" 
+              onClick={() => handleOpenChange(false)}
+              className="h-7 text-xs px-3 bg-background"
+            >
+              Tutup
+            </Button>
+          )}
+        </div>
 
         <div className="flex items-center gap-2">
           {extraFooterActions}
+          
+          {onEdit && (
+            <Button 
+              size="sm" 
+              variant="outline" 
+              onClick={onEdit} 
+              leftIcon={<Pencil className="h-3.5 w-3.5" />}
+              className="h-7 text-xs px-3 bg-background"
+            >
+              {finalEditLabel}
+            </Button>
+          )}
           
           {onDelete && (
             <Button 

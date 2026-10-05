@@ -564,6 +564,10 @@ export const dictionaries = {
       panelLeft: 'Kiri',
       hidePanel: 'Sembunyikan',
       layoutToggleTitle: 'Ubah Posisi Panel',
+
+      // Columns
+      colLicensePlate: 'Plat Nomor',
+      colPricingCategory: 'Kategori Tarif',
       
       // Filter & Status
       filterStatus: 'Status',
@@ -1350,6 +1354,10 @@ export const dictionaries = {
       panelLeft: 'Left',
       hidePanel: 'Hide',
       layoutToggleTitle: 'Toggle Panel Position',
+
+      // Columns
+      colLicensePlate: 'License Plate',
+      colPricingCategory: 'Pricing Category',
       
       // Filter & Status
       filterStatus: 'Status',

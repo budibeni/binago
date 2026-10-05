@@ -50,6 +50,14 @@ export const rentalCustomersDictionaries = {
     tabLegal: 'Legalitas',
     tabPic: 'PIC',
     tabSim: 'Data SIM',
+    sectionStats: 'Statistik & Keuangan',
+    sectionContact: 'Kontak & Alamat',
+    sectionLegalIndiv: 'Identitas Pribadi',
+    sectionLegalComp: 'Legalitas Perusahaan',
+    sectionSim: 'Lisensi Mengemudi (SIM)',
+    sectionPic: 'Informasi Penanggung Jawab (PIC)',
+    statRentals: 'Jml Sewa Sukses',
+    unitTimes: 'Kali',
     
     // Form / Actions
     actionDetail: 'Lihat Detail',
@@ -132,12 +140,12 @@ export const rentalCustomersDictionaries = {
     colActiveVehicles: 'Active Vehicles',
     colActiveContracts: 'Active Contracts',
     colStatus: 'Status',
-    colBilling: 'Total Tagihan',
-    colPaid: 'Total Dibayar',
-    colLastRental: 'Sewa Terakhir',
-    colLastPayment: 'Bayar Terakhir',
-    colOutstanding: 'Sisa Tagihan',
-    colRentals: 'Jml Sewa',
+    colBilling: 'Total Billing',
+    colPaid: 'Total Paid',
+    colLastRental: 'Last Rental',
+    colLastPayment: 'Last Payment',
+    colOutstanding: 'Outstanding',
+    colRentals: 'Total Rentals',
     colActions: 'Actions',
     
     // Empty state
@@ -155,6 +163,14 @@ export const rentalCustomersDictionaries = {
     tabLegal: 'Legal',
     tabPic: 'PIC',
     tabSim: 'SIM Data',
+    sectionStats: 'Statistics & Financials',
+    sectionContact: 'Contact & Address',
+    sectionLegalIndiv: 'Personal Identity',
+    sectionLegalComp: 'Company Legality',
+    sectionSim: 'Driving License (SIM)',
+    sectionPic: 'Person in Charge (PIC)',
+    statRentals: 'Successful Rentals',
+    unitTimes: 'Times',
     
     // Form / Actions
     actionDetail: 'View Detail',

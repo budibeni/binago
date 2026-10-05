@@ -85,7 +85,7 @@ function buildColumns(
     {
       id: 'plateNumber',
       accessorFn: (v) => v.coreVehicle.plateNumber,
-      header: 'Plat Nomor',
+      header: labels.colLicensePlate || 'Plat Nomor',
       enableSorting: true,
       size: 130,
       cell: ({ row }) => (
@@ -160,7 +160,7 @@ function buildColumns(
     {
       id: 'pricingType',
       accessorKey: 'pricingType',
-      header: 'Kategori Tarif',
+      header: labels.colPricingCategory || 'Kategori Tarif',
       enableSorting: true,
       size: 130,
       cell: ({ row }) => {

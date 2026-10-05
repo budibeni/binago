@@ -28,6 +28,23 @@ export function DataTableHeader<TData extends RowData = RowData>({
             const canSort = header.column.getCanSort();
             const isSorted = header.column.getIsSorted();
             const isPinned = header.column.getIsPinned();
+            
+            const hasSize = header.column.columnDef.size !== undefined;
+            const hasMinSize = header.column.columnDef.minSize !== undefined;
+            const hasMaxSize = header.column.columnDef.maxSize !== undefined;
+            const isFixedWidth = (header.column.columnDef.meta as any)?.fixedWidth || hasSize;
+    
+            let widthStyle = {};
+            if (isFixedWidth) {
+              widthStyle = {
+                width: header.column.getSize(),
+                minWidth: header.column.getSize(),
+                maxWidth: header.column.getSize(),
+              };
+            } else {
+              if (hasMinSize) widthStyle = { ...widthStyle, minWidth: header.column.columnDef.minSize };
+              if (hasMaxSize) widthStyle = { ...widthStyle, maxWidth: header.column.columnDef.maxSize };
+            }
 
             return (
               <th
@@ -45,11 +62,7 @@ export function DataTableHeader<TData extends RowData = RowData>({
                 )}
                 onClick={header.column.getToggleSortingHandler()}
                 style={{
-                  ...((header.column.columnDef.meta as any)?.fixedWidth ? {
-                    width: header.column.getSize(),
-                    minWidth: header.column.getSize(),
-                    maxWidth: header.column.getSize(),
-                  } : {}),
+                  ...widthStyle,
                   ...((isPinned as string) === 'left' || isPinned === 'start'
                     ? { left: `${header.column.getStart('left' as any)}px` }
                     : (isPinned as string) === 'right' || isPinned === 'end'

@@ -13,7 +13,7 @@ import {
   Mail,
 } from 'lucide-react';
 import { cn, formatCurrency } from '@adatrack/utils';
-import { Badge, DetailShell } from '@adatrack/ui';
+import { Badge, DetailShell, Button, PhoneLink, EmailLink } from '@adatrack/ui';
 import type { Customer, IndividualCustomer, CompanyCustomer } from '../types/customer';
 
 // ─── Helper Components ──────────────────────────────────────────────────────────
@@ -67,20 +67,8 @@ interface CustomerViewProps {
   onClose: () => void;
   onEdit?: (c: Customer) => void;
   onDelete?: (c: Customer) => void;
-  labels: {
-    detailTitle: string;
-    detailClose: string;
-    tabPersonalInfo: string;
-    tabCompanyInfo: string;
-    tabAddress: string;
-    tabLegal: string;
-    tabPic: string;
-    tabSim: string;
-    statusActive: string;
-    statusInactive: string;
-    typeIndividual: string;
-    typeCompany: string;
-  };
+  labels: any;
+  locale?: string;
 }
 
 export function CustomerView({
@@ -90,6 +78,7 @@ export function CustomerView({
   onEdit,
   onDelete,
   labels,
+  locale = 'id-ID',
 }: CustomerViewProps) {
   if (!open || !customer) return null;
 
@@ -101,7 +90,7 @@ export function CustomerView({
     <DetailShell
       open={open}
       onOpenChange={(isOpen) => !isOpen && onClose()}
-      title="Detail Pelanggan"
+      title={labels.detailTitle || "Detail Pelanggan"}
       onEdit={onEdit ? () => onEdit(customer) : undefined}
       onDelete={onDelete ? () => onDelete(customer) : undefined}
     >
@@ -116,13 +105,13 @@ export function CustomerView({
             <div className="flex items-center gap-2 mt-0.5">
               <span className="text-[11px] text-muted-foreground font-medium flex items-center gap-1.5">
                 {isIndiv ? <User className="w-3.5 h-3.5" /> : <Building className="w-3.5 h-3.5" />}
-                {isIndiv ? labels.typeIndividual : labels.typeCompany} &bull; {customer.code}
+                {isIndiv ? labels.typeIndividual || 'Individual' : labels.typeCompany || 'Perusahaan'} &bull; {customer.code}
               </span>
             </div>
           </div>
           <div className={cn("px-2.5 py-0.5 rounded text-[11px] font-semibold flex items-center gap-1.5", customer.status === 'ACTIVE' ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400" : "bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-400")}>
             <span className={cn('h-1.5 w-1.5 rounded-full', customer.status === 'ACTIVE' ? 'bg-green-500' : 'bg-neutral-500')} />
-            {customer.status === 'ACTIVE' ? labels.statusActive : labels.statusInactive}
+            {customer.status === 'ACTIVE' ? labels.statusActive || 'Aktif' : labels.statusInactive || 'Nonaktif'}
           </div>
         </div>
 
@@ -132,95 +121,76 @@ export function CustomerView({
           {/* Statistik & Keuangan */}
           <SectionCard 
             icon={CreditCard} 
-            title="Statistik & Keuangan"
+            title={labels.sectionStats || "Statistik & Keuangan"}
             colorClass="text-amber-600 dark:text-amber-400"
             bgClass="bg-amber-100 dark:bg-amber-900/40"
           >
             <InfoItem 
-              label="Sisa Tagihan (Utang)" 
+              label={labels.colOutstanding || "Sisa Tagihan (Utang)"}
               value={customer.balance?.totalOutstanding ? `${formatCurrency(customer.balance.totalOutstanding)}` : 'Rp 0'} 
               highlight={!!(customer.balance?.totalOutstanding && customer.balance.totalOutstanding > 0)} 
             />
             <InfoItem 
-              label="Total Tagihan" 
+              label={labels.colBilling || "Total Tagihan"}
               value={customer.balance?.totalBilling ? `${formatCurrency(customer.balance.totalBilling)}` : 'Rp 0'} 
             />
             <InfoItem 
-              label="Total Dibayar" 
+              label={labels.colPaid || "Total Dibayar"}
               value={customer.balance?.totalPaid ? `${formatCurrency(customer.balance.totalPaid)}` : 'Rp 0'} 
               valueClassName="text-success"
             />
             <InfoItem 
-              label="Jml Sewa Sukses" 
-              value={`${customer.balance?.totalRentals || 0} Kali`} 
+              label={labels.statRentals || "Jml Sewa Sukses"}
+              value={`${customer.balance?.totalRentals || 0} ${labels.unitTimes || 'Kali'}`}
             />
             <InfoItem 
-              label="Sewa Terakhir" 
-              value={customer.balance?.lastRentalDate ? new Date(customer.balance.lastRentalDate).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }) : '-'} 
+              label={labels.colLastRental || "Sewa Terakhir"}
+              value={customer.balance?.lastRentalDate ? new Date(customer.balance.lastRentalDate).toLocaleDateString(locale, { year: 'numeric', month: 'long', day: 'numeric' }) : '-'} 
             />
             <InfoItem 
-              label="Bayar Terakhir" 
-              value={customer.balance?.lastPaymentDate ? new Date(customer.balance.lastPaymentDate).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }) : '-'} 
+              label={labels.colLastPayment || "Bayar Terakhir"}
+              value={customer.balance?.lastPaymentDate ? new Date(customer.balance.lastPaymentDate).toLocaleDateString(locale, { year: 'numeric', month: 'long', day: 'numeric' }) : '-'} 
             />
           </SectionCard>
 
           {/* Kontak & Alamat */}
           <SectionCard 
             icon={MapPin} 
-            title="Kontak & Alamat"
+            title={labels.sectionContact || "Kontak & Alamat"}
             colorClass="text-blue-600 dark:text-blue-400"
             bgClass="bg-blue-100 dark:bg-blue-900/40"
           >
             <InfoItem 
-              label="Telepon" 
-              value={
-                customer.phone ? (
-                  <a 
-                    href={`https://wa.me/${customer.phone.replace(/[^0-9]/g, '')}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 hover:text-green-600 dark:hover:text-green-400 transition-colors text-foreground"
-                  >
-                    <Phone className="w-3 h-3 text-green-500 shrink-0" />
-                    {customer.phone}
-                  </a>
-                ) : '-'
-              } 
+              label={labels.fieldPhone || "Telepon"}
+              value={<PhoneLink phone={customer.phone} />}
             />
             <InfoItem 
-              label="Email" 
-              value={
-                customer.email ? (
-                  <a href={`mailto:${customer.email}`} className="flex items-start gap-1.5 hover:text-blue-600 transition-colors text-foreground break-all">
-                     <Mail className="w-3 h-3 text-blue-500 shrink-0 mt-0.5" />
-                     <span className="flex-1">{customer.email}</span>
-                  </a>
-                ) : '-'
-              } 
+              label={labels.fieldEmail || "Email"}
+              value={<EmailLink email={customer.email} />} 
             />
-            <InfoItem label="Alamat Lengkap" value={customer.address || '-'} colSpan={2} />
-            <InfoItem label="Kota" value={customer.city || '-'} />
-            <InfoItem label="Provinsi" value={customer.province || '-'} />
-            <InfoItem label="Kode Pos" value={customer.postalCode || '-'} colSpan={2} />
+            <InfoItem label={labels.fieldAddress || "Alamat Lengkap"} value={customer.address || '-'} colSpan={2} />
+            <InfoItem label={labels.fieldCity || "Kota"} value={customer.city || '-'} />
+            <InfoItem label={labels.fieldProvince || "Provinsi"} value={customer.province || '-'} />
+            <InfoItem label={labels.fieldPostalCode || "Kode Pos"} value={customer.postalCode || '-'} colSpan={2} />
           </SectionCard>
 
           {/* Identitas */}
           <SectionCard 
             icon={FileText} 
-            title={isIndiv ? 'Identitas Pribadi' : 'Legalitas Perusahaan'}
+            title={isIndiv ? (labels.sectionLegalIndiv || 'Identitas Pribadi') : (labels.sectionLegalComp || 'Legalitas Perusahaan')}
             colorClass="text-purple-600 dark:text-purple-400"
             bgClass="bg-purple-100 dark:bg-purple-900/40"
           >
             {isIndiv ? (
               <>
-                <InfoItem label="NIK" value={cIndiv.nik || '-'} colSpan={2} />
-                <InfoItem label="Tempat Lahir" value={cIndiv.birthPlace || '-'} />
-                <InfoItem label="Tanggal Lahir" value={cIndiv.birthDate ? new Date(cIndiv.birthDate).toLocaleDateString('id-ID') : '-'} />
+                <InfoItem label={labels.fieldNik || "NIK"} value={cIndiv.nik || '-'} colSpan={2} />
+                <InfoItem label={labels.fieldBirthPlace || "Tempat Lahir"} value={cIndiv.birthPlace || '-'} />
+                <InfoItem label={labels.fieldBirthDate || "Tanggal Lahir"} value={cIndiv.birthDate ? new Date(cIndiv.birthDate).toLocaleDateString(locale) : '-'} />
               </>
             ) : (
               <>
-                <InfoItem label="NIB" value={cComp.nib || '-'} />
-                <InfoItem label="NPWP" value={cComp.npwp || '-'} />
+                <InfoItem label={labels.fieldNib || "NIB"} value={cComp.nib || '-'} />
+                <InfoItem label={labels.fieldNpwp || "NPWP"} value={cComp.npwp || '-'} />
               </>
             )}
           </SectionCard>
@@ -228,24 +198,24 @@ export function CustomerView({
           {/* SIM / PIC */}
           <SectionCard 
             icon={Briefcase} 
-            title={isIndiv ? 'Lisensi Mengemudi (SIM)' : 'Informasi Penanggung Jawab (PIC)'}
+            title={isIndiv ? (labels.sectionSim || 'Lisensi Mengemudi (SIM)') : (labels.sectionPic || 'Informasi Penanggung Jawab (PIC)')}
             colorClass="text-emerald-600 dark:text-emerald-400"
             bgClass="bg-emerald-100 dark:bg-emerald-900/40"
           >
             {isIndiv ? (
               <>
-                <InfoItem label="Tipe SIM" value={cIndiv.simType || '-'} />
-                <InfoItem label="Nomor SIM" value={cIndiv.simNumber || '-'} />
-                <InfoItem label="Berlaku Hingga" value={cIndiv.simExpiredAt ? new Date(cIndiv.simExpiredAt).toLocaleDateString('id-ID') : '-'} colSpan={2} />
+                <InfoItem label={labels.fieldSimType || "Tipe SIM"} value={cIndiv.simType || '-'} />
+                <InfoItem label={labels.fieldSimNumber || "Nomor SIM"} value={cIndiv.simNumber || '-'} />
+                <InfoItem label={labels.fieldSimExpiredAt || "Berlaku Hingga"} value={cIndiv.simExpiredAt ? new Date(cIndiv.simExpiredAt).toLocaleDateString(locale) : '-'} colSpan={2} />
               </>
             ) : (
               <>
-                <InfoItem label="Nama PIC" value={cComp.picName || '-'} colSpan={2} />
-                <InfoItem label="Jabatan" value={cComp.picPosition || '-'} colSpan={2} />
-                <InfoItem label="Telepon PIC" value={cComp.picPhone || '-'} />
+                <InfoItem label={labels.fieldPicName || "Nama PIC"} value={cComp.picName || '-'} colSpan={2} />
+                <InfoItem label={labels.fieldPicPosition || "Jabatan"} value={cComp.picPosition || '-'} colSpan={2} />
+                <InfoItem label={labels.fieldPicPhone || "Telepon PIC"} value={<PhoneLink phone={cComp.picPhone} />} />
                 <InfoItem 
-                  label="Email PIC" 
-                  value={cComp.picEmail ? <span className="break-all">{cComp.picEmail}</span> : '-'} 
+                  label={labels.fieldPicEmail || "Email PIC"}
+                  value={<EmailLink email={cComp.picEmail} />} 
                 />
               </>
             )}
