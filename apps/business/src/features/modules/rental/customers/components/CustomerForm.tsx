@@ -27,7 +27,7 @@ const DEFAULT_CUSTOMER = {
   city: '',
   province: '',
   postalCode: '',
-  
+
   // Individual
   nik: '',
   birthPlace: '',
@@ -70,7 +70,7 @@ export function CustomerForm({
     schema: getCustomerFormSchema(t.validation || {}),
     onSubmit: async (data) => {
       await new Promise(r => setTimeout(r, 800)); // simulate API call
-      
+
       const baseData = {
         type: data.type,
         status: data.status,
@@ -172,7 +172,7 @@ export function CustomerForm({
               label={type === 'INDIVIDUAL' ? t.fieldFullName : t.fieldCompanyName}
               value={formData.name || ''}
               onChange={(v) => handleChange('name', v)}
-              error={errors.name} 
+              error={errors.name}
               required
               placeholder={t.placeholderName}
             />
@@ -185,7 +185,7 @@ export function CustomerForm({
                   label={t.fieldNik}
                   value={(formData as any).nik || ''}
                   onChange={(v) => handleChange('nik', v)}
-                  error={errors.nik} 
+                  error={errors.nik}
                   required
                   placeholder={t.placeholderNik}
                 />
@@ -276,7 +276,7 @@ export function CustomerForm({
             label={t.fieldPhone}
             value={formData.phone || ''}
             onChange={(v) => handleChange('phone', v)}
-            error={errors.phone} 
+            error={errors.phone}
             required
             placeholder={t.placeholderPhone}
           />
@@ -331,7 +331,7 @@ export function CustomerForm({
                 label={t.fieldPicName}
                 value={(formData as any).picName || ''}
                 onChange={(v) => handleChange('picName', v)}
-                error={errors.picName} 
+                error={errors.picName}
                 required
                 placeholder={t.placeholderName}
               />

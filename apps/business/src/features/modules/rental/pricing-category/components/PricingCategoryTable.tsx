@@ -46,9 +46,12 @@ export function PricingCategoryTable({
       enableSorting: true,
       size: 200,
       cell: ({ row }) => (
-        <span>
+        <button
+          onClick={() => onDetail(row.original)}
+          className="text-left font-medium text-foreground hover:text-danger hover:underline focus:outline-none transition-colors"
+        >
           {row.original.name}
-        </span>
+        </button>
       ),
     },
     {

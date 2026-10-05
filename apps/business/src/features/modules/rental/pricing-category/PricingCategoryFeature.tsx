@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { getTranslation } from '@/i18n';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
+import { getPricingCategoryTranslation } from './i18n';
 import { pricingService } from '@/data/modules/rental/services/pricingService';
 import { useRouter } from 'next/navigation';
 import { rentalVehicleService } from '@/data/modules/rental/services/vehicleService';
@@ -10,11 +10,10 @@ import { rentalVehicleService } from '@/data/modules/rental/services/vehicleServ
 import type { RentalPricingCategory, RentalRate } from './types/pricing';
 import { PricingCategoryTable, type EnrichedPricingCategory } from './components/PricingCategoryTable';
 import { PricingCategoryForm, type PricingCategoryFormData } from './components/PricingCategoryForm';
-import { PricingCategoryDetailDrawer } from './components/PricingCategoryDetailDrawer';
-import { PricingVehicleAssignmentDialog } from './components/PricingVehicleAssignmentDialog';
-import { PricingVehicleCustomRateDialog } from './components/PricingVehicleCustomRateDialog';
+import { PricingCategoryView } from './components/PricingCategoryView';
+import { PricingCategoryAssignmentForm } from './components/PricingCategoryAssignmentForm';
 import type { VehiclePricingSelection } from '@/data/modules/rental/services/pricingService';
-import { Button, Card } from '@adatrack/ui';
+import { Button, Card, toast, ConfirmDialog } from '@adatrack/ui';
 import type { DataTableFilterConfig } from '@adatrack/ui';
 import { Plus } from 'lucide-react';
 import type { RateType } from '../bookings/types/booking';
@@ -23,26 +22,7 @@ import { formatNumber } from '@adatrack/utils';
 
 export function PricingCategoryFeature() {
   const locale = useBusinessLocale();
-  const t = getTranslation(locale);
-  // Using some standard labels or adding specific ones if they don't exist
-  const labels = (t as any).pricingCategorys || {
-    title: locale === 'en' ? 'Pricing Category' : 'Kategori Tarif',
-    pageSubtitle: locale === 'en' ? 'Manage rental pricing categories' : 'Kelola master tarif penyewaan kendaraan',
-    addBtn: locale === 'en' ? 'Add' : 'Tambah',
-    exportBtn: locale === 'en' ? 'Export' : 'Ekspor',
-    searchPlaceholder: locale === 'en' ? 'Search pricing category...' : 'Cari kategori tarif...',
-    actionDetail: locale === 'en' ? 'Detail' : 'Detail',
-    actionEdit: locale === 'en' ? 'Edit' : 'Edit',
-    formAddTitle: locale === 'en' ? 'Add New Pricing Category' : 'Tambah Kategori Tarif Baru',
-    formEditTitle: locale === 'en' ? 'Edit Pricing Category' : 'Edit Kategori Tarif',
-    headerName: locale === 'en' ? 'Pricing Category' : 'Kategori Tarif',
-    headerDesc: locale === 'en' ? 'Description' : 'Deskripsi',
-    headerVehicles: locale === 'en' ? 'Vehicles' : 'Kendaraan',
-    headerStatus: locale === 'en' ? 'Status' : 'Status',
-    statusActive: locale === 'en' ? 'Active' : 'Aktif',
-    statusInactive: locale === 'en' ? 'Inactive' : 'Nonaktif',
-    unit: locale === 'en' ? 'units' : 'unit',
-  };
+  const labels = getPricingCategoryTranslation(locale);
 
   const [dataVersion, setDataVersion] = React.useState(0);
   
@@ -57,10 +37,16 @@ export function PricingCategoryFeature() {
   const [formOpen, setFormOpen] = React.useState(false);
   const [detailOpen, setDetailOpen] = React.useState(false);
   const [assignmentOpen, setAssignmentOpen] = React.useState(false);
-  const [customRateOpen, setCustomRateOpen] = React.useState(false);
   
-  const [selectedGroup, setSelectedGroup] = React.useState<RentalPricingCategory | undefined>();
-  const [selectedOverrideVehicleId, setSelectedOverrideVehicleId] = React.useState<string | undefined>();
+  const [selectedGroup, setSelectedGroup] = React.useState<EnrichedPricingCategory | undefined>();
+  const [deleteGroup, setDeleteGroup] = React.useState<EnrichedPricingCategory | null>(null);
+  const [deleteOpen, setDeleteOpen] = React.useState(false);
+  const [editingCategory, setEditingCategory] = React.useState<EnrichedPricingCategory | null>(null);
+  const editingRates = React.useMemo(() => {
+    if (!editingCategory) return [];
+    return pricingService.getRatesByGroupId(editingCategory.id);
+  }, [editingCategory, dataVersion]);
+
   const [selectedRates, setSelectedRates] = React.useState<{ rateType: RateType, amount: number }[]>([]);
   const [selectedVehicles, setSelectedVehicles] = React.useState<any[]>([]);
   const [availableVehicles, setAvailableVehicles] = React.useState<VehiclePricingSelection[]>([]);
@@ -85,11 +71,15 @@ export function PricingCategoryFeature() {
   const router = useRouter();
 
   const handleAdd = () => {
-    router.push('/rental/pricing-category/create');
+    window.history.pushState(null, '', '/rental/pricing-category/create');
+    setEditingCategory(null);
+    setFormOpen(true);
   };
 
   const handleEdit = (group: EnrichedPricingCategory) => {
-    router.push(`/rental/pricing-category/edit/${group.id}`);
+    window.history.pushState(null, '', `/rental/pricing-category/edit`);
+    setEditingCategory(group);
+    setFormOpen(true);
   };
 
   const handleDetail = (group: EnrichedPricingCategory) => {
@@ -114,11 +104,19 @@ export function PricingCategoryFeature() {
   };
 
   const handleDelete = (id: string) => {
-    if (confirm('Apakah Anda yakin ingin menghapus Kategori Tarif ini? Semua kendaraan di dalamnya akan dikeluarkan dari kategori.')) {
-      pricingService.deletePricingCategory(id);
-      setDataVersion(v => v + 1);
-      setDetailOpen(false);
+    const group = groups.find(g => g.id === id);
+    if (group) {
+      setDeleteGroup(group);
+      setDeleteOpen(true);
     }
+  };
+
+  const handleConfirmDelete = (id: string) => {
+    pricingService.deletePricingCategory(id);
+    setDataVersion(v => v + 1);
+    setDetailOpen(false);
+    setDeleteOpen(false);
+    toast.success(labels.deleteSuccess);
   };
 
   const handleOpenAssignment = async () => {
@@ -132,7 +130,8 @@ export function PricingCategoryFeature() {
     if (!selectedGroup) return;
     pricingService.updatePricingCategoryVehicles(selectedGroup.id, vehicleIds);
     setAssignmentOpen(false);
-    setAssignmentOpen(false);
+    
+    toast.success('Daftar kendaraan berhasil diperbarui');
     
     // Refresh detail drawer silently
     if (selectedGroup) {
@@ -144,28 +143,11 @@ export function PricingCategoryFeature() {
     if (selectedGroup) {
       pricingService.removeVehicleFromGroup(vehicleId, selectedGroup.id);
       setDataVersion(v => v + 1);
+      toast.success('Kendaraan dikeluarkan dari kategori');
       setTimeout(() => handleDetail(selectedGroup as any), 100);
     }
   };
 
-  const handleOpenManageOverride = (vehicleId: string) => {
-    setSelectedOverrideVehicleId(vehicleId);
-    setCustomRateOpen(true);
-  };
-
-  const handleSaveCustomRate = (vehicleId: string, rates: { rateType: RateType; amount: number }[]) => {
-    // Save rates
-    rates.forEach(r => pricingService.setVehicleOverride(vehicleId, r.rateType, r.amount));
-    
-    setDataVersion(v => v + 1);
-    setCustomRateOpen(false);
-    setSelectedOverrideVehicleId(undefined);
-
-    // Refresh detail drawer to reflect removal of vehicle
-    if (selectedGroup) {
-      setTimeout(() => handleDetail(selectedGroup as any), 100);
-    }
-  };
 
   const handleSubmitForm = (formData: PricingCategoryFormData) => {
     const rates = [
@@ -174,22 +156,34 @@ export function PricingCategoryFeature() {
       { rateType: 'MONTHLY' as RateType, amount: formData.monthlyRate },
     ];
 
-    if (selectedGroup) {
-      pricingService.updatePricingCategory(selectedGroup.id, {
+    if (editingCategory) {
+      pricingService.updatePricingCategory(editingCategory.id, {
         name: formData.name,
         description: formData.description,
         status: formData.status
       }, rates);
+      toast.success(labels.updateSuccess);
     } else {
       pricingService.createPricingCategory({
         name: formData.name,
         description: formData.description,
         status: formData.status
       }, rates);
+      toast.success(labels.createSuccess);
     }
 
+    window.history.pushState(null, '', '/rental/pricing-category');
     setFormOpen(false);
+    setEditingCategory(null);
     setDataVersion(v => v + 1);
+  };
+
+  const handleCloseForm = (open: boolean) => {
+    if (!open) {
+      window.history.pushState(null, '', '/rental/pricing-category');
+      setEditingCategory(null);
+    }
+    setFormOpen(open);
   };
 
   const filterConfig: DataTableFilterConfig = React.useMemo(() => ({
@@ -198,16 +192,16 @@ export function PricingCategoryFeature() {
     onClearAll: () => setFilterState({ status: [] }),
     labels: {
       title: 'Filter',
-      clearAll: locale === 'en' ? 'Clear Filters' : 'Hapus Filter',
+      clearAll: labels.clearFilters,
     },
     fields: [
       {
         id: 'status',
-        label: 'Status',
+        label: labels.filterStatus,
         type: 'pills-single',
         options: [
-          { value: 'ACTIVE', label: locale === 'en' ? 'Active' : 'Aktif', colorClass: 'bg-success', activeClass: 'bg-success/15 border-success/40 text-success' },
-          { value: 'INACTIVE', label: locale === 'en' ? 'Inactive' : 'Nonaktif', colorClass: 'bg-neutral-400', activeClass: 'bg-neutral-100 dark:bg-neutral-800 border-neutral-400 text-foreground' },
+          { value: 'ACTIVE', label: labels.statusActive, colorClass: 'bg-success', activeClass: 'bg-success/15 border-success/40 text-success' },
+          { value: 'INACTIVE', label: labels.statusInactive, colorClass: 'bg-neutral-400', activeClass: 'bg-neutral-100 dark:bg-neutral-800 border-neutral-400 text-foreground' },
         ],
       },
     ],
@@ -249,8 +243,37 @@ export function PricingCategoryFeature() {
         />
       </div>
 
+      <PricingCategoryForm
+        open={formOpen}
+        onOpenChange={handleCloseForm}
+        initialData={editingCategory || undefined}
+        initialRates={editingRates}
+        title={editingCategory ? labels.formEditTitle : labels.formAddTitle}
+        onSubmit={handleSubmitForm}
+        layout="drawer"
+      />
 
-      <PricingCategoryDetailDrawer
+      <ConfirmDialog
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        title="Hapus Kategori Tarif"
+        description={
+          <div className="flex flex-col">
+            <span>Apakah Anda yakin ingin menghapus Kategori Tarif ini? Semua kendaraan di dalamnya akan dikeluarkan dari kategori.</span>
+            <div className="mt-3 text-center">
+              <strong className="text-danger text-[15px]">{deleteGroup?.name}</strong>
+            </div>
+          </div>
+        }
+        confirmLabel="Ya, Hapus"
+        cancelLabel="Batal"
+        onConfirm={() => {
+          if (deleteGroup) handleConfirmDelete(deleteGroup.id);
+        }}
+        variant="danger"
+      />
+
+      <PricingCategoryView
         open={detailOpen}
         onOpenChange={setDetailOpen}
         group={selectedGroup}
@@ -268,7 +291,7 @@ export function PricingCategoryFeature() {
         onRemoveVehicle={handleRemoveVehicle}
       />
 
-      <PricingVehicleAssignmentDialog
+      <PricingCategoryAssignmentForm
         open={assignmentOpen}
         onOpenChange={setAssignmentOpen}
         groupId={selectedGroup?.id || ''}
@@ -276,16 +299,6 @@ export function PricingCategoryFeature() {
         availableVehicles={availableVehicles}
         onSave={handleSaveAssignment}
       />
-
-      {selectedOverrideVehicleId && (
-        <PricingVehicleCustomRateDialog
-          open={customRateOpen}
-          onOpenChange={setCustomRateOpen}
-          vehicleId={selectedOverrideVehicleId}
-          initialRates={pricingService.getVehicleOverrides(selectedOverrideVehicleId)}
-          onSave={handleSaveCustomRate}
-        />
-      )}
     </div>
   );
 }
