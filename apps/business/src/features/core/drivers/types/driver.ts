@@ -19,6 +19,7 @@ export interface Driver {
   // Contacts
   phone: string;
   email: string;
+  createUserAccount?: boolean;
   address: string;
   
   // Identity
