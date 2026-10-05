@@ -1,4 +1,4 @@
-# TASK-05 — HALAMAN KONTRAK SEWA RENTAL (CONTRACTS)
+# TASK-06 — HALAMAN KONTRAK SEWA RENTAL (CONTRACTS)
 
 **Halaman/Menu:** Kontrak Rental (`/rental/contracts`)  
 **Status:** COMPLETED  

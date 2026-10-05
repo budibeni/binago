@@ -1,8 +1,8 @@
-# TASK-09 — HALAMAN LAPORAN RENTAL
+# TASK-12 — INTEGRASI DAN REGRESSION MODUL RENTAL
 
-**Halaman/menu:** Laporan Rental  
+**Halaman/menu:** Integrasi Rental  
 **Status:** PROPOSED  
-**Tujuan:** Menyediakan laporan berdasarkan data transaksi Rental yang benar-benar tersedia.
+**Tujuan:** Memvalidasi keseluruhan alur setelah task per halaman diselesaikan.
 
 ## 1. Aturan eksekusi
 - Baca `AGENTS.md` dan `docs/README.md` terlebih dahulu.
@@ -21,25 +21,27 @@
 - Catat dependency halaman lain dan CORE tanpa mengubahnya.
 
 ## 3. Ruang lingkup implementasi
-- Audit route Reports, tab/section, query/service/repository, mock data, filter, export, dan permission.
-- Mulai dari inventarisasi field dan relasi yang benar-benar tersedia; jangan mengasumsikan payment/reporting data sudah lengkap.
-- Bangun ringkasan dan filter hanya dari data yang telah tersedia dan dapat dihitung secara konsisten.
-- Pastikan laporan menghormati permission dan cakupan data pengguna sesuai sistem otorisasi.
-- Pastikan filter periode, status, customer, dan kendaraan hanya ditambahkan jika didukung oleh data serta requirement.
-- Pastikan export hanya disediakan jika mekanisme export tersedia/diimplementasikan dalam scope.
-- Audit route laporan yang pernah dilaporkan 404.
-- Jika metrik pembayaran, deposit, pendapatan bersih, denda, atau refund belum memiliki sumber data dan definisi, tandai BLOCKED dan jangan membuat angka estimasi seolah-olah data aktual.
+- Audit kembali relasi Customer → Booking → BookingItems → Contract → Handover → Return.
+- Pastikan setiap BookingItem menggunakan CORE Vehicle ID yang konsisten dari Pricing/Vehicle Profile sampai Handover dan Return.
+- Pastikan lifecycle Booking, Contract, dan Rental Vehicle tidak saling bertentangan.
+- Pastikan Contract selesai hanya setelah semua BookingItems dikembalikan.
+- Pastikan VehicleContext dari Rental dibangun oleh module Rental dan dibaca CORE tanpa CORE mengenal Rental.
+- Pastikan navigasi ke Tracking menggunakan /tracking dan trackingNavigationService, bukan query parameters.
+- Validasi template Contract terhadap data Contract/Booking multi-vehicle.
+- Periksa permission, i18n, loading/empty/error state, dan navigasi antar halaman.
+- Jalankan typecheck, lint, automated tests yang tersedia, dan build; catat semua error aktual.
+- Periksa regression pada halaman di luar Rental hanya jika perubahan task sebelumnya berpotensi memengaruhinya.
 
 ## 4. Batasan / bukan ruang lingkup
-- Jangan membuat modul Payment/Settlement.
-- Jangan mengarang KPI atau formula keuangan.
-- Jangan membuat laporan berbasis field yang tidak ada.
+- Task ini bukan kesempatan untuk refactor seluruh monorepo.
+- Jangan mengubah CORE contract atau shared architecture tanpa persetujuan.
+- Jangan mengimplementasikan Payment/Settlement yang belum diputuskan.
 
 ## 5. Dependensi
-- TASK-04 sampai TASK-08 untuk sumber transaksi yang relevan.
+- TASK-01 sampai TASK-09.
 
 ## 6. Acceptance criteria
-- Laporan dapat dibuka dan menyajikan metrik yang sumber serta definisinya jelas; metrik tanpa data/keputusan ditandai BLOCKED.
+- Alur Rental lintas halaman konsisten dan hasil verifikasi akhir terdokumentasi.
 - Aksi utama benar-benar bekerja dan memiliki feedback yang sesuai.
 - Tidak ada business rule baru yang diciptakan tanpa keputusan.
 - Tidak ada duplikasi master data yang melanggar SSoT.

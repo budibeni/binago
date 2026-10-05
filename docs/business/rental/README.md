@@ -1,50 +1,35 @@
-# ADATRACK — Dokumentasi dan Task Modul Rental
+# ADATRACK - Modul Rental Business
 
-Dokumentasi ini menggunakan **task per halaman sesuai menu Rental di aplikasi**, bukan task besar yang mencampur beberapa halaman.
+Dokumentasi ini menjelaskan arsitektur, panduan antarmuka (UI/UX), dan fitur-fitur operasional untuk Modul Rental pada aplikasi ADATRACK Business. Modul ini dikembangkan khusus untuk mengelola bisnis penyewaan armada, mencakup dari hulu ke hilir (Master Data hingga Pelaporan Keuangan & Produktivitas).
 
-## Struktur menu dan kegunaan masing-masing halaman
+## Daftar Isi Dokumentasi
 
-1. **Pelanggan (`/rental/customers`)**: Mengelola master database penyewa (Individu & Perusahaan), dokumen identitas (NIK/SIM/NPWP), kontak PIC, dan riwayat penyewaan sebagai sumber data transaksi.
-2. **Kategori Tarif (`/rental/pricing-category`)**: Mengatur skema harga sewa armada berdasarkan kategori unit (Daily, Weekly, Monthly), penetapan deposit, penugasan armada, dan tarif khusus (*rate override*).
-3. **Kendaraan Rental (`/rental/vehicles`)**: Mengelola alokasi armada rental berbasis CORE Vehicle (SSoT), memantau status operasional (*Ready, Reserved, Rented, Maintenance*), kelengkapan unit, masa berlaku dokumen (STNK/Pajak), dan navigasi ke live tracking.
-4. **Booking (`/rental/bookings`)**: Menangani reservasi pemesanan armada rental dengan dukungan multi-kendaraan (**1 Customer → 1 Booking → N BookingItems**), pengecekan ketersediaan tanggal (*availability check*), kalkulasi harga, dan konfirmasi pemesanan.
-5. **Kontrak Rental (`/rental/contracts`)**: Mengelola dokumen hukum perjanjian sewa dari booking terkonfirmasi, menaungi multi-armada dalam kontrak, memantau masa sewa, dan mencetak dokumen fisik/PDF kontrak perjanjian sewa.
-6. **Template Kontrak (`/rental/templates`)**: Mengatur format dan redaksi surat perjanjian sewa menggunakan TipTap HTML WYSIWYG Editor, penyisipan tag dinamis Handlebars, dan pengelolaan template aktif serta template default sistem.
-7. **Serah Terima (`/rental/contracts/[id]/handover`)**: Mencatat inspeksi dan serah terima fisik armada per unit kepada penyewa, mencatat odometer awal, level BBM, checklist fisik, serta mengaktifkan kontrak sewa.
-8. **Pengembalian (`/rental/contracts/[id]/return`)**: Mencatat inspeksi pengembalian fisik armada per unit, mencatat odometer akhir, mengecek kerusakan/keterlambatan, dan menyelesaikan kontrak sewa setelah seluruh unit kembali.
-9. **Laporan Rental (`/rental/reports`)**: Menyajikan analitik dan rekapitulasi data operasional rental (utilisasi armada, pendapatan sewa, durasi sewa, dan riwayat penyewa).
+1. [Arsitektur dan Aturan Bisnis](./architecture-and-rules.md)
+   Menjelaskan konsep *Single Source of Truth* (SSoT), batas domain (domain boundaries), dan alur operasional dasar.
+2. [Panduan UI/UX](./ui-ux-guidelines.md)
+   Standar antarmuka pengguna yang diterapkan pada modul ini (seperti `PanelShell`, `StatCard` mendatar, penggunaan `DataTable` *full-height*, dll).
+3. [Entitas Utama (Master Data)](./core-entities.md)
+   Dokumentasi manajemen Pelanggan, Kategori Tarif (Pricing), dan Armada Rental.
+4. [Alur Transaksi (Transaction Flow)](./transaction-flow.md)
+   Siklus hidup penyewaan: Reservasi (Booking) → Serah Terima (Handover) → Kontrak → Pengembalian (Return). Termasuk pengelolaan Template Kontrak.
+5. [Monitoring & Keuangan](./monitoring-and-finance.md)
+   Penjelasan fitur pemantauan armada langsung (Live Monitoring), manajemen pembayaran (Payments), dan laporan produktivitas (Productivity).
 
-Dashboard Rental tidak dimasukkan karena tidak tampil pada struktur menu yang diberikan sebagai acuan revisi ini.
+## Status Implementasi Modul
 
-## Struktur dokumen
+Berikut adalah daftar fitur yang telah diselesaikan dan diintegrasikan:
 
-- `00-current-state-and-rules.md` — konteks, arsitektur, business rules, temuan audit, dan batasan.
-- `tasks/TASK-01-pelanggan.md` sampai `TASK-09-laporan-rental.md` — satu task untuk satu halaman.
-- `tasks/TASK-10-integrasi-rental.md` — validasi lintas halaman setelah task halaman selesai.
+- ✅ **Pelanggan** (`/rental/customers`): Manajemen penyewa Individu/Perusahaan.
+- ✅ **Kategori Tarif** (`/rental/pricing-category`): Manajemen skema harga (Harian, Mingguan, Bulanan).
+- ✅ **Kendaraan Rental** (`/rental/vehicles`): Manajemen alokasi armada dari CORE.
+- ✅ **Booking** (`/rental/bookings`): Reservasi sewa multi-armada dengan snapshot harga.
+- ✅ **Template Kontrak** (`/rental/templates`): Desain surat perjanjian sewa menggunakan Tiptap Editor & Handlebars.
+- ✅ **Kontrak Rental** (`/rental/contracts`): Manajemen dan pencetakan dokumen legal sewa.
+- ✅ **Serah Terima (Handover)** (`/rental/handovers`): Pencatatan kondisi awal dan odometer saat armada keluar.
+- ✅ **Monitoring Armada** (`/rental/monitoring`): Pemantauan *live* masa sewa armada yang sedang berjalan, indikator sisa waktu, dan integrasi WhatsApp.
+- ✅ **Global Pembayaran** (`/rental/payments`): Riwayat transaksi seluruh pembayaran dan laporan pendapatan menggunakan `PanelShell`.
+- ✅ **Produktivitas Armada** (`/rental/productivity`): Laporan utilisasi dan pendapatan armada per bulan & tahun.
+- 🚧 **Pengembalian (Return)** (`/rental/returns`): Pencatatan kondisi akhir dan odometer saat armada kembali. *(Dalam proses/segera diimplementasi)*
 
-## Cara menjalankan workflow
-
-Kerjakan **satu task dalam satu waktu**. Jangan mengerjakan task berikutnya sebelum task aktif selesai dan dilaporkan.
-
-Setiap task:
-1. Audit halaman dan implementasi aktual terlebih dahulu.
-2. Catat route, komponen, feature, service, repository, mock, dan dependency yang ditemukan.
-3. Cocokkan dengan aturan bisnis di dokumen ini.
-4. Implementasikan hanya ruang lingkup halaman aktif.
-5. Jalankan pemeriksaan yang relevan.
-6. Laporkan file yang berubah, hasil verifikasi, keterbatasan, dan blocker.
-7. STOP. Tunggu instruksi untuk task berikutnya.
-
-## Status task
-
-- **TASK-01 s.d. TASK-06**: Berstatus **COMPLETED** (telah diimplementasikan pada codebase aktual: Pelanggan, Kategori Tarif, Kendaraan Rental, Booking multi-vehicle, Kontrak Rental, dan Template Kontrak WYSIWYG HTML TipTap).
-- **TASK-07 s.d. TASK-10**: Berstatus **PROPOSED / PENDING** (tahap lanjutan: Serah Terima, Pengembalian, Laporan Rental, dan Integrasi Lintas Alur).
-
-## Prinsip penting
-
-- Jangan mengarang business rules yang belum diputuskan.
-- Jangan melakukan refactor lintas halaman di luar kebutuhan task aktif.
-- Jangan mengubah CORE atau kontrak antar-package tanpa persetujuan.
-- Reuse komponen dan pola ADATRACK yang sudah ada.
-- Jangan mengganti mock dengan API/backend/production infrastructure selama scope masih menggunakan mock.
-- Jangan menandai task DONE hanya karena UI terlihat selesai; alur dan validasi terkait juga harus bekerja.
+## Acuan Pengembangan
+Seluruh pengembangan Modul Rental harus berpedoman pada `AGENTS.md` di *root* repositori.
