@@ -30,6 +30,7 @@ export function useDrivers(filters?: { search?: string; status?: string; groupId
         placement: d.placement || '-',
         licenseNumber: d.license_number || '-',
         licenseExpiry: d.license_expiry || new Date().toISOString(),
+        groupId: d.group_id ? String(d.group_id) : undefined,
         status: 'active',
         performanceScore: 100,
         history: [],
