@@ -4,8 +4,10 @@ export type PricingCategoryStatus = 'ACTIVE' | 'INACTIVE';
 
 export interface RentalPricingCategory {
   id: string;
+  code: string;
   name: string;
   description?: string;
+  defaultDeposit: number;
   status: PricingCategoryStatus;
   createdAt: string;
   updatedAt: string;

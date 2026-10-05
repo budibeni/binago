@@ -54,6 +54,7 @@ export function PricingCategoryEditFeature({ id }: { id: string }) {
         initialRates={rates.map(r => ({ rateType: r.rateType, amount: r.amount }))}
         title={labels.formEditTitle}
         layout="drawer"
+        labels={labels as any}
       />
     </div>
   );

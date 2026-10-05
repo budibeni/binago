@@ -73,6 +73,7 @@ export interface PricingCategoryViewProps {
   onDelete?: () => void;
   onAssignVehicle?: () => void;
   onRemoveVehicle?: (vehicleId: string) => void;
+  labels?: Record<string, string>;
 }
 
 export function PricingCategoryView({ 
@@ -84,7 +85,8 @@ export function PricingCategoryView({
   onEdit,
   onDelete,
   onAssignVehicle,
-  onRemoveVehicle
+  onRemoveVehicle,
+  labels
 }: PricingCategoryViewProps) {
   const [searchQuery, setSearchQuery] = React.useState('');
 
@@ -150,23 +152,28 @@ export function PricingCategoryView({
           {/* Tarif Default */}
           <SectionCard
             icon={CreditCard}
-            title="Tarif Default"
+            title={labels?.formRatesInfo || "Tarif Default"}
             colorClass="text-amber-600 dark:text-amber-400"
             bgClass="bg-amber-100 dark:bg-amber-900/40"
-            className="grid grid-cols-3 gap-y-4 gap-x-4"
+            className="grid grid-cols-2 gap-y-4 gap-x-4"
           >
             <InfoItem 
-              label="Harian"
+              label={labels?.headerDaily || "Harian"}
               value={getRate('DAILY')}
               highlight
             />
             <InfoItem 
-              label="Mingguan"
+              label={labels?.headerWeekly || "Mingguan"}
               value={getRate('WEEKLY')}
             />
             <InfoItem 
-              label="Bulanan"
+              label={labels?.headerMonthly || "Bulanan"}
               value={getRate('MONTHLY')}
+            />
+            <InfoItem 
+              label={labels?.headerDeposit || "Deposit"}
+              value={formatCurrency(group.defaultDeposit || 0)}
+              highlight
             />
           </SectionCard>
 

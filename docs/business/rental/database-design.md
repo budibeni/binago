@@ -66,10 +66,12 @@ Skema harga berjenjang dan pemetaan armada CORE ke operasional rental.
 | `id` | UUID | PRIMARY KEY | |
 | `code` | VARCHAR | UNIQUE, NOT NULL | Kode Kategori (Cth: CAT-A) |
 | `name` | VARCHAR | NOT NULL | Nama (Cth: Premium SUV) |
+| `description` | TEXT | NULL | Deskripsi Kategori |
 | `rate_daily` | DECIMAL | NOT NULL | Tarif Harian |
 | `rate_weekly` | DECIMAL | NULL | Tarif Mingguan |
 | `rate_monthly` | DECIMAL | NULL | Tarif Bulanan |
 | `default_deposit`| DECIMAL | NOT NULL | Uang Jaminan Default |
+| `status` | ENUM | NOT NULL | `ACTIVE`, `INACTIVE` |
 
 **Table: `rental_vehicle_profiles`**
 | Column | Type | Constraints | Description |

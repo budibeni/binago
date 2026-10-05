@@ -33,21 +33,21 @@ Halaman Kategori Tarif (`/rental/pricing-category`) berfungsi sebagai **pusat st
 │  [🔍 Cari Kategori Tarif...]       [+ Tambah Kategori Tarif]           │
 ├────────────────────────────────────────────────────────────────────────┤
 │  DataTable Kategori Tarif Rental:                                      │
-│  Nama Kategori | Tarif Harian | Mingguan   | Bulanan     | Deposit | Armada│
-│  ──────────────┼──────────────┼────────────┼─────────────┼─────────┼───────┤
-│  MPV Standar   | Rp 450.000   | Rp 2.800rb | Rp 9.500rb  | Rp 1jt  | 14    │
-│  City Car      | Rp 350.000   | Rp 2.100rb | Rp 7.000rb  | Rp 500rb| 8     │
-│  Luxury Sedan  | Rp 1.500.000 | Rp 9.000rb | Rp 32.000rb | Rp 3jt  | 4     │
+│  Kategori Tarif| Deskripsi    | Harian     | Mingguan   | Bulanan     | Deposit | Kendaraan | Status │
+│  ──────────────┼──────────────┼────────────┼────────────┼─────────────┼─────────┼───────────┼────────┤
+│  MPV Standar   | MPV Keluarga | Rp 450.000 | Rp 2.800rb | Rp 9.500rb  | Rp 1jt  | 14 unit   | Aktif  │
+│  City Car      | Mobil Kota   | Rp 350.000 | Rp 2.100rb | Rp 7.000rb  | Rp 500rb| 8 unit    | Aktif  │
 └────────────────────────────────────────────────────────────────────────┘
        │                                                      │
        ▼ (Klik baris kategori)                                 ▼ (Klik [+ Tambah])
 ┌──────────────────────────────┐              ┌──────────────────────────────┐
-│ Drawer Detail Kategori Tarif │              │ Modal: PricingCategoryForm   │
-│ • Struktur Tarif & Deposit   │              │ • Nama Kategori & Deskripsi  │
-│ • Daftar Armada Terdaftar    │              │ • Tarif Harian (Daily)       │
-│ • Indikator Custom Override  │              │ • Tarif Mingguan (Weekly)    │
-│ [+ Tugaskan Armada]          │              │ • Tarif Bulanan (Monthly)    │
-│ [⚙ Set Tarif Khusus Unit]    │              │ • Nominal Deposit Wajib      │
+│ Detail: PricingCategoryView  │              │ Drawer: PricingCategoryForm  │
+│ • Informasi Kategori & Status│              │ • Nama Kategori & Deskripsi  │
+│ • Struktur Tarif & Deposit   │              │ • Status Aktif/Nonaktif      │
+│ • Daftar Kendaraan           │              │ • Tarif Harian (Daily)       │
+│ [+ Kelola Kendaraan]         │              │ • Tarif Mingguan (Weekly)    │
+│                              │              │ • Tarif Bulanan (Monthly)    │
+│                              │              │ • Deposit Wajib              │
 └──────────────────────────────┘              └──────────────────────────────┘
 ```
 
@@ -57,22 +57,47 @@ Halaman Kategori Tarif (`/rental/pricing-category`) berfungsi sebagai **pusat st
 
 - **`PricingCategoryTable.tsx`:**
   - Tabel data berbasis `@adatrack/ui` `DataTable`.
-  - **Kolom Data:** Nama Kategori, Deskripsi, Tarif Harian, Tarif Mingguan, Tarif Bulanan, Uang Jaminan (Deposit), Jumlah Armada Terdaftar (*Assigned Vehicles Count*), Status, dan Tombol Aksi (Ubah & Hapus).
-- **`PricingCategoryDetailDrawer.tsx`:**
-  - Drawer sisi kanan yang menampilkan rincian tarif kategori beserta daftar lengkap armada rental yang bernaung di bawah kategori tersebut.
-  - Setiap baris kendaraan di dalam drawer menampilkan plat nomor, merk/model, dan apakah unit menggunakan tarif standar atau tarif khusus (*Custom Override*).
-  - Tombol **"Tugaskan Armada"** untuk memunculkan modal alokasi armada.
-  - Tombol **"Set Tarif Khusus"** untuk mengatur harga override pada unit tertentu.
+  - **Kolom Data:** Kategori Tarif, Deskripsi, Harian, Mingguan, Bulanan, Deposit, Kendaraan (*Assigned Vehicles Count*), Status. Mendukung sistem *multilingual* (i18n).
+- **`PricingCategoryView.tsx`:**
+  - Tampilan Detail (Drawer Samping) yang merangkum tarif default kategori beserta daftar lengkap armada rental yang dinaungi.
+  - Setiap baris kendaraan di dalam drawer menampilkan plat nomor, tipe, nama kendaraan, dan merek.
+  - Tombol **"+ Kelola"** untuk membuka *form assignment* kendaraan.
+  - Tombol aksi (ikon tong sampah) untuk mengeluarkan kendaraan dari kategori.
 - **`PricingCategoryForm.tsx`:**
-  - Dialog modal untuk menambah kategori tarif baru atau menyunting kategori yang ada (Nama, Deskripsi, Tarif Harian, Tarif Mingguan, Tarif Bulanan, Nominal Deposit).
-- **`PricingVehicleAssignmentDialog.tsx`:**
-  - Dialog modal yang menampilkan daftar armada rental yang belum memiliki kategori tarif, lengkap dengan pencarian dan checkbox untuk menugaskan banyak unit sekaligus (*batch assignment*).
-- **`PricingVehicleCustomRateDialog.tsx`:**
-  - Dialog modal untuk menetapkan tarif override pada unit kendaraan terpilih.
+  - Drawer form untuk menambah kategori tarif baru atau menyunting kategori yang ada (Nama Kategori Tarif, Status, Deskripsi, Tarif Harian, Tarif Mingguan, Tarif Bulanan, Deposit).
+- **`PricingCategoryAssignmentForm.tsx`:**
+  - Dialog modal yang menampilkan daftar armada rental yang tersedia, lengkap dengan fitur pencarian dan *checkbox* untuk menugaskan banyak unit sekaligus ke dalam kategori tarif (*batch assignment*).
 
 ---
 
-## 4. Mesin Resolusi Harga (`resolveVehicleRate`)
+## 4. Struktur Direktori & File
+
+Proyek memisahkan antara bagian **URL Routing**, **Features**, dan **Data/Mockups**.
+
+### A. Routing (Next.js App Router)
+Berada di `apps/business/src/app/(modules)/rental/pricing-category/`. Bertugas memetakan URL ke komponen:
+- `page.tsx` → URL `/rental/pricing-category` (Daftar Kategori Tarif)
+- `create/page.tsx` → URL `/rental/pricing-category/create` (Form Penambahan)
+- `edit/page.tsx` → URL `/rental/pricing-category/edit` (Form Penyuntingan)
+
+### B. Features & Components
+Berada di `apps/business/src/features/modules/rental/pricing-category/`. Menyimpan komponen visual dan logika UI:
+- `PricingCategoryFeature.tsx` (Root/gabungan tabel, filter, fungsi Hapus)
+- `PricingCategoryCreateFeature.tsx` (Layout khusus halaman tambah)
+- `PricingCategoryEditFeature.tsx` (Layout khusus halaman sunting)
+- `i18n.ts` (Terjemahan antarmuka spesifik modul kategori tarif)
+- `components/PricingCategoryTable.tsx`, `PricingCategoryForm.tsx`, `PricingCategoryView.tsx`, `PricingCategoryAssignmentForm.tsx`
+- `types/pricing.ts` (Definisi tipe data UI)
+
+### C. Data Layer & Mockups
+Berada di `apps/business/src/data/modules/rental/`. Bertugas sebagai mesin data di balik UI:
+- **Mockup Data:** `mock/pricing.ts` (Kumpulan data dummy awal/database bayangan).
+- **Repositories:** `repositories/pricingRepository.ts` (Logika baca/tulis/hapus memanipulasi *mock array*).
+- **Services:** `services/pricingService.ts` (Menjembatani pemanggilan dari komponen UI ke repository).
+
+---
+
+## 5. Mesin Resolusi Harga (`resolveVehicleRate`)
 
 Saat modul pemesanan (Booking) memilih kendaraan, sistem memanggil mesin resolusi harga pada `pricingService.ts`:
 
@@ -97,47 +122,39 @@ Saat modul pemesanan (Booking) memilih kendaraan, sistem memanggil mesin resolus
 
 ---
 
-## 5. Model Data Teknis (`Pricing`)
+## 6. Model Data Teknis (`Pricing`)
+
+Model data ini mengacu pada desain database yang didefinisikan pada `database-design.md` untuk tabel `rental_pricing_categories` dan `rental_vehicle_profiles`.
 
 ```ts
 export type RentalRateType = 'DAILY' | 'WEEKLY' | 'MONTHLY';
-
-export interface RentalRate {
-  daily: number;                 // Tarif per hari
-  weekly: number;                // Tarif paket 7 hari
-  monthly: number;               // Tarif paket 30 hari
-  deposit: number;               // Uang jaminan sewa
-}
+export type RentalVehicleStatus = 'READY' | 'RESERVED' | 'RENTED' | 'MAINTENANCE';
 
 export interface RentalPricingCategory {
-  id: string;                    // Format: prc-xxx
+  id: string;                    // UUID
+  code: string;                  // Format: CAT-xxx
   name: string;                  // e.g. "MPV Standar"
-  description?: string;
-  rates: RentalRate;
-  assignedVehicleCount: number;  // Jumlah unit terdaftar
-  status: 'ACTIVE' | 'INACTIVE';
-  createdAt: string;
-  updatedAt: string;
+  description?: string | null;   // Deskripsi
+  rateDaily: number;             // Tarif per hari
+  rateWeekly?: number | null;    // Tarif paket 7 hari
+  rateMonthly?: number | null;   // Tarif paket 30 hari
+  defaultDeposit: number;        // Uang jaminan sewa
+  status: 'ACTIVE' | 'INACTIVE'; // Status aktif/non-aktif
+  // Atribut UI tambahan
+  assignedVehicleCount?: number; 
 }
 
-export interface VehicleRateOverride {
-  vehicleId: string;             // Referensi ke RentalVehicle
-  categoryId: string;
-  rates: Partial<RentalRate>;    // Nilai tarif yang ditimpa
-  reason?: string;               // Alasan tarif khusus
+export interface RentalVehicleProfile {
+  id: string;                    // UUID
+  vehicleId: string;             // SSoT ke core_vehicles.id
+  categoryId?: string | null;    // FK ke rental_pricing_categories.id
+  status: RentalVehicleStatus;
+  currentOdometer: number;
+  rateOverrideDaily?: number | null;
+  rateOverrideWeekly?: number | null;
+  rateOverrideMonthly?: number | null;
 }
 ```
-
----
-
-## 6. Service & Repository Layer
-
-- **`pricingService.ts`:**
-  - `getCategories()`: Mengambil seluruh kategori tarif aktif.
-  - `createCategory(data)` / `updateCategory(id, data)` / `deleteCategory(id)`: Operasi CRUD kategori.
-  - `assignVehiclesToCategory(categoryId, vehicleIds[])`: Menugaskan batch armada ke kategori tarif.
-  - `setVehicleRateOverride(vehicleId, overrideData)`: Menetapkan tarif khusus kendaraan.
-  - `resolveVehicleRate(vehicleId, rateType)`: Menghasilkan snapshot tarif kalkulasi booking.
 
 ---
 

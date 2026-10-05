@@ -47,6 +47,7 @@ export function PricingCategoryCreateFeature() {
         onSubmit={handleSave}
         title={labels.formAddTitle}
         layout="drawer"
+        labels={labels as any}
       />
     </div>
   );

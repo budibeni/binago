@@ -55,9 +55,11 @@ export function PricingCategoryFeature() {
     const rawGroups = pricingService.getPricingCategory();
     let enriched = rawGroups.map(g => {
       const assignments = pricingService.getAssignedVehicles(g.id);
+      const rates = pricingService.getRatesByGroupId(g.id);
       return {
         ...g,
-        vehicleCount: assignments.length
+        vehicleCount: assignments.length,
+        rates
       };
     });
 
@@ -251,6 +253,7 @@ export function PricingCategoryFeature() {
         title={editingCategory ? labels.formEditTitle : labels.formAddTitle}
         onSubmit={handleSubmitForm}
         layout="drawer"
+        labels={labels as any}
       />
 
       <ConfirmDialog
@@ -289,6 +292,7 @@ export function PricingCategoryFeature() {
         }}
         onAssignVehicle={handleOpenAssignment}
         onRemoveVehicle={handleRemoveVehicle}
+        labels={labels as any}
       />
 
       <PricingCategoryAssignmentForm

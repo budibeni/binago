@@ -1,12 +1,14 @@
 import React from 'react';
 import { DataTable } from '@adatrack/ui';
 import type { DataTableColumnDef, DataTableFilterConfig, DataTableLabels } from '@adatrack/ui';
-import { MoreVertical, Edit2, Info, Users, Tag, Eye } from 'lucide-react';
+import { MoreVertical, Edit2, Info, Users, Tag, Eye, Car } from 'lucide-react';
 import { Button, Badge } from '@adatrack/ui';
-import type { RentalPricingCategory } from '../types/pricing';
+import type { RentalPricingCategory, RentalRate } from '../types/pricing';
+import { formatCurrency } from '@adatrack/utils';
 
 export interface EnrichedPricingCategory extends RentalPricingCategory {
   vehicleCount: number;
+  rates: RentalRate[];
 }
 
 export interface PricingCategoryTableProps {
@@ -23,12 +25,12 @@ export interface PricingCategoryTableProps {
   className?: string;
 }
 
-export function PricingCategoryTable({ 
-  data, 
-  labels, 
-  toolbarActions, 
-  onEdit, 
-  onDetail, 
+export function PricingCategoryTable({
+  data,
+  labels,
+  toolbarActions,
+  onEdit,
+  onDetail,
   filterConfig,
   isFilterOpen,
   onFilterOpenChange,
@@ -48,7 +50,7 @@ export function PricingCategoryTable({
       cell: ({ row }) => (
         <button
           onClick={() => onDetail(row.original)}
-          className="text-left font-medium text-foreground hover:text-danger hover:underline focus:outline-none transition-colors"
+          className="text-left font-bold text-foreground hover:text-primary hover:underline focus:outline-none transition-colors text-[13px]"
         >
           {row.original.name}
         </button>
@@ -59,7 +61,44 @@ export function PricingCategoryTable({
       header: labels.headerDesc || 'Deskripsi',
       enableSorting: true,
       size: 300,
-      cell: ({ row }) => <span>{row.original.description || '-'}</span>,
+      cell: ({ row }) => row.original.description || '-',
+    },
+    {
+      id: 'dailyRate',
+      header: labels.headerDaily || 'Harian',
+      enableSorting: false,
+      size: 130,
+      accessorFn: (row) => {
+        const rate = (row.rates || []).find(r => r.rateType === 'DAILY');
+        return rate ? formatCurrency(rate.amount) : '-';
+      },
+    },
+    {
+      id: 'weeklyRate',
+      header: labels.headerWeekly || 'Mingguan',
+      enableSorting: false,
+      size: 130,
+      accessorFn: (row) => {
+        const rate = (row.rates || []).find(r => r.rateType === 'WEEKLY');
+        return rate ? formatCurrency(rate.amount) : '-';
+      },
+    },
+    {
+      id: 'monthlyRate',
+      header: labels.headerMonthly || 'Bulanan',
+      enableSorting: false,
+      size: 130,
+      accessorFn: (row) => {
+        const rate = (row.rates || []).find(r => r.rateType === 'MONTHLY');
+        return rate ? formatCurrency(rate.amount) : '-';
+      },
+    },
+    {
+      accessorKey: 'defaultDeposit',
+      header: labels.headerDeposit || 'Deposit',
+      enableSorting: true,
+      size: 130,
+      cell: ({ row }) => formatCurrency(row.original.defaultDeposit),
     },
     {
       accessorKey: 'vehicleCount',
@@ -68,7 +107,7 @@ export function PricingCategoryTable({
       size: 150,
       cell: ({ row }) => (
         <div className="flex items-center space-x-1.5">
-          <Users className="h-3.5 w-3.5" />
+          <Car className="h-3.5 w-3.5" />
           <span>{row.original.vehicleCount} {labels.unit || 'unit'}</span>
         </div>
       ),
