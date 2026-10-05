@@ -13,6 +13,7 @@ export interface Geofence {
   description?: string;
   geometry: MapGeometry;
   status: 'active' | 'inactive';
+  vehicleIds?: string[];
   createdAt: string;
   updatedAt: string;
 }

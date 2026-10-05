@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { Hexagon, Square, Waypoints, MapPin, ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
 import { cn } from '@adatrack/utils';
-import { Button, InputString, InputSelect, InputTextarea } from '@adatrack/ui';
+import { Button, InputString, InputSelect, InputTextarea, InputMultiSelect } from '@adatrack/ui';
+import { api } from '@adatrack/utils';
 import { geofenceService } from '@/data/services';
 import { GeofenceMap } from './GeofenceMap';
 import type { Geofence } from '../types';
@@ -31,12 +32,22 @@ export function GeofenceEditorView({
     groupId: geofence?.groupId || '',
     description: geofence?.description || '',
     status: geofence?.status || 'active',
+    vehicleIds: geofence?.vehicleIds || [],
   });
 
   const [drawMode, setDrawMode] = useState<'polygon' | 'rectangle' | 'multiline'>('polygon');
   const [editorMode, setEditorMode] = useState<'idle' | 'draw_polygon' | 'draw_rectangle' | 'draw_multiline' | 'edit'>('idle');
   const [currentGeometry, setCurrentGeometry] = useState<MapGeometry | null>(geofence?.geometry || null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [vehicles, setVehicles] = useState<{value: string, label: string}[]>([]);
+  useEffect(() => {
+    api.get('/vehicles').then((res: any) => {
+      const vData = Array.isArray(res) ? res : (res.data || []);
+      setVehicles(vData.map((v: any) => ({ value: String(v.id), label: v.plate_number })));
+    }).catch(console.error);
+  }, []);
+
 
   useEffect(() => {
     if (editorMode !== 'idle' || !currentGeometry) {
@@ -114,6 +125,14 @@ export function GeofenceEditorView({
                   { value: 'none', label: `-- ${t.unassigned} --` },
                   ...([] as any[]).map(group => ({ value: group.id, label: group.name }))
                 ]}
+              />
+
+              <InputMultiSelect
+                label="Kendaraan Tertaut"
+                value={formData.vehicleIds}
+                onChange={(val: any) => setFormData({ ...formData, vehicleIds: val })}
+                options={vehicles}
+                placeholder="Pilih kendaraan..."
               />
 
               <div className="space-y-1.5">
