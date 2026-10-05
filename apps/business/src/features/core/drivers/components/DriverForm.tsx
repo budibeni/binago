@@ -7,6 +7,7 @@ import { groupService } from '@/data/services';
 import { getDriverFormSchema, type Driver } from '../types/driver';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
 import { getDriversTranslation } from '../i18n';
+import { api } from '@adatrack/utils';
 
 interface DriverFormProps {
   driver: Driver | null;
@@ -28,6 +29,7 @@ const DEFAULT_DRIVER = {
   address: '',
   placement: '',
   groupId: '',
+  assignedVehicleId: '',
   licenseNumber: '',
   licenseExpiry: '',
   joinDate: new Date().toISOString().split('T')[0],
@@ -47,11 +49,19 @@ export function DriverForm({
   const tF = isEdit ? tD.editPage : tD.addPage;
 
   const [groups, setGroups] = React.useState<{ value: string; label: string }[]>([]);
+  const [vehicles, setVehicles] = React.useState<{ value: string; label: string }[]>([]);
 
   React.useEffect(() => {
     if (open) {
       groupService.getDriverGroups()
         .then(res => setGroups(res.map(group => ({ value: group.id, label: group.name }))))
+        .catch(console.error);
+
+      api.get('/vehicles')
+        .then((res: any) => {
+          const vData = Array.isArray(res) ? res : (res.data || []);
+          setVehicles(vData.map((v: any) => ({ value: String(v.id), label: v.plate_number })));
+        })
         .catch(console.error);
     }
   }, [open]);
@@ -199,6 +209,17 @@ export function DriverForm({
               error={errors.groupId}
               options={groups}
               required
+            />
+          </div>
+
+          <div className="col-span-1 group-data-[layout=default]/form:md:col-span-2 group-data-[layout=fullscreen]/form:md:col-span-2">
+            <InputSelect
+              label="Kendaraan Aktif"
+              placeholder="Pilih kendaraan..."
+              value={formData.assignedVehicleId || ''}
+              onChange={(v) => handleChange('assignedVehicleId', v)}
+              error={errors.assignedVehicleId}
+              options={vehicles}
             />
           </div>
 

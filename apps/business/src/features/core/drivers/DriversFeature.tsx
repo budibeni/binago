@@ -262,12 +262,20 @@ export function DriversFeature() {
                 license_expiry: data.licenseExpiry,
               };
               
+              let savedDriverId = data.id;
               if (data.id) {
                 await api.put(`/drivers/${data.id}`, payload);
                 toast.success('Driver updated successfully');
               } else {
-                await api.post('/drivers', payload);
+                const res: any = await api.post('/drivers', payload);
+                savedDriverId = res.data?.id || res.id;
                 toast.success('Driver created successfully');
+              }
+
+              if (savedDriverId) {
+                // Update vehicle assignment
+                const vehicleId = data.assignedVehicleId ? parseInt(data.assignedVehicleId, 10) : null;
+                await api.post(`/drivers/${savedDriverId}/assignments`, { vehicle_id: vehicleId });
               }
 
               refetch();
