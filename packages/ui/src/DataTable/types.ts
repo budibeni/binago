@@ -35,6 +35,8 @@ export interface DataTableColumnMeta {
   fixedWidth?: boolean;
   /** Add custom CSS classes to th and td */
   className?: string;
+  /** Alignment of column content (header and cells) */
+  align?: 'left' | 'center' | 'right';
 }
 
 export type DataTableInstance<TData extends RowData = RowData> =
@@ -131,6 +133,11 @@ export interface DataTableProps<TData extends RowData = RowData> {
   searchValue?: string;
   onSearchChange?: (value: string) => void;
   searchPlaceholder?: string;
+
+  // Selection State
+  selectedIds?: string[];
+  onSelectionChange?: (ids: string[]) => void;
+  getRowId?: (row: TData) => string;
 
   // Pagination State
   pageIndex?: number;

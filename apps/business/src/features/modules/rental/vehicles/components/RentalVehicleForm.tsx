@@ -1,16 +1,16 @@
 'use client';
 
 import React from 'react';
-import { Button, Input, Label, FormShell, FormCard, InputSelect, InputDecimal, InputString } from '@adatrack/ui';
+import { Button, Input, Label, FormShell, FormCard, InputSelect, InputDecimal, InputString, Checkbox } from '@adatrack/ui';
 import { CarFront, FileText, Settings, ShieldCheck } from 'lucide-react';
 import { cn, formatCurrency } from '@adatrack/utils';
 import type { RentalPricingCategory, RentalRate } from '../../pricing-category/types/pricing';
-import { getRentalVehicleFormSchema, type RentalVehicleFormValues, type RentalVehicle, type RentalStatus } from '../types/rentalVehicle';
+import { getRentalVehicleFormSchema, type RentalVehicleFormValues, type RentalVehicle, type RentalStatus, type RentalCondition } from '../types/rentalVehicle';
 import type { Vehicle } from '@/features/core/vehicles/types/vehicle';
 
 interface RentalVehicleFormProps {
   title: string;
-  labels: Record<string, string>;
+  labels: Record<string, any>;
   initialData?: RentalVehicle;
   availableCoreVehicles?: Vehicle[];
   availablePricingCategory?: RentalPricingCategory[];
@@ -47,6 +47,7 @@ export function RentalVehicleForm({
   const [rateOverrideDaily, setRateOverrideDaily] = React.useState(initialData?.rateOverrideDaily || null);
   const [rateOverrideWeekly, setRateOverrideWeekly] = React.useState(initialData?.rateOverrideWeekly || null);
   const [rateOverrideMonthly, setRateOverrideMonthly] = React.useState(initialData?.rateOverrideMonthly || null);
+  const [condition, setCondition] = React.useState<RentalCondition>(initialData?.condition || 'GOOD');
   const [conditionNotes, setConditionNotes] = React.useState(initialData?.conditionNotes || '');
   const [checklist, setChecklist] = React.useState(initialData?.completenessChecklist || {
     stnkOriginal: false,
@@ -76,6 +77,7 @@ export function RentalVehicleForm({
       rateOverrideDaily,
       rateOverrideWeekly,
       rateOverrideMonthly,
+      condition,
       conditionNotes,
       completenessChecklist: checklist
     };
@@ -219,13 +221,18 @@ export function RentalVehicleForm({
                       value={status}
                       onChange={(v) => setStatus(v as RentalStatus)}
                       disabled={isSystemManaged}
-                      options={[
-                        { value: 'READY', label: labels.statusReady },
-                        { value: 'RESERVED', label: labels.statusReserved },
-                        { value: 'RENTED', label: labels.statusRented },
-                        { value: 'MAINTENANCE', label: labels.statusMaintenance },
-                        { value: 'UNAVAILABLE', label: labels.statusUnavailable }
-                      ]}
+                      options={
+                        isSystemManaged
+                          ? [
+                              { value: 'RESERVED', label: labels.statusReserved || 'Dipesan' },
+                              { value: 'RENTED', label: labels.statusRented || 'Disewa' }
+                            ].filter(o => o.value === status) // Only show the active one when disabled
+                          : [
+                              { value: 'READY', label: labels.statusReady || 'Tersedia' },
+                              { value: 'MAINTENANCE', label: labels.statusMaintenance || 'Perawatan' },
+                              { value: 'UNAVAILABLE', label: labels.statusUnavailable || 'Nonaktif' }
+                            ]
+                      }
                     />
                     {isSystemManaged ? (
                       <p className="text-[11px] text-warning flex items-center gap-1 mt-0.5">
@@ -366,9 +373,20 @@ export function RentalVehicleForm({
               description={labels.sectionNotesDesc}
               icon={<FileText className="w-5 h-5 text-danger" />}
             >
+              <InputSelect
+                id="condition"
+                label={labels.colCondition || 'Kondisi'}
+                value={condition}
+                onChange={(v) => setCondition(v as RentalCondition)}
+                options={[
+                  { value: 'GOOD', label: 'Baik' },
+                  { value: 'MINOR_DAMAGE', label: 'Rusak Ringan' },
+                  { value: 'NEEDS_REPAIR', label: 'Butuh Perbaikan' },
+                ]}
+              />
               <InputString
                 id="conditionNotes"
-                label=""
+                label="Catatan Kondisi"
                 value={conditionNotes || ''}
                 onChange={setConditionNotes}
                 placeholder={labels.notesPlaceholder}
@@ -376,6 +394,7 @@ export function RentalVehicleForm({
                 helpText={`${(conditionNotes || '').length} / 500`}
               />
             </FormCard>
+
           </div>
         </div>
       </div>

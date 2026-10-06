@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle2, AlertCircle, Plus, FileText, MoreVertical, Eye, Edit2, MapPin, LogOut, EyeOff } from 'lucide-react';
+import { CheckCircle2, AlertCircle, Plus, FileText, MoreVertical, Eye, Edit2, MapPin, LogOut, EyeOff, Tag, SlidersHorizontal, Activity, Wrench } from 'lucide-react';
 import { Button, Checkbox, DataTable } from '@adatrack/ui';
 import type { DataTableColumnDef, DataTableFilterConfig } from '@adatrack/ui';
 import type { RentalVehicle } from '../types/rentalVehicle';
@@ -9,7 +9,7 @@ import { cn, formatCurrency } from '@adatrack/utils';
 interface RentalVehicleTableProps {
   data: RentalVehicle[];
   pricingCategorys?: RentalPricingCategory[];
-  labels: Record<string, string>;
+  labels: Record<string, any>;
   onView: (v: RentalVehicle) => void;
   onEdit: (v: RentalVehicle) => void;
   onComplete: (v: RentalVehicle) => void;
@@ -39,49 +39,8 @@ function buildColumns(
   dataList: RentalVehicle[],
   pricingCategorys: RentalPricingCategory[]
 ): DataTableColumnDef<RentalVehicle>[] {
-  
-  const handleSelectAll = (checked: boolean) => {
-    if (checked) {
-      onSelectionChange(dataList.map(v => v.vehicleId));
-    } else {
-      onSelectionChange([]);
-    }
-  };
-
-  const handleSelectRow = (checked: boolean, id: string) => {
-    if (checked) {
-      onSelectionChange([...selectedIds, id]);
-    } else {
-      onSelectionChange(selectedIds.filter(vId => vId !== id));
-    }
-  };
 
   return [
-    {
-      id: 'select',
-      header: () => (
-        <Checkbox
-          checked={dataList.length > 0 && selectedIds.length === dataList.length}
-          onCheckedChange={handleSelectAll}
-          aria-label="Select all"
-          className="ml-2"
-        />
-      ),
-      cell: ({ row }) => {
-        const vId = row.original.vehicleId;
-        return (
-          <Checkbox
-            checked={selectedIds.includes(vId)}
-            onCheckedChange={(checked) => handleSelectRow(!!checked, vId)}
-            aria-label={`Select ${row.original.coreVehicle.plateNumber}`}
-            className="ml-2 data-[state=checked]:bg-danger data-[state=checked]:border-danger"
-          />
-        );
-      },
-      enableSorting: false,
-      size: 40,
-    },
-
     {
       id: 'plateNumber',
       accessorFn: (v) => v.coreVehicle.plateNumber,
@@ -89,9 +48,12 @@ function buildColumns(
       enableSorting: true,
       size: 130,
       cell: ({ row }) => (
-        <span className="uppercase tracking-wider">
+        <button
+          onClick={() => onView(row.original)}
+          className="whitespace-nowrap uppercase tracking-wider text-inherit font-inherit hover:text-primary transition-colors hover:underline text-left"
+        >
           {row.original.coreVehicle.plateNumber}
-        </span>
+        </button>
       ),
     },
     {
@@ -123,34 +85,22 @@ function buildColumns(
         else if (s === 'MAINTENANCE') label = labels.statusMaintenance;
         else if (s === 'UNAVAILABLE') label = labels.statusUnavailable;
 
-        const textClass = 
-          s === 'READY' ? 'text-success' :
-          s === 'RESERVED' ? 'text-warning' :
-          s === 'RENTED' ? 'text-primary' :
-          s === 'MAINTENANCE' ? 'text-purple-500' :
-          'text-neutral-500 dark:text-neutral-400';
+        const dotClass =
+          s === 'READY' ? 'bg-success' :
+            s === 'RESERVED' ? 'bg-warning' :
+              s === 'RENTED' ? 'bg-blue-500' :
+                s === 'MAINTENANCE' ? 'bg-purple-500' :
+                  'bg-neutral-400 dark:bg-neutral-600';
 
         return (
-          <div className="whitespace-nowrap">
-            <span className={textClass}>{label}</span>
+          <div className="flex items-center gap-1.5 text-inherit whitespace-nowrap">
+            <span className={cn('h-1.5 w-1.5 shrink-0 rounded-full', dotClass)} />
+            <span className="truncate text-[13px]">{label}</span>
           </div>
         );
       },
     },
-    {
-      id: 'customer',
-      accessorFn: (v) => '-',
-      header: labels.colCustomer,
-      enableSorting: true,
-      size: 180,
-    },
-    {
-      id: 'period',
-      accessorFn: (v) => '-',
-      header: labels.colPeriod,
-      enableSorting: true,
-      size: 180,
-    },
+
     {
       id: 'pricingCategory',
       accessorKey: 'categoryId',
@@ -160,55 +110,140 @@ function buildColumns(
       cell: ({ row }) => {
         const hasCategory = !!row.original.categoryId;
         const group = hasCategory ? pricingCategorys.find(g => g.id === row.original.categoryId) : null;
-        return hasCategory ? (
-          <span className="w-fit text-[11px] font-semibold px-2 py-1 rounded bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 border border-border">
-            {group?.name || 'Unknown'}
-          </span>
-        ) : (
-          <span className="w-fit text-[11px] font-semibold px-2 py-1 rounded bg-primary/10 text-primary border border-primary/20">Mandiri</span>
+        return (
+          <div className="flex items-center w-fit gap-1.5 text-inherit">
+            {hasCategory ? (
+              <Tag className="w-3.5 h-3.5 opacity-60 shrink-0" />
+            ) : (
+              <SlidersHorizontal className="w-3.5 h-3.5 opacity-60 shrink-0" />
+            )}
+            <span className="truncate">
+              {hasCategory ? group?.name || 'Unknown' : 'Mandiri'}
+            </span>
+          </div>
         );
       },
     },
     {
-      id: 'rate',
+      id: 'dailyRate',
       accessorKey: 'dailyRate',
-      header: labels.colRate,
+      header: labels.colDailyRate || 'Tarif Harian',
       enableSorting: true,
-      size: 140,
-      cell: ({ row }) => {
-        const v = row.original;
-        return <span>{formatCurrency(v.dailyRate)} / hari</span>;
-      },
+      size: 110,
+      cell: ({ row }) => (
+        <span>{row.original.dailyRate ? formatCurrency(row.original.dailyRate) : '-'}</span>
+      ),
+      meta: { align: 'right' }
+    },
+    {
+      id: 'weeklyRate',
+      accessorKey: 'weeklyRate',
+      header: labels.colWeeklyRate || 'Tarif Mingguan',
+      enableSorting: true,
+      size: 110,
+      cell: ({ row }) => (
+        <span className="text-muted-foreground">{row.original.weeklyRate ? formatCurrency(row.original.weeklyRate) : '-'}</span>
+      ),
+      meta: { align: 'right' }
+    },
+    {
+      id: 'monthlyRate',
+      accessorKey: 'monthlyRate',
+      header: labels.colMonthlyRate || 'Tarif Bulanan',
+      enableSorting: true,
+      size: 110,
+      cell: ({ row }) => (
+        <span className="text-muted-foreground">{row.original.monthlyRate ? formatCurrency(row.original.monthlyRate) : '-'}</span>
+      ),
+      meta: { align: 'right' }
     },
     {
       id: 'condition',
-      accessorFn: (v) => v.conditionNotes ? 'Ada Catatan' : 'Baik',
+      accessorKey: 'condition',
       header: labels.colCondition,
       enableSorting: true,
       size: 140,
+      cell: ({ row }) => {
+        const c = row.original.condition;
+        
+        let label = labels.conditionGood;
+        let iconColor = 'text-muted-foreground'; // Abu-abu
+        const Icon = Wrench;
+        const isGood = !c || c === 'GOOD';
+        
+        if (c === 'MINOR_DAMAGE') {
+          label = labels.conditionMinor;
+          iconColor = 'text-warning'; // Kuning
+        } else if (c === 'NEEDS_REPAIR') {
+          label = labels.conditionRepair;
+          iconColor = 'text-danger'; // Merah
+        }
+
+        return (
+          <div className="flex items-center gap-1.5 text-inherit">
+            {isGood ? (
+              <div className="w-3.5 h-3.5 shrink-0" /> // Placeholder to keep text aligned
+            ) : (
+              <Icon className={cn("w-3.5 h-3.5 shrink-0", iconColor)} />
+            )}
+            <span className="text-[11.5px] truncate">{label}</span>
+          </div>
+        );
+      },
     },
     {
       id: 'completeness',
       accessorKey: 'completeness',
       header: labels.colCompleteness,
-      enableSorting: true,
-      size: 160,
+      enableSorting: false,
+      size: 240,
       cell: ({ row }) => {
-        const isComplete = row.original.isComplete;
+        const isProfileComplete = row.original.isComplete;
+        const checklist = row.original.completenessChecklist || {};
+        
+        const items = [
+          { label: labels.equipStnk || 'STNK', val: checklist.stnkOriginal },
+          { label: labels.equipSpareKey || 'Kunci Serep', val: checklist.spareKey },
+          { label: labels.equipJackAndTools || 'Dongkrak', val: checklist.jackAndTools },
+          { label: labels.equipSpareTire || 'Ban Serep', val: checklist.spareTire },
+          { label: labels.equipFirstAid || 'P3K', val: checklist.firstAidKit },
+        ];
+        
+        const presentItems = items.filter(i => i.val).map(i => i.label);
+        const isChecklistComplete = presentItems.length === 5;
+
         return (
-          <div className="flex items-center gap-2">
-            <span className={cn('h-1.5 w-1.5 shrink-0 rounded-full', isComplete ? 'bg-success' : 'bg-warning')} />
-            <span>
-              {isComplete ? (labels.dataCompleteShort || 'Lengkap') : (labels.dataNotCompleteShort || 'Belum Lengkap')}
-            </span>
-            {!isComplete && (
-              <button 
-                 onClick={() => onComplete(row.original)}
-                 className="text-[11px] font-semibold text-warning hover:underline"
-              >
-                (Lengkapi)
-              </button>
+          <div className="flex flex-col gap-0.5 py-1 text-inherit">
+            <div className="flex items-center gap-1.5">
+              <span className="text-[11px] font-medium">
+                {isChecklistComplete ? labels.dataCompleteShort : `${presentItems.length}/5 ${labels.statusReady}`}
+              </span>
+            </div>
+            
+            {presentItems.length > 0 ? (
+              <span className="text-[10px] text-muted-foreground leading-snug truncate w-full" title={`${labels.statusReady}: ${presentItems.join(', ')}`}>
+                {presentItems.join(', ')}
+              </span>
+            ) : (
+              <span className="text-[10px] text-muted-foreground/50 italic leading-snug truncate w-full">
+                {labels.emptyDescription ? '-' : '-'}
+              </span>
             )}
+          </div>
+        );
+      },
+    },
+    {
+      id: 'notes',
+      accessorKey: 'conditionNotes',
+      header: labels.colNotes || 'Catatan',
+      enableSorting: false,
+      size: 200,
+      cell: ({ row }) => {
+        const notes = row.original.conditionNotes;
+        return (
+          <div className="text-[11px] text-muted-foreground whitespace-normal line-clamp-2" title={notes || ''}>
+            {notes ? notes : <span className="italic opacity-50">-</span>}
           </div>
         );
       },
@@ -245,6 +280,10 @@ export function RentalVehicleTable({
       data={data}
       columns={columns}
       onRowActionClick={onView}
+      selectable={true}
+      selectedIds={selectedIds}
+      onSelectionChange={onSelectionChange}
+      getRowId={(row) => row.vehicleId}
       // Capabilities
       searchable
       sortable

@@ -17,7 +17,7 @@
     "@adatrack/ui": "workspace:*",
     "@adatrack/utils": "workspace:*",
     "@tanstack/react-table": "^9.1.2",
-    "lucide-react": "^1.31.0",
+    "lucide-react": "^1.52.0",
     "next": "^14.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

@@ -6,6 +6,7 @@ import { cn } from '@adatrack/utils';
 import type { DataTableProps, DataTableColumnDef } from './types';
 import { Eye } from 'lucide-react';
 import { Button } from '../Button';
+import { Checkbox } from '../Checkbox';
 import { useDataTable } from './useDataTable';
 import { DataTableHeader } from './DataTableHeader';
 import { DataTableBody } from './DataTableBody';
@@ -56,9 +57,15 @@ export function DataTable<TData extends RowData = RowData>(
 
     // i18n
     labels,
-    
+
     // Action
     onRowActionClick,
+
+    // Selection
+    selectable = false,
+    selectedIds = [],
+    onSelectionChange,
+    getRowId,
   } = props;
 
   // Internal panel state (uncontrolled)
@@ -85,26 +92,89 @@ export function DataTable<TData extends RowData = RowData>(
   };
 
   const enhancedColumns = React.useMemo(() => {
-    if (!onRowActionClick) return props.columns;
-    const actionCol: DataTableColumnDef<TData> = {
-      id: 'actions',
-      header: '',
-      enableSorting: false,
-      size: 50,
-      meta: { fixedWidth: true, pin: 'left' },
-      cell: ({ row }) => (
-        <Button
-          variant="ghost-danger"
-          size="icon"
-          onClick={() => onRowActionClick(row.original)}
-          title={labels?.actionDetail || 'Lihat Detail'}
-        >
-          <Eye className="h-4 w-4" strokeWidth={1.5} />
-        </Button>
-      ),
-    };
-    return [actionCol, ...props.columns];
-  }, [props.columns, onRowActionClick, labels?.actionDetail]);
+    let newCols = [...props.columns];
+
+    if (onRowActionClick) {
+      const actionCol: DataTableColumnDef<TData> = {
+        id: 'actions',
+        header: '',
+        enableSorting: false,
+        size: 50,
+        meta: { fixedWidth: true, pin: 'left', className: 'w-[40px] px-1 max-w-[40px]', align: 'center' },
+        cell: ({ row }) => (
+          <div className="flex items-center justify-center w-full">
+            <Button
+              variant="ghost-danger"
+              size="icon"
+              onClick={() => onRowActionClick(row.original)}
+              title={labels?.actionDetail || 'Lihat Detail'}
+            >
+              <Eye className="h-4 w-4" strokeWidth={1.5} />
+            </Button>
+          </div>
+        ),
+      };
+      newCols.unshift(actionCol);
+    }
+
+    if (selectable) {
+      const getRowIdValue = (row: TData): string => {
+        if (getRowId) return getRowId(row);
+        return (row as any).id || (row as any).vehicleId || '';
+      };
+
+      const checkboxCol: DataTableColumnDef<TData> = {
+        id: 'select',
+        header: ({ table }) => {
+          const rows = table.getRowModel().rows;
+          const visibleIds = rows.map(r => getRowIdValue(r.original)).filter(Boolean);
+          const isAllSelected = visibleIds.length > 0 && visibleIds.every(id => selectedIds.includes(id));
+          return (
+            <div className="flex items-center justify-center w-full">
+              <Checkbox
+                checked={isAllSelected}
+                onCheckedChange={(checked) => {
+                  if (!onSelectionChange) return;
+                  if (checked) {
+                    onSelectionChange(Array.from(new Set([...selectedIds, ...visibleIds])));
+                  } else {
+                    onSelectionChange(selectedIds.filter(id => !visibleIds.includes(id)));
+                  }
+                }}
+                aria-label="Select all"
+              />
+            </div>
+          );
+        },
+        cell: ({ row }) => {
+          const id = getRowIdValue(row.original);
+          return (
+            <div className="flex items-center justify-center w-full">
+              <Checkbox
+                checked={selectedIds.includes(id)}
+                onCheckedChange={(checked) => {
+                  if (!onSelectionChange) return;
+                  if (checked) {
+                    onSelectionChange([...selectedIds, id]);
+                  } else {
+                    onSelectionChange(selectedIds.filter(vId => vId !== id));
+                  }
+                }}
+                aria-label={`Select ${id}`}
+                className="data-[state=checked]:bg-danger data-[state=checked]:border-danger"
+              />
+            </div>
+          );
+        },
+        enableSorting: false,
+        size: 40,
+        meta: { fixedWidth: true, pin: 'left', className: 'w-10 max-w-[40px] px-1', align: 'center' },
+      };
+      newCols.unshift(checkboxCol);
+    }
+
+    return newCols;
+  }, [props.columns, onRowActionClick, labels?.actionDetail, selectable, selectedIds, onSelectionChange, getRowId]);
 
   const table = useDataTable({
     ...props,

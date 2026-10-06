@@ -59,6 +59,8 @@ export function DataTableHeader<TData extends RowData = RowData>({
                 (isPinned === 'end' || (isPinned as string) === 'right') &&
                   'shadow-[-2px_0_4px_-1px_rgba(0,0,0,0.08)]',
                 (header.column.columnDef.meta as any)?.className,
+                (header.column.columnDef.meta as any)?.align === 'center' && 'text-center',
+                (header.column.columnDef.meta as any)?.align === 'right' && 'text-right',
                 )}
                 onClick={header.column.getToggleSortingHandler()}
                 style={{
@@ -71,8 +73,14 @@ export function DataTableHeader<TData extends RowData = RowData>({
                 }}
               >
                 {header.isPlaceholder ? null : (
-                  <div className="flex items-center gap-1.5">
-                    <span>
+                  <div className={cn(
+                    "flex items-center gap-1.5",
+                    (header.column.columnDef.meta as any)?.align === 'center' && 'justify-center w-full',
+                    (header.column.columnDef.meta as any)?.align === 'right' && 'justify-end w-full'
+                  )}>
+                    <span className={cn(
+                      (header.column.columnDef.meta as any)?.align === 'center' && 'flex justify-center w-full'
+                    )}>
                       {flexRender(header.column.columnDef.header, header.getContext())}
                     </span>
                     {canSort && (

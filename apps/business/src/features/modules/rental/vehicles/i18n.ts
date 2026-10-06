@@ -14,12 +14,22 @@ export const rentalVehiclesDictionaries = {
     
     // Filter & Status
     filterStatus: 'Status',
+    filterTitle: 'Filter',
+    filterClear: 'Hapus Filter',
     filterAll: 'Semua',
-    statusReady: 'Ready / Tersedia',
-    statusReserved: 'Reserved / Dipesan',
+    summaryTitle: 'Ringkasan',
+    totalVehicle: 'Total Kendaraan',
+    selectedVehicle: 'kendaraan terpilih',
+    openLocation: 'Buka Lokasi',
+    dtColumns: 'Kolom',
+    dtExport: 'Ekspor',
+    dtPerPage: '/halaman',
+    dtShowing: (from: number, to: number, total: number) => `Menampilkan ${from}-${to} dari ${total}`,
+    statusReady: 'Tersedia',
+    statusReserved: 'Dipesan',
     statusRented: 'Disewa',
-    statusMaintenance: 'Maintenance',
-    statusUnavailable: 'Tidak Tersedia',
+    statusMaintenance: 'Perawatan',
+    statusUnavailable: 'Nonaktif',
     
     // Data Completeness
     dataComplete: 'Data Rental Lengkap',
@@ -43,12 +53,16 @@ export const rentalVehiclesDictionaries = {
     // Table Columns
     colVehicle: 'Kendaraan',
     colYear: 'Tahun',
-    colStatus: 'Status Rental',
+    colStatus: 'Status',
     colCustomer: 'Pelanggan',
     colPeriod: 'Periode Rental',
     colRate: 'Tarif',
+    colDailyRate: 'Tarif Harian',
+    colWeeklyRate: 'Tarif Mingguan',
+    colMonthlyRate: 'Tarif Bulanan',
     colCondition: 'Kondisi',
     colCompleteness: 'Kelengkapan Data',
+    colNotes: 'Catatan',
     colActions: 'Aksi',
     
     // Form fields
@@ -154,12 +168,22 @@ export const rentalVehiclesDictionaries = {
     
     // Filter & Status
     filterStatus: 'Status',
+    filterTitle: 'Filter',
+    filterClear: 'Clear Filter',
     filterAll: 'All',
-    statusReady: 'Ready / Available',
-    statusReserved: 'Reserved',
+    summaryTitle: 'Summary',
+    totalVehicle: 'Total Vehicles',
+    selectedVehicle: 'vehicles selected',
+    openLocation: 'View Location',
+    dtColumns: 'Columns',
+    dtExport: 'Export',
+    dtPerPage: '/page',
+    dtShowing: (from: number, to: number, total: number) => `Showing ${from}-${to} of ${total}`,
+    statusReady: 'Available',
+    statusReserved: 'Booked',
     statusRented: 'Rented',
-    statusMaintenance: 'Maintenance',
-    statusUnavailable: 'Unavailable',
+    statusMaintenance: 'Serviced',
+    statusUnavailable: 'Inactive',
     
     // Data Completeness
     dataComplete: 'Complete Rental Data',
@@ -183,12 +207,16 @@ export const rentalVehiclesDictionaries = {
     // Table Columns
     colVehicle: 'Vehicle',
     colYear: 'Year',
-    colStatus: 'Rental Status',
+    colStatus: 'Status',
     colCustomer: 'Customer',
     colPeriod: 'Rental Period',
     colRate: 'Rate',
+    colDailyRate: 'Daily Rate',
+    colWeeklyRate: 'Weekly Rate',
+    colMonthlyRate: 'Monthly Rate',
     colCondition: 'Condition',
     colCompleteness: 'Data Completeness',
+    colNotes: 'Notes',
     colActions: 'Actions',
     
     // Form fields

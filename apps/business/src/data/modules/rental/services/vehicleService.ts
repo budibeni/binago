@@ -18,6 +18,9 @@ class RentalVehicleService {
 
     let categoryName: string | undefined = undefined;
     let dailyRate = profile.rateOverrideDaily || 0;
+    let weeklyRate = profile.rateOverrideWeekly || undefined;
+    let monthlyRate = profile.rateOverrideMonthly || undefined;
+    
     if (profile.categoryId) {
       const category = pricingService.getPricingCategory({ status: 'ACTIVE' }).find(c => c.id === profile.categoryId);
       if (category) {
@@ -26,6 +29,14 @@ class RentalVehicleService {
         const daily = rates.find(r => r.rateType === 'DAILY');
         if (daily) {
           dailyRate = daily.amount;
+        }
+        const weekly = rates.find(r => r.rateType === 'WEEKLY');
+        if (weekly) {
+          weeklyRate = weekly.amount;
+        }
+        const monthly = rates.find(r => r.rateType === 'MONTHLY');
+        if (monthly) {
+          monthlyRate = monthly.amount;
         }
       }
     }
@@ -36,6 +47,8 @@ class RentalVehicleService {
       isComplete: this.isProfileComplete(profile),
       categoryName,
       dailyRate,
+      weeklyRate,
+      monthlyRate,
     };
   }
 

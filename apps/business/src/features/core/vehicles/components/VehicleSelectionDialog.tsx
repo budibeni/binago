@@ -64,51 +64,6 @@ export function VehicleSelectionDialog({
 
   const columns = React.useMemo<DataTableColumnDef<Vehicle>[]>(() => [
     {
-      id: 'select',
-      size: 40,
-      meta: { pin: 'left' },
-      header: ({ table }) => {
-        const rows = table.getRowModel().rows;
-        const visibleIds = rows.map((r) => r.original.id);
-        const isAllSelected = visibleIds.length > 0 && visibleIds.every((id) => selectedIds.includes(id));
-
-        return (
-          <div className="px-1 flex items-center justify-center">
-            <Checkbox
-              checked={isAllSelected}
-              onCheckedChange={(checked) => {
-                if (checked) {
-                  setSelectedIds((prev) => Array.from(new Set([...prev, ...visibleIds])));
-                } else {
-                  setSelectedIds((prev) => prev.filter((id) => !visibleIds.includes(id)));
-                }
-              }}
-              aria-label="Select all"
-            />
-          </div>
-        );
-      },
-      cell: ({ row }) => {
-        const isSelected = selectedIds.includes(row.original.id);
-        return (
-          <div className="px-1 flex items-center justify-center">
-            <Checkbox
-              checked={isSelected}
-              onCheckedChange={(checked) => {
-                if (checked) {
-                  setSelectedIds((prev) => [...prev, row.original.id]);
-                } else {
-                  setSelectedIds((prev) => prev.filter((id) => id !== row.original.id));
-                }
-              }}
-              aria-label={`Select ${row.original.plateNumber}`}
-              className="data-[state=checked]:bg-danger data-[state=checked]:border-danger"
-            />
-          </div>
-        );
-      }
-    },
-    {
       id: 'plateNumber',
       accessorKey: 'plateNumber',
       header: 'Plat Nomor',
@@ -245,6 +200,10 @@ export function VehicleSelectionDialog({
           <DataTable
             data={vehicles}
             columns={columns}
+            selectable={true}
+            selectedIds={selectedIds}
+            onSelectionChange={setSelectedIds}
+            getRowId={(row) => row.id}
             searchable
             columnVisibility
             hideToolbarLabels

@@ -15,10 +15,9 @@ import type { DataTableFilterConfig } from '@adatrack/ui';
 import { RentalVehicleTable } from './components/RentalVehicleTable';
 import { VehicleSelectionDialog } from '@/features/core/vehicles/components/VehicleSelectionDialog';
 import { RentalVehicleView } from './components/RentalVehicleView';
-import { RentalVehicleDisableDialog } from './components/RentalVehicleDisableDialog';
 import { RentalVehicleForm } from './components/RentalVehicleForm';
 import { useRouter } from 'next/navigation';
-import { Card, Input, Button, Checkbox, PanelShell } from '@adatrack/ui';
+import { Card, Input, Button, Checkbox, PanelShell, ConfirmDialog } from '@adatrack/ui';
 import { CarFront, Plus, Search, MapPin, List, CheckCircle2, Calendar, User, Wrench, Ban, RotateCcw, ChevronRight } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 
@@ -127,6 +126,7 @@ export function RentalVehiclesFeature() {
   };
 
   const handleEditClick = (v: RentalVehicle) => {
+    window.history.pushState(null, '', '/rental/vehicles/edit');
     setEditId(v.id);
   };
 
@@ -189,8 +189,8 @@ export function RentalVehiclesFeature() {
     onStateChange: (state) => setStatusFilter((state.status as RentalStatusFilter) || 'all'),
     onClearAll: () => setStatusFilter('all'),
     labels: {
-      title: 'Filter',
-      clearAll: 'Hapus Filter',
+      title: labels.filterTitle,
+      clearAll: labels.filterClear,
     },
     fields: [
       {
@@ -200,7 +200,7 @@ export function RentalVehiclesFeature() {
         options: [
           { value: 'READY', label: labels.statusReady || 'Siap', colorClass: 'bg-success', activeClass: 'bg-success/15 border-success/40 text-success' },
           { value: 'RESERVED', label: labels.statusReserved || 'Dipesan', colorClass: 'bg-warning', activeClass: 'bg-warning/15 border-warning/40 text-warning' },
-          { value: 'RENTED', label: labels.statusRented || 'Disewa', colorClass: 'bg-primary', activeClass: 'bg-primary/15 border-primary/40 text-primary' },
+          { value: 'RENTED', label: labels.statusRented || 'Disewa', colorClass: 'bg-blue-500', activeClass: 'bg-blue-500/15 border-blue-500/40 text-blue-500' },
           { value: 'MAINTENANCE', label: labels.statusMaintenance || 'Perawatan', colorClass: 'bg-purple-500', activeClass: 'bg-purple-500/15 border-purple-500/40 text-purple-500' },
           { value: 'UNAVAILABLE', label: labels.statusUnavailable || 'Tidak Tersedia', colorClass: 'bg-neutral-400', activeClass: 'bg-neutral-100 dark:bg-neutral-800 border-neutral-400 text-foreground' },
         ],
@@ -215,12 +215,12 @@ export function RentalVehiclesFeature() {
   const renderStatsPanel = () => {
     return (
       <PanelShell
-      title="Ringkasan"
+      title={labels.summaryTitle}
       side={panelSide}
       isOpen={showStats}
       onClose={() => setShowStats(false)}
       onOpen={() => setShowStats(true)}
-      collapsedTitle="RINGKASAN"
+      collapsedTitle={labels.summaryTitle.toUpperCase()}
       onSideChange={setPanelSide}
       labels={{
         top: globalLabels.common.panel.top,
@@ -236,10 +236,10 @@ export function RentalVehiclesFeature() {
       )}
     >
       <div className={cn("gap-2.5 p-3", (panelSide === 'top' || panelSide === 'bottom') ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6" : "flex flex-col h-full")}>
-        <StatCard label="Total Kendaraan" value={stats.all} colorClass="bg-foreground" icon={CarFront} />
+        <StatCard label={labels.totalVehicle} value={stats.all} colorClass="bg-foreground" icon={CarFront} />
         <StatCard label={labels.statusReady || 'Siap'} value={stats.ready} colorClass="bg-success" icon={CheckCircle2} />
         <StatCard label={labels.statusReserved || 'Dipesan'} value={stats.reserved} colorClass="bg-warning" icon={Calendar} />
-        <StatCard label={labels.statusRented || 'Disewa'} value={stats.rented} colorClass="bg-primary" icon={User} />
+        <StatCard label={labels.statusRented || 'Disewa'} value={stats.rented} colorClass="bg-blue-500" icon={User} />
         <StatCard label={labels.statusMaintenance || 'Perawatan'} value={stats.maintenance} colorClass="bg-purple-500" icon={Wrench} />
         <StatCard label={labels.statusUnavailable || 'Tidak Tersedia'} value={stats.unavailable} colorClass="bg-neutral-500 dark:bg-neutral-400" icon={Ban} />
       </div>
@@ -277,11 +277,16 @@ export function RentalVehiclesFeature() {
             onFilterOpenChange={setIsFilterOpen}
             className="border-none shadow-none"
             dtLabels={{
-              noResultTitle: 'Kendaraan tidak ditemukan',
-              noResultDescription: 'Coba sesuaikan kata kunci atau filter pencarian.',
-              emptyTitle: 'Belum ada kendaraan',
-              emptyDescription: 'Tambahkan kendaraan rental baru',
-              searchPlaceholder: 'Cari kendaraan...',
+              noResultTitle: labels.noResultTitle,
+              noResultDescription: labels.noResultDescription,
+              emptyTitle: labels.emptyTitle,
+              emptyDescription: labels.emptyDescription,
+              searchPlaceholder: labels.searchPlaceholder,
+              toolbarColumns: labels.dtColumns,
+              toolbarExport: labels.dtExport,
+              toolbarFilter: labels.filterTitle,
+              paginationShowing: labels.dtShowing,
+              paginationPerPage: labels.dtPerPage,
             }}
           />
         </div>
@@ -295,7 +300,7 @@ export function RentalVehiclesFeature() {
                 onCheckedChange={() => setSelectedIds([])}
                 className="w-4 h-4 data-[state=checked]:bg-muted-foreground data-[state=checked]:border-muted-foreground"
               />
-              <span className="text-[12px] font-medium text-muted-foreground">{selectedIds.length} kendaraan terpilih</span>
+              <span className="text-[12px] font-medium text-muted-foreground">{selectedIds.length} {labels.selectedVehicle}</span>
             </div>
             <Button
               variant="destructive"
@@ -304,7 +309,7 @@ export function RentalVehiclesFeature() {
               className="px-8 md:px-12 h-full rounded-none text-[12px] font-medium gap-1.5 shadow-none hover:bg-danger/90 transition-colors"
             >
               <MapPin className="w-3.5 h-3.5" />
-              Buka Lokasi
+              {labels.openLocation}
             </Button>
           </div>
         )}
@@ -341,12 +346,24 @@ export function RentalVehiclesFeature() {
         onDelete={handleDisableClick}
       />
 
-      <RentalVehicleDisableDialog
+      <ConfirmDialog
         open={disableOpen}
         onOpenChange={setDisableOpen}
-        data={selectedVehicle}
-        labels={labels}
+        title={labels.confirmDisable}
+        description={
+          <div className="flex flex-col">
+            <span>{labels.confirmDisableDesc}</span>
+            {selectedVehicle && (
+              <div className="mt-3 text-center">
+                <strong className="text-danger text-[15px]">{selectedVehicle.coreVehicle.brand} {selectedVehicle.coreVehicle.vehicleName}</strong> <span className="text-danger/80">({selectedVehicle.coreVehicle.plateNumber})</span>
+              </div>
+            )}
+          </div>
+        }
+        confirmLabel={labels.confirm || 'Ya, Nonaktifkan'}
+        cancelLabel={labels.cancel || 'Batal'}
         onConfirm={handleConfirmDisable}
+        variant="danger"
       />
 
       {editId && (
@@ -354,6 +371,7 @@ export function RentalVehiclesFeature() {
           layout="default"
           open={!!editId}
           onOpenChange={(open) => {
+            if (!open) window.history.pushState(null, '', '/rental/vehicles');
             if (!open) setEditId(null);
           }}
           title={labels.actionEdit || 'Edit Kendaraan Rental'}
@@ -361,9 +379,13 @@ export function RentalVehiclesFeature() {
           initialData={vehicles.find(v => v.id === editId)}
           availablePricingCategory={pricingCategorys}
           availableRates={pricingRates}
-          onCancel={() => setEditId(null)}
+          onCancel={() => {
+            window.history.pushState(null, '', '/rental/vehicles');
+            setEditId(null);
+          }}
           onSave={(data) => {
             // TODO: dispatch edit save
+            window.history.pushState(null, '', '/rental/vehicles');
             setEditId(null);
             setDataVersion(prev => prev + 1);
           }}

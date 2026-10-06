@@ -26,6 +26,7 @@ export interface RentalVehicleProfile {
   currentBookingId?: string | null;
   currentContractId?: string | null;
   fuelLevelPercent?: number | null;
+  condition?: RentalCondition;
   conditionNotes?: string | null;
   completenessChecklist: CompletenessChecklist;
   
@@ -38,6 +39,8 @@ export interface RentalVehicle extends RentalVehicleProfile {
   isComplete: boolean;
   categoryName?: string;
   dailyRate: number;
+  weeklyRate?: number;
+  monthlyRate?: number;
 }
 
 export type RentalStatusFilter = 'all' | RentalStatus;
@@ -56,6 +59,7 @@ export const getRentalVehicleFormSchema = (labels: Record<string, string>) => z.
   rateOverrideDaily: z.number().optional().nullable(),
   rateOverrideWeekly: z.number().optional().nullable(),
   rateOverrideMonthly: z.number().optional().nullable(),
+  condition: z.enum(['GOOD', 'MINOR_DAMAGE', 'NEEDS_REPAIR']).optional().nullable(),
   conditionNotes: z.string().max(500).optional().nullable(),
   completenessChecklist: z.object({
     stnkOriginal: z.boolean(),

@@ -8,7 +8,7 @@ interface RentalVehicleViewProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   data: RentalVehicle | null;
-  labels: Record<string, string>;
+  labels: Record<string, any>;
   onEdit: (v: RentalVehicle) => void;
   onDelete?: (v: RentalVehicle) => void;
   onDisable?: (v: RentalVehicle) => void;
