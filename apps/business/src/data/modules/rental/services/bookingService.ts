@@ -194,7 +194,7 @@ class BookingService {
       dropoffLocation: data.dropoffLocation,
       notes: data.notes,
       items,
-      status: 'PENDING',
+      status: 'BOOKED',
     });
   }
 

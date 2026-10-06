@@ -6,7 +6,7 @@ import { Calendar, Clock, CheckCircle2, Car, XCircle, List, MapPin, ChevronRight
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
 import { bookingService } from '@/data/modules/rental/services/bookingService';
 import type { Booking, BookingStatusFilter } from './types/booking';
-import { BookingList } from './components/BookingList';
+import { BookingTable } from './components/BookingTable';
 import { BookingView } from './components/BookingView';
 import { BookingCreateFeature } from './BookingCreateFeature';
 import { getBookingTranslation } from './i18n';
@@ -50,9 +50,10 @@ export function BookingsFeature() {
   const [showStats, setShowStats] = useState(true);
   const [panelSide, setPanelSide] = useState<'left' | 'right' | 'top' | 'bottom'>('top');
 
-  // Modals
+  // Modals & Selection
   const [detailBooking, setDetailBooking] = useState<Booking | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   
 
   useEffect(() => {
@@ -82,8 +83,8 @@ export function BookingsFeature() {
 
   const stats = useMemo(() => ({
     all:       bookings.length,
-    pending:   bookings.filter(r => r.status === 'PENDING').length,
-    confirmed: bookings.filter(r => r.status === 'CONFIRMED').length,
+    booked:    bookings.filter(r => r.status === 'BOOKED').length,
+    contracted:bookings.filter(r => r.status === 'CONTRACTED').length,
     active:    bookings.filter(r => r.status === 'ACTIVE').length,
     completed: bookings.filter(r => r.status === 'COMPLETED').length,
     cancelled: bookings.filter(r => r.status === 'CANCELLED').length,
@@ -103,10 +104,10 @@ export function BookingsFeature() {
     });
   }, [bookings, statusFilter, search]);
 
-  const handleOpenMapSingle = (vehicleId: string) => {
+  const handleOpenMapMulti = (vehicleIds: string[]) => {
     trackingNavigationService.navigateToTracking(router, {
       mode: 'live',
-      vehicleId: vehicleId
+      vehicleIds: vehicleIds
     });
   };
 
@@ -125,11 +126,11 @@ export function BookingsFeature() {
 
   const handleConfirm = async (booking: Booking) => {
     try {
-      await bookingService.updateBookingStatus(booking.id, 'CONFIRMED');
+      await bookingService.updateBookingStatus(booking.id, 'CONTRACTED');
       const data = await bookingService.getBookings();
       setBookings(data);
       if (detailBooking?.id === booking.id) {
-        setDetailBooking({ ...booking, status: 'CONFIRMED' });
+        setDetailBooking({ ...booking, status: 'CONTRACTED' });
       }
       alert('Booking berhasil dikonfirmasi');
     } catch (error) {
@@ -185,8 +186,8 @@ export function BookingsFeature() {
         label: labels.filterStatus || 'Status',
         type: 'pills-single',
         options: [
-          { value: 'PENDING', label: labels.statusPending || 'Menunggu', colorClass: 'bg-amber-500', activeClass: 'bg-amber-500/15 border-amber-500/40 text-amber-500' },
-          { value: 'CONFIRMED', label: labels.statusConfirmed || 'Dikonfirmasi', colorClass: 'bg-blue-500', activeClass: 'bg-blue-500/15 border-blue-500/40 text-blue-500' },
+          { value: 'BOOKED', label: labels.statusBooked || 'Dipesan', colorClass: 'bg-amber-500', activeClass: 'bg-amber-500/15 border-amber-500/40 text-amber-500' },
+          { value: 'CONTRACTED', label: labels.statusContracted || 'Dikontrak', colorClass: 'bg-blue-500', activeClass: 'bg-blue-500/15 border-blue-500/40 text-blue-500' },
           { value: 'ACTIVE', label: labels.statusActive || 'Aktif', colorClass: 'bg-success', activeClass: 'bg-success/15 border-success/40 text-success' },
           { value: 'COMPLETED', label: labels.statusCompleted || 'Selesai', colorClass: 'bg-neutral-500', activeClass: 'bg-neutral-500/15 border-neutral-500/40 text-neutral-500' },
           { value: 'CANCELLED', label: labels.statusCancelled || 'Batal', colorClass: 'bg-danger', activeClass: 'bg-danger/15 border-danger/40 text-danger' },
@@ -198,12 +199,12 @@ export function BookingsFeature() {
   const renderStatsPanel = () => {
     return (
       <PanelShell
-        title="Ringkasan"
+        title={labels.summaryTitle || 'Ringkasan'}
         side={panelSide}
         isOpen={showStats}
         onClose={() => setShowStats(false)}
         onOpen={() => setShowStats(true)}
-        collapsedTitle="RINGKASAN"
+        collapsedTitle={(labels.summaryTitle || 'Ringkasan').toUpperCase()}
         onSideChange={setPanelSide}
         labels={{
           top: (labels as any).panelTop || 'Atas',
@@ -220,8 +221,8 @@ export function BookingsFeature() {
       >
         <div className={cn("gap-2.5 p-3", (panelSide === 'top' || panelSide === 'bottom') ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6" : "flex flex-col h-full")}>
           <StatCard label={labels.summaryTotal || 'Total Booking'} value={stats.all} colorClass="bg-foreground" icon={List} />
-          <StatCard label={labels.statusPending || 'Menunggu'} value={stats.pending} colorClass="bg-amber-500" icon={Clock} />
-          <StatCard label={labels.statusConfirmed || 'Dikonfirmasi'} value={stats.confirmed} colorClass="bg-blue-500" icon={CheckCircle2} />
+          <StatCard label={labels.statusBooked || 'Dipesan'} value={stats.booked} colorClass="bg-amber-500" icon={Clock} />
+          <StatCard label={labels.statusContracted || 'Dikontrak'} value={stats.contracted} colorClass="bg-blue-500" icon={CheckCircle2} />
           <StatCard label={labels.statusActive || 'Aktif'} value={stats.active} colorClass="bg-success" icon={Car} />
           <StatCard label={labels.statusCompleted || 'Selesai'} value={stats.completed} colorClass="bg-neutral-500" icon={CheckCircle2} />
           <StatCard label={labels.statusCancelled || 'Batal'} value={stats.cancelled} colorClass="bg-danger" icon={XCircle} />
@@ -238,16 +239,18 @@ export function BookingsFeature() {
 
       {/* Main Table */}
       <div className="flex-1 min-h-0 min-w-0 w-full relative border-none">
-        <BookingList
+        <BookingTable
           data={filteredData}
           labels={labels}
           searchValue={search}
           onSearchChange={setSearch}
+          selectedIds={selectedIds}
+          onSelectionChange={setSelectedIds}
           onAdd={() => router.push('/rental/bookings/create')}
           onView={handleView}
           onEdit={handleEdit}
           onDelete={handleDelete}
-          onOpenMap={handleOpenMapSingle}
+          onOpenMap={handleOpenMapMulti}
           filterConfig={filterConfig}
           isFilterOpen={isFilterOpen}
           onFilterOpenChange={setIsFilterOpen}
@@ -269,6 +272,7 @@ export function BookingsFeature() {
         onEdit={(b) => { setDrawerOpen(false); handleEdit(b); }}
         onConfirm={handleConfirm}
         onCancel={handleCancel}
+        onOpenMap={handleOpenMapMulti}
       />
 
     </div>

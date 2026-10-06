@@ -2,7 +2,7 @@ import type { Customer } from '@/features/modules/rental/customers/types/custome
 import type { RentalVehicle } from '@/features/modules/rental/vehicles/types/rentalVehicle';
 import { z } from 'zod';
 
-export type BookingStatus = 'PENDING' | 'CONFIRMED' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
+export type BookingStatus = 'BOOKED' | 'CONTRACTED' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
 
 export type RentalType = 'SELF_DRIVE' | 'WITH_DRIVER';
 
@@ -41,6 +41,9 @@ export interface Booking {
   pickupLocation?: string;
   dropoffLocation?: string;
   notes?: string;
+  needDelivery?: boolean;
+  needFuel?: boolean;
+  needInsurance?: boolean;
   createdAt: string;
   updatedAt: string;
   

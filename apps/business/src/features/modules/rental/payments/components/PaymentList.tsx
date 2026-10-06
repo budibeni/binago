@@ -22,6 +22,7 @@ interface PaymentListProps {
   onVerify: (id: string) => void;
   onCancel: (id: string) => void;
   onDelete: (id: string) => void;
+  hideAddButton?: boolean;
 }
 
 const typeIcon: Record<string, React.ReactNode> = {
@@ -47,6 +48,7 @@ export function PaymentList({
   onVerify,
   onCancel,
   onDelete,
+  hideAddButton,
 }: PaymentListProps) {
   const totalVerified = payments
     .filter((p) => p.status === 'VERIFIED' && p.type !== 'REFUND')
@@ -71,15 +73,12 @@ export function PaymentList({
           <p className="text-[9px] uppercase font-semibold text-muted-foreground tracking-wider">Total Tagihan</p>
           <p className="text-xs font-bold">{formatIDR(totalAmount)}</p>
         </div>
-        <div className="p-2.5 rounded-lg border border-emerald-200 dark:border-emerald-900/50 bg-emerald-50/50 dark:bg-emerald-950/10 flex flex-col gap-0.5">
+        <div className="p-2.5 rounded-lg border border-border bg-background flex flex-col gap-0.5">
           <p className="text-[9px] uppercase font-semibold text-emerald-600 dark:text-emerald-400 tracking-wider">Terbayar</p>
           <p className="text-xs font-bold text-emerald-700 dark:text-emerald-300">{formatIDR(netPaid)}</p>
         </div>
         <div className={cn(
-          "p-2.5 rounded-lg border flex flex-col gap-0.5",
-          outstanding > 0
-            ? "border-danger/30 bg-danger/5"
-            : "border-border bg-background"
+          "p-2.5 rounded-lg border border-border bg-background flex flex-col gap-0.5"
         )}>
           <p className={cn("text-[9px] uppercase font-semibold tracking-wider", outstanding > 0 ? "text-danger" : "text-muted-foreground")}>Sisa Tagihan</p>
           <p className={cn("text-xs font-bold", outstanding > 0 ? "text-danger" : "text-foreground")}>{formatIDR(Math.max(0, outstanding))}</p>
@@ -89,10 +88,12 @@ export function PaymentList({
       {/* Header */}
       <div className="flex items-center justify-between">
         <p className="text-xs font-semibold text-foreground">Riwayat Transaksi</p>
-        <Button type="button" size="sm" onClick={onAdd} className="gap-1.5 h-7 text-[11px] px-2.5">
-          <Plus className="w-3 h-3" />
-          Tambah Pembayaran
-        </Button>
+        {!hideAddButton && (
+          <Button type="button" size="sm" onClick={onAdd} className="gap-1.5 h-7 text-[11px] px-2.5">
+            <Plus className="w-3 h-3" />
+            Tambah Pembayaran
+          </Button>
+        )}
       </div>
 
       {/* List */}

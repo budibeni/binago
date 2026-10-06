@@ -9,6 +9,8 @@ export const bookingDictionaries = {
     addBooking: 'Tambah',
     
     // Status
+    statusBooked: 'Dipesan',
+    statusContracted: 'Dikontrak',
     statusPending: 'Menunggu Konfirmasi',
     statusConfirmed: 'Dikonfirmasi',
     statusActive: 'Berjalan',
@@ -17,7 +19,16 @@ export const bookingDictionaries = {
     statusAll: 'Semua Status',
     
     // Summary Cards
+    summaryTitle: 'Ringkasan',
     summaryTotal: 'Semua Booking',
+    
+    // Panel Labels
+    panelTop: 'Atas',
+    panelRight: 'Kanan',
+    panelBottom: 'Bawah',
+    panelLeft: 'Kiri',
+    hidePanel: 'Sembunyikan',
+    layoutToggleTitle: 'Ubah Posisi Panel',
     
     // Filters
     filterStatus: 'Status',
@@ -28,13 +39,36 @@ export const bookingDictionaries = {
     
     // Table
     colNo: 'NO. BOOKING',
-    colCustomer: 'PELANGGAN',
-    colVehicle: 'KENDARAAN',
+    colBooking: 'Booking',
+    colCustomer: 'Pelanggan',
+    colVehicle: 'Kendaraan',
+    colTypeAndPeriod: 'Tipe & Periode',
+    colContact: 'Kontak',
+    colTotalCost: 'Total Biaya',
+    colExtraServices: 'Layanan Ekstra',
+    colNotes: 'Catatan',
     colRentalDate: 'TANGGAL SEWA',
     colDuration: 'DURASI',
     colTotal: 'TOTAL',
-    colStatus: 'STATUS',
-    colActions: 'AKSI',
+    colStatus: 'Status',
+    colActions: 'Aksi',
+    
+    // Table values
+    daily: 'Harian',
+    weekly: 'Mingguan',
+    monthly: 'Bulanan',
+    selfDrive: 'Lepas Kunci',
+    withDriver: 'Dengan Pengemudi',
+    typeCompany: 'Perusahaan',
+    typeIndividual: 'Individu',
+    vehicles: 'Kendaraan',
+    remaining: 'Sisa',
+    paid: 'Lunas',
+    delivery: 'Antar/Jemput',
+    fuel: 'BBM',
+    insurance: 'Asuransi',
+    noExtraServices: 'Tanpa Layanan Ekstra',
+    services: 'Layanan',
     
     // Details
     dp: 'DP',
@@ -121,6 +155,8 @@ export const bookingDictionaries = {
     addBooking: 'Add',
     
     // Status
+    statusBooked: 'Booked',
+    statusContracted: 'Contracted',
     statusPending: 'Pending Confirmation',
     statusConfirmed: 'Confirmed',
     statusActive: 'Active',
@@ -129,7 +165,16 @@ export const bookingDictionaries = {
     statusAll: 'All Statuses',
     
     // Summary Cards
+    summaryTitle: 'Summary',
     summaryTotal: 'All Bookings',
+    
+    // Panel Labels
+    panelTop: 'Top',
+    panelRight: 'Right',
+    panelBottom: 'Bottom',
+    panelLeft: 'Left',
+    hidePanel: 'Hide',
+    layoutToggleTitle: 'Change Panel Position',
     
     // Filters
     filterStatus: 'Status',
@@ -140,13 +185,36 @@ export const bookingDictionaries = {
     
     // Table
     colNo: 'RESERVATION NO.',
-    colCustomer: 'CUSTOMER',
-    colVehicle: 'VEHICLE',
+    colBooking: 'Booking',
+    colCustomer: 'Customer',
+    colVehicle: 'Vehicle',
+    colTypeAndPeriod: 'Type & Period',
+    colContact: 'Contact',
+    colTotalCost: 'Total Cost',
+    colExtraServices: 'Extra Services',
+    colNotes: 'Notes',
     colRentalDate: 'RENTAL DATE',
     colDuration: 'DURATION',
     colTotal: 'TOTAL',
-    colStatus: 'STATUS',
-    colActions: 'ACTIONS',
+    colStatus: 'Status',
+    colActions: 'Actions',
+    
+    // Table values
+    daily: 'Daily',
+    weekly: 'Weekly',
+    monthly: 'Monthly',
+    selfDrive: 'Self Drive',
+    withDriver: 'With Driver',
+    typeCompany: 'Company',
+    typeIndividual: 'Individual',
+    vehicles: 'Vehicles',
+    remaining: 'Remaining',
+    paid: 'Paid',
+    delivery: 'Delivery',
+    fuel: 'Fuel',
+    insurance: 'Insurance',
+    noExtraServices: 'No Extra Services',
+    services: 'Services',
     
     // Details
     dp: 'DP',

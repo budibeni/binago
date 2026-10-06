@@ -41,20 +41,21 @@ function exportToCsv<TData extends RowData>(
   filename: string,
 ): void {
   const visibleColumns = table.getVisibleFlatColumns();
-  const rows = table.getRowModel().rows;
+  const exportableColumns = visibleColumns.filter(col => col.id !== 'select' && col.id !== 'actions');
+  const rows = table.getFilteredRowModel().rows;
 
   // Header row: gunakan header string jika tersedia, fallback ke column id
-  const headers = visibleColumns.map((col) => {
+  const headers = exportableColumns.map((col) => {
     const headerDef = col.columnDef.header;
     return toCsvCell(typeof headerDef === 'string' ? headerDef : col.id);
   });
 
   // Data rows
   const dataRows = rows.map((row) =>
-    visibleColumns.map((col) => toCsvCell(row.getValue(col.id))).join(','),
+    exportableColumns.map((col) => toCsvCell(row.getValue(col.id))).join(','),
   );
 
-  const csvContent = [headers.join(','), ...dataRows].join('\n');
+  const csvContent = [headers.join(','), ...dataRows].join('\r\n');
 
   // Buat dan trigger download
   const blob = new Blob(['\uFEFF' + csvContent], {

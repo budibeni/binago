@@ -13,6 +13,9 @@ interface PaymentsFeatureProps {
   deposit: number;
   remainingAmount: number;
   defaultStage?: import('./types/payment').PaymentStage;
+  isFormOpen?: boolean;
+  onFormOpenChange?: (open: boolean) => void;
+  hideAddButton?: boolean;
 }
 
 export function PaymentsFeature({ 
@@ -21,12 +24,18 @@ export function PaymentsFeature({
   totalAmount, 
   deposit, 
   remainingAmount, 
-  defaultStage = 'MANUAL'
+  defaultStage = 'MANUAL',
+  isFormOpen: externalIsFormOpen,
+  onFormOpenChange,
+  hideAddButton,
 }: PaymentsFeatureProps) {
   const [payments, setPayments] = useState<RentalPayment[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [internalIsFormOpen, setInternalIsFormOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const isFormOpen = externalIsFormOpen !== undefined ? externalIsFormOpen : internalIsFormOpen;
+  const setIsFormOpen = onFormOpenChange || setInternalIsFormOpen;
 
   const fetchPayments = useCallback(async () => {
     setLoading(true);
@@ -103,6 +112,7 @@ export function PaymentsFeature({
           onVerify={handleVerify}
           onCancel={handleCancel}
           onDelete={handleDelete}
+          hideAddButton={hideAddButton}
         />
       </div>
 
