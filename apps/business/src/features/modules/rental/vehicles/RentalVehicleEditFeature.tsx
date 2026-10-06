@@ -2,21 +2,21 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { getTranslation } from '@/i18n';
+import { getRentalVehiclesTranslation } from './i18n';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
 import { rentalVehicleService } from '@/data/modules/rental/services/vehicleService';
 import { RentalVehicleForm } from './components/RentalVehicleForm';
 import type { RentalVehicle } from './types/rentalVehicle';
 
-interface EditRentalVehicleFeatureProps {
+interface RentalVehicleEditFeatureProps {
   id: string;
 }
 
-export function EditRentalVehicleFeature({ id }: EditRentalVehicleFeatureProps) {
+export function RentalVehicleEditFeature({ id }: RentalVehicleEditFeatureProps) {
   const router = useRouter();
   const locale = useBusinessLocale();
-  const t = getTranslation(locale);
-  const labels = t.rentalVehicles;
+  const t = getRentalVehiclesTranslation(locale);
+  const labels = t;
 
   const [vehicle, setVehicle] = React.useState<RentalVehicle | null>(null);
   const [error, setError] = React.useState('');

@@ -1,49 +1,43 @@
+import { z } from 'zod';
 import type { Vehicle } from '@/features/core/vehicles/types/vehicle';
 
 export type RentalStatus = 'READY' | 'RESERVED' | 'RENTED' | 'MAINTENANCE' | 'UNAVAILABLE';
 export type RentalCondition = 'GOOD' | 'MINOR_DAMAGE' | 'NEEDS_REPAIR';
 
-export interface RentalEquipment {
-  stnk: boolean;
-  bpkb: boolean;
+export interface CompletenessChecklist {
+  stnkOriginal: boolean;
+  spareKey: boolean;
+  jackAndTools: boolean;
   spareTire: boolean;
-  jack: boolean;
-  toolkit: boolean;
   firstAidKit: boolean;
-  fireExtinguisher: boolean;
-  carpet: boolean;
-  audio: boolean;
 }
 
 export interface RentalVehicleProfile {
   id: string;
-  vehicleId: string; // CORE Vehicle ID (e.g. 'veh-001')
+  vehicleId: string;
+  categoryId?: string | null;
   status: RentalStatus;
-  dailyRate: number;
-  weeklyRate: number;
-  monthlyRate: number;
-  pricingType: 'CATEGORY' | 'INDEPENDENT';
-  pricingCategoryId?: string;
-  deposit: number;
-  condition: RentalCondition;
   currentOdometer: number;
-  rentalStartOdometer?: number;
-  stnkExpiredAt: string;
-  taxExpiredAt: string;
-  insuranceExpiredAt: string;
-  notes?: string;
-  equipment: RentalEquipment;
-  createdAt: string;
-  updatedAt: string;
+  rateOverrideDaily?: number | null;
+  rateOverrideWeekly?: number | null;
+  rateOverrideMonthly?: number | null;
   
-  customerId?: string;
-  rentalPeriod?: string;
+  // Operational fields from TASK-03
+  currentBookingId?: string | null;
+  currentContractId?: string | null;
+  fuelLevelPercent?: number | null;
+  conditionNotes?: string | null;
+  completenessChecklist: CompletenessChecklist;
+  
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface RentalVehicle extends RentalVehicleProfile {
   coreVehicle: Vehicle;
   isComplete: boolean;
-  customerName?: string;
+  categoryName?: string;
+  dailyRate: number;
 }
 
 export type RentalStatusFilter = 'all' | RentalStatus;
@@ -52,3 +46,32 @@ export interface RentalVehicleFilters {
   search: string;
   status: RentalStatusFilter;
 }
+
+export const getRentalVehicleFormSchema = (labels: Record<string, string>) => z.object({
+  vehicleId: z.string().min(1, { message: labels.validationRequired }),
+  categoryId: z.string().optional().nullable(),
+  status: z.enum(['READY', 'RESERVED', 'RENTED', 'MAINTENANCE', 'UNAVAILABLE']),
+  currentOdometer: z.number().min(0),
+  pricingType: z.enum(['CATEGORY', 'INDEPENDENT']),
+  rateOverrideDaily: z.number().optional().nullable(),
+  rateOverrideWeekly: z.number().optional().nullable(),
+  rateOverrideMonthly: z.number().optional().nullable(),
+  conditionNotes: z.string().max(500).optional().nullable(),
+  completenessChecklist: z.object({
+    stnkOriginal: z.boolean(),
+    spareKey: z.boolean(),
+    jackAndTools: z.boolean(),
+    spareTire: z.boolean(),
+    firstAidKit: z.boolean(),
+  }),
+}).refine(data => {
+  if (data.pricingType === 'CATEGORY' && (!data.categoryId || data.categoryId === '')) {
+    return false;
+  }
+  return true;
+}, {
+  message: labels.validationCategoryRequired,
+  path: ['categoryId']
+});
+
+export type RentalVehicleFormValues = z.infer<ReturnType<typeof getRentalVehicleFormSchema>>;

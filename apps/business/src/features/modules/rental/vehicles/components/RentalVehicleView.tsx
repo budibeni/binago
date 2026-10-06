@@ -111,14 +111,16 @@ export function RentalVehicleView({
             
             <div className="p-3.5 flex flex-col gap-3.5">
               <div className="grid grid-cols-2 gap-3">
-                <InfoItem label="Tipe Tarif" value={data.pricingType === 'CATEGORY' ? 'Kategori Master' : 'Mandiri (Kustom)'} />
-                <InfoItem label="Deposit" value={data.deposit ? formatCurrency(data.deposit) : '-'} highlight />
+                <InfoItem label="Skema Tarif" value={data.categoryId ? 'Kategori Master' : 'Mandiri (Kustom)'} />
+                {data.categoryId && (
+                  <InfoItem label="Kategori" value={data.categoryName || '-'} />
+                )}
               </div>
               
               <div className="grid grid-cols-3 gap-3 pt-3 border-t border-border/40">
                 <InfoItem label="Harian" value={data.dailyRate ? formatCurrency(data.dailyRate) : '-'} />
-                <InfoItem label="Mingguan" value={data.weeklyRate ? formatCurrency(data.weeklyRate) : '-'} />
-                <InfoItem label="Bulanan" value={data.monthlyRate ? formatCurrency(data.monthlyRate) : '-'} />
+                <InfoItem label="Mingguan" value={data.rateOverrideWeekly ? formatCurrency(data.rateOverrideWeekly) : '-'} />
+                <InfoItem label="Bulanan" value={data.rateOverrideMonthly ? formatCurrency(data.rateOverrideMonthly) : '-'} />
               </div>
             </div>
           </div>
@@ -134,11 +136,12 @@ export function RentalVehicleView({
               <InfoItem label="Merk & Model" value={`${core.brand} ${core.vehicleName}`} />
               <InfoItem label="Warna" value={core.color || '-'} />
               <InfoItem label="Bahan Bakar" value={core.fuelType || '-'} />
+              <InfoItem label="Masa Berlaku STNK" value={core.registrationExpiry || '-'} />
             </div>
           </div>
 
           {/* STATUS OPERASIONAL & KELENGKAPAN */}
-          <div className="rounded-2xl border border-border/60 bg-background overflow-hidden">
+          <div className="rounded-2xl border border-border/60 bg-background overflow-hidden mb-6">
             <div className="px-4 py-3 flex justify-between items-center border-b border-border/40 bg-neutral-50/50 dark:bg-neutral-900/30">
               <div className="flex items-center gap-2">
                 <FileText className="w-3.5 h-3.5 text-muted-foreground" />
@@ -159,15 +162,8 @@ export function RentalVehicleView({
 
             <div className="p-3.5 flex flex-col gap-3.5">
               <div className="grid grid-cols-2 gap-3">
-                <InfoItem 
-                  label="Kondisi Fisik" 
-                  value={
-                    data.condition === 'GOOD' ? 'Baik' :
-                    data.condition === 'MINOR_DAMAGE' ? 'Kerusakan Ringan' :
-                    data.condition === 'NEEDS_REPAIR' ? 'Perlu Perbaikan' : '-'
-                  } 
-                />
                 <InfoItem label="Odometer" value={data.currentOdometer ? `${formatNumber(data.currentOdometer)} km` : '-'} />
+                <InfoItem label="Level BBM" value={data.fuelLevelPercent !== null && data.fuelLevelPercent !== undefined ? `${data.fuelLevelPercent}%` : '-'} />
               </div>
 
               <div className="pt-3 border-t border-border/40">
@@ -175,14 +171,11 @@ export function RentalVehicleView({
                   label="Checklist Kelengkapan" 
                   value={(() => {
                     const equips = [];
-                    if (data.equipment.stnk) equips.push('STNK');
-                    if (data.equipment.bpkb) equips.push('BPKB');
-                    if (data.equipment.spareTire) equips.push('Ban Cadangan');
-                    if (data.equipment.jack) equips.push('Dongkrak');
-                    if (data.equipment.toolkit) equips.push('Toolkit');
-                    if (data.equipment.firstAidKit) equips.push('P3K');
-                    if (data.equipment.fireExtinguisher) equips.push('APAR');
-                    if (data.equipment.audio) equips.push('Radio / Audio');
+                    if (data.completenessChecklist?.stnkOriginal) equips.push('STNK');
+                    if (data.completenessChecklist?.spareKey) equips.push('Kunci Cadangan');
+                    if (data.completenessChecklist?.spareTire) equips.push('Ban Serep');
+                    if (data.completenessChecklist?.jackAndTools) equips.push('Dongkrak & Tools');
+                    if (data.completenessChecklist?.firstAidKit) equips.push('P3K');
                     return equips.length > 0 ? (
                       <span className="leading-relaxed">{equips.join(' • ')}</span>
                     ) : '-';
@@ -190,24 +183,11 @@ export function RentalVehicleView({
                 />
               </div>
 
-              {data.notes && (
+              {data.conditionNotes && (
                 <div className="pt-3 border-t border-border/40">
-                  <InfoItem label="Catatan Internal" value={<span className="italic leading-relaxed text-muted-foreground">{data.notes}</span>} />
+                  <InfoItem label="Catatan Kondisi" value={<span className="italic leading-relaxed text-muted-foreground">{data.conditionNotes}</span>} />
                 </div>
               )}
-            </div>
-          </div>
-
-          {/* DOKUMEN LEGAL */}
-          <div className="rounded-2xl border border-border/60 bg-background overflow-hidden mb-6">
-            <div className="px-4 py-3 flex items-center gap-2 border-b border-border/40 bg-neutral-50/50 dark:bg-neutral-900/30">
-              <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
-              <h3 className="text-[11px] font-bold text-foreground uppercase tracking-widest">Masa Berlaku Dokumen</h3>
-            </div>
-            <div className="p-3.5 grid grid-cols-2 gap-y-3.5 gap-x-3">
-              <InfoItem label="STNK" value={data.stnkExpiredAt || '-'} />
-              <InfoItem label="Pajak Tahunan" value={data.taxExpiredAt || '-'} />
-              <InfoItem label="Asuransi" value={data.insuranceExpiredAt || '-'} />
             </div>
           </div>
 

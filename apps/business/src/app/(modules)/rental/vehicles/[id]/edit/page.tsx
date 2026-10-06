@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { EditRentalVehicleFeature } from '@/features/modules/rental/vehicles/EditRentalVehicleFeature';
+import { RentalVehicleEditFeature } from '@/features/modules/rental/vehicles/RentalVehicleEditFeature';
 
 interface EditRentalVehiclePageProps {
   params: {
@@ -10,5 +10,5 @@ interface EditRentalVehiclePageProps {
 }
 
 export default function EditRentalVehiclePage({ params }: EditRentalVehiclePageProps) {
-  return <EditRentalVehicleFeature id={params.id} />;
+  return <RentalVehicleEditFeature id={params.id} />;
 }

@@ -139,34 +139,28 @@ function buildColumns(
     },
     {
       id: 'customer',
-      accessorFn: (v) => {
-        if (v.status !== 'RENTED' && v.status !== 'RESERVED') return '-';
-        return v.customerName || '-';
-      },
+      accessorFn: (v) => '-',
       header: labels.colCustomer,
       enableSorting: true,
       size: 180,
     },
     {
       id: 'period',
-      accessorFn: (v) => {
-        if (v.status !== 'RENTED' && v.status !== 'RESERVED') return '-';
-        return v.rentalPeriod || '-';
-      },
+      accessorFn: (v) => '-',
       header: labels.colPeriod,
       enableSorting: true,
       size: 180,
     },
     {
-      id: 'pricingType',
-      accessorKey: 'pricingType',
+      id: 'pricingCategory',
+      accessorKey: 'categoryId',
       header: labels.colPricingCategory || 'Kategori Tarif',
       enableSorting: true,
       size: 130,
       cell: ({ row }) => {
-        const isGroup = row.original.pricingType === 'CATEGORY';
-        const group = isGroup ? pricingCategorys.find(g => g.id === row.original.pricingCategoryId) : null;
-        return isGroup ? (
+        const hasCategory = !!row.original.categoryId;
+        const group = hasCategory ? pricingCategorys.find(g => g.id === row.original.categoryId) : null;
+        return hasCategory ? (
           <span className="w-fit text-[11px] font-semibold px-2 py-1 rounded bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 border border-border">
             {group?.name || 'Unknown'}
           </span>
@@ -188,12 +182,7 @@ function buildColumns(
     },
     {
       id: 'condition',
-      accessorFn: (v) => {
-        const c = v.condition;
-        if (c === 'MINOR_DAMAGE') return labels.conditionMinor || 'Rusak Ringan';
-        if (c === 'NEEDS_REPAIR') return labels.conditionRepair || 'Perlu Perbaikan';
-        return labels.conditionGood || 'Baik';
-      },
+      accessorFn: (v) => v.conditionNotes ? 'Ada Catatan' : 'Baik',
       header: labels.colCondition,
       enableSorting: true,
       size: 140,

@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import type { RateType } from '../../bookings/types/booking';
 
 export type PricingCategoryStatus = 'ACTIVE' | 'INACTIVE';
@@ -45,3 +46,13 @@ export interface PricingCategoryFilters {
   search?: string;
   status?: PricingCategoryStatusFilter;
 }
+
+export const getPricingCategoryFormSchema = (t: Record<string, any>) => z.object({
+  name: z.string().min(1, t.formNameRequired || 'Nama Kategori Tarif wajib diisi'),
+  description: z.string().optional(),
+  status: z.enum(['ACTIVE', 'INACTIVE']).optional(),
+  dailyRate: z.number().min(0, 'Tarif minimal 0'),
+  weeklyRate: z.number().min(0, 'Tarif minimal 0'),
+  monthlyRate: z.number().min(0, 'Tarif minimal 0'),
+  defaultDeposit: z.number().min(0, 'Deposit minimal 0'),
+});

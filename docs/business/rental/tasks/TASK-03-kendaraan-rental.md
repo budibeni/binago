@@ -126,5 +126,5 @@ export interface RentalVehicleViewModel {
 
 ## 6. Status Verifikasi & Hasil
 
-- **Status:** COMPLETED
+- **Status:** 
 - **Verifikasi:** Alokasi armada dari CORE, visualisasi summary cards, tabel data, filter status, drawer rincian, dan integrasi navigasi bersih ke `/tracking` telah teruji dan bekerja normal.

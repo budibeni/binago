@@ -76,25 +76,29 @@ export function PricingCategoryAssignmentForm({
       onCancel={() => onOpenChange(false)}
       saveText="Simpan"
     >
-      <div className="flex flex-col h-[60vh] max-h-[500px]">
+      <div className="flex flex-col h-[60vh] max-h-[500px] bg-gradient-to-b from-neutral-50/50 to-neutral-100/30 dark:from-neutral-900/20 dark:to-neutral-950/40 relative">
         {/* Search */}
-        <div className="p-2 border-b shrink-0 bg-neutral-50/50 dark:bg-neutral-900/50">
-          <div className="relative">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-foreground-muted" />
+        <div className="pb-2  sticky top-0 z-10">
+          <div className="relative group">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-neutral-400 group-focus-within:text-primary transition-colors" />
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Cari kendaraan..."
-              className="pl-8 h-8 text-xs bg-white dark:bg-neutral-950 border-border/60"
+              className="pl-8 h-8 text-xs bg-gray-50 dark:bg-neutral-900 border-border/60 hover:border-primary/40 focus:bg-white dark:focus:bg-neutral-900 transition-all rounded-lg shadow-sm"
             />
           </div>
         </div>
 
         {/* List */}
-        <div className="flex-1 overflow-y-auto p-2 space-y-1.5">
+        <div className="flex-1 overflow-y-auto p-2 space-y-1 bg-gray-50 dark:bg-neutral-950 border border-border/50 rounded-lg">
           {filteredVehicles.length === 0 ? (
-            <div className="text-center py-6 text-xs text-foreground-muted">
-              Tidak ada kendaraan yang cocok.
+            <div className="flex flex-col items-center justify-center py-8 text-center">
+              <div className="w-10 h-10 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center mb-2 border border-border/50">
+                <Search className="h-4 w-4 text-neutral-400" />
+              </div>
+              <span className="text-xs font-bold text-foreground">Tidak ada kendaraan yang cocok</span>
+              <span className="text-[10px] text-foreground-muted mt-0.5">Coba gunakan kata kunci pencarian yang lain.</span>
             </div>
           ) : (
             filteredVehicles.map(item => {
@@ -112,42 +116,45 @@ export function PricingCategoryAssignmentForm({
                     }
                   }}
                   className={`
-                    flex items-center gap-2.5 p-2 rounded-md border transition-colors
-                    ${isDisabled ? 'opacity-60 bg-neutral-50/50 dark:bg-neutral-900/30 cursor-not-allowed border-dashed border-border/50' : 'cursor-pointer hover:border-primary/40'}
-                    ${isSelected ? 'border-primary/60 bg-primary/5' : 'border-border/40 bg-card'}
+                    group flex items-center gap-2.5 p-2 rounded-lg border transition-all duration-300
+                    ${isDisabled ? 'opacity-50 bg-neutral-100/50 dark:bg-neutral-900/30 cursor-not-allowed border-dashed border-border/60' : 'cursor-pointer hover:shadow-sm hover:border-primary/40 hover:-translate-y-[0.5px]'}
+                    ${isSelected ? 'border-primary/50 bg-primary/[0.04] ' : 'border-border/40 bg-white dark:bg-neutral-950'}
                   `}
                 >
-                  <div className="flex items-center justify-center shrink-0">
-                    <input
-                      type="checkbox"
-                      className="w-3.5 h-3.5 rounded border-border text-primary focus:ring-primary disabled:opacity-50"
-                      checked={isSelected}
-                      disabled={isDisabled}
-                      readOnly
-                    />
+                  <div className={`flex items-center justify-center shrink-0 w-3.5 h-3.5 rounded border transition-colors ${isSelected ? 'bg-primary border-primary' : 'bg-transparent border-neutral-300 dark:border-neutral-600 group-hover:border-primary/50'}`}>
+                    {isSelected && (
+                      <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                      </svg>
+                    )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="font-semibold text-[11px] text-foreground truncate">
-                        {core.plateNumber}
-                      </span>
+                    <div className="flex items-center justify-between gap-2 mb-0.5">
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <span className={`font-semibold text-[12px] truncate ${isSelected ? 'text-primary' : 'text-foreground'}`}>
+                          {core.plateNumber}
+                        </span>
+                        <span className="text-[8.5px] font-bold uppercase tracking-wider px-1 py-0.5 rounded text-neutral-500 bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 shrink-0 leading-none">
+                          {core.vehicleCategory}
+                        </span>
+                      </div>
                       {status === 'CURRENT_GROUP' && !isSelected && (
-                        <span className="text-[9px] uppercase tracking-wider px-1.5 py-0.5 bg-danger/10 text-danger rounded flex-shrink-0">
+                        <span className="text-[8.5px] font-bold uppercase tracking-wider px-1.5 py-0.5 bg-danger/10 text-danger border border-danger/20 rounded-full flex-shrink-0 shadow-sm leading-none">
                           Hapus
                         </span>
                       )}
                       {status === 'AVAILABLE' && isSelected && (
-                        <span className="text-[9px] uppercase tracking-wider px-1.5 py-0.5 bg-success/10 text-success rounded flex-shrink-0">
+                        <span className="text-[8.5px] font-bold uppercase tracking-wider px-1.5 py-0.5 bg-success/10 text-success border border-success/20 rounded-full flex-shrink-0 shadow-sm leading-none">
                           Tambah
                         </span>
                       )}
                     </div>
-                    <div className="text-[10px] text-foreground-subtle truncate leading-tight">
+                    <div className="text-[10px] text-foreground-subtle truncate">
                       {core.brand} {core.vehicleName}
                     </div>
                     {isDisabled && otherGroupName && (
-                      <div className="mt-0.5 text-[9px] text-foreground-muted truncate">
-                        Terdaftar di: <span className="font-medium">{otherGroupName}</span>
+                      <div className="mt-1 text-[8.5px] font-medium text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 border border-amber-200/50 dark:border-amber-900/50 px-1.5 py-0.5 rounded inline-block truncate max-w-full">
+                        Kategori lain: <span className="font-bold">{otherGroupName}</span>
                       </div>
                     )}
                   </div>

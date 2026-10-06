@@ -13,6 +13,14 @@ export const dictionaries = {
       edit: 'Edit',
       deleteText: 'Hapus',
       add: 'Tambah',
+      panel: {
+        top: 'Atas',
+        right: 'Kanan',
+        bottom: 'Bawah',
+        left: 'Kiri',
+        hide: 'Sembunyikan',
+        layoutToggleTitle: 'Ubah Posisi Panel',
+      },
     },
 
     // Navigation Labels
@@ -549,158 +557,6 @@ export const dictionaries = {
 
 
 
-    // Rental Vehicles
-    rentalVehicles: {
-      title: 'Kendaraan Rental',
-      pageSubtitle: 'Kelola ketersediaan dan informasi kendaraan untuk kebutuhan rental.',
-      searchPlaceholder: 'Cari...',
-      addVehicle: 'Tambah',
-      exportFilename: 'kendaraan-rental-adatrack',
-      
-      // Panel
-      panelTop: 'Atas',
-      panelRight: 'Kanan',
-      panelBottom: 'Bawah',
-      panelLeft: 'Kiri',
-      hidePanel: 'Sembunyikan',
-      layoutToggleTitle: 'Ubah Posisi Panel',
-
-      // Columns
-      colLicensePlate: 'Plat Nomor',
-      colPricingCategory: 'Kategori Tarif',
-      
-      // Filter & Status
-      filterStatus: 'Status',
-      filterAll: 'Semua',
-      statusReady: 'Ready / Tersedia',
-      statusReserved: 'Reserved / Dipesan',
-      statusRented: 'Disewa',
-      statusMaintenance: 'Maintenance',
-      statusUnavailable: 'Tidak Tersedia',
-      
-      // Data Completeness
-      dataComplete: 'Data Rental Lengkap',
-      dataCompleteShort: 'Lengkap',
-      dataCompleteBadge: 'Data Lengkap',
-      dataCompleteDesc: 'Seluruh data profil rental telah diisi.',
-      dataNotComplete: 'Data Rental Belum Lengkap',
-      dataNotCompleteShort: 'Belum Lengkap',
-      dataNotCompleteBadge: 'Belum Lengkap',
-      dataNotCompleteDesc: 'Harap lengkapi tarif dan dokumen rental.',
-      actionCompleteData: 'Lengkapi Data Rental',
-      
-      // Detail & Form Section
-      detailTitle: 'Detail Kendaraan',
-      tabCoreInfo: 'Data Kendaraan',
-      tabRentalInfo: 'Data Rental',
-      coreInfoNotice: 'Data kendaraan dikelola di Master Data Kendaraan. Tidak boleh diedit dari halaman Rental.',
-      alreadyRegistered: 'Kendaraan sudah terdaftar pada Kendaraan Rental.',
-      noCoreVehicles: 'Tidak ada kendaraan master yang belum didaftarkan ke rental.',
-      
-      // Table Columns
-      colVehicle: 'Kendaraan',
-      colYear: 'Tahun',
-      colStatus: 'Status Rental',
-      colCustomer: 'Pelanggan',
-      colPeriod: 'Periode Rental',
-      colRate: 'Tarif',
-      colCondition: 'Kondisi',
-      colCompleteness: 'Kelengkapan Data',
-      colActions: 'Aksi',
-      
-      // Form fields
-      fieldSelectVehicle: 'Pilih Kendaraan',
-      fieldRentalStatus: 'Status Rental',
-      fieldDailyRate: 'Tarif Harian',
-      fieldWeeklyRate: 'Tarif Mingguan',
-      fieldMonthlyRate: 'Tarif Bulanan',
-      fieldDeposit: 'Deposit',
-      fieldCondition: 'Kondisi',
-      fieldStartOdo: 'Kilometer Saat Tersedia',
-      fieldCurrentOdo: 'Kilometer Terakhir',
-      fieldNotes: 'Catatan',
-      fieldStnkExpiry: 'Masa Berlaku STNK',
-      fieldTaxExpiry: 'Masa Berlaku Pajak',
-      fieldInsuranceExpiry: 'Masa Berlaku Asuransi',
-      fieldEquipment: 'Kelengkapan',
-      
-      // Equipment options
-      equipStnk: 'STNK',
-      equipBpkb: 'BPKB',
-      equipSpareTire: 'Ban Cadangan',
-      equipJack: 'Dongkrak',
-      equipToolkit: 'Toolkit',
-      equipFirstAid: 'P3K',
-      equipFireExtinguisher: 'APAR',
-      equipCarpet: 'Karpet',
-      equipAudio: 'Radio / Audio',
-      
-      // Conditions
-      conditionGood: 'Baik',
-      conditionMinor: 'Kerusakan Ringan',
-      conditionRepair: 'Perlu Perbaikan',
-      
-      // Actions
-      actionDetail: 'Detail',
-      actionEdit: 'Edit Data Rental',
-      actionDisable: 'Nonaktifkan dari Rental',
-      confirmDisable: 'Nonaktifkan Kendaraan Rental',
-      confirmDisableDesc: 'Apakah Anda yakin ingin menonaktifkan kendaraan ini dari Kendaraan Rental? Data master pada CORE Vehicle tidak akan terhapus.',
-      cancel: 'Batal',
-      confirm: 'Nonaktifkan',
-      save: 'Simpan',
-      createSuccess: 'Kendaraan Rental berhasil didaftarkan.',
-      updateSuccess: 'Data Kendaraan Rental berhasil diperbarui.',
-      deleteSuccess: 'Kendaraan berhasil dinonaktifkan dari Rental.',
-      
-      // Empty state
-      emptyTitle: 'Belum ada Kendaraan Rental',
-      emptyDescription: 'Belum ada profil kendaraan rental yang terdaftar.',
-      noResultTitle: 'Kendaraan tidak ditemukan',
-      noResultDescription: 'Coba sesuaikan kata kunci atau filter pencarian.',
-
-      // Form section titles & helpers
-      sectionVehicleData: 'Data Kendaraan',
-      sectionVehicleDataDesc: 'Data kendaraan dikelola di Master Data Kendaraan. Informasi berikut bersifat read-only.',
-      sectionRentalData: 'Data Rental',
-      sectionRentalDataDesc: 'Pengaturan tarif, status, kondisi, dan kilometer.',
-      sectionNotes: 'Catatan',
-      sectionNotesDesc: 'Informasi tambahan atau catatan khusus mengenai kendaraan rental ini.',
-      sectionDocExpiry: 'Masa Berlaku Dokumen',
-      sectionEquipmentTitle: 'Kelengkapan Kendaraan',
-      sectionEquipmentDesc: 'Ceklis perlengkapan yang tersedia di kendaraan ini.',
-
-      // Status auto-manage
-      statusSystemManaged: 'Status dikelola otomatis oleh sistem karena ada transaksi aktif.',
-      statusManualHint: 'Set manual untuk Maintenance atau Tidak Tersedia. Status lain dikelola otomatis saat ada transaksi.',
-
-      // Pricing
-      pricingLabel: 'Pengaturan Tarif',
-      pricingCategory: 'Tarif Kategori',
-      pricingIndependent: 'Tarif Mandiri (Kustom)',
-      fieldPricingCategoryId: 'Pilih Kategori Tarif',
-      fieldDailyRateRp: 'Tarif Harian (Rp)',
-      fieldWeeklyRateRp: 'Tarif Mingguan (Rp)',
-      fieldMonthlyRateRp: 'Tarif Bulanan (Rp)',
-      fieldDepositRp: 'Deposit (Rp)',
-
-      // Core vehicle labels
-      fieldPlatNomor: 'Plat Nomor',
-      fieldGrup: 'Grup',
-      fieldMerk: 'Merk',
-      fieldAlias: 'Kendaraan (Alias)',
-      fieldKategori: 'Kategori',
-      fieldTahun: 'Tahun',
-      fieldWarna: 'Warna',
-      fieldBahanBakar: 'Bahan Bakar',
-      fieldNoStnk: 'No. STNK',
-      fieldBerlakuStnk: 'Berlaku STNK',
-
-      // Notes placeholder
-      notesPlaceholder: 'Tulis catatan (opsional)',
-    },
-
-
     rentalContractFeature: {
       title: 'Kontrak Rental',
       pageSubtitle: 'Kelola data kontrak dan serah terima kendaraan rental.',
@@ -803,6 +659,14 @@ export const dictionaries = {
       edit: 'Edit',
       deleteText: 'Delete',
       add: 'Add',
+      panel: {
+        top: 'Top',
+        right: 'Right',
+        bottom: 'Bottom',
+        left: 'Left',
+        hide: 'Hide',
+        layoutToggleTitle: 'Toggle Panel Position',
+      },
     },
 
     // Navigation Labels

@@ -111,5 +111,5 @@ Halaman Template Kontrak (`/rental/templates`) berfungsi sebagai **pusat peranca
 
 ## 6. Status Verifikasi & Hasil
 
-- **Status:** COMPLETED
+- **Status:** 
 - **Verifikasi:** Editor visual TipTap, injeksi variabel dinamis Handlebars, modal pratinjau dokumen dengan mock data sewa, dan pengaktifan template telah teruji dan berjalan normal.

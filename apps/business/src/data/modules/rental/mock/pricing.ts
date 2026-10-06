@@ -8,6 +8,8 @@ import type {
 export const mockPricingCategory: RentalPricingCategory[] = [
   {
     id: 'prg-001',
+    code: 'REG-001',
+    defaultDeposit: 1000000,
     name: 'MPV Standard',
     description: 'Kendaraan keluarga standar 7 penumpang',
     status: 'ACTIVE',
@@ -16,6 +18,8 @@ export const mockPricingCategory: RentalPricingCategory[] = [
   },
   {
     id: 'prg-002',
+    code: 'PRM-002',
+    defaultDeposit: 2000000,
     name: 'MPV Premium',
     description: 'Kendaraan MPV kelas atas',
     status: 'ACTIVE',
@@ -24,6 +28,8 @@ export const mockPricingCategory: RentalPricingCategory[] = [
   },
   {
     id: 'prg-003',
+    code: 'SUV-003',
+    defaultDeposit: 1500000,
     name: 'SUV Standard',
     description: 'Kendaraan SUV standar',
     status: 'ACTIVE',

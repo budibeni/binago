@@ -7,10 +7,10 @@ import { cn, formatCurrency } from '@adatrack/utils';
 
 // ─── Helper Components ──────────────────────────────────────────────────────────
 
-const InfoItem = ({ label, value, highlight = false, valueClassName, colSpan = 1 }: { 
-  label: string; 
-  value: React.ReactNode; 
-  highlight?: boolean; 
+const InfoItem = ({ label, value, highlight = false, valueClassName, colSpan = 1 }: {
+  label: string;
+  value: React.ReactNode;
+  highlight?: boolean;
   valueClassName?: string;
   colSpan?: 1 | 2;
 }) => (
@@ -22,22 +22,22 @@ const InfoItem = ({ label, value, highlight = false, valueClassName, colSpan = 1
   </div>
 );
 
-function SectionCard({ 
-  icon: Icon, 
-  title, 
+function SectionCard({
+  icon: Icon,
+  title,
   colorClass = "text-muted-foreground",
   bgClass = "",
   className = "",
   rightAction,
-  children 
-}: { 
-  icon: any; 
-  title: string; 
+  children
+}: {
+  icon: any;
+  title: string;
   colorClass?: string;
   bgClass?: string;
   className?: string;
   rightAction?: React.ReactNode;
-  children: React.ReactNode 
+  children: React.ReactNode
 }) {
   return (
     <div className="rounded-2xl border border-border/60 bg-background overflow-hidden flex flex-col">
@@ -76,10 +76,10 @@ export interface PricingCategoryViewProps {
   labels?: Record<string, string>;
 }
 
-export function PricingCategoryView({ 
-  open, 
-  onOpenChange, 
-  group, 
+export function PricingCategoryView({
+  open,
+  onOpenChange,
+  group,
   rates = [],
   vehicles = [],
   onEdit,
@@ -100,7 +100,7 @@ export function PricingCategoryView({
   const filteredVehicles = React.useMemo(() => {
     if (!searchQuery) return vehicles;
     const q = searchQuery.toLowerCase();
-    return vehicles.filter(v => 
+    return vehicles.filter(v =>
       v.vehicle.coreVehicle.plateNumber.toLowerCase().includes(q) ||
       v.vehicle.coreVehicle.vehicleName.toLowerCase().includes(q) ||
       v.vehicle.coreVehicle.brand.toLowerCase().includes(q)
@@ -109,7 +109,7 @@ export function PricingCategoryView({
 
   if (!group) return null;
 
-  
+
   const getRate = (type: string) => {
     const rate = rates.find(r => r.rateType === type);
     return rate ? formatCurrency(rate.amount) : '-';
@@ -124,7 +124,7 @@ export function PricingCategoryView({
       title="Detail Kategori Tarif"
     >
       <div className="flex-1 overflow-y-auto bg-neutral-50/30 dark:bg-neutral-950/20 pb-8 flex flex-col h-full">
-        
+
         {/* Header Section */}
         <div className="px-4 py-3 bg-background border-b border-border/40 flex flex-col gap-1.5 shrink-0">
           <div className="flex justify-between items-start">
@@ -157,20 +157,20 @@ export function PricingCategoryView({
             bgClass="bg-amber-100 dark:bg-amber-900/40"
             className="grid grid-cols-2 gap-y-4 gap-x-4"
           >
-            <InfoItem 
+            <InfoItem
               label={labels?.headerDaily || "Harian"}
               value={getRate('DAILY')}
               highlight
             />
-            <InfoItem 
+            <InfoItem
               label={labels?.headerWeekly || "Mingguan"}
               value={getRate('WEEKLY')}
             />
-            <InfoItem 
+            <InfoItem
               label={labels?.headerMonthly || "Bulanan"}
               value={getRate('MONTHLY')}
             />
-            <InfoItem 
+            <InfoItem
               label={labels?.headerDeposit || "Deposit"}
               value={formatCurrency(group.defaultDeposit || 0)}
               highlight
@@ -185,7 +185,7 @@ export function PricingCategoryView({
             bgClass="bg-purple-100 dark:bg-purple-900/40"
             className="flex flex-col p-0 flex-1 min-h-[300px]"
             rightAction={
-              <Button variant="outline" size="sm" className="h-6 text-[10px] px-2 rounded font-medium" onClick={onAssignVehicle}>
+              <Button variant="outline" size="sm" className="h-6 text-[12px] px-2 rounded font-medium" onClick={onAssignVehicle}>
                 + Kelola
               </Button>
             }
@@ -193,8 +193,8 @@ export function PricingCategoryView({
             <div className="p-3 border-b border-border/40 bg-neutral-50/50 dark:bg-neutral-900/20">
               <div className="relative">
                 <Search className="absolute left-2.5 top-1.5 h-3.5 w-3.5 text-foreground-muted" />
-                <Input 
-                  placeholder="Cari kendaraan..." 
+                <Input
+                  placeholder="Cari kendaraan..."
                   className="pl-8 h-7 text-xs bg-white dark:bg-neutral-950 border-border/60 transition-colors"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -213,40 +213,40 @@ export function PricingCategoryView({
                   </span>
                 </div>
               ) : filteredVehicles.map((v) => {
-                  return (
-                    <div key={v.vehicle.id} className="group p-2.5 border border-border/60 rounded-xl flex items-center justify-between bg-background shadow-sm hover:border-primary/40 hover:shadow-md transition-all duration-200">
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="h-8 w-8 rounded-lg bg-neutral-100 dark:bg-neutral-900 flex items-center justify-center shrink-0 border border-border/50">
-                          <CarFront className="h-4 w-4 text-foreground-muted group-hover:text-primary transition-colors" />
-                        </div>
-                        <div className="min-w-0 flex flex-col justify-center">
-                          <div className="flex items-center gap-1.5 mb-0.5">
-                            <span className="font-bold text-[11px] text-foreground truncate">{v.vehicle.coreVehicle.plateNumber}</span>
-                            <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded text-neutral-500 bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 shrink-0">
-                              {v.vehicle.coreVehicle.vehicleCategory}
-                            </span>
-                          </div>
-                          <div className="text-[10px] font-medium text-foreground-subtle truncate">
-                            {v.vehicle.coreVehicle.vehicleName} • {v.vehicle.coreVehicle.brand}
-                          </div>
-                        </div>
+                return (
+                  <div key={v.vehicle.id} className="group p-2.5 border border-border/60 rounded-xl flex items-center justify-between bg-background shadow-sm hover:border-primary/40 hover:shadow-md transition-all duration-200">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="h-8 w-8 rounded-lg bg-neutral-100 dark:bg-neutral-900 flex items-center justify-center shrink-0 border border-border/50">
+                        <CarFront className="h-4 w-4 text-foreground-muted group-hover:text-primary transition-colors" />
                       </div>
-                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        {onRemoveVehicle && (
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="h-7 w-7 p-0 shrink-0 text-foreground-muted hover:text-danger hover:bg-danger/10 rounded-md transition-colors"
-                            onClick={() => onRemoveVehicle(v.vehicle.id)}
-                            title="Keluarkan dari kategori"
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </Button>
-                        )}
+                      <div className="min-w-0 flex flex-col justify-center">
+                        <div className="flex items-center gap-1.5 mb-0.5">
+                          <span className="font-bold text-[11px] text-foreground truncate">{v.vehicle.coreVehicle.plateNumber}</span>
+                          <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded text-neutral-500 bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 shrink-0">
+                            {v.vehicle.coreVehicle.vehicleCategory}
+                          </span>
+                        </div>
+                        <div className="text-[10px] font-medium text-foreground-subtle truncate">
+                          {v.vehicle.coreVehicle.vehicleName} • {v.vehicle.coreVehicle.brand}
+                        </div>
                       </div>
                     </div>
-                  );
-                })
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {onRemoveVehicle && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 w-7 p-0 shrink-0 text-foreground-muted hover:text-danger hover:bg-danger/10 rounded-md transition-colors"
+                          onClick={() => onRemoveVehicle(v.vehicle.id)}
+                          title="Keluarkan dari kategori"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })
               }
             </div>
           </SectionCard>

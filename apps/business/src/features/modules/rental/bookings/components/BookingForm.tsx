@@ -109,8 +109,8 @@ export function BookingForm({
     let total = 0;
     selectedVehicles.forEach(vehicle => {
       let rate = vehicle.dailyRate;
-      if (formData.rateType === 'WEEKLY') rate = vehicle.weeklyRate || (vehicle.dailyRate * 7);
-      if (formData.rateType === 'MONTHLY') rate = vehicle.monthlyRate || (vehicle.dailyRate * 30);
+      if (formData.rateType === 'WEEKLY') rate = vehicle.rateOverrideWeekly || (vehicle.dailyRate * 7);
+      if (formData.rateType === 'MONTHLY') rate = vehicle.rateOverrideMonthly || (vehicle.dailyRate * 30);
       
       let multiplier = duration;
       if (formData.rateType === 'WEEKLY') multiplier = Math.ceil(duration / 7);
@@ -300,8 +300,8 @@ export function BookingForm({
                   <tbody className="divide-y divide-border/40">
                     {selectedVehicles.map(v => {
                        let rate = v.dailyRate;
-                       if (formData.rateType === 'WEEKLY') rate = v.weeklyRate || (v.dailyRate * 7);
-                       if (formData.rateType === 'MONTHLY') rate = v.monthlyRate || (v.dailyRate * 30);
+                       if (formData.rateType === 'WEEKLY') rate = v.rateOverrideWeekly || (v.dailyRate * 7);
+                       if (formData.rateType === 'MONTHLY') rate = v.rateOverrideMonthly || (v.dailyRate * 30);
                        
                        return (
                         <tr key={v.vehicleId} className="hover:bg-neutral-50/50 dark:hover:bg-neutral-900/50">

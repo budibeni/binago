@@ -3,32 +3,39 @@ import type { Vehicle } from '@/features/core/vehicles/types/vehicle';
 import { rentalVehicleRepository } from '../repositories/vehicleRepository';
 import { vehicleService as coreVehicleService } from '@/data/services/vehicleService';
 import { rentalCustomerService } from './customerService';
+import { pricingService } from './pricingService';
 
 class RentalVehicleService {
   private isProfileComplete(profile: RentalVehicleProfile): boolean {
     return !!(
-      profile.dailyRate > 0 &&
-      profile.stnkExpiredAt &&
-      profile.taxExpiredAt &&
-      profile.insuranceExpiredAt
-    );
+      profile.rateOverrideDaily || profile.categoryId
+    ) && !!(profile.completenessChecklist?.stnkOriginal);
   }
 
   private enrichProfile(profile: RentalVehicleProfile): RentalVehicle | null {
     const coreVehicle = coreVehicleService.getVehicleById(profile.vehicleId);
     if (!coreVehicle) return null;
 
-    let customerName: string | undefined = undefined;
-    if (profile.customerId) {
-      const customer = rentalCustomerService.getCustomerById(profile.customerId);
-      if (customer) customerName = customer.name;
+    let categoryName: string | undefined = undefined;
+    let dailyRate = profile.rateOverrideDaily || 0;
+    if (profile.categoryId) {
+      const category = pricingService.getPricingCategory({ status: 'ACTIVE' }).find(c => c.id === profile.categoryId);
+      if (category) {
+        categoryName = category.name;
+        const rates = pricingService.getRatesByGroupId(category.id);
+        const daily = rates.find(r => r.rateType === 'DAILY');
+        if (daily) {
+          dailyRate = daily.amount;
+        }
+      }
     }
 
     return {
       ...profile,
       coreVehicle,
       isComplete: this.isProfileComplete(profile),
-      customerName,
+      categoryName,
+      dailyRate,
     };
   }
 
@@ -53,7 +60,7 @@ class RentalVehicleService {
       }
     }
 
-    return enrichedVehicles.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    return enrichedVehicles.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
   }
 
   getRentalVehicleById(id: string): RentalVehicle | null {
@@ -102,28 +109,14 @@ class RentalVehicleService {
       rentalVehicleRepository.create({
         vehicleId,
         status: 'READY',
-        pricingType: 'INDEPENDENT',
-        dailyRate: 0,
-        weeklyRate: 0,
-        monthlyRate: 0,
-        deposit: 0,
-        condition: 'GOOD',
         currentOdometer: 0,
-        rentalStartOdometer: 0,
-        notes: '',
-        stnkExpiredAt: '',
-        taxExpiredAt: '',
-        insuranceExpiredAt: '',
-        equipment: {
-          stnk: false,
-          bpkb: false,
+        rateOverrideDaily: 0,
+        completenessChecklist: {
+          stnkOriginal: false,
+          spareKey: false,
+          jackAndTools: false,
           spareTire: false,
-          jack: false,
-          toolkit: false,
           firstAidKit: false,
-          fireExtinguisher: false,
-          carpet: false,
-          audio: false,
         }
       });
       success++;

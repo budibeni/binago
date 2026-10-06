@@ -23,9 +23,11 @@ export function PricingCategoryCreateFeature() {
     ];
 
     pricingService.createPricingCategory({
+      code: formData.name.substring(0, 3).toUpperCase() + '-' + Date.now().toString().slice(-4),
       name: formData.name,
-      description: formData.description,
-      status: formData.status
+      description: formData.description || '',
+      defaultDeposit: formData.defaultDeposit || 0,
+      status: formData.status || 'ACTIVE'
     }, rates);
     
     toast.success(labels.createSuccess);

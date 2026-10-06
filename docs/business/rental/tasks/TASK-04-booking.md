@@ -132,5 +132,5 @@ export interface Booking {
 
 ## 6. Status Verifikasi & Hasil
 
-- **Status:** COMPLETED
+- **Status:** 
 - **Verifikasi:** Alur reservasi multi-kendaraan, validasi tanggal bentrok (*conflict detection*), kalkulasi harga bertingkat, drawer rincian, dan konversi ke kontrak sewa telah teruji dan bekerja normal.

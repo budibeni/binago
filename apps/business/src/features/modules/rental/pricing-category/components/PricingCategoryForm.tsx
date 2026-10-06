@@ -1,10 +1,11 @@
 'use client';
 
 import React from 'react';
-import { FormShell, FormCard, InputString, InputNumber, InputSelect, InputTextarea } from '@adatrack/ui';
+import { FormShell, FormCard, InputString, InputNumber, InputSelect, InputTextarea, useForm } from '@adatrack/ui';
 import { Layers, Banknote } from 'lucide-react';
 import type { RateType } from '../../bookings/types/booking';
 import type { RentalPricingCategory, PricingCategoryStatus } from '../types/pricing';
+import { getPricingCategoryFormSchema } from '../types/pricing';
 
 export interface PricingCategoryFormData {
   name: string;
@@ -34,49 +35,37 @@ export function PricingCategoryForm({ open, onOpenChange, initialData, initialRa
     return rate ? rate.amount : 0;
   };
 
-  const [name, setName] = React.useState('');
-  const [description, setDescription] = React.useState('');
-  const [status, setStatus] = React.useState<PricingCategoryStatus>('ACTIVE');
-  const [dailyRate, setDailyRate] = React.useState<number | null>(0);
-  const [weeklyRate, setWeeklyRate] = React.useState<number | null>(0);
-  const [monthlyRate, setMonthlyRate] = React.useState<number | null>(0);
-  const [defaultDeposit, setDefaultDeposit] = React.useState<number | null>(0);
-
-  React.useEffect(() => {
-    if (open) {
-      if (initialData) {
-        setName(initialData.name);
-        setDescription(initialData.description || '');
-        setStatus(initialData.status);
-        setDefaultDeposit(initialData.defaultDeposit);
-        setDailyRate(getInitialRate('DAILY'));
-        setWeeklyRate(getInitialRate('WEEKLY'));
-        setMonthlyRate(getInitialRate('MONTHLY'));
-      } else {
-        setName('');
-        setDescription('');
-        setStatus('ACTIVE');
-        setDefaultDeposit(0);
-        setDailyRate(0);
-        setWeeklyRate(0);
-        setMonthlyRate(0);
-      }
+  const initialFormData = React.useMemo(() => {
+    if (initialData) {
+      return {
+        name: initialData.name,
+        description: initialData.description || '',
+        status: initialData.status,
+        defaultDeposit: initialData.defaultDeposit || 0,
+        dailyRate: getInitialRate('DAILY'),
+        weeklyRate: getInitialRate('WEEKLY'),
+        monthlyRate: getInitialRate('MONTHLY'),
+      };
     }
-  }, [open, initialData, initialRates]);
+    return {
+      name: '',
+      description: '',
+      status: 'ACTIVE' as PricingCategoryStatus,
+      defaultDeposit: 0,
+      dailyRate: 0,
+      weeklyRate: 0,
+      monthlyRate: 0,
+    };
+  }, [initialData, initialRates]);
 
-  const handleSubmit = () => {
-    if (!name) return;
-
-    onSubmit({
-      name,
-      description,
-      status,
-      dailyRate: dailyRate || 0,
-      weeklyRate: weeklyRate || 0,
-      monthlyRate: monthlyRate || 0,
-      defaultDeposit: defaultDeposit || 0,
-    });
-  };
+  const { formData, errors, isSubmitting, handleChange, handleSubmit } = useForm<any>({
+    initialData: initialFormData,
+    resetOn: [open, initialData, initialRates],
+    schema: getPricingCategoryFormSchema(labels || {}),
+    onSubmit: async (data) => {
+      onSubmit(data as PricingCategoryFormData);
+    }
+  });
 
   return (
     <FormShell
@@ -86,7 +75,8 @@ export function PricingCategoryForm({ open, onOpenChange, initialData, initialRa
       title={title}
       subtitle={initialData ? (labels.formEditSubtitle || 'Perbarui informasi kategori tarif') : (labels.formAddSubtitle || 'Tambahkan kategori tarif baru')}
       onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}
-      onSave={handleSubmit}
+      onSave={() => handleSubmit()}
+      isSubmitting={isSubmitting}
       onCancel={() => onOpenChange(false)}
       saveText={labels.formSave || "Simpan"}
       columns={1}
@@ -101,16 +91,18 @@ export function PricingCategoryForm({ open, onOpenChange, initialData, initialRa
             <InputString
               label={labels.formNameLabel || "Nama Kategori Tarif"}
               placeholder={labels.formNamePlaceholder || "Misal: MPV Standard"}
-              value={name}
-              onChange={setName}
+              value={formData.name || ''}
+              onChange={(v) => handleChange('name', v)}
+              error={errors.name}
               required
             />
           </div>
           <div className="col-span-1 group-data-[layout=default]/form:md:col-span-2 group-data-[layout=fullscreen]/form:md:col-span-2">
             <InputSelect
               label={labels.formStatusLabel || "Status"}
-              value={status}
-              onChange={(val: any) => setStatus(val)}
+              value={formData.status || 'ACTIVE'}
+              onChange={(v) => handleChange('status', v)}
+              error={errors.status}
               options={[
                 { value: 'ACTIVE', label: labels.statusActive || 'Aktif' },
                 { value: 'INACTIVE', label: labels.statusInactive || 'Nonaktif' }
@@ -122,8 +114,9 @@ export function PricingCategoryForm({ open, onOpenChange, initialData, initialRa
             <InputTextarea
               label={labels.formDescLabel || "Deskripsi"}
               placeholder={labels.formDescPlaceholder || "Opsional"}
-              value={description}
-              onChange={setDescription}
+              value={formData.description || ''}
+              onChange={(v) => handleChange('description', v)}
+              error={errors.description}
               rows={3}
             />
           </div>
@@ -138,32 +131,36 @@ export function PricingCategoryForm({ open, onOpenChange, initialData, initialRa
           <div className="col-span-1 group-data-[layout=default]/form:md:col-span-2 group-data-[layout=fullscreen]/form:md:col-span-2">
             <InputNumber
               label={labels.formDailyLabel || "Tarif Harian (Rp)"}
-              value={dailyRate}
-              onChange={setDailyRate}
+              value={formData.dailyRate}
+              onChange={(v) => handleChange('dailyRate', v)}
+              error={errors.dailyRate}
               min={0}
             />
           </div>
           <div className="col-span-1 group-data-[layout=default]/form:md:col-span-2 group-data-[layout=fullscreen]/form:md:col-span-2">
             <InputNumber
               label={labels.formWeeklyLabel || "Tarif Mingguan (Rp)"}
-              value={weeklyRate}
-              onChange={setWeeklyRate}
+              value={formData.weeklyRate}
+              onChange={(v) => handleChange('weeklyRate', v)}
+              error={errors.weeklyRate}
               min={0}
             />
           </div>
           <div className="col-span-1 group-data-[layout=default]/form:md:col-span-2 group-data-[layout=fullscreen]/form:md:col-span-2">
             <InputNumber
               label={labels.formMonthlyLabel || "Tarif Bulanan (Rp)"}
-              value={monthlyRate}
-              onChange={setMonthlyRate}
+              value={formData.monthlyRate}
+              onChange={(v) => handleChange('monthlyRate', v)}
+              error={errors.monthlyRate}
               min={0}
             />
           </div>
           <div className="col-span-1 group-data-[layout=default]/form:md:col-span-2 group-data-[layout=fullscreen]/form:md:col-span-2">
             <InputNumber
               label={labels.formDepositLabel || "Uang Jaminan (Rp)"}
-              value={defaultDeposit}
-              onChange={setDefaultDeposit}
+              value={formData.defaultDeposit}
+              onChange={(v) => handleChange('defaultDeposit', v)}
+              error={errors.defaultDeposit}
               min={0}
             />
           </div>

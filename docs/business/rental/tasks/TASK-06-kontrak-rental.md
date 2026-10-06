@@ -136,5 +136,5 @@ export interface Contract {
 
 ## 6. Status Verifikasi & Hasil
 
-- **Status:** COMPLETED
+- **Status:** 
 - **Verifikasi:** Seluruh alur pembuatan kontrak dari booking, multi-armada sewa, pratinjau cetak PDF surat perjanjian sewa, drawer rincian, dan transisi status sewa telah teruji dan berjalan normal.

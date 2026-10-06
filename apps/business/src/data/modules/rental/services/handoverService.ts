@@ -119,9 +119,8 @@ export const handoverService = {
     if (vehicle) {
       rentalVehicleService.updateRentalVehicle(vehicle.id, {
         status: 'RENTED',
-        condition: data.vehicleCondition,
+        conditionNotes: data.vehicleCondition === 'NEEDS_REPAIR' ? 'Perlu perbaikan (Serah Terima)' : '',
         currentOdometer: data.odometerStart,
-        rentalStartOdometer: data.odometerStart,
       });
     }
 

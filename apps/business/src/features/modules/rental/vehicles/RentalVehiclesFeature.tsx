@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { getRentalVehiclesTranslation } from './i18n';
 import { getTranslation } from '@/i18n';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
 import { rentalVehicleService } from '@/data/modules/rental/services/vehicleService';
@@ -43,8 +44,9 @@ function StatCard({ label, value, colorClass, icon: Icon }: { label: string, val
 
 export function RentalVehiclesFeature() {
   const locale = useBusinessLocale();
-  const t = getTranslation(locale);
-  const labels = t.rentalVehicles;
+  const t = getRentalVehiclesTranslation(locale);
+  const globalLabels = getTranslation(locale);
+  const labels = t;
 
   // State
   const [dataVersion, setDataVersion] = React.useState(0);
@@ -221,12 +223,12 @@ export function RentalVehiclesFeature() {
       collapsedTitle="RINGKASAN"
       onSideChange={setPanelSide}
       labels={{
-        top: labels.panelTop || 'Atas',
-        right: labels.panelRight || 'Kanan',
-        bottom: labels.panelBottom || 'Bawah',
-        left: labels.panelLeft || 'Kiri',
-        hide: labels.hidePanel || 'Sembunyikan',
-        layoutToggleTitle: labels.layoutToggleTitle || 'Ubah Posisi Panel',
+        top: globalLabels.common.panel.top,
+        right: globalLabels.common.panel.right,
+        bottom: globalLabels.common.panel.bottom,
+        left: globalLabels.common.panel.left,
+        hide: globalLabels.common.panel.hide,
+        layoutToggleTitle: globalLabels.common.panel.layoutToggleTitle,
       }}
       className={cn(
         "shrink-0 bg-white dark:bg-background z-10",
