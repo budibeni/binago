@@ -23,7 +23,7 @@ import { cn } from '@adatrack/utils';
 
 function StatCard({ label, value, colorClass, icon: Icon }: { label: string, value: number, colorClass: string, icon?: React.ElementType }) {
   const textColorClass = colorClass.replace(/bg-/g, 'text-');
-  
+
   return (
     <div className="flex items-center justify-between p-3 rounded-none border border-border/80 bg-background transition-colors hover:border-border">
       <div className="flex items-center gap-2.5">
@@ -34,14 +34,14 @@ function StatCard({ label, value, colorClass, icon: Icon }: { label: string, val
         ) : (
           <div className={cn("w-2 h-2 rounded-full", colorClass)} />
         )}
-        <span className="text-[11px] font-semibold text-foreground-muted tracking-tight">{label}</span>
+        <span className="text-[12px] text-foreground-muted tracking-tight">{label}</span>
       </div>
-      <span className="text-sm font-bold text-foreground">{value}</span>
+      <span className="text-base font-bold text-foreground">{value}</span>
     </div>
   );
 }
 
-export function RentalVehiclesFeature() {
+export function RentalVehicleFeature() {
   const locale = useBusinessLocale();
   const t = getRentalVehiclesTranslation(locale);
   const globalLabels = getTranslation(locale);
@@ -64,6 +64,7 @@ export function RentalVehiclesFeature() {
   const [disableOpen, setDisableOpen] = React.useState(false);
 
   const [editId, setEditId] = React.useState<string | null>(null);
+
 
   const [selectedVehicle, setSelectedVehicle] = React.useState<RentalVehicle | null>(null);
 
@@ -120,8 +121,9 @@ export function RentalVehiclesFeature() {
 
       setDataVersion(prev => prev + 1);
       setSelectionDialogOpen(false);
-    } catch (e: any) {
-      showToast('Error', e.message, 'error');
+    } catch (e) {
+      const error = e as Error;
+      showToast('Error', error.message, 'error');
     }
   };
 
@@ -131,6 +133,7 @@ export function RentalVehiclesFeature() {
   };
 
   const handleCompleteClick = (v: RentalVehicle) => {
+    window.history.pushState(null, '', '/rental/vehicles/edit');
     setEditId(v.id);
   };
 
@@ -152,8 +155,9 @@ export function RentalVehiclesFeature() {
         rentalVehicleService.removeFromRental(selectedVehicle.id);
         alert(labels.deleteSuccess);
         setDataVersion(prev => prev + 1);
-      } catch (e: any) {
-        alert(`Error: ${e.message}`);
+      } catch (e) {
+        const error = e as Error;
+        alert(`Error: ${error.message}`);
       }
     }
   };
@@ -215,41 +219,41 @@ export function RentalVehiclesFeature() {
   const renderStatsPanel = () => {
     return (
       <PanelShell
-      title={labels.summaryTitle}
-      side={panelSide}
-      isOpen={showStats}
-      onClose={() => setShowStats(false)}
-      onOpen={() => setShowStats(true)}
-      collapsedTitle={labels.summaryTitle.toUpperCase()}
-      onSideChange={setPanelSide}
-      labels={{
-        top: globalLabels.common.panel.top,
-        right: globalLabels.common.panel.right,
-        bottom: globalLabels.common.panel.bottom,
-        left: globalLabels.common.panel.left,
-        hide: globalLabels.common.panel.hide,
-        layoutToggleTitle: globalLabels.common.panel.layoutToggleTitle,
-      }}
-      className={cn(
-        "shrink-0 bg-white dark:bg-background z-10",
-        (panelSide === 'top' || panelSide === 'bottom') ? "w-full" : "w-80 min-w-80 h-full"
-      )}
-    >
-      <div className={cn("gap-2.5 p-3", (panelSide === 'top' || panelSide === 'bottom') ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6" : "flex flex-col h-full")}>
-        <StatCard label={labels.totalVehicle} value={stats.all} colorClass="bg-foreground" icon={CarFront} />
-        <StatCard label={labels.statusReady || 'Siap'} value={stats.ready} colorClass="bg-success" icon={CheckCircle2} />
-        <StatCard label={labels.statusReserved || 'Dipesan'} value={stats.reserved} colorClass="bg-warning" icon={Calendar} />
-        <StatCard label={labels.statusRented || 'Disewa'} value={stats.rented} colorClass="bg-blue-500" icon={User} />
-        <StatCard label={labels.statusMaintenance || 'Perawatan'} value={stats.maintenance} colorClass="bg-purple-500" icon={Wrench} />
-        <StatCard label={labels.statusUnavailable || 'Tidak Tersedia'} value={stats.unavailable} colorClass="bg-neutral-500 dark:bg-neutral-400" icon={Ban} />
-      </div>
-    </PanelShell>
+        title={labels.summaryTitle}
+        side={panelSide}
+        isOpen={showStats}
+        onClose={() => setShowStats(false)}
+        onOpen={() => setShowStats(true)}
+        collapsedTitle={labels.summaryTitle.toUpperCase()}
+        onSideChange={setPanelSide}
+        labels={{
+          top: globalLabels.common.panel.top,
+          right: globalLabels.common.panel.right,
+          bottom: globalLabels.common.panel.bottom,
+          left: globalLabels.common.panel.left,
+          hide: globalLabels.common.panel.hide,
+          layoutToggleTitle: globalLabels.common.panel.layoutToggleTitle,
+        }}
+        className={cn(
+          "shrink-0 bg-white dark:bg-background z-10",
+          (panelSide === 'top' || panelSide === 'bottom') ? "w-full" : "w-80 min-w-80 h-full"
+        )}
+      >
+        <div className={cn("gap-2.5 p-3", (panelSide === 'top' || panelSide === 'bottom') ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6" : "flex flex-col h-full")}>
+          <StatCard label={labels.totalVehicle} value={stats.all} colorClass="bg-foreground" icon={CarFront} />
+          <StatCard label={labels.statusReady || 'Siap'} value={stats.ready} colorClass="bg-success" icon={CheckCircle2} />
+          <StatCard label={labels.statusReserved || 'Dipesan'} value={stats.reserved} colorClass="bg-warning" icon={Calendar} />
+          <StatCard label={labels.statusRented || 'Disewa'} value={stats.rented} colorClass="bg-blue-500" icon={User} />
+          <StatCard label={labels.statusMaintenance || 'Perawatan'} value={stats.maintenance} colorClass="bg-purple-500" icon={Wrench} />
+          <StatCard label={labels.statusUnavailable || 'Tidak Tersedia'} value={stats.unavailable} colorClass="bg-neutral-500 dark:bg-neutral-400" icon={Ban} />
+        </div>
+      </PanelShell>
     );
   };
 
   return (
     <div className={cn("flex h-full w-full bg-background overflow-hidden relative", (panelSide === 'top' || panelSide === 'bottom') ? 'flex-col' : 'flex-row')}>
-      
+
       {/* Render panel first if top or left */}
       {(panelSide === 'top' || panelSide === 'left') && renderStatsPanel()}
 
@@ -278,10 +282,7 @@ export function RentalVehiclesFeature() {
             className="border-none shadow-none"
             dtLabels={{
               noResultTitle: labels.noResultTitle,
-              noResultDescription: labels.noResultDescription,
-              emptyTitle: labels.emptyTitle,
-              emptyDescription: labels.emptyDescription,
-              searchPlaceholder: labels.searchPlaceholder,
+              noResultDesc: labels.noResultDescription,
               toolbarColumns: labels.dtColumns,
               toolbarExport: labels.dtExport,
               toolbarFilter: labels.filterTitle,
@@ -341,6 +342,7 @@ export function RentalVehiclesFeature() {
         labels={labels}
         onEdit={(v) => {
           setDetailOpen(false);
+          window.history.pushState(null, '', '/rental/vehicles/edit');
           setEditId(v.id);
         }}
         onDelete={handleDisableClick}
@@ -384,10 +386,19 @@ export function RentalVehiclesFeature() {
             setEditId(null);
           }}
           onSave={(data) => {
-            // TODO: dispatch edit save
-            window.history.pushState(null, '', '/rental/vehicles');
-            setEditId(null);
-            setDataVersion(prev => prev + 1);
+            try {
+              const payload = {
+                ...data,
+                condition: data.condition === null ? undefined : data.condition
+              };
+              rentalVehicleService.updateRentalVehicle(editId, payload as any);
+              window.history.pushState(null, '', '/rental/vehicles');
+              setEditId(null);
+              setDataVersion(prev => prev + 1);
+            } catch (e) {
+              const error = e as Error;
+              alert(`Error: ${error.message}`);
+            }
           }}
         />
       )}

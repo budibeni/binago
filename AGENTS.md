@@ -375,6 +375,15 @@ Jangan mencampurkan navigation atau business logic keduanya.
 
 Shared component boleh digunakan jika memang generic dan benar-benar shared.
 
+# 13B. FORM DAN NAVIGATION (DRAWER OVERLAY)
+
+Jika form (Add/Edit) secara UI dirancang muncul sebagai Drawer/Modal di atas tabel:
+- JANGAN gunakan `router.push()` dari Next.js untuk berpindah halaman karena akan men-unmount tabel.
+- GUNAKAN komponen `[Domain]Form.tsx` langsung di dalam file `[Domain]Feature.tsx`.
+- Manipulasi URL hanya untuk kebutuhan estetika menggunakan `window.history.pushState(null, '', '/domain/edit');`.
+
+Pembuatan halaman terpisah seperti `[Domain]EditFeature.tsx` (dengan routing `/edit/[id]`) HANYA diizinkan sebagai fallback jika user mengakses link edit secara langsung (deep-link/refresh browser).
+
 ---
 
 # 14. DUMMY DATA

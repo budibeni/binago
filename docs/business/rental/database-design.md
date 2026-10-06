@@ -79,11 +79,16 @@ Skema harga berjenjang dan pemetaan armada CORE ke operasional rental.
 | `id` | UUID | PRIMARY KEY | |
 | `vehicle_id` | UUID | UNIQUE, FK `core_vehicles.id`| SSoT dari Core |
 | `category_id` | UUID | FK `rental_pricing_categories.id`| |
-| `status` | ENUM | NOT NULL | `READY`, `RESERVED`, `RENTED`, `MAINTENANCE` |
+| `status` | ENUM | NOT NULL | `READY`, `RESERVED`, `RENTED`, `MAINTENANCE`, `UNAVAILABLE` |
 | `current_odometer`| INTEGER | NOT NULL | Pembaruan rutin |
-| `rate_override_daily` | DECIMAL | NULL | Timpa harga master |
-| `rate_override_weekly`| DECIMAL | NULL | Timpa harga master |
-| `rate_override_monthly`| DECIMAL| NULL | Timpa harga master |
+| `fuel_level_percent` | INTEGER | DEFAULT 100 | Level BBM saat ini (0-100%) |
+| `condition_notes` | TEXT | NULL | Catatan kondisi fisik kendaraan |
+| `completeness_checklist` | JSONB | NOT NULL | Status STNK, Kunci Cadangan, Dongkrak, dll. |
+| `current_booking_id` | UUID | FK `rental_bookings.id` | Booking aktif (jika RESERVED) |
+| `current_contract_id` | UUID | FK `rental_contracts.id` | Kontrak aktif (jika RENTED) |
+| `rate_override_daily` | DECIMAL | NULL | Timpa harga master (harian) |
+| `rate_override_weekly`| DECIMAL | NULL | Timpa harga master (mingguan) |
+| `rate_override_monthly`| DECIMAL| NULL | Timpa harga master (bulanan) |
 
 ## 3. Transaksi Sewa (Booking & Kontrak)
 Pencatatan reservasi (*multi-armada*) dan dokumen legalnya.

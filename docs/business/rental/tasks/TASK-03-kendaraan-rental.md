@@ -85,14 +85,19 @@ export type RentalVehicleStatus = 'READY' | 'RESERVED' | 'RENTED' | 'MAINTENANCE
 export interface RentalVehicleProfile {
   id: string;                    // Format: rvp-xxx
   vehicleId: string;             // Foreign Key ke CORE Vehicle (SSoT)
-  pricingCategoryId?: string;    // Foreign Key ke RentalPricingCategory
-  customRateId?: string;         // Referensi tarif khusus jika ada
+  categoryId?: string | null;    // Foreign Key ke RentalPricingCategory
   status: RentalVehicleStatus;
-  currentBookingId?: string;     // Booking aktif jika status RESERVED
-  currentContractId?: string;    // Kontrak aktif jika status RENTED
-  odometerCurrent: number;       // Odometer terkini
-  fuelLevelPercent: number;      // Level BBM saat ini (0-100%)
-  conditionNotes?: string;
+  currentOdometer: number;       // Odometer terkini
+  rateOverrideDaily?: number | null;   // Timpa harga master (harian)
+  rateOverrideWeekly?: number | null;  // Timpa harga master (mingguan)
+  rateOverrideMonthly?: number | null; // Timpa harga master (bulanan)
+  
+  // Operational fields
+  currentBookingId?: string | null;     // Booking aktif jika status RESERVED
+  currentContractId?: string | null;    // Kontrak aktif jika status RENTED
+  fuelLevelPercent?: number | null;     // Level BBM saat ini (0-100%)
+  condition?: 'GOOD' | 'MINOR_DAMAGE' | 'NEEDS_REPAIR'; // Kondisi kendaraan
+  conditionNotes?: string | null;
   completenessChecklist: {
     stnkOriginal: boolean;
     spareKey: boolean;
@@ -100,8 +105,8 @@ export interface RentalVehicleProfile {
     spareTire: boolean;
     firstAidKit: boolean;
   };
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 // Objek gabungan tampilan (Enriched View Model)
@@ -126,5 +131,5 @@ export interface RentalVehicleViewModel {
 
 ## 6. Status Verifikasi & Hasil
 
-- **Status:** 
+- **Status:** COMPLETED
 - **Verifikasi:** Alokasi armada dari CORE, visualisasi summary cards, tabel data, filter status, drawer rincian, dan integrasi navigasi bersih ke `/tracking` telah teruji dan bekerja normal.

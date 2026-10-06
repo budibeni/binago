@@ -1,6 +1,6 @@
 import React from 'react';
-import { RentalVehiclesFeature } from '../../../../features/modules/rental/vehicles/RentalVehiclesFeature';
+import { RentalVehicleFeature } from '../../../../features/modules/rental/vehicles/RentalVehicleFeature';
 
 export default function RentalVehiclesPage() {
-  return <RentalVehiclesFeature />;
+  return <RentalVehicleFeature />;
 }

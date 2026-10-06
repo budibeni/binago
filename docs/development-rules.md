@@ -22,13 +22,25 @@ Feature component boleh mengandung logic domain feature.
 
 Setiap feature menggunakan pola component standar:
 
-- `[Domain]Feature.tsx` — orchestrator: mengelola state, data loading, dan layout halaman.
+- `[Domain]Feature.tsx` — orchestrator utama: mengelola state, render DataTable, dan Overlay Drawer (tambah/edit/detail).
 - `[Domain]Table.tsx` — presentasi data tabular menggunakan DataTable Foundation.
-- `[Domain]Form.tsx` — form untuk add/edit, biasanya ditampilkan sebagai drawer.
-- `[Domain]View.tsx` — tampilan detail read-only, biasanya sebagai drawer (opsional).
+- `[Domain]Form.tsx` — form utama yang di-render sebagai Drawer di dalam `[Domain]Feature.tsx`. Datatable akan tetap terlihat di latar belakang.
+- `[Domain]View.tsx` — tampilan detail read-only, di-render sebagai Drawer di dalam `[Domain]Feature.tsx`.
 
-Jika feature memerlukan halaman create/edit terpisah (form kompleks, navigasi sendiri),
-gunakan `[Domain]CreateFeature.tsx` dan `[Domain]EditFeature.tsx` sebagai pengganti `[Domain]Form.tsx`.
+### Aturan Navigasi Overlay vs Halaman Terpisah
+
+1. **Overlay / Drawer Mode (Standar ADATRACK):**
+   Jika UI mengharuskan form muncul sebagai dialog/drawer di atas tabel, **JANGAN MENGGUNAKAN `router.push()`** yang menyebabkan tabel ter-unmount.
+   Sebaliknya, buka *state* drawer dari dalam `[Domain]Feature.tsx` dan manipulasi URL secara visual menggunakan:
+   ```ts
+   window.history.pushState(null, '', '/domain-route/edit');
+   setEditId(id); // atau setFormOpen(true)
+   ```
+   Lalu, pulihkan URL saat drawer ditutup menggunakan pushState yang sama.
+
+2. **Standalone Page Mode (Direct URL / Refresh):**
+   Meskipun menggunakan Drawer Mode (seperti penjelasan di atas), Anda diizinkan membuat rute terpisah (misal `app/.../edit/[id]/page.tsx` dan `[Domain]EditFeature.tsx`) **HANYA** untuk menangani kasus di mana *user* mengakses URL tersebut secara langsung (*deep-linking* / *refresh* halaman). Dalam mode ini, datatable memang tidak ditampilkan.
+   Jika form benar-benar dirancang eksklusif sebagai halaman penuh (bukan drawer sama sekali), maka `[Domain]CreateFeature.tsx` dan `[Domain]EditFeature.tsx` digunakan secara utuh bersama `router.push()`.
 
 ## 4. i18n
 

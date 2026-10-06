@@ -21,7 +21,7 @@ export const mockRentalVehicles: RentalVehicleProfile[] = [
     },
     "createdAt": "2025-01-01T00:00:00Z",
     "updatedAt": "2026-08-01T00:00:00Z",
-    "currentContractId": "ctr-001"
+    "fuelLevelPercent": 80
   },
   {
     "id": "rveh-002",
@@ -43,7 +43,8 @@ export const mockRentalVehicles: RentalVehicleProfile[] = [
     },
     "createdAt": "2025-01-01T00:00:00Z",
     "updatedAt": "2026-08-01T00:00:00Z",
-    "currentContractId": "ctr-002"
+    "fuelLevelPercent": 83,
+    "currentBookingId": "bkg-002"
   },
   {
     "id": "rveh-003",
@@ -65,7 +66,7 @@ export const mockRentalVehicles: RentalVehicleProfile[] = [
     },
     "createdAt": "2025-01-01T00:00:00Z",
     "updatedAt": "2026-08-01T00:00:00Z",
-    "currentContractId": "ctr-003"
+    "fuelLevelPercent": 83
   },
   {
     "id": "rveh-004",
@@ -87,7 +88,7 @@ export const mockRentalVehicles: RentalVehicleProfile[] = [
     },
     "createdAt": "2025-01-01T00:00:00Z",
     "updatedAt": "2026-08-01T00:00:00Z",
-    "currentContractId": "ctr-004"
+    "fuelLevelPercent": 56
   },
   {
     "id": "rveh-005",
@@ -109,7 +110,8 @@ export const mockRentalVehicles: RentalVehicleProfile[] = [
     },
     "createdAt": "2025-01-01T00:00:00Z",
     "updatedAt": "2026-08-01T00:00:00Z",
-    "currentContractId": "ctr-005"
+    "currentContractId": "ctr-005",
+    "fuelLevelPercent": 67
   },
   {
     "id": "rveh-006",
@@ -130,7 +132,8 @@ export const mockRentalVehicles: RentalVehicleProfile[] = [
     },
     "createdAt": "2025-01-01T00:00:00Z",
     "updatedAt": "2026-08-01T00:00:00Z",
-    "currentContractId": "ctr-006"
+    "fuelLevelPercent": 53,
+    "currentBookingId": "bkg-006"
   },
   {
     "id": "rveh-007",
@@ -151,7 +154,8 @@ export const mockRentalVehicles: RentalVehicleProfile[] = [
     },
     "createdAt": "2025-01-01T00:00:00Z",
     "updatedAt": "2026-08-01T00:00:00Z",
-    "currentContractId": "ctr-007"
+    "fuelLevelPercent": 92,
+    "currentBookingId": "bkg-007"
   },
   {
     "id": "rveh-008",
@@ -172,7 +176,8 @@ export const mockRentalVehicles: RentalVehicleProfile[] = [
     },
     "createdAt": "2025-01-01T00:00:00Z",
     "updatedAt": "2026-08-01T00:00:00Z",
-    "currentContractId": "ctr-008"
+    "fuelLevelPercent": 44,
+    "currentBookingId": "bkg-008"
   },
   {
     "id": "rveh-009",
@@ -192,7 +197,8 @@ export const mockRentalVehicles: RentalVehicleProfile[] = [
       "firstAidKit": true
     },
     "createdAt": "2025-01-01T00:00:00Z",
-    "updatedAt": "2026-08-01T00:00:00Z"
+    "updatedAt": "2026-08-01T00:00:00Z",
+    "fuelLevelPercent": 85
   },
   {
     "id": "rveh-010",
@@ -212,7 +218,8 @@ export const mockRentalVehicles: RentalVehicleProfile[] = [
       "firstAidKit": true
     },
     "createdAt": "2025-01-01T00:00:00Z",
-    "updatedAt": "2026-08-01T00:00:00Z"
+    "updatedAt": "2026-08-01T00:00:00Z",
+    "fuelLevelPercent": 49
   },
   {
     "id": "rveh-011",
@@ -232,7 +239,8 @@ export const mockRentalVehicles: RentalVehicleProfile[] = [
       "firstAidKit": true
     },
     "createdAt": "2025-01-01T00:00:00Z",
-    "updatedAt": "2026-08-01T00:00:00Z"
+    "updatedAt": "2026-08-01T00:00:00Z",
+    "fuelLevelPercent": 49
   },
   {
     "id": "rveh-012",
@@ -252,7 +260,8 @@ export const mockRentalVehicles: RentalVehicleProfile[] = [
       "firstAidKit": true
     },
     "createdAt": "2025-01-01T00:00:00Z",
-    "updatedAt": "2026-08-01T00:00:00Z"
+    "updatedAt": "2026-08-01T00:00:00Z",
+    "fuelLevelPercent": 100
   },
   {
     "id": "rveh-013",
@@ -272,7 +281,8 @@ export const mockRentalVehicles: RentalVehicleProfile[] = [
       "firstAidKit": true
     },
     "createdAt": "2025-01-01T00:00:00Z",
-    "updatedAt": "2026-08-01T00:00:00Z"
+    "updatedAt": "2026-08-01T00:00:00Z",
+    "fuelLevelPercent": 86
   },
   {
     "id": "rveh-014",
@@ -292,7 +302,8 @@ export const mockRentalVehicles: RentalVehicleProfile[] = [
       "firstAidKit": true
     },
     "createdAt": "2025-01-01T00:00:00Z",
-    "updatedAt": "2026-08-01T00:00:00Z"
+    "updatedAt": "2026-08-01T00:00:00Z",
+    "fuelLevelPercent": 68
   },
   {
     "id": "rveh-015",
@@ -312,6 +323,7 @@ export const mockRentalVehicles: RentalVehicleProfile[] = [
       "firstAidKit": true
     },
     "createdAt": "2025-01-01T00:00:00Z",
-    "updatedAt": "2026-08-01T00:00:00Z"
+    "updatedAt": "2026-08-01T00:00:00Z",
+    "fuelLevelPercent": 73
   }
 ];

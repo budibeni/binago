@@ -23,7 +23,7 @@ interface RentalVehicleTableProps {
   isFilterOpen?: boolean;
   onFilterOpenChange?: (open: boolean) => void;
   className?: string;
-  dtLabels?: any;
+  dtLabels?: import('@adatrack/ui').DataTableLabels;
 }
 
 const DEFAULT_COLUMN_VISIBILITY = {};
@@ -295,11 +295,11 @@ export function RentalVehicleTable({
       // Search
       searchValue={searchValue}
       onSearchChange={onSearchChange}
-      searchPlaceholder={dtLabels?.searchPlaceholder || labels.searchPlaceholder || "Cari kendaraan..."}
+      searchPlaceholder={labels.searchPlaceholder || "Cari kendaraan..."}
       // UI Customizations
       className={className}
-      emptyTitle={dtLabels?.emptyTitle || labels.emptyTitle}
-      emptyDescription={dtLabels?.emptyDescription || labels.emptyDescription}
+      emptyTitle={labels.emptyTitle}
+      emptyDescription={labels.emptyDescription}
       filterConfig={filterConfig}
       isFilterOpen={isFilterOpen}
       onFilterOpenChange={onFilterOpenChange}

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Button, Input, Label, FormShell, FormCard, InputSelect, InputDecimal, InputString, Checkbox } from '@adatrack/ui';
+import { Button, Input, Label, FormShell, FormCard, InputSelect, InputDecimal, InputString, InputTextarea, InputMultiCheckbox, InputOptions, useFormShell } from '@adatrack/ui';
 import { CarFront, FileText, Settings, ShieldCheck } from 'lucide-react';
 import { cn, formatCurrency } from '@adatrack/utils';
 import type { RentalPricingCategory, RentalRate } from '../../pricing-category/types/pricing';
@@ -49,12 +49,21 @@ export function RentalVehicleForm({
   const [rateOverrideMonthly, setRateOverrideMonthly] = React.useState(initialData?.rateOverrideMonthly || null);
   const [condition, setCondition] = React.useState<RentalCondition>(initialData?.condition || 'GOOD');
   const [conditionNotes, setConditionNotes] = React.useState(initialData?.conditionNotes || '');
-  const [checklist, setChecklist] = React.useState(initialData?.completenessChecklist || {
-    stnkOriginal: false,
-    spareKey: false,
-    jackAndTools: false,
-    spareTire: false,
-    firstAidKit: false,
+  const [checklist, setChecklist] = React.useState<string[]>(() => {
+    const init = initialData?.completenessChecklist || {
+      stnkOriginal: false,
+      spareKey: false,
+      jackAndTools: false,
+      spareTire: false,
+      firstAidKit: false,
+    };
+    const list: string[] = [];
+    if (init.stnkOriginal) list.push('stnkOriginal');
+    if (init.spareKey) list.push('spareKey');
+    if (init.jackAndTools) list.push('jackAndTools');
+    if (init.spareTire) list.push('spareTire');
+    if (init.firstAidKit) list.push('firstAidKit');
+    return list;
   });
 
   const [errors, setErrors] = React.useState<Record<string, string>>({});
@@ -79,7 +88,13 @@ export function RentalVehicleForm({
       rateOverrideMonthly,
       condition,
       conditionNotes,
-      completenessChecklist: checklist
+      completenessChecklist: {
+        stnkOriginal: checklist.includes('stnkOriginal'),
+        spareKey: checklist.includes('spareKey'),
+        jackAndTools: checklist.includes('jackAndTools'),
+        spareTire: checklist.includes('spareTire'),
+        firstAidKit: checklist.includes('firstAidKit'),
+      }
     };
 
     const result = schema.safeParse(formData);
@@ -102,9 +117,7 @@ export function RentalVehicleForm({
     }, 500);
   };
 
-  const handleChecklistToggle = (key: keyof typeof checklist) => {
-    setChecklist(prev => ({ ...prev, [key]: !prev[key] }));
-  };
+
 
   return (
     <FormShell
@@ -120,15 +133,36 @@ export function RentalVehicleForm({
       saveProps={{ disabled: isSubmitting || !vehicleId }}
       isSubmitting={isSubmitting}
     >
-      <div className="w-full max-w-6xl mx-auto p-4 lg:p-6 flex flex-col gap-4 lg:gap-5">
-        <div className={cn("grid gap-4 lg:gap-5 items-start", (layout === 'fullscreen' || layout === 'default') ? "grid-cols-1 lg:grid-cols-2" : "grid-cols-1")}>
+      <RentalVehicleFormContent 
+        {...{ isEdit, vehicleId, setVehicleId, availableCoreVehicles, selectedCoreVehicle, labels, 
+              checklist, setChecklist, pricingType, setPricingType, categoryId, 
+              setCategoryId, availablePricingCategory, isSystemManaged, status, setStatus, 
+              currentOdometer, setCurrentOdometer, rateOverrideDaily, setRateOverrideDaily, 
+              rateOverrideWeekly, setRateOverrideWeekly, rateOverrideMonthly, setRateOverrideMonthly, 
+              condition, setCondition, conditionNotes, setConditionNotes, availableRates, errors }} 
+      />
+    </FormShell>
+  );
+}
+
+function RentalVehicleFormContent(props: any) {
+  const { isEdit, vehicleId, setVehicleId, availableCoreVehicles, selectedCoreVehicle, labels, 
+          checklist, setChecklist, pricingType, setPricingType, categoryId, 
+          setCategoryId, availablePricingCategory, isSystemManaged, status, setStatus, 
+          currentOdometer, setCurrentOdometer, rateOverrideDaily, setRateOverrideDaily, 
+          rateOverrideWeekly, setRateOverrideWeekly, rateOverrideMonthly, setRateOverrideMonthly, 
+          condition, setCondition, conditionNotes, setConditionNotes, availableRates, errors } = props;
+
+  return (
+    <div className="w-full max-w-6xl mx-auto p-4 lg:p-6 flex flex-col gap-4 lg:gap-5">
+      <div className="grid grid-cols-1 group-data-[layout=fullscreen]/form:lg:grid-cols-2 group-data-[layout=default]/form:lg:grid-cols-2 gap-4 lg:gap-5 items-start">
           {/* Kolom Kiri */}
           <div className="flex flex-col gap-4 lg:gap-5">
             {/* Core Info Card */}
             <FormCard
               title={labels.sectionVehicleData}
               description={labels.sectionVehicleDataDesc}
-              icon={<CarFront className="w-5 h-5 text-danger" />}
+              icon={<CarFront className="w-5 h-5 text-blue-500 dark:text-blue-400" />}
             >
               {!isEdit && (
                 <div>
@@ -137,7 +171,7 @@ export function RentalVehicleForm({
                     label={labels.fieldSelectVehicle}
                     value={vehicleId}
                     onChange={setVehicleId}
-                    options={availableCoreVehicles.map(v => ({ value: v.id, label: `${v.plateNumber} - ${v.brand} ${v.vehicleName}` }))}
+                    options={availableCoreVehicles.map((v: any) => ({ value: v.id, label: `${v.plateNumber} - ${v.brand} ${v.vehicleName}` }))}
                     required
                     error={errors.vehicleId}
                   />
@@ -173,33 +207,52 @@ export function RentalVehicleForm({
             <FormCard
               title={labels.sectionEquipmentTitle}
               description={labels.sectionEquipmentDesc}
-              icon={<ShieldCheck className="w-5 h-5 text-danger" />}
+              icon={<ShieldCheck className="w-5 h-5 text-emerald-500 dark:text-emerald-400" />}
             >
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                {[
-                  { id: 'stnkOriginal', label: labels.equipStnk },
-                  { id: 'spareKey', label: labels.equipSpareKey },
-                  { id: 'jackAndTools', label: labels.equipJackAndTools },
-                  { id: 'spareTire', label: labels.equipSpareTire },
-                  { id: 'firstAidKit', label: labels.equipFirstAid }
-                ].map((item) => (
-                  <label
-                    key={item.id}
-                    className={cn(
-                      "flex items-center gap-2.5 px-3 min-h-[42px] border rounded-lg cursor-pointer transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-800/50",
-                      checklist[item.id as keyof typeof checklist] ? "bg-danger/5 border-danger/40" : "border-border/60"
-                    )}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={checklist[item.id as keyof typeof checklist]}
-                      onChange={() => handleChecklistToggle(item.id as keyof typeof checklist)}
-                      className="rounded border-neutral-300 text-danger accent-red-600 focus:ring-danger w-4 h-4 shrink-0"
-                    />
-                    <span className="text-xs font-medium">{item.label}</span>
-                  </label>
-                ))}
+              <div className="pt-2">
+                <InputMultiCheckbox
+                  id="checklist"
+                  label=""
+                  value={checklist}
+                  onChange={setChecklist}
+                  options={[
+                    { value: 'stnkOriginal', label: labels.equipStnk },
+                    { value: 'spareKey', label: labels.equipSpareKey },
+                    { value: 'jackAndTools', label: labels.equipJackAndTools },
+                    { value: 'spareTire', label: labels.equipSpareTire },
+                    { value: 'firstAidKit', label: labels.equipFirstAid }
+                  ]}
+                />
               </div>
+            </FormCard>
+
+            <FormCard
+              title={labels.sectionNotes}
+              description={labels.sectionNotesDesc}
+              icon={<FileText className="w-5 h-5 text-amber-500 dark:text-amber-400" />}
+            >
+              <InputOptions
+                id="condition"
+                label={labels.colCondition || 'Kondisi'}
+                value={condition}
+                onChange={(v) => setCondition(v as RentalCondition)}
+                options={[
+                  { value: 'GOOD', label: 'Baik' },
+                  { value: 'MINOR_DAMAGE', label: 'Rusak Ringan' },
+                  { value: 'NEEDS_REPAIR', label: 'Butuh Perbaikan' },
+                ]}
+                layout="horizontal"
+              />
+              <InputTextarea
+                id="conditionNotes"
+                label="Catatan Kondisi"
+                value={conditionNotes || ''}
+                onChange={setConditionNotes}
+                placeholder={labels.notesPlaceholder}
+                maxLength={500}
+                helpText={`${(conditionNotes || '').length} / 500`}
+                rows={3}
+              />
             </FormCard>
           </div>
 
@@ -208,10 +261,10 @@ export function RentalVehicleForm({
             <FormCard
               title={labels.sectionRentalData}
               description={labels.sectionRentalDataDesc}
-              icon={<Settings className="w-5 h-5 text-danger" />}
+              icon={<Settings className="w-5 h-5 text-violet-500 dark:text-violet-400" />}
               className="h-full"
             >
-              <div className={cn("grid gap-x-4 gap-y-4", (layout === 'fullscreen' || layout === 'default') ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1")}>
+              <div className="grid grid-cols-1 group-data-[layout=fullscreen]/form:sm:grid-cols-2 group-data-[layout=default]/form:sm:grid-cols-2 gap-x-4 gap-y-4">
                 
                 <div className="sm:col-span-2">
                   <div className="flex flex-col gap-1">
@@ -255,38 +308,24 @@ export function RentalVehicleForm({
                     placeholder="0"
                   />
                 </div>
-
                 <div className="sm:col-span-2">
-                  <div className="flex flex-col gap-1.5 mb-2">
-                    <Label className="text-xs font-semibold">{labels.pricingLabel}</Label>
-                    <div className="flex flex-col sm:flex-row gap-3">
-                      <button
-                        type="button"
-                        onClick={() => setPricingType('CATEGORY')}
-                        className={cn(
-                          "flex-1 py-2.5 px-3 border rounded-lg text-[12px] font-medium transition-colors text-center",
-                          pricingType === 'CATEGORY' ? "bg-danger/10 text-danger border-danger" : "bg-background text-foreground hover:bg-muted border-border"
-                        )}
-                      >
-                        {labels.pricingCategory}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setPricingType('INDEPENDENT');
-                          setCategoryId('');
-                        }}
-                        className={cn(
-                          "flex-1 py-2.5 px-3 border rounded-lg text-[12px] font-medium transition-colors text-center",
-                          pricingType === 'INDEPENDENT' ? "bg-danger/10 text-danger border-danger" : "bg-background text-foreground hover:bg-muted border-border"
-                        )}
-                      >
-                        {labels.pricingIndependent}
-                      </button>
-                    </div>
-                  </div>
+                  <InputOptions
+                    id="pricingType"
+                    label={labels.pricingLabel}
+                    value={pricingType}
+                    onChange={(v) => {
+                      setPricingType(v as 'CATEGORY' | 'INDEPENDENT');
+                      if (v === 'INDEPENDENT') {
+                        setCategoryId('');
+                      }
+                    }}
+                    options={[
+                      { value: 'CATEGORY', label: labels.pricingCategory, description: 'Gunakan tarif dari kategori' },
+                      { value: 'INDEPENDENT', label: labels.pricingIndependent, description: 'Tentukan tarif khusus' },
+                    ]}
+                    layout="cards"
+                  />
                 </div>
-
                 {pricingType === 'CATEGORY' ? (
                   <div className="sm:col-span-2 flex flex-col gap-3">
                     <InputSelect
@@ -294,17 +333,17 @@ export function RentalVehicleForm({
                       label={labels.fieldPricingCategoryId}
                       value={categoryId || ''}
                       onChange={setCategoryId}
-                      options={availablePricingCategory.map(g => ({ value: g.id, label: g.name }))}
+                      options={availablePricingCategory.map((g: any) => ({ value: g.id, label: g.name }))}
                       required={pricingType === 'CATEGORY'}
                       error={errors.categoryId}
                     />
                     {categoryId && (() => {
-                      const cat = availablePricingCategory.find(c => c.id === categoryId);
+                      const cat = availablePricingCategory.find((c: any) => c.id === categoryId);
                       if (!cat) return null;
-                      const catRates = availableRates.filter(r => r.pricingCategoryId === categoryId && r.status === 'ACTIVE');
-                      const daily = catRates.find(r => r.rateType === 'DAILY');
-                      const weekly = catRates.find(r => r.rateType === 'WEEKLY');
-                      const monthly = catRates.find(r => r.rateType === 'MONTHLY');
+                      const catRates = availableRates.filter((r: any) => r.pricingCategoryId === categoryId && r.status === 'ACTIVE');
+                      const daily = catRates.find((r: any) => r.rateType === 'DAILY');
+                      const weekly = catRates.find((r: any) => r.rateType === 'WEEKLY');
+                      const monthly = catRates.find((r: any) => r.rateType === 'MONTHLY');
                       const fmt = (n: number) => `${formatCurrency(n)}`;
                       return (
                         <div className="bg-gray-100 dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-3">
@@ -368,36 +407,8 @@ export function RentalVehicleForm({
               </div>
             </FormCard>
 
-            <FormCard
-              title={labels.sectionNotes}
-              description={labels.sectionNotesDesc}
-              icon={<FileText className="w-5 h-5 text-danger" />}
-            >
-              <InputSelect
-                id="condition"
-                label={labels.colCondition || 'Kondisi'}
-                value={condition}
-                onChange={(v) => setCondition(v as RentalCondition)}
-                options={[
-                  { value: 'GOOD', label: 'Baik' },
-                  { value: 'MINOR_DAMAGE', label: 'Rusak Ringan' },
-                  { value: 'NEEDS_REPAIR', label: 'Butuh Perbaikan' },
-                ]}
-              />
-              <InputString
-                id="conditionNotes"
-                label="Catatan Kondisi"
-                value={conditionNotes || ''}
-                onChange={setConditionNotes}
-                placeholder={labels.notesPlaceholder}
-                maxLength={500}
-                helpText={`${(conditionNotes || '').length} / 500`}
-              />
-            </FormCard>
-
           </div>
-        </div>
       </div>
-    </FormShell>
+    </div>
   );
 }

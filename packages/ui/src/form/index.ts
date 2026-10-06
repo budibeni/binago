@@ -11,6 +11,7 @@ export * from './InputDateTimeGps';
 export * from './InputSelect';
 export * from './InputMultiSelect';
 export * from './InputTextarea';
+export * from './InputOptions';
 export * from './InputCheckbox';
 export * from './InputMultiCheckbox';
 export * from './InputPhone';
