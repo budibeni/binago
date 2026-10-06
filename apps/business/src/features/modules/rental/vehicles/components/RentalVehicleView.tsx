@@ -31,24 +31,90 @@ export function RentalVehicleView({
   const renderStatus = () => {
     const s = data.status;
     let label = '';
-    if (s === 'READY') { label = labels.statusReady; }
-    else if (s === 'RESERVED') { label = labels.statusReserved; }
-    else if (s === 'RENTED') { label = labels.statusRented; }
-    else if (s === 'MAINTENANCE') { label = labels.statusMaintenance; }
-    else if (s === 'UNAVAILABLE') { label = labels.statusUnavailable || 'Tidak Tersedia'; }
+    let colorClass = 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300';
+    let dotClass = 'bg-neutral-400 dark:bg-neutral-600';
     
-    // Grey badge as in the image "Tidak Tersedia"
-    return <div className="px-2.5 py-0.5 bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300 rounded text-[11px] font-semibold">{label}</div>;
+    if (s === 'READY') { 
+      label = labels.statusReady; 
+      colorClass = 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400';
+      dotClass = 'bg-success'; 
+    }
+    else if (s === 'RESERVED') { 
+      label = labels.statusReserved; 
+      colorClass = 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-400';
+      dotClass = 'bg-warning';
+    }
+    else if (s === 'RENTED') { 
+      label = labels.statusRented; 
+      colorClass = 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400';
+      dotClass = 'bg-blue-500';
+    }
+    else if (s === 'MAINTENANCE') { 
+      label = labels.statusMaintenance; 
+      colorClass = 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-400';
+      dotClass = 'bg-purple-500';
+    }
+    else if (s === 'UNAVAILABLE') { 
+      label = labels.statusUnavailable || 'Tidak Tersedia'; 
+      colorClass = 'bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-400';
+      dotClass = 'bg-neutral-400 dark:bg-neutral-600';
+    }
+    
+    return (
+      <div className={cn("px-2.5 py-0.5 rounded text-[11px] font-semibold flex items-center gap-1.5", colorClass)}>
+        <span className={cn('h-1.5 w-1.5 rounded-full', dotClass)} />
+        {label}
+      </div>
+    );
   };
 
-  const InfoItem = ({ label, value, highlight = false }: { label: string, value: React.ReactNode, highlight?: boolean }) => (
-    <div className="flex flex-col gap-0.5">
+  const InfoItem = ({ label, value, highlight = false, valueClassName, colSpan = 1 }: { 
+    label: string; 
+    value: React.ReactNode; 
+    highlight?: boolean; 
+    valueClassName?: string;
+    colSpan?: 1 | 2;
+  }) => (
+    <div className={cn("flex flex-col gap-0.5", colSpan === 2 && "col-span-2")}>
       <span className="text-[9px] font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">{label}</span>
-      <span className={cn("text-xs font-medium", highlight ? "text-danger font-bold" : "text-neutral-900 dark:text-neutral-100")}>
+      <span className={cn("text-[11px] font-medium", highlight ? "text-danger font-bold" : "text-neutral-900 dark:text-neutral-100", valueClassName)}>
         {value}
       </span>
     </div>
   );
+
+  function SectionCard({ 
+    icon: Icon, 
+    title, 
+    colorClass = "text-muted-foreground",
+    bgClass = "",
+    children,
+    extraHeader
+  }: { 
+    icon: any; 
+    title: string; 
+    colorClass?: string;
+    bgClass?: string;
+    children: React.ReactNode;
+    extraHeader?: React.ReactNode;
+  }) {
+    return (
+      <div className="rounded-2xl border border-border/60 bg-background overflow-hidden">
+        <div className="px-3 py-2 flex items-center justify-between border-b border-border/40 bg-neutral-50/80 dark:bg-neutral-900/40">
+          <div className="flex items-center gap-2">
+            <div className={cn("flex items-center justify-center rounded-md p-1", bgClass)}>
+              <Icon className={cn("w-3.5 h-3.5", colorClass)} />
+            </div>
+            <h3 className="text-[10px] font-bold text-foreground uppercase tracking-wider pt-[2px]">{title}</h3>
+          </div>
+          {extraHeader && <div>{extraHeader}</div>}
+        </div>
+        <div className="p-4 grid grid-cols-2 gap-y-4 gap-x-4">
+          {children}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <DetailShell
@@ -80,9 +146,9 @@ export function RentalVehicleView({
           <Button 
             variant="outline" 
             size="sm" 
-            className="flex-1 h-8 text-[11px] font-semibold hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-all"
+            className="group flex-1 h-8 text-[11px] font-semibold bg-neutral-100 text-neutral-700 border-neutral-200/60 hover:bg-red-50 hover:border-red-200/60 hover:text-red-600 dark:bg-neutral-800/40 dark:text-neutral-300 dark:border-neutral-700/60 dark:hover:bg-red-900/40 dark:hover:text-red-400 transition-all shadow-sm"
             onClick={() => window.location.href = `/tracking/live?vehicleId=${data.vehicleId}`}
-            leftIcon={<MapPin className="w-3.5 h-3.5 text-info" />}
+            leftIcon={<MapPin className="w-3.5 h-3.5 text-neutral-500 dark:text-neutral-400 group-hover:text-red-500 transition-colors" />}
           >
             Lacak Posisi
           </Button>
@@ -100,96 +166,112 @@ export function RentalVehicleView({
         </div>
 
         {/* Content Body */}
-        <div className="p-3 flex flex-col gap-3">
+        <div className="p-4 flex flex-col gap-4">
 
           {/* TARIF SEWA CARD */}
-          <div className="rounded-2xl border border-border/60 bg-background overflow-hidden">
-            <div className="px-4 py-3 flex items-center gap-2 border-b border-border/40 bg-neutral-50/50 dark:bg-neutral-900/30">
-              <CreditCard className="w-3.5 h-3.5 text-muted-foreground" />
-              <h3 className="text-[11px] font-bold text-foreground uppercase tracking-widest">Informasi Tarif</h3>
-            </div>
-            
-            <div className="p-3.5 flex flex-col gap-3.5">
-              <div className="grid grid-cols-2 gap-3">
-                <InfoItem label="Skema Tarif" value={data.categoryId ? 'Kategori Master' : 'Mandiri (Kustom)'} />
-                {data.categoryId && (
-                  <InfoItem label="Kategori" value={data.categoryName || '-'} />
-                )}
-              </div>
-              
-              <div className="grid grid-cols-3 gap-3 pt-3 border-t border-border/40">
-                <InfoItem label="Harian" value={data.dailyRate ? formatCurrency(data.dailyRate) : '-'} />
-                <InfoItem label="Mingguan" value={data.rateOverrideWeekly ? formatCurrency(data.rateOverrideWeekly) : '-'} />
-                <InfoItem label="Bulanan" value={data.rateOverrideMonthly ? formatCurrency(data.rateOverrideMonthly) : '-'} />
-              </div>
-            </div>
-          </div>
+          <SectionCard 
+            icon={CreditCard} 
+            title="Informasi Tarif"
+            colorClass="text-amber-600 dark:text-amber-400"
+            bgClass="bg-amber-100 dark:bg-amber-900/40"
+          >
+            <InfoItem label="Skema Tarif" value={data.categoryId ? 'Kategori Master' : 'Mandiri (Kustom)'} colSpan={2} />
+            {data.categoryId && (
+              <InfoItem label="Kategori" value={data.categoryName || '-'} colSpan={2} />
+            )}
+            <InfoItem label="Harian" value={data.dailyRate ? formatCurrency(data.dailyRate) : '-'} />
+            <InfoItem label="Mingguan" value={data.rateOverrideWeekly ? formatCurrency(data.rateOverrideWeekly) : '-'} />
+            <InfoItem label="Bulanan" value={data.rateOverrideMonthly ? formatCurrency(data.rateOverrideMonthly) : '-'} />
+          </SectionCard>
           
           {/* IDENTITAS KENDARAAN */}
-          <div className="rounded-2xl border border-border/60 bg-background overflow-hidden">
-            <div className="px-4 py-3 flex items-center gap-2 border-b border-border/40 bg-neutral-50/50 dark:bg-neutral-900/30">
-              <Car className="w-3.5 h-3.5 text-muted-foreground" />
-              <h3 className="text-[11px] font-bold text-foreground uppercase tracking-widest">Identitas Fisik</h3>
-            </div>
-            <div className="p-3.5 grid grid-cols-2 gap-y-3.5 gap-x-3">
-              <InfoItem label="Plat Nomor" value={core.plateNumber} />
-              <InfoItem label="Merk & Model" value={`${core.brand} ${core.vehicleName}`} />
-              <InfoItem label="Warna" value={core.color || '-'} />
-              <InfoItem label="Bahan Bakar" value={core.fuelType || '-'} />
-              <InfoItem label="Masa Berlaku STNK" value={core.registrationExpiry || '-'} />
-            </div>
-          </div>
+          <SectionCard 
+            icon={Car} 
+            title="Identitas Fisik"
+            colorClass="text-blue-600 dark:text-blue-400"
+            bgClass="bg-blue-100 dark:bg-blue-900/40"
+          >
+            <InfoItem label="Plat Nomor" value={core.plateNumber} />
+            <InfoItem label="Merk & Model" value={`${core.brand} ${core.vehicleName}`} />
+            <InfoItem label="Warna" value={core.color || '-'} />
+            <InfoItem label="Bahan Bakar" value={core.fuelType || '-'} />
+            <InfoItem label="Masa Berlaku STNK" value={core.registrationExpiry || '-'} colSpan={2} />
+          </SectionCard>
 
           {/* STATUS OPERASIONAL & KELENGKAPAN */}
-          <div className="rounded-2xl border border-border/60 bg-background overflow-hidden mb-6">
-            <div className="px-4 py-3 flex justify-between items-center border-b border-border/40 bg-neutral-50/50 dark:bg-neutral-900/30">
-              <div className="flex items-center gap-2">
-                <FileText className="w-3.5 h-3.5 text-muted-foreground" />
-                <h3 className="text-[11px] font-bold text-foreground uppercase tracking-widest">Operasional</h3>
-              </div>
-              {data.isComplete ? (
-                <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-green-50 dark:bg-green-500/10 text-green-600 dark:text-green-500 border border-green-200 dark:border-green-500/20">
-                  <CheckCircle2 className="w-3 h-3" />
-                  <span className="text-[10px] font-bold tracking-wide uppercase">Lengkap</span>
-                </div>
-              ) : (
-                <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-orange-50 dark:bg-orange-500/10 text-orange-600 dark:text-orange-500 border border-orange-200 dark:border-orange-500/20">
-                  <AlertCircle className="w-3 h-3" />
-                  <span className="text-[10px] font-bold tracking-wide uppercase">Tidak Lengkap</span>
-                </div>
-              )}
+          <SectionCard 
+            icon={FileText} 
+            title="Operasional"
+            colorClass="text-purple-600 dark:text-purple-400"
+            bgClass="bg-purple-100 dark:bg-purple-900/40"
+            extraHeader={
+              (() => {
+                const checklist = data.completenessChecklist || {};
+                const presentCount = [
+                  checklist.stnkOriginal,
+                  checklist.spareKey,
+                  checklist.jackAndTools,
+                  checklist.spareTire,
+                  checklist.firstAidKit
+                ].filter(Boolean).length;
+                
+                const isChecklistComplete = presentCount === 5;
+                
+                if (isChecklistComplete) {
+                  return (
+                    <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-green-50 dark:bg-green-500/10 text-green-600 dark:text-green-500 border border-green-200 dark:border-green-500/20">
+                      <CheckCircle2 className="w-3 h-3" />
+                      <span className="text-[9px] font-bold tracking-wide uppercase">{labels.dataCompleteShort || 'Lengkap'}</span>
+                    </div>
+                  );
+                }
+                return (
+                  <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-orange-50 dark:bg-orange-500/10 text-orange-600 dark:text-orange-500 border border-orange-200 dark:border-orange-500/20">
+                    <AlertCircle className="w-3 h-3" />
+                    <span className="text-[9px] font-bold tracking-wide uppercase">{presentCount}/5 {labels.statusReady || 'Siap'}</span>
+                  </div>
+                );
+              })()
+            }
+          >
+            <InfoItem label="Odometer" value={data.currentOdometer ? `${formatNumber(data.currentOdometer)} km` : '-'} />
+            <InfoItem label="Level BBM" value={data.fuelLevelPercent !== null && data.fuelLevelPercent !== undefined ? `${data.fuelLevelPercent}%` : '-'} />
+            <InfoItem label="Kondisi Fisik" value={
+              data.condition === 'GOOD' ? 'Baik' :
+              data.condition === 'MINOR_DAMAGE' ? 'Lecet Minor' :
+              data.condition === 'NEEDS_REPAIR' ? 'Perlu Perbaikan' : '-'
+            } />
+            {data.currentBookingId && (
+              <InfoItem label="Booking Aktif" value={<span className="text-blue-600 dark:text-blue-400 cursor-pointer hover:underline">{data.currentBookingId}</span>} />
+            )}
+            {data.currentContractId && (
+              <InfoItem label="Kontrak Aktif" value={<span className="text-blue-600 dark:text-blue-400 cursor-pointer hover:underline">{data.currentContractId}</span>} />
+            )}
+            
+            <div className="col-span-2 pt-2">
+              <InfoItem 
+                label="Checklist Kelengkapan" 
+                value={(() => {
+                  const equips = [];
+                  if (data.completenessChecklist?.stnkOriginal) equips.push('STNK');
+                  if (data.completenessChecklist?.spareKey) equips.push('Kunci Cadangan');
+                  if (data.completenessChecklist?.spareTire) equips.push('Ban Serep');
+                  if (data.completenessChecklist?.jackAndTools) equips.push('Dongkrak & Tools');
+                  if (data.completenessChecklist?.firstAidKit) equips.push('P3K');
+                  return equips.length > 0 ? (
+                    <span className="leading-relaxed">{equips.join(' • ')}</span>
+                  ) : '-';
+                })()} 
+                colSpan={2}
+              />
             </div>
 
-            <div className="p-3.5 flex flex-col gap-3.5">
-              <div className="grid grid-cols-2 gap-3">
-                <InfoItem label="Odometer" value={data.currentOdometer ? `${formatNumber(data.currentOdometer)} km` : '-'} />
-                <InfoItem label="Level BBM" value={data.fuelLevelPercent !== null && data.fuelLevelPercent !== undefined ? `${data.fuelLevelPercent}%` : '-'} />
+            {data.conditionNotes && (
+              <div className="col-span-2 pt-1">
+                <InfoItem label="Catatan Kondisi" value={<span className="italic leading-relaxed text-muted-foreground">{data.conditionNotes}</span>} colSpan={2} />
               </div>
-
-              <div className="pt-3 border-t border-border/40">
-                <InfoItem 
-                  label="Checklist Kelengkapan" 
-                  value={(() => {
-                    const equips = [];
-                    if (data.completenessChecklist?.stnkOriginal) equips.push('STNK');
-                    if (data.completenessChecklist?.spareKey) equips.push('Kunci Cadangan');
-                    if (data.completenessChecklist?.spareTire) equips.push('Ban Serep');
-                    if (data.completenessChecklist?.jackAndTools) equips.push('Dongkrak & Tools');
-                    if (data.completenessChecklist?.firstAidKit) equips.push('P3K');
-                    return equips.length > 0 ? (
-                      <span className="leading-relaxed">{equips.join(' • ')}</span>
-                    ) : '-';
-                  })()} 
-                />
-              </div>
-
-              {data.conditionNotes && (
-                <div className="pt-3 border-t border-border/40">
-                  <InfoItem label="Catatan Kondisi" value={<span className="italic leading-relaxed text-muted-foreground">{data.conditionNotes}</span>} />
-                </div>
-              )}
-            </div>
-          </div>
+            )}
+          </SectionCard>
 
         </div>
       </div>
