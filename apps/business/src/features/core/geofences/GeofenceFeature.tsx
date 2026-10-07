@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { ConfirmDialog, toast } from '@adatrack/ui';
 import { GeofenceListView } from './components/GeofenceListView';
 import { GeofenceEditorView } from './components/GeofenceEditorView';
-import { geofenceService } from '@/data/services';
+import { geofenceService, groupService } from '@/data/services';
 import type { Geofence } from './types';
 import { type GeofenceLocale, getGeofencesTranslation } from './i18n';
 import { useGeofences } from './hooks/useGeofences';
@@ -22,6 +22,11 @@ export function GeofenceFeature({ locale = 'id' }: GeofenceFeatureProps) {
   const { geofences, loading, refetch } = useGeofences();
   const [editingGeofence, setEditingGeofence] = useState<Geofence | null>(null);
   const [geofenceToDelete, setGeofenceToDelete] = useState<string | null>(null);
+  const [groups, setGroups] = useState<any[]>([]);
+
+  React.useEffect(() => {
+    groupService.getGeofenceGroups().then((res) => setGroups(res)).catch(console.error);
+  }, []);
 
   const handleAdd = () => {
     setEditingGeofence(null);
@@ -106,7 +111,7 @@ export function GeofenceFeature({ locale = 'id' }: GeofenceFeatureProps) {
       ) : (
         <GeofenceListView
           geofences={geofences}
-          groups={[]}
+          groups={groups}
           onAdd={handleAdd}
           onEdit={handleEdit}
           onDelete={handleDelete}
