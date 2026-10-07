@@ -1,6 +1,46 @@
 import type { RentalPayment } from '@/features/modules/rental/payments/types/payment';
 
 export const mockPayments: RentalPayment[] = [
+
+  {
+    id: "pay-mega-001",
+    bookingId: "res-mega-001",
+    customerId: "cust-com-001",
+    type: "RENTAL_PAYMENT",
+    method: "BANK_TRANSFER",
+    status: "VERIFIED",
+    stage: "BOOKING",
+    amount: 24000000,
+    referenceNumber: "TRF-MEGA-001",
+    paidAt: "2026-10-06T10:30:00.000Z",
+    verifiedAt: "2026-10-06T11:00:00.000Z",
+    verifiedBy: "Budi Beni",
+    notes: "Pelunasan penuh dan deposit",
+    staffId: "usr-budi",
+    staffName: "Budi Beni",
+    createdAt: "2026-10-06T10:30:00.000Z",
+    updatedAt: "2026-10-06T11:00:00.000Z",
+  },
+  {
+    id: "pay-multi-001",
+    bookingId: "res-multi-001",
+    customerId: "cust-com-002",
+    type: "DOWN_PAYMENT",
+    method: "CASH",
+    status: "VERIFIED",
+    stage: "BOOKING",
+    amount: 1500000,
+    referenceNumber: "CASH-MULTI-001",
+    paidAt: "2026-10-06T10:30:00.000Z",
+    verifiedAt: "2026-10-06T11:00:00.000Z",
+    verifiedBy: "Budi Beni",
+    notes: "DP untuk booking multi tarif",
+    staffId: "usr-budi",
+    staffName: "Budi Beni",
+    createdAt: "2026-10-06T10:30:00.000Z",
+    updatedAt: "2026-10-06T11:00:00.000Z",
+  },
+
   // --- Kontrak ctr-001 ---
   {
     id: 'pay-001',

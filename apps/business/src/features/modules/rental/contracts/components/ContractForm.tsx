@@ -20,6 +20,20 @@ interface ContractFormProps {
   onOpenChange?: (open: boolean) => void;
 }
 
+
+  const getMaxEndDate = (items: any[]) => {
+    if (!items || items.length === 0) return "";
+    let max = new Date(items[0].startDate || "");
+    for (const item of items) {
+      if (!item.startDate) continue;
+      const d = new Date(item.startDate);
+      if (item.rateType === "HOURLY") d.setHours(d.getHours() + (item.duration || 1));
+      else d.setDate(d.getDate() + (item.duration || 1)); // simplifying package/daily
+      if (d > max) max = d;
+    }
+    return max.toISOString();
+  };
+
 export function ContractForm({
   contract,
   availableBookings = [],
@@ -136,7 +150,7 @@ export function ContractForm({
                         </div>
                         <h4 className="font-bold text-foreground text-[13px] truncate">{r.customer?.name}</h4>
                         <div className="flex justify-between items-end mt-1">
-                          <p className="text-[11px] text-muted-foreground font-medium">{formatDate(r.startDate).split(' ')[0]} - {formatDate(r.endDate).split(' ')[0]}</p>
+                          <p className="text-[11px] text-muted-foreground font-medium">{formatDate(r.startDate).split(' ')[0]} - {formatDate(getMaxEndDate(r.items)).split(' ')[0]}</p>
                           <p className="text-xs font-bold text-foreground">{formatCurrency(r.totalAmount)}</p>
                         </div>
                       </div>
@@ -187,14 +201,14 @@ export function ContractForm({
                     </div>
                     <div>
                       <Label className="text-neutral-500 dark:text-neutral-400 font-normal">{labels.fieldEnd || 'Selesai'}</Label>
-                      <p className="text-[14px] mt-0.5 font-semibold text-foreground">{formatDate(displayRes?.endDate || '')}</p>
+                      <p className="text-[14px] mt-0.5 font-semibold text-foreground">{formatDate(getMaxEndDate(displayRes?.items || []) || '')}</p>
                     </div>
                   </div>
                 </div>
 
                 <div className="pt-6 border-t border-border/40 mt-6">
                   <div className="flex items-center justify-between mb-1">
-                    <Label className="text-neutral-500 dark:text-neutral-400 font-normal">{labels.fieldTotalAmount || 'Total Tagihan'} ({displayRes?.duration} {labels.fieldDays || 'Hari'})</Label>
+                    <Label className="text-neutral-500 dark:text-neutral-400 font-normal">{labels.fieldTotalAmount || 'Total Tagihan'} ({(displayRes?.items?.[0]?.duration || 1)} {labels.fieldDays || 'Hari'})</Label>
                   </div>
                   <p className="text-2xl font-bold text-foreground tracking-tight">{formatCurrency(displayRes?.totalAmount || 0)}</p>
                 </div>

@@ -113,7 +113,7 @@ function buildColumns(
     },
     {
       id: 'period',
-      accessorFn: (row) => `${formatShortDate(row.startDate)} s/d ${formatShortDate(row.endDate)}`,
+      accessorFn: (row) => `${formatShortDate(row.startDate)} s/d ${formatShortDate(getMaxEndDate(row.booking?.items || []))}`,
       header: labels.colPeriod || 'Periode Sewa',
       enableSorting: true,
       size: 180,
@@ -152,6 +152,20 @@ function buildColumns(
 }
 
 const DEFAULT_COLUMN_VISIBILITY = {};
+
+
+const getMaxEndDate = (items: any[]) => {
+  if (!items || items.length === 0) return "";
+  let max = new Date(items[0].startDate || "");
+  for (const item of items) {
+    if (!item.startDate) continue;
+    const d = new Date(item.startDate);
+    if (item.rateType === "HOURLY") d.setHours(d.getHours() + (item.duration || 1));
+    else d.setDate(d.getDate() + (item.duration || 1));
+    if (d > max) max = d;
+  }
+  return max.toISOString();
+};
 
 export function ContractList({
   data,

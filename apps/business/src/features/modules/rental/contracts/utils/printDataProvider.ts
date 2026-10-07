@@ -1,3 +1,17 @@
+
+const getMaxEndDate = (items: any[]) => {
+  if (!items || items.length === 0) return "";
+  let max = new Date(items[0].startDate || "");
+  for (const item of items) {
+    if (!item.startDate) continue;
+    const d = new Date(item.startDate);
+    if (item.rateType === "HOURLY") d.setHours(d.getHours() + (item.duration || 1));
+    else d.setDate(d.getDate() + (item.duration || 1));
+    if (d > max) max = d;
+  }
+  return max.toISOString();
+};
+
 import type { RentalContract } from '../types/contract';
 import type { BookingItem } from '../../bookings/types/booking';
 import { formatCurrency, formatDate, formatNumber } from '@adatrack/utils';
@@ -56,7 +70,7 @@ export function getRentalContractPrintData(contract: RentalContract) {
     number: contract.contractNumber || '-',
     contractDate: formatDate(contract.contractDate),
     startDate: formatDate(contract.startDate),
-    endDate: formatDate(contract.endDate),
+    endDate: formatDate(getMaxEndDate(contract.booking?.items || [])),
     rentalType: contract.rentalType === 'SELF_DRIVE' ? 'Lepas Kunci' : 'Dengan Pengemudi',
     
     totalAmount: formatCurrency(contract.totalAmount),

@@ -1,3 +1,17 @@
+
+const getMaxEndDate = (items: any[]) => {
+  if (!items || items.length === 0) return "";
+  let max = new Date(items[0].startDate || "");
+  for (const item of items) {
+    if (!item.startDate) continue;
+    const d = new Date(item.startDate);
+    if (item.rateType === "HOURLY") d.setHours(d.getHours() + (item.duration || 1));
+    else d.setDate(d.getDate() + (item.duration || 1));
+    if (d > max) max = d;
+  }
+  return max.toISOString();
+};
+
 import type { VehicleContext, VehicleContextField } from '@/features/core/tracking/types/tracking';
 import { rentalVehicleService } from './vehicleService';
 import { contractService } from './contractService';
@@ -45,7 +59,7 @@ export async function buildRentalVehicleContext(coreVehicleId: string, locale: L
         // 5. Tambahkan info tarif & periode
         data.push({ 
           label: isEn ? 'Rental Period' : 'Periode Rental', 
-          value: `${new Date(activeContract.startDate).toLocaleDateString(locale === 'en' ? 'en-US' : 'id-ID', { day: 'numeric', month: 'short', year: 'numeric' })} - ${new Date(activeContract.endDate).toLocaleDateString(locale === 'en' ? 'en-US' : 'id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}`,
+          value: `${new Date(activeContract.startDate).toLocaleDateString(locale === 'en' ? 'en-US' : 'id-ID', { day: 'numeric', month: 'short', year: 'numeric' })} - ${new Date(getMaxEndDate(activeContract.booking?.items || [])).toLocaleDateString(locale === 'en' ? 'en-US' : 'id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}`,
           type: 'date' 
         });
         

@@ -1,3 +1,17 @@
+
+const getMaxEndDate = (items: any[]) => {
+  if (!items || items.length === 0) return "";
+  let max = new Date(items[0].startDate || "");
+  for (const item of items) {
+    if (!item.startDate) continue;
+    const d = new Date(item.startDate);
+    if (item.rateType === "HOURLY") d.setHours(d.getHours() + (item.duration || 1));
+    else d.setDate(d.getDate() + (item.duration || 1));
+    if (d > max) max = d;
+  }
+  return max.toISOString();
+};
+
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -87,7 +101,7 @@ export function MonitoringFeature() {
       const items = contract.booking?.items || [];
       items.forEach(item => {
         // Use item endDate if different, otherwise fallback to contract
-        const endDateObj = new Date(item.endDate || contract.endDate);
+        const endDateObj = new Date(getMaxEndDate(contract.booking?.items || []));
         const overdue = now > endDateObj;
         
         const msDiff = Math.abs(now.getTime() - endDateObj.getTime());
@@ -106,7 +120,7 @@ export function MonitoringFeature() {
           vehicleName: item.vehicle?.coreVehicle?.vehicleName || 'Unknown Vehicle',
           licensePlate: item.vehicle?.coreVehicle?.plateNumber || '-',
           startDate: item.startDate || contract.startDate,
-          endDate: item.endDate || contract.endDate,
+          endDate: getMaxEndDate(contract.booking?.items || []),
           isOverdue: overdue,
           remainingHours,
           remainingDays,

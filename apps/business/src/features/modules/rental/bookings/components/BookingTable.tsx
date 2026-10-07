@@ -104,7 +104,16 @@ function buildColumns(
       size: 200,
       cell: ({ row }) => {
         const b = row.original;
-        const rateTypeLabel = `${b.items?.length || 0} Unit Kendaraan`;
+        
+        let rateTypeLabel = labels.multiRate || "Multi Tarif";
+        if (b.items && b.items.length > 0) {
+          const firstRateType = b.items[0].rateType;
+          const allSame = b.items.every(i => i.rateType === firstRateType);
+          if (allSame) {
+            rateTypeLabel = firstRateType === "DAILY" ? labels.rateDaily || "Harian" : firstRateType === "HOURLY" ? labels.rateHourly || "Per Jam" : labels.ratePackage || "Paket";
+          }
+        }
+
         const rentalTypeLabel = b.rentalType === 'SELF_DRIVE' ? (labels.selfDrive || 'Lepas Kunci') : (labels.withDriver || 'Dengan Pengemudi');
 
         let periodColorClass = 'text-muted-foreground';
@@ -113,12 +122,12 @@ function buildColumns(
 
         return (
           <div className="flex flex-col gap-0.5 py-1">
-            <span className="text-[13px] font-normal text-foreground">
+            <span className="text-[13px] font-normal text-foreground truncate w-full max-w-[200px]" title={`${rateTypeLabel} • ${rentalTypeLabel}`}>
               {rateTypeLabel} • {rentalTypeLabel}
             </span>
-            <div className={`flex items-center gap-1.5 mt-0.5 text-[11px] ${periodColorClass}`} title={`${formatShortDate(b.startDate)} - ${formatShortDate(b.endDate)}`}>
+            <div className={`flex items-center gap-1.5 mt-0.5 text-[11px] ${periodColorClass}`} title={`${formatShortDate(b.startDate)} - ${formatShortDate(getMaxEndDate(b.items))}`}>
               <Calendar className="h-3 w-3 shrink-0" />
-              <span className="truncate">{formatShortDate(b.startDate)} - {formatShortDate(b.endDate)}</span>
+              <span className="truncate">{formatShortDate(b.startDate)} - {formatShortDate(getMaxEndDate(b.items))}</span>
             </div>
           </div>
         );
@@ -294,6 +303,20 @@ function buildColumns(
 }
 
 const DEFAULT_COLUMN_VISIBILITY = {};
+
+
+  const getMaxEndDate = (items: any[]) => {
+    if (!items || items.length === 0) return "";
+    let max = new Date(items[0].startDate || "");
+    for (const item of items) {
+      if (!item.startDate) continue;
+      const d = new Date(item.startDate);
+      if (item.rateType === "HOURLY") d.setHours(d.getHours() + (item.duration || 1));
+      else d.setDate(d.getDate() + (item.duration || 1)); // simplifying package/daily
+      if (d > max) max = d;
+    }
+    return max.toISOString();
+  };
 
 export function BookingTable({
   data,

@@ -2,9 +2,63 @@ import type { Booking } from '@/features/modules/rental/bookings/types/booking';
 
 export const mockBookings: Booking[] = [
   {
+    "id": "res-multi-001",
+    "bookingNumber": "RES-2610-MIX",
+    "customerId": "cust-com-002",
+    "rentalType": "WITH_DRIVER",
+    "totalAmount": 4150000,
+    "deposit": 1500000,
+    "remainingAmount": 2650000,
+    "status": "BOOKED",
+    "createdAt": "2026-10-06T10:00:00.000Z",
+    "updatedAt": "2026-10-06T10:00:00.000Z",
+    "startDate": "2026-10-15T08:00:00.000Z",
+    "items": [
+      {
+        "id": "res-multi-001-item-1",
+        "bookingId": "res-multi-001",
+        "vehicleId": "veh-011",
+        "rateType": "DAILY",
+        "startDate": "2026-10-15T08:00:00.000Z",
+        "endDate": "2026-10-18T08:00:00.000Z",
+        "duration": 3,
+        "unitPrice": 400000,
+        "depositSnapshot": 500000,
+        "subtotal": 1200000
+      },
+      {
+        "id": "res-multi-001-item-2",
+        "bookingId": "res-multi-001",
+        "vehicleId": "veh-012",
+        "rateType": "HOURLY",
+        "startDate": "2026-10-15T08:00:00.000Z",
+        "endDate": "2026-10-15T20:00:00.000Z",
+        "duration": 12,
+        "unitPrice": 50000,
+        "depositSnapshot": 500000,
+        "subtotal": 600000
+      },
+      {
+        "id": "res-multi-001-item-3",
+        "bookingId": "res-multi-001",
+        "vehicleId": "veh-013",
+        "rateType": "PACKAGE",
+        "packageId": "pkg-001",
+        "packageName": "Paket Wisata 3 Hari 2 Malam",
+        "startDate": "2026-10-15T08:00:00.000Z",
+        "endDate": "2026-10-18T08:00:00.000Z",
+        "duration": 1,
+        "unitPrice": 2350000,
+        "depositSnapshot": 500000,
+        "subtotal": 2350000
+      }
+    ]
+  },
+
+  {
     "id": "res-mega-001",
     "bookingNumber": "RES-2610-999",
-    "customerId": "cust-corp-001",
+    "customerId": "cust-com-001",
     "rentalType": "WITH_DRIVER",
     "totalAmount": 24000000,
     "deposit": 24000000,
@@ -13,8 +67,6 @@ export const mockBookings: Booking[] = [
     "createdAt": "2026-10-06T10:00:00.000Z",
     "updatedAt": "2026-10-06T10:00:00.000Z",
     "startDate": "2026-10-15T08:00:00.000Z",
-    "endDate": "2026-10-20T18:00:00.000Z",
-    "duration": 5,
     "items": Array.from({ length: 12 }).map((_, i) => ({
       "id": `res-mega-001-item-${i+1}`,
       "bookingId": "res-mega-001",
@@ -40,8 +92,6 @@ export const mockBookings: Booking[] = [
     "createdAt": "2026-09-10T10:00:00.000Z",
     "updatedAt": "2026-09-15T18:00:00.000Z",
     "startDate": "2026-09-12T08:00:00.000Z",
-    "endDate": "2026-09-15T18:00:00.000Z",
-    "duration": 3,
     "items": [
       {
         "id": "res-completed-001-item-1",
@@ -69,8 +119,6 @@ export const mockBookings: Booking[] = [
     "createdAt": "2026-10-01T10:00:00.000Z",
     "updatedAt": "2026-10-02T10:00:00.000Z",
     "startDate": "2026-10-05T08:00:00.000Z",
-    "endDate": "2026-10-10T18:00:00.000Z",
-    "duration": 5,
     "items": [
       {
         "id": "res-cancelled-001-item-1",
@@ -98,8 +146,6 @@ export const mockBookings: Booking[] = [
     "createdAt": "2026-08-18T12:00:00.000Z",
     "updatedAt": "2026-08-21T12:00:00.000Z",
     "startDate": "2026-08-23T12:00:00.000Z",
-    "endDate": "2026-08-28T12:00:00.000Z",
-    "duration": 5,
     "items": [
       {
         "id": "res-001-item-1",
@@ -151,8 +197,6 @@ export const mockBookings: Booking[] = [
     "createdAt": "2026-08-18T12:00:00.000Z",
     "updatedAt": "2026-08-21T12:00:00.000Z",
     "startDate": "2026-08-23T12:00:00.000Z",
-    "endDate": "2026-08-28T12:00:00.000Z",
-    "duration": 5,
     "items": [
       {
         "id": "res-002-item-1",
@@ -192,8 +236,6 @@ export const mockBookings: Booking[] = [
     "createdAt": "2026-08-18T12:00:00.000Z",
     "updatedAt": "2026-08-21T12:00:00.000Z",
     "startDate": "2026-08-23T12:00:00.000Z",
-    "endDate": "2026-08-28T12:00:00.000Z",
-    "duration": 5,
     "items": [
       {
         "id": "res-003-item-1",
@@ -221,8 +263,6 @@ export const mockBookings: Booking[] = [
     "createdAt": "2026-08-18T12:00:00.000Z",
     "updatedAt": "2026-08-21T12:00:00.000Z",
     "startDate": "2026-08-23T12:00:00.000Z",
-    "endDate": "2026-08-28T12:00:00.000Z",
-    "duration": 5,
     "items": [
       {
         "id": "res-004-item-1",
@@ -250,8 +290,6 @@ export const mockBookings: Booking[] = [
     "createdAt": "2026-08-18T12:00:00.000Z",
     "updatedAt": "2026-08-21T12:00:00.000Z",
     "startDate": "2026-08-23T12:00:00.000Z",
-    "endDate": "2026-08-28T12:00:00.000Z",
-    "duration": 5,
     "items": [
       {
         "id": "res-005-item-1",
@@ -279,8 +317,6 @@ export const mockBookings: Booking[] = [
     "createdAt": "2026-08-22T12:00:00.000Z",
     "updatedAt": "2026-08-25T12:00:00.000Z",
     "startDate": "2026-08-27T12:00:00.000Z",
-    "endDate": "2026-08-30T12:00:00.000Z",
-    "duration": 3,
     "items": [
       {
         "id": "res-006-item-1",
@@ -308,8 +344,6 @@ export const mockBookings: Booking[] = [
     "createdAt": "2026-08-22T12:00:00.000Z",
     "updatedAt": "2026-08-25T12:00:00.000Z",
     "startDate": "2026-08-27T12:00:00.000Z",
-    "endDate": "2026-08-30T12:00:00.000Z",
-    "duration": 3,
     "items": [
       {
         "id": "res-007-item-1",
@@ -337,8 +371,6 @@ export const mockBookings: Booking[] = [
     "createdAt": "2026-08-22T12:00:00.000Z",
     "updatedAt": "2026-08-25T12:00:00.000Z",
     "startDate": "2026-08-27T12:00:00.000Z",
-    "endDate": "2026-08-30T12:00:00.000Z",
-    "duration": 3,
     "items": [
       {
         "id": "res-008-item-1",
@@ -366,8 +398,6 @@ export const mockBookings: Booking[] = [
     "createdAt": "2026-08-10T12:00:00.000Z",
     "updatedAt": "2026-08-13T12:00:00.000Z",
     "startDate": "2026-08-15T12:00:00.000Z",
-    "endDate": "2026-08-18T12:00:00.000Z",
-    "duration": 3,
     "items": [
       {
         "id": "res-009-item-1",
@@ -395,8 +425,6 @@ export const mockBookings: Booking[] = [
     "createdAt": "2026-08-10T12:00:00.000Z",
     "updatedAt": "2026-08-13T12:00:00.000Z",
     "startDate": "2026-08-15T12:00:00.000Z",
-    "endDate": "2026-08-18T12:00:00.000Z",
-    "duration": 3,
     "items": [
       {
         "id": "res-010-item-1",
@@ -424,8 +452,6 @@ export const mockBookings: Booking[] = [
     "createdAt": "2026-08-10T12:00:00.000Z",
     "updatedAt": "2026-08-13T12:00:00.000Z",
     "startDate": "2026-08-15T12:00:00.000Z",
-    "endDate": "2026-08-18T12:00:00.000Z",
-    "duration": 3,
     "items": [
       {
         "id": "res-011-item-1",
@@ -453,8 +479,6 @@ export const mockBookings: Booking[] = [
     "createdAt": "2026-08-15T12:00:00.000Z",
     "updatedAt": "2026-08-18T12:00:00.000Z",
     "startDate": "2026-08-20T12:00:00.000Z",
-    "endDate": "2026-08-22T12:00:00.000Z",
-    "duration": 2,
     "items": [
       {
         "id": "res-012-item-1",
@@ -482,8 +506,6 @@ export const mockBookings: Booking[] = [
     "createdAt": "2026-08-25T12:00:00.000Z",
     "updatedAt": "2026-08-28T12:00:00.000Z",
     "startDate": "2026-08-30T12:00:00.000Z",
-    "endDate": "2026-09-01T12:00:00.000Z",
-    "duration": 2,
     "items": [
       {
         "id": "res-013-item-1",
@@ -512,8 +534,6 @@ export const mockBookings: Booking[] = [
     "createdAt": "2026-08-25T12:00:00.000Z",
     "updatedAt": "2026-08-28T12:00:00.000Z",
     "startDate": "2026-08-30T12:00:00.000Z",
-    "endDate": "2026-09-01T12:00:00.000Z",
-    "duration": 2,
     "items": [
       {
         "id": "res-015-item-1",
@@ -541,8 +561,6 @@ export const mockBookings: Booking[] = [
     "createdAt": "2026-09-01T12:00:00.000Z",
     "updatedAt": "2026-09-02T12:00:00.000Z",
     "startDate": "2026-10-17T08:00:00.000Z",
-    "endDate": "2026-10-19T08:00:00.000Z",
-    "duration": 2,
     "items": [
       {
         "id": "res-016-item-1",
@@ -570,8 +588,6 @@ export const mockBookings: Booking[] = [
     "createdAt": "2026-09-01T12:00:00.000Z",
     "updatedAt": "2026-09-02T12:00:00.000Z",
     "startDate": "2026-10-18T08:00:00.000Z",
-    "endDate": "2026-10-20T08:00:00.000Z",
-    "duration": 2,
     "items": [
       {
         "id": "res-017-item-1",
@@ -599,8 +615,6 @@ export const mockBookings: Booking[] = [
     "createdAt": "2026-09-01T12:00:00.000Z",
     "updatedAt": "2026-09-02T12:00:00.000Z",
     "startDate": "2026-10-19T08:00:00.000Z",
-    "endDate": "2026-10-21T08:00:00.000Z",
-    "duration": 2,
     "items": [
       {
         "id": "res-018-item-1",
@@ -628,8 +642,6 @@ export const mockBookings: Booking[] = [
     "createdAt": "2026-09-01T12:00:00.000Z",
     "updatedAt": "2026-09-02T12:00:00.000Z",
     "startDate": "2026-10-20T08:00:00.000Z",
-    "endDate": "2026-10-22T08:00:00.000Z",
-    "duration": 2,
     "items": [
       {
         "id": "res-019-item-1",
@@ -657,8 +669,6 @@ export const mockBookings: Booking[] = [
     "createdAt": "2026-09-01T12:00:00.000Z",
     "updatedAt": "2026-09-02T12:00:00.000Z",
     "startDate": "2026-10-21T08:00:00.000Z",
-    "endDate": "2026-10-23T08:00:00.000Z",
-    "duration": 2,
     "items": [
       {
         "id": "res-020-item-1",
@@ -686,8 +696,6 @@ export const mockBookings: Booking[] = [
     "createdAt": "2026-09-01T12:00:00.000Z",
     "updatedAt": "2026-09-02T12:00:00.000Z",
     "startDate": "2026-10-22T08:00:00.000Z",
-    "endDate": "2026-10-24T08:00:00.000Z",
-    "duration": 2,
     "items": [
       {
         "id": "res-021-item-1",
@@ -715,8 +723,6 @@ export const mockBookings: Booking[] = [
     "createdAt": "2026-09-01T12:00:00.000Z",
     "updatedAt": "2026-09-02T12:00:00.000Z",
     "startDate": "2026-10-23T08:00:00.000Z",
-    "endDate": "2026-10-25T08:00:00.000Z",
-    "duration": 2,
     "items": [
       {
         "id": "res-022-item-1",
@@ -744,8 +750,6 @@ export const mockBookings: Booking[] = [
     "createdAt": "2026-09-01T12:00:00.000Z",
     "updatedAt": "2026-09-02T12:00:00.000Z",
     "startDate": "2026-10-24T08:00:00.000Z",
-    "endDate": "2026-10-26T08:00:00.000Z",
-    "duration": 2,
     "items": [
       {
         "id": "res-023-item-1",
@@ -773,8 +777,6 @@ export const mockBookings: Booking[] = [
     "createdAt": "2026-09-01T12:00:00.000Z",
     "updatedAt": "2026-09-02T12:00:00.000Z",
     "startDate": "2026-10-25T08:00:00.000Z",
-    "endDate": "2026-10-27T08:00:00.000Z",
-    "duration": 2,
     "items": [
       {
         "id": "res-024-item-1",
@@ -802,8 +804,6 @@ export const mockBookings: Booking[] = [
     "createdAt": "2026-09-01T12:00:00.000Z",
     "updatedAt": "2026-09-02T12:00:00.000Z",
     "startDate": "2026-10-26T08:00:00.000Z",
-    "endDate": "2026-10-28T08:00:00.000Z",
-    "duration": 2,
     "items": [
       {
         "id": "res-025-item-1",
@@ -831,8 +831,6 @@ export const mockBookings: Booking[] = [
     "createdAt": "2026-09-01T12:00:00.000Z",
     "updatedAt": "2026-09-02T12:00:00.000Z",
     "startDate": "2026-10-27T08:00:00.000Z",
-    "endDate": "2026-10-29T08:00:00.000Z",
-    "duration": 2,
     "items": [
       {
         "id": "res-026-item-1",
@@ -860,8 +858,6 @@ export const mockBookings: Booking[] = [
     "createdAt": "2026-09-01T12:00:00.000Z",
     "updatedAt": "2026-09-02T12:00:00.000Z",
     "startDate": "2026-10-28T08:00:00.000Z",
-    "endDate": "2026-10-30T08:00:00.000Z",
-    "duration": 2,
     "items": [
       {
         "id": "res-027-item-1",
@@ -889,8 +885,6 @@ export const mockBookings: Booking[] = [
     "createdAt": "2026-09-01T12:00:00.000Z",
     "updatedAt": "2026-09-02T12:00:00.000Z",
     "startDate": "2026-10-01T08:00:00.000Z",
-    "endDate": "2026-10-03T08:00:00.000Z",
-    "duration": 2,
     "items": [
       {
         "id": "res-028-item-1",
@@ -918,8 +912,6 @@ export const mockBookings: Booking[] = [
     "createdAt": "2026-09-01T12:00:00.000Z",
     "updatedAt": "2026-09-02T12:00:00.000Z",
     "startDate": "2026-10-02T08:00:00.000Z",
-    "endDate": "2026-10-04T08:00:00.000Z",
-    "duration": 2,
     "items": [
       {
         "id": "res-029-item-1",
@@ -947,8 +939,6 @@ export const mockBookings: Booking[] = [
     "createdAt": "2026-09-01T12:00:00.000Z",
     "updatedAt": "2026-09-02T12:00:00.000Z",
     "startDate": "2026-10-03T08:00:00.000Z",
-    "endDate": "2026-10-05T08:00:00.000Z",
-    "duration": 2,
     "items": [
       {
         "id": "res-030-item-1",
@@ -976,8 +966,6 @@ export const mockBookings: Booking[] = [
     "createdAt": "2026-09-01T12:00:00.000Z",
     "updatedAt": "2026-09-02T12:00:00.000Z",
     "startDate": "2026-10-04T08:00:00.000Z",
-    "endDate": "2026-10-06T08:00:00.000Z",
-    "duration": 2,
     "items": [
       {
         "id": "res-031-item-1",
@@ -1005,8 +993,6 @@ export const mockBookings: Booking[] = [
     "createdAt": "2026-09-01T12:00:00.000Z",
     "updatedAt": "2026-09-02T12:00:00.000Z",
     "startDate": "2026-10-05T08:00:00.000Z",
-    "endDate": "2026-10-07T08:00:00.000Z",
-    "duration": 2,
     "items": [
       {
         "id": "res-032-item-1",
@@ -1034,8 +1020,6 @@ export const mockBookings: Booking[] = [
     "createdAt": "2026-09-01T12:00:00.000Z",
     "updatedAt": "2026-09-02T12:00:00.000Z",
     "startDate": "2026-10-06T08:00:00.000Z",
-    "endDate": "2026-10-08T08:00:00.000Z",
-    "duration": 2,
     "items": [
       {
         "id": "res-033-item-1",
@@ -1063,8 +1047,6 @@ export const mockBookings: Booking[] = [
     "createdAt": "2026-09-01T12:00:00.000Z",
     "updatedAt": "2026-09-02T12:00:00.000Z",
     "startDate": "2026-10-07T08:00:00.000Z",
-    "endDate": "2026-10-09T08:00:00.000Z",
-    "duration": 2,
     "items": [
       {
         "id": "res-034-item-1",
@@ -1092,8 +1074,6 @@ export const mockBookings: Booking[] = [
     "createdAt": "2026-09-01T12:00:00.000Z",
     "updatedAt": "2026-09-02T12:00:00.000Z",
     "startDate": "2026-10-08T08:00:00.000Z",
-    "endDate": "2026-10-10T08:00:00.000Z",
-    "duration": 2,
     "items": [
       {
         "id": "res-035-item-1",
@@ -1121,8 +1101,6 @@ export const mockBookings: Booking[] = [
     "createdAt": "2026-09-01T12:00:00.000Z",
     "updatedAt": "2026-09-02T12:00:00.000Z",
     "startDate": "2026-10-09T08:00:00.000Z",
-    "endDate": "2026-10-11T08:00:00.000Z",
-    "duration": 2,
     "items": [
       {
         "id": "res-036-item-1",
@@ -1150,8 +1128,6 @@ export const mockBookings: Booking[] = [
     "createdAt": "2026-09-01T12:00:00.000Z",
     "updatedAt": "2026-09-02T12:00:00.000Z",
     "startDate": "2026-10-10T08:00:00.000Z",
-    "endDate": "2026-10-12T08:00:00.000Z",
-    "duration": 2,
     "items": [
       {
         "id": "res-037-item-1",
@@ -1179,8 +1155,6 @@ export const mockBookings: Booking[] = [
     "createdAt": "2026-09-01T12:00:00.000Z",
     "updatedAt": "2026-09-02T12:00:00.000Z",
     "startDate": "2026-10-11T08:00:00.000Z",
-    "endDate": "2026-10-13T08:00:00.000Z",
-    "duration": 2,
     "items": [
       {
         "id": "res-038-item-1",
@@ -1208,8 +1182,6 @@ export const mockBookings: Booking[] = [
     "createdAt": "2026-09-01T12:00:00.000Z",
     "updatedAt": "2026-09-02T12:00:00.000Z",
     "startDate": "2026-10-12T08:00:00.000Z",
-    "endDate": "2026-10-14T08:00:00.000Z",
-    "duration": 2,
     "items": [
       {
         "id": "res-039-item-1",

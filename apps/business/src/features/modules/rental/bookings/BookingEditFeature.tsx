@@ -89,7 +89,7 @@ export function BookingEditFeature({ bookingId, onOpenChange, onSuccess }: Booki
       packageName: i.packageName,
       unitPrice: i.unitPrice,
       depositSnapshot: i.depositSnapshot,
-        duration: i.duration,
+        duration: i.duration || 1,
       subtotal: i.subtotal,
     })) || [],
     startDate: booking.startDate,

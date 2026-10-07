@@ -19,6 +19,20 @@ interface BookingViewProps {
   layout?: 'drawer' | 'dialog' | 'fullscreen';
 }
 
+
+  const getMaxEndDate = (items: any[]) => {
+    if (!items || items.length === 0) return "";
+    let max = new Date(items[0].startDate || "");
+    for (const item of items) {
+      if (!item.startDate) continue;
+      const d = new Date(item.startDate);
+      if (item.rateType === "HOURLY") d.setHours(d.getHours() + (item.duration || 1));
+      else d.setDate(d.getDate() + (item.duration || 1)); // simplifying package/daily
+      if (d > max) max = d;
+    }
+    return max.toISOString();
+  };
+
 export function BookingView({
   booking,
   open,
@@ -108,7 +122,7 @@ export function BookingView({
     <DetailShell
       open={open}
       onOpenChange={(isOpen) => !isOpen && onClose()}
-      title="Detail Booking"
+      title={labels.bookingDetail || "Detail Booking"}
       layout={layout}
       extraFooterActions={
         <>
@@ -160,9 +174,7 @@ export function BookingView({
               className="flex-1 h-8 text-[11px] font-semibold hover:bg-success/5 hover:text-success hover:border-success/30 transition-all"
               onClick={() => onConfirm(booking)}
               leftIcon={<CheckCircle2 className="w-3.5 h-3.5" />}
-            >
-              Konfirmasi Booking
-            </Button>
+            >{labels.confirmBooking || "Konfirmasi Booking"}</Button>
           </div>
         )}
 
@@ -187,9 +199,7 @@ export function BookingView({
                 ? "text-primary border-primary" 
                 : "text-muted-foreground border-transparent hover:text-foreground"
             )}
-          >
-            Pembayaran
-          </button>
+          >{labels.paymentTab || "Pembayaran"}</button>
         </div>
 
         {/* Content Body */}
@@ -207,11 +217,11 @@ export function BookingView({
               <>
                 <InfoItem label={labels.fieldCustomer || 'Nama'} value={booking.customer.name} colSpan={2} />
                 <InfoItem label="Tipe Pelanggan" value={booking.customer.type === 'COMPANY' ? (labels.typeCompany || 'Perusahaan') : (labels.typeIndividual || 'Individu')} />
-                <InfoItem label="No. Telepon" value={<PhoneLink phone={booking.customer.phone || ''} className="text-[11px] font-bold text-foreground hover:underline" />} />
-                <InfoItem label="Lokasi" value={[booking.customer.city, booking.customer.province].filter(Boolean).join(' - ') || '-'} colSpan={2} />
+                <InfoItem label={labels.contact || "No. Telepon"} value={<PhoneLink phone={booking.customer.phone || ''} className="text-[11px] font-bold text-foreground hover:underline" />} />
+                <InfoItem label={labels.address || "Lokasi"} value={[booking.customer.city, booking.customer.province].filter(Boolean).join(' - ') || '-'} colSpan={2} />
               </>
             ) : (
-              <span className="text-[11px] text-muted-foreground italic col-span-2">Tidak ada data pelanggan</span>
+              <span className="text-[11px] text-muted-foreground italic col-span-2">{labels.noCustomerData || "Tidak ada data pelanggan"}</span>
             )}
           </SectionCard>
 
@@ -223,8 +233,8 @@ export function BookingView({
             bgClass="bg-emerald-100 dark:bg-emerald-900/40"
           >
             <InfoItem label={labels.fieldStartDate || 'Tgl Mulai'} value={formatDate(booking.startDate)} />
-            <InfoItem label={labels.fieldEndDate || 'Tgl Selesai'} value={formatDate(booking.endDate)} />
-            <InfoItem label={labels.fieldDuration || 'Durasi'} value={`${booking.duration} Hari`} />
+            <InfoItem label={labels.fieldEndDate || 'Tgl Selesai'} value={formatDate(getMaxEndDate(booking.items))} />
+            <InfoItem label={labels.fieldDuration || 'Durasi'} value={`${(booking.items?.[0]?.duration || 1)} ${labels.day || 'Hari'}`} />
             <InfoItem label={labels.fieldRentalType || 'Jenis Sewa'} value={booking.rentalType === 'SELF_DRIVE' ? (labels.selfDrive || 'Lepas Kunci') : (labels.withDriver || 'Dengan Pengemudi')} />
           </SectionCard>
 
@@ -278,7 +288,7 @@ export function BookingView({
                   })}
                 </div>
               ) : (
-                <div className="text-[11px] text-muted-foreground italic">Tidak ada kendaraan yang dipilih</div>
+                <div className="text-[11px] text-muted-foreground italic">{labels.noVehicleSelected || "Tidak ada kendaraan yang dipilih"}</div>
               )}
             </div>
           </SectionCard>
@@ -292,7 +302,7 @@ export function BookingView({
             colorClass="text-amber-600 dark:text-amber-400"
             bgClass="bg-amber-100 dark:bg-amber-900/40"
           >
-            <InfoItem label="Total Deposit Jaminan" value={formatCurrency(booking.deposit || 0)} />
+            <InfoItem label={labels.fieldDeposit || "Total Deposit Jaminan"} value={formatCurrency(booking.deposit || 0)} />
             
             
             {booking.notes && (
@@ -301,17 +311,17 @@ export function BookingView({
 
             <div className="col-span-2 w-full bg-neutral-50/80 dark:bg-neutral-900/50 p-3 rounded-xl border border-border/60 flex flex-col gap-2.5 mt-2">
               <div className="flex justify-between items-center pb-2 border-b border-border/40">
-                <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Subtotal Booking</span>
+                <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">{labels.subtotalRental || "Subtotal Booking"}</span>
                 <span className="text-[11px] font-bold text-foreground">{formatCurrency(booking.totalAmount || 0)}</span>
               </div>
               {(booking.driverFee || 0) > 0 && (
                 <div className="flex justify-between items-center pb-2 border-b border-border/40">
-                  <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Biaya Pengemudi</span>
+                  <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">{labels.globalDriverFee || "Biaya Pengemudi"}</span>
                   <span className="text-[11px] font-bold text-foreground">{formatCurrency(booking.driverFee || 0)}</span>
                 </div>
               )}
               <div className="flex justify-between items-center pt-0.5 pb-2 border-b border-border/40">
-                <span className="text-[11px] font-bold text-foreground uppercase tracking-wider">Total Tagihan</span>
+                <span className="text-[11px] font-bold text-foreground uppercase tracking-wider">{labels.totalBilling || "Total Tagihan"}</span>
                 <span className="text-sm font-bold text-foreground">{formatCurrency(booking.totalAmount || 0)}</span>
               </div>
               <div className="flex justify-between items-center pt-0.5">

@@ -240,7 +240,7 @@ export function BookingForm({
         
         {/* KIRI: PELANGGAN */}
         <div className="flex flex-col gap-6 h-full">
-          <FormCard className="h-full" title={t.sectionGeneral} description="Pilih pelanggan dari database." icon={<User className="w-5 h-5 text-primary" />} iconWrapperClassName="bg-primary/10">
+          <FormCard className="h-full" title={t.sectionGeneral} description={t.selectCustomerDesc || "Pilih pelanggan dari database."} icon={<User className="w-5 h-5 text-primary" />} iconWrapperClassName="bg-primary/10">
             <div className="flex flex-col gap-6">
               <div>
                 <InputSelect
@@ -257,15 +257,15 @@ export function BookingForm({
               {selectedCustomer ? (
                 <div className="grid grid-cols-1 gap-y-4 gap-x-4 p-4 bg-gray-100 dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 -mt-2">
                   <div>
-                    <p className="text-[11px] group-data-[layout=drawer]/form:!text-[10px] group-data-[layout=dialog]/form:!text-[10px] text-muted-foreground font-medium mb-1">Tipe Pelanggan</p>
+                    <p className="text-[11px] group-data-[layout=drawer]/form:!text-[10px] group-data-[layout=dialog]/form:!text-[10px] text-muted-foreground font-medium mb-1">{t.customerType || "Tipe Pelanggan"}</p>
                     <p className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] font-bold text-primary">{selectedCustomer.type === 'COMPANY' ? 'Perusahaan' : 'Individu'}</p>
                   </div>
                   <div>
-                    <p className="text-[11px] group-data-[layout=drawer]/form:!text-[10px] group-data-[layout=dialog]/form:!text-[10px] text-muted-foreground font-medium mb-1">Nama {selectedCustomer.type === 'COMPANY' ? 'Perusahaan' : 'Lengkap'}</p>
+                    <p className="text-[11px] group-data-[layout=drawer]/form:!text-[10px] group-data-[layout=dialog]/form:!text-[10px] text-muted-foreground font-medium mb-1">{selectedCustomer.type === 'COMPANY' ? (t.companyName || 'Nama Perusahaan') : (t.fullName || 'Nama Lengkap')}</p>
                     <p className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] font-bold">{selectedCustomer.name}</p>
                   </div>
                   <div>
-                    <p className="text-[11px] group-data-[layout=drawer]/form:!text-[10px] group-data-[layout=dialog]/form:!text-[10px] text-muted-foreground font-medium mb-1">Kontak</p>
+                    <p className="text-[11px] group-data-[layout=drawer]/form:!text-[10px] group-data-[layout=dialog]/form:!text-[10px] text-muted-foreground font-medium mb-1">{t.contact || "Kontak"}</p>
                     <p className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] font-bold">{selectedCustomer.phone} • {selectedCustomer.email || '-'}</p>
                   </div>
                   {selectedCustomer.type === 'INDIVIDUAL' ? (
@@ -275,18 +275,18 @@ export function BookingForm({
                     </div>
                   ) : (
                     <div>
-                      <p className="text-[11px] group-data-[layout=drawer]/form:!text-[10px] group-data-[layout=dialog]/form:!text-[10px] text-muted-foreground font-medium mb-1">PIC (Penanggung Jawab)</p>
+                      <p className="text-[11px] group-data-[layout=drawer]/form:!text-[10px] group-data-[layout=dialog]/form:!text-[10px] text-muted-foreground font-medium mb-1">{t.picName || "PIC (Penanggung Jawab)"}</p>
                       <p className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] font-bold">{(selectedCustomer as any).picName || '-'} ({(selectedCustomer as any).picPhone || '-'})</p>
                     </div>
                   )}
                   <div>
-                    <p className="text-[11px] group-data-[layout=drawer]/form:!text-[10px] group-data-[layout=dialog]/form:!text-[10px] text-muted-foreground font-medium mb-1">Alamat</p>
+                    <p className="text-[11px] group-data-[layout=drawer]/form:!text-[10px] group-data-[layout=dialog]/form:!text-[10px] text-muted-foreground font-medium mb-1">{t.address || "Alamat"}</p>
                     <p className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] font-bold line-clamp-2" title={selectedCustomer.address}>{selectedCustomer.address || '-'}</p>
                   </div>
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center p-6 bg-neutral-50 dark:bg-neutral-900/30 rounded-lg border border-dashed border-border/60 -mt-2 text-center h-[240px]">
-                  <p className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] text-muted-foreground font-medium">Belum ada pelanggan yang dipilih</p>
+                  <p className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] text-muted-foreground font-medium">{t.noCustomerSelected || "Belum ada pelanggan yang dipilih"}</p>
                   <p className="text-[11px] text-muted-foreground mt-1">Silakan cari dan pilih pelanggan terlebih dahulu.</p>
                 </div>
               )}
@@ -296,7 +296,7 @@ export function BookingForm({
 
         {/* KANAN: STATUS, PEMBAYARAN & EKSTRA */}
         <div className="flex flex-col gap-6 h-full">
-          <FormCard className="h-full" title="Pengaturan Booking" description="Atur status dan tipe penyewaan kendaraan." icon={<Settings2 className="w-5 h-5 text-blue-500" />} iconWrapperClassName="bg-blue-100 dark:bg-blue-900/30">
+          <FormCard className="h-full" title={t.bookingSettings || "Pengaturan Booking"} description={t.bookingSettingsDesc || "Atur status dan tipe penyewaan kendaraan."} icon={<Settings2 className="w-5 h-5 text-blue-500" />} iconWrapperClassName="bg-blue-100 dark:bg-blue-900/30">
             <div className="flex flex-col gap-6">
               
               <div className="grid grid-cols-2 gap-4">
@@ -331,14 +331,14 @@ export function BookingForm({
               
               <div className="grid grid-cols-2 gap-4">
                 <InputDate
-                  label="Tanggal Ambil"
+                  label={t.pickupDate || "Tanggal Ambil"}
                   value={pickUpDate}
                   onChange={(d) => handlePickUpChange(d, pickUpTime)}
                   error={errors.startDate}
                   required
                 />
                 <InputTime
-                  label="Jam Ambil"
+                  label={t.pickupTimeOnly || "Jam Ambil"}
                   value={pickUpTime}
                   onChange={(t) => handlePickUpChange(pickUpDate, t)}
                   error={errors.startDate}
@@ -374,15 +374,15 @@ export function BookingForm({
 
       {/* BARIS 2: KENDARAAN */}
       <div className="mt-2 md:col-span-2 group-data-[layout=drawer]/form:!col-span-1 group-data-[layout=dialog]/form:!col-span-1">
-        <FormCard title="Daftar Kendaraan" description="Pilih kendaraan yang disewa beserta durasi/paketnya." icon={<ShoppingCart className="w-5 h-5 text-emerald-500" />} iconWrapperClassName="bg-emerald-100 dark:bg-emerald-900/30">
+        <FormCard title={t.sectionVehicle || "Daftar Kendaraan"} description={t.selectVehicleDesc || "Pilih kendaraan yang disewa beserta durasi/paketnya."} icon={<ShoppingCart className="w-5 h-5 text-emerald-500" />} iconWrapperClassName="bg-emerald-100 dark:bg-emerald-900/30">
           
           <div className="flex items-center justify-between mb-4">
-            <h4 className="text-sm font-bold text-foreground">Pilih Kendaraan</h4>
+            <h4 className="text-sm font-bold text-foreground">{t.selectVehicle || "Pilih Kendaraan"}</h4>
             
             {/* Hanya tampilkan input fee jika with driver */}
             {formData.rentalType === 'WITH_DRIVER' && (
               <div className="flex items-center gap-2">
-                <span className="text-xs text-muted-foreground whitespace-nowrap">Biaya Pengemudi (Global)</span>
+                <span className="text-xs text-muted-foreground whitespace-nowrap">{t.globalDriverFee || "Biaya Pengemudi (Global)"}</span>
                 <div className="w-[150px]">
                   <InputDecimal
                     value={formData.driverFee || 0}
@@ -400,14 +400,14 @@ export function BookingForm({
                 <InputSelect
                   value={selectedVehicleToAdd}
                   onChange={setSelectedVehicleToAdd}
-                  placeholder="Pilih Kendaraan..."
+                  placeholder={t.selectVehicle || "Pilih Kendaraan"}
                   options={vehicles
                     .filter(v => (v.status === 'READY' || v.status === 'RESERVED') && !(formData.items || []).find(i => i.vehicleId === v.vehicleId))
                     .map(v => ({ value: v.vehicleId, label: `${v.coreVehicle.plateNumber} - ${v.coreVehicle.brand} ${v.coreVehicle.vehicleName}` }))}
                 />
               </div>
               <Button type="button" onClick={handleAddVehicle} disabled={!selectedVehicleToAdd} variant="secondary">
-                <Plus className="w-4 h-4 mr-1" /> Tambah
+                <Plus className="w-4 h-4 mr-1" /> {t.add || "Tambah"}
               </Button>
             </div>
             {errors.items && typeof errors.items === 'string' && <p className="text-xs text-danger">{errors.items}</p>}
@@ -436,8 +436,8 @@ export function BookingForm({
                             value={item.rateType}
                             onChange={(val) => handleItemChange(index, { rateType: val as RateType, packageId: undefined, duration: val === 'HOURLY' ? 6 : 1 })}
                             options={[
-                              { value: 'DAILY', label: 'Harian' },
-                              { value: 'HOURLY', label: 'Per Jam' },
+                              { value: 'DAILY', label: t.rateDaily || 'Harian' },
+                              { value: 'HOURLY', label: t.rateHourly || 'Per Jam' },
                               { value: 'PACKAGE', label: 'Paket' }
                             ]}
                           />
@@ -447,7 +447,7 @@ export function BookingForm({
                             <InputSelect
                               value={item.packageId || ''}
                               onChange={(val) => handleItemChange(index, { packageId: val })}
-                              placeholder="Pilih Paket"
+                              placeholder={t.selectPackage || "Pilih Paket"}
                               options={(v.packages || []).map(p => ({ value: p.id, label: `${p.name} (${p.durationDays} hari)` }))}
                             />
                           ) : (
@@ -460,7 +460,7 @@ export function BookingForm({
                                 />
                               </div>
                               <div className="flex items-center text-xs text-muted-foreground font-medium px-1">
-                                {item.rateType === 'DAILY' ? 'Hari' : 'Jam'}
+                                {item.rateType === 'DAILY' ? (t.day || 'Hari') : (t.hour || 'Jam')}
                               </div>
                             </div>
                           )}
@@ -470,7 +470,7 @@ export function BookingForm({
                       
                       {/* Subtotal & Actions */}
                       <div className="flex flex-col items-end min-w-[140px] pt-2 md:pt-0 border-t md:border-t-0 border-border/40 w-full md:w-auto mr-4">
-                        <p className="text-[11px] group-data-[layout=drawer]/form:!text-[10px] group-data-[layout=dialog]/form:!text-[10px] text-muted-foreground font-medium mb-0.5">Pengembalian</p>
+                        <p className="text-[11px] group-data-[layout=drawer]/form:!text-[10px] group-data-[layout=dialog]/form:!text-[10px] text-muted-foreground font-medium mb-0.5">{t.returnText || "Pengembalian"}</p>
                         <p className="text-[12px] group-data-[layout=drawer]/form:!text-[11px] group-data-[layout=dialog]/form:!text-[11px] font-semibold text-foreground bg-neutral-100 dark:bg-neutral-800 px-2 py-0.5 rounded border border-border/50">
                           {(() => {
                             if (!formData.startDate) return "-";
@@ -490,11 +490,11 @@ export function BookingForm({
 
                       {/* Subtotal & Actions */}
                       <div className="flex flex-col items-end min-w-[120px] pt-2 md:pt-0 border-t md:border-t-0 border-border/40 w-full md:w-auto">
-                        <p className="text-[11px] group-data-[layout=drawer]/form:!text-[10px] group-data-[layout=dialog]/form:!text-[10px] text-muted-foreground font-medium mb-0.5">Subtotal Sewa</p>
+                        <p className="text-[11px] group-data-[layout=drawer]/form:!text-[10px] group-data-[layout=dialog]/form:!text-[10px] text-muted-foreground font-medium mb-0.5">{t.subtotalRental || "Subtotal Sewa"}</p>
                         <p className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] font-bold text-primary">{formatCurrency(item.subtotal)}</p>
                         <div className="flex items-center gap-1 mt-0.5" title={`Deposit Kendaraan: ${formatCurrency(item.depositSnapshot)}`}>
                           <Info className="w-3 h-3 text-muted-foreground" />
-                          <p className="text-[10px] text-muted-foreground">Jaminan: {formatCurrency(item.depositSnapshot)}</p>
+                          <p className="text-[10px] text-muted-foreground">{t.depositText || "Jaminan"}: {formatCurrency(item.depositSnapshot)}</p>
                         </div>
                       </div>
                       
@@ -512,8 +512,8 @@ export function BookingForm({
             ) : (
               <div className="p-8 border-2 border-dashed border-border/60 rounded-xl text-center flex flex-col items-center justify-center mt-2 bg-neutral-50/50 dark:bg-neutral-900/30">
                 <ShoppingCart className="w-8 h-8 text-muted-foreground/50 mb-2" />
-                <p className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] font-semibold text-foreground">Keranjang Masih Kosong</p>
-                <p className="text-xs text-muted-foreground max-w-[250px] mt-1">Tambahkan kendaraan untuk mulai mengatur tarif pemesanan.</p>
+                <p className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] font-semibold text-foreground">{t.emptyCart || "Keranjang Masih Kosong"}</p>
+                <p className="text-xs text-muted-foreground max-w-[250px] mt-1">{t.emptyCartDesc || "Tambahkan kendaraan untuk mulai mengatur tarif pemesanan."}</p>
               </div>
             )}
           </div>
@@ -525,25 +525,25 @@ export function BookingForm({
         <div className="flex flex-col md:flex-row group-data-[layout=drawer]/form:!flex-col gap-6 pt-2">
           <div className="flex-1 flex flex-col gap-2">
             <div className="grid grid-cols-[100px_1fr] gap-2">
-              <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] text-muted-foreground">Pelanggan</span>
+              <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] text-muted-foreground">{t.fieldCustomer || "Pelanggan"}</span>
               <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] font-semibold">{selectedCustomer?.name || '-'}</span>
             </div>
             <div className="grid grid-cols-[100px_1fr] gap-2">
-              <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] text-muted-foreground">Kendaraan</span>
+              <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] text-muted-foreground">{t.fieldVehicle || "Kendaraan"}</span>
               <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] font-semibold">{formData.items?.length || 0} unit</span>
             </div>
             <div className="grid grid-cols-[100px_1fr] gap-2">
-              <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] text-muted-foreground">Tipe Rental</span>
+              <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] text-muted-foreground">{t.fieldRentalType || "Tipe Rental"}</span>
               <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] font-semibold">{formData.rentalType === 'SELF_DRIVE' ? t.rentalTypeSelfDrive : t.rentalTypeWithDriver}</span>
             </div>
             <div className="grid grid-cols-[100px_1fr] gap-2 pt-2 border-t border-border/30 mt-2">
-              <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] text-muted-foreground">Waktu Ambil</span>
+              <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] text-muted-foreground">{t.pickupTime || "Waktu Ambil"}</span>
               <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] font-semibold">
                 {formData.startDate ? new Date(formData.startDate).toLocaleString("id-ID", { dateStyle: "medium", timeStyle: "short" }) : "-"}
               </span>
             </div>
             <div className="grid grid-cols-[100px_1fr] gap-2 pt-1">
-              <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] text-muted-foreground">Selesai (Maks)</span>
+              <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] text-muted-foreground">{t.returnMaxTime || "Selesai (Maks)"}</span>
               <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] font-semibold text-primary">
                 {(() => {
                   if (!formData.startDate || !formData.items || formData.items.length === 0) return "-";
@@ -569,17 +569,17 @@ export function BookingForm({
 
           <div className="w-full md:w-[280px] group-data-[layout=drawer]/form:!w-full shrink-0 border-t md:border-t-0 md:border-l group-data-[layout=drawer]/form:!border-t group-data-[layout=drawer]/form:!border-l-0 border-border/50 pt-6 md:pt-0 md:pl-6 group-data-[layout=drawer]/form:!pt-6 group-data-[layout=drawer]/form:!pl-0 flex flex-col">
             <div className="flex justify-between items-center mb-2">
-              <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] text-muted-foreground">Subtotal Sewa</span>
+              <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] text-muted-foreground">{t.subtotalRental || "Subtotal Sewa"}</span>
               <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] font-semibold">{formatCurrency(totalAmount - (formData.driverFee || 0))}</span>
             </div>
             {(formData.driverFee || 0) > 0 && (
               <div className="flex justify-between items-center mb-2">
-                <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] text-muted-foreground">Biaya Pengemudi</span>
+                <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] text-muted-foreground">{t.driverFeeText || "Biaya Pengemudi"}</span>
                 <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] font-semibold">{formatCurrency(formData.driverFee || 0)}</span>
               </div>
             )}
             <div className="flex justify-between items-center mb-6">
-              <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] text-muted-foreground">Total Deposit</span>
+              <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] text-muted-foreground">{t.totalDepositText || "Total Deposit"}</span>
               <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] font-semibold">{formatCurrency(formData.deposit || 0)}</span>
             </div>
 

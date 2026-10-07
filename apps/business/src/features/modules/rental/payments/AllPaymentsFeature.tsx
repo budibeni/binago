@@ -104,7 +104,7 @@ export function AllPaymentsFeature() {
           bookingId: p.bookingId,
           bookingNumber: p.booking?.bookingNumber || p.bookingId,
           customerName: p.customer?.name || '-',
-          duration: p.booking?.duration || 0,
+          duration: (p.booking?.items?.[0]?.duration || 1) || 0,
           totalVehicles: p.booking?.items?.length || 0,
           totalTagihan: p.booking?.totalAmount || 0, // Fallback if populated
           BOOKING_FEE: 0,
@@ -128,7 +128,7 @@ export function AllPaymentsFeature() {
       // Update totalTagihan and relations if it was 0 and we found it now
       if (!entry.totalTagihan && p.booking?.totalAmount) {
         entry.totalTagihan = p.booking.totalAmount;
-        entry.duration = p.booking.duration || 0;
+        entry.duration = (p.booking.items?.[0]?.duration || 1) || 0;
         entry.totalVehicles = p.booking.items?.length || 0;
       }
     });

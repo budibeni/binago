@@ -14,10 +14,10 @@ export interface BookingItem {
   vehicleId: string; // CORE Vehicle ID
   startDate: string; // ISO String
   endDate: string; // ISO String
-  duration: number; // in days
   rateType: RateType;
   packageId?: string;
   packageName?: string;
+  duration?: number;
   unitPrice: number; // Snapshot of the resolved rate (hourly/daily/package price)
   depositSnapshot: number; // Snapshot of deposit for this vehicle
   subtotal: number;
@@ -31,8 +31,6 @@ export interface Booking {
   bookingNumber: string;
   customerId: string;
   startDate: string; // ISO String (Main period)
-  endDate: string; // ISO String (Main period)
-  duration: number; // in days
   rentalType: RentalType;
   totalAmount: number;
   deposit: number;
@@ -66,13 +64,13 @@ export const getBookingFormSchema = (t: Record<string, any>) => z.object({
     vehicleId: z.string(),
     rateType: z.enum(['HOURLY', 'DAILY', 'PACKAGE']),
     packageId: z.string().optional(),
+    duration: z.number().optional(),
     packageName: z.string().optional(),
     unitPrice: z.number(),
     depositSnapshot: z.number(),
     subtotal: z.number(),
   })).min(1, t.vehicleRequired || 'Pilih minimal satu kendaraan'),
   startDate: z.string().min(1, t.startDateRequired || 'Tanggal mulai wajib diisi'),
-  endDate: z.string().min(1, t.endDateRequired || 'Tanggal selesai wajib diisi'),
   rentalType: z.enum(['SELF_DRIVE', 'WITH_DRIVER'], t.rentalTypeRequired || 'Tipe rental wajib dipilih'),
   pickupLocation: z.string().optional(),
   dropoffLocation: z.string().optional(),
@@ -83,12 +81,4 @@ export const getBookingFormSchema = (t: Record<string, any>) => z.object({
   needFuel: z.boolean().optional(),
   needInsurance: z.boolean().optional(),
   notes: z.string().optional(),
-}).refine(data => {
-  if (data.startDate && data.endDate) {
-    return new Date(data.endDate) > new Date(data.startDate);
-  }
-  return true;
-}, {
-  message: t.dateRangeInvalid || 'Tanggal selesai harus setelah tanggal mulai',
-  path: ['endDate'],
 });

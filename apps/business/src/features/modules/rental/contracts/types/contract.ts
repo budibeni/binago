@@ -17,8 +17,7 @@ export interface RentalContract {
   contractDate: string;
 
   startDate: string;
-  endDate: string;
-
+  
   rentalType: 'SELF_DRIVE' | 'WITH_DRIVER';
   
   totalAmount: number;

@@ -16,6 +16,20 @@ interface ContractDetailDrawerProps {
   onReturn?: (c: RentalContract) => void;
 }
 
+
+  const getMaxEndDate = (items: any[]) => {
+    if (!items || items.length === 0) return "";
+    let max = new Date(items[0].startDate || "");
+    for (const item of items) {
+      if (!item.startDate) continue;
+      const d = new Date(item.startDate);
+      if (item.rateType === "HOURLY") d.setHours(d.getHours() + (item.duration || 1));
+      else d.setDate(d.getDate() + (item.duration || 1)); // simplifying package/daily
+      if (d > max) max = d;
+    }
+    return max.toISOString();
+  };
+
 export function ContractView({
   contract,
   open,
@@ -226,11 +240,11 @@ export function ContractView({
             <div className="p-3.5 flex flex-col gap-3.5">
               <div className="grid grid-cols-1 gap-3">
                 <InfoItem label="Tanggal Mulai" value={formatDate(contract.startDate)} />
-                <InfoItem label="Tanggal Selesai" value={formatDate(contract.endDate)} />
+                <InfoItem label="Tanggal Selesai" value={formatDate(getMaxEndDate(contract.booking?.items || []))} />
               </div>
               
               <div className="grid grid-cols-2 gap-3 pt-3 border-t border-border/40">
-                <InfoItem label="Durasi" value={`${contract.booking?.duration || '-'} hari`} />
+                <InfoItem label="Durasi" value={`${(contract.booking?.items?.[0]?.duration || 1) || '-'} hari`} />
                 <InfoItem label="Tipe Rental" value={contract.rentalType === 'SELF_DRIVE' ? 'Lepas Kunci' : 'Dengan Pengemudi'} />
               </div>
             </div>

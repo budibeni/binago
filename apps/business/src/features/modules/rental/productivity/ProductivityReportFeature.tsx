@@ -1,3 +1,17 @@
+
+const getMaxEndDate = (items: any[]) => {
+  if (!items || items.length === 0) return "";
+  let max = new Date(items[0].startDate || "");
+  for (const item of items) {
+    if (!item.startDate) continue;
+    const d = new Date(item.startDate);
+    if (item.rateType === "HOURLY") d.setHours(d.getHours() + (item.duration || 1));
+    else d.setDate(d.getDate() + (item.duration || 1));
+    if (d > max) max = d;
+  }
+  return max.toISOString();
+};
+
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -108,7 +122,7 @@ export function ReportsFeature() {
         if (!item) return;
 
         const start = new Date(item.startDate || contract.startDate);
-        const end = new Date(item.endDate || contract.endDate);
+        const end = new Date(getMaxEndDate(contract.booking?.items || []));
 
         // Check if the rental overlaps with our selected period
         // But more specifically, we should only count hours that fall within the selected months!

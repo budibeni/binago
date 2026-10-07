@@ -86,7 +86,7 @@ export const contractService = {
       customerId: booking.customerId,
       contractDate: data.contractDate,
       startDate: booking.startDate,
-      endDate: booking.endDate,
+      
       rentalType: booking.rentalType,
       totalAmount: booking.totalAmount,
       deposit: booking.deposit,

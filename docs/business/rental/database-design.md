@@ -97,8 +97,8 @@ Pencatatan reservasi (*multi-armada*) dan dokumen legalnya.
 | `id` | UUID | PRIMARY KEY | |
 | `booking_number` | VARCHAR | UNIQUE, NOT NULL | (Cth: BKG-202410-001) |
 | `customer_id` | UUID | FK `rental_customers.id`| |
-| `start_date` | TIMESTAMP | NOT NULL | Waktu mulai sewa |
-| `end_date` | TIMESTAMP | NOT NULL | Waktu akhir sewa |
+| `start_date` | TIMESTAMP | NOT NULL | Waktu mulai sewa (Global) |
+| `rental_type` | ENUM | NOT NULL | `WITH_DRIVER`, `SELF_DRIVE` |
 | `total_amount` | DECIMAL | NOT NULL | Total Tagihan awal |
 | `status` | ENUM | NOT NULL | `DRAFT`, `CONFIRMED`, `CANCELLED`, `COMPLETED` |
 
@@ -113,8 +113,7 @@ Pencatatan reservasi (*multi-armada*) dan dokumen legalnya.
 | `package_name` | VARCHAR | NULL | Nama paket saat transaksi (snapshot) |
 | `unit_price` | DECIMAL | NOT NULL | Harga bekuan (snapshot tarif harian/jam/paket) |
 | `deposit_snapshot` | DECIMAL | NOT NULL | Uang jaminan untuk kendaraan ini |
-| `start_date` | TIMESTAMP | NOT NULL | Waktu mulai sewa per item |
-| `end_date` | TIMESTAMP | NOT NULL | Waktu akhir sewa per item |
+| `duration` | INTEGER | NOT NULL | Durasi (jam/hari) sesuai rate_type |
 | `subtotal` | DECIMAL | NOT NULL | Total harga (rate * durasi) untuk unit ini |
 
 **Table: `rental_contracts`**

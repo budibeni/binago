@@ -19,6 +19,20 @@ interface ReturnFormProps {
   onOpenChange?: (open: boolean) => void;
 }
 
+
+const getMaxEndDate = (items: any[]) => {
+  if (!items || items.length === 0) return "";
+  let max = new Date(items[0].startDate || "");
+  for (const item of items) {
+    if (!item.startDate) continue;
+    const d = new Date(item.startDate);
+    if (item.rateType === "HOURLY") d.setHours(d.getHours() + (item.duration || 1));
+    else d.setDate(d.getDate() + (item.duration || 1));
+    if (d > max) max = d;
+  }
+  return max.toISOString();
+};
+
 export function ReturnForm({ contract, handovers, onSubmit, onCancel, isSubmitting, layout = 'default', open, onOpenChange }: ReturnFormProps) {
   const [selectedHandoverIds, setSelectedHandoverIds] = React.useState<string[]>([]);
   const [activeTab, setActiveTab] = React.useState<string>('');
@@ -201,7 +215,7 @@ export function ReturnForm({ contract, handovers, onSubmit, onCancel, isSubmitti
             <div>
               <p className="text-[13px] font-normal text-neutral-500 mb-1">Periode Sewa</p>
               <p className="text-[13px] font-semibold text-foreground">
-                {new Date(contract.startDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })} - {new Date(contract.endDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })}
+                {new Date(contract.startDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })} - {new Date(getMaxEndDate(contract.booking?.items || [])).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })}
               </p>
             </div>
             <div>
