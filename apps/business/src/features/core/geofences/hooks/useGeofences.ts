@@ -27,9 +27,9 @@ export function useGeofences(filters?: { search?: string; status?: string; group
         return {
           id: String(g.id),
           name: g.name || '-',
-          description: '-',
+          description: g.description || '-',
           geometry: geometry,
-          status: 'active',
+          status: g.status || 'active',
           groupId: g.group_id ? String(g.group_id) : undefined,
           vehicleIds: g.vehicle_ids ? g.vehicle_ids.map(String) : [],
           createdAt: new Date().toISOString(),
