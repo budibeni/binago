@@ -60,6 +60,7 @@ export function GroupForm({
       open={open}
       onOpenChange={onOpenChange}
       onCancel={onCancel}
+      onSave={() => handleSubmit()}
       onSubmit={handleSubmit}
       isSubmitting={isSubmitting}
       layout={layout}
