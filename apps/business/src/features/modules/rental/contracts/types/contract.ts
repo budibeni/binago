@@ -20,7 +20,9 @@ export interface RentalContract {
   endDate: string;
 
   rentalType: 'SELF_DRIVE' | 'WITH_DRIVER';
-  rateType: 'DAILY' | 'WEEKLY' | 'MONTHLY';
+  rateType: 'HOURLY' | 'DAILY' | 'PACKAGE';
+  packageId?: string;
+  packageName?: string;
 
   totalAmount: number;
   deposit: number;

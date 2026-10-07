@@ -7,6 +7,7 @@ import type { Customer } from '@/features/modules/rental/customers/types/custome
 import type { RentalVehicle } from '@/features/modules/rental/vehicles/types/rentalVehicle';
 import type { RateType, RentalType } from '../types/booking';
 import { getBookingFormSchema } from '../types/booking';
+import type { BookingStatus } from '../types/booking';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
 import { getBookingTranslation } from '../i18n';
 import { formatCurrency } from '@adatrack/utils';
@@ -14,6 +15,8 @@ import { formatCurrency } from '@adatrack/utils';
 
 export interface BookingFormData {
   id?: string;
+  bookingNumber?: string;
+  status?: BookingStatus;
   customerId: string;
   vehicleIds: string[];
   startDate: string;
@@ -144,7 +147,7 @@ export function BookingForm({
       layout={layout}
       open={open}
       onOpenChange={onOpenChange}
-      title={isEditing ? 'Edit Booking' : t.addBooking}
+      title={isEditing ? `Edit Booking ${formData.bookingNumber ? `(${formData.bookingNumber})` : ''}`.trim() : (t.addBooking || 'Tambah Booking')}
       subtitle="Masukkan informasi detail booking."
       onCancel={onCancel}
       cancelText={t.cancel || 'Batal'}
@@ -222,6 +225,20 @@ export function BookingForm({
                   ]}
                   error={errors.rentalType}
                   required
+                />
+              </div>
+              <div>
+                <InputSelect
+                  label={'Status Booking'}
+                  value={formData.status || 'BOOKED'}
+                  onChange={(val) => handleChange('status', val as BookingStatus)}
+                  options={isEditing ? [
+                    { value: 'BOOKED', label: t.statusBooked || 'Dipesan' },
+                    { value: 'CANCELLED', label: t.statusCancelled || 'Dibatalkan' }
+                  ] : [
+                    { value: 'BOOKED', label: t.statusBooked || 'Dipesan' }
+                  ]}
+                  disabled={!isEditing}
                 />
               </div>
             </div>
@@ -359,8 +376,8 @@ export function BookingForm({
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="col-span-1">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
               <InputDecimal
                 label="Biaya Pengemudi"
                 value={(formData as any).driverFee || 0}
@@ -369,7 +386,7 @@ export function BookingForm({
                 disabled={formData.rentalType !== 'WITH_DRIVER'}
               />
             </div>
-            <div className="col-span-1">
+            <div>
               <InputSelect
                 label={t.fieldPaymentMethod || 'Metode Pembayaran'}
                 value={formData.paymentMethod || 'TRANSFER'}
@@ -379,6 +396,14 @@ export function BookingForm({
                   { value: 'CASH', label: t.paymentCash || 'Tunai' },
                   { value: 'CARD', label: t.paymentCard || 'Kartu Kredit' }
                 ]}
+              />
+            </div>
+            <div>
+              <InputDecimal
+                label="Deposit"
+                value={formData.deposit || 0}
+                onChange={(val) => handleChange('deposit', val !== null ? val : 0)}
+                placeholder="0"
               />
             </div>
           </div>

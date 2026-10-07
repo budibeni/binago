@@ -12,6 +12,8 @@ export interface CreateBookingPayload {
   endDate: string;
   rentalType: RentalType;
   rateType: RateType;
+  packageId?: string;
+  packageName?: string;
   deposit: number;
   driverFee?: number;
   paymentMethod?: string;
@@ -147,15 +149,14 @@ class BookingService {
     const items: BookingItem[] = data.vehicleIds.map(vehicleId => {
       let rateSnapshot = 0;
       try {
-        rateSnapshot = pricingService.resolveVehicleRate(vehicleId, data.rateType);
+        rateSnapshot = pricingService.resolveVehicleRate(vehicleId, data.rateType, data.packageId);
       } catch (e) {
         throw new Error(`Gagal mendapatkan tarif untuk kendaraan ID ${vehicleId}.`);
       }
 
-      // Special handling if logic is per week/month
-      let multiplier = duration;
-      if (data.rateType === 'WEEKLY') multiplier = Math.ceil(duration / 7);
-      if (data.rateType === 'MONTHLY') multiplier = Math.ceil(duration / 30);
+      // If package, multiplier is 1 (duration is locked to the package duration)
+      // Otherwise, multiplier is the requested duration
+      let multiplier = data.rateType === 'PACKAGE' ? 1 : duration;
 
       const subtotal = rateSnapshot * multiplier;
       totalAmount += subtotal;

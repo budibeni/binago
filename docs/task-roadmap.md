@@ -45,7 +45,7 @@ Task pengerjaan modular berada di [`docs/business/rental/tasks/`](docs/business/
 | Task | Fitur | Lingkup & Kemampuan | Status |
 |---|---|---|:---:|
 | **TASK-01** | Pelanggan | Master penyewa individu & perusahaan (SSoT transaksi) | ✅ Completed |
-| **TASK-02** | Kategori Tarif | Tiered pricing (Daily, Weekly, Monthly, Deposit), override & resolver | ✅ Completed |
+| **TASK-02** | Kategori Tarif | Tiered pricing (Hourly, Daily, Packages, Deposit), override & resolver | ✅ Completed |
 | **TASK-03** | Kendaraan Rental | Alokasi armada dari CORE SSoT, status operasional, integrasi live tracking | ✅ Completed |
 | **TASK-04** | Booking | Multi-vehicle booking engine (1 Customer → N Items), cek ketersediaan | ✅ Completed |
 | **TASK-05** | Kontrak Rental | Multi-armada sewa, konversi booking, cetak surat perjanjian PDF | ✅ Completed |

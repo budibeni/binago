@@ -112,17 +112,8 @@ export function BookingView({
       layout={layout}
       extraFooterActions={
         <>
-          {(booking.status === 'BOOKED' || booking.status === 'CONTRACTED') && onCancel ? (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => onCancel(booking)}
-              className="h-7 text-xs px-3 text-neutral-600 border-neutral-300 hover:bg-neutral-100"
-            >
-              {labels.cancelBooking || 'Batalkan'}
-            </Button>
-          ) : null}
-          {onEdit && (
+
+          {onEdit && booking.status === 'BOOKED' && (
             <Button 
               size="sm" 
               variant="outline" 
@@ -233,7 +224,7 @@ export function BookingView({
           >
             <InfoItem label={labels.fieldStartDate || 'Tgl Mulai'} value={formatDate(booking.startDate)} />
             <InfoItem label={labels.fieldEndDate || 'Tgl Selesai'} value={formatDate(booking.endDate)} />
-            <InfoItem label={labels.fieldDuration || 'Durasi'} value={`${booking.duration} ${booking.rateType === 'DAILY' ? 'Hari' : booking.rateType === 'WEEKLY' ? 'Minggu' : 'Bulan'}`} />
+            <InfoItem label={labels.fieldDuration || 'Durasi'} value={`${booking.duration} ${booking.rateType === 'HOURLY' ? 'Jam' : booking.rateType === 'DAILY' ? 'Hari' : 'Paket'}`} />
             <InfoItem label={labels.fieldRentalType || 'Jenis Sewa'} value={booking.rentalType === 'SELF_DRIVE' ? (labels.selfDrive || 'Lepas Kunci') : (labels.withDriver || 'Dengan Pengemudi')} />
           </SectionCard>
 
@@ -311,7 +302,7 @@ export function BookingView({
             colorClass="text-amber-600 dark:text-amber-400"
             bgClass="bg-amber-100 dark:bg-amber-900/40"
           >
-            <InfoItem label="Dasar Tarif" value={booking.rateType === 'DAILY' ? (labels.daily || 'Harian') : booking.rateType === 'WEEKLY' ? (labels.weekly || 'Mingguan') : (labels.monthly || 'Bulanan')} />
+            <InfoItem label="Dasar Tarif" value={booking.rateType === 'HOURLY' ? 'Per Jam' : booking.rateType === 'DAILY' ? (labels.daily || 'Harian') : (booking.packageName || 'Paket')} />
             <InfoItem label="Metode Pembayaran" value={booking.paymentMethod || 'TRANSFER'} />
             
             {booking.notes && (

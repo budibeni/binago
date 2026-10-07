@@ -104,7 +104,7 @@ function buildColumns(
       size: 200,
       cell: ({ row }) => {
         const b = row.original;
-        const rateTypeLabel = b.rateType === 'DAILY' ? (labels.daily || 'Harian') : b.rateType === 'WEEKLY' ? (labels.weekly || 'Mingguan') : (labels.monthly || 'Bulanan');
+        const rateTypeLabel = b.rateType === 'HOURLY' ? 'Per Jam' : b.rateType === 'DAILY' ? (labels.daily || 'Harian') : (b.packageName || 'Paket');
         const rentalTypeLabel = b.rentalType === 'SELF_DRIVE' ? (labels.selfDrive || 'Lepas Kunci') : (labels.withDriver || 'Dengan Pengemudi');
 
         let periodColorClass = 'text-muted-foreground';

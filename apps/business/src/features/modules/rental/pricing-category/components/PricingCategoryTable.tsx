@@ -64,6 +64,16 @@ export function PricingCategoryTable({
       cell: ({ row }) => row.original.description || '-',
     },
     {
+      id: 'hourlyRate',
+      header: 'Per Jam',
+      enableSorting: false,
+      size: 130,
+      accessorFn: (row) => {
+        const rate = (row.rates || []).find(r => r.rateType === 'HOURLY');
+        return rate ? formatCurrency(rate.amount) : '-';
+      },
+    },
+    {
       id: 'dailyRate',
       header: labels.headerDaily || 'Harian',
       enableSorting: false,
@@ -74,32 +84,15 @@ export function PricingCategoryTable({
       },
     },
     {
-      id: 'weeklyRate',
-      header: labels.headerWeekly || 'Mingguan',
+      id: 'packages',
+      header: 'Jml Paket',
       enableSorting: false,
-      size: 130,
+      size: 100,
       accessorFn: (row) => {
-        const rate = (row.rates || []).find(r => r.rateType === 'WEEKLY');
-        return rate ? formatCurrency(rate.amount) : '-';
+        return row.packages?.length ? `${row.packages.length} Paket` : '-';
       },
     },
-    {
-      id: 'monthlyRate',
-      header: labels.headerMonthly || 'Bulanan',
-      enableSorting: false,
-      size: 130,
-      accessorFn: (row) => {
-        const rate = (row.rates || []).find(r => r.rateType === 'MONTHLY');
-        return rate ? formatCurrency(rate.amount) : '-';
-      },
-    },
-    {
-      accessorKey: 'defaultDeposit',
-      header: labels.headerDeposit || 'Deposit',
-      enableSorting: true,
-      size: 130,
-      cell: ({ row }) => formatCurrency(row.original.defaultDeposit),
-    },
+
     {
       accessorKey: 'vehicleCount',
       header: labels.headerVehicles || 'Kendaraan',

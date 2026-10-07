@@ -52,9 +52,9 @@ export const contractService = {
   },
 
   getAvailableBookingsForContract: async (): Promise<Booking[]> => {
-    // Get all CONFIRMED bookings
+    // Get all BOOKED bookings
     const allBookings = await bookingService.getBookings();
-    const bookings = allBookings.filter(r => r.status === 'CONFIRMED');
+    const bookings = allBookings.filter(r => r.status === 'BOOKED');
     
     // Get all contracts to find which bookings already have a contract
     const allContracts = await contractRepository.getContracts();
@@ -70,8 +70,8 @@ export const contractService = {
     if (!booking) {
       throw new Error('Booking not found');
     }
-    if (booking.status !== 'CONFIRMED') {
-      throw new Error('Hanya reservasi berstatus CONFIRMED yang dapat dibuatkan kontrak');
+    if (booking.status !== 'BOOKED') {
+      throw new Error('Hanya reservasi berstatus BOOKED yang dapat dibuatkan kontrak');
     }
 
     // 2. Duplicate prevention - checked inside repository, but double check here
@@ -89,6 +89,8 @@ export const contractService = {
       endDate: booking.endDate,
       rentalType: booking.rentalType,
       rateType: booking.rateType,
+      packageId: booking.packageId,
+      packageName: booking.packageName,
       totalAmount: booking.totalAmount,
       deposit: booking.deposit,
       remainingAmount: booking.remainingAmount,

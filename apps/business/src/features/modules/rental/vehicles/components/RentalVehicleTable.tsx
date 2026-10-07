@@ -108,19 +108,11 @@ function buildColumns(
       enableSorting: true,
       size: 130,
       cell: ({ row }) => {
-        const hasCategory = !!row.original.categoryId;
-        const group = hasCategory ? pricingCategorys.find(g => g.id === row.original.categoryId) : null;
+        const group = pricingCategorys.find(g => g.id === row.original.categoryId);
         return (
-          <div className="flex items-center w-fit gap-1.5 text-inherit">
-            {hasCategory ? (
-              <Tag className="w-3.5 h-3.5 opacity-60 shrink-0" />
-            ) : (
-              <SlidersHorizontal className="w-3.5 h-3.5 opacity-60 shrink-0" />
-            )}
-            <span className="truncate">
-              {hasCategory ? group?.name || 'Unknown' : 'Mandiri'}
-            </span>
-          </div>
+          <span className="truncate">
+            {group?.name || '-'}
+          </span>
         );
       },
     },
@@ -136,26 +128,28 @@ function buildColumns(
       meta: { align: 'right' }
     },
     {
-      id: 'weeklyRate',
-      accessorKey: 'weeklyRate',
-      header: labels.colWeeklyRate || 'Tarif Mingguan',
+      id: 'hourlyRate',
+      accessorKey: 'hourlyRate',
+      header: 'Tarif Per Jam',
       enableSorting: true,
       size: 110,
       cell: ({ row }) => (
-        <span className="text-muted-foreground">{row.original.weeklyRate ? formatCurrency(row.original.weeklyRate) : '-'}</span>
+        <span className="text-muted-foreground">{row.original.hourlyRate ? formatCurrency(row.original.hourlyRate) : '-'}</span>
       ),
       meta: { align: 'right' }
     },
     {
-      id: 'monthlyRate',
-      accessorKey: 'monthlyRate',
-      header: labels.colMonthlyRate || 'Tarif Bulanan',
-      enableSorting: true,
-      size: 110,
-      cell: ({ row }) => (
-        <span className="text-muted-foreground">{row.original.monthlyRate ? formatCurrency(row.original.monthlyRate) : '-'}</span>
-      ),
-      meta: { align: 'right' }
+      id: 'packages',
+      accessorKey: 'categoryId',
+      header: 'Jml Paket',
+      enableSorting: false,
+      size: 100,
+      cell: ({ row }) => {
+        const group = pricingCategorys.find(g => g.id === row.original.categoryId);
+        const count = group?.packages?.length || 0;
+        return count ? `${count} Paket` : '-';
+      },
+      meta: { align: 'center' }
     },
     {
       id: 'condition',

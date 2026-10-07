@@ -9,6 +9,7 @@ import type { Booking, BookingStatusFilter } from './types/booking';
 import { BookingTable } from './components/BookingTable';
 import { BookingView } from './components/BookingView';
 import { BookingCreateFeature } from './BookingCreateFeature';
+import { BookingEditFeature } from './BookingEditFeature';
 import { getBookingTranslation } from './i18n';
 import { cn, formatNumber } from '@adatrack/utils';
 import { trackingNavigationService } from '@/features/core/tracking/services/trackingNavigationService';
@@ -54,7 +55,19 @@ export function BookingsFeature() {
   const [detailBooking, setDetailBooking] = useState<Booking | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  
+  const [editId, setEditId] = useState<string | null>(null);
+
+  const fetchBookings = React.useCallback(async () => {
+    try {
+      setLoading(true);
+      const data = await bookingService.getBookings();
+      setBookings(data);
+    } catch (error) {
+      console.error('Failed to load bookings:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -66,20 +79,9 @@ export function BookingsFeature() {
       setSearch(q);
     }
 
-    const fetchBookings = async () => {
-      try {
-        setLoading(true);
-        const data = await bookingService.getBookings();
-        if (mounted) setBookings(data);
-      } catch (error) {
-        console.error('Failed to load bookings:', error);
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    };
     fetchBookings();
     return () => { mounted = false; };
-  }, []);
+  }, [fetchBookings]);
 
   const stats = useMemo(() => ({
     all:       bookings.length,
@@ -117,7 +119,8 @@ export function BookingsFeature() {
   };
 
   const handleEdit = (booking: Booking) => {
-    router.push(`/rental/bookings/edit/${booking.id}`);
+    window.history.pushState(null, '', '/rental/bookings/edit');
+    setEditId(booking.id);
   };
 
   const handleDelete = (booking: Booking) => {
@@ -275,6 +278,20 @@ export function BookingsFeature() {
         onOpenMap={handleOpenMapMulti}
       />
 
+      <BookingEditFeature 
+        bookingId={editId}
+        onOpenChange={(open) => {
+          if (!open) {
+            setEditId(null);
+            window.history.pushState(null, '', '/rental/bookings');
+          }
+        }}
+        onSuccess={() => {
+          setEditId(null);
+          window.history.pushState(null, '', '/rental/bookings');
+          fetchBookings();
+        }}
+      />
     </div>
   );
 }

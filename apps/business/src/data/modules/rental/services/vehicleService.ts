@@ -7,9 +7,7 @@ import { pricingService } from './pricingService';
 
 class RentalVehicleService {
   private isProfileComplete(profile: RentalVehicleProfile): boolean {
-    return !!(
-      profile.rateOverrideDaily || profile.categoryId
-    ) && !!(profile.completenessChecklist?.stnkOriginal);
+    return !!(profile.categoryId) && !!(profile.completenessChecklist?.stnkOriginal);
   }
 
   private enrichProfile(profile: RentalVehicleProfile): RentalVehicle | null {
@@ -17,26 +15,28 @@ class RentalVehicleService {
     if (!coreVehicle) return null;
 
     let categoryName: string | undefined = undefined;
-    let dailyRate = profile.rateOverrideDaily || 0;
-    let weeklyRate = profile.rateOverrideWeekly || undefined;
-    let monthlyRate = profile.rateOverrideMonthly || undefined;
+    let hourlyRate = 0;
+    let dailyRate = 0;
+    let packageCount = 0;
+    let packages: any[] = [];
     
     if (profile.categoryId) {
       const category = pricingService.getPricingCategory({ status: 'ACTIVE' }).find(c => c.id === profile.categoryId);
       if (category) {
         categoryName = category.name;
         const rates = pricingService.getRatesByGroupId(category.id);
+        const hourly = rates.find(r => r.rateType === 'HOURLY');
+        if (hourly) {
+          hourlyRate = hourly.amount;
+        }
         const daily = rates.find(r => r.rateType === 'DAILY');
         if (daily) {
           dailyRate = daily.amount;
         }
-        const weekly = rates.find(r => r.rateType === 'WEEKLY');
-        if (weekly) {
-          weeklyRate = weekly.amount;
-        }
-        const monthly = rates.find(r => r.rateType === 'MONTHLY');
-        if (monthly) {
-          monthlyRate = monthly.amount;
+        
+        if (category.packages) {
+          packageCount = category.packages.length;
+          packages = category.packages;
         }
       }
     }
@@ -46,9 +46,10 @@ class RentalVehicleService {
       coreVehicle,
       isComplete: this.isProfileComplete(profile),
       categoryName,
+      hourlyRate,
       dailyRate,
-      weeklyRate,
-      monthlyRate,
+      packageCount,
+      packages,
     };
   }
 
@@ -121,9 +122,9 @@ class RentalVehicleService {
       
       rentalVehicleRepository.create({
         vehicleId,
+        categoryId: 'prg-001', // assign default category instead of rate overrides
         status: 'READY',
         currentOdometer: 0,
-        rateOverrideDaily: 0,
         completenessChecklist: {
           stnkOriginal: false,
           spareKey: false,

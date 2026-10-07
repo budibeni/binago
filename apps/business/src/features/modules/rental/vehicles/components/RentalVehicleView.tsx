@@ -12,6 +12,7 @@ interface RentalVehicleViewProps {
   onEdit: (v: RentalVehicle) => void;
   onDelete?: (v: RentalVehicle) => void;
   onDisable?: (v: RentalVehicle) => void;
+  onTrack?: (v: RentalVehicle) => void;
 }
 
 export function RentalVehicleView({
@@ -22,6 +23,7 @@ export function RentalVehicleView({
   onEdit,
   onDelete,
   onDisable,
+  onTrack,
 }: RentalVehicleViewProps) {
   if (!data) return null;
 
@@ -143,15 +145,17 @@ export function RentalVehicleView({
 
         {/* Quick Actions */}
         <div className="px-4 py-2.5 bg-background flex gap-2 border-b border-border/40">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="group flex-1 h-8 text-[11px] font-semibold bg-neutral-100 text-neutral-700 border-neutral-200/60 hover:bg-red-50 hover:border-red-200/60 hover:text-red-600 dark:bg-neutral-800/40 dark:text-neutral-300 dark:border-neutral-700/60 dark:hover:bg-red-900/40 dark:hover:text-red-400 transition-all shadow-sm"
-            onClick={() => window.location.href = `/tracking/live?vehicleId=${data.vehicleId}`}
-            leftIcon={<MapPin className="w-3.5 h-3.5 text-neutral-500 dark:text-neutral-400 group-hover:text-red-500 transition-colors" />}
-          >
-            Lacak Posisi
-          </Button>
+          {onTrack && (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="group flex-1 h-8 text-[11px] font-semibold bg-neutral-100 text-neutral-700 border-neutral-200/60 hover:bg-red-50 hover:border-red-200/60 hover:text-red-600 dark:bg-neutral-800/40 dark:text-neutral-300 dark:border-neutral-700/60 dark:hover:bg-red-900/40 dark:hover:text-red-400 transition-all shadow-sm"
+              onClick={() => onTrack(data)}
+              leftIcon={<MapPin className="w-3.5 h-3.5 text-neutral-500 dark:text-neutral-400 group-hover:text-red-500 transition-colors" />}
+            >
+              Lacak Posisi
+            </Button>
+          )}
           {onDisable && (
             <Button 
               variant="outline" 
@@ -175,13 +179,26 @@ export function RentalVehicleView({
             colorClass="text-amber-600 dark:text-amber-400"
             bgClass="bg-amber-100 dark:bg-amber-900/40"
           >
-            <InfoItem label="Skema Tarif" value={data.categoryId ? 'Kategori Master' : 'Mandiri (Kustom)'} colSpan={2} />
-            {data.categoryId && (
-              <InfoItem label="Kategori" value={data.categoryName || '-'} colSpan={2} />
-            )}
+            <InfoItem label="Kategori" value={data.categoryName || '-'} colSpan={2} />
+            <InfoItem label="Per Jam" value={data.hourlyRate ? formatCurrency(data.hourlyRate) : '-'} />
             <InfoItem label="Harian" value={data.dailyRate ? formatCurrency(data.dailyRate) : '-'} />
-            <InfoItem label="Mingguan" value={data.rateOverrideWeekly ? formatCurrency(data.rateOverrideWeekly) : '-'} />
-            <InfoItem label="Bulanan" value={data.rateOverrideMonthly ? formatCurrency(data.rateOverrideMonthly) : '-'} />
+            
+            {data.packages && data.packages.length > 0 && (
+              <div className="col-span-2 mt-1 pt-3 border-t border-border/40">
+                <span className="text-[9px] font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-2 block">Paket Tersedia</span>
+                <div className="flex flex-col gap-1.5">
+                  {data.packages.map((pkg: any) => (
+                    <div key={pkg.id} className="flex justify-between items-center bg-background px-2.5 py-1.5 rounded-md border border-border/60">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[11px] font-medium text-neutral-900 dark:text-neutral-100">{pkg.name}</span>
+                        <span className="text-[10px] bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 px-1.5 py-0.5 rounded">{pkg.durationDays} Hari</span>
+                      </div>
+                      <span className="text-[11px] font-bold text-neutral-900 dark:text-neutral-100">{formatCurrency(pkg.price)}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </SectionCard>
           
           {/* IDENTITAS KENDARAAN */}
@@ -228,7 +245,7 @@ export function RentalVehicleView({
                 return (
                   <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-orange-50 dark:bg-orange-500/10 text-orange-600 dark:text-orange-500 border border-orange-200 dark:border-orange-500/20">
                     <AlertCircle className="w-3 h-3" />
-                    <span className="text-[9px] font-bold tracking-wide uppercase">{presentCount}/5 {labels.statusReady || 'Siap'}</span>
+                    <span className="text-[9px] font-bold tracking-wide uppercase">{presentCount}/5 Kelengkapan</span>
                   </div>
                 );
               })()

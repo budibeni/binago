@@ -60,7 +60,10 @@ export const RadioGroupItem = React.forwardRef<
             <label
               htmlFor={radioId}
               className={cn(
-                'text-sm font-medium text-foreground select-none cursor-pointer',
+                'text-[14px] text-foreground select-none cursor-pointer',
+                'group-data-[layout=drawer]/form:!text-[12px]',
+                'group-data-[layout=dialog]/form:!text-[12px]',
+                'group-data-[layout=default]/form:!text-[13px]',
                 disabled && 'cursor-not-allowed opacity-50',
               )}
             >

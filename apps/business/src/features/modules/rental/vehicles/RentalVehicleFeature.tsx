@@ -162,6 +162,21 @@ export function RentalVehicleFeature() {
     }
   };
 
+  const handleTrackSingle = async (v: RentalVehicle) => {
+    try {
+      const ctx = await buildRentalVehicleContext(v.vehicleId, locale);
+      if (ctx) {
+        sessionStorage.setItem(`adatrack_vehicle_context_${locale}_${v.vehicleId}`, JSON.stringify(ctx));
+      }
+    } catch (e) {
+      console.error('Failed to build context', e);
+    }
+    trackingNavigationService.navigateToTracking(router, {
+      mode: 'live',
+      vehicleId: v.vehicleId
+    });
+  };
+
   const handleOpenTracking = async () => {
     if (selectedIds.length > 0) {
       if (selectedIds.length === 1) {
@@ -346,6 +361,7 @@ export function RentalVehicleFeature() {
           setEditId(v.id);
         }}
         onDelete={handleDisableClick}
+        onTrack={handleTrackSingle}
       />
 
       <ConfirmDialog

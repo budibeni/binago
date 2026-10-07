@@ -20,15 +20,17 @@ export function PricingCategoryEditFeature({ id }: { id: string }) {
 
   const handleSave = (formData: PricingCategoryFormData) => {
     const newRates = [
-      { rateType: 'DAILY' as RateType, amount: formData.dailyRate },
-      { rateType: 'WEEKLY' as RateType, amount: formData.weeklyRate },
-      { rateType: 'MONTHLY' as RateType, amount: formData.monthlyRate },
+      { rateType: 'HOURLY' as RateType, amount: formData.hourlyRate || 0 },
+      { rateType: 'DAILY' as RateType, amount: formData.dailyRate || 0 },
     ];
 
     pricingService.updatePricingCategory(id, {
       name: formData.name,
       description: formData.description,
-      status: formData.status
+      hourlyDeposit: formData.hourlyDeposit,
+      dailyDeposit: formData.dailyDeposit,
+      status: formData.status,
+      packages: formData.packages
     }, newRates);
     
     toast.success(labels.updateSuccess);
@@ -52,8 +54,9 @@ export function PricingCategoryEditFeature({ id }: { id: string }) {
         onSubmit={handleSave}
         initialData={group}
         initialRates={rates.map(r => ({ rateType: r.rateType, amount: r.amount }))}
+        initialPackages={group.packages}
         title={labels.formEditTitle}
-        layout="drawer"
+        layout="default"
         labels={labels as any}
       />
     </div>

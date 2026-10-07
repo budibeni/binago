@@ -85,12 +85,9 @@ export type RentalVehicleStatus = 'READY' | 'RESERVED' | 'RENTED' | 'MAINTENANCE
 export interface RentalVehicleProfile {
   id: string;                    // Format: rvp-xxx
   vehicleId: string;             // Foreign Key ke CORE Vehicle (SSoT)
-  categoryId?: string | null;    // Foreign Key ke RentalPricingCategory
+  categoryId: string;            // Foreign Key ke RentalPricingCategory
   status: RentalVehicleStatus;
   currentOdometer: number;       // Odometer terkini
-  rateOverrideDaily?: number | null;   // Timpa harga master (harian)
-  rateOverrideWeekly?: number | null;  // Timpa harga master (mingguan)
-  rateOverrideMonthly?: number | null; // Timpa harga master (bulanan)
   
   // Operational fields
   currentBookingId?: string | null;     // Booking aktif jika status RESERVED

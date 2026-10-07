@@ -121,20 +121,27 @@ class PricingService {
    * 2. Active Kategori Tarif Rate
    * 3. Throws Error if not found (No fallback to arbitrary values)
    */
-  resolveVehicleRate(vehicleId: string, rateType: RateType): number {
-    // 1. Check for Active Override
-    const override = pricingRepository.getVehicleOverride(vehicleId, rateType);
-    if (override && override.status === 'ACTIVE') {
-      return override.amount;
+  resolveVehicleRate(vehicleId: string, rateType: RateType, packageId?: string): number {
+    // 1. Check for Active Override (only applies to HOURLY/DAILY)
+    if (rateType !== 'PACKAGE') {
+      const override = pricingRepository.getVehicleOverride(vehicleId, rateType);
+      if (override && override.status === 'ACTIVE') {
+        return override.amount;
+      }
     }
 
     // 2. Check Kategori Tarif
     const group = pricingRepository.getPricingCategoryForVehicle(vehicleId);
     if (group && group.status === 'ACTIVE') {
-      const rates = pricingRepository.getRatesByGroupId(group.id);
-      const groupRate = rates.find(r => r.rateType === rateType && r.status === 'ACTIVE');
-      if (groupRate) {
-        return groupRate.amount;
+      if (rateType === 'PACKAGE' && packageId) {
+        const pkg = (group.packages || []).find(p => p.id === packageId);
+        if (pkg) return pkg.price;
+      } else {
+        const rates = pricingRepository.getRatesByGroupId(group.id);
+        const groupRate = rates.find(r => r.rateType === rateType && r.status === 'ACTIVE');
+        if (groupRate) {
+          return groupRate.amount;
+        }
       }
     }
 

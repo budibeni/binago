@@ -67,10 +67,11 @@ Skema harga berjenjang dan pemetaan armada CORE ke operasional rental.
 | `code` | VARCHAR | UNIQUE, NOT NULL | Kode Kategori (Cth: CAT-A) |
 | `name` | VARCHAR | NOT NULL | Nama (Cth: Premium SUV) |
 | `description` | TEXT | NULL | Deskripsi Kategori |
+| `rate_hourly` | DECIMAL | NOT NULL | Tarif Per Jam |
 | `rate_daily` | DECIMAL | NOT NULL | Tarif Harian |
-| `rate_weekly` | DECIMAL | NULL | Tarif Mingguan |
-| `rate_monthly` | DECIMAL | NULL | Tarif Bulanan |
-| `default_deposit`| DECIMAL | NOT NULL | Uang Jaminan Default |
+| `packages` | JSONB | NULL | Daftar paket sewa (durasi hari, harga & deposit) |
+| `hourly_deposit`| DECIMAL | NOT NULL | Uang Jaminan Per Jam |
+| `daily_deposit`| DECIMAL | NOT NULL | Uang Jaminan Harian |
 | `status` | ENUM | NOT NULL | `ACTIVE`, `INACTIVE` |
 
 **Table: `rental_vehicle_profiles`**
@@ -86,9 +87,6 @@ Skema harga berjenjang dan pemetaan armada CORE ke operasional rental.
 | `completeness_checklist` | JSONB | NOT NULL | Status STNK, Kunci Cadangan, Dongkrak, dll. |
 | `current_booking_id` | UUID | FK `rental_bookings.id` | Booking aktif (jika RESERVED) |
 | `current_contract_id` | UUID | FK `rental_contracts.id` | Kontrak aktif (jika RENTED) |
-| `rate_override_daily` | DECIMAL | NULL | Timpa harga master (harian) |
-| `rate_override_weekly`| DECIMAL | NULL | Timpa harga master (mingguan) |
-| `rate_override_monthly`| DECIMAL| NULL | Timpa harga master (bulanan) |
 
 ## 3. Transaksi Sewa (Booking & Kontrak)
 Pencatatan reservasi (*multi-armada*) dan dokumen legalnya.

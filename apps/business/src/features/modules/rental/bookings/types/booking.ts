@@ -6,7 +6,7 @@ export type BookingStatus = 'BOOKED' | 'CONTRACTED' | 'ACTIVE' | 'COMPLETED' | '
 
 export type RentalType = 'SELF_DRIVE' | 'WITH_DRIVER';
 
-export type RateType = 'DAILY' | 'WEEKLY' | 'MONTHLY';
+export type RateType = 'HOURLY' | 'DAILY' | 'PACKAGE';
 
 export interface BookingItem {
   id: string;
@@ -32,6 +32,8 @@ export interface Booking {
   duration: number; // in days
   rentalType: RentalType;
   rateType: RateType;
+  packageId?: string;
+  packageName?: string;
   totalAmount: number;
   deposit: number;
   remainingAmount: number;
@@ -71,7 +73,9 @@ export const getBookingFormSchema = (t: Record<string, any>) => z.object({
   pickupLocation: z.string().optional(),
   dropoffLocation: z.string().optional(),
   paymentMethod: z.string().optional(),
-  rateType: z.enum(['DAILY', 'WEEKLY', 'MONTHLY']).optional(),
+  rateType: z.enum(['HOURLY', 'DAILY', 'PACKAGE']).optional(),
+  packageId: z.string().optional(),
+  packageName: z.string().optional(),
   deposit: z.number().optional(),
   driverFee: z.number().optional(),
   needDelivery: z.boolean().optional(),

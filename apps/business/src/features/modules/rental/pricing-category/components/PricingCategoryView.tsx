@@ -152,30 +152,54 @@ export function PricingCategoryView({
           {/* Tarif Default */}
           <SectionCard
             icon={CreditCard}
-            title={labels?.formRatesInfo || "Tarif Default"}
+            title={labels?.formRatesInfo || "Tarif Default Reguler"}
             colorClass="text-amber-600 dark:text-amber-400"
             bgClass="bg-amber-100 dark:bg-amber-900/40"
             className="grid grid-cols-2 gap-y-4 gap-x-4"
           >
+            <InfoItem
+              label={"Per Jam"}
+              value={getRate('HOURLY')}
+            />
+            <InfoItem
+              label={"Deposit Per Jam"}
+              value={formatCurrency(group.hourlyDeposit || 0)}
+            />
             <InfoItem
               label={labels?.headerDaily || "Harian"}
               value={getRate('DAILY')}
               highlight
             />
             <InfoItem
-              label={labels?.headerWeekly || "Mingguan"}
-              value={getRate('WEEKLY')}
-            />
-            <InfoItem
-              label={labels?.headerMonthly || "Bulanan"}
-              value={getRate('MONTHLY')}
-            />
-            <InfoItem
-              label={labels?.headerDeposit || "Deposit"}
-              value={formatCurrency(group.defaultDeposit || 0)}
+              label={"Deposit Harian"}
+              value={formatCurrency(group.dailyDeposit || 0)}
               highlight
             />
           </SectionCard>
+
+          {/* Paket Sewa */}
+          {group.packages && group.packages.length > 0 && (
+            <SectionCard
+              icon={CreditCard}
+              title={"Daftar Paket Sewa"}
+              colorClass="text-indigo-600 dark:text-indigo-400"
+              bgClass="bg-indigo-100 dark:bg-indigo-900/40"
+              className="flex flex-col gap-3"
+            >
+              {group.packages.map((pkg, idx) => (
+                <div key={pkg.id || idx} className="flex justify-between items-center border-b border-border/40 last:border-0 pb-2 last:pb-0">
+                  <div className="flex flex-col">
+                    <span className="text-[12px] font-medium text-foreground">{pkg.name}</span>
+                    <span className="text-[11px] text-foreground-subtle">{pkg.durationDays} Hari</span>
+                  </div>
+                  <div className="flex flex-col text-right">
+                    <span className="text-[12px] font-bold text-primary">{formatCurrency(pkg.price)}</span>
+                    <span className="text-[10px] text-muted-foreground font-medium">Dep: {formatCurrency(pkg.deposit || 0)}</span>
+                  </div>
+                </div>
+              ))}
+            </SectionCard>
+          )}
 
           {/* Kendaraan */}
           <SectionCard

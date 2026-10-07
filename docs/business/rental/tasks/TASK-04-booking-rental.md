@@ -61,7 +61,7 @@ Implementasi antarmuka wajib mengikuti standar *Enterprise Grade* ADATRACK:
 ```ts
 export type BookingStatus = 'DRAFT' | 'CONFIRMED' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
 export type RentalType = 'SELF_DRIVE' | 'WITH_DRIVER';
-export type RateType = 'DAILY' | 'WEEKLY' | 'MONTHLY';
+export type RateType = 'HOURLY' | 'DAILY' | 'PACKAGE';
 
 export interface BookingItem {
   id: string;
@@ -69,7 +69,7 @@ export interface BookingItem {
   vehicleId: string; 
   startDate: string; 
   endDate: string; 
-  duration: number; // hari
+  duration: number; // durasi (jam/hari)
   rateType: RateType;
   rateSnapshot: number; 
   subtotal: number;
@@ -85,6 +85,8 @@ export interface Booking {
   duration: number;              
   rentalType: RentalType;        // Lepas Kunci / Dengan Pengemudi
   rateType: RateType;
+  packageId?: string;            // ID paket (jika PACKAGE)
+  packageName?: string;          // Nama paket (jika PACKAGE)
   totalAmount: number;           // Total Invoice
   deposit: number;               // Titipan Jaminan
   remainingAmount: number;       // Sisa tagihan

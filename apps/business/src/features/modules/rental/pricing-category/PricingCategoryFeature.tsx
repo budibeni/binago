@@ -149,20 +149,20 @@ export function PricingCategoryFeature() {
       setTimeout(() => handleDetail(selectedGroup as any), 100);
     }
   };
-
-
   const handleSubmitForm = (formData: PricingCategoryFormData) => {
     const rates = [
-      { rateType: 'DAILY' as RateType, amount: formData.dailyRate },
-      { rateType: 'WEEKLY' as RateType, amount: formData.weeklyRate },
-      { rateType: 'MONTHLY' as RateType, amount: formData.monthlyRate },
+      { rateType: 'HOURLY' as RateType, amount: formData.hourlyRate || 0 },
+      { rateType: 'DAILY' as RateType, amount: formData.dailyRate || 0 },
     ];
 
     if (editingCategory) {
       pricingService.updatePricingCategory(editingCategory.id, {
         name: formData.name,
         description: formData.description,
-        status: formData.status
+        hourlyDeposit: formData.hourlyDeposit,
+        dailyDeposit: formData.dailyDeposit,
+        status: formData.status,
+        packages: formData.packages || [],
       }, rates);
       toast.success(labels.updateSuccess);
     } else {
@@ -170,7 +170,9 @@ export function PricingCategoryFeature() {
         code: formData.name.substring(0, 3).toUpperCase() + '-' + Date.now().toString().slice(-4),
         name: formData.name,
         description: formData.description || '',
-        defaultDeposit: formData.defaultDeposit || 0,
+        hourlyDeposit: formData.hourlyDeposit || 0,
+        dailyDeposit: formData.dailyDeposit || 0,
+        packages: formData.packages || [],
         status: formData.status || 'ACTIVE'
       }, rates);
       toast.success(labels.createSuccess);
@@ -252,9 +254,10 @@ export function PricingCategoryFeature() {
         onOpenChange={handleCloseForm}
         initialData={editingCategory || undefined}
         initialRates={editingRates}
+        initialPackages={editingCategory?.packages}
         title={editingCategory ? labels.formEditTitle : labels.formAddTitle}
         onSubmit={handleSubmitForm}
-        layout="drawer"
+        layout="default"
         labels={labels as any}
       />
 
