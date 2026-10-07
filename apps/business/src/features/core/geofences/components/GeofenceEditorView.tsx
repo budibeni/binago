@@ -35,8 +35,8 @@ export function GeofenceEditorView({
     vehicleIds: geofence?.vehicleIds || [],
   });
 
-  const [drawMode, setDrawMode] = useState<'polygon' | 'rectangle' | 'multiline'>('polygon');
-  const [editorMode, setEditorMode] = useState<'idle' | 'draw_polygon' | 'draw_rectangle' | 'draw_multiline' | 'edit'>('idle');
+  const [drawMode, setDrawMode] = useState<'polygon' | 'rectangle' | 'multiline'>((geofence?.geometry?.type as any) || 'polygon');
+  const [editorMode, setEditorMode] = useState<'idle' | 'draw_polygon' | 'draw_rectangle' | 'draw_multiline' | 'edit'>(geofence?.geometry ? 'edit' : ('draw_' + ((geofence?.geometry?.type as any) || 'polygon')) as any);
   const [currentGeometry, setCurrentGeometry] = useState<MapGeometry | null>(geofence?.geometry || null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -55,11 +55,7 @@ export function GeofenceEditorView({
   }, []);
 
 
-  useEffect(() => {
-    if (editorMode !== 'idle' || !currentGeometry) {
-      setEditorMode(`draw_${drawMode}` as any);
-    }
-  }, [drawMode]);
+
 
   const handleSave = async () => {
     setIsSubmitting(true);
