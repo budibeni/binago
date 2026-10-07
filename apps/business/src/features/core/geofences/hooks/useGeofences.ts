@@ -18,12 +18,10 @@ export function useGeofences(filters?: { search?: string; status?: string; group
       const data = await api.get<Geofence[]>('/geofences', { params: queryParams });
       const rawData = Array.isArray(data) ? data : (data as any).data || [];
       const mapped: Geofence[] = rawData.map((g: any) => {
-        let geometry: any = { type: 'polygon', coordinates: [] };
+        let geometry: any = { type: g.area_type || 'polygon', coordinates: [] };
         
-        if (g.area_type === 'polygon' && g.boundary_points) {
-            geometry = { type: 'polygon', coordinates: g.boundary_points };
-        } else if (g.boundary_points) {
-            geometry = { type: 'polygon', coordinates: g.boundary_points };
+        if (g.boundary_points) {
+            geometry.coordinates = g.boundary_points;
         }
         
         return {

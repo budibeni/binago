@@ -58,7 +58,7 @@ export function GeofenceFeature({ locale = 'id' }: GeofenceFeatureProps) {
 
   const handleSave = async (data: Partial<Geofence>) => {
     try {
-      let areaType = 'polygon';
+      let areaType = data.geometry?.type || 'polygon';
       let boundaryPoints: any[] = [];
       
       if (data.geometry?.type === 'polygon' || data.geometry?.type === 'rectangle' || data.geometry?.type === 'multiline') {
