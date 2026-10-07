@@ -44,7 +44,7 @@ export function GroupForm({
   const isEdit = !!group;
   
   const { formData, errors, isSubmitting, handleChange, handleSubmit } = useForm<GroupData>({
-    initialData: group || { ...DEFAULT_GROUP, type: defaultType },
+    initialData: group ? { ...group, type: group.type || defaultType } : { ...DEFAULT_GROUP, type: defaultType },
     resetOn: [open, group, defaultType],
     schema: getGroupFormSchema(),
     onSubmit: async (data) => {

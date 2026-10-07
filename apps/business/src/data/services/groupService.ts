@@ -8,6 +8,7 @@ export const groupService = {
       .filter((g: any) => g.type === 'vehicle' || !g.type)
       .map((g: any) => ({
       id: g.id.toString(),
+      type: g.type || 'vehicle',
       name: g.name,
       description: g.description || '',
       unitCount: 0
@@ -20,6 +21,7 @@ export const groupService = {
       .filter((g: any) => g.type === 'driver')
       .map((g: any) => ({
       id: g.id.toString(),
+      type: g.type || 'vehicle',
       name: g.name,
       description: g.description || '',
       unitCount: 0
@@ -32,6 +34,7 @@ export const groupService = {
       .filter((g: any) => g.type === 'geofence')
       .map((g: any) => ({
       id: g.id.toString(),
+      type: g.type || 'vehicle',
       name: g.name,
       description: g.description || '',
       unitCount: 0
@@ -44,6 +47,7 @@ export const groupService = {
       .filter((g: any) => g.type === 'route')
       .map((g: any) => ({
       id: g.id.toString(),
+      type: g.type || 'vehicle',
       name: g.name,
       description: g.description || '',
       unitCount: 0
