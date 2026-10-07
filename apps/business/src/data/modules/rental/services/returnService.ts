@@ -56,7 +56,7 @@ export const returnService = {
 
     const eligible: RentalContract[] = [];
     for (const contract of activeContracts) {
-      if (!contract.booking) continue;
+      if (!contract) continue;
       
       let hasPendingItems = false;
       for (const item of contract.items) {

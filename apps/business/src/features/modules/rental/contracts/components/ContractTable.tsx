@@ -1,7 +1,10 @@
+import type { RentalContract, ContractStatusFilter } from '../types/contract';
+export type ContractStatus = RentalContract['status'];
 'use client';
 
 import React from 'react';
-import { MapPin, Plus, MessageCircle, MoreVertical, Eye, EyeOff, Edit2, Trash2, Calendar, Clock } from 'lucide-react';
+import Link from 'next/link';
+import { Printer, MapPin, Plus, MessageCircle, MoreVertical, Eye, EyeOff, Edit2, Trash2, Calendar, Clock , FileText } from 'lucide-react';
 import {
   Button,
   Badge,
@@ -9,20 +12,21 @@ import {
   PhoneLink,
 } from '@adatrack/ui';
 import type { DataTableColumnDef, DataTableFilterConfig } from '@adatrack/ui';
-import type { Booking, BookingStatus } from '../types/booking';
+
 import { cn, formatCurrency } from '@adatrack/utils';
 
-interface BookingTableProps {
-  data: Booking[];
+interface ContractTableProps {
+  data: RentalContract[];
   labels: Record<string, any>;
-  onView: (r: Booking) => void;
-  onEdit: (r: Booking) => void;
-  onDelete: (r: Booking) => void;
+  onView: (r: RentalContract) => void;
+  onEdit: (r: RentalContract) => void;
+  onDelete: (r: RentalContract) => void;
   selectedIds?: string[];
   onSelectionChange?: (ids: string[]) => void;
   searchValue: string;
   onSearchChange: (value: string) => void;
   onAdd: () => void;
+  onPrint?: (c: RentalContract) => void;
   onOpenMap: (vehicleIds: string[]) => void;
   filterConfig?: DataTableFilterConfig;
   isFilterOpen?: boolean;
@@ -33,7 +37,7 @@ interface BookingTableProps {
   dtLabels?: any;
 }
 
-const getStatusColor = (status: BookingStatus) => {
+const getStatusColor = (status: ContractStatus) => {
   switch (status) {
     case 'DRAFT': return 'bg-neutral-200 text-neutral-700 dark:bg-neutral-700/50 dark:text-neutral-300';
     case 'BOOKED': return 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400';
@@ -45,11 +49,11 @@ const getStatusColor = (status: BookingStatus) => {
   }
 };
 
-const getStatusLabel = (status: BookingStatus, labels: Record<string, any>) => {
+const getStatusLabel = (status: ContractStatus, labels: Record<string, any>) => {
   switch (status) {
     case 'DRAFT': return labels.statusDraft || 'Draft';
     case 'BOOKED': return labels.statusBooked || 'Dipesan';
-    case 'CONTRACTED': return labels.statusContracted || 'Diterbitkan';
+    case 'CONTRACTED': return labels.statusIssued || 'Diterbitkan';
     case 'ACTIVE': return labels.statusActive || 'Berjalan';
     case 'COMPLETED': return labels.statusCompleted || 'Selesai';
     case 'CANCELLED': return labels.statusCancelled || 'Dibatalkan';
@@ -66,17 +70,17 @@ const formatShortDate = (dateStr: string) => {
 
 function buildColumns(
   labels: Record<string, any>,
-  onView: (r: Booking) => void,
-  onEdit: (r: Booking) => void,
-  onDelete: (r: Booking) => void,
+  onView: (r: RentalContract) => void,
+  onEdit: (r: RentalContract) => void,
+  onDelete: (r: RentalContract) => void,
   onOpenMap: (vehicleIds: string[]) => void
-): DataTableColumnDef<Booking>[] {
+): DataTableColumnDef<RentalContract>[] {
   return [
-    // --- Booking Info ---
+    // --- RentalContract Info ---
     {
       id: 'bookingGroup',
-      accessorFn: (row) => row.bookingNumber,
-      header: labels.colBooking || 'Booking',
+      accessorFn: (row) => row.contractNumber,
+      header: labels.colRentalContract || 'No. Kontrak',
       enableSorting: true,
       size: 150,
       cell: ({ row }) => {
@@ -86,12 +90,12 @@ function buildColumns(
             <button
               onClick={(e) => { e.stopPropagation(); onView(b); }}
               className="text-[13px] font-normal text-foreground truncate hover:text-primary hover:underline transition-colors text-left"
-              title={b.bookingNumber}
+              title={b.contractNumber}
             >
-              {b.bookingNumber}
+              {b.contractNumber}
             </button>
             <span className="text-[11px] text-foreground truncate">
-              {formatShortDate(b.createdAt)}
+              {formatShortDate(b.contractDate || '')}
             </span>
           </div>
         );
@@ -110,7 +114,7 @@ function buildColumns(
         let rateTypeLabel = labels.multiRate || "Multi Tarif";
         if (b.items && b.items.length > 0) {
           const firstRateType = b.items[0].rateType;
-          const allSame = b.items.every(i => i.rateType === firstRateType);
+          const allSame = b.items.every((i: any) => i.rateType === firstRateType);
           if (allSame) {
             rateTypeLabel = firstRateType === "DAILY" ? labels.rateDaily || "Harian" : firstRateType === "HOURLY" ? labels.rateHourly || "Per Jam" : labels.ratePackage || "Paket";
           }
@@ -185,7 +189,7 @@ function buildColumns(
       id: 'vehicleGroup',
       accessorFn: (row) => {
         const items = row.items || [];
-        return items.map(i => i.vehicleSnapshot?.licensePlate).filter(Boolean).join(', ');
+        return items.map((i: any) => i.vehicleSnapshot?.licensePlate).filter(Boolean).join(', ');
       },
       header: labels.colVehicle || 'Kendaraan',
       enableSorting: true,
@@ -195,7 +199,7 @@ function buildColumns(
         const items = b.items;
         if (!items || items.length === 0) return <span className="text-muted-foreground">-</span>;
 
-        const plates = items.map(i => i.vehicleSnapshot?.licensePlate).filter(Boolean);
+        const plates = items.map((i: any) => i.vehicleSnapshot?.licensePlate).filter(Boolean);
         if (plates.length === 0) return <span className="text-muted-foreground">-</span>;
 
         const isTrackable = b.status !== 'COMPLETED' && b.status !== 'CANCELLED';
@@ -211,7 +215,7 @@ function buildColumns(
                 title={plates.join(', ')}
                 onClick={(e) => {
                   e.stopPropagation(); // prevent row click
-                  const ids = items.map(i => i.vehicleId).filter(Boolean);
+                  const ids = items.map((i: any) => i.vehicleId).filter(Boolean);
                   if (ids.length > 0) onOpenMap(ids as string[]);
                 }}
               >
@@ -254,7 +258,7 @@ function buildColumns(
         );
       }
     },
-    // --- Status Booking ---
+    // --- Status RentalContract ---
     {
       id: 'status',
       accessorFn: (row) => getStatusLabel(row.status, labels),
@@ -301,6 +305,27 @@ function buildColumns(
         );
       }
     },
+    // --- Booking Ref ---
+    {
+      id: 'bookingReference',
+      accessorFn: (row) => row.bookingNumber,
+      header: labels.colBookingRef || 'Booking Ref.',
+      enableSorting: true,
+      size: 150,
+      cell: ({ row }) => {
+        const b = row.original;
+        return (
+          <div className="flex flex-col gap-0.5 py-1">
+            <span className="text-[13px] font-normal text-foreground truncate" title={b.bookingNumber}>
+              {b.bookingNumber}
+            </span>
+            <span className="text-[11px] text-muted-foreground truncate">
+              {formatShortDate(b.createdAt || '')}
+            </span>
+          </div>
+        );
+      }
+    },
   ];
 }
 
@@ -320,7 +345,7 @@ const DEFAULT_COLUMN_VISIBILITY = {};
     return max.toISOString();
   };
 
-export function BookingTable({
+export function ContractTable({
   data,
   labels,
   onView,
@@ -331,6 +356,7 @@ export function BookingTable({
   searchValue,
   onSearchChange,
   onAdd,
+  onPrint,
   onOpenMap,
   filterConfig,
   isFilterOpen,
@@ -339,14 +365,14 @@ export function BookingTable({
   onToggleStats,
   className,
   dtLabels
-}: BookingTableProps) {
+}: ContractTableProps) {
   const columns = React.useMemo(
     () => buildColumns(labels, onView, onEdit, onDelete, onOpenMap),
     [labels, onView, onEdit, onDelete, onOpenMap],
   );
 
   return (
-    <DataTable<Booking>
+    <DataTable<RentalContract>
       data={data}
       columns={columns}
       onRowActionClick={onView}
@@ -361,23 +387,31 @@ export function BookingTable({
       // Search
       searchValue={searchValue}
       onSearchChange={onSearchChange}
-      searchPlaceholder={labels.searchPlaceholder || "Cari booking..."}
+      searchPlaceholder={labels.searchPlaceholder || "Cari kontrak..."}
+      extraMiddleActions={
+        <Link href="/rental/templates/contracts">
+          <Button variant="outline" className="h-8 px-3 gap-2 text-[12px] font-medium border-border/80 text-foreground-muted hover:text-foreground">
+            <FileText className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline-block">{labels.btnTemplate || 'Template'}</span>
+          </Button>
+        </Link>
+      }
       // Filter
       filterConfig={filterConfig}
       isFilterOpen={isFilterOpen}
       onFilterOpenChange={onFilterOpenChange}
       // UI Slots
       className={className}
-      exportFilename="Data_Booking_Rental"
+      exportFilename="Data_RentalContract_Rental"
       labels={dtLabels}
-      emptyTitle={labels.emptyTitle}
-      emptyDescription={labels.emptyDesc}
+      emptyTitle={labels.emptyTitle || "Kontrak Kosong"}
+      emptyDescription={labels.emptyDesc || "Belum ada kontrak rental yang diterbitkan."}
       toolbarActions={
         <div className="flex items-center gap-2">
           {onAdd && (
             <Button variant="destructive" onClick={onAdd} className="h-8 gap-1.5 text-[12px] font-medium shadow-none">
               <Plus className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline-block">{labels.addBooking || 'Tambah'}</span>
+              <span className="hidden sm:inline-block">{labels.add || 'Tambah'}</span>
             </Button>
           )}
         </div>

@@ -40,7 +40,7 @@ export async function buildRentalVehicleContext(coreVehicleId: string, locale: L
       const allContracts = await contractService.getContracts();
       const activeContract = allContracts.find(c => 
         c.items?.some(item => item.vehicleId === coreVehicleId) && 
-        (c.status === 'ACTIVE' || c.status === 'ISSUED')
+        (c.status === 'ACTIVE' || c.status === 'CONTRACTED')
       );
 
       if (activeContract) {
@@ -54,7 +54,7 @@ export async function buildRentalVehicleContext(coreVehicleId: string, locale: L
         }
 
         // 4. Tambahkan info contract
-        data.push({ label: isEn ? 'Contract No.' : 'No. Kontrak', value: activeContract.contractNumber, type: 'text' });
+        data.push({ label: isEn ? 'Contract No.' : 'No. Kontrak', value: activeContract.contractNumber || '', type: 'text' });
         
         // 5. Tambahkan info tarif & periode
         data.push({ 

@@ -2,19 +2,19 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import { trackingNavigationService } from '@/features/core/tracking/services/trackingNavigationService';
 import { FileCheck, Activity, CheckCircle2, Clock, XCircle, FileText, List } from 'lucide-react';
-import { getTranslation } from '@/i18n';
+import { getContractTranslation } from './i18n';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
 import { contractService } from '@/data/modules/rental/services/contractService';
 import type { RentalContract, ContractStatusFilter } from './types/contract';
-import { ContractList } from './components/ContractList';
+import { ContractTable } from './components/ContractTable';
 import { ContractView } from './components/ContractView';
 import { ContractPrintModal } from './components/ContractPrintModal';
 import { ContractCreateFeature } from './ContractCreateFeature';
-import { HandoverFeature } from '../handover/HandoverFeature';
 import { ReturnFeature } from '../returns/ReturnFeature';
 import { cn, formatNumber } from '@adatrack/utils';
-import { PanelShell, type DataTableFilterConfig } from '@adatrack/ui';
+import { PanelShell, type DataTableFilterConfig, ConfirmDialog, toast } from '@adatrack/ui';
 
 function StatCard({ label, value, colorClass, icon: Icon }: { label: string, value: number, colorClass: string, icon?: React.ElementType }) {
   const textColorClass = colorClass.replace(/bg-/g, 'text-');
@@ -36,12 +36,11 @@ function StatCard({ label, value, colorClass, icon: Icon }: { label: string, val
   );
 }
 
-export function ContractsFeature() {
+export function ContractFeature() {
   const router = useRouter();
   const locale = useBusinessLocale();
-  const t = getTranslation(locale);
-  const labels = (t as any).rentalContractFeature || {};
-
+  const labels = getContractTranslation(locale) as any;
+    
   const [contracts, setContracts] = useState<RentalContract[]>([]);
   const [loading, setLoading] = useState(true);
   
@@ -54,11 +53,18 @@ export function ContractsFeature() {
   const [selectedContract, setSelectedContract] = useState<RentalContract | null>(null);
   const [printContract, setPrintContract] = useState<RentalContract | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
-
-  const [handoverId, setHandoverId] = React.useState<string | null>(null);
-  const [returnId, setReturnId] = React.useState<string | null>(null);
-
   const [errorMsg, setErrorMsg] = React.useState<string>('');
+
+  const [confirmDialog, setConfirmDialog] = useState<{
+    open: boolean;
+    title: string;
+    description: string;
+    confirmLabel?: string;
+    variant?: 'danger' | 'warning' | 'primary';
+    icon?: React.ReactNode;
+    onConfirm: () => void;
+  }>({ open: false, title: '', description: '', onConfirm: () => {} });
+
 
   const fetchContracts = React.useCallback(async () => {
     setLoading(true);
@@ -119,20 +125,52 @@ export function ContractsFeature() {
   };
   
 
-  const handleCancel = async (c: RentalContract) => {
-    try {
-      await contractService.updateContractStatus(c.id, 'CANCELLED');
-      alert('Kontrak berhasil dibatalkan.');
-      fetchContracts();
-      setDrawerOpen(false);
-    } catch (error: any) {
-      alert(error.message || 'Gagal membatalkan kontrak');
-    }
+  const handleCancel = (c: RentalContract) => {
+    setConfirmDialog({
+      open: true,
+      title: 'Batal Sewa',
+      description: 'Anda yakin ingin membatalkan pesanan sewa ini sepenuhnya? Semua tagihan akan hangus dan kendaraan akan bebas kembali.',
+      confirmLabel: 'Batalkan Pesanan',
+      variant: 'danger',
+      icon: <XCircle className="w-6 h-6" strokeWidth={1.5} />,
+      onConfirm: async () => {
+        try {
+          await contractService.updateContractStatus(c.id, 'CANCELLED');
+          toast.success('Pesanan sewa berhasil dibatalkan sepenuhnya.');
+          fetchContracts();
+          setDrawerOpen(false);
+        } catch (error: any) {
+          toast.error(error.message || 'Gagal membatalkan pesanan');
+        }
+      }
+    });
   };
 
-  const handleHandover = (c: RentalContract) => {
-    setDrawerOpen(false);
-    setHandoverId(c.id);
+  const handleOpenMapMulti = (vehicleIds: string[]) => {
+    trackingNavigationService.navigateToTracking(router, {
+      mode: 'live',
+      vehicleIds: vehicleIds
+    });
+  };
+
+  const handleDelete = (c: RentalContract) => {
+    setConfirmDialog({
+      open: true,
+      title: 'Hapus Dokumen Kontrak',
+      description: 'Anda yakin ingin menghapus dokumen kontrak ini? Pesanan tidak dibatalkan, namun akan kembali ke status Booking.',
+      confirmLabel: 'Hapus Dokumen',
+      variant: 'warning',
+      onConfirm: async () => {
+        try {
+          await contractService.updateContractStatus(c.id, 'BOOKED' as any);
+          toast.success('Kontrak berhasil dihapus. Pesanan kembali ke status Booking.');
+          fetchContracts();
+          setDrawerOpen(false);
+        } catch (error: any) {
+          toast.error(error.message || 'Gagal menghapus kontrak');
+        }
+      }
+    });
   };
 
   const dtLabels = useMemo(() => {
@@ -179,7 +217,7 @@ export function ContractsFeature() {
   }), [statusFilter, labels]);
 
   const renderStatsPanel = () => {
-    const panelLabels = (t as any).rentalVehicles || {};
+    const panelLabels = labels || {};
 
     return (
       <PanelShell
@@ -228,12 +266,14 @@ export function ContractsFeature() {
         )}
         
         <div className="flex-1 min-h-0 w-full relative">
-          <ContractList
+          <ContractTable
+            onEdit={() => {}}
+            onDelete={() => {}}
+            onOpenMap={handleOpenMapMulti}
             data={filteredData}
             labels={labels}
             onView={handleView}
             onPrint={handlePrint}
-            onHandover={handleHandover}
             searchValue={search}
             onSearchChange={setSearch}
             onAdd={handleAdd}
@@ -257,7 +297,7 @@ export function ContractsFeature() {
         labels={labels}
         onPrint={handlePrint}
         onCancel={handleCancel}
-        onHandover={handleHandover}
+        onDelete={handleDelete}
       />
 
       <ContractPrintModal
@@ -266,29 +306,18 @@ export function ContractsFeature() {
         onClose={() => setPrintContract(null)}
       />
 
-      <HandoverFeature
-        contractId={handoverId}
-        open={!!handoverId}
-        onOpenChange={(open) => {
-          if (!open) setHandoverId(null);
+      <ConfirmDialog
+        open={confirmDialog.open}
+        onOpenChange={(open) => setConfirmDialog(prev => ({ ...prev, open }))}
+        title={confirmDialog.title}
+        description={confirmDialog.description}
+        confirmLabel={confirmDialog.confirmLabel}
+        variant={confirmDialog.variant}
+        icon={confirmDialog.icon}
+        onConfirm={() => {
+          confirmDialog.onConfirm();
+          setConfirmDialog(prev => ({ ...prev, open: false }));
         }}
-        onSuccess={() => {
-          setHandoverId(null);
-          fetchContracts();
-        }}
-      />
-
-      <ReturnFeature
-        contractId={returnId}
-        open={!!returnId}
-        onOpenChange={(open) => {
-          if (!open) setReturnId(null);
-        }}
-        onSuccess={() => {
-          setReturnId(null);
-          fetchContracts();
-        }}
-      />
-    </div>
+      />    </div>
   );
 }

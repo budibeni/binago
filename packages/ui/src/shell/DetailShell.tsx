@@ -16,6 +16,8 @@ export function useDetailShell() {
 }
 
 export interface DetailShellProps {
+  /** Label for the Close button */
+  closeLabel?: string;
   /** Controlled open state */
   open: boolean;
   /** Callback when open state changes */
@@ -48,6 +50,7 @@ export interface DetailShellProps {
 
 export function DetailShell({
   open,
+  closeLabel,
   onOpenChange,
   title,
   children,
@@ -132,7 +135,7 @@ export function DetailShell({
       className="flex h-7 w-7 items-center justify-center rounded-md text-foreground-muted hover:bg-neutral-200 dark:hover:bg-neutral-800 hover:text-foreground transition-colors"
     >
       <X className="h-4 w-4" />
-      <span className="sr-only">Tutup</span>
+      <span className="sr-only">{closeLabel || "Tutup"}</span>
     </button>
   );
 
@@ -148,8 +151,7 @@ export function DetailShell({
               onClick={() => handleOpenChange(false)}
               className="h-7 text-xs px-3 bg-background"
             >
-              Tutup
-            </Button>
+              {closeLabel || "Tutup"}</Button>
           )}
         </div>
 

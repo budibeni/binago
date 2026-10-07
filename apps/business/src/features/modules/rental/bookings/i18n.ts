@@ -11,7 +11,7 @@ export const bookingDictionaries = {
     // Status
     statusDraft: 'Draft',
     statusBooked: 'Dipesan',
-    statusContracted: 'Dikontrak',
+    statusContracted: 'Diterbitkan',
     statusPending: 'Menunggu Konfirmasi',
     statusConfirmed: 'Dikonfirmasi',
     statusActive: 'Berjalan',

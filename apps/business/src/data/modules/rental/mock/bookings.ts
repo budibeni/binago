@@ -26,7 +26,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 1200000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-011",
+          "licensePlate": "B 10011 GHI",
           "brand": "Toyota",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -44,7 +44,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 600000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-012",
+          "licensePlate": "B 10012 GHI",
           "brand": "Suzuki",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -64,7 +64,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 2350000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-013",
+          "licensePlate": "B 10013 GHI",
           "brand": "Isuzu",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -72,6 +72,7 @@ export const mockBookings: Booking[] = [
       }
     ],
     "customerSnapshot": {
+      "name": "Mock Name",
       "type": "Perusahaan",
       "phone": "022-7654321",
       "email": "contact@makmursentosa.com",
@@ -91,6 +92,8 @@ export const mockBookings: Booking[] = [
     "deposit": 24000000,
     "remainingAmount": 24000000,
     "status": "ACTIVE",
+    "contractNumber": "KTR-2410-001",
+    "contractDate": "2024-10-15T09:00:00Z",
     "createdAt": "2026-10-06T10:00:00.000Z",
     "updatedAt": "2026-10-06T10:00:00.000Z",
     "startDate": "2026-10-15T08:00:00.000Z",
@@ -107,7 +110,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 2000000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-001",
+          "licensePlate": "B 10001 GHI",
           "brand": "Daihatsu",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -125,7 +128,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 2000000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-002",
+          "licensePlate": "B 10002 GHI",
           "brand": "Toyota",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -143,7 +146,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 2000000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-003",
+          "licensePlate": "B 10003 GHI",
           "brand": "Mitsubishi",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -161,7 +164,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 2000000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-004",
+          "licensePlate": "B 10004 GHI",
           "brand": "Daihatsu",
           "model": "Mobil",
           "categoryName": "MPV Premium"
@@ -179,7 +182,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 2000000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-005",
+          "licensePlate": "B 10005 GHI",
           "brand": "Toyota",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -197,7 +200,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 2000000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-006",
+          "licensePlate": "B 10006 GHI",
           "brand": "Toyota",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -215,7 +218,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 2000000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-007",
+          "licensePlate": "B 10007 GHI",
           "brand": "Honda",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -233,7 +236,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 2000000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-008",
+          "licensePlate": "B 10008 GHI",
           "brand": "Toyota",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -251,7 +254,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 2000000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-009",
+          "licensePlate": "B 10009 GHI",
           "brand": "Daihatsu",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -269,7 +272,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 2000000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-010",
+          "licensePlate": "B 10010 GHI",
           "brand": "Mitsubishi",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -287,7 +290,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 2000000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-011",
+          "licensePlate": "B 10011 GHI",
           "brand": "Toyota",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -305,7 +308,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 2000000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-012",
+          "licensePlate": "B 10012 GHI",
           "brand": "Suzuki",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -313,6 +316,7 @@ export const mockBookings: Booking[] = [
       }
     ],
     "customerSnapshot": {
+      "name": "Mock Name",
       "type": "Perusahaan",
       "phone": "021-1234567",
       "email": "info@majuterus.co.id",
@@ -332,6 +336,8 @@ export const mockBookings: Booking[] = [
     "deposit": 1200000,
     "remainingAmount": 1200000,
     "status": "COMPLETED",
+    "contractNumber": "KTR-2410-002",
+    "contractDate": "2024-10-15T09:00:00Z",
     "createdAt": "2026-09-10T10:00:00.000Z",
     "updatedAt": "2026-09-15T18:00:00.000Z",
     "startDate": "2026-09-12T08:00:00.000Z",
@@ -348,7 +354,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 1200000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-008",
+          "licensePlate": "B 10008 GHI",
           "brand": "Toyota",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -374,6 +380,8 @@ export const mockBookings: Booking[] = [
     "deposit": 0,
     "remainingAmount": 2500000,
     "status": "CANCELLED",
+    "contractNumber": "KTR-2410-003",
+    "contractDate": "2024-10-15T09:00:00Z",
     "createdAt": "2026-10-01T10:00:00.000Z",
     "updatedAt": "2026-10-02T10:00:00.000Z",
     "startDate": "2026-10-05T08:00:00.000Z",
@@ -390,7 +398,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 2500000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-009",
+          "licensePlate": "B 10009 GHI",
           "brand": "Daihatsu",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -416,6 +424,8 @@ export const mockBookings: Booking[] = [
     "deposit": 1000000,
     "remainingAmount": 6000000,
     "status": "ACTIVE",
+    "contractNumber": "KTR-2410-004",
+    "contractDate": "2024-10-15T09:00:00Z",
     "createdAt": "2026-08-18T12:00:00.000Z",
     "updatedAt": "2026-08-21T12:00:00.000Z",
     "startDate": "2026-08-23T12:00:00.000Z",
@@ -432,7 +442,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 2000000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-001",
+          "licensePlate": "B 10001 GHI",
           "brand": "Daihatsu",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -450,7 +460,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 2000000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-004",
+          "licensePlate": "B 10004 GHI",
           "brand": "Daihatsu",
           "model": "Mobil",
           "categoryName": "MPV Premium"
@@ -468,7 +478,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 2000000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-005",
+          "licensePlate": "B 10005 GHI",
           "brand": "Toyota",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -494,6 +504,8 @@ export const mockBookings: Booking[] = [
     "deposit": 1000000,
     "remainingAmount": 4000000,
     "status": "ACTIVE",
+    "contractNumber": "KTR-2410-005",
+    "contractDate": "2024-10-15T09:00:00Z",
     "createdAt": "2026-08-18T12:00:00.000Z",
     "updatedAt": "2026-08-21T12:00:00.000Z",
     "startDate": "2026-08-23T12:00:00.000Z",
@@ -510,7 +522,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 2000000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-002",
+          "licensePlate": "B 10002 GHI",
           "brand": "Toyota",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -528,7 +540,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 2000000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-007",
+          "licensePlate": "B 10007 GHI",
           "brand": "Honda",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -554,6 +566,8 @@ export const mockBookings: Booking[] = [
     "deposit": 500000,
     "remainingAmount": 2000000,
     "status": "ACTIVE",
+    "contractNumber": "KTR-2410-006",
+    "contractDate": "2024-10-15T09:00:00Z",
     "createdAt": "2026-08-18T12:00:00.000Z",
     "updatedAt": "2026-08-21T12:00:00.000Z",
     "startDate": "2026-08-23T12:00:00.000Z",
@@ -570,7 +584,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 2000000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-003",
+          "licensePlate": "B 10003 GHI",
           "brand": "Mitsubishi",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -596,6 +610,8 @@ export const mockBookings: Booking[] = [
     "deposit": 500000,
     "remainingAmount": 2000000,
     "status": "ACTIVE",
+    "contractNumber": "KTR-2410-007",
+    "contractDate": "2024-10-15T09:00:00Z",
     "createdAt": "2026-08-18T12:00:00.000Z",
     "updatedAt": "2026-08-21T12:00:00.000Z",
     "startDate": "2026-08-23T12:00:00.000Z",
@@ -612,7 +628,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 2000000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-004",
+          "licensePlate": "B 10004 GHI",
           "brand": "Daihatsu",
           "model": "Mobil",
           "categoryName": "MPV Premium"
@@ -638,6 +654,8 @@ export const mockBookings: Booking[] = [
     "deposit": 500000,
     "remainingAmount": 2000000,
     "status": "ACTIVE",
+    "contractNumber": "KTR-2410-008",
+    "contractDate": "2024-10-15T09:00:00Z",
     "createdAt": "2026-08-18T12:00:00.000Z",
     "updatedAt": "2026-08-21T12:00:00.000Z",
     "startDate": "2026-08-23T12:00:00.000Z",
@@ -654,7 +672,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 2000000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-005",
+          "licensePlate": "B 10005 GHI",
           "brand": "Toyota",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -680,6 +698,8 @@ export const mockBookings: Booking[] = [
     "deposit": 500000,
     "remainingAmount": 1200000,
     "status": "CONTRACTED",
+    "contractNumber": "KTR-2410-009",
+    "contractDate": "2024-10-15T09:00:00Z",
     "createdAt": "2026-08-22T12:00:00.000Z",
     "updatedAt": "2026-08-25T12:00:00.000Z",
     "startDate": "2026-08-27T12:00:00.000Z",
@@ -696,7 +716,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 1200000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-006",
+          "licensePlate": "B 10006 GHI",
           "brand": "Toyota",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -704,6 +724,7 @@ export const mockBookings: Booking[] = [
       }
     ],
     "customerSnapshot": {
+      "name": "Mock Name",
       "type": "Perusahaan",
       "phone": "021-1234567",
       "email": "info@majuterus.co.id",
@@ -723,6 +744,8 @@ export const mockBookings: Booking[] = [
     "deposit": 500000,
     "remainingAmount": 1200000,
     "status": "CONTRACTED",
+    "contractNumber": "KTR-2410-010",
+    "contractDate": "2024-10-15T09:00:00Z",
     "createdAt": "2026-08-22T12:00:00.000Z",
     "updatedAt": "2026-08-25T12:00:00.000Z",
     "startDate": "2026-08-27T12:00:00.000Z",
@@ -739,7 +762,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 1200000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-007",
+          "licensePlate": "B 10007 GHI",
           "brand": "Honda",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -747,6 +770,7 @@ export const mockBookings: Booking[] = [
       }
     ],
     "customerSnapshot": {
+      "name": "Mock Name",
       "type": "Perusahaan",
       "phone": "022-7654321",
       "email": "contact@makmursentosa.com",
@@ -766,6 +790,8 @@ export const mockBookings: Booking[] = [
     "deposit": 500000,
     "remainingAmount": 1200000,
     "status": "CONTRACTED",
+    "contractNumber": "KTR-2410-011",
+    "contractDate": "2024-10-15T09:00:00Z",
     "createdAt": "2026-08-22T12:00:00.000Z",
     "updatedAt": "2026-08-25T12:00:00.000Z",
     "startDate": "2026-08-27T12:00:00.000Z",
@@ -782,7 +808,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 1200000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-008",
+          "licensePlate": "B 10008 GHI",
           "brand": "Toyota",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -790,6 +816,7 @@ export const mockBookings: Booking[] = [
       }
     ],
     "customerSnapshot": {
+      "name": "Mock Name",
       "type": "Perusahaan",
       "phone": "031-1234567",
       "email": "hello@logistikcepat.id",
@@ -809,6 +836,8 @@ export const mockBookings: Booking[] = [
     "deposit": 500000,
     "remainingAmount": 1200000,
     "status": "COMPLETED",
+    "contractNumber": "KTR-2410-012",
+    "contractDate": "2024-10-15T09:00:00Z",
     "createdAt": "2026-08-10T12:00:00.000Z",
     "updatedAt": "2026-08-13T12:00:00.000Z",
     "startDate": "2026-08-15T12:00:00.000Z",
@@ -825,7 +854,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 1200000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-011",
+          "licensePlate": "B 10011 GHI",
           "brand": "Toyota",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -851,6 +880,8 @@ export const mockBookings: Booking[] = [
     "deposit": 500000,
     "remainingAmount": 1200000,
     "status": "COMPLETED",
+    "contractNumber": "KTR-2410-013",
+    "contractDate": "2024-10-15T09:00:00Z",
     "createdAt": "2026-08-10T12:00:00.000Z",
     "updatedAt": "2026-08-13T12:00:00.000Z",
     "startDate": "2026-08-15T12:00:00.000Z",
@@ -867,7 +898,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 1200000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-012",
+          "licensePlate": "B 10012 GHI",
           "brand": "Suzuki",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -893,6 +924,8 @@ export const mockBookings: Booking[] = [
     "deposit": 500000,
     "remainingAmount": 1200000,
     "status": "COMPLETED",
+    "contractNumber": "KTR-2410-014",
+    "contractDate": "2024-10-15T09:00:00Z",
     "createdAt": "2026-08-10T12:00:00.000Z",
     "updatedAt": "2026-08-13T12:00:00.000Z",
     "startDate": "2026-08-15T12:00:00.000Z",
@@ -909,7 +942,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 1200000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-013",
+          "licensePlate": "B 10013 GHI",
           "brand": "Isuzu",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -935,6 +968,8 @@ export const mockBookings: Booking[] = [
     "deposit": 500000,
     "remainingAmount": 800000,
     "status": "CANCELLED",
+    "contractNumber": "KTR-2410-015",
+    "contractDate": "2024-10-15T09:00:00Z",
     "createdAt": "2026-08-15T12:00:00.000Z",
     "updatedAt": "2026-08-18T12:00:00.000Z",
     "startDate": "2026-08-20T12:00:00.000Z",
@@ -951,7 +986,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 800000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-014",
+          "licensePlate": "B 10014 GHI",
           "brand": "Daihatsu",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -993,7 +1028,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 800000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-015",
+          "licensePlate": "B 10015 GHI",
           "brand": "Toyota",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -1001,6 +1036,7 @@ export const mockBookings: Booking[] = [
       }
     ],
     "customerSnapshot": {
+      "name": "Mock Name",
       "type": "Perusahaan",
       "phone": "021-9876543",
       "email": "contact@konstruksijaya.co.id",
@@ -1020,6 +1056,8 @@ export const mockBookings: Booking[] = [
     "deposit": 500000,
     "remainingAmount": 1000000,
     "status": "CONTRACTED",
+    "contractNumber": "KTR-2410-016",
+    "contractDate": "2024-10-15T09:00:00Z",
     "createdAt": "2026-08-25T12:00:00.000Z",
     "updatedAt": "2026-08-28T12:00:00.000Z",
     "startDate": "2026-08-30T12:00:00.000Z",
@@ -1036,7 +1074,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 1000000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-015",
+          "licensePlate": "B 10015 GHI",
           "brand": "Toyota",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -1062,6 +1100,8 @@ export const mockBookings: Booking[] = [
     "deposit": 500000,
     "remainingAmount": 1500000,
     "status": "CONTRACTED",
+    "contractNumber": "KTR-2410-017",
+    "contractDate": "2024-10-15T09:00:00Z",
     "createdAt": "2026-09-01T12:00:00.000Z",
     "updatedAt": "2026-09-02T12:00:00.000Z",
     "startDate": "2026-10-17T08:00:00.000Z",
@@ -1078,7 +1118,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 1500000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-002",
+          "licensePlate": "B 10002 GHI",
           "brand": "Toyota",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -1104,6 +1144,8 @@ export const mockBookings: Booking[] = [
     "deposit": 500000,
     "remainingAmount": 2500000,
     "status": "CONTRACTED",
+    "contractNumber": "KTR-2410-018",
+    "contractDate": "2024-10-15T09:00:00Z",
     "createdAt": "2026-09-01T12:00:00.000Z",
     "updatedAt": "2026-09-02T12:00:00.000Z",
     "startDate": "2026-10-18T08:00:00.000Z",
@@ -1120,7 +1162,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 2500000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-003",
+          "licensePlate": "B 10003 GHI",
           "brand": "Mitsubishi",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -1146,6 +1188,8 @@ export const mockBookings: Booking[] = [
     "deposit": 500000,
     "remainingAmount": 1500000,
     "status": "ACTIVE",
+    "contractNumber": "KTR-2410-019",
+    "contractDate": "2024-10-15T09:00:00Z",
     "createdAt": "2026-09-01T12:00:00.000Z",
     "updatedAt": "2026-09-02T12:00:00.000Z",
     "startDate": "2026-10-19T08:00:00.000Z",
@@ -1162,7 +1206,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 1500000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-004",
+          "licensePlate": "B 10004 GHI",
           "brand": "Daihatsu",
           "model": "Mobil",
           "categoryName": "MPV Premium"
@@ -1188,6 +1232,8 @@ export const mockBookings: Booking[] = [
     "deposit": 500000,
     "remainingAmount": 2500000,
     "status": "CONTRACTED",
+    "contractNumber": "KTR-2410-020",
+    "contractDate": "2024-10-15T09:00:00Z",
     "createdAt": "2026-09-01T12:00:00.000Z",
     "updatedAt": "2026-09-02T12:00:00.000Z",
     "startDate": "2026-10-20T08:00:00.000Z",
@@ -1204,7 +1250,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 2500000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-005",
+          "licensePlate": "B 10005 GHI",
           "brand": "Toyota",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -1230,6 +1276,8 @@ export const mockBookings: Booking[] = [
     "deposit": 500000,
     "remainingAmount": 1500000,
     "status": "CONTRACTED",
+    "contractNumber": "KTR-2410-021",
+    "contractDate": "2024-10-15T09:00:00Z",
     "createdAt": "2026-09-01T12:00:00.000Z",
     "updatedAt": "2026-09-02T12:00:00.000Z",
     "startDate": "2026-10-21T08:00:00.000Z",
@@ -1246,7 +1294,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 1500000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-006",
+          "licensePlate": "B 10006 GHI",
           "brand": "Toyota",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -1288,7 +1336,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 2500000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-007",
+          "licensePlate": "B 10007 GHI",
           "brand": "Honda",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -1314,6 +1362,8 @@ export const mockBookings: Booking[] = [
     "deposit": 500000,
     "remainingAmount": 1500000,
     "status": "CONTRACTED",
+    "contractNumber": "KTR-2410-022",
+    "contractDate": "2024-10-15T09:00:00Z",
     "createdAt": "2026-09-01T12:00:00.000Z",
     "updatedAt": "2026-09-02T12:00:00.000Z",
     "startDate": "2026-10-23T08:00:00.000Z",
@@ -1330,7 +1380,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 1500000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-008",
+          "licensePlate": "B 10008 GHI",
           "brand": "Toyota",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -1356,6 +1406,8 @@ export const mockBookings: Booking[] = [
     "deposit": 500000,
     "remainingAmount": 2500000,
     "status": "CONTRACTED",
+    "contractNumber": "KTR-2410-023",
+    "contractDate": "2024-10-15T09:00:00Z",
     "createdAt": "2026-09-01T12:00:00.000Z",
     "updatedAt": "2026-09-02T12:00:00.000Z",
     "startDate": "2026-10-24T08:00:00.000Z",
@@ -1372,7 +1424,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 2500000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-009",
+          "licensePlate": "B 10009 GHI",
           "brand": "Daihatsu",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -1398,6 +1450,8 @@ export const mockBookings: Booking[] = [
     "deposit": 500000,
     "remainingAmount": 1500000,
     "status": "ACTIVE",
+    "contractNumber": "KTR-2410-024",
+    "contractDate": "2024-10-15T09:00:00Z",
     "createdAt": "2026-09-01T12:00:00.000Z",
     "updatedAt": "2026-09-02T12:00:00.000Z",
     "startDate": "2026-10-25T08:00:00.000Z",
@@ -1414,7 +1468,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 1500000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-010",
+          "licensePlate": "B 10010 GHI",
           "brand": "Mitsubishi",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -1440,6 +1494,8 @@ export const mockBookings: Booking[] = [
     "deposit": 500000,
     "remainingAmount": 2500000,
     "status": "CONTRACTED",
+    "contractNumber": "KTR-2410-025",
+    "contractDate": "2024-10-15T09:00:00Z",
     "createdAt": "2026-09-01T12:00:00.000Z",
     "updatedAt": "2026-09-02T12:00:00.000Z",
     "startDate": "2026-10-26T08:00:00.000Z",
@@ -1456,7 +1512,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 2500000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-011",
+          "licensePlate": "B 10011 GHI",
           "brand": "Toyota",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -1482,6 +1538,8 @@ export const mockBookings: Booking[] = [
     "deposit": 500000,
     "remainingAmount": 1500000,
     "status": "CONTRACTED",
+    "contractNumber": "KTR-2410-026",
+    "contractDate": "2024-10-15T09:00:00Z",
     "createdAt": "2026-09-01T12:00:00.000Z",
     "updatedAt": "2026-09-02T12:00:00.000Z",
     "startDate": "2026-10-27T08:00:00.000Z",
@@ -1498,7 +1556,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 1500000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-012",
+          "licensePlate": "B 10012 GHI",
           "brand": "Suzuki",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -1540,7 +1598,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 2500000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-013",
+          "licensePlate": "B 10013 GHI",
           "brand": "Isuzu",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -1566,6 +1624,8 @@ export const mockBookings: Booking[] = [
     "deposit": 500000,
     "remainingAmount": 1500000,
     "status": "CONTRACTED",
+    "contractNumber": "KTR-2410-027",
+    "contractDate": "2024-10-15T09:00:00Z",
     "createdAt": "2026-09-01T12:00:00.000Z",
     "updatedAt": "2026-09-02T12:00:00.000Z",
     "startDate": "2026-10-01T08:00:00.000Z",
@@ -1582,7 +1642,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 1500000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-014",
+          "licensePlate": "B 10014 GHI",
           "brand": "Daihatsu",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -1608,6 +1668,8 @@ export const mockBookings: Booking[] = [
     "deposit": 500000,
     "remainingAmount": 2500000,
     "status": "CONTRACTED",
+    "contractNumber": "KTR-2410-028",
+    "contractDate": "2024-10-15T09:00:00Z",
     "createdAt": "2026-09-01T12:00:00.000Z",
     "updatedAt": "2026-09-02T12:00:00.000Z",
     "startDate": "2026-10-02T08:00:00.000Z",
@@ -1624,7 +1686,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 2500000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-015",
+          "licensePlate": "B 10015 GHI",
           "brand": "Toyota",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -1650,6 +1712,8 @@ export const mockBookings: Booking[] = [
     "deposit": 500000,
     "remainingAmount": 1500000,
     "status": "ACTIVE",
+    "contractNumber": "KTR-2410-029",
+    "contractDate": "2024-10-15T09:00:00Z",
     "createdAt": "2026-09-01T12:00:00.000Z",
     "updatedAt": "2026-09-02T12:00:00.000Z",
     "startDate": "2026-10-03T08:00:00.000Z",
@@ -1666,7 +1730,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 1500000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-001",
+          "licensePlate": "B 10001 GHI",
           "brand": "Daihatsu",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -1692,6 +1756,8 @@ export const mockBookings: Booking[] = [
     "deposit": 500000,
     "remainingAmount": 2500000,
     "status": "CONTRACTED",
+    "contractNumber": "KTR-2410-030",
+    "contractDate": "2024-10-15T09:00:00Z",
     "createdAt": "2026-09-01T12:00:00.000Z",
     "updatedAt": "2026-09-02T12:00:00.000Z",
     "startDate": "2026-10-04T08:00:00.000Z",
@@ -1708,7 +1774,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 2500000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-002",
+          "licensePlate": "B 10002 GHI",
           "brand": "Toyota",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -1734,6 +1800,8 @@ export const mockBookings: Booking[] = [
     "deposit": 500000,
     "remainingAmount": 1500000,
     "status": "CONTRACTED",
+    "contractNumber": "KTR-2410-031",
+    "contractDate": "2024-10-15T09:00:00Z",
     "createdAt": "2026-09-01T12:00:00.000Z",
     "updatedAt": "2026-09-02T12:00:00.000Z",
     "startDate": "2026-10-05T08:00:00.000Z",
@@ -1750,7 +1818,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 1500000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-003",
+          "licensePlate": "B 10003 GHI",
           "brand": "Mitsubishi",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -1792,7 +1860,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 2500000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-004",
+          "licensePlate": "B 10004 GHI",
           "brand": "Daihatsu",
           "model": "Mobil",
           "categoryName": "MPV Premium"
@@ -1818,6 +1886,8 @@ export const mockBookings: Booking[] = [
     "deposit": 500000,
     "remainingAmount": 1500000,
     "status": "CONTRACTED",
+    "contractNumber": "KTR-2410-032",
+    "contractDate": "2024-10-15T09:00:00Z",
     "createdAt": "2026-09-01T12:00:00.000Z",
     "updatedAt": "2026-09-02T12:00:00.000Z",
     "startDate": "2026-10-07T08:00:00.000Z",
@@ -1834,7 +1904,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 1500000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-005",
+          "licensePlate": "B 10005 GHI",
           "brand": "Toyota",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -1860,6 +1930,8 @@ export const mockBookings: Booking[] = [
     "deposit": 500000,
     "remainingAmount": 2500000,
     "status": "CONTRACTED",
+    "contractNumber": "KTR-2410-033",
+    "contractDate": "2024-10-15T09:00:00Z",
     "createdAt": "2026-09-01T12:00:00.000Z",
     "updatedAt": "2026-09-02T12:00:00.000Z",
     "startDate": "2026-10-08T08:00:00.000Z",
@@ -1876,7 +1948,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 2500000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-006",
+          "licensePlate": "B 10006 GHI",
           "brand": "Toyota",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -1902,6 +1974,8 @@ export const mockBookings: Booking[] = [
     "deposit": 500000,
     "remainingAmount": 1500000,
     "status": "ACTIVE",
+    "contractNumber": "KTR-2410-034",
+    "contractDate": "2024-10-15T09:00:00Z",
     "createdAt": "2026-09-01T12:00:00.000Z",
     "updatedAt": "2026-09-02T12:00:00.000Z",
     "startDate": "2026-10-09T08:00:00.000Z",
@@ -1918,7 +1992,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 1500000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-007",
+          "licensePlate": "B 10007 GHI",
           "brand": "Honda",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -1944,6 +2018,8 @@ export const mockBookings: Booking[] = [
     "deposit": 500000,
     "remainingAmount": 2500000,
     "status": "CONTRACTED",
+    "contractNumber": "KTR-2410-035",
+    "contractDate": "2024-10-15T09:00:00Z",
     "createdAt": "2026-09-01T12:00:00.000Z",
     "updatedAt": "2026-09-02T12:00:00.000Z",
     "startDate": "2026-10-10T08:00:00.000Z",
@@ -1960,7 +2036,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 2500000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-008",
+          "licensePlate": "B 10008 GHI",
           "brand": "Toyota",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -1986,6 +2062,8 @@ export const mockBookings: Booking[] = [
     "deposit": 500000,
     "remainingAmount": 1500000,
     "status": "CONTRACTED",
+    "contractNumber": "KTR-2410-036",
+    "contractDate": "2024-10-15T09:00:00Z",
     "createdAt": "2026-09-01T12:00:00.000Z",
     "updatedAt": "2026-09-02T12:00:00.000Z",
     "startDate": "2026-10-11T08:00:00.000Z",
@@ -2002,7 +2080,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 1500000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-009",
+          "licensePlate": "B 10009 GHI",
           "brand": "Daihatsu",
           "model": "Mobil",
           "categoryName": "MPV Standard"
@@ -2044,7 +2122,7 @@ export const mockBookings: Booking[] = [
         "depositSnapshot": 500000,
         "subtotal": 2500000,
         "vehicleSnapshot": {
-          "licensePlate": "veh-010",
+          "licensePlate": "B 10010 GHI",
           "brand": "Mitsubishi",
           "model": "Mobil",
           "categoryName": "MPV Standard"

@@ -1,4 +1,4 @@
-import { ContractsFeature } from '@/features/modules/rental/contracts/ContractsFeature';
+import { ContractFeature } from '@/features/modules/rental/contracts/ContractFeature';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function ContractsPage() {
-  return <ContractsFeature />;
+  return <ContractFeature />;
 }

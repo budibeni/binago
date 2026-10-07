@@ -9,7 +9,7 @@ export const contractService = {
     // Contracts are Bookings with status >= CONTRACTED
     // To simplify, we include 'CONTRACTED', 'ACTIVE', 'COMPLETED', 'CANCELLED' (if cancelled after contracted, though usually void)
     const validStatuses = ['CONTRACTED', 'ACTIVE', 'COMPLETED', 'CANCELLED'];
-    let contracts = allBookings.filter(b => validStatuses.includes(b.status));
+    let contracts = allBookings.filter(b => validStatuses.includes(b.status) && !!b.contractNumber);
     
     if (filters) {
       if (filters.search) {
@@ -52,13 +52,7 @@ export const contractService = {
     const count = (await bookingService.getBookings()).filter(b => !!b.contractNumber).length + 1;
     const contractNumber = `KTR-2410-${String(count).padStart(3, '0')}`;
 
-    const updated = await bookingService.updateBooking(booking.id, {
-      status: 'CONTRACTED',
-      contractNumber,
-      contractDate: data.contractDate,
-      contractNotes: data.notes || '-',
-      terms: data.terms || '',
-    });
+    const updated = await bookingService.updateBookingStatus(booking.id, 'CONTRACTED');
     
     return updated as RentalContract;
   },
@@ -75,7 +69,7 @@ export const contractService = {
       throw new Error('Hanya kontrak ACTIVE yang dapat diselesaikan (via Pengembalian)');
     }
     
-    const updated = await bookingService.updateBooking(id, { status });
+    const updated = await bookingService.updateBookingStatus(id, status);
     return updated as RentalContract;
   },
   
@@ -86,7 +80,7 @@ export const contractService = {
       throw new Error('Hanya kontrak berstatus DITERBITKAN yang dapat diedit');
     }
 
-    const updated = await bookingService.updateBooking(id, data);
+    const updated = await bookingService.updateBookingStatus(id, data.status as any);
     return updated as RentalContract;
   },
 };

@@ -23,13 +23,13 @@ Berikut adalah daftar fitur yang telah diselesaikan dan diintegrasikan:
 - ✅ **Kategori Tarif** (`/rental/pricing-category`): Manajemen skema harga (Harian, Mingguan, Bulanan).
 - ✅ **Kendaraan Rental** (`/rental/vehicles`): Manajemen alokasi armada dari CORE.
 - ✅ **Booking** (`/rental/bookings`): Reservasi sewa multi-armada dengan snapshot harga.
-- ✅ **Template Kontrak** (`/rental/templates`): Desain surat perjanjian sewa menggunakan Tiptap Editor & Handlebars.
-- ✅ **Kontrak Rental** (`/rental/contracts`): Manajemen dan pencetakan dokumen legal sewa.
-- ✅ **Serah Terima (Handover)** (`/rental/handovers`): Pencatatan kondisi awal dan odometer saat armada keluar.
-- ✅ **Monitoring Armada** (`/rental/monitoring`): Pemantauan *live* masa sewa armada yang sedang berjalan, indikator sisa waktu, dan integrasi WhatsApp.
-- ✅ **Global Pembayaran** (`/rental/payments`): Riwayat transaksi seluruh pembayaran dan laporan pendapatan menggunakan `PanelShell`.
-- ✅ **Produktivitas Armada** (`/rental/productivity`): Laporan utilisasi dan pendapatan armada per bulan & tahun.
-- 🚧 **Pengembalian (Return)** (`/rental/returns`): Pencatatan kondisi akhir dan odometer saat armada kembali. *(Dalam proses/segera diimplementasi)*
+- 🚧 **Template Kontrak** (`/rental/templates`): Desain surat perjanjian sewa menggunakan Tiptap Editor & Handlebars. *(Penyesuaian UI bertahap)*
+- 🚧 **Kontrak Rental** (`/rental/contracts`): Manajemen dan pencetakan dokumen legal sewa. *(Penyesuaian UI bertahap)*
+- 🚧 **Serah Terima (Handover)** (`/rental/handovers`): Pencatatan kondisi awal dan odometer saat armada keluar. *(Penyesuaian UI bertahap)*
+- 🚧 **Monitoring Armada** (`/rental/monitoring`): Pemantauan *live* masa sewa armada yang sedang berjalan, indikator sisa waktu, dan integrasi WhatsApp. *(Penyesuaian UI bertahap)*
+- 🚧 **Global Pembayaran** (`/rental/payments`): Riwayat transaksi seluruh pembayaran dan laporan pendapatan menggunakan `PanelShell`. *(Penyesuaian UI bertahap)*
+- 🚧 **Produktivitas Armada** (`/rental/productivity`): Laporan utilisasi dan pendapatan armada per bulan & tahun. *(Penyesuaian UI bertahap)*
+- 🚧 **Pengembalian (Return)** (`/rental/returns`): Pencatatan kondisi akhir dan odometer saat armada kembali. *(Penyesuaian UI bertahap)*
 
 ## Acuan Pengembangan
 Seluruh pengembangan Modul Rental harus berpedoman pada `AGENTS.md` di *root* repositori.

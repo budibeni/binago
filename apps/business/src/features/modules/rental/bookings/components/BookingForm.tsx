@@ -12,6 +12,7 @@ import { getBookingTranslation } from '../i18n';
 import { formatCurrency } from '@adatrack/utils';
 
 export interface BookingItemData {
+  vehicleSnapshot?: any;
   vehicleId: string;
   rateType: RateType;
   packageId?: string;
@@ -146,8 +147,8 @@ export function BookingForm({
       let unitPrice = item.unitPrice;
       let depositSnapshot = item.depositSnapshot;
 
-      if (item.rateType === 'PACKAGE' && item.packageId && v.packages) {
-        const pkg = v.packages.find(p => p.id === item.packageId);
+      if (item.rateType === 'PACKAGE' && item.packageId && v?.packages) {
+        const pkg = v?.packages?.find(p => p.id === item.packageId);
         if (pkg) {
           unitPrice = pkg.price;
           depositSnapshot = pkg.deposit || 0;
@@ -165,7 +166,7 @@ export function BookingForm({
 
       if (item.subtotal !== subtotal || item.unitPrice !== unitPrice || item.depositSnapshot !== depositSnapshot) {
         hasChanges = true;
-        return { ...item, subtotal, unitPrice, depositSnapshot, packageName: item.rateType === 'PACKAGE' && v.packages ? v.packages.find(p => p.id === item.packageId)?.name : undefined };
+        return { ...item, subtotal, unitPrice, depositSnapshot, packageName: item.rateType === 'PACKAGE' && v.packages ? v?.packages?.find(p => p.id === item.packageId)?.name : undefined };
       }
       return item;
     });
@@ -456,7 +457,7 @@ export function BookingForm({
                               value={item.packageId || ''}
                               onChange={(val) => handleItemChange(index, { packageId: val })}
                               placeholder={t.selectPackage || "Pilih Paket"}
-                              options={(v.packages || []).map(p => ({ value: p.id, label: `${p.name} (${p.durationDays} hari)` }))}
+                              options={(v?.packages || []).map(p => ({ value: p.id, label: `${p.name} (${p.durationDays} hari)` }))}
                             />
                           ) : (
                             <div className="flex gap-2">
@@ -485,8 +486,8 @@ export function BookingForm({
                             const d = new Date(formData.startDate);
                             if (item.rateType === "HOURLY") {
                               d.setHours(d.getHours() + (item.duration || 1));
-                            } else if (item.rateType === "PACKAGE" && item.packageId && v.packages) {
-                              const pkg = v.packages.find((p) => p.id === item.packageId);
+                            } else if (item.rateType === "PACKAGE" && item.packageId && v?.packages) {
+                              const pkg = v?.packages?.find((p) => p.id === item.packageId);
                               d.setDate(d.getDate() + (pkg?.durationDays || 1));
                             } else {
                               d.setDate(d.getDate() + (item.duration || 1));
@@ -573,7 +574,7 @@ export function BookingForm({
                         if (item.rateType === "HOURLY") {
                           d.setHours(d.getHours() + (item.duration || 1));
                         } else if (item.rateType === "PACKAGE" && item.packageId && v?.packages) {
-                          const pkg = v.packages.find((p) => p.id === item.packageId);
+                          const pkg = v?.packages?.find((p) => p.id === item.packageId);
                           d.setDate(d.getDate() + (pkg?.durationDays || 1));
                         } else {
                           d.setDate(d.getDate() + (item.duration || 1));

@@ -2,7 +2,155 @@ import type { Locale } from '@adatrack/types';
 
 export const contractDictionaries = {
   id: {
-    // Form Titles & Sections
+    title: 'Kontrak Rental',
+    createTitle: 'Buat Kontrak',
+    pageSubtitle: 'Kelola pemesanan kendaraan dan booking rental Anda.',
+    searchPlaceholder: 'Cari...',
+    addBooking: 'Tambah',
+    
+    // Status
+    statusDraft: 'Draft',
+    statusBooked: 'Dipesan',
+    statusContracted: 'Diterbitkan',
+    statusPending: 'Menunggu Konfirmasi',
+    statusConfirmed: 'Dikonfirmasi',
+    statusActive: 'Berjalan',
+    statusCompleted: 'Selesai',
+    statusCancelled: 'Dibatalkan',
+    statusAll: 'Semua Status',
+    
+    // Summary Cards
+    summaryTitle: 'Ringkasan',
+    summaryTotal: 'Semua Kontrak',
+    
+    // Panel Labels
+    panelTop: 'Atas',
+    panelRight: 'Kanan',
+    panelBottom: 'Bawah',
+    panelLeft: 'Kiri',
+    hidePanel: 'Sembunyikan',
+    layoutToggleTitle: 'Ubah Posisi Panel',
+    
+    // Filters
+    filterStatus: 'Status',
+    filterBookingDate: 'Tanggal Booking',
+    filterRentalDate: 'Tanggal Sewa',
+    selectDate: 'Pilih tanggal',
+    reset: 'Reset',
+    
+    // Table
+    colNo: 'NO. KONTRAK',
+    colBooking: 'Kontrak',
+    colCustomer: 'Pelanggan',
+    colVehicle: 'Kendaraan',
+    colTypeAndPeriod: 'Tipe & Periode',
+    colContact: 'Kontak',
+    colTotalCost: 'Total Biaya',
+    colExtraServices: 'Layanan Ekstra',
+    colNotes: 'Catatan',
+    colRentalDate: 'TANGGAL SEWA',
+    colDuration: 'DURASI',
+    colTotal: 'TOTAL',
+    colStatus: 'Status',
+    colActions: 'Aksi',
+    
+    // Table values
+    daily: 'Harian',
+    weekly: 'Mingguan',
+    monthly: 'Bulanan',
+    typeCompany: 'Perusahaan',
+    typeIndividual: 'Individu',
+    vehicles: 'Kendaraan',
+    remaining: 'Sisa',
+    paid: 'Lunas',
+    delivery: 'Antar/Jemput',
+    fuel: 'BBM',
+    insurance: 'Asuransi',
+    noExtraServices: 'Tanpa Layanan Ekstra',
+    services: 'Layanan',
+    
+    // Details
+    dp: 'DP',
+    
+    // Create Form Sections
+    sectionGeneral: 'Informasi Utama',
+    sectionTimeLocation: 'Waktu & Lokasi',
+    sectionPricing: 'Detail Pembayaran',
+    sectionAdditional: 'Kebutuhan Tambahan',
+    sectionSummary: 'Ringkasan Booking',
+    
+    // Form Fields
+    fieldCustomer: 'Pelanggan',
+    newCustomer: 'Pelanggan Baru',
+    searchCustomerPlaceholder: 'Cari nama atau nomor telepon pelanggan...',
+    fieldVehicle: 'Kendaraan',
+    selectVehiclePlaceholder: 'Pilih kendaraan rental...',
+    fieldVehicleStatus: 'Status Kendaraan',
+    
+    fieldStartDate: 'Tanggal & Jam Pengambilan',
+    fieldEndDate: 'Tanggal & Jam Pengembalian',
+    fieldPickupLocation: 'Lokasi Pengambilan',
+    fieldDropoffLocation: 'Lokasi Pengembalian',
+    pickupPlaceholder: 'Contoh: Bandara, Stasiun, Kantor',
+    fieldDuration: 'Durasi Sewa',
+    fieldRentalType: 'Tipe Rental',
+    
+    rentalTypeSelfDrive: 'Lepas Kunci',
+    rentalTypeWithDriver: 'Dengan Pengemudi',
+    
+    fieldDailyRate: 'Tarif Harian',
+    fieldWeeklyRate: 'Tarif Mingguan',
+    fieldMonthlyRate: 'Tarif Bulanan',
+    fieldUsedRate: 'Tarif yang Digunakan',
+    fieldTotalEstimate: 'Total Estimasi',
+    fieldDeposit: 'Uang Jaminan (Deposit)',
+    depositPlaceholder: 'Opsional jika tidak ada deposit',
+    fieldPaymentMethod: 'Metode Pembayaran',
+    paymentTransfer: 'Transfer Bank',
+    paymentCash: 'Tunai',
+    paymentCard: 'Kartu Kredit',
+    
+    fieldNotes: 'Catatan',
+    notesPlaceholder: 'Tulis catatan booking (opsional)...',
+    fieldAdditionalNeeds: 'Layanan Ekstra',
+    needDriver: 'Pakai Pengemudi',
+    needDelivery: 'Layanan Antar-Jemput',
+    needFuel: 'BBM Termasuk (Full to Full)',
+    needInsurance: 'Asuransi Kendaraan',
+    needOther: 'Lainnya',
+    
+    remainingEstimate: 'Sisa Pembayaran Estimasi',
+    
+    // Form Actions
+    cancel: 'Batal',
+    save: 'Simpan Booking',
+    cancelBooking: 'Batalkan',
+    
+    // Messages
+    createSuccess: 'Booking berhasil dibuat.',
+    updateSuccess: 'Booking berhasil diperbarui.',
+    overlapError: 'Kendaraan sudah memiliki booking pada periode tersebut.',
+    
+    // Empty State
+    emptyTitle: 'Belum ada Booking',
+    emptyDesc: 'Belum ada data booking kendaraan.',
+
+    // Contract Specifics
+    contractDetail: 'Detail Kontrak',
+    contractDateText: 'Tanggal Kontrak:',
+    bookingRefText: 'Ref. Booking:',
+    depositNotes: '* Ditagih terpisah dari biaya sewa dan akan di-refund utuh saat kendaraan kembali dengan aman.',
+    payContract: 'Bayar',
+    statusIssued: 'Diterbitkan',
+    actionPrint: 'Cetak Kontrak',
+    actionDelete: 'Hapus Dokumen',
+    actionDeleteTitle: 'Tarik/Hapus dokumen kontrak, kembali ke status Booking',
+    actionCancel: 'Batal Sewa',
+    actionCancelTitle: 'Batalkan keseluruhan pesanan sewa',
+    actionSaving: 'Menyimpan...',
+    actionSaveChanges: 'Simpan Perubahan',
+    btnTemplate: 'Template',
+    btnSaveDraft: 'Simpan Kontrak',
     titleSelectBooking: 'Pilih Booking',
     descSelectBooking: 'Pilih booking untuk dibuatkan kontrak.',
     titleBookingSummary: 'Ringkasan Booking',
@@ -10,47 +158,217 @@ export const contractDictionaries = {
     titleNewContractDetail: 'Detail Kontrak Baru',
     descNewContractDetail: 'Lengkapi informasi untuk menerbitkan dokumen kontrak.',
     titleEditContractDetail: 'Ubah Detail Kontrak',
-    
-    // Booking Summary Fields
-    fieldCustomer: 'Pelanggan',
-    fieldBookingNo: 'No. Booking',
-    fieldRentalType: 'Tipe Sewa',
-    fieldStart: 'Mulai',
-    fieldEnd: 'Selesai',
-    fieldTotalAmount: 'Total Tagihan',
-    fieldDays: 'Hari',
-    fieldVehicles: 'Kendaraan',
-    
-    // Form Inputs
     fieldContractDate: 'Tanggal Penerbitan Kontrak',
     descContractDate: 'Tanggal kontrak ini dicetak/diterbitkan.',
-    fieldNotes: 'Catatan Tambahan (Opsional)',
-    descNotes: 'Catatan ini akan muncul pada dokumen yang dicetak.',
     placeholderNotes: 'Tambahkan catatan khusus yang akan dicetak pada dokumen kontrak...',
-    
-    // Actions & Misc
     btnChange: 'Ganti',
     btnViewFullBooking: 'Lihat Booking Lengkap',
-    searchPlaceholder: 'Cari no booking, pelanggan...',
-    notFoundTitle: 'Tidak ditemukan',
-    notFoundDesc: 'Coba kata kunci lain.',
-    
-    // Rental Types
-    rentalTypeSelfDrive: 'Lepas Kunci',
-    rentalTypeWithDriver: 'Dgn Pengemudi',
-    
-    // Warnings
     snapshotTitle: 'Data Terkunci (Snapshot)',
-    snapshotDesc: 'Data periode, tarif, dan total tagihan disalin dari booking dan tidak dapat diubah pada tahap pembuatan kontrak. Silakan ubah dari menu Booking jika diperlukan penyesuaian.',
-    
-    // Statuses
-    statusIssued: 'Diterbitkan',
-    statusActive: 'Berjalan',
-    statusCompleted: 'Selesai',
-    statusCancelled: 'Batal',
+    snapshotDesc: 'Data periode, tarif, dan total tagihan disalin dari booking dan tidak dapat diubah pada tahap pembuatan kontrak.',
+
+    noResultTitle: 'Booking tidak ditemukan',
+    noResultDesc: 'Coba sesuaikan kata kunci atau filter pencarian Anda.',
+
+    selectVehicle: "Pilih Kendaraan",
+    globalDriverFee: "Biaya Pengemudi (Global)",
+    returnText: "Pengembalian",
+    subtotalRental: "Subtotal Sewa",
+    emptyCart: "Keranjang Masih Kosong",
+    emptyCartDesc: "Tambahkan kendaraan untuk mulai mengatur tarif pemesanan.",
+    customerType: "Tipe Pelanggan",
+    companyName: "Nama Perusahaan",
+    fullName: "Nama Lengkap",
+    contact: "Kontak",
+    address: "Alamat",
+    picName: "PIC (Penanggung Jawab)",
+    pickupTime: "Waktu Ambil",
+    returnMaxTime: "Selesai (Maks)",
+    selectPackage: "Pilih Paket",
+    rateDaily: "Harian",
+    rateHourly: "Per Jam",
+    ratePackage: "Paket",
+    multiRate: "Multi Tarif",
+    totalBilling: "Total Tagihan",
+    sectionVehicle: "Daftar Kendaraan",
+    noCustomerSelected: "Belum ada pelanggan yang dipilih",
+    driverFeeText: "Biaya Pengemudi",
+    totalDepositText: "Total Deposit",
+    noVehicleSelected: "Tidak ada kendaraan yang dipilih",
+    bookingSettings: "Pengaturan Booking",
+    bookingSettingsDesc: "Atur status dan tipe penyewaan kendaraan.",
+    selectCustomerDesc: "Pilih pelanggan dari database.",
+    pickupDate: "Tanggal Ambil",
+    pickupTimeOnly: "Jam Ambil",
+    selectVehicleDesc: "Pilih kendaraan yang disewa beserta durasi/paketnya.",
+    add: "Tambah",
+    day: "Hari",
+    hour: "Jam",
+    depositText: "Jaminan",
+    bookingDetail: "Detail Booking",
+    confirmBooking: "Konfirmasi Booking",
+    payBooking: "Bayar",
+    sectionCustomer: "Informasi Pelanggan",
+    sectionPeriod: "Periode Sewa",
+    paymentTab: "Pembayaran",
+    validation: {
+      customerRequired: 'Pelanggan wajib dipilih',
+      vehicleRequired: 'Kendaraan wajib dipilih',
+      startDateRequired: 'Tanggal mulai wajib diisi',
+      endDateRequired: 'Tanggal selesai wajib diisi',
+      rentalTypeRequired: 'Tipe rental wajib dipilih',
+      dateRangeInvalid: 'Tanggal selesai harus setelah tanggal mulai',
+    }
   },
   en: {
-    // Form Titles & Sections
+    title: 'Rental Contracts',
+    createTitle: 'Create Contract',
+    pageSubtitle: 'Manage your vehicle bookings and rental bookings.',
+    searchPlaceholder: 'Search...',
+    addBooking: 'Add',
+    
+    // Status
+    statusDraft: 'Draft',
+    statusBooked: 'Booked',
+    statusContracted: 'Contracted',
+    statusPending: 'Pending Confirmation',
+    statusConfirmed: 'Confirmed',
+    statusActive: 'Active',
+    statusCompleted: 'Completed',
+    statusCancelled: 'Cancelled',
+    statusAll: 'All Statuses',
+    
+    // Summary Cards
+    summaryTitle: 'Summary',
+    summaryTotal: 'All Contracts',
+    
+    // Panel Labels
+    panelTop: 'Top',
+    panelRight: 'Right',
+    panelBottom: 'Bottom',
+    panelLeft: 'Left',
+    hidePanel: 'Hide',
+    layoutToggleTitle: 'Change Panel Position',
+    
+    // Filters
+    filterStatus: 'Status',
+    filterBookingDate: 'Booking Date',
+    filterRentalDate: 'Rental Date',
+    selectDate: 'Select date',
+    reset: 'Reset',
+    
+    // Table
+    colNo: 'CONTRACT NO.',
+    colBooking: 'Kontrak',
+    colCustomer: 'Customer',
+    colVehicle: 'Vehicle',
+    colTypeAndPeriod: 'Type & Period',
+    colContact: 'Contact',
+    colTotalCost: 'Total Cost',
+    colExtraServices: 'Extra Services',
+    colNotes: 'Notes',
+    colRentalDate: 'RENTAL DATE',
+    colDuration: 'DURATION',
+    colTotal: 'TOTAL',
+    colStatus: 'Status',
+    colActions: 'Actions',
+    
+    // Table values
+    daily: 'Daily',
+    weekly: 'Weekly',
+    monthly: 'Monthly',
+    typeCompany: 'Company',
+    typeIndividual: 'Individual',
+    vehicles: 'Vehicles',
+    remaining: 'Remaining',
+    paid: 'Paid',
+    delivery: 'Delivery',
+    fuel: 'Fuel',
+    insurance: 'Insurance',
+    noExtraServices: 'No Extra Services',
+    services: 'Services',
+    
+    // Details
+    dp: 'DP',
+    
+    // Create Form Sections
+    sectionGeneral: 'General Information',
+    sectionTimeLocation: 'Time & Location',
+    sectionPricing: 'Pricing & Payment',
+    sectionAdditional: 'Additional Needs',
+    sectionSummary: 'Booking Summary',
+    
+    // Form Fields
+    fieldCustomer: 'Customer',
+    newCustomer: 'New Customer',
+    searchCustomerPlaceholder: 'Search customer name or phone number...',
+    fieldVehicle: 'Vehicle',
+    selectVehiclePlaceholder: 'Select rental vehicle...',
+    fieldVehicleStatus: 'Vehicle Status',
+    
+    fieldStartDate: 'Pickup Time',
+    fieldEndDate: 'Dropoff Time',
+    fieldPickupLocation: 'Pickup Location',
+    fieldDropoffLocation: 'Dropoff Location',
+    pickupPlaceholder: 'E.g. Airport, Station, Office',
+    fieldDuration: 'Rental Duration',
+    fieldRentalType: 'Rental Type',
+    
+    rentalTypeSelfDrive: 'Self Drive',
+    rentalTypeWithDriver: 'With Driver',
+    
+    fieldDailyRate: 'Daily Rate',
+    fieldWeeklyRate: 'Weekly Rate',
+    fieldMonthlyRate: 'Monthly Rate',
+    fieldUsedRate: 'Used Rate',
+    fieldTotalEstimate: 'Total Estimate',
+    fieldDeposit: 'Security Deposit',
+    depositPlaceholder: 'Optional if no deposit',
+    fieldPaymentMethod: 'Payment Method',
+    paymentTransfer: 'Bank Transfer',
+    paymentCash: 'Cash',
+    paymentCard: 'Credit Card',
+    
+    fieldNotes: 'Notes',
+    notesPlaceholder: 'Write booking notes (optional)...',
+    fieldAdditionalNeeds: 'Extra Services',
+    needDriver: 'Include Driver',
+    needDelivery: 'Delivery & Pickup Service',
+    needFuel: 'Fuel Included (Full to Full)',
+    needInsurance: 'Vehicle Insurance',
+    needOther: 'Other',
+    
+    remainingEstimate: 'Remaining Estimate',
+    
+    // Form Actions
+    cancel: 'Cancel',
+    save: 'Save Booking',
+    cancelBooking: 'Cancel',
+    
+    // Messages
+    createSuccess: 'Booking created successfully.',
+    updateSuccess: 'Booking updated successfully.',
+    overlapError: 'Vehicle already has a booking for the selected period.',
+    
+    // Empty State
+    emptyTitle: 'No Bookings',
+    emptyDesc: 'There are no booking data yet.',
+
+    // Contract Specifics
+    contractDetail: 'Contract Detail',
+    contractDateText: 'Contract Date:',
+    bookingRefText: 'Booking Ref.:',
+    depositNotes: '* Billed separately from rental fees and will be fully refunded upon safe return of the vehicle.',
+    payContract: 'Pay',
+    statusIssued: 'Issued',
+    actionPrint: 'Print Contract',
+    actionDelete: 'Delete Document',
+    actionDeleteTitle: 'Revoke/Delete contract document, return to Booking status',
+    actionCancel: 'Cancel Rental',
+    actionCancelTitle: 'Cancel the entire rental order',
+    actionSaving: 'Saving...',
+    actionSaveChanges: 'Save Changes',
+    btnTemplate: 'Template',
+    btnSaveDraft: 'Save Contract',
     titleSelectBooking: 'Select Booking',
     descSelectBooking: 'Select a booking to create a contract.',
     titleBookingSummary: 'Booking Summary',
@@ -58,47 +376,69 @@ export const contractDictionaries = {
     titleNewContractDetail: 'New Contract Details',
     descNewContractDetail: 'Complete the information to issue the contract document.',
     titleEditContractDetail: 'Edit Contract Details',
-    
-    // Booking Summary Fields
-    fieldCustomer: 'Customer',
-    fieldBookingNo: 'Booking No.',
-    fieldRentalType: 'Rental Type',
-    fieldStart: 'Start',
-    fieldEnd: 'End',
-    fieldTotalAmount: 'Total Amount',
-    fieldDays: 'Days',
-    fieldVehicles: 'Vehicles',
-    
-    // Form Inputs
     fieldContractDate: 'Contract Issuance Date',
-    descContractDate: 'The date this contract is printed/issued.',
-    fieldNotes: 'Additional Notes (Optional)',
-    descNotes: 'These notes will appear on the printed document.',
-    placeholderNotes: 'Add special notes that will be printed on the contract document...',
-    
-    // Actions & Misc
+    descContractDate: 'Date this contract is printed/issued.',
+    placeholderNotes: 'Add special notes to be printed on the contract document...',
     btnChange: 'Change',
     btnViewFullBooking: 'View Full Booking',
-    searchPlaceholder: 'Search booking no, customer...',
-    notFoundTitle: 'Not found',
-    notFoundDesc: 'Try another keyword.',
-    
-    // Rental Types
-    rentalTypeSelfDrive: 'Self Drive',
-    rentalTypeWithDriver: 'With Driver',
-    
-    // Warnings
     snapshotTitle: 'Locked Data (Snapshot)',
-    snapshotDesc: 'Period, rate, and total amount data are copied from the booking and cannot be changed during contract creation. Please change from the Booking menu if adjustments are needed.',
-    
-    // Statuses
-    statusIssued: 'Issued',
-    statusActive: 'Active',
-    statusCompleted: 'Completed',
-    statusCancelled: 'Cancelled',
+    snapshotDesc: 'Period, rate, and total billing data are copied from the booking and cannot be changed during contract creation.',
+
+    noResultTitle: 'Booking not found',
+    noResultDesc: 'Try adjusting your keywords or search filters.',
+
+    selectVehicle: "Select Vehicle",
+    globalDriverFee: "Global Driver Fee",
+    returnText: "Return",
+    subtotalRental: "Rental Subtotal",
+    emptyCart: "Cart is Empty",
+    emptyCartDesc: "Add vehicles to start managing booking rates.",
+    customerType: "Customer Type",
+    companyName: "Company Name",
+    fullName: "Full Name",
+    contact: "Contact",
+    address: "Address",
+    picName: "PIC (Person in Charge)",
+    pickupTime: "Pickup Time",
+    returnMaxTime: "Return (Max)",
+    selectPackage: "Select Package",
+    rateDaily: "Daily",
+    rateHourly: "Hourly",
+    ratePackage: "Package",
+    multiRate: "Multi Rate",
+    totalBilling: "Total Billing",
+    sectionVehicle: "Vehicle List",
+    noCustomerSelected: "No customer selected",
+    driverFeeText: "Driver Fee",
+    totalDepositText: "Total Deposit",
+    noVehicleSelected: "No vehicles selected",
+    bookingSettings: "Booking Settings",
+    bookingSettingsDesc: "Set booking status and rental type.",
+    selectCustomerDesc: "Select customer from database.",
+    pickupDate: "Pickup Date",
+    pickupTimeOnly: "Pickup Time",
+    selectVehicleDesc: "Select rental vehicles and their durations/packages.",
+    add: "Add",
+    day: "Day(s)",
+    hour: "Hour(s)",
+    depositText: "Deposit",
+    bookingDetail: "Booking Detail",
+    confirmBooking: "Confirm Booking",
+    payBooking: "Pay",
+    sectionCustomer: "Customer Information",
+    sectionPeriod: "Rental Period",
+    paymentTab: "Payments",
+    validation: {
+      customerRequired: 'Customer is required',
+      vehicleRequired: 'Vehicle is required',
+      startDateRequired: 'Start date is required',
+      endDateRequired: 'End date is required',
+      rentalTypeRequired: 'Rental type is required',
+      dateRangeInvalid: 'End date must be after start date',
+    }
   }
 };
 
-export function getContractDictionary(locale: Locale) {
+export function getContractTranslation(locale: Locale = 'id') {
   return contractDictionaries[locale] || contractDictionaries.id;
 }

@@ -118,15 +118,15 @@ class BookingService {
     // 3. Generate Snapshots
     const customer = await customerService.getCustomerById(data.customerId);
     const customerSnapshot = customer ? {
-      name: customer.type === 'COMPANY' ? customer.companyName! : customer.name,
+      name: customer.name,
       type: customer.type === 'COMPANY' ? 'Perusahaan' : 'Individu',
       phone: customer.phone,
       email: customer.email,
       address: customer.address,
       city: customer.city,
       province: customer.province,
-      picName: customer.picName,
-      picPhone: customer.picPhone
+      picName: (customer as any).picName,
+      picPhone: (customer as any).picPhone
     } : undefined;
 
     // 4. Resolve Pricing and Build Items
@@ -136,9 +136,9 @@ class BookingService {
       
       const vehicle = await rentalVehicleService.getRentalVehicleByVehicleId(item.vehicleId);
       const vehicleSnapshot = vehicle ? {
-        licensePlate: vehicle.coreVehicle?.licensePlate || item.vehicleId,
+        licensePlate: (vehicle.coreVehicle as any)?.plateNumber || item.vehicleId,
         brand: vehicle.coreVehicle?.brand || '-',
-        model: vehicle.coreVehicle?.model || '-',
+        model: (vehicle.coreVehicle as any)?.vehicleName || '-',
         categoryName: vehicle.categoryName || '-'
       } : undefined;
 

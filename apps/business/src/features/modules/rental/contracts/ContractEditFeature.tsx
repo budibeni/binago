@@ -3,7 +3,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
-import { getContractDictionary } from './i18n';
+import { getContractTranslation } from './i18n';
 import { ChevronLeft } from 'lucide-react';
 
 import { ContractForm } from './components/ContractForm';
@@ -20,7 +20,7 @@ interface ContractEditFeatureProps {
 export function ContractEditFeature({ contractId, open, onOpenChange, onSuccess }: ContractEditFeatureProps) {
   const router = useRouter();
   const locale = useBusinessLocale();
-  const labels = getContractDictionary(locale);
+  const labels = getContractTranslation(locale);
 
   const [contract, setContract] = React.useState<RentalContract | null>(null);
   const [loading, setLoading] = React.useState(true);

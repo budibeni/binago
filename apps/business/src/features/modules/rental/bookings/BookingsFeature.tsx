@@ -13,7 +13,7 @@ import { BookingEditFeature } from './BookingEditFeature';
 import { getBookingTranslation } from './i18n';
 import { cn, formatNumber } from '@adatrack/utils';
 import { trackingNavigationService } from '@/features/core/tracking/services/trackingNavigationService';
-import { PanelShell, type DataTableFilterConfig } from '@adatrack/ui';
+import { PanelShell, type DataTableFilterConfig, ConfirmDialog, toast } from '@adatrack/ui';
 
 function StatCard({ label, value, colorClass, icon: Icon }: { label: string, value: number, colorClass: string, icon?: React.ElementType }) {
   const textColorClass = colorClass.replace(/bg-/g, 'text-');
@@ -56,6 +56,16 @@ export function BookingsFeature() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [editId, setEditId] = useState<string | null>(null);
+  const [confirmDialog, setConfirmDialog] = useState<{
+    open: boolean;
+    title: string;
+    description: string;
+    confirmLabel?: string;
+    variant?: 'danger' | 'warning' | 'primary';
+    icon?: React.ReactNode;
+    onConfirm: () => void;
+  }>({ open: false, title: '', description: '', onConfirm: () => {} });
+
 
   const fetchBookings = React.useCallback(async () => {
     try {
@@ -128,32 +138,51 @@ export function BookingsFeature() {
     console.log('Delete', booking.id);
   };
 
-  const handleConfirm = async (booking: Booking) => {
-    try {
-      await bookingService.updateBookingStatus(booking.id, 'BOOKED');
-      const data = await bookingService.getBookings();
-      setBookings(data);
-      if (detailBooking?.id === booking.id) {
-        setDetailBooking({ ...booking, status: 'BOOKED' });
+  const handleConfirm = (booking: Booking) => {
+    setConfirmDialog({
+      open: true,
+      title: 'Konfirmasi Booking',
+      description: 'Apakah Anda yakin ingin mengonfirmasi pesanan (booking) ini?',
+      confirmLabel: 'Konfirmasi',
+      variant: 'primary',
+      onConfirm: async () => {
+        try {
+          await bookingService.updateBookingStatus(booking.id, 'BOOKED');
+          const data = await bookingService.getBookings();
+          setBookings(data);
+          if (detailBooking?.id === booking.id) {
+            setDetailBooking({ ...booking, status: 'BOOKED' });
+          }
+          toast.success('Booking berhasil dikonfirmasi');
+        } catch (error) {
+          toast.error(error instanceof Error ? error.message : 'Gagal mengonfirmasi booking');
+        }
       }
-      alert('Booking berhasil dikonfirmasi');
-    } catch (error) {
-      alert(error instanceof Error ? error.message : 'Gagal mengonfirmasi booking');
-    }
+    });
   };
 
-  const handleCancel = async (booking: Booking) => {
-    try {
-      await bookingService.updateBookingStatus(booking.id, 'CANCELLED');
-      const data = await bookingService.getBookings();
-      setBookings(data);
-      if (detailBooking?.id === booking.id) {
-        setDetailBooking({ ...booking, status: 'CANCELLED' });
+  const handleCancel = (booking: Booking) => {
+    setConfirmDialog({
+      open: true,
+      title: 'Batalkan Booking',
+      description: 'Apakah Anda yakin ingin membatalkan pesanan (booking) ini? Aksi ini tidak dapat dibatalkan.',
+      confirmLabel: 'Batalkan',
+      variant: 'danger',
+      icon: <XCircle className="w-6 h-6" strokeWidth={1.5} />,
+      onConfirm: async () => {
+        try {
+          await bookingService.updateBookingStatus(booking.id, 'CANCELLED');
+          const data = await bookingService.getBookings();
+          setBookings(data);
+          if (detailBooking?.id === booking.id) {
+            setDetailBooking({ ...booking, status: 'CANCELLED' });
+          }
+          toast.success('Booking berhasil dibatalkan');
+        } catch (error) {
+          toast.error(error instanceof Error ? error.message : 'Gagal membatalkan booking');
+        }
       }
-      alert('Booking berhasil dibatalkan');
-    } catch (error) {
-      alert(error instanceof Error ? error.message : 'Gagal membatalkan booking');
-    }
+    });
   };
 
   const dtLabels = useMemo(() => {
@@ -191,8 +220,8 @@ export function BookingsFeature() {
         type: 'pills-single',
         options: [
           { value: 'BOOKED', label: labels.statusBooked || 'Dipesan', colorClass: 'bg-amber-500', activeClass: 'bg-amber-500/15 border-amber-500/40 text-amber-500' },
-          { value: 'CONTRACTED', label: labels.statusContracted || 'Dikontrak', colorClass: 'bg-blue-500', activeClass: 'bg-blue-500/15 border-blue-500/40 text-blue-500' },
-          { value: 'ACTIVE', label: labels.statusActive || 'Aktif', colorClass: 'bg-success', activeClass: 'bg-success/15 border-success/40 text-success' },
+          { value: 'CONTRACTED', label: labels.statusContracted || 'Diterbitkan', colorClass: 'bg-blue-500', activeClass: 'bg-blue-500/15 border-blue-500/40 text-blue-500' },
+          { value: 'ACTIVE', label: labels.statusActive || 'Berjalan', colorClass: 'bg-success', activeClass: 'bg-success/15 border-success/40 text-success' },
           { value: 'COMPLETED', label: labels.statusCompleted || 'Selesai', colorClass: 'bg-neutral-500', activeClass: 'bg-neutral-500/15 border-neutral-500/40 text-neutral-500' },
           { value: 'CANCELLED', label: labels.statusCancelled || 'Batal', colorClass: 'bg-danger', activeClass: 'bg-danger/15 border-danger/40 text-danger' },
         ],
@@ -227,8 +256,8 @@ export function BookingsFeature() {
           <StatCard label={labels.summaryTotal || 'Total Booking'} value={stats.all} colorClass="bg-foreground" icon={List} />
           <StatCard label={labels.statusDraft || 'Draft'} value={stats.draft} colorClass="bg-neutral-400" icon={FileEdit} />
           <StatCard label={labels.statusBooked || 'Dipesan'} value={stats.booked} colorClass="bg-amber-500" icon={Clock} />
-          <StatCard label={labels.statusContracted || 'Dikontrak'} value={stats.contracted} colorClass="bg-blue-500" icon={CheckCircle2} />
-          <StatCard label={labels.statusActive || 'Aktif'} value={stats.active} colorClass="bg-success" icon={Car} />
+          <StatCard label={labels.statusContracted || 'Diterbitkan'} value={stats.contracted} colorClass="bg-blue-500" icon={CheckCircle2} />
+          <StatCard label={labels.statusActive || 'Berjalan'} value={stats.active} colorClass="bg-success" icon={Car} />
           <StatCard label={labels.statusCompleted || 'Selesai'} value={stats.completed} colorClass="bg-neutral-500" icon={CheckCircle2} />
           <StatCard label={labels.statusCancelled || 'Batal'} value={stats.cancelled} colorClass="bg-danger" icon={XCircle} />
         </div>
@@ -278,6 +307,20 @@ export function BookingsFeature() {
         onConfirm={handleConfirm}
         onCancel={handleCancel}
         onOpenMap={handleOpenMapMulti}
+      />
+
+      <ConfirmDialog
+        open={confirmDialog.open}
+        onOpenChange={(open) => setConfirmDialog(prev => ({ ...prev, open }))}
+        title={confirmDialog.title}
+        description={confirmDialog.description}
+        confirmLabel={confirmDialog.confirmLabel}
+        variant={confirmDialog.variant}
+        icon={confirmDialog.icon}
+        onConfirm={() => {
+          confirmDialog.onConfirm();
+          setConfirmDialog(prev => ({ ...prev, open: false }));
+        }}
       />
 
       <BookingEditFeature 

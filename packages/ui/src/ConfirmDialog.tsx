@@ -17,6 +17,7 @@ export interface ConfirmDialogProps {
   cancelLabel?: string;
   variant?: 'danger' | 'warning' | 'primary';
   isLoading?: boolean;
+  icon?: React.ReactNode;
 }
 
 export function ConfirmDialog({
@@ -30,6 +31,7 @@ export function ConfirmDialog({
   cancelLabel = 'Batal',
   variant = 'danger',
   isLoading = false,
+  icon,
 }: ConfirmDialogProps) {
   const handleCancel = () => {
     if (onCancel) onCancel();
@@ -38,23 +40,24 @@ export function ConfirmDialog({
 
   const getIconColor = () => {
     if (variant === 'danger') return 'text-danger';
-    if (variant === 'warning') return 'text-warning-600';
+    if (variant === 'warning') return 'text-warning';
     return 'text-primary';
   };
 
   const getBgColor = () => {
     if (variant === 'danger') return 'bg-danger/10';
-    if (variant === 'warning') return 'bg-warning-500/10';
+    if (variant === 'warning') return 'bg-warning/10';
     return 'bg-primary/10';
   };
 
   const getConfirmButtonClass = () => {
     if (variant === 'danger') return 'bg-danger text-white hover:bg-danger-600 border-transparent';
-    if (variant === 'warning') return 'bg-warning-500 text-white hover:bg-warning-600 border-transparent';
+    if (variant === 'warning') return 'bg-warning text-white hover:bg-warning/90 border-transparent';
     return 'bg-primary text-primary-foreground hover:bg-primary/90 border-transparent';
   };
 
   const getIcon = () => {
+    if (icon) return icon;
     if (variant === 'danger') return <Trash2 className="w-6 h-6" strokeWidth={1.5} />;
     if (variant === 'warning') return <AlertTriangle className="w-6 h-6" strokeWidth={1.5} />;
     return <Check className="w-6 h-6" strokeWidth={1.5} />;
