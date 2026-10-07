@@ -72,7 +72,7 @@ export function GeofenceFeature({ locale = 'id' }: GeofenceFeatureProps) {
         group_id: data.groupId ? parseInt(data.groupId.toString(), 10) : undefined,
         description: data.description || '',
         status: data.status || 'active',
-        vehicle_ids: data.vehicleIds || [],
+        vehicle_ids: data.vehicleIds ? data.vehicleIds.map((id: string | number) => parseInt(id.toString(), 10)) : [],
       };
       
       if (view === 'edit' && editingGeofence) {
