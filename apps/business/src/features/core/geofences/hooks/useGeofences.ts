@@ -30,7 +30,7 @@ export function useGeofences(filters?: { search?: string; status?: string; group
           description: g.description || '-',
           geometry: geometry,
           status: g.status || 'active',
-          groupId: g.group_id ? String(g.group_id) : undefined,
+          groupId: (g.group_id || g.groupId) ? String(g.group_id || g.groupId) : undefined,
           vehicleIds: g.vehicle_ids ? g.vehicle_ids.map(String) : [],
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
