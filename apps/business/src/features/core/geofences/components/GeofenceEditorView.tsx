@@ -5,7 +5,7 @@ import { Hexagon, Square, Waypoints, MapPin, ChevronDown, ChevronUp, Trash2 } fr
 import { cn } from '@adatrack/utils';
 import { Button, InputString, InputSelect, InputTextarea, InputMultiSelect } from '@adatrack/ui';
 import { api } from '@adatrack/utils';
-import { geofenceService } from '@/data/services';
+import { geofenceService, groupService } from '@/data/services';
 import { GeofenceMap } from './GeofenceMap';
 import type { Geofence } from '../types';
 import type { MapGeometry } from '@adatrack/maps';
@@ -41,10 +41,16 @@ export function GeofenceEditorView({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [vehicles, setVehicles] = useState<{value: string, label: string}[]>([]);
+  const [groups, setGroups] = useState<{value: string, label: string}[]>([]);
+  
   useEffect(() => {
     api.get('/vehicles').then((res: any) => {
       const vData = Array.isArray(res) ? res : (res.data || []);
       setVehicles(vData.map((v: any) => ({ value: String(v.id), label: v.plate_number })));
+    }).catch(console.error);
+    
+    groupService.getGeofenceGroups().then((res: any[]) => {
+      setGroups(res.map(g => ({ value: g.id, label: g.name })));
     }).catch(console.error);
   }, []);
 
@@ -123,7 +129,7 @@ export function GeofenceEditorView({
                 onChange={(val) => setFormData({ ...formData, groupId: val === 'none' ? '' : val })}
                 options={[
                   { value: 'none', label: `-- ${t.unassigned} --` },
-                  ...([] as any[]).map(group => ({ value: group.id, label: group.name }))
+                  ...groups
                 ]}
               />
 
