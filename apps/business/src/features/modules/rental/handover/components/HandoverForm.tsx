@@ -159,7 +159,7 @@ export function HandoverForm({ contract, handedOverItemIds = [], labels, onSubmi
             <div>
               <p className="text-[13px] font-normal text-neutral-500 mb-1">Layanan</p>
               <p className="text-[13px] font-semibold text-foreground">
-                {contract.rentalType === 'SELF_DRIVE' ? 'Lepas Kunci' : 'Dgn Sopir'} <span className="text-muted-foreground font-normal">({contract.rateType === 'HOURLY' ? 'Per Jam' : contract.rateType === 'DAILY' ? 'Harian' : 'Paket'})</span>
+                {contract.rentalType === 'SELF_DRIVE' ? 'Lepas Kunci' : 'Dgn Sopir'} 
               </p>
             </div>
           </div>

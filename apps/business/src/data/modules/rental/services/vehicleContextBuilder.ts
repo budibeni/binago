@@ -50,9 +50,9 @@ export async function buildRentalVehicleContext(coreVehicleId: string, locale: L
         });
         
         const targetItem = activeContract.booking?.items?.find(item => item.vehicleId === coreVehicleId);
-        const vehicleRate = targetItem?.rateSnapshot || 0;
+        const vehicleRate = targetItem?.unitPrice || 0;
         
-        const rateLabel = activeContract.rateType === 'HOURLY' ? (isEn ? 'hour' : 'jam') : activeContract.rateType === 'DAILY' ? (isEn ? 'day' : 'hari') : (isEn ? 'package' : 'paket');
+        const rateLabel = targetItem?.rateType === 'HOURLY' ? (isEn ? 'hour' : 'jam') : targetItem?.rateType === 'DAILY' ? (isEn ? 'day' : 'hari') : (isEn ? 'package' : 'paket');
         data.push({ 
           label: isEn ? 'Rate' : 'Tarif', 
           value: new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(vehicleRate) + ` / ${rateLabel}`,

@@ -104,7 +104,7 @@ function buildColumns(
       size: 200,
       cell: ({ row }) => {
         const b = row.original;
-        const rateTypeLabel = b.rateType === 'HOURLY' ? 'Per Jam' : b.rateType === 'DAILY' ? (labels.daily || 'Harian') : (b.packageName || 'Paket');
+        const rateTypeLabel = `${b.items?.length || 0} Unit Kendaraan`;
         const rentalTypeLabel = b.rentalType === 'SELF_DRIVE' ? (labels.selfDrive || 'Lepas Kunci') : (labels.withDriver || 'Dengan Pengemudi');
 
         let periodColorClass = 'text-muted-foreground';
@@ -269,36 +269,7 @@ function buildColumns(
         );
       },
     },
-    // --- Layanan Ekstra ---
-    {
-      id: 'extraServices',
-      accessorFn: (row) => [row.needDelivery, row.needFuel, row.needInsurance].join(','),
-      header: labels.colExtraServices || 'Layanan Ekstra',
-      enableSorting: false,
-      size: 160,
-      cell: ({ row }) => {
-        const b = row.original;
-        const services = [];
-        if (b.needDelivery) services.push(labels.delivery || 'Antar/Jemput');
-        if (b.needFuel) services.push(labels.fuel || 'BBM');
-        if (b.needInsurance) services.push(labels.insurance || 'Asuransi');
 
-        if (services.length === 0) {
-          return <span className="text-[11px] text-muted-foreground italic">{labels.noExtraServices || 'Tanpa Layanan Ekstra'}</span>;
-        }
-
-        return (
-          <div className="flex flex-col gap-0.5 py-1">
-            <span className="text-[13px] font-normal text-foreground truncate" title={services.join(', ')}>
-              {services.join(', ')}
-            </span>
-            <span className="text-[11px] text-muted-foreground">
-              {services.length} {labels.services || 'Layanan'}
-            </span>
-          </div>
-        );
-      }
-    },
     // --- Catatan ---
     {
       id: 'notes',

@@ -47,12 +47,15 @@ export function BookingCreateFeature({ open, onOpenChange, onSuccess }: BookingC
 
       await bookingService.createBooking({
         customerId: formData.customerId,
-        vehicleIds: formData.vehicleIds,
+        items: formData.items,
         startDate: formData.startDate,
-        endDate: formData.endDate,
+        endDate: (formData as any).endDate,
+        duration: (formData as any).duration,
         rentalType: formData.rentalType,
-        rateType: formData.rateType,
         deposit: formData.deposit,
+        driverFee: formData.driverFee,
+        pickupLocation: formData.pickupLocation,
+        dropoffLocation: formData.dropoffLocation,
         notes: formData.notes
       });
 

@@ -16,7 +16,10 @@ export interface BookingItem {
   endDate: string; // ISO String
   duration: number; // in days
   rateType: RateType;
-  rateSnapshot: number; // Snapshot of the resolved rate
+  packageId?: string;
+  packageName?: string;
+  unitPrice: number; // Snapshot of the resolved rate (hourly/daily/package price)
+  depositSnapshot: number; // Snapshot of deposit for this vehicle
   subtotal: number;
   
   // Relations (populated for UI)
@@ -31,21 +34,14 @@ export interface Booking {
   endDate: string; // ISO String (Main period)
   duration: number; // in days
   rentalType: RentalType;
-  rateType: RateType;
-  packageId?: string;
-  packageName?: string;
   totalAmount: number;
   deposit: number;
   remainingAmount: number;
   driverFee?: number;
   status: BookingStatus;
-  paymentMethod?: string;
   pickupLocation?: string;
   dropoffLocation?: string;
   notes?: string;
-  needDelivery?: boolean;
-  needFuel?: boolean;
-  needInsurance?: boolean;
   createdAt: string;
   updatedAt: string;
   
@@ -66,16 +62,21 @@ export interface BookingFilters {
 
 export const getBookingFormSchema = (t: Record<string, any>) => z.object({
   customerId: z.string().min(1, t.customerRequired || 'Pelanggan wajib dipilih'),
-  vehicleIds: z.array(z.string()).min(1, t.vehicleRequired || 'Pilih minimal satu kendaraan'),
+  items: z.array(z.object({
+    vehicleId: z.string(),
+    rateType: z.enum(['HOURLY', 'DAILY', 'PACKAGE']),
+    packageId: z.string().optional(),
+    packageName: z.string().optional(),
+    unitPrice: z.number(),
+    depositSnapshot: z.number(),
+    subtotal: z.number(),
+  })).min(1, t.vehicleRequired || 'Pilih minimal satu kendaraan'),
   startDate: z.string().min(1, t.startDateRequired || 'Tanggal mulai wajib diisi'),
   endDate: z.string().min(1, t.endDateRequired || 'Tanggal selesai wajib diisi'),
   rentalType: z.enum(['SELF_DRIVE', 'WITH_DRIVER'], t.rentalTypeRequired || 'Tipe rental wajib dipilih'),
   pickupLocation: z.string().optional(),
   dropoffLocation: z.string().optional(),
   paymentMethod: z.string().optional(),
-  rateType: z.enum(['HOURLY', 'DAILY', 'PACKAGE']).optional(),
-  packageId: z.string().optional(),
-  packageName: z.string().optional(),
   deposit: z.number().optional(),
   driverFee: z.number().optional(),
   needDelivery: z.boolean().optional(),

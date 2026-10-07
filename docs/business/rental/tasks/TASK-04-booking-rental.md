@@ -71,7 +71,10 @@ export interface BookingItem {
   endDate: string; 
   duration: number; // durasi (jam/hari)
   rateType: RateType;
-  rateSnapshot: number; 
+  packageId?: string;            // ID paket (jika PACKAGE)
+  packageName?: string;          // Nama paket (jika PACKAGE)
+  unitPrice: number;             // Snapshot harga bekuan (harian/jam/paket)
+  depositSnapshot: number;       // Snapshot uang jaminan untuk kendaraan ini
   subtotal: number;
   vehicle?: RentalVehicle; // View Model relation
 }
@@ -84,9 +87,6 @@ export interface Booking {
   endDate: string;               // Tanggal Selesai Global
   duration: number;              
   rentalType: RentalType;        // Lepas Kunci / Dengan Pengemudi
-  rateType: RateType;
-  packageId?: string;            // ID paket (jika PACKAGE)
-  packageName?: string;          // Nama paket (jika PACKAGE)
   totalAmount: number;           // Total Invoice
   deposit: number;               // Titipan Jaminan
   remainingAmount: number;       // Sisa tagihan
@@ -118,5 +118,5 @@ export interface Booking {
 
 ## 6. Status Verifikasi & Hasil
 
-- **Status:** BLOCKED / NOT STARTED
-- **Verifikasi:** Dalam tahapan diskusi dan refactor arsitektur awal. Perlu melakukan standardisasi tabel dan komponen view.
+- **Status:** IN PROGRESS
+- **Verifikasi:** Tahap refactor kerangka UI Form Pemesanan (Shopping Cart Style).

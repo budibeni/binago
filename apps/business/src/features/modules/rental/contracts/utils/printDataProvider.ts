@@ -58,7 +58,7 @@ export function getRentalContractPrintData(contract: RentalContract) {
     startDate: formatDate(contract.startDate),
     endDate: formatDate(contract.endDate),
     rentalType: contract.rentalType === 'SELF_DRIVE' ? 'Lepas Kunci' : 'Dengan Pengemudi',
-    rateType: contract.rateType || '-',
+    
     totalAmount: formatCurrency(contract.totalAmount),
     deposit: formatCurrency(contract.deposit),
     remainingAmount: formatCurrency(contract.remainingAmount),

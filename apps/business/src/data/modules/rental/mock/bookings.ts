@@ -15,7 +15,6 @@ export const mockBookings: Booking[] = [
     "startDate": "2026-10-15T08:00:00.000Z",
     "endDate": "2026-10-20T18:00:00.000Z",
     "duration": 5,
-    "rateType": "DAILY",
     "items": Array.from({ length: 12 }).map((_, i) => ({
       "id": `res-mega-001-item-${i+1}`,
       "bookingId": "res-mega-001",
@@ -24,7 +23,8 @@ export const mockBookings: Booking[] = [
       "endDate": "2026-10-20T18:00:00.000Z",
       "duration": 5,
       "rateType": "DAILY" as any,
-      "rateSnapshot": 400000,
+      "unitPrice": 400000,
+        "depositSnapshot": 500000,
       "subtotal": 2000000
     }))
   },
@@ -42,17 +42,17 @@ export const mockBookings: Booking[] = [
     "startDate": "2026-09-12T08:00:00.000Z",
     "endDate": "2026-09-15T18:00:00.000Z",
     "duration": 3,
-    "rateType": "DAILY",
     "items": [
       {
         "id": "res-completed-001-item-1",
         "bookingId": "res-completed-001",
         "vehicleId": "veh-008",
+      "rateType": "DAILY",
         "startDate": "2026-09-12T08:00:00.000Z",
         "endDate": "2026-09-15T18:00:00.000Z",
         "duration": 3,
-        "rateType": "DAILY",
-        "rateSnapshot": 400000,
+        "unitPrice": 400000,
+        "depositSnapshot": 500000,
         "subtotal": 1200000
       }
     ]
@@ -71,17 +71,17 @@ export const mockBookings: Booking[] = [
     "startDate": "2026-10-05T08:00:00.000Z",
     "endDate": "2026-10-10T18:00:00.000Z",
     "duration": 5,
-    "rateType": "DAILY",
     "items": [
       {
         "id": "res-cancelled-001-item-1",
         "bookingId": "res-cancelled-001",
         "vehicleId": "veh-009",
+      "rateType": "DAILY",
         "startDate": "2026-10-05T08:00:00.000Z",
         "endDate": "2026-10-10T18:00:00.000Z",
         "duration": 5,
-        "rateType": "DAILY",
-        "rateSnapshot": 500000,
+        "unitPrice": 500000,
+        "depositSnapshot": 500000,
         "subtotal": 2500000
       }
     ]
@@ -100,39 +100,41 @@ export const mockBookings: Booking[] = [
     "startDate": "2026-08-23T12:00:00.000Z",
     "endDate": "2026-08-28T12:00:00.000Z",
     "duration": 5,
-    "rateType": "DAILY",
     "items": [
       {
         "id": "res-001-item-1",
         "bookingId": "res-001",
         "vehicleId": "veh-001",
+      "rateType": "DAILY",
         "startDate": "2026-08-23T12:00:00.000Z",
         "endDate": "2026-08-28T12:00:00.000Z",
         "duration": 5,
-        "rateType": "DAILY",
-        "rateSnapshot": 400000,
+        "unitPrice": 400000,
+        "depositSnapshot": 500000,
         "subtotal": 2000000
       },
       {
         "id": "res-001-item-2",
         "bookingId": "res-001",
         "vehicleId": "veh-004",
+      "rateType": "DAILY",
         "startDate": "2026-08-23T12:00:00.000Z",
         "endDate": "2026-08-28T12:00:00.000Z",
         "duration": 5,
-        "rateType": "DAILY",
-        "rateSnapshot": 400000,
+        "unitPrice": 400000,
+        "depositSnapshot": 500000,
         "subtotal": 2000000
       },
       {
         "id": "res-001-item-3",
         "bookingId": "res-001",
         "vehicleId": "veh-005",
+      "rateType": "DAILY",
         "startDate": "2026-08-23T12:00:00.000Z",
         "endDate": "2026-08-28T12:00:00.000Z",
         "duration": 5,
-        "rateType": "DAILY",
-        "rateSnapshot": 400000,
+        "unitPrice": 400000,
+        "depositSnapshot": 500000,
         "subtotal": 2000000
       }
     ]
@@ -151,28 +153,29 @@ export const mockBookings: Booking[] = [
     "startDate": "2026-08-23T12:00:00.000Z",
     "endDate": "2026-08-28T12:00:00.000Z",
     "duration": 5,
-    "rateType": "DAILY",
     "items": [
       {
         "id": "res-002-item-1",
         "bookingId": "res-002",
         "vehicleId": "veh-002",
+      "rateType": "DAILY",
         "startDate": "2026-08-23T12:00:00.000Z",
         "endDate": "2026-08-28T12:00:00.000Z",
         "duration": 5,
-        "rateType": "DAILY",
-        "rateSnapshot": 400000,
+        "unitPrice": 400000,
+        "depositSnapshot": 500000,
         "subtotal": 2000000
       },
       {
         "id": "res-002-item-2",
         "bookingId": "res-002",
         "vehicleId": "veh-007",
+      "rateType": "DAILY",
         "startDate": "2026-08-23T12:00:00.000Z",
         "endDate": "2026-08-28T12:00:00.000Z",
         "duration": 5,
-        "rateType": "DAILY",
-        "rateSnapshot": 400000,
+        "unitPrice": 400000,
+        "depositSnapshot": 500000,
         "subtotal": 2000000
       }
     ]
@@ -191,17 +194,17 @@ export const mockBookings: Booking[] = [
     "startDate": "2026-08-23T12:00:00.000Z",
     "endDate": "2026-08-28T12:00:00.000Z",
     "duration": 5,
-    "rateType": "DAILY",
     "items": [
       {
         "id": "res-003-item-1",
         "bookingId": "res-003",
         "vehicleId": "veh-003",
+      "rateType": "DAILY",
         "startDate": "2026-08-23T12:00:00.000Z",
         "endDate": "2026-08-28T12:00:00.000Z",
         "duration": 5,
-        "rateType": "DAILY",
-        "rateSnapshot": 400000,
+        "unitPrice": 400000,
+        "depositSnapshot": 500000,
         "subtotal": 2000000
       }
     ]
@@ -220,17 +223,17 @@ export const mockBookings: Booking[] = [
     "startDate": "2026-08-23T12:00:00.000Z",
     "endDate": "2026-08-28T12:00:00.000Z",
     "duration": 5,
-    "rateType": "DAILY",
     "items": [
       {
         "id": "res-004-item-1",
         "bookingId": "res-004",
         "vehicleId": "veh-004",
+      "rateType": "DAILY",
         "startDate": "2026-08-23T12:00:00.000Z",
         "endDate": "2026-08-28T12:00:00.000Z",
         "duration": 5,
-        "rateType": "DAILY",
-        "rateSnapshot": 400000,
+        "unitPrice": 400000,
+        "depositSnapshot": 500000,
         "subtotal": 2000000
       }
     ]
@@ -249,17 +252,17 @@ export const mockBookings: Booking[] = [
     "startDate": "2026-08-23T12:00:00.000Z",
     "endDate": "2026-08-28T12:00:00.000Z",
     "duration": 5,
-    "rateType": "DAILY",
     "items": [
       {
         "id": "res-005-item-1",
         "bookingId": "res-005",
         "vehicleId": "veh-005",
+      "rateType": "DAILY",
         "startDate": "2026-08-23T12:00:00.000Z",
         "endDate": "2026-08-28T12:00:00.000Z",
         "duration": 5,
-        "rateType": "DAILY",
-        "rateSnapshot": 400000,
+        "unitPrice": 400000,
+        "depositSnapshot": 500000,
         "subtotal": 2000000
       }
     ]
@@ -278,17 +281,17 @@ export const mockBookings: Booking[] = [
     "startDate": "2026-08-27T12:00:00.000Z",
     "endDate": "2026-08-30T12:00:00.000Z",
     "duration": 3,
-    "rateType": "DAILY",
     "items": [
       {
         "id": "res-006-item-1",
         "bookingId": "res-006",
         "vehicleId": "veh-006",
+      "rateType": "DAILY",
         "startDate": "2026-08-27T12:00:00.000Z",
         "endDate": "2026-08-30T12:00:00.000Z",
         "duration": 3,
-        "rateType": "DAILY",
-        "rateSnapshot": 400000,
+        "unitPrice": 400000,
+        "depositSnapshot": 500000,
         "subtotal": 1200000
       }
     ]
@@ -307,17 +310,17 @@ export const mockBookings: Booking[] = [
     "startDate": "2026-08-27T12:00:00.000Z",
     "endDate": "2026-08-30T12:00:00.000Z",
     "duration": 3,
-    "rateType": "DAILY",
     "items": [
       {
         "id": "res-007-item-1",
         "bookingId": "res-007",
         "vehicleId": "veh-007",
+      "rateType": "DAILY",
         "startDate": "2026-08-27T12:00:00.000Z",
         "endDate": "2026-08-30T12:00:00.000Z",
         "duration": 3,
-        "rateType": "DAILY",
-        "rateSnapshot": 400000,
+        "unitPrice": 400000,
+        "depositSnapshot": 500000,
         "subtotal": 1200000
       }
     ]
@@ -336,17 +339,17 @@ export const mockBookings: Booking[] = [
     "startDate": "2026-08-27T12:00:00.000Z",
     "endDate": "2026-08-30T12:00:00.000Z",
     "duration": 3,
-    "rateType": "DAILY",
     "items": [
       {
         "id": "res-008-item-1",
         "bookingId": "res-008",
         "vehicleId": "veh-008",
+      "rateType": "DAILY",
         "startDate": "2026-08-27T12:00:00.000Z",
         "endDate": "2026-08-30T12:00:00.000Z",
         "duration": 3,
-        "rateType": "DAILY",
-        "rateSnapshot": 400000,
+        "unitPrice": 400000,
+        "depositSnapshot": 500000,
         "subtotal": 1200000
       }
     ]
@@ -365,17 +368,17 @@ export const mockBookings: Booking[] = [
     "startDate": "2026-08-15T12:00:00.000Z",
     "endDate": "2026-08-18T12:00:00.000Z",
     "duration": 3,
-    "rateType": "DAILY",
     "items": [
       {
         "id": "res-009-item-1",
         "bookingId": "res-009",
         "vehicleId": "veh-011",
+      "rateType": "DAILY",
         "startDate": "2026-08-15T12:00:00.000Z",
         "endDate": "2026-08-18T12:00:00.000Z",
         "duration": 3,
-        "rateType": "DAILY",
-        "rateSnapshot": 400000,
+        "unitPrice": 400000,
+        "depositSnapshot": 500000,
         "subtotal": 1200000
       }
     ]
@@ -394,17 +397,17 @@ export const mockBookings: Booking[] = [
     "startDate": "2026-08-15T12:00:00.000Z",
     "endDate": "2026-08-18T12:00:00.000Z",
     "duration": 3,
-    "rateType": "DAILY",
     "items": [
       {
         "id": "res-010-item-1",
         "bookingId": "res-010",
         "vehicleId": "veh-012",
+      "rateType": "DAILY",
         "startDate": "2026-08-15T12:00:00.000Z",
         "endDate": "2026-08-18T12:00:00.000Z",
         "duration": 3,
-        "rateType": "DAILY",
-        "rateSnapshot": 400000,
+        "unitPrice": 400000,
+        "depositSnapshot": 500000,
         "subtotal": 1200000
       }
     ]
@@ -423,17 +426,17 @@ export const mockBookings: Booking[] = [
     "startDate": "2026-08-15T12:00:00.000Z",
     "endDate": "2026-08-18T12:00:00.000Z",
     "duration": 3,
-    "rateType": "DAILY",
     "items": [
       {
         "id": "res-011-item-1",
         "bookingId": "res-011",
         "vehicleId": "veh-013",
+      "rateType": "DAILY",
         "startDate": "2026-08-15T12:00:00.000Z",
         "endDate": "2026-08-18T12:00:00.000Z",
         "duration": 3,
-        "rateType": "DAILY",
-        "rateSnapshot": 400000,
+        "unitPrice": 400000,
+        "depositSnapshot": 500000,
         "subtotal": 1200000
       }
     ]
@@ -452,17 +455,17 @@ export const mockBookings: Booking[] = [
     "startDate": "2026-08-20T12:00:00.000Z",
     "endDate": "2026-08-22T12:00:00.000Z",
     "duration": 2,
-    "rateType": "DAILY",
     "items": [
       {
         "id": "res-012-item-1",
         "bookingId": "res-012",
         "vehicleId": "veh-014",
+      "rateType": "DAILY",
         "startDate": "2026-08-20T12:00:00.000Z",
         "endDate": "2026-08-22T12:00:00.000Z",
         "duration": 2,
-        "rateType": "DAILY",
-        "rateSnapshot": 400000,
+        "unitPrice": 400000,
+        "depositSnapshot": 500000,
         "subtotal": 800000
       }
     ]
@@ -481,17 +484,17 @@ export const mockBookings: Booking[] = [
     "startDate": "2026-08-30T12:00:00.000Z",
     "endDate": "2026-09-01T12:00:00.000Z",
     "duration": 2,
-    "rateType": "DAILY",
     "items": [
       {
         "id": "res-013-item-1",
         "bookingId": "res-013",
         "vehicleId": "veh-015",
+      "rateType": "DAILY",
         "startDate": "2026-08-30T12:00:00.000Z",
         "endDate": "2026-09-01T12:00:00.000Z",
         "duration": 2,
-        "rateType": "DAILY",
-        "rateSnapshot": 400000,
+        "unitPrice": 400000,
+        "depositSnapshot": 500000,
         "subtotal": 800000
       }
     ]
@@ -511,17 +514,17 @@ export const mockBookings: Booking[] = [
     "startDate": "2026-08-30T12:00:00.000Z",
     "endDate": "2026-09-01T12:00:00.000Z",
     "duration": 2,
-    "rateType": "DAILY",
     "items": [
       {
         "id": "res-015-item-1",
         "bookingId": "res-015",
         "vehicleId": "veh-015",
+      "rateType": "DAILY",
         "startDate": "2026-08-30T12:00:00.000Z",
         "endDate": "2026-09-01T12:00:00.000Z",
         "duration": 2,
-        "rateType": "DAILY",
-        "rateSnapshot": 500000,
+        "unitPrice": 500000,
+        "depositSnapshot": 500000,
         "subtotal": 1000000
       }
     ]
@@ -540,17 +543,17 @@ export const mockBookings: Booking[] = [
     "startDate": "2026-10-17T08:00:00.000Z",
     "endDate": "2026-10-19T08:00:00.000Z",
     "duration": 2,
-    "rateType": "DAILY",
     "items": [
       {
         "id": "res-016-item-1",
         "bookingId": "res-016",
         "vehicleId": "veh-002",
+      "rateType": "DAILY",
         "startDate": "2026-10-17T08:00:00.000Z",
         "endDate": "2026-10-19T08:00:00.000Z",
         "duration": 2,
-        "rateType": "DAILY",
-        "rateSnapshot": 750000,
+        "unitPrice": 750000,
+        "depositSnapshot": 500000,
         "subtotal": 1500000
       }
     ]
@@ -569,17 +572,17 @@ export const mockBookings: Booking[] = [
     "startDate": "2026-10-18T08:00:00.000Z",
     "endDate": "2026-10-20T08:00:00.000Z",
     "duration": 2,
-    "rateType": "DAILY",
     "items": [
       {
         "id": "res-017-item-1",
         "bookingId": "res-017",
         "vehicleId": "veh-003",
+      "rateType": "DAILY",
         "startDate": "2026-10-18T08:00:00.000Z",
         "endDate": "2026-10-20T08:00:00.000Z",
         "duration": 2,
-        "rateType": "DAILY",
-        "rateSnapshot": 1250000,
+        "unitPrice": 1250000,
+        "depositSnapshot": 500000,
         "subtotal": 2500000
       }
     ]
@@ -598,17 +601,17 @@ export const mockBookings: Booking[] = [
     "startDate": "2026-10-19T08:00:00.000Z",
     "endDate": "2026-10-21T08:00:00.000Z",
     "duration": 2,
-    "rateType": "DAILY",
     "items": [
       {
         "id": "res-018-item-1",
         "bookingId": "res-018",
         "vehicleId": "veh-004",
+      "rateType": "DAILY",
         "startDate": "2026-10-19T08:00:00.000Z",
         "endDate": "2026-10-21T08:00:00.000Z",
         "duration": 2,
-        "rateType": "DAILY",
-        "rateSnapshot": 750000,
+        "unitPrice": 750000,
+        "depositSnapshot": 500000,
         "subtotal": 1500000
       }
     ]
@@ -627,17 +630,17 @@ export const mockBookings: Booking[] = [
     "startDate": "2026-10-20T08:00:00.000Z",
     "endDate": "2026-10-22T08:00:00.000Z",
     "duration": 2,
-    "rateType": "DAILY",
     "items": [
       {
         "id": "res-019-item-1",
         "bookingId": "res-019",
         "vehicleId": "veh-005",
+      "rateType": "DAILY",
         "startDate": "2026-10-20T08:00:00.000Z",
         "endDate": "2026-10-22T08:00:00.000Z",
         "duration": 2,
-        "rateType": "DAILY",
-        "rateSnapshot": 1250000,
+        "unitPrice": 1250000,
+        "depositSnapshot": 500000,
         "subtotal": 2500000
       }
     ]
@@ -656,17 +659,17 @@ export const mockBookings: Booking[] = [
     "startDate": "2026-10-21T08:00:00.000Z",
     "endDate": "2026-10-23T08:00:00.000Z",
     "duration": 2,
-    "rateType": "DAILY",
     "items": [
       {
         "id": "res-020-item-1",
         "bookingId": "res-020",
         "vehicleId": "veh-006",
+      "rateType": "DAILY",
         "startDate": "2026-10-21T08:00:00.000Z",
         "endDate": "2026-10-23T08:00:00.000Z",
         "duration": 2,
-        "rateType": "DAILY",
-        "rateSnapshot": 750000,
+        "unitPrice": 750000,
+        "depositSnapshot": 500000,
         "subtotal": 1500000
       }
     ]
@@ -685,17 +688,17 @@ export const mockBookings: Booking[] = [
     "startDate": "2026-10-22T08:00:00.000Z",
     "endDate": "2026-10-24T08:00:00.000Z",
     "duration": 2,
-    "rateType": "DAILY",
     "items": [
       {
         "id": "res-021-item-1",
         "bookingId": "res-021",
         "vehicleId": "veh-007",
+      "rateType": "DAILY",
         "startDate": "2026-10-22T08:00:00.000Z",
         "endDate": "2026-10-24T08:00:00.000Z",
         "duration": 2,
-        "rateType": "DAILY",
-        "rateSnapshot": 1250000,
+        "unitPrice": 1250000,
+        "depositSnapshot": 500000,
         "subtotal": 2500000
       }
     ]
@@ -714,17 +717,17 @@ export const mockBookings: Booking[] = [
     "startDate": "2026-10-23T08:00:00.000Z",
     "endDate": "2026-10-25T08:00:00.000Z",
     "duration": 2,
-    "rateType": "DAILY",
     "items": [
       {
         "id": "res-022-item-1",
         "bookingId": "res-022",
         "vehicleId": "veh-008",
+      "rateType": "DAILY",
         "startDate": "2026-10-23T08:00:00.000Z",
         "endDate": "2026-10-25T08:00:00.000Z",
         "duration": 2,
-        "rateType": "DAILY",
-        "rateSnapshot": 750000,
+        "unitPrice": 750000,
+        "depositSnapshot": 500000,
         "subtotal": 1500000
       }
     ]
@@ -743,17 +746,17 @@ export const mockBookings: Booking[] = [
     "startDate": "2026-10-24T08:00:00.000Z",
     "endDate": "2026-10-26T08:00:00.000Z",
     "duration": 2,
-    "rateType": "DAILY",
     "items": [
       {
         "id": "res-023-item-1",
         "bookingId": "res-023",
         "vehicleId": "veh-009",
+      "rateType": "DAILY",
         "startDate": "2026-10-24T08:00:00.000Z",
         "endDate": "2026-10-26T08:00:00.000Z",
         "duration": 2,
-        "rateType": "DAILY",
-        "rateSnapshot": 1250000,
+        "unitPrice": 1250000,
+        "depositSnapshot": 500000,
         "subtotal": 2500000
       }
     ]
@@ -772,17 +775,17 @@ export const mockBookings: Booking[] = [
     "startDate": "2026-10-25T08:00:00.000Z",
     "endDate": "2026-10-27T08:00:00.000Z",
     "duration": 2,
-    "rateType": "DAILY",
     "items": [
       {
         "id": "res-024-item-1",
         "bookingId": "res-024",
         "vehicleId": "veh-010",
+      "rateType": "DAILY",
         "startDate": "2026-10-25T08:00:00.000Z",
         "endDate": "2026-10-27T08:00:00.000Z",
         "duration": 2,
-        "rateType": "DAILY",
-        "rateSnapshot": 750000,
+        "unitPrice": 750000,
+        "depositSnapshot": 500000,
         "subtotal": 1500000
       }
     ]
@@ -801,17 +804,17 @@ export const mockBookings: Booking[] = [
     "startDate": "2026-10-26T08:00:00.000Z",
     "endDate": "2026-10-28T08:00:00.000Z",
     "duration": 2,
-    "rateType": "DAILY",
     "items": [
       {
         "id": "res-025-item-1",
         "bookingId": "res-025",
         "vehicleId": "veh-011",
+      "rateType": "DAILY",
         "startDate": "2026-10-26T08:00:00.000Z",
         "endDate": "2026-10-28T08:00:00.000Z",
         "duration": 2,
-        "rateType": "DAILY",
-        "rateSnapshot": 1250000,
+        "unitPrice": 1250000,
+        "depositSnapshot": 500000,
         "subtotal": 2500000
       }
     ]
@@ -830,17 +833,17 @@ export const mockBookings: Booking[] = [
     "startDate": "2026-10-27T08:00:00.000Z",
     "endDate": "2026-10-29T08:00:00.000Z",
     "duration": 2,
-    "rateType": "DAILY",
     "items": [
       {
         "id": "res-026-item-1",
         "bookingId": "res-026",
         "vehicleId": "veh-012",
+      "rateType": "DAILY",
         "startDate": "2026-10-27T08:00:00.000Z",
         "endDate": "2026-10-29T08:00:00.000Z",
         "duration": 2,
-        "rateType": "DAILY",
-        "rateSnapshot": 750000,
+        "unitPrice": 750000,
+        "depositSnapshot": 500000,
         "subtotal": 1500000
       }
     ]
@@ -859,17 +862,17 @@ export const mockBookings: Booking[] = [
     "startDate": "2026-10-28T08:00:00.000Z",
     "endDate": "2026-10-30T08:00:00.000Z",
     "duration": 2,
-    "rateType": "DAILY",
     "items": [
       {
         "id": "res-027-item-1",
         "bookingId": "res-027",
         "vehicleId": "veh-013",
+      "rateType": "DAILY",
         "startDate": "2026-10-28T08:00:00.000Z",
         "endDate": "2026-10-30T08:00:00.000Z",
         "duration": 2,
-        "rateType": "DAILY",
-        "rateSnapshot": 1250000,
+        "unitPrice": 1250000,
+        "depositSnapshot": 500000,
         "subtotal": 2500000
       }
     ]
@@ -888,17 +891,17 @@ export const mockBookings: Booking[] = [
     "startDate": "2026-10-01T08:00:00.000Z",
     "endDate": "2026-10-03T08:00:00.000Z",
     "duration": 2,
-    "rateType": "DAILY",
     "items": [
       {
         "id": "res-028-item-1",
         "bookingId": "res-028",
         "vehicleId": "veh-014",
+      "rateType": "DAILY",
         "startDate": "2026-10-01T08:00:00.000Z",
         "endDate": "2026-10-03T08:00:00.000Z",
         "duration": 2,
-        "rateType": "DAILY",
-        "rateSnapshot": 750000,
+        "unitPrice": 750000,
+        "depositSnapshot": 500000,
         "subtotal": 1500000
       }
     ]
@@ -917,17 +920,17 @@ export const mockBookings: Booking[] = [
     "startDate": "2026-10-02T08:00:00.000Z",
     "endDate": "2026-10-04T08:00:00.000Z",
     "duration": 2,
-    "rateType": "DAILY",
     "items": [
       {
         "id": "res-029-item-1",
         "bookingId": "res-029",
         "vehicleId": "veh-015",
+      "rateType": "DAILY",
         "startDate": "2026-10-02T08:00:00.000Z",
         "endDate": "2026-10-04T08:00:00.000Z",
         "duration": 2,
-        "rateType": "DAILY",
-        "rateSnapshot": 1250000,
+        "unitPrice": 1250000,
+        "depositSnapshot": 500000,
         "subtotal": 2500000
       }
     ]
@@ -946,17 +949,17 @@ export const mockBookings: Booking[] = [
     "startDate": "2026-10-03T08:00:00.000Z",
     "endDate": "2026-10-05T08:00:00.000Z",
     "duration": 2,
-    "rateType": "DAILY",
     "items": [
       {
         "id": "res-030-item-1",
         "bookingId": "res-030",
         "vehicleId": "veh-001",
+      "rateType": "DAILY",
         "startDate": "2026-10-03T08:00:00.000Z",
         "endDate": "2026-10-05T08:00:00.000Z",
         "duration": 2,
-        "rateType": "DAILY",
-        "rateSnapshot": 750000,
+        "unitPrice": 750000,
+        "depositSnapshot": 500000,
         "subtotal": 1500000
       }
     ]
@@ -975,17 +978,17 @@ export const mockBookings: Booking[] = [
     "startDate": "2026-10-04T08:00:00.000Z",
     "endDate": "2026-10-06T08:00:00.000Z",
     "duration": 2,
-    "rateType": "DAILY",
     "items": [
       {
         "id": "res-031-item-1",
         "bookingId": "res-031",
         "vehicleId": "veh-002",
+      "rateType": "DAILY",
         "startDate": "2026-10-04T08:00:00.000Z",
         "endDate": "2026-10-06T08:00:00.000Z",
         "duration": 2,
-        "rateType": "DAILY",
-        "rateSnapshot": 1250000,
+        "unitPrice": 1250000,
+        "depositSnapshot": 500000,
         "subtotal": 2500000
       }
     ]
@@ -1004,17 +1007,17 @@ export const mockBookings: Booking[] = [
     "startDate": "2026-10-05T08:00:00.000Z",
     "endDate": "2026-10-07T08:00:00.000Z",
     "duration": 2,
-    "rateType": "DAILY",
     "items": [
       {
         "id": "res-032-item-1",
         "bookingId": "res-032",
         "vehicleId": "veh-003",
+      "rateType": "DAILY",
         "startDate": "2026-10-05T08:00:00.000Z",
         "endDate": "2026-10-07T08:00:00.000Z",
         "duration": 2,
-        "rateType": "DAILY",
-        "rateSnapshot": 750000,
+        "unitPrice": 750000,
+        "depositSnapshot": 500000,
         "subtotal": 1500000
       }
     ]
@@ -1033,17 +1036,17 @@ export const mockBookings: Booking[] = [
     "startDate": "2026-10-06T08:00:00.000Z",
     "endDate": "2026-10-08T08:00:00.000Z",
     "duration": 2,
-    "rateType": "DAILY",
     "items": [
       {
         "id": "res-033-item-1",
         "bookingId": "res-033",
         "vehicleId": "veh-004",
+      "rateType": "DAILY",
         "startDate": "2026-10-06T08:00:00.000Z",
         "endDate": "2026-10-08T08:00:00.000Z",
         "duration": 2,
-        "rateType": "DAILY",
-        "rateSnapshot": 1250000,
+        "unitPrice": 1250000,
+        "depositSnapshot": 500000,
         "subtotal": 2500000
       }
     ]
@@ -1062,17 +1065,17 @@ export const mockBookings: Booking[] = [
     "startDate": "2026-10-07T08:00:00.000Z",
     "endDate": "2026-10-09T08:00:00.000Z",
     "duration": 2,
-    "rateType": "DAILY",
     "items": [
       {
         "id": "res-034-item-1",
         "bookingId": "res-034",
         "vehicleId": "veh-005",
+      "rateType": "DAILY",
         "startDate": "2026-10-07T08:00:00.000Z",
         "endDate": "2026-10-09T08:00:00.000Z",
         "duration": 2,
-        "rateType": "DAILY",
-        "rateSnapshot": 750000,
+        "unitPrice": 750000,
+        "depositSnapshot": 500000,
         "subtotal": 1500000
       }
     ]
@@ -1091,17 +1094,17 @@ export const mockBookings: Booking[] = [
     "startDate": "2026-10-08T08:00:00.000Z",
     "endDate": "2026-10-10T08:00:00.000Z",
     "duration": 2,
-    "rateType": "DAILY",
     "items": [
       {
         "id": "res-035-item-1",
         "bookingId": "res-035",
         "vehicleId": "veh-006",
+      "rateType": "DAILY",
         "startDate": "2026-10-08T08:00:00.000Z",
         "endDate": "2026-10-10T08:00:00.000Z",
         "duration": 2,
-        "rateType": "DAILY",
-        "rateSnapshot": 1250000,
+        "unitPrice": 1250000,
+        "depositSnapshot": 500000,
         "subtotal": 2500000
       }
     ]
@@ -1120,17 +1123,17 @@ export const mockBookings: Booking[] = [
     "startDate": "2026-10-09T08:00:00.000Z",
     "endDate": "2026-10-11T08:00:00.000Z",
     "duration": 2,
-    "rateType": "DAILY",
     "items": [
       {
         "id": "res-036-item-1",
         "bookingId": "res-036",
         "vehicleId": "veh-007",
+      "rateType": "DAILY",
         "startDate": "2026-10-09T08:00:00.000Z",
         "endDate": "2026-10-11T08:00:00.000Z",
         "duration": 2,
-        "rateType": "DAILY",
-        "rateSnapshot": 750000,
+        "unitPrice": 750000,
+        "depositSnapshot": 500000,
         "subtotal": 1500000
       }
     ]
@@ -1149,17 +1152,17 @@ export const mockBookings: Booking[] = [
     "startDate": "2026-10-10T08:00:00.000Z",
     "endDate": "2026-10-12T08:00:00.000Z",
     "duration": 2,
-    "rateType": "DAILY",
     "items": [
       {
         "id": "res-037-item-1",
         "bookingId": "res-037",
         "vehicleId": "veh-008",
+      "rateType": "DAILY",
         "startDate": "2026-10-10T08:00:00.000Z",
         "endDate": "2026-10-12T08:00:00.000Z",
         "duration": 2,
-        "rateType": "DAILY",
-        "rateSnapshot": 1250000,
+        "unitPrice": 1250000,
+        "depositSnapshot": 500000,
         "subtotal": 2500000
       }
     ]
@@ -1178,17 +1181,17 @@ export const mockBookings: Booking[] = [
     "startDate": "2026-10-11T08:00:00.000Z",
     "endDate": "2026-10-13T08:00:00.000Z",
     "duration": 2,
-    "rateType": "DAILY",
     "items": [
       {
         "id": "res-038-item-1",
         "bookingId": "res-038",
         "vehicleId": "veh-009",
+      "rateType": "DAILY",
         "startDate": "2026-10-11T08:00:00.000Z",
         "endDate": "2026-10-13T08:00:00.000Z",
         "duration": 2,
-        "rateType": "DAILY",
-        "rateSnapshot": 750000,
+        "unitPrice": 750000,
+        "depositSnapshot": 500000,
         "subtotal": 1500000
       }
     ]
@@ -1207,17 +1210,17 @@ export const mockBookings: Booking[] = [
     "startDate": "2026-10-12T08:00:00.000Z",
     "endDate": "2026-10-14T08:00:00.000Z",
     "duration": 2,
-    "rateType": "DAILY",
     "items": [
       {
         "id": "res-039-item-1",
         "bookingId": "res-039",
         "vehicleId": "veh-010",
+      "rateType": "DAILY",
         "startDate": "2026-10-12T08:00:00.000Z",
         "endDate": "2026-10-14T08:00:00.000Z",
         "duration": 2,
-        "rateType": "DAILY",
-        "rateSnapshot": 1250000,
+        "unitPrice": 1250000,
+        "depositSnapshot": 500000,
         "subtotal": 2500000
       }
     ]

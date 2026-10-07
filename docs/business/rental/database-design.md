@@ -108,8 +108,14 @@ Pencatatan reservasi (*multi-armada*) dan dokumen legalnya.
 | `id` | UUID | PRIMARY KEY | |
 | `booking_id` | UUID | FK `rental_bookings.id` | |
 | `vehicle_id` | UUID | FK `core_vehicles.id` | |
-| `rate_snapshot` | JSONB | NOT NULL | Bekuan harga (`daily`, `deposit`) saat booking |
-| `subtotal` | DECIMAL | NOT NULL | |
+| `rate_type` | ENUM | NOT NULL | `HOURLY`, `DAILY`, `PACKAGE` |
+| `package_id` | UUID | NULL | FK ke `packages` milik kategori kendaraan |
+| `package_name` | VARCHAR | NULL | Nama paket saat transaksi (snapshot) |
+| `unit_price` | DECIMAL | NOT NULL | Harga bekuan (snapshot tarif harian/jam/paket) |
+| `deposit_snapshot` | DECIMAL | NOT NULL | Uang jaminan untuk kendaraan ini |
+| `start_date` | TIMESTAMP | NOT NULL | Waktu mulai sewa per item |
+| `end_date` | TIMESTAMP | NOT NULL | Waktu akhir sewa per item |
+| `subtotal` | DECIMAL | NOT NULL | Total harga (rate * durasi) untuk unit ini |
 
 **Table: `rental_contracts`**
 | Column | Type | Constraints | Description |

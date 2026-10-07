@@ -82,11 +82,18 @@ export function BookingEditFeature({ bookingId, onOpenChange, onSuccess }: Booki
     bookingNumber: booking.bookingNumber,
     status: booking.status,
     customerId: booking.customerId,
-    vehicleIds: booking.items?.map(i => i.vehicleId) || [],
+    items: booking.items?.map(i => ({
+      vehicleId: i.vehicleId,
+      rateType: i.rateType,
+      packageId: i.packageId,
+      packageName: i.packageName,
+      unitPrice: i.unitPrice,
+      depositSnapshot: i.depositSnapshot,
+        duration: i.duration,
+      subtotal: i.subtotal,
+    })) || [],
     startDate: booking.startDate,
-    endDate: booking.endDate,
     rentalType: booking.rentalType,
-    rateType: booking.rateType,
     deposit: booking.deposit,
     notes: booking.notes
   };

@@ -224,7 +224,7 @@ export function BookingView({
           >
             <InfoItem label={labels.fieldStartDate || 'Tgl Mulai'} value={formatDate(booking.startDate)} />
             <InfoItem label={labels.fieldEndDate || 'Tgl Selesai'} value={formatDate(booking.endDate)} />
-            <InfoItem label={labels.fieldDuration || 'Durasi'} value={`${booking.duration} ${booking.rateType === 'HOURLY' ? 'Jam' : booking.rateType === 'DAILY' ? 'Hari' : 'Paket'}`} />
+            <InfoItem label={labels.fieldDuration || 'Durasi'} value={`${booking.duration} Hari`} />
             <InfoItem label={labels.fieldRentalType || 'Jenis Sewa'} value={booking.rentalType === 'SELF_DRIVE' ? (labels.selfDrive || 'Lepas Kunci') : (labels.withDriver || 'Dengan Pengemudi')} />
           </SectionCard>
 
@@ -270,7 +270,7 @@ export function BookingView({
                       {item.vehicle && (
                         <div className="flex flex-col gap-0.5 mt-1 ml-6">
                           <span className="text-[11px] font-medium text-foreground">{item.vehicle.coreVehicle.brand} {item.vehicle.coreVehicle.vehicleName} {item.vehicle.coreVehicle.year}</span>
-                          <span className="text-[10px] text-muted-foreground">Tarif: {formatCurrency(item.rateSnapshot)} / {booking.rateType === 'DAILY' ? (labels.daily || 'Hari') : booking.rateType === 'WEEKLY' ? (labels.weekly || 'Minggu') : (labels.monthly || 'Bulan')}</span>
+                          <span className="text-[10px] text-muted-foreground">Tarif: {formatCurrency(item.unitPrice)} / {item.rateType === 'DAILY' ? (labels.daily || 'Hari') : item.rateType === 'HOURLY' ? 'Jam' : (item.packageName || 'Paket')}</span>
                         </div>
                       )}
                     </div>
@@ -283,17 +283,7 @@ export function BookingView({
             </div>
           </SectionCard>
 
-          {/* LAYANAN EKSTRA */}
-          <SectionCard 
-            icon={Package} 
-            title={labels.colExtraServices || 'Layanan Ekstra'}
-            colorClass="text-pink-600 dark:text-pink-400"
-            bgClass="bg-pink-100 dark:bg-pink-900/40"
-          >
-            <InfoItem label={labels.delivery || 'Antar/Jemput'} value={booking.needDelivery ? 'Ya' : 'Tidak'} />
-            <InfoItem label={labels.fuel || 'BBM'} value={booking.needFuel ? 'Ya' : 'Tidak'} />
-            <InfoItem label={labels.insurance || 'Asuransi'} value={booking.needInsurance ? 'Ya' : 'Tidak'} />
-          </SectionCard>
+          
 
           {/* INFORMASI BIAYA & TAGIHAN */}
           <SectionCard 
@@ -302,8 +292,8 @@ export function BookingView({
             colorClass="text-amber-600 dark:text-amber-400"
             bgClass="bg-amber-100 dark:bg-amber-900/40"
           >
-            <InfoItem label="Dasar Tarif" value={booking.rateType === 'HOURLY' ? 'Per Jam' : booking.rateType === 'DAILY' ? (labels.daily || 'Harian') : (booking.packageName || 'Paket')} />
-            <InfoItem label="Metode Pembayaran" value={booking.paymentMethod || 'TRANSFER'} />
+            <InfoItem label="Total Deposit Jaminan" value={formatCurrency(booking.deposit || 0)} />
+            
             
             {booking.notes && (
               <InfoItem label={labels.fieldNotes || 'Catatan'} value={<span className="italic leading-relaxed text-muted-foreground">{booking.notes}</span>} colSpan={2} />

@@ -37,6 +37,8 @@ export interface RentalVehicle extends RentalVehicleProfile {
   categoryName?: string;
   hourlyRate: number;
   dailyRate: number;
+  hourlyDeposit?: number;
+  dailyDeposit?: number;
   packageCount: number;
   packages?: any[];
 }

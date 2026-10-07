@@ -17,6 +17,8 @@ class RentalVehicleService {
     let categoryName: string | undefined = undefined;
     let hourlyRate = 0;
     let dailyRate = 0;
+    let hourlyDeposit = 0;
+    let dailyDeposit = 0;
     let packageCount = 0;
     let packages: any[] = [];
     
@@ -38,6 +40,8 @@ class RentalVehicleService {
           packageCount = category.packages.length;
           packages = category.packages;
         }
+        hourlyDeposit = category.hourlyDeposit || 0;
+        dailyDeposit = category.dailyDeposit || 0;
       }
     }
 
@@ -48,6 +52,8 @@ class RentalVehicleService {
       categoryName,
       hourlyRate,
       dailyRate,
+      hourlyDeposit,
+      dailyDeposit,
       packageCount,
       packages,
     };
