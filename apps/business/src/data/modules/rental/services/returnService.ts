@@ -59,7 +59,7 @@ export const returnService = {
       if (!contract.booking) continue;
       
       let hasPendingItems = false;
-      for (const item of contract.booking.items) {
+      for (const item of contract.items) {
         const handover = await handoverRepository.getHandoverByBookingItemId(contract.id, item.id);
         if (!handover) continue; // Must have handover
         const existingReturn = await returnRepository.getReturnByBookingItemId(contract.id, item.id);
@@ -103,7 +103,7 @@ export const returnService = {
 
     // 7. Check if all items are returned, if so mark contract as COMPLETED
     let allReturned = true;
-    for (const item of contract.booking?.items || []) {
+    for (const item of contract.items || []) {
       const hndv = await handoverRepository.getHandoverByBookingItemId(contract.id, item.id);
       if (hndv) {
         const ret = await returnRepository.getReturnByBookingItemId(contract.id, item.id);

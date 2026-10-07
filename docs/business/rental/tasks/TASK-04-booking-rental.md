@@ -120,3 +120,10 @@ export interface Booking {
 
 - **Status:** IN PROGRESS
 - **Verifikasi:** Tahap refactor kerangka UI Form Pemesanan (Shopping Cart Style).
+
+## Keputusan Arsitektur: Data Snapshotting
+Untuk menjamin integritas data historis, setiap `Booking` dan `BookingItem` wajib menyimpan duplikat informasi utama (snapshot) dari tabel master pada saat pemesanan dibuat. Data snapshot meliputi:
+- `customerSnapshot`: name, type, phone, email, address, city, province, picName, picPhone.
+- `vehicleSnapshot` (di dalam `items`): licensePlate, brand, model, categoryName.
+
+Hal ini memastikan UI Tabel, Drawer (View), dan Kontrak dapat me-*render* dokumen secara mandiri tanpa bergantung pada relasi ID `customers` atau `vehicles` yang berpotensi berubah atau dihapus di masa depan.

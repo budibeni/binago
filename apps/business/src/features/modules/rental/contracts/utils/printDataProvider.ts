@@ -53,24 +53,23 @@ export function getRentalContractPrintData(contract: RentalContract) {
   };
 
   // 3. Vehicles
-  const items = contract.booking?.items || [];
+  const items = contract.items || [];
   const vehicles = items.map((item: BookingItem, index: number) => {
-    const core = item.vehicle?.coreVehicle;
     return {
       no: index + 1,
-      brand: core?.brand || '-',
-      model: core?.vehicleName || '-',
-      plateNumber: core?.plateNumber || '-',
-      odometer: item.vehicle?.currentOdometer ? formatNumber(item.vehicle.currentOdometer) : '0',
+      brand: item.vehicleSnapshot?.brand || '-',
+      model: item.vehicleSnapshot?.model || '-',
+      plateNumber: item.vehicleSnapshot?.licensePlate || '-',
+      odometer: '0', // Fallback since odometer is not snapshotted
     };
   });
 
   // 4. Contract Data
   const contractData = {
     number: contract.contractNumber || '-',
-    contractDate: formatDate(contract.contractDate),
+    contractDate: formatDate((contract.contractDate || contract.startDate)),
     startDate: formatDate(contract.startDate),
-    endDate: formatDate(getMaxEndDate(contract.booking?.items || [])),
+    endDate: formatDate(getMaxEndDate(contract.items || [])),
     rentalType: contract.rentalType === 'SELF_DRIVE' ? 'Lepas Kunci' : 'Dengan Pengemudi',
     
     totalAmount: formatCurrency(contract.totalAmount),

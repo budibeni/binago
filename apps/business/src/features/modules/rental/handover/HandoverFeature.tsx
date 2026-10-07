@@ -42,7 +42,7 @@ export function HandoverFeature({ contractId, open, onOpenChange, onSuccess }: H
           setErrorMsg(labels.errorInvalidContract || 'Kontrak tidak ditemukan.');
           return;
         }
-        if (data.status !== 'ISSUED' && data.status !== 'ACTIVE') {
+        if (data.status !== 'CONTRACTED' && data.status !== 'ACTIVE') {
           setErrorMsg(labels.errorInvalidContract || 'Kontrak ini tidak dapat diproses untuk serah terima.');
           return;
         }

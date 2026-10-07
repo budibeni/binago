@@ -21,6 +21,7 @@
 - Catat dependency halaman lain dan CORE tanpa mengubahnya.
 
 ## 3. Ruang lingkup implementasi
+- **Catatan Pembaruan Arsitektur:** Tabel `rental_returns` kini dihapus dan dilebur ke dalam struktur `BookingItem` sesuai penyederhanaan tabel transaksi (Desain *Single Source of Truth*). Atribut pengembalian (tanggal kembali, kondisi, denda, odometer akhir) dicatat langsung pada armada yang terkait di dalam Booking.
 - Audit route list/create/detail, Return type/form, service/repository/mock, Contract, Handover, dan RentalVehicleProfile.
 - Pastikan Return mengacu ke handover/bookingItem yang benar; jangan hanya mengandalkan contractId jika satu Contract memiliki banyak kendaraan.
 - Pastikan hanya kendaraan yang telah diserahterimakan dan belum dikembalikan yang dapat diproses.

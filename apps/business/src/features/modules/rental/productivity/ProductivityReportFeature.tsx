@@ -118,11 +118,11 @@ export function ReportsFeature() {
         if (contract.status === 'CANCELLED') return;
         
         // Find if this vehicle was rented in this contract
-        const item = contract.booking?.items?.find((i: any) => i.vehicleId === v.id);
+        const item = contract.items?.find((i: any) => i.vehicleId === v.id);
         if (!item) return;
 
         const start = new Date(item.startDate || contract.startDate);
-        const end = new Date(getMaxEndDate(contract.booking?.items || []));
+        const end = new Date(getMaxEndDate(contract.items || []));
 
         // Check if the rental overlaps with our selected period
         // But more specifically, we should only count hours that fall within the selected months!

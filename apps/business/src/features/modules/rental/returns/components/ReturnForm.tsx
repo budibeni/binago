@@ -215,7 +215,7 @@ export function ReturnForm({ contract, handovers, onSubmit, onCancel, isSubmitti
             <div>
               <p className="text-[13px] font-normal text-neutral-500 mb-1">Periode Sewa</p>
               <p className="text-[13px] font-semibold text-foreground">
-                {new Date(contract.startDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })} - {new Date(getMaxEndDate(contract.booking?.items || [])).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })}
+                {new Date(contract.startDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })} - {new Date(getMaxEndDate(contract.items || [])).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })}
               </p>
             </div>
             <div>

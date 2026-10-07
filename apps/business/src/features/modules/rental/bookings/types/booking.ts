@@ -2,11 +2,30 @@ import type { Customer } from '@/features/modules/rental/customers/types/custome
 import type { RentalVehicle } from '@/features/modules/rental/vehicles/types/rentalVehicle';
 import { z } from 'zod';
 
-export type BookingStatus = 'BOOKED' | 'CONTRACTED' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
+export type BookingStatus = 'DRAFT' | 'BOOKED' | 'CONTRACTED' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
 
 export type RentalType = 'SELF_DRIVE' | 'WITH_DRIVER';
 
 export type RateType = 'HOURLY' | 'DAILY' | 'PACKAGE';
+
+export interface CustomerSnapshot {
+  name: string;
+  type: string;
+  phone: string;
+  email?: string;
+  address?: string;
+  city?: string;
+  province?: string;
+  picName?: string;
+  picPhone?: string;
+}
+
+export interface VehicleSnapshot {
+  licensePlate: string;
+  brand: string;
+  model: string;
+  categoryName: string;
+}
 
 export interface BookingItem {
   id: string;
@@ -21,7 +40,19 @@ export interface BookingItem {
   unitPrice: number; // Snapshot of the resolved rate (hourly/daily/package price)
   depositSnapshot: number; // Snapshot of deposit for this vehicle
   subtotal: number;
-  
+  vehicleSnapshot?: VehicleSnapshot; // Historical data
+
+  // Operational fields (Handover & Return)
+  handoverDate?: string;
+  handoverBy?: string; // UUID of admin
+  handoverOdometer?: number;
+  handoverCondition?: Record<string, any>;
+  returnDate?: string;
+  returnBy?: string; // UUID of admin
+  returnOdometer?: number;
+  returnCondition?: Record<string, any>;
+  extraCharges?: number;
+
   // Relations (populated for UI)
   vehicle?: RentalVehicle;
 }
@@ -42,7 +73,19 @@ export interface Booking {
   notes?: string;
   createdAt: string;
   updatedAt: string;
+  createdBy?: string; // UUID of admin
+  updatedBy?: string; // UUID of admin
   
+  customerSnapshot?: CustomerSnapshot; // Historical data
+  
+  // Contract fields
+  contractNumber?: string;
+  contractDate?: string;
+  contractNotes?: string;
+  terms?: string;
+  contractIssuedBy?: string; // UUID of admin
+  contractIssuedAt?: string; // System timestamp when contract was issued
+
   items: BookingItem[];
   
   // Relations (populated for UI)

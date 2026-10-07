@@ -64,8 +64,8 @@ export function ContractForm({
     const s = searchBooking.toLowerCase();
     return availableBookings.filter(r => 
       r.bookingNumber?.toLowerCase().includes(s) ||
-      r.customer?.name?.toLowerCase().includes(s) ||
-      r.items?.some(item => item.vehicle?.coreVehicle?.plateNumber?.toLowerCase().includes(s))
+      r.customerSnapshot?.name?.toLowerCase().includes(s) ||
+      r.items?.some(item => item.vehicleSnapshot?.licensePlate?.toLowerCase().includes(s))
     );
   }, [availableBookings, searchBooking]);
 
@@ -81,7 +81,7 @@ export function ContractForm({
       if (!selectedRes) return;
 
       await onSubmit({
-        bookingId: selectedRes.id,
+        /* bookingId was here */
         contractDate: new Date(contractDate).toISOString(),
         notes,
       });
@@ -89,7 +89,7 @@ export function ContractForm({
   };
 
   // Derive display values based on mode
-  const displayRes = isEditing ? contract?.booking : selectedRes;
+  const displayRes = isEditing ? contract : selectedRes;
   const displayCustomer = isEditing ? contract?.customer : selectedRes?.customer;
 
   return (
@@ -148,7 +148,7 @@ export function ContractForm({
                             <Car className="w-3 h-3" /> {r.items?.length || 0}
                           </span>
                         </div>
-                        <h4 className="font-bold text-foreground text-[13px] truncate">{r.customer?.name}</h4>
+                        <h4 className="font-bold text-foreground text-[13px] truncate">{r.customerSnapshot?.name}</h4>
                         <div className="flex justify-between items-end mt-1">
                           <p className="text-[11px] text-muted-foreground font-medium">{formatDate(r.startDate).split(' ')[0]} - {formatDate(getMaxEndDate(r.items)).split(' ')[0]}</p>
                           <p className="text-xs font-bold text-foreground">{formatCurrency(r.totalAmount)}</p>
@@ -180,7 +180,9 @@ export function ContractForm({
                 <div className="space-y-6">
                   <div>
                     <Label className="text-neutral-500 dark:text-neutral-400 font-normal">{labels.fieldCustomer || 'Pelanggan'}</Label>
-                    <p className="text-[14px] mt-0.5 font-semibold text-foreground">{displayCustomer?.name} - {displayCustomer?.phone}</p>
+                    <p className="text-[14px] mt-0.5 font-semibold text-foreground">
+                      {isEditing ? (contract?.customerSnapshot?.name || contract?.customer?.name) : displayRes?.customerSnapshot?.name} - {isEditing ? (contract?.customerSnapshot?.phone || contract?.customer?.phone) : displayRes?.customerSnapshot?.phone}
+                    </p>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
@@ -219,8 +221,8 @@ export function ContractForm({
                     <div className="space-y-2">
                       {displayRes.items.map((item) => (
                         <div key={item.id} className="flex justify-between items-center bg-neutral-100 dark:bg-neutral-800 p-2.5 rounded-lg border border-border/50 dark:border-neutral-700">
-                          <span className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">{item.vehicle?.coreVehicle?.plateNumber}</span>
-                          <span className="text-xs text-neutral-500 dark:text-neutral-400">{item.vehicle?.coreVehicle?.vehicleName}</span>
+                          <span className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">{item.vehicleSnapshot?.licensePlate}</span>
+                          <span className="text-xs text-neutral-500 dark:text-neutral-400">{item.vehicleSnapshot?.model}</span>
                         </div>
                       ))}
                     </div>

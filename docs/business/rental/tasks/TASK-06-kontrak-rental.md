@@ -76,49 +76,17 @@ Halaman Kontrak Rental (`/rental/contracts`) berfungsi sebagai **pusat pengelola
 
 ---
 
-## 4. Model Data Teknis (`Contract` & `ContractItem`)
+## 4. Model Data Teknis
 
-```ts
-export type ContractStatus = 'ISSUED' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
+Sesuai dengan pembaruan arsitektur (*Single Source of Truth*), **Kontrak Rental kini dilebur ke dalam objek `Booking`**.
 
-export interface ContractItem {
-  id: string;                    // Format: cti-xxx
-  contractId: string;
-  vehicleId: string;             // Referensi ke RentalVehicle (SSoT)
-  plateNumber: string;
-  vehicleName: string;
-  brand: string;
-  chassisNumber?: string;
-  engineNumber?: string;
-  dailyRate: number;
-  subtotal: number;
-  deposit: number;
-  handoverCompleted: boolean;    // Status serah terima fisik
-  returnCompleted: boolean;      // Status pengembalian fisik
-}
+Status kontrak dikendalikan oleh properti `status` pada Booking (`CONTRACTED`, `ACTIVE`, `COMPLETED`, `CANCELLED`).
+Setiap unit kendaraan (*item*) direpresentasikan oleh `BookingItem` yang kini memuat histori data kendaraan (`vehicleSnapshot`).
 
-export interface Contract {
-  id: string;                    // Format: ctr-xxx
-  contractNumber: string;        // Contoh: "CTR-2026-09-001"
-  bookingId?: string;            // Referensi ke Booking asal
-  customerId: string;            // Foreign Key ke Customer (SSoT)
-  customerName: string;
-  customerType: 'INDIVIDUAL' | 'COMPANY';
-  templateId?: string;           // Referensi ke DocumentTemplate
-  startDate: string;             // YYYY-MM-DD
-  endDate: string;               // YYYY-MM-DD
-  rentalType: 'LEPAS_KUNCI' | 'DENGAN_PENGEMUDI';
-  items: ContractItem[];         // Daftar multi-armada dalam kontrak
-  totalAmount: number;           // Total biaya sewa
-  depositAmount: number;         // Total uang jaminan
-  termsAndConditions?: string;
-  signatoryCompany: string;      // Penandatangan dari pihak rental
-  signatoryCustomer: string;     // Penandatangan dari pihak penyewa
-  status: ContractStatus;
-  createdAt: string;
-  updatedAt: string;
-}
-```
+Variabel kontrak seperti nomor kontrak dan tanggal kontrak disimpan langsung di objek Booking:
+- `contractNumber`: VARCHAR (Contoh: "CTR-2026-09-001")
+- `contractDate`: TIMESTAMP
+- `contractNotes`: TEXT (Catatan/Terms)
 
 ---
 

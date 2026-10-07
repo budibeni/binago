@@ -265,7 +265,7 @@ export function HandoverView({
               {c.items.some(i => i.notes && i.vehicleCondition === 'GOOD') ? (
                 <ul className="list-disc list-inside space-y-1">
                   {c.items.filter(i => i.notes && i.vehicleCondition === 'GOOD').map((item, idx) => (
-                    <li key={idx}><span className="font-semibold text-foreground mr-1">{item.vehicle?.coreVehicle?.plateNumber}:</span> {item.notes}</li>
+                    <li key={idx}><span className="font-semibold text-foreground mr-1">{item.vehicleSnapshot?.licensePlate}:</span> {item.notes}</li>
                   ))}
                 </ul>
               ) : (
@@ -277,7 +277,7 @@ export function HandoverView({
         </div>
         ) : (
           <PaymentsFeature 
-            bookingId={contract?.bookingId || c.contractId}
+            bookingId={contractId || c.contractId}
             customerId={customer?.id || ''}
             totalAmount={contract?.totalAmount || 0}
             deposit={contract?.deposit || 0}

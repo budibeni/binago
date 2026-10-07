@@ -40,7 +40,7 @@ export function ReturnFeature({ contractId, open, onOpenChange, onSuccess }: Ret
         }
 
         const loadedHandovers: RentalHandover[] = [];
-        for (const item of data.booking?.items || []) {
+        for (const item of data.items || []) {
           const existingReturn = await returnService.getReturnByBookingItemId(contractId, item.id);
           if (!existingReturn) {
             const hnd = await handoverService.getHandoverByBookingItemId(contractId, item.id);

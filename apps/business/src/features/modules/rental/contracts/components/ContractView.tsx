@@ -51,7 +51,7 @@ export function ContractView({
     let label = labels[`status${s.charAt(0).toUpperCase() + s.slice(1).toLowerCase()}`] || s;
     let colorClass = 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300';
     
-    if (s === 'ISSUED') colorClass = 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400';
+    if (s === 'CONTRACTED') colorClass = 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400';
     else if (s === 'ACTIVE') colorClass = 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400';
     else if (s === 'CANCELLED') colorClass = 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400';
     else if (s === 'COMPLETED') colorClass = 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300';
@@ -78,7 +78,7 @@ export function ContractView({
       onOpenChange={(isOpen) => !isOpen && onClose()}
       title="Detail Kontrak Rental"
       leftFooterActions={
-        contract.status === 'ISSUED' && onCancel && (
+        contract.status === 'CONTRACTED' && onCancel && (
           <Button
             size="sm"
             variant="outline"
@@ -119,7 +119,7 @@ export function ContractView({
         </div>
 
         {/* Quick Actions */}
-        {contract.status === 'ISSUED' && onHandover && (
+        {contract.status === 'CONTRACTED' && onHandover && (
           <div className="px-4 py-2.5 bg-background flex gap-2 border-b border-border/40">
             <Button 
               variant="outline" 
@@ -167,8 +167,8 @@ export function ContractView({
             </div>
             <div className="p-3.5 flex flex-col gap-3.5">
               <div className="grid grid-cols-2 gap-3">
-                <InfoItem label={labels.colBookingNo || 'No. Booking'} value={contract.bookingId} />
-                <InfoItem label={labels.fieldContractDate || 'Tanggal Kontrak'} value={formatDate(contract.contractDate)} />
+                <InfoItem label={labels.colBookingNo || 'No. Booking'} value={contract.id} />
+                <InfoItem label={labels.fieldContractDate || 'Tanggal Kontrak'} value={formatDate((contract.contractDate || contract.startDate))} />
               </div>
             </div>
           </div>
@@ -180,12 +180,12 @@ export function ContractView({
               <h3 className="text-[11px] font-bold text-foreground uppercase tracking-widest">{labels.sectionCustomerInfo || 'Data Pelanggan'}</h3>
             </div>
             <div className="p-3.5 flex flex-col gap-3.5">
-              {contract.customer ? (
+              {contract.customerSnapshot ? (
                 <>
-                  <InfoItem label="Nama" value={contract.customer.name} />
+                  <InfoItem label="Nama" value={contract.customerSnapshot.name} />
                   <div className="grid grid-cols-2 gap-3 pt-3 border-t border-border/40">
-                    <InfoItem label="Tipe" value={contract.customer.type === 'COMPANY' ? 'Perusahaan' : 'Individu'} />
-                    <InfoItem label="Telepon" value={contract.customer.phone} />
+                    <InfoItem label="Tipe" value={contract.customerSnapshot.type} />
+                    <InfoItem label="Telepon" value={contract.customerSnapshot.phone} />
                   </div>
                 </>
               ) : (
@@ -201,24 +201,24 @@ export function ContractView({
               <h3 className="text-[11px] font-bold text-foreground uppercase tracking-widest">{labels.sectionVehicleInfo || 'Data Kendaraan'}</h3>
             </div>
             <div className="p-3.5 flex flex-col gap-3.5">
-              {contract.booking?.items && contract.booking.items.length > 0 ? (
+              {contract.items && contract.items.length > 0 ? (
                 <div className="flex flex-col gap-3">
-                  {contract.booking.items.map((item, index) => (
+                  {contract.items.map((item, index) => (
                     <div key={item.id} className={cn("flex flex-col gap-2", index > 0 && "pt-3 border-t border-border/40")}>
                       <div className="flex justify-between items-center">
                         <span className="text-[11px] font-bold text-foreground uppercase tracking-widest">
                           Kendaraan {index + 1}
                         </span>
-                        {item.vehicle && (
+                        {item.vehicleSnapshot && (
                           <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300">
-                            {item.vehicle.coreVehicle.plateNumber}
+                            {item.vehicleSnapshot.licensePlate}
                           </span>
                         )}
                       </div>
                       
-                      {item.vehicle && (
+                      {item.vehicleSnapshot && (
                         <>
-                          <InfoItem label="Merek & Model" value={`${item.vehicle.coreVehicle.brand} ${item.vehicle.coreVehicle.vehicleName} ${item.vehicle.coreVehicle.year}`} />
+                          <InfoItem label="Merek & Model" value={`${item.vehicleSnapshot.brand} ${item.vehicleSnapshot.model}`} />
                           <InfoItem label="Subtotal" value={formatCurrency(item.subtotal)} />
                         </>
                       )}
@@ -240,11 +240,11 @@ export function ContractView({
             <div className="p-3.5 flex flex-col gap-3.5">
               <div className="grid grid-cols-1 gap-3">
                 <InfoItem label="Tanggal Mulai" value={formatDate(contract.startDate)} />
-                <InfoItem label="Tanggal Selesai" value={formatDate(getMaxEndDate(contract.booking?.items || []))} />
+                <InfoItem label="Tanggal Selesai" value={formatDate(getMaxEndDate(contract.items || []))} />
               </div>
               
               <div className="grid grid-cols-2 gap-3 pt-3 border-t border-border/40">
-                <InfoItem label="Durasi" value={`${(contract.booking?.items?.[0]?.duration || 1) || '-'} hari`} />
+                <InfoItem label="Durasi" value={`${(contract.items?.[0]?.duration || 1) || '-'} hari`} />
                 <InfoItem label="Tipe Rental" value={contract.rentalType === 'SELF_DRIVE' ? 'Lepas Kunci' : 'Dengan Pengemudi'} />
               </div>
             </div>
@@ -259,7 +259,7 @@ export function ContractView({
             <div className="p-3.5 flex flex-col gap-3.5">
               <div className="grid grid-cols-2 gap-3">
                 <InfoItem label="Tipe Rental" value={contract.rentalType === 'SELF_DRIVE' ? 'Lepas Kunci' : 'Dgn Sopir'} />
-                <InfoItem label="Jumlah Kendaraan" value={`${contract.booking?.items?.length || 0} Unit`} />
+                <InfoItem label="Jumlah Kendaraan" value={`${contract.items?.length || 0} Unit`} />
               </div>
 
               <div className="w-full bg-neutral-50/80 dark:bg-neutral-900/50 p-3 rounded-xl border border-border/60 flex flex-col gap-2.5 mt-1">
@@ -301,7 +301,7 @@ export function ContractView({
           </div>
         ) : (
           <PaymentsFeature 
-            bookingId={contract.bookingId}
+            bookingId={contract.id}
             customerId={contract.customerId}
             totalAmount={contract.totalAmount || 0}
             deposit={contract.deposit || 0}

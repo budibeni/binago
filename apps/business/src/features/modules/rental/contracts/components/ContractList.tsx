@@ -31,7 +31,7 @@ interface ContractListProps {
 
 const getStatusLabel = (status: ContractStatus, labels: Record<string, string>) => {
   switch (status) {
-    case 'ISSUED': return labels.statusIssued || 'Diterbitkan';
+    case 'CONTRACTED': return labels.statusIssued || 'Diterbitkan';
     case 'ACTIVE':    return labels.statusActive || 'Berjalan';
     case 'COMPLETED': return labels.statusCompleted || 'Selesai';
     case 'CANCELLED': return labels.statusCancelled || 'Dibatalkan';
@@ -90,7 +90,7 @@ function buildColumns(
     },
     {
       id: 'customer',
-      accessorFn: (row) => row.customer?.name || '-',
+      accessorFn: (row) => row.customerSnapshot?.name || '-',
       header: labels.colCustomer || 'Pelanggan',
       enableSorting: true,
       size: 180,
@@ -98,12 +98,12 @@ function buildColumns(
     {
       id: 'vehicle',
       accessorFn: (row) => {
-        const items = row.booking?.items || [];
+        const items = row.items || [];
         if (items.length === 0) return '-';
         if (items.length === 1) {
-          const cv = items[0].vehicle?.coreVehicle;
+          const cv = items[0].vehicleSnapshot;
           if (!cv) return '-';
-          return `${cv.plateNumber} - ${cv.brand} ${cv.vehicleName}`;
+          return `${cv.licensePlate} - ${cv.brand} ${cv.model}`;
         }
         return `${items.length} Kendaraan`;
       },
@@ -113,7 +113,7 @@ function buildColumns(
     },
     {
       id: 'period',
-      accessorFn: (row) => `${formatShortDate(row.startDate)} s/d ${formatShortDate(getMaxEndDate(row.booking?.items || []))}`,
+      accessorFn: (row) => `${formatShortDate(row.startDate)} s/d ${formatShortDate(getMaxEndDate(row.items || []))}`,
       header: labels.colPeriod || 'Periode Sewa',
       enableSorting: true,
       size: 180,
@@ -136,7 +136,7 @@ function buildColumns(
         const label = getStatusLabel(s, labels);
         const textClass = 
           s === 'ACTIVE' ? 'text-success' :
-          s === 'ISSUED' ? 'text-blue-500' :
+          s === 'CONTRACTED' ? 'text-blue-500' :
           s === 'COMPLETED' ? 'text-neutral-500 dark:text-neutral-400' :
           s === 'CANCELLED' ? 'text-danger' :
           'text-neutral-500 dark:text-neutral-400';

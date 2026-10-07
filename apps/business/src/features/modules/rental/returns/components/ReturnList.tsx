@@ -149,7 +149,7 @@ function buildColumns(
     },
     {
       id: 'contractDate',
-      accessorKey: 'contract.contractDate',
+      accessorKey: '(contract.contractDate || contract.startDate)',
       header: 'TANGGAL KONTRAK',
       size: 150,
       cell: ({ row }) => {

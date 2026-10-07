@@ -39,7 +39,7 @@ export function ContractEditFeature({ contractId, open, onOpenChange, onSuccess 
           onOpenChange(false);
           return;
         }
-        if (data.status !== 'ISSUED') {
+        if (data.status !== 'CONTRACTED') {
           alert('Hanya kontrak berstatus DITERBITKAN yang dapat diedit');
           onOpenChange(false);
           return;

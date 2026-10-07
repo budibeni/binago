@@ -36,11 +36,11 @@ export function HandoverForm({ contract, handedOverItemIds = [], labels, onSubmi
   const [selectedItemIds, setSelectedItemIds] = React.useState<string[]>([]);
   const [activeTab, setActiveTab] = React.useState<string>('');
   
-  const pendingItems = contract.booking?.items?.filter(i => !handedOverItemIds.includes(i.id)) || [];
+  const pendingItems = contract.items?.filter(i => !handedOverItemIds.includes(i.id)) || [];
   const isSingleVehicle = pendingItems.length === 1;
 
   React.useEffect(() => {
-    const pendingItems = contract.booking?.items?.filter(i => !handedOverItemIds.includes(i.id)) || [];
+    const pendingItems = contract.items?.filter(i => !handedOverItemIds.includes(i.id)) || [];
     if (pendingItems.length > 0 && !activeTab && selectedItemIds.length === 0) {
       setActiveTab(pendingItems[0].id);
       setSelectedItemIds(pendingItems.map(i => i.id));
@@ -61,7 +61,7 @@ export function HandoverForm({ contract, handedOverItemIds = [], labels, onSubmi
   React.useEffect(() => {
     setVehicleData(prev => {
       const newData = { ...prev };
-      const pendingItems = contract.booking?.items?.filter(i => !handedOverItemIds.includes(i.id)) || [];
+      const pendingItems = contract.items?.filter(i => !handedOverItemIds.includes(i.id)) || [];
       pendingItems.forEach(item => {
         if (!newData[item.id]) {
           const now = new Date();
@@ -108,7 +108,7 @@ export function HandoverForm({ contract, handedOverItemIds = [], labels, onSubmi
     }
 
     const payload = selectedItemIds.map(id => {
-      const item = contract.booking?.items?.find(i => i.id === id);
+      const item = contract.items?.find(i => i.id === id);
       const data = vehicleData[id];
       return {
         contractId: contract.id,
@@ -167,7 +167,7 @@ export function HandoverForm({ contract, handedOverItemIds = [], labels, onSubmi
             <div>
               <p className="text-[13px] font-normal text-neutral-500 mb-1">Periode Sewa</p>
               <p className="text-[13px] font-semibold text-foreground">
-                {new Date(contract.startDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })} - {new Date(getMaxEndDate(contract.booking?.items || [])).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })}
+                {new Date(contract.startDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })} - {new Date(getMaxEndDate(contract.items || [])).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })}
               </p>
             </div>
             <div>
@@ -207,7 +207,7 @@ export function HandoverForm({ contract, handedOverItemIds = [], labels, onSubmi
                           >
                             <div className={cn("w-2 h-2 rounded-full", isChecked ? "bg-primary" : "bg-neutral-300")} />
                             <Car className={cn("h-3.5 w-3.5", isSelected ? "text-sky-500 dark:text-sky-400" : "opacity-70")} />
-                            {item.vehicle?.coreVehicle?.plateNumber}
+                            {item.vehicleSnapshot?.licensePlate}
                           </button>
                         );
                       })}
@@ -216,7 +216,7 @@ export function HandoverForm({ contract, handedOverItemIds = [], labels, onSubmi
               )}
 
               {activeTab && (() => {
-                const item = contract.booking?.items?.find(i => i.id === activeTab);
+                const item = contract.items?.find(i => i.id === activeTab);
                 const isChecked = selectedItemIds.includes(activeTab);
 
                 return (

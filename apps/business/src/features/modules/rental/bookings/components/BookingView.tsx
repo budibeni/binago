@@ -56,7 +56,8 @@ export function BookingView({
     let label = labels[`status${s.charAt(0).toUpperCase() + s.slice(1).toLowerCase()}`] || s;
     let colorClass = 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300';
     let dotClass = 'bg-neutral-400 dark:bg-neutral-600';
-    if (s === 'BOOKED') { colorClass = 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400'; dotClass = 'bg-warning'; }
+    if (s === 'DRAFT') { colorClass = 'bg-neutral-200 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300'; dotClass = 'bg-neutral-500'; }
+    else if (s === 'BOOKED') { colorClass = 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400'; dotClass = 'bg-warning'; }
     else if (s === 'CONTRACTED') { colorClass = 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400'; dotClass = 'bg-blue-500'; }
     else if (s === 'ACTIVE') { colorClass = 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400'; dotClass = 'bg-success'; }
     else if (s === 'COMPLETED') { colorClass = 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300'; dotClass = 'bg-neutral-500'; }
@@ -127,7 +128,7 @@ export function BookingView({
       extraFooterActions={
         <>
 
-          {onEdit && booking.status === 'BOOKED' && (
+          {onEdit && (booking.status === 'BOOKED' || booking.status === 'DRAFT') && (
             <Button 
               size="sm" 
               variant="outline" 
@@ -166,7 +167,7 @@ export function BookingView({
         </div>
 
         {/* Quick Actions */}
-        {booking.status === 'BOOKED' && onConfirm && (
+        {booking.status === 'DRAFT' && onConfirm && (
           <div className="px-4 py-2.5 bg-background flex gap-2 border-b border-border/40">
             <Button 
               variant="outline" 
@@ -213,12 +214,12 @@ export function BookingView({
             colorClass="text-blue-600 dark:text-blue-400"
             bgClass="bg-blue-100 dark:bg-blue-900/40"
           >
-            {booking.customer ? (
+            {booking.customerSnapshot ? (
               <>
-                <InfoItem label={labels.fieldCustomer || 'Nama'} value={booking.customer.name} colSpan={2} />
-                <InfoItem label="Tipe Pelanggan" value={booking.customer.type === 'COMPANY' ? (labels.typeCompany || 'Perusahaan') : (labels.typeIndividual || 'Individu')} />
-                <InfoItem label={labels.contact || "No. Telepon"} value={<PhoneLink phone={booking.customer.phone || ''} className="text-[11px] font-bold text-foreground hover:underline" />} />
-                <InfoItem label={labels.address || "Lokasi"} value={[booking.customer.city, booking.customer.province].filter(Boolean).join(' - ') || '-'} colSpan={2} />
+                <InfoItem label={labels.fieldCustomer || 'Nama'} value={booking.customerSnapshot.name} colSpan={2} />
+                <InfoItem label="Tipe Pelanggan" value={booking.customerSnapshot.type} />
+                <InfoItem label={labels.contact || "No. Telepon"} value={<PhoneLink phone={booking.customerSnapshot.phone || ''} className="text-[11px] font-bold text-foreground hover:underline" />} />
+                <InfoItem label={labels.address || "Lokasi"} value={[booking.customerSnapshot.city, booking.customerSnapshot.province].filter(Boolean).join(' - ') || '-'} colSpan={2} />
               </>
             ) : (
               <span className="text-[11px] text-muted-foreground italic col-span-2">{labels.noCustomerData || "Tidak ada data pelanggan"}</span>
@@ -249,7 +250,7 @@ export function BookingView({
               {booking.items && booking.items.length > 0 ? (
                 <div className="divide-y divide-border/40">
                   {booking.items.map((item, index) => {
-                    const plates = [item.vehicle?.coreVehicle?.plateNumber].filter(Boolean);
+                    const plates = [item.vehicleSnapshot?.licensePlate].filter(Boolean);
                     const isTrackable = booking.status !== 'COMPLETED' && booking.status !== 'CANCELLED';
                     return (
                       <div key={item.id} className="py-2.5 flex flex-col gap-1.5 hover:bg-neutral-50/50 dark:hover:bg-neutral-900/50 transition-colors">
@@ -277,9 +278,9 @@ export function BookingView({
                         <span className="text-[11px] font-bold">{formatCurrency(item.subtotal)}</span>
                       </div>
                       
-                      {item.vehicle && (
+                      {item.vehicleSnapshot && (
                         <div className="flex flex-col gap-0.5 mt-1 ml-6">
-                          <span className="text-[11px] font-medium text-foreground">{item.vehicle.coreVehicle.brand} {item.vehicle.coreVehicle.vehicleName} {item.vehicle.coreVehicle.year}</span>
+                          <span className="text-[11px] font-medium text-foreground">{item.vehicleSnapshot.brand} {item.vehicleSnapshot.model}</span>
                           <span className="text-[10px] text-muted-foreground">Tarif: {formatCurrency(item.unitPrice)} / {item.rateType === 'DAILY' ? (labels.daily || 'Hari') : item.rateType === 'HOURLY' ? 'Jam' : (item.packageName || 'Paket')}</span>
                         </div>
                       )}
@@ -302,14 +303,7 @@ export function BookingView({
             colorClass="text-amber-600 dark:text-amber-400"
             bgClass="bg-amber-100 dark:bg-amber-900/40"
           >
-            <InfoItem label={labels.fieldDeposit || "Total Deposit Jaminan"} value={formatCurrency(booking.deposit || 0)} />
-            
-            
-            {booking.notes && (
-              <InfoItem label={labels.fieldNotes || 'Catatan'} value={<span className="italic leading-relaxed text-muted-foreground">{booking.notes}</span>} colSpan={2} />
-            )}
-
-            <div className="col-span-2 w-full bg-neutral-50/80 dark:bg-neutral-900/50 p-3 rounded-xl border border-border/60 flex flex-col gap-2.5 mt-2">
+            <div className="col-span-2 w-full bg-neutral-50/80 dark:bg-neutral-900/50 p-3 rounded-xl border border-border/60 flex flex-col gap-2.5 mb-3">
               <div className="flex justify-between items-center pb-2 border-b border-border/40">
                 <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">{labels.subtotalRental || "Subtotal Booking"}</span>
                 <span className="text-[11px] font-bold text-foreground">{formatCurrency(booking.totalAmount || 0)}</span>
@@ -329,6 +323,22 @@ export function BookingView({
                 <span className="text-sm font-bold text-danger">{formatCurrency(booking.remainingAmount || 0)}</span>
               </div>
             </div>
+
+            <div className="col-span-2 mb-2 p-3 bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/50 dark:border-amber-900/30 rounded-lg">
+              <div className="flex justify-between items-start">
+                <div className="flex flex-col gap-0.5 max-w-[80%]">
+                  <span className="text-[10px] text-amber-700 dark:text-amber-400 font-semibold uppercase tracking-wider">Uang Jaminan (Deposit)</span>
+                  <span className="text-[9px] text-muted-foreground/80 leading-relaxed mt-0.5">* Ditagih terpisah dari biaya sewa dan akan di-<i>refund</i> utuh saat kendaraan kembali dengan aman.</span>
+                </div>
+                <span className="text-[12px] font-semibold text-amber-700/90 dark:text-amber-400/90 whitespace-nowrap ml-2 mt-0.5">{formatCurrency(booking.deposit || 0)}</span>
+              </div>
+            </div>
+            
+            {booking.notes && (
+              <div className="col-span-2 mt-1">
+                <InfoItem label={labels.fieldNotes || 'Catatan'} value={<span className="italic leading-relaxed text-muted-foreground">{booking.notes}</span>} colSpan={1} />
+              </div>
+            )}
           </SectionCard>
           </div>
         ) : (
@@ -337,7 +347,7 @@ export function BookingView({
             customerId={booking.customerId}
             totalAmount={booking.totalAmount || 0}
             deposit={booking.deposit || 0}
-            remainingAmount={Math.max((booking.totalAmount || 0) - (booking.deposit || 0), 0)}
+            remainingAmount={booking.remainingAmount || 0}
             defaultStage="BOOKING"
             isFormOpen={isPaymentFormOpen}
             onFormOpenChange={setIsPaymentFormOpen}

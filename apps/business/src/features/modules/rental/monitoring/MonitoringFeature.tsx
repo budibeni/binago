@@ -98,10 +98,10 @@ export function MonitoringFeature() {
     const now = new Date();
 
     contracts.forEach(contract => {
-      const items = contract.booking?.items || [];
+      const items = contract.items || [];
       items.forEach(item => {
         // Use item endDate if different, otherwise fallback to contract
-        const endDateObj = new Date(getMaxEndDate(contract.booking?.items || []));
+        const endDateObj = new Date(getMaxEndDate(contract.items || []));
         const overdue = now > endDateObj;
         
         const msDiff = Math.abs(now.getTime() - endDateObj.getTime());
@@ -112,15 +112,15 @@ export function MonitoringFeature() {
         rows.push({
           id: `${contract.id}-${item.id}`,
           contractId: contract.id,
-          contractNumber: contract.contractNumber,
-          bookingNumber: contract.booking?.bookingNumber || '-',
+          contractNumber: contract.contractNumber || '-',
+          bookingNumber: contract.bookingNumber || '-',
           customerName: contract.customer?.name || '-',
           customerPhone: contract.customer?.phone || '',
           vehicleId: item.vehicleId,
-          vehicleName: item.vehicle?.coreVehicle?.vehicleName || 'Unknown Vehicle',
-          licensePlate: item.vehicle?.coreVehicle?.plateNumber || '-',
+          vehicleName: item.vehicleSnapshot?.model || 'Unknown Vehicle',
+          licensePlate: item.vehicleSnapshot?.licensePlate || '-',
           startDate: item.startDate || contract.startDate,
-          endDate: getMaxEndDate(contract.booking?.items || []),
+          endDate: getMaxEndDate(contract.items || []),
           isOverdue: overdue,
           remainingHours,
           remainingDays,

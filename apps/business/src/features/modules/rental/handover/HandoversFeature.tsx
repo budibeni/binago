@@ -133,7 +133,7 @@ export function HandoversFeature() {
     });
 
     return Object.values(groups).map(g => {
-      const totalBooked = g.contract?.booking?.items?.length || 0;
+      const totalBooked = g.contract?.items?.length || 0;
       const totalHandedOver = g.items.length;
       g.status = totalHandedOver >= totalBooked && totalBooked > 0 ? 'COMPLETED' : 'PARTIAL';
       return g;
@@ -146,7 +146,7 @@ export function HandoversFeature() {
     return eligibleContracts.filter(c => {
       if (c.contractNumber?.toLowerCase().includes(s)) return true;
       if (c.customer?.name?.toLowerCase().includes(s)) return true;
-      if (c.booking?.items?.some(i =>
+      if (c.items?.some(i =>
         i.vehicle?.coreVehicle?.plateNumber?.toLowerCase().includes(s) ||
         i.vehicle?.coreVehicle?.brand?.toLowerCase().includes(s) ||
         i.vehicle?.coreVehicle?.vehicleName?.toLowerCase().includes(s)
@@ -224,12 +224,12 @@ export function HandoversFeature() {
                           <span className="text-[11px] text-muted-foreground truncate" title={contract.customer?.name}>{contract.customer?.name}</span>
                         </div>
                         <span className="text-[10px] font-medium text-muted-foreground shrink-0 mt-0.5">
-                          {new Date(contract.contractDate).toLocaleDateString(locale === 'id' ? 'id-ID' : 'en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
+                          {new Date((contract.contractDate || contract.startDate)).toLocaleDateString(locale === 'id' ? 'id-ID' : 'en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
                         </span>
                       </div>
 
                       <div className="flex flex-wrap gap-1 mb-1.5 w-full">
-                        {(contract.booking?.items || []).map((item, idx) => {
+                        {(contract.items || []).map((item, idx) => {
                           const isHandedOver = handedOverItemIds.has(item.id);
                           return (
                             <TooltipProvider key={item.id || idx}>
@@ -244,11 +244,11 @@ export function HandoversFeature() {
                                     )}
                                   >
                                     {isHandedOver && <Check className="w-3 h-3 shrink-0" />}
-                                    {item.vehicle?.coreVehicle?.plateNumber}
+                                    {item.vehicleSnapshot?.licensePlate}
                                   </div>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                  <p className="font-semibold">{item.vehicle?.coreVehicle?.brand} {item.vehicle?.coreVehicle?.vehicleName}</p>
+                                  <p className="font-semibold">{item.vehicleSnapshot?.brand} {item.vehicleSnapshot?.model}</p>
                                   {isHandedOver && <p className="text-[10px] text-success font-medium mt-0.5">Sudah Diserahterimakan</p>}
                                 </TooltipContent>
                               </Tooltip>
@@ -265,8 +265,8 @@ export function HandoversFeature() {
                         className="h-7 w-7 p-0 shrink-0 shadow-none transition-all hover:border-primary/40 hover:text-primary"
                         title="Lihat Lokasi Kendaraan"
                         onClick={async () => {
-                          const vehicleIds = (contract.booking?.items || [])
-                            .map(i => i.vehicle?.coreVehicle?.id)
+                          const vehicleIds = (contract.items || [])
+                            .map(i => i.vehicleId)
                             .filter(Boolean) as string[];
 
                           if (vehicleIds.length > 0) {

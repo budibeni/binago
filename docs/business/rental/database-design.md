@@ -19,7 +19,9 @@ Menyimpan data identitas pelanggan rental (Single Source of Truth untuk Booking)
 | `city` | VARCHAR | NULL | |
 | `province` | VARCHAR | NULL | |
 | `postal_code` | VARCHAR | NULL | |
+| `created_by`| UUID | FK `users.id` | |
 | `created_at`| TIMESTAMP | DEFAULT NOW() | |
+| `updated_by`| UUID | FK `users.id` | |
 | `updated_at`| TIMESTAMP | DEFAULT NOW() | |
 
 **Atribut Khusus Individu (Jika `type` = `INDIVIDUAL`)**
@@ -56,6 +58,10 @@ Menyimpan data identitas pelanggan rental (Single Source of Truth untuk Booking)
 | `total_rentals` | INTEGER | DEFAULT 0 | Total frekuensi sewa (Booking yang sukses menjadi Kontrak) |
 | `last_rental_date` | TIMESTAMP| NULL | Tanggal terakhir kali sewa berjalan (Handover) |
 | `last_payment_date`| TIMESTAMP| NULL | Tanggal terakhir kali melakukan pembayaran |
+| `created_by`| UUID | FK `users.id` | |
+| `created_at`| TIMESTAMP | DEFAULT NOW() | |
+| `updated_by`| UUID | FK `users.id` | |
+| `updated_at`| TIMESTAMP | DEFAULT NOW() | Waktu saldo terakhir diperbarui |
 
 ## 2. Kategori Tarif & Profil Armada
 Skema harga berjenjang dan pemetaan armada CORE ke operasional rental.
@@ -73,6 +79,10 @@ Skema harga berjenjang dan pemetaan armada CORE ke operasional rental.
 | `hourly_deposit`| DECIMAL | NOT NULL | Uang Jaminan Per Jam |
 | `daily_deposit`| DECIMAL | NOT NULL | Uang Jaminan Harian |
 | `status` | ENUM | NOT NULL | `ACTIVE`, `INACTIVE` |
+| `created_by`| UUID | FK `users.id` | |
+| `created_at`| TIMESTAMP | DEFAULT NOW() | |
+| `updated_by`| UUID | FK `users.id` | |
+| `updated_at`| TIMESTAMP | DEFAULT NOW() | |
 
 **Table: `rental_vehicle_profiles`**
 | Column | Type | Constraints | Description |
@@ -85,8 +95,11 @@ Skema harga berjenjang dan pemetaan armada CORE ke operasional rental.
 | `fuel_level_percent` | INTEGER | DEFAULT 100 | Level BBM saat ini (0-100%) |
 | `condition_notes` | TEXT | NULL | Catatan kondisi fisik kendaraan |
 | `completeness_checklist` | JSONB | NOT NULL | Status STNK, Kunci Cadangan, Dongkrak, dll. |
-| `current_booking_id` | UUID | FK `rental_bookings.id` | Booking aktif (jika RESERVED) |
-| `current_contract_id` | UUID | FK `rental_contracts.id` | Kontrak aktif (jika RENTED) |
+| `current_booking_id` | UUID | FK `rental_bookings.id` | Booking aktif (jika RESERVED atau RENTED) |
+| `created_by`| UUID | FK `users.id` | |
+| `created_at`| TIMESTAMP | DEFAULT NOW() | |
+| `updated_by`| UUID | FK `users.id` | |
+| `updated_at`| TIMESTAMP | DEFAULT NOW() | |
 
 ## 3. Transaksi Sewa (Booking & Kontrak)
 Pencatatan reservasi (*multi-armada*) dan dokumen legalnya.
@@ -100,7 +113,17 @@ Pencatatan reservasi (*multi-armada*) dan dokumen legalnya.
 | `start_date` | TIMESTAMP | NOT NULL | Waktu mulai sewa (Global) |
 | `rental_type` | ENUM | NOT NULL | `WITH_DRIVER`, `SELF_DRIVE` |
 | `total_amount` | DECIMAL | NOT NULL | Total Tagihan awal |
-| `status` | ENUM | NOT NULL | `DRAFT`, `CONFIRMED`, `CANCELLED`, `COMPLETED` |
+| `status` | ENUM | NOT NULL | `DRAFT`, `BOOKED`, `CONTRACTED`, `ACTIVE`, `COMPLETED`, `CANCELLED` |
+| `customer_snapshot` | JSONB | NOT NULL | Bekuan data detail pelanggan (nama, tipe, kontak) |
+| `contract_number` | VARCHAR | NULL | (Cth: CTR-202410-001) Diisi saat `CONTRACTED` |
+| `contract_date` | TIMESTAMP | NULL | Tanggal kontrak disetujui |
+| `contract_notes` | TEXT | NULL | Catatan kontrak / Terms & Conditions |
+| `contract_issued_by` | UUID | FK `users.id` | Admin yang menerbitkan kontrak |
+| `contract_issued_at` | TIMESTAMP | NULL | Waktu sistem saat kontrak diterbitkan |
+| `created_by` | UUID | FK `users.id` | Admin yang membuat booking |
+| `created_at` | TIMESTAMP | DEFAULT NOW() | Waktu booking dibuat |
+| `updated_by` | UUID | FK `users.id` | Admin yang terakhir mengubah |
+| `updated_at` | TIMESTAMP | DEFAULT NOW() | Waktu terakhir diubah |
 
 **Table: `rental_booking_items`** (Menampung armada di dalam Booking)
 | Column | Type | Constraints | Description |
@@ -113,44 +136,20 @@ Pencatatan reservasi (*multi-armada*) dan dokumen legalnya.
 | `package_name` | VARCHAR | NULL | Nama paket saat transaksi (snapshot) |
 | `unit_price` | DECIMAL | NOT NULL | Harga bekuan (snapshot tarif harian/jam/paket) |
 | `deposit_snapshot` | DECIMAL | NOT NULL | Uang jaminan untuk kendaraan ini |
+| `vehicle_snapshot` | JSONB | NOT NULL | Bekuan data kendaraan (plat, merek, model, kategori) |
 | `duration` | INTEGER | NOT NULL | Durasi (jam/hari) sesuai rate_type |
 | `subtotal` | DECIMAL | NOT NULL | Total harga (rate * durasi) untuk unit ini |
+| `handover_date` | TIMESTAMP | NULL | Tanggal serah terima unit |
+| `handover_by` | UUID | FK `users.id` | Admin/Petugas yang menyerahkan |
+| `handover_odometer` | INTEGER | NULL | Jarak Tempuh Awal (saat Handover) |
+| `handover_condition` | JSONB | NULL | Log kondisi/bahan bakar saat diserahkan |
+| `return_date` | TIMESTAMP | NULL | Tanggal pengembalian unit |
+| `return_by` | UUID | FK `users.id` | Admin/Petugas yang menerima kembali |
+| `return_odometer` | INTEGER | NULL | Jarak Tempuh Akhir (saat Return) |
+| `return_condition` | JSONB | NULL | Log kondisi/bahan bakar saat dikembalikan |
+| `extra_charges` | DECIMAL | NULL | Denda (Jika ada, dihitung saat return) |
 
-**Table: `rental_contracts`**
-| Column | Type | Constraints | Description |
-|---|---|---|---|
-| `id` | UUID | PRIMARY KEY | |
-| `booking_id` | UUID | UNIQUE, FK `rental_bookings.id`| 1 Booking = 1 Kontrak |
-| `contract_number`| VARCHAR | UNIQUE, NOT NULL | (Cth: CTR-202410-001) |
-| `content_html` | TEXT | NULL | Hasil render Tiptap/Handlebars |
-| `status` | ENUM | NOT NULL | `DRAFT`, `ACTIVE`, `COMPLETED`, `VOID` |
-
-## 4. Operasional (Serah Terima & Pengembalian)
-Pencatatan kondisi fisik unit.
-
-**Table: `rental_handovers`**
-| Column | Type | Constraints | Description |
-|---|---|---|---|
-| `id` | UUID | PRIMARY KEY | |
-| `contract_id` | UUID | FK `rental_contracts.id` | |
-| `vehicle_id` | UUID | FK `core_vehicles.id` | |
-| `start_odometer`| INTEGER | NOT NULL | Jarak Tempuh Awal |
-| `fuel_level` | VARCHAR | NOT NULL | (Cth: 100%, 75%, 50%) |
-| `conditions` | JSONB | NULL | Log goresan / interior |
-| `handover_date` | TIMESTAMP | DEFAULT NOW() | |
-
-**Table: `rental_returns`**
-| Column | Type | Constraints | Description |
-|---|---|---|---|
-| `id` | UUID | PRIMARY KEY | |
-| `contract_id` | UUID | FK `rental_contracts.id` | |
-| `vehicle_id` | UUID | FK `core_vehicles.id` | |
-| `end_odometer` | INTEGER | NOT NULL | Jarak Tempuh Akhir |
-| `fuel_level` | VARCHAR | NOT NULL | |
-| `additional_fee`| DECIMAL | NULL | Denda (Jika ada) |
-| `return_date` | TIMESTAMP | DEFAULT NOW() | |
-
-## 5. Global Pembayaran
+## 4. Global Pembayaran
 Rekonsiliasi arus kas.
 
 **Table: `rental_payments`**
@@ -166,3 +165,7 @@ Rekonsiliasi arus kas.
 | `status` | ENUM | NOT NULL | `PENDING`, `VERIFIED`, `CANCELLED` |
 | `reference_number`| VARCHAR | NULL | Referensi Bukti Transfer |
 | `payment_date` | TIMESTAMP | NOT NULL | |
+| `created_by`| UUID | FK `users.id` | |
+| `created_at`| TIMESTAMP | DEFAULT NOW() | |
+| `updated_by`| UUID | FK `users.id` | |
+| `updated_at`| TIMESTAMP | DEFAULT NOW() | |

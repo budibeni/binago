@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { Calendar, Clock, CheckCircle2, Car, XCircle, List, MapPin, ChevronRight, Eye, EyeOff } from 'lucide-react';
+import { Calendar, Clock, CheckCircle2, Car, XCircle, List, MapPin, ChevronRight, Eye, EyeOff, FileEdit } from 'lucide-react';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
 import { bookingService } from '@/data/modules/rental/services/bookingService';
 import type { Booking, BookingStatusFilter } from './types/booking';
@@ -84,7 +84,8 @@ export function BookingsFeature() {
   }, [fetchBookings]);
 
   const stats = useMemo(() => ({
-    all:       bookings.length,
+    all: bookings.length,
+    draft: bookings.filter(r => r.status === 'DRAFT').length,
     booked:    bookings.filter(r => r.status === 'BOOKED').length,
     contracted:bookings.filter(r => r.status === 'CONTRACTED').length,
     active:    bookings.filter(r => r.status === 'ACTIVE').length,
@@ -98,8 +99,8 @@ export function BookingsFeature() {
       if (search) {
         const q = search.toLowerCase();
         const noMatch   = r.bookingNumber.toLowerCase().includes(q);
-        const nameMatch = r.customer?.name?.toLowerCase().includes(q);
-        const plateMatch = r.items?.some(item => item.vehicle?.coreVehicle?.plateNumber?.toLowerCase().includes(q));
+        const nameMatch = r.customerSnapshot?.name?.toLowerCase().includes(q);
+        const plateMatch = r.items?.some(item => item.vehicleSnapshot?.licensePlate?.toLowerCase().includes(q));
         if (!noMatch && !nameMatch && !plateMatch) return false;
       }
       return true;
@@ -129,11 +130,11 @@ export function BookingsFeature() {
 
   const handleConfirm = async (booking: Booking) => {
     try {
-      await bookingService.updateBookingStatus(booking.id, 'CONTRACTED');
+      await bookingService.updateBookingStatus(booking.id, 'BOOKED');
       const data = await bookingService.getBookings();
       setBookings(data);
       if (detailBooking?.id === booking.id) {
-        setDetailBooking({ ...booking, status: 'CONTRACTED' });
+        setDetailBooking({ ...booking, status: 'BOOKED' });
       }
       alert('Booking berhasil dikonfirmasi');
     } catch (error) {
@@ -222,8 +223,9 @@ export function BookingsFeature() {
           (panelSide === 'top' || panelSide === 'bottom') ? "w-full" : "w-80 min-w-80 h-full"
         )}
       >
-        <div className={cn("gap-2.5 p-3", (panelSide === 'top' || panelSide === 'bottom') ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6" : "flex flex-col h-full")}>
+        <div className={cn("gap-2.5 p-3", (panelSide === 'top' || panelSide === 'bottom') ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-7" : "flex flex-col h-full")}>
           <StatCard label={labels.summaryTotal || 'Total Booking'} value={stats.all} colorClass="bg-foreground" icon={List} />
+          <StatCard label={labels.statusDraft || 'Draft'} value={stats.draft} colorClass="bg-neutral-400" icon={FileEdit} />
           <StatCard label={labels.statusBooked || 'Dipesan'} value={stats.booked} colorClass="bg-amber-500" icon={Clock} />
           <StatCard label={labels.statusContracted || 'Dikontrak'} value={stats.contracted} colorClass="bg-blue-500" icon={CheckCircle2} />
           <StatCard label={labels.statusActive || 'Aktif'} value={stats.active} colorClass="bg-success" icon={Car} />

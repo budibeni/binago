@@ -71,6 +71,14 @@ export const mockVehiclePricingAssignments: VehiclePricingAssignment[] = [
   { vehicleId: 'rveh-001', pricingCategoryId: 'prg-001', assignedAt: '2026-01-01T00:00:00Z' },
   { vehicleId: 'rveh-002', pricingCategoryId: 'prg-001', assignedAt: '2026-01-01T00:00:00Z' },
   { vehicleId: 'rveh-003', pricingCategoryId: 'prg-001', assignedAt: '2026-01-01T00:00:00Z' },
+  { vehicleId: 'rveh-008', pricingCategoryId: 'prg-001', assignedAt: '2026-01-01T00:00:00Z' },
+  { vehicleId: 'rveh-009', pricingCategoryId: 'prg-001', assignedAt: '2026-01-01T00:00:00Z' },
+  { vehicleId: 'rveh-010', pricingCategoryId: 'prg-001', assignedAt: '2026-01-01T00:00:00Z' },
+  { vehicleId: 'rveh-011', pricingCategoryId: 'prg-001', assignedAt: '2026-01-01T00:00:00Z' },
+  { vehicleId: 'rveh-012', pricingCategoryId: 'prg-001', assignedAt: '2026-01-01T00:00:00Z' },
+  { vehicleId: 'rveh-013', pricingCategoryId: 'prg-001', assignedAt: '2026-01-01T00:00:00Z' },
+  { vehicleId: 'rveh-014', pricingCategoryId: 'prg-001', assignedAt: '2026-01-01T00:00:00Z' },
+  { vehicleId: 'rveh-015', pricingCategoryId: 'prg-001', assignedAt: '2026-01-01T00:00:00Z' },
   
   // MPV Premium
   { vehicleId: 'rveh-004', pricingCategoryId: 'prg-002', assignedAt: '2026-01-01T00:00:00Z' },

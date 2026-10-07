@@ -35,6 +35,7 @@ interface BookingTableProps {
 
 const getStatusColor = (status: BookingStatus) => {
   switch (status) {
+    case 'DRAFT': return 'bg-neutral-200 text-neutral-700 dark:bg-neutral-700/50 dark:text-neutral-300';
     case 'BOOKED': return 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400';
     case 'CONTRACTED': return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400';
     case 'ACTIVE': return 'bg-success/10 text-success';
@@ -46,6 +47,7 @@ const getStatusColor = (status: BookingStatus) => {
 
 const getStatusLabel = (status: BookingStatus, labels: Record<string, any>) => {
   switch (status) {
+    case 'DRAFT': return labels.statusDraft || 'Draft';
     case 'BOOKED': return labels.statusBooked || 'Dipesan';
     case 'CONTRACTED': return labels.statusContracted || 'Dikontrak';
     case 'ACTIVE': return labels.statusActive || 'Berjalan';
@@ -136,18 +138,18 @@ function buildColumns(
     // --- Pelanggan ---
     {
       id: 'customerGroup',
-      accessorFn: (row) => row.customer?.name || '-',
+      accessorFn: (row) => row.customerSnapshot?.name || '-',
       header: labels.colCustomer || 'Pelanggan',
       enableSorting: true,
       size: 200,
       cell: ({ row }) => {
-        const c = row.original.customer;
+        const c = row.original.customerSnapshot;
         if (!c) return <span className="text-muted-foreground">-</span>;
         return (
           <div className="flex flex-col gap-0.5 py-1">
             <span className="text-[13px] font-normal text-foreground truncate" title={c.name}>{c.name}</span>
             <span className="text-[11px] text-muted-foreground truncate">
-              {c.code || '-'} • {c.type === 'COMPANY' ? (labels.typeCompany || 'Perusahaan') : (labels.typeIndividual || 'Individu')}
+              {c.type}
             </span>
           </div>
         );
@@ -156,12 +158,12 @@ function buildColumns(
     // --- Kontak ---
     {
       id: 'contact',
-      accessorFn: (row) => row.customer?.phone || '-',
+      accessorFn: (row) => row.customerSnapshot?.phone || '-',
       header: labels.colContact || 'Kontak',
       enableSorting: false,
       size: 160,
       cell: ({ row }) => {
-        const c = row.original.customer;
+        const c = row.original.customerSnapshot;
         if (!c) return <span className="text-muted-foreground">-</span>;
 
         const location = [c.city, c.province].filter(Boolean).join(' - ');
@@ -183,7 +185,7 @@ function buildColumns(
       id: 'vehicleGroup',
       accessorFn: (row) => {
         const items = row.items || [];
-        return items.map(i => i.vehicle?.coreVehicle?.plateNumber).filter(Boolean).join(', ');
+        return items.map(i => i.vehicleSnapshot?.licensePlate).filter(Boolean).join(', ');
       },
       header: labels.colVehicle || 'Kendaraan',
       enableSorting: true,
@@ -193,7 +195,7 @@ function buildColumns(
         const items = b.items;
         if (!items || items.length === 0) return <span className="text-muted-foreground">-</span>;
 
-        const plates = items.map(i => i.vehicle?.coreVehicle?.plateNumber).filter(Boolean);
+        const plates = items.map(i => i.vehicleSnapshot?.licensePlate).filter(Boolean);
         if (plates.length === 0) return <span className="text-muted-foreground">-</span>;
 
         const isTrackable = b.status !== 'COMPLETED' && b.status !== 'CANCELLED';

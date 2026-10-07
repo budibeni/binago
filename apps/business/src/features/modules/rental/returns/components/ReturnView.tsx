@@ -262,7 +262,7 @@ export function ReturnView({
               {c.items.some(i => i.notes && i.vehicleConditionEnd === 'GOOD') ? (
                 <ul className="list-disc list-inside space-y-1">
                   {c.items.filter(i => i.notes && i.vehicleConditionEnd === 'GOOD').map((item, idx) => (
-                    <li key={idx}><span className="font-semibold text-foreground mr-1">{item.vehicle?.coreVehicle?.plateNumber}:</span> {item.notes}</li>
+                    <li key={idx}><span className="font-semibold text-foreground mr-1">{item.vehicleSnapshot?.licensePlate}:</span> {item.notes}</li>
                   ))}
                 </ul>
               ) : (
@@ -281,7 +281,7 @@ export function ReturnView({
               </div>
             )}
             <PaymentsFeature 
-              bookingId={contract?.bookingId || c.contractId}
+              bookingId={contractId || c.contractId}
               customerId={customer?.id || ''}
               totalAmount={grandTotalAmount}
               deposit={contract?.deposit || 0}

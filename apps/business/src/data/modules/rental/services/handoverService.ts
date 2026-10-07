@@ -58,7 +58,7 @@ export const handoverService = {
       if (!contract.booking) continue;
       
       let hasPendingItems = false;
-      for (const item of contract.booking.items) {
+      for (const item of contract.items) {
         const existing = await handoverRepository.getHandoverByBookingItemId(contract.id, item.id);
         if (!existing) {
           hasPendingItems = true;
@@ -101,7 +101,7 @@ export const handoverService = {
     }
 
     // Validation against previous odometer
-    const item = contract.booking?.items.find(i => i.id === data.bookingItemId);
+    const item = contract.items.find(i => i.id === data.bookingItemId);
     const vehicle = await rentalVehicleService.getRentalVehicleByVehicleId(data.vehicleId);
     if (vehicle && vehicle.currentOdometer > data.odometerStart) {
       throw new Error('Nilai odometer tidak boleh lebih kecil dari pembacaan sebelumnya.');

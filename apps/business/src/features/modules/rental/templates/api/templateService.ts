@@ -14,7 +14,7 @@ const defaultHtml = `
     <tr>
       <td><p><strong>Tanggal</strong></p></td>
       <td><p>:</p></td>
-      <td><p>{{contract.contractDate}}</p></td>
+      <td><p>{{(contract.contractDate || contract.startDate)}}</p></td>
     </tr>
   </tbody>
 </table>

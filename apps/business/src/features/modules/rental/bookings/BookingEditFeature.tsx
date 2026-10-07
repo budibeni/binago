@@ -82,6 +82,7 @@ export function BookingEditFeature({ bookingId, onOpenChange, onSuccess }: Booki
     bookingNumber: booking.bookingNumber,
     status: booking.status,
     customerId: booking.customerId,
+    createdAt: booking.createdAt,
     items: booking.items?.map(i => ({
       vehicleId: i.vehicleId,
       rateType: i.rateType,

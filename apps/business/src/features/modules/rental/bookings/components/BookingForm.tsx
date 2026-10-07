@@ -29,6 +29,7 @@ export interface BookingFormData {
   customerId: string;
   items: BookingItemData[];
   startDate: string; // Global Pick-up time
+  createdAt?: string; // Tanggal Booking
   rentalType: RentalType;
   deposit: number;
   notes: string;
@@ -316,12 +317,14 @@ export function BookingForm({
                 <div>
                   <InputSelect
                     label={'Status Booking'}
-                    value={formData.status || 'BOOKED'}
+                    value={formData.status || 'DRAFT'}
                     onChange={(val) => handleChange('status', val as BookingStatus)}
                     options={isEditing ? [
+                      { value: 'DRAFT', label: t.statusDraft || 'Draft' },
                       { value: 'BOOKED', label: t.statusBooked || 'Dipesan' },
                       { value: 'CANCELLED', label: t.statusCancelled || 'Dibatalkan' }
                     ] : [
+                      { value: 'DRAFT', label: t.statusDraft || 'Draft' },
                       { value: 'BOOKED', label: t.statusBooked || 'Dipesan' }
                     ]}
                     disabled={!isEditing}
@@ -416,16 +419,21 @@ export function BookingForm({
               <div className="flex flex-col gap-3 mt-2">
                 {formData.items.map((item, index) => {
                   const v = vehicles.find(x => x.vehicleId === item.vehicleId);
-                  if (!v) return null;
+                  if (!v && !item.vehicleSnapshot) return null;
                   
+                  const plate = item.vehicleSnapshot?.licensePlate || v?.coreVehicle.plateNumber;
+                  const brand = item.vehicleSnapshot?.brand || v?.coreVehicle.brand;
+                  const model = item.vehicleSnapshot?.model || v?.coreVehicle.vehicleName;
+                  const category = item.vehicleSnapshot?.categoryName || v?.categoryName;
+
                   return (
                     <div key={item.vehicleId} className="flex flex-col md:flex-row gap-4 p-4 border border-border/60 bg-white dark:bg-neutral-900/60 rounded-xl items-start md:items-center relative group">
                       {/* Vehicle Info */}
                       <div className="flex-1 min-w-[200px]">
-                        <p className="font-bold text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] text-foreground">{v.coreVehicle.plateNumber}</p>
-                        <p className="text-[11px] group-data-[layout=drawer]/form:!text-[10px] group-data-[layout=dialog]/form:!text-[10px] text-muted-foreground">{v.coreVehicle.brand} {v.coreVehicle.vehicleName}</p>
+                        <p className="font-bold text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] text-foreground">{plate}</p>
+                        <p className="text-[11px] group-data-[layout=drawer]/form:!text-[10px] group-data-[layout=dialog]/form:!text-[10px] text-muted-foreground">{brand} {model}</p>
                         <div className="mt-1 flex items-center gap-2">
-                          <span className="px-1.5 py-0.5 rounded bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400 border border-border/50 text-[9px] font-bold uppercase tracking-wider">{v.categoryName || 'Kategori'}</span>
+                          <span className="px-1.5 py-0.5 rounded bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400 border border-border/50 text-[9px] font-bold uppercase tracking-wider">{category || 'Kategori'}</span>
                         </div>
                       </div>
 
@@ -523,47 +531,72 @@ export function BookingForm({
       {/* RINGKASAN BOOKING */}
       <FormCard title={t.sectionSummary} description="Cek kembali detail booking sebelum menyimpan." icon={<ClipboardList className="w-5 h-5 text-amber-500" />} iconWrapperClassName="bg-amber-100 dark:bg-amber-900/30" className="mt-2 group-data-[layout=default]/form:lg:col-span-2 group-data-[layout=dialog]/form:lg:col-span-2 group-data-[layout=fullscreen]/form:lg:col-span-2">
         <div className="flex flex-col md:flex-row group-data-[layout=drawer]/form:!flex-col gap-6 pt-2">
-          <div className="flex-1 flex flex-col gap-2">
-            <div className="grid grid-cols-[100px_1fr] gap-2">
-              <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] text-muted-foreground">{t.fieldCustomer || "Pelanggan"}</span>
-              <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] font-semibold">{selectedCustomer?.name || '-'}</span>
+          <div className="flex-1 flex flex-col gap-3">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-x-6 gap-y-2 group-data-[layout=drawer]/form:!grid-cols-1 group-data-[layout=drawer]/form:!gap-y-2">
+              <div className="flex flex-col gap-2">
+                <div className="grid grid-cols-[100px_1fr] gap-2">
+                  <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] text-muted-foreground">{t.fieldCustomer || "Pelanggan"}</span>
+                  <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] font-semibold">{selectedCustomer?.name || '-'}</span>
+                </div>
+                <div className="grid grid-cols-[100px_1fr] gap-2">
+                  <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] text-muted-foreground">{t.fieldVehicle || "Kendaraan"}</span>
+                  <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] font-semibold">{formData.items?.length || 0} unit</span>
+                </div>
+                <div className="grid grid-cols-[100px_1fr] gap-2">
+                  <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] text-muted-foreground">{t.fieldRentalType || "Tipe Rental"}</span>
+                  <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] font-semibold">{formData.rentalType === 'SELF_DRIVE' ? t.rentalTypeSelfDrive : t.rentalTypeWithDriver}</span>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-2 xl:border-l xl:pl-6 group-data-[layout=drawer]/form:!border-l-0 group-data-[layout=drawer]/form:!pl-0 group-data-[layout=drawer]/form:!border-t group-data-[layout=drawer]/form:!pt-2 group-data-[layout=drawer]/form:!mt-1 border-border/30">
+                <div className="grid grid-cols-[100px_1fr] gap-2">
+                  <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] text-muted-foreground">Tgl Booking</span>
+                  <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] font-semibold">
+                    {new Date(formData.createdAt || new Date()).toLocaleString("id-ID", { dateStyle: "medium", timeStyle: "short" })}
+                  </span>
+                </div>
+                <div className="grid grid-cols-[100px_1fr] gap-2 pt-1">
+                  <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] text-muted-foreground">{t.pickupTime || "Waktu Ambil"}</span>
+                  <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] font-semibold">
+                    {formData.startDate ? new Date(formData.startDate).toLocaleString("id-ID", { dateStyle: "medium", timeStyle: "short" }) : "-"}
+                  </span>
+                </div>
+                <div className="grid grid-cols-[100px_1fr] gap-2 pt-1">
+                  <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] text-muted-foreground">{t.returnMaxTime || "Selesai (Maks)"}</span>
+                  <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] font-semibold text-primary">
+                    {(() => {
+                      if (!formData.startDate || !formData.items || formData.items.length === 0) return "-";
+                      let maxDate = new Date(formData.startDate);
+                      formData.items.forEach(item => {
+                        const d = new Date(formData.startDate!);
+                        const v = vehicles.find(x => x.vehicleId === item.vehicleId);
+                        if (item.rateType === "HOURLY") {
+                          d.setHours(d.getHours() + (item.duration || 1));
+                        } else if (item.rateType === "PACKAGE" && item.packageId && v?.packages) {
+                          const pkg = v.packages.find((p) => p.id === item.packageId);
+                          d.setDate(d.getDate() + (pkg?.durationDays || 1));
+                        } else {
+                          d.setDate(d.getDate() + (item.duration || 1));
+                        }
+                        if (d > maxDate) maxDate = d;
+                      });
+                      return maxDate.toLocaleString("id-ID", { dateStyle: "medium", timeStyle: "short" });
+                    })()}
+                  </span>
+                </div>
+              </div>
             </div>
-            <div className="grid grid-cols-[100px_1fr] gap-2">
-              <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] text-muted-foreground">{t.fieldVehicle || "Kendaraan"}</span>
-              <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] font-semibold">{formData.items?.length || 0} unit</span>
-            </div>
-            <div className="grid grid-cols-[100px_1fr] gap-2">
-              <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] text-muted-foreground">{t.fieldRentalType || "Tipe Rental"}</span>
-              <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] font-semibold">{formData.rentalType === 'SELF_DRIVE' ? t.rentalTypeSelfDrive : t.rentalTypeWithDriver}</span>
-            </div>
-            <div className="grid grid-cols-[100px_1fr] gap-2 pt-2 border-t border-border/30 mt-2">
-              <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] text-muted-foreground">{t.pickupTime || "Waktu Ambil"}</span>
-              <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] font-semibold">
-                {formData.startDate ? new Date(formData.startDate).toLocaleString("id-ID", { dateStyle: "medium", timeStyle: "short" }) : "-"}
-              </span>
-            </div>
-            <div className="grid grid-cols-[100px_1fr] gap-2 pt-1">
-              <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] text-muted-foreground">{t.returnMaxTime || "Selesai (Maks)"}</span>
-              <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] font-semibold text-primary">
-                {(() => {
-                  if (!formData.startDate || !formData.items || formData.items.length === 0) return "-";
-                  let maxDate = new Date(formData.startDate);
-                  formData.items.forEach(item => {
-                    const d = new Date(formData.startDate!);
-                    const v = vehicles.find(x => x.vehicleId === item.vehicleId);
-                    if (item.rateType === "HOURLY") {
-                      d.setHours(d.getHours() + (item.duration || 1));
-                    } else if (item.rateType === "PACKAGE" && item.packageId && v?.packages) {
-                      const pkg = v.packages.find((p) => p.id === item.packageId);
-                      d.setDate(d.getDate() + (pkg?.durationDays || 1));
-                    } else {
-                      d.setDate(d.getDate() + (item.duration || 1));
-                    }
-                    if (d > maxDate) maxDate = d;
-                  });
-                  return maxDate.toLocaleString("id-ID", { dateStyle: "medium", timeStyle: "short" });
-                })()}
-              </span>
+
+            <div className="mt-4 pt-4 border-t border-border/50 w-full pr-0">
+              <div className="bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/50 dark:border-amber-900/30 rounded-lg p-3 w-full">
+                <div className="flex justify-between items-start w-full">
+                  <div className="flex flex-col gap-0.5 max-w-[80%]">
+                    <span className="text-[10px] text-amber-700 dark:text-amber-400 font-semibold uppercase tracking-wider">Uang Jaminan (Deposit)</span>
+                    <span className="text-[9px] text-muted-foreground/80 leading-relaxed mt-0.5">* Ditagih terpisah dari biaya sewa dan akan di-<i>refund</i> utuh saat kendaraan kembali dengan aman.</span>
+                  </div>
+                  <span className="text-[12px] font-semibold text-amber-700/90 dark:text-amber-400/90 whitespace-nowrap ml-2 mt-0.5">{formatCurrency(formData.deposit || 0)}</span>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -572,20 +605,22 @@ export function BookingForm({
               <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] text-muted-foreground">{t.subtotalRental || "Subtotal Sewa"}</span>
               <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] font-semibold">{formatCurrency(totalAmount - (formData.driverFee || 0))}</span>
             </div>
-            {(formData.driverFee || 0) > 0 && (
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] text-muted-foreground">{t.driverFeeText || "Biaya Pengemudi"}</span>
-                <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] font-semibold">{formatCurrency(formData.driverFee || 0)}</span>
-              </div>
-            )}
-            <div className="flex justify-between items-center mb-6">
-              <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] text-muted-foreground">{t.totalDepositText || "Total Deposit"}</span>
-              <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] font-semibold">{formatCurrency(formData.deposit || 0)}</span>
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] text-muted-foreground">
+                {formData.rentalType === 'WITH_DRIVER' ? (t.driverFeeText || "Biaya Pengemudi") : "Biaya Lainnya"}
+              </span>
+              <span className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] font-semibold">
+                {formatCurrency(formData.driverFee || 0)}
+              </span>
             </div>
-
-            <div className="mt-auto bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 rounded-lg p-3">
-              <p className="text-[11px] group-data-[layout=drawer]/form:!text-[10px] group-data-[layout=dialog]/form:!text-[10px] text-red-700 dark:text-red-400 font-semibold mb-1">Total Tagihan (termasuk Deposit)</p>
-              <p className="text-[15px] group-data-[layout=drawer]/form:!text-[14px] group-data-[layout=dialog]/form:!text-[14px] font-bold text-red-800 dark:text-red-300">{formatCurrency(totalAmount + (formData.deposit || 0))}</p>
+            <div className="mb-0 mt-auto bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 rounded-lg p-3 w-full">
+              <div className="flex justify-between items-start w-full">
+                <div className="flex flex-col gap-0.5 max-w-[80%]">
+                  <span className="text-[10px] text-red-700 dark:text-red-400 font-semibold uppercase tracking-wider">Total Tagihan Sewa</span>
+                  <span className="text-[9px] text-muted-foreground/80 leading-relaxed mt-0.5 group-data-[layout=drawer]/form:text-transparent group-data-[layout=drawer]/form:select-none">* Tagihan murni layanan rental.</span>
+                </div>
+                <span className="text-[14px] font-bold text-red-800 dark:text-red-300 whitespace-nowrap ml-2">{formatCurrency(totalAmount)}</span>
+              </div>
             </div>
           </div>
         </div>

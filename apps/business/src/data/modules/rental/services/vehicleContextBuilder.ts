@@ -39,7 +39,7 @@ export async function buildRentalVehicleContext(coreVehicleId: string, locale: L
     if (rentalVehicle.status === 'RENTED' || rentalVehicle.status === 'RESERVED') {
       const allContracts = await contractService.getContracts();
       const activeContract = allContracts.find(c => 
-        c.booking?.items?.some(item => item.vehicleId === coreVehicleId) && 
+        c.items?.some(item => item.vehicleId === coreVehicleId) && 
         (c.status === 'ACTIVE' || c.status === 'ISSUED')
       );
 
@@ -59,11 +59,11 @@ export async function buildRentalVehicleContext(coreVehicleId: string, locale: L
         // 5. Tambahkan info tarif & periode
         data.push({ 
           label: isEn ? 'Rental Period' : 'Periode Rental', 
-          value: `${new Date(activeContract.startDate).toLocaleDateString(locale === 'en' ? 'en-US' : 'id-ID', { day: 'numeric', month: 'short', year: 'numeric' })} - ${new Date(getMaxEndDate(activeContract.booking?.items || [])).toLocaleDateString(locale === 'en' ? 'en-US' : 'id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}`,
+          value: `${new Date(activeContract.startDate).toLocaleDateString(locale === 'en' ? 'en-US' : 'id-ID', { day: 'numeric', month: 'short', year: 'numeric' })} - ${new Date(getMaxEndDate(activeContract.items || [])).toLocaleDateString(locale === 'en' ? 'en-US' : 'id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}`,
           type: 'date' 
         });
         
-        const targetItem = activeContract.booking?.items?.find(item => item.vehicleId === coreVehicleId);
+        const targetItem = activeContract.items?.find(item => item.vehicleId === coreVehicleId);
         const vehicleRate = targetItem?.unitPrice || 0;
         
         const rateLabel = targetItem?.rateType === 'HOURLY' ? (isEn ? 'hour' : 'jam') : targetItem?.rateType === 'DAILY' ? (isEn ? 'day' : 'hari') : (isEn ? 'package' : 'paket');

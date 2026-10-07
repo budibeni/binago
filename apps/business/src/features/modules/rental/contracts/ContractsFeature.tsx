@@ -81,7 +81,7 @@ export function ContractsFeature() {
   // Statistics
   const stats = useMemo(() => {
     const total = contracts.length;
-    const issued = contracts.filter((c) => c.status === 'ISSUED').length;
+    const issued = contracts.filter((c) => c.status === 'CONTRACTED').length;
     const active = contracts.filter((c) => c.status === 'ACTIVE').length;
     const completed = contracts.filter((c) => c.status === 'COMPLETED').length;
     const cancelled = contracts.filter((c) => c.status === 'CANCELLED').length;
@@ -94,8 +94,8 @@ export function ContractsFeature() {
       if (search) {
         const q = search.toLowerCase();
         const noMatch = c.contractNumber?.toLowerCase()?.includes(q) || false;
-        const nameMatch = c.customer?.name?.toLowerCase()?.includes(q) || false;
-        const plateMatch = c.booking?.items?.some(item => item.vehicle?.coreVehicle?.plateNumber?.toLowerCase()?.includes(q)) || false;
+        const nameMatch = c.customerSnapshot?.name?.toLowerCase()?.includes(q) || false;
+        const plateMatch = c.items?.some(item => item.vehicleSnapshot?.licensePlate?.toLowerCase()?.includes(q)) || false;
         if (!noMatch && !nameMatch && !plateMatch) return false;
       }
       return true;
@@ -169,7 +169,7 @@ export function ContractsFeature() {
         label: labels.filterStatus || 'Status',
         type: 'pills-single',
         options: [
-          { value: 'ISSUED', label: labels.statusIssued || 'Diterbitkan', colorClass: 'bg-blue-500', activeClass: 'bg-blue-500/15 border-blue-500/40 text-blue-500' },
+          { value: 'CONTRACTED', label: labels.statusIssued || 'Diterbitkan', colorClass: 'bg-blue-500', activeClass: 'bg-blue-500/15 border-blue-500/40 text-blue-500' },
           { value: 'ACTIVE', label: labels.statusActive || 'Berjalan', colorClass: 'bg-success', activeClass: 'bg-success/15 border-success/40 text-success' },
           { value: 'COMPLETED', label: labels.statusCompleted || 'Selesai', colorClass: 'bg-neutral-500', activeClass: 'bg-neutral-500/15 border-neutral-500/40 text-neutral-500' },
           { value: 'CANCELLED', label: labels.statusCancelled || 'Batal', colorClass: 'bg-danger', activeClass: 'bg-danger/15 border-danger/40 text-danger' },

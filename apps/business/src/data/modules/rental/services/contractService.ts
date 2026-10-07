@@ -1,71 +1,45 @@
 import type { RentalContract, ContractFilters, ContractStatus } from '@/features/modules/rental/contracts/types/contract';
 import type { Booking } from '@/features/modules/rental/bookings/types/booking';
-import { contractRepository } from '../repositories/contractRepository';
 import { bookingService } from './bookingService';
-import { customerRepository } from '../repositories/customerRepository';
-import { rentalVehicleService } from './vehicleService';
-
-const populateRelations = async (contract: RentalContract): Promise<RentalContract> => {
-  const result = { ...contract };
-  
-  try {
-    const booking = await bookingService.getBookingById(contract.bookingId);
-    if (booking) {
-      result.booking = booking;
-    }
-    
-    const customer = customerRepository.getById(contract.customerId);
-    if (customer) {
-      result.customer = customer;
-    }
-  } catch (error) {
-    console.error('Error populating relations for contract', error);
-  }
-  
-  return result;
-};
 
 export const contractService = {
   getContracts: async (filters?: ContractFilters): Promise<RentalContract[]> => {
-    const contracts = await contractRepository.getContracts(filters);
+    const allBookings = await bookingService.getBookings();
     
-    // In a real app, populate on DB query. Here we do it sequentially or Promise.all
-    const populated = await Promise.all(contracts.map(c => populateRelations(c)));
+    // Contracts are Bookings with status >= CONTRACTED
+    // To simplify, we include 'CONTRACTED', 'ACTIVE', 'COMPLETED', 'CANCELLED' (if cancelled after contracted, though usually void)
+    const validStatuses = ['CONTRACTED', 'ACTIVE', 'COMPLETED', 'CANCELLED'];
+    let contracts = allBookings.filter(b => validStatuses.includes(b.status));
     
-    // If there's a search text, we can also filter by populated customer/vehicle name
-    if (filters?.search) {
-      const s = filters.search.toLowerCase();
-      return populated.filter(c => 
-        c.contractNumber.toLowerCase().includes(s) ||
-        c.bookingId.toLowerCase().includes(s) ||
-        c.customer?.name.toLowerCase().includes(s)
-      );
+    if (filters) {
+      if (filters.search) {
+        const s = filters.search.toLowerCase();
+        contracts = contracts.filter(c => 
+          c.contractNumber?.toLowerCase().includes(s) ||
+          c.bookingNumber.toLowerCase().includes(s) ||
+          c.customerSnapshot?.name.toLowerCase().includes(s)
+        );
+      }
+      
+      if (filters.status && filters.status !== 'all') {
+        contracts = contracts.filter((c) => c.status === filters.status);
+      }
     }
     
-    return populated;
+    return contracts;
   },
 
   getContractById: async (id: string): Promise<RentalContract | undefined> => {
-    const contract = await contractRepository.getContractById(id);
-    if (!contract) return undefined;
-    return populateRelations(contract);
+    return await bookingService.getBookingById(id);
   },
 
   getAvailableBookingsForContract: async (): Promise<Booking[]> => {
-    // Get all BOOKED bookings
     const allBookings = await bookingService.getBookings();
-    const bookings = allBookings.filter(r => r.status === 'BOOKED');
-    
-    // Get all contracts to find which bookings already have a contract
-    const allContracts = await contractRepository.getContracts();
-    const usedBookingIds = new Set(allContracts.map(c => c.bookingId));
-    
-    // Filter out those that already have a contract
-    return bookings.filter(r => !usedBookingIds.has(r.id));
+    // Only BOOKED status can become CONTRACTED
+    return allBookings.filter(r => r.status === 'BOOKED');
   },
 
   createContract: async (data: { bookingId: string; contractDate: string; notes?: string; terms?: string }): Promise<RentalContract> => {
-    // 1. Validation - check if booking is CONFIRMED
     const booking = await bookingService.getBookingById(data.bookingId);
     if (!booking) {
       throw new Error('Booking not found');
@@ -74,38 +48,26 @@ export const contractService = {
       throw new Error('Hanya reservasi berstatus BOOKED yang dapat dibuatkan kontrak');
     }
 
-    // 2. Duplicate prevention - checked inside repository, but double check here
-    const existing = await contractRepository.getContractByBookingId(data.bookingId);
-    if (existing) {
-      throw new Error('Booking ini sudah memiliki kontrak.');
-    }
+    // Generate contract number (simplified)
+    const count = (await bookingService.getBookings()).filter(b => !!b.contractNumber).length + 1;
+    const contractNumber = `KTR-2410-${String(count).padStart(3, '0')}`;
 
-    // 3. Create the contract
-    const newContract = await contractRepository.createContract({
-      bookingId: data.bookingId,
-      customerId: booking.customerId,
+    const updated = await bookingService.updateBooking(booking.id, {
+      status: 'CONTRACTED',
+      contractNumber,
       contractDate: data.contractDate,
-      startDate: booking.startDate,
-      
-      rentalType: booking.rentalType,
-      totalAmount: booking.totalAmount,
-      deposit: booking.deposit,
-      remainingAmount: booking.remainingAmount,
-      driverFee: booking.driverFee,
-      notes: data.notes || '-',
+      contractNotes: data.notes || '-',
       terms: data.terms || '',
-      status: 'ISSUED', // Starts directly as ISSUED
     });
     
-    return populateRelations(newContract);
+    return updated as RentalContract;
   },
 
   updateContractStatus: async (id: string, status: ContractStatus): Promise<RentalContract> => {
-    const contract = await contractRepository.getContractById(id);
+    const contract = await bookingService.getBookingById(id);
     if (!contract) throw new Error('Contract not found');
     
-    // Business rule validations
-    if (status === 'ACTIVE' && contract.status !== 'ISSUED') {
+    if (status === 'ACTIVE' && contract.status !== 'CONTRACTED') {
       throw new Error('Hanya kontrak DITERBITKAN yang dapat diaktifkan (via Serah Terima)');
     }
     
@@ -113,35 +75,18 @@ export const contractService = {
       throw new Error('Hanya kontrak ACTIVE yang dapat diselesaikan (via Pengembalian)');
     }
     
-    if (status === 'CANCELLED' && contract.status !== 'ISSUED') {
-      throw new Error('Kontrak hanya dapat dibatalkan jika belum diserahterimakan');
-    }
-    
-    // Transition
-    const updated = await contractRepository.updateContract(id, { status });
-    return populateRelations(updated);
+    const updated = await bookingService.updateBooking(id, { status });
+    return updated as RentalContract;
   },
   
   updateContract: async (id: string, data: Partial<RentalContract>): Promise<RentalContract> => {
-    const contract = await contractRepository.getContractById(id);
+    const contract = await bookingService.getBookingById(id);
     if (!contract) throw new Error('Contract not found');
-    if (contract.status !== 'ISSUED') {
+    if (contract.status !== 'CONTRACTED') {
       throw new Error('Hanya kontrak berstatus DITERBITKAN yang dapat diedit');
     }
 
-    // Protect certain fields from being overridden directly from UI
-    const protectedFields = [
-      'customerId', 'bookingId', 
-      'rentalType', 'rateType', 
-      'totalAmount', 'deposit', 'remainingAmount', 'status'
-    ];
-
-    const safeData = { ...data };
-    for (const field of protectedFields) {
-      delete (safeData as any)[field];
-    }
-
-    const updated = await contractRepository.updateContract(id, safeData);
-    return populateRelations(updated);
+    const updated = await bookingService.updateBooking(id, data);
+    return updated as RentalContract;
   },
 };

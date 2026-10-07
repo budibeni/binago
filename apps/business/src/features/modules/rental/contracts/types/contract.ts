@@ -1,42 +1,8 @@
-import type { Customer } from '@/features/modules/rental/customers/types/customer';
-import type { RentalVehicle } from '@/features/modules/rental/vehicles/types/rentalVehicle';
-import type { Booking } from '@/features/modules/rental/bookings/types/booking';
+import type { Booking, BookingStatusFilter } from '@/features/modules/rental/bookings/types/booking';
 
-export type ContractStatus =
-  | 'ISSUED'
-  | 'ACTIVE'
-  | 'COMPLETED'
-  | 'CANCELLED';
+export type ContractStatus = 'CONTRACTED' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
 
-export interface RentalContract {
-  id: string;
-  contractNumber: string;
-  bookingId: string;
-  customerId: string;
-
-  contractDate: string;
-
-  startDate: string;
-  
-  rentalType: 'SELF_DRIVE' | 'WITH_DRIVER';
-  
-  totalAmount: number;
-  deposit: number;
-  remainingAmount: number;
-  driverFee?: number;
-
-  notes?: string;
-  terms?: string;
-
-  status: ContractStatus;
-
-  createdAt: string;
-  updatedAt: string;
-  
-  // Relations (populated for UI)
-  customer?: Customer;
-  booking?: Booking;
-}
+export type RentalContract = Booking;
 
 export type ContractStatusFilter = 'all' | ContractStatus;
 

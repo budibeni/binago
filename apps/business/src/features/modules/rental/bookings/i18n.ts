@@ -9,6 +9,7 @@ export const bookingDictionaries = {
     addBooking: 'Tambah',
     
     // Status
+    statusDraft: 'Draft',
     statusBooked: 'Dipesan',
     statusContracted: 'Dikontrak',
     statusPending: 'Menunggu Konfirmasi',
@@ -197,6 +198,7 @@ export const bookingDictionaries = {
     addBooking: 'Add',
     
     // Status
+    statusDraft: 'Draft',
     statusBooked: 'Booked',
     statusContracted: 'Contracted',
     statusPending: 'Pending Confirmation',
