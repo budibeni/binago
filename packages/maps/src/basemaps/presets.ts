@@ -181,3 +181,73 @@ export const BASEMAP_STYLES: Record<BasemapId, string | object> = {
 
 // Legacy - tetap tersedia untuk backward compatibility
 export const BASEMAP_PROVIDERS = BASEMAP_METADATA;
+
+
+// Cache for Google Map Tiles API session token
+let googleSessionToken: string | null = null;
+let googleSessionTokenExpiry: number = 0;
+
+async function getGoogleTilesSession(mapType: 'roadmap' | 'satellite'): Promise<string | null> {
+  const apiKey = (process.env as any).NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+  if (!apiKey) return null;
+  
+  // Create a new session if none exists or it has expired (tokens usually last 2 weeks, we cache for 1 day for safety)
+  if (googleSessionToken && Date.now() < googleSessionTokenExpiry) {
+    return googleSessionToken;
+  }
+  
+  try {
+    const res = await fetch(`https://tile.googleapis.com/v1/createSession?key=${apiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        mapType: mapType,
+        language: 'id-ID',
+        region: 'ID',
+        overlay: mapType === 'satellite' // to show labels on satellite (hybrid)
+      })
+    });
+    
+    if (!res.ok) {
+      console.warn('Google Map Tiles API error:', await res.text());
+      return null;
+    }
+    
+    const data = await res.json();
+    if (data.session) {
+      googleSessionToken = data.session;
+      googleSessionTokenExpiry = Date.now() + 1000 * 60 * 60 * 24; // 1 day
+      return data.session;
+    }
+    return null;
+  } catch (error) {
+    console.error('Failed to fetch Google Map Tiles session:', error);
+    return null;
+  }
+}
+
+export async function getBasemapStyleAsync(id: BasemapId): Promise<string | object> {
+  const apiKey = (process.env as any).NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+  
+  if (id === 'google_streets') {
+    if (!apiKey) return getBasemapStyle('standard'); // Fallback to standard
+    const session = await getGoogleTilesSession('roadmap');
+    if (!session) return getBasemapStyle('standard');
+    return buildRasterTileStyle(
+      `https://tile.googleapis.com/v1/2dtiles/{z}/{x}/{y}?session=${session}&key=${apiKey}`,
+      BASEMAP_METADATA.google_streets.attribution
+    );
+  }
+  
+  if (id === 'google_hybrid') {
+    if (!apiKey) return getBasemapStyle('standard'); // Fallback to standard
+    const session = await getGoogleTilesSession('satellite');
+    if (!session) return getBasemapStyle('standard');
+    return buildRasterTileStyle(
+      `https://tile.googleapis.com/v1/2dtiles/{z}/{x}/{y}?session=${session}&key=${apiKey}`,
+      BASEMAP_METADATA.google_hybrid.attribution
+    );
+  }
+
+  return getBasemapStyle(id);
+}

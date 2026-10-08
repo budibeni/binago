@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useContext, useState } from 'react';
 import { cn } from '@adatrack/utils';
 import * as maplibregl from 'maplibre-gl';
 import { MapContext } from './MapContext';
-import { getBasemapStyle, BASEMAP_METADATA } from '../basemaps/presets';
+import { getBasemapStyleAsync, getBasemapStyle, BASEMAP_METADATA } from '../basemaps/presets';
 import type { BasemapId } from '../basemaps/types';
 import { AlertTriangle } from 'lucide-react';
 
@@ -35,8 +35,8 @@ export interface MapContainerProps extends React.HTMLAttributes<HTMLDivElement> 
 }
 
 // Resolve style dari basemap ID
-function resolveStyle(basemap: BasemapId) {
-  return getBasemapStyle(basemap);
+async function resolveStyle(basemap: BasemapId) {
+  return await getBasemapStyleAsync(basemap);
 }
 
 // Inner component yang memiliki akses ke MapContext
@@ -80,14 +80,24 @@ function MapContainerInner({
     if (!mapContainerRef.current) return;
     if (mapRef.current) return;
 
-    const initialStyle = resolveStyle(effectiveBasemap) as string | maplibregl.StyleSpecification;
-
+    // Initialize with standard/osm first to avoid blank screen while fetching API keys
+    const fallbackStyle = getBasemapStyle(effectiveBasemap === 'google_streets' || effectiveBasemap === 'google_hybrid' ? 'standard' : effectiveBasemap) as string | maplibregl.StyleSpecification;
+    
     const map = new maplibregl.Map({
       container: mapContainerRef.current,
-      style: initialStyle,
+      style: fallbackStyle,
       center: [viewport.center.lng, viewport.center.lat],
       zoom: viewport.zoom,
       attributionControl: false,
+    });
+    
+    // Asynchronously resolve actual style (fetches Google API Key if needed)
+    resolveStyle(effectiveBasemap).then(newStyle => {
+        if (mapRef.current) {
+            mapRef.current.setStyle(newStyle as string | maplibregl.StyleSpecification);
+        }
+    }).catch(e => {
+        console.error("Failed to load map style:", e);
     });
 
     mapRef.current = map;
@@ -153,9 +163,16 @@ function MapContainerInner({
     if (currentBasemapRef.current === effectiveBasemap) return;
 
     currentBasemapRef.current = effectiveBasemap;
-    const newStyle = resolveStyle(effectiveBasemap) as string | maplibregl.StyleSpecification;
-
-    mapRef.current.setStyle(newStyle);
+    resolveStyle(effectiveBasemap).then(newStyle => {
+      if (mapRef.current) {
+        mapRef.current.setStyle(newStyle as string | maplibregl.StyleSpecification);
+      }
+    }).catch(e => {
+      console.error("Failed to update map style:", e);
+      if (mapRef.current) {
+        mapRef.current.setStyle(getBasemapStyle('standard') as string | maplibregl.StyleSpecification);
+      }
+    });
     // After setStyle(), map fires 'style.load' → we dispatch to styleLoadListeners in the 'style.load' handler above
   }, [effectiveBasemap]);
 
