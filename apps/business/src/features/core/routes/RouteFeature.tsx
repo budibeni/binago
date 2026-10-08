@@ -189,7 +189,7 @@ const handleDelete = (id: string) => {
               <SelectContent>
                 {vehicles?.map(v => (
                   <SelectItem key={v.id} value={String(v.id)}>
-                    {v.vehicleName || v.licensePlate}
+                    {v.vehicleName || v.plateNumber}
                   </SelectItem>
                 ))}
               </SelectContent>
