@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Eye, Car, Check } from 'lucide-react';
+import { Eye, Plus } from 'lucide-react';
 import { cn, formatTime } from '@adatrack/utils';
 import { useRouter } from 'next/navigation';
 import { Button, DataTable } from '@adatrack/ui';
@@ -22,7 +22,7 @@ export interface HandoverGroup {
   items: RentalHandover[];
 }
 
-interface HandoverListProps {
+interface HandoverTableProps {
   data: HandoverGroup[];
   searchValue: string;
   onSearchChange: (value: string) => void;
@@ -31,13 +31,15 @@ interface HandoverListProps {
   filterConfig?: any;
   isFilterOpen?: boolean;
   onFilterOpenChange?: (open: boolean) => void;
+  labels?: Record<string, string>;
+  onAdd?: () => void;
 }
 
-const getConditionLabel = (condition: string) => {
+const getConditionLabel = (condition: string, labels: Record<string, string> = {}) => {
   switch (condition) {
-    case 'GOOD': return 'Baik';
-    case 'MINOR_DAMAGE': return 'Kerusakan Ringan';
-    case 'NEEDS_REPAIR': return 'Perlu Perbaikan';
+    case 'GOOD': return labels.condGood || 'Baik';
+    case 'MINOR_DAMAGE': return labels.condMinorDamage || 'Kerusakan Ringan';
+    case 'NEEDS_REPAIR': return labels.condNeedsRepair || 'Perlu Perbaikan';
     default: return condition;
   }
 };
@@ -51,7 +53,8 @@ const formatShortDate = (dateStr: string) => {
 
 function buildColumns(
   onViewDetail: (group: HandoverGroup) => void,
-  onViewMap: (h: RentalHandover) => void
+  onViewMap: (h: RentalHandover) => void,
+  labels: Record<string, string> = {}
 ): DataTableColumnDef<HandoverGroup>[] {
   return [
     {
@@ -75,27 +78,27 @@ function buildColumns(
     {
       id: 'handoverInfo',
       accessorKey: 'id',
-      header: 'ID HANDOVER',
+      header: labels.colHandoverId || 'ID HANDOVER',
       size: 160,
       cell: ({ row }) => (
-        <div className="flex flex-col min-w-0">
-          <span className="font-medium text-[12px] truncate">{row.original.id}</span>
-          <span className="text-[12px] text-muted-foreground truncate">{row.original.contract?.contractNumber || row.original.contractId}</span>
+        <div className="flex flex-col gap-0.5 py-1">
+          <span className="font-normal text-[13px] text-foreground truncate">{row.original.id}</span>
+          <span className="text-[11px] text-muted-foreground truncate">{row.original.contract?.contractNumber || row.original.contractId}</span>
         </div>
       ),
     },
     {
       id: 'customer',
       accessorKey: 'customer.name',
-      header: 'CUSTOMER',
+      header: labels.colCustomer || 'CUSTOMER',
       size: 190,
       cell: ({ row }) => {
         const cust = row.original.customer;
         if (!cust) return <span className="text-muted-foreground text-[12px]">-</span>;
         return (
-          <div className="flex flex-col min-w-0">
-            <span className="font-medium text-[12px] text-foreground truncate">{cust.name}</span>
-            <span className="text-[12px] text-muted-foreground truncate capitalize">{cust.type?.toLowerCase() || '-'}</span>
+          <div className="flex flex-col gap-0.5 py-1">
+            <span className="font-normal text-[13px] text-foreground truncate">{cust.name}</span>
+            <span className="text-[11px] text-muted-foreground truncate capitalize">{cust.type?.toLowerCase() || '-'}</span>
           </div>
         );
       },
@@ -103,19 +106,19 @@ function buildColumns(
     {
       id: 'date',
       accessorKey: 'handoverAt',
-      header: 'TGL SERAH TERIMA',
+      header: labels.colDate || 'TGL SERAH TERIMA',
       size: 150,
       cell: ({ row }) => (
-        <div className="flex flex-col min-w-0">
-          <span className="font-medium text-[12px] text-foreground">{formatShortDate(row.original.handoverAt)}</span>
-          <span className="text-[12px] text-muted-foreground">{formatTime(row.original.handoverAt)}</span>
+        <div className="flex flex-col gap-0.5 py-1">
+          <span className="font-normal text-[13px] text-foreground">{formatShortDate(row.original.handoverAt)}</span>
+          <span className="text-[11px] text-muted-foreground">{formatTime(row.original.handoverAt)}</span>
         </div>
       ),
     },
     {
       id: 'status',
       accessorKey: 'status',
-      header: 'STATUS',
+      header: labels.colStatus || 'STATUS',
       size: 110,
       cell: ({ row }) => {
         const isCompleted = row.original.status === 'COMPLETED';
@@ -126,7 +129,7 @@ function buildColumns(
               ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400" 
               : "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400"
           )}>
-            {isCompleted ? 'Selesai' : 'Sebagian'}
+            {isCompleted ? labels.statusCompleted || 'Selesai' : labels.statusPartial || 'Sebagian'}
           </div>
         );
       }
@@ -134,7 +137,7 @@ function buildColumns(
     {
       id: 'vehicle',
       accessorKey: 'vehicleId',
-      header: 'KENDARAAN',
+      header: labels.colVehicle || 'KENDARAAN',
       size: 550,
       minSize: 350,
       cell: ({ row }) => {
@@ -164,13 +167,13 @@ function buildColumns(
     {
       id: 'contractDate',
       accessorKey: '(contract.contractDate || contract.startDate)',
-      header: 'TANGGAL KONTRAK',
+      header: labels.colContractDate || 'TANGGAL KONTRAK',
       size: 150,
       cell: ({ row }) => {
         const cDate = row.original.contract?.contractDate;
         return (
-          <div className="flex flex-col min-w-0">
-            <span className="font-medium text-[12px] text-foreground">{formatShortDate(cDate)}</span>
+          <div className="flex flex-col gap-0.5 py-1">
+            <span className="font-normal text-[13px] text-foreground">{formatShortDate(cDate)}</span>
           </div>
         );
       }
@@ -179,7 +182,7 @@ function buildColumns(
   ];
 }
 
-export function HandoverList({
+export function HandoverTable({
   data,
   searchValue,
   onSearchChange,
@@ -188,7 +191,9 @@ export function HandoverList({
   filterConfig,
   isFilterOpen,
   onFilterOpenChange,
-}: HandoverListProps) {
+  labels = {},
+  onAdd,
+}: HandoverTableProps) {
   const router = useRouter();
 
   const handleViewMap = React.useCallback((h: RentalHandover) => {
@@ -205,8 +210,8 @@ export function HandoverList({
   }, [router]);
 
   const columns = React.useMemo(
-    () => buildColumns(onViewDetail, handleViewMap),
-    [onViewDetail, handleViewMap],
+    () => buildColumns(onViewDetail, handleViewMap, labels),
+    [onViewDetail, handleViewMap, labels],
   );
 
   return (
@@ -230,8 +235,18 @@ export function HandoverList({
       isFilterOpen={isFilterOpen}
       onFilterOpenChange={onFilterOpenChange}
       // UI Slots
-      emptyTitle="Tidak ada data serah terima"
-      emptyDescription="Belum ada transaksi serah terima yang tercatat atau sesuai dengan pencarian Anda."
+      emptyTitle={labels.emptyTitle || "Tidak ada data serah terima"}
+      emptyDescription={labels.emptyDescription || "Belum ada transaksi serah terima yang tercatat atau sesuai dengan pencarian Anda."}
+      toolbarActions={
+        <div className="flex items-center gap-2">
+          {onAdd && (
+            <Button variant="destructive" onClick={onAdd} className="h-8 gap-1.5 text-[12px] font-medium shadow-none">
+              <Plus className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline-block">{labels.add || 'Tambah'}</span>
+            </Button>
+          )}
+        </div>
+      }
     />
   );
 }

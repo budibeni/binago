@@ -96,6 +96,7 @@ export const mockBookings: Booking[] = [
     "contractDate": "2024-10-15T09:00:00Z",
     "createdAt": "2026-10-06T10:00:00.000Z",
     "updatedAt": "2026-10-06T10:00:00.000Z",
+    "pickupLocation": "Bandara Soekarno Hatta",
     "startDate": "2026-10-15T08:00:00.000Z",
     "items": [
       {
