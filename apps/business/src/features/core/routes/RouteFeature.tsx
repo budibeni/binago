@@ -108,8 +108,8 @@ const handleDelete = (id: string) => {
         status: route.status || 'active',
         description: route.description || '',
         group_id: route.groupId ? parseInt(route.groupId.toString(), 10) : undefined,
-        planned_distance: route.plannedDistance ? parseFloat(route.plannedDistance.toString()) : undefined,
-        estimated_duration: route.estimatedDuration ? parseFloat(route.estimatedDuration.toString()) : undefined,
+        planned_distance: route.plannedDistance !== undefined ? parseFloat(route.plannedDistance.toString()) : null,
+        estimated_duration: route.estimatedDuration !== undefined ? parseFloat(route.estimatedDuration.toString()) : null,
       };
 
       if (route.id) {

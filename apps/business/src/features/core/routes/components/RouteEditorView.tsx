@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Route, RouteStop, RouteLocation, MapInteractionMode, ActiveLocationTarget } from '../types';
 import { Geofence } from '../../geofences/types';
-import { Button, Input, Label, InputString, InputNumber, InputSelect, toast } from '@adatrack/ui';
+import { Button, Input, Label, InputString, InputNumber, InputDecimal, InputSelect, toast } from '@adatrack/ui';
 import { getRouteTranslation } from '../i18n';
 import type { Locale } from '@adatrack/types';
 import { MapGeometry, defaultNominatimSearch } from '@adatrack/maps';
@@ -16,6 +16,18 @@ interface RouteEditorViewProps {
   onSave: (route: Partial<Route>) => Promise<void> | void;
   onCancel: () => void;
   locale?: Locale;
+}
+
+
+function calculateHaversineDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371; // km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon/2) * Math.sin(dLon/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * c;
 }
 
 export function RouteEditorView({
@@ -49,9 +61,62 @@ export function RouteEditorView({
   const [activeLocationTarget, setActiveLocationTarget] = useState<ActiveLocationTarget>(null);
   const [isExpanded, setIsExpanded] = useState(true);
 
+
   const [isSearchingAddress, setIsSearchingAddress] = useState<Record<string, boolean>>({});
 
+  // Auto-calculate distance and duration
+  useEffect(() => {
+    let totalDist = 0;
+    let hasValidPoints = false;
+
+    // If drawn path exists, use it
+    if (editorGeometry && editorGeometry.type === 'LineString' && editorGeometry.coordinates && editorGeometry.coordinates.length >= 2) {
+      const coords = editorGeometry.coordinates;
+      for (let i = 0; i < coords.length - 1; i++) {
+        // coords are [lon, lat]
+        const lon1 = coords[i][0];
+        const lat1 = coords[i][1];
+        const lon2 = coords[i+1][0];
+        const lat2 = coords[i+1][1];
+        totalDist += calculateHaversineDistance(lat1, lon1, lat2, lon2);
+      }
+      hasValidPoints = true;
+    } else {
+      // Otherwise, use origin -> stops -> destination straight lines
+      const points: {lat: number, lon: number}[] = [];
+      if (origin.type === 'coordinate' && origin.latitude && origin.longitude) {
+        points.push({ lat: origin.latitude, lon: origin.longitude });
+      }
+      stops.forEach(s => {
+        if (s.location.type === 'coordinate' && s.location.latitude && s.location.longitude) {
+          points.push({ lat: s.location.latitude, lon: s.location.longitude });
+        }
+      });
+      if (destination.type === 'coordinate' && destination.latitude && destination.longitude) {
+        points.push({ lat: destination.latitude, lon: destination.longitude });
+      }
+      
+      if (points.length >= 2) {
+        for (let i = 0; i < points.length - 1; i++) {
+          totalDist += calculateHaversineDistance(points[i].lat, points[i].lon, points[i+1].lat, points[i+1].lon);
+        }
+        hasValidPoints = true;
+      }
+    }
+
+    if (hasValidPoints) {
+      // Round to 2 decimal places
+      const roundedDist = Math.round(totalDist * 100) / 100;
+      setPlannedDistance(roundedDist);
+      
+      // Estimate duration based on avg 40km/h (1.5 min per km)
+      const durationMin = Math.round(roundedDist * 1.5);
+      setEstimatedDuration(durationMin);
+    }
+  }, [origin, destination, stops, editorGeometry]);
+
   const handleSearchAddress = async (targetId: string, address: string, onChange: (val: RouteLocation) => void, currentLoc: RouteLocation) => {
+
     if (!address || !address.trim()) return;
     setIsSearchingAddress(prev => ({ ...prev, [targetId]: true }));
     try {
@@ -410,15 +475,15 @@ export function RouteEditorView({
             {/* Estimations & Status */}
             <div className="space-y-2.5 pt-2 border-t border-border/50">
               <div className="grid grid-cols-2 gap-2.5">
-                <InputNumber 
+                <InputDecimal 
                   label={t.estimatedDistance}
-                  value={plannedDistance || null}
-                  onChange={(val) => setPlannedDistance(val || undefined)}
+                  value={plannedDistance !== undefined ? plannedDistance : null}
+                  onChange={(val) => setPlannedDistance(val !== null ? val : undefined)}
                 />
-                <InputNumber 
+                <InputDecimal 
                   label={t.estimatedDuration}
-                  value={estimatedDuration || null}
-                  onChange={(val) => setEstimatedDuration(val || undefined)}
+                  value={estimatedDuration !== undefined ? estimatedDuration : null}
+                  onChange={(val) => setEstimatedDuration(val !== null ? val : undefined)}
                 />
               </div>
               
