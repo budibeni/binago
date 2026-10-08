@@ -68,6 +68,8 @@ export function GeofenceFeature({ locale = 'id' }: GeofenceFeatureProps) {
       const payload = {
         name: data.name,
         area_type: areaType,
+        coordinates: {},
+        radius_meters: null,
         boundary_points: boundaryPoints,
         group_id: data.groupId ? parseInt(data.groupId.toString(), 10) : null,
         description: data.description || '',
