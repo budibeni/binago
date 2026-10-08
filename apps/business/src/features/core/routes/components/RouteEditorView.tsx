@@ -73,11 +73,11 @@ export function RouteEditorView({
     if (editorGeometry && editorGeometry.type === 'multiline' && editorGeometry.coordinates && editorGeometry.coordinates.length >= 2) {
       const coords = editorGeometry.coordinates;
       for (let i = 0; i < coords.length - 1; i++) {
-        // coords are [lon, lat]
-        const lon1 = coords[i][0];
-        const lat1 = coords[i][1];
-        const lon2 = coords[i+1][0];
-        const lat2 = coords[i+1][1];
+        // coords are {lat, lng}
+        const lon1 = coords[i].lng;
+        const lat1 = coords[i].lat;
+        const lon2 = coords[i+1].lng;
+        const lat2 = coords[i+1].lat;
         totalDist += calculateHaversineDistance(lat1, lon1, lat2, lon2);
       }
       hasValidPoints = true;
