@@ -67,6 +67,19 @@ function GeofenceMapInner({
     }
   };
 
+  // Pan to editor geometry on mount
+  const hasPannedToEditorRef = useRef(false);
+  useEffect(() => {
+    if (!map || !editorGeometry || hasPannedToEditorRef.current) return;
+    if (editorGeometry.type === 'rectangle' || editorGeometry.type === 'polygon' || editorGeometry.type === 'multiline') {
+      const bounds = calcEntityBounds(editorGeometry.coordinates);
+      if (bounds) {
+        actions.fitBounds(bounds, { padding: 50 });
+        hasPannedToEditorRef.current = true;
+      }
+    }
+  }, [map, editorGeometry, actions]);
+
   // Pan to selected geofence
   useEffect(() => {
     if (!map || !selectedGeofenceId) return;
