@@ -41,9 +41,7 @@ class APIClient {
     if (typeof window !== 'undefined') {
       if (url.startsWith('http')) {
         const urlObj = new URL(url);
-        url = `/api/proxy${urlObj.pathname}`;
-      } else {
-        url = `/api/proxy${endpoint.startsWith('/') ? endpoint : '/' + endpoint}`;
+        url = urlObj.pathname + urlObj.search;
       }
     }
     

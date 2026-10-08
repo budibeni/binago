@@ -6,9 +6,9 @@ export function middleware(request: NextRequest) {
   const isLoginPage = request.nextUrl.pathname === "/login";
 
   // Reverse Proxy for API requests
-  if (request.nextUrl.pathname.startsWith("/api/proxy/")) {
+  if (request.nextUrl.pathname.startsWith("/api/v1/")) {
     try {
-      const backendPath = request.nextUrl.pathname.replace("/api/proxy", "");
+      const backendPath = request.nextUrl.pathname;
       
       let targetOrigin = "http://localhost:8080";
       
