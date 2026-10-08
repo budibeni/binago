@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, Button, FormShell, FormCard, InputNumber, InputTextarea, Label, InputSelect, InputCheckbox, InputDateTimeGps, PhoneLink } from '@adatrack/ui';
-import { MapPin, Car, Fuel, Wrench, CheckSquare, Clock, FileText, StickyNote, Search, ChevronDown, ChevronUp } from 'lucide-react';
+import { MapPin, Car, Fuel, Wrench, CheckSquare, Clock, FileText, StickyNote, Search, ChevronDown, ChevronUp, CheckCircle2 } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import type { RentalContract } from '../../contracts/types/contract';
 import type { RentalHandover } from '../types/handover';
@@ -65,12 +65,38 @@ export function HandoverForm({ contract, eligibleContracts = [], onSelectContrac
   }, [open]);
 
   React.useEffect(() => {
-    const pItems = contract?.items?.filter(i => !handedOverItemIds.includes(i.id)) || [];
-    if (pItems.length > 0 && !activeTab && selectedItemIds.length === 0) {
-      setActiveTab(pItems[0].id);
-      setSelectedItemIds(pItems.map(i => i.id));
+    if (open && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          setVehicleData(prev => {
+            const next = { ...prev };
+            let hasChanges = false;
+            Object.keys(next).forEach(key => {
+              if (next[key].latitude === null) {
+                next[key] = { ...next[key], latitude: lat, longitude: lng };
+                hasChanges = true;
+              }
+            });
+            return hasChanges ? next : prev;
+          });
+        },
+        (err) => console.error("Auto location error:", err),
+        { enableHighAccuracy: true, timeout: 10000 }
+      );
     }
-  }, [contract, handedOverItemIds, activeTab, selectedItemIds]);
+  }, [open]);
+
+  React.useEffect(() => {
+    const pItems = contract?.items?.filter(i => !handedOverItemIds.includes(i.id)) || [];
+    if (pItems.length > 0) {
+      if (!activeTab) setActiveTab(pItems[0].id);
+      setSelectedItemIds(pItems.map(i => i.id));
+    } else {
+      setSelectedItemIds([]);
+    }
+  }, [contract]);
 
   const [vehicleData, setVehicleData] = React.useState<Record<string, {
     handoverAt: string,
@@ -380,37 +406,15 @@ export function HandoverForm({ contract, eligibleContracts = [], onSelectContrac
               </div>
             </div>
 
-            <div className="mt-5 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between animate-in fade-in duration-300">
-              <div>
-                <p className="text-sm font-semibold text-foreground">Siap Serah Terima</p>
-                <p className="text-xs text-muted-foreground">Centang untuk memproses serah terima kendaraan pada kontrak ini.</p>
-              </div>
-              <div className="flex items-center gap-2 bg-primary/5 hover:bg-primary/10 border border-primary/20 px-4 py-2.5 rounded-xl transition-colors cursor-pointer">
-                <InputCheckbox
-                  label="Proses Serah Terima"
-                  value={selectedItemIds.length > 0 && selectedItemIds.length === pendingItems.length}
-                  onChange={(checked) => {
-                    if (checked) setSelectedItemIds(pendingItems.map(i => i.id));
-                    else setSelectedItemIds([]);
-                  }}
-                  className="m-0 font-medium text-primary"
-                />
-              </div>
-            </div>
           </FormCard>
         )}
         {contract && (
           <>
-            <FormCard
-              title={isSingleVehicle ? labels.sectionVehicles || "Detail Kendaraan" : labels.descVehiclesTabs || "Detail Kendaraan (Pilih Tab)"}
-              description={labels.descVehicles || "Lengkapi data serah terima untuk kendaraan di bawah ini."}
-              icon={<Car className="w-5 h-5" />}
-              iconWrapperClassName="text-sky-500"
-            >
+            <FormCard>
               <div className="space-y-3">
                 {!isSingleVehicle && (
-                  <div className="shrink-0 bg-background border-b border-border mb-3">
-                    <div className="flex items-center overflow-x-auto hide-scrollbar">
+                  <div className="mb-5">
+                    <div className="flex items-center gap-2 overflow-x-auto hide-scrollbar p-1.5 bg-slate-100/70 dark:bg-slate-800/40 rounded-xl border border-slate-200/60 dark:border-slate-700/50">
                       {pendingItems.map(item => {
                         const id = item.id;
                         const isSelected = activeTab === id;
@@ -422,13 +426,23 @@ export function HandoverForm({ contract, eligibleContracts = [], onSelectContrac
                             type="button"
                             onClick={() => setActiveTab(id)}
                             className={cn(
-                              "px-4 h-[34px] text-xs font-semibold border-b-2 transition-colors focus:outline-none flex items-center gap-2 pt-[2px] whitespace-nowrap",
-                              isSelected ? 'border-b-danger text-foreground' : 'border-b-transparent text-muted-foreground hover:text-foreground'
+                              "px-3.5 py-1.5 text-[12px] font-semibold rounded-lg transition-all flex items-center gap-2 whitespace-nowrap shrink-0 focus:outline-none",
+                              isSelected
+                                ? 'bg-white dark:bg-neutral-900 shadow-sm border border-slate-200/80 dark:border-slate-600 text-primary'
+                                : 'border border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 hover:bg-white/60 dark:hover:bg-neutral-800/60'
                             )}
                           >
-                            <div className={cn("w-2 h-2 rounded-full", isChecked ? "bg-primary" : "bg-neutral-300")} />
-                            <Car className={cn("h-3.5 w-3.5", isSelected ? "text-sky-500 dark:text-sky-400" : "opacity-70")} />
-                            {item.vehicleSnapshot?.licensePlate}
+                            {isChecked ? (
+                              <CheckCircle2 className="w-3.5 h-3.5 text-primary shrink-0" />
+                            ) : (
+                              <div className={cn(
+                                "w-2 h-2 rounded-full shrink-0 transition-all",
+                                isSelected ? "bg-primary" : "bg-slate-300 dark:bg-slate-600"
+                              )} />
+                            )}
+                            <span className={isSelected ? "text-primary" : ""}>
+                              {item.vehicleSnapshot?.licensePlate}
+                            </span>
                           </button>
                         );
                       })}
@@ -438,86 +452,117 @@ export function HandoverForm({ contract, eligibleContracts = [], onSelectContrac
 
                 {activeTab && (() => {
                   const item = contract.items?.find(i => i.id === activeTab);
-                  const isChecked = selectedItemIds.includes(activeTab);
+                  const isChecked = isSingleVehicle || selectedItemIds.includes(activeTab);
 
                   return (
                     <div className="flex flex-col gap-4 pt-1">
 
                       {/* Header Kendaraan */}
-                      <div className="flex items-center justify-between pb-3 border-b border-border">
-                        <div>
-                          <h5 className="font-bold text-sm">{item?.vehicle?.coreVehicle?.plateNumber}</h5>
-                          <p className="text-xs text-muted-foreground">{item?.vehicle?.coreVehicle?.brand} {item?.vehicle?.coreVehicle?.vehicleName}</p>
+                      <div className="mb-2">
+                        <div className="flex items-center justify-between mb-1">
+                          <label className={cn("flex items-center gap-2.5 select-none group", isSingleVehicle ? "cursor-default opacity-90" : "cursor-pointer")}>
+                            <InputCheckbox
+                              className="m-0"
+                              label=""
+                              value={isChecked}
+                              disabled={isSingleVehicle}
+                              onChange={(checked) => {
+                                if (isSingleVehicle) return;
+                                if (checked) setSelectedItemIds(prev => [...prev, activeTab]);
+                                else setSelectedItemIds(prev => prev.filter(id => id !== activeTab));
+                              }}
+                            />
+                            <span className={cn("font-bold text-sm text-slate-800 dark:text-slate-200 transition-colors", !isSingleVehicle && "group-hover:text-primary")}>
+                              {(isSingleVehicle ? pendingItems[0] : item)?.vehicle?.coreVehicle?.plateNumber || (isSingleVehicle ? pendingItems[0] : item)?.vehicleSnapshot?.licensePlate || "Belum ada Nopol"}
+                            </span>
+                          </label>
+                          <span className="text-[13px] font-semibold text-slate-500 dark:text-slate-400">
+                            {((isSingleVehicle ? pendingItems[0] : item)?.vehicle?.coreVehicle?.brand || (isSingleVehicle ? pendingItems[0] : item)?.vehicleSnapshot?.brand || "") + " " + ((isSingleVehicle ? pendingItems[0] : item)?.vehicle?.coreVehicle?.vehicleName || (isSingleVehicle ? pendingItems[0] : item)?.vehicleSnapshot?.model || "")}
+                          </span>
                         </div>
                       </div>
 
                       {isChecked ? (
                         <div className="flex flex-col gap-4 animate-in fade-in duration-300">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-                            <InputDateTimeGps
-                              label={labels.fieldHandoverTime || "Waktu Serah Terima"}
-                              value={vehicleData[activeTab]?.handoverAt}
-                              onChange={(v) => setVehicleData({ ...vehicleData, [activeTab]: { ...vehicleData[activeTab], handoverAt: v } })}
-                              latitude={vehicleData[activeTab]?.latitude}
-                              longitude={vehicleData[activeTab]?.longitude}
-                              onCoordinates={(lat, lng) => setVehicleData(prev => ({ ...prev, [activeTab]: { ...prev[activeTab], latitude: lat, longitude: lng } }))}
-                              showAddress={false}
-                              required
-                            />
-                            <InputTextarea
-                              id={`addr-${activeTab}`}
-                              label={labels.fieldAddress || "Detail Alamat (Opsional)"}
-                              value={vehicleData[activeTab]?.address}
-                              onChange={(v) => setVehicleData({ ...vehicleData, [activeTab]: { ...vehicleData[activeTab], address: v } })}
-                              placeholder={labels.fieldAddressPlaceholder || "Cth: Area lobi..."}
-                              rows={2}
-                            />
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {/* Kolom Kiri */}
+                            <div className="flex flex-col gap-4 bg-slate-50/50 dark:bg-slate-800/10 rounded-xl border border-dashed border-slate-200 dark:border-slate-700 p-3.5">
+                              <InputDateTimeGps
+                                label={labels.fieldHandoverTime || "Waktu Serah Terima"}
+                                value={vehicleData[activeTab]?.handoverAt}
+                                onChange={(v) => setVehicleData({ ...vehicleData, [activeTab]: { ...vehicleData[activeTab], handoverAt: v } })}
+                                latitude={vehicleData[activeTab]?.latitude}
+                                longitude={vehicleData[activeTab]?.longitude}
+                                onCoordinates={(lat, lng) => setVehicleData(prev => ({ ...prev, [activeTab]: { ...prev[activeTab], latitude: lat, longitude: lng } }))}
+                                showAddress={false}
+                                required
+                              />
+                              <InputTextarea
+                                id={`addr-${activeTab}`}
+                                label={labels.fieldAddress || "Detail Alamat (Opsional)"}
+                                value={vehicleData[activeTab]?.address}
+                                onChange={(v) => setVehicleData({ ...vehicleData, [activeTab]: { ...vehicleData[activeTab], address: v } })}
+                                placeholder={labels.fieldAddressPlaceholder || "Cth: Area lobi, nama gedung, lantai..."}
+                                rows={3}
+                              />
+                            </div>
+                            {/* Kolom Kanan */}
+                            <div className="flex flex-col gap-3 bg-slate-50/50 dark:bg-slate-800/10 rounded-xl border border-dashed border-slate-200 dark:border-slate-700 p-3.5">
+                              <InputNumber
+                                label={labels.fieldOdometer || "Odometer (km)"}
+                                value={vehicleData[activeTab]?.odometer ?? null}
+                                onChange={(val) => setVehicleData({ ...vehicleData, [activeTab]: { ...vehicleData[activeTab], odometer: val } })}
+                                placeholder={labels.fieldOdometerPlaceholder || "Contoh: 15000"}
+                              />
+                              <InputSelect
+                                label={labels.fieldFuelLevel || "BBM"}
+                                value={vehicleData[activeTab]?.fuelLevel}
+                                onChange={(val) => setVehicleData({ ...vehicleData, [activeTab]: { ...vehicleData[activeTab], fuelLevel: val as any } })}
+                                placeholder={labels.fieldFuelPlaceholder || "Pilih Kondisi BBM"}
+                                options={[
+                                  { value: 'EMPTY', label: labels.fuelEmpty || 'Kosong' },
+                                  { value: 'QUARTER', label: labels.fuelQuarter || '1/4' },
+                                  { value: 'HALF', label: labels.fuelHalf || '1/2' },
+                                  { value: 'THREE_QUARTER', label: labels.fuelThreeQuarter || '3/4' },
+                                  { value: 'FULL', label: labels.fuelFull || 'Penuh' },
+                                ]}
+                              />
+                              <InputSelect
+                                label={labels.fieldCondition || "Kondisi Kendaraan"}
+                                value={vehicleData[activeTab]?.vehicleCondition}
+                                onChange={(val) => setVehicleData({ ...vehicleData, [activeTab]: { ...vehicleData[activeTab], vehicleCondition: val as any } })}
+                                placeholder={labels.fieldConditionPlaceholder || "Pilih Kondisi"}
+                                options={[
+                                  { value: 'GOOD', label: labels.condGood || 'Baik' },
+                                  { value: 'MINOR_DAMAGE', label: labels.condMinorDamage || 'Kerusakan Ringan' },
+                                  { value: 'NEEDS_REPAIR', label: labels.condNeedsRepair || 'Perlu Perbaikan' },
+                                ]}
+                              />
+                            </div>
                           </div>
 
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-border/50 pt-3">
-                            <InputNumber
-                              label={labels.fieldOdometer || "Odometer (km)"}
-                              value={vehicleData[activeTab]?.odometer ?? null}
-                              onChange={(val) => setVehicleData({ ...vehicleData, [activeTab]: { ...vehicleData[activeTab], odometer: val } })}
-                              placeholder={labels.fieldOdometerPlaceholder || "Contoh: 15000"}
-                            />
-                            <InputSelect
-                              label={labels.fieldFuelLevel || "BBM"}
-                              value={vehicleData[activeTab]?.fuelLevel}
-                              onChange={(val) => setVehicleData({ ...vehicleData, [activeTab]: { ...vehicleData[activeTab], fuelLevel: val as any } })}
-                              placeholder={labels.fieldFuelPlaceholder || "Pilih Kondisi BBM"}
-                              options={[
-                                { value: 'EMPTY', label: labels.fuelEmpty || 'Kosong' },
-                                { value: 'QUARTER', label: labels.fuelQuarter || '1/4' },
-                                { value: 'HALF', label: labels.fuelHalf || '1/2' },
-                                { value: 'THREE_QUARTER', label: labels.fuelThreeQuarter || '3/4' },
-                                { value: 'FULL', label: labels.fuelFull || 'Penuh' },
-                              ]}
-                            />
-                            <InputSelect
-                              label={labels.fieldCondition || "Kondisi"}
-                              value={vehicleData[activeTab]?.vehicleCondition}
-                              onChange={(val) => setVehicleData({ ...vehicleData, [activeTab]: { ...vehicleData[activeTab], vehicleCondition: val as any } })}
-                              placeholder={labels.fieldConditionPlaceholder || "Pilih Kondisi Kendaraan"}
-                              options={[
-                                { value: 'GOOD', label: labels.condGood || 'Baik' },
-                                { value: 'MINOR_DAMAGE', label: labels.condMinorDamage || 'Kerusakan Ringan' },
-                                { value: 'NEEDS_REPAIR', label: labels.condNeedsRepair || 'Perlu Perbaikan' },
-                              ]}
-                            />
-                          </div>
 
-                          <div className="border-t border-border/50 pt-3">
-                            <Label className="text-[11px] uppercase font-semibold text-muted-foreground mb-2 block">{labels.fieldEquipment || 'Kelengkapan Kendaraan'}</Label>
+                          <div className="bg-slate-50/50 dark:bg-slate-800/10 rounded-xl border border-dashed border-slate-200 dark:border-slate-700 p-3.5">
+                            <Label className="text-[11px] uppercase font-semibold text-slate-500 dark:text-slate-400 mb-2.5 block tracking-wide">{labels.fieldEquipment || 'Kelengkapan Kendaraan'}</Label>
                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                               {Object.keys(vehicleData[activeTab]?.equipment || {}).map((key) => {
                                 if (key === 'other') return null;
+                                const isItemChecked = (vehicleData[activeTab]?.equipment as any)?.[key] || false;
                                 return (
-                                  <div key={key} className="flex items-center">
+                                  <label
+                                    key={key}
+                                    className={cn(
+                                      "flex items-center gap-2 h-8 px-2.5 rounded-md border transition-all cursor-pointer bg-white dark:bg-neutral-900",
+                                      isItemChecked
+                                        ? "border-primary/40 shadow-sm"
+                                        : "border-slate-200 dark:border-slate-800 hover:border-slate-300 hover:bg-slate-50 dark:hover:bg-neutral-800"
+                                    )}
+                                  >
                                     <InputCheckbox
                                       id={`eq-${activeTab}-${key}`}
-                                      label={key.replace(/([A-Z])/g, ' $1').trim().replace(/^\w/, c => c.toUpperCase())}
-                                      value={(vehicleData[activeTab]?.equipment as any)?.[key] || false}
+                                      className="m-0"
+                                      label=""
+                                      value={isItemChecked}
                                       onChange={(checked) => setVehicleData({
                                         ...vehicleData,
                                         [activeTab]: {
@@ -526,7 +571,10 @@ export function HandoverForm({ contract, eligibleContracts = [], onSelectContrac
                                         }
                                       })}
                                     />
-                                  </div>
+                                    <span className="text-[13px] font-medium text-slate-700 dark:text-slate-300 select-none">
+                                      {key.replace(/([A-Z])/g, ' $1').trim().replace(/^\w/, c => c.toUpperCase())}
+                                    </span>
+                                  </label>
                                 );
                               })}
                             </div>
