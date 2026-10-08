@@ -57,6 +57,18 @@ export const BASEMAP_METADATA: Record<
     attribution:
       'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
   },
+  google_streets: {
+    label: 'Google Streets',
+    provider: 'Google Maps',
+    usagePolicy: 'Development use only without official API Key.',
+    attribution: '&copy; Google Maps',
+  },
+  google_hybrid: {
+    label: 'Google Hybrid',
+    provider: 'Google Maps',
+    usagePolicy: 'Development use only without official API Key.',
+    attribution: '&copy; Google Maps',
+  },
 };
 
 /**
@@ -113,6 +125,9 @@ const OSM_TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 const ESRI_SATELLITE_TILE_URL =
   'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
 
+const GOOGLE_STREETS_URL = 'https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}';
+const GOOGLE_HYBRID_URL = 'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}';
+
 /**
  * getBasemapStyle - resolve MapLibre style untuk basemap yang dipilih.
  *
@@ -137,6 +152,18 @@ export function getBasemapStyle(id: BasemapId): string | object {
         BASEMAP_METADATA.satellite.attribution,
       );
 
+    case 'google_streets':
+      return buildRasterTileStyle(
+        GOOGLE_STREETS_URL,
+        BASEMAP_METADATA.google_streets.attribution,
+      );
+
+    case 'google_hybrid':
+      return buildRasterTileStyle(
+        GOOGLE_HYBRID_URL,
+        BASEMAP_METADATA.google_hybrid.attribution,
+      );
+
     default:
       return STANDARD_STYLE_URL;
   }
@@ -148,6 +175,8 @@ export const BASEMAP_STYLES: Record<BasemapId, string | object> = {
   dark: getBasemapStyle('dark'),
   osm: getBasemapStyle('osm'),
   satellite: getBasemapStyle('satellite'),
+  google_streets: getBasemapStyle('google_streets'),
+  google_hybrid: getBasemapStyle('google_hybrid'),
 };
 
 // Legacy - tetap tersedia untuk backward compatibility

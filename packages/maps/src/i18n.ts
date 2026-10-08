@@ -30,6 +30,8 @@ export const mapDictionaries = {
       dark: 'Gelap',
       osm: 'OpenStreetMap',
       satellite: 'Satelit',
+      google_streets: 'Google Maps',
+      google_hybrid: 'Google Satelit',
     },
     search: {
       addressTab: 'Alamat',
@@ -118,6 +120,8 @@ export const mapDictionaries = {
       dark: 'Dark',
       osm: 'OpenStreetMap',
       satellite: 'Satellite',
+      google_streets: 'Google Maps',
+      google_hybrid: 'Google Satellite',
     },
     search: {
       addressTab: 'Address',

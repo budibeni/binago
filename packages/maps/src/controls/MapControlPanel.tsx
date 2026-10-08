@@ -79,6 +79,8 @@ const BASEMAP_ICONS: Record<BasemapId, React.FC<{ className?: string }>> = {
   dark: Moon,
   osm: MapPinned,
   satellite: Satellite,
+  google_streets: MapIcon,
+  google_hybrid: Satellite,
 };
 
 export function MapControlPanel({

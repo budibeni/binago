@@ -23,6 +23,8 @@ const ICONS: Record<BasemapId, React.FC<{ className?: string }>> = {
   dark: Moon,
   osm: MapPinned,
   satellite: Satellite,
+  google_streets: MapIcon,
+  google_hybrid: Satellite,
 };
 
 export function BasemapSwitcher({ value, onChange, className, compact = false, locale = 'id' }: BasemapSwitcherProps) {
@@ -49,6 +51,8 @@ export function BasemapSwitcher({ value, onChange, className, compact = false, l
     { id: 'dark', label: t.dark, icon: ICONS.dark },
     { id: 'osm', label: t.osm, icon: ICONS.osm },
     { id: 'satellite', label: t.satellite, icon: ICONS.satellite },
+    { id: 'google_streets', label: (t as any).google_streets || 'Google Maps', icon: ICONS.google_streets },
+    { id: 'google_hybrid', label: (t as any).google_hybrid || 'Google Satelit', icon: ICONS.google_hybrid },
   ];
 
   const activeOption = OPTIONS.find((o) => o.id === value) || OPTIONS[0];
