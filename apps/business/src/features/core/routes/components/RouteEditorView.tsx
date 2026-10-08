@@ -70,7 +70,7 @@ export function RouteEditorView({
     let hasValidPoints = false;
 
     // If drawn path exists, use it
-    if (editorGeometry && editorGeometry.type === 'LineString' && editorGeometry.coordinates && editorGeometry.coordinates.length >= 2) {
+    if (editorGeometry && editorGeometry.type === 'multiline' && editorGeometry.coordinates && editorGeometry.coordinates.length >= 2) {
       const coords = editorGeometry.coordinates;
       for (let i = 0; i < coords.length - 1; i++) {
         // coords are [lon, lat]
