@@ -29,6 +29,7 @@ export function RouteListPanel({
   onCreateNew,
   onEdit,
   onDelete,
+  onAssign,
   locale = 'id',
   onClose
 }: RouteListPanelProps) {
@@ -130,6 +131,9 @@ export function RouteListPanel({
             <DropdownMenuContent align="end" className="w-36">
               <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onEdit(route.id); }}>
                 Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onAssign && onAssign(route.id); }}>
+                Tugaskan (Assign)
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-red-600 focus:bg-red-50 focus:text-red-700 dark:focus:bg-red-950"

@@ -16,6 +16,7 @@ interface RouteListViewProps {
   onCreateNew: () => void;
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
+  onAssign?: (id: string) => void;
   locale?: Locale;
 }
 
@@ -28,6 +29,7 @@ export function RouteListView({
   onCreateNew,
   onEdit,
   onDelete,
+  onAssign,
   locale = 'id',
 }: RouteListViewProps) {
   const [isPanelVisible, setIsPanelVisible] = useState(true);
@@ -65,6 +67,7 @@ export function RouteListView({
             onCreateNew={onCreateNew}
             onEdit={onEdit}
             onDelete={onDelete}
+            onAssign={onAssign}
             locale={locale}
             onClose={() => setIsPanelVisible(false)}
           />

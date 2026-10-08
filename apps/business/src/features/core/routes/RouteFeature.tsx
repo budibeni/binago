@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ConfirmDialog, toast } from '@adatrack/ui';
+import { ConfirmDialog, toast, Dialog, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Button } from '@adatrack/ui';
 import type { Locale } from '@adatrack/types';
 import { Route } from './types';
 import { groupService } from '@/data/services';
@@ -10,6 +10,7 @@ import { RouteListView } from './components/RouteListView';
 import { RouteEditorView } from './components/RouteEditorView';
 import { getRouteTranslation } from './i18n';
 import { useRoutes } from './hooks/useRoutes';
+import { useVehicles } from '../vehicles/hooks/useVehicles';
 import { api } from '@adatrack/utils';
 import { useSearchParams } from 'next/navigation';
 
@@ -26,7 +27,11 @@ export function RouteFeature({ locale = 'id' }: RouteFeatureProps) {
   const { routes, loading, refetch } = useRoutes();
   const [selectedRouteId, setSelectedRouteId] = useState<string | undefined>(initialRouteId);
   const [isEditing, setIsEditing] = useState(false);
-  const [routeToDelete, setRouteToDelete] = useState<string | null>(null);
+const [routeToDelete, setRouteToDelete] = useState<string | null>(null);
+  const [assigningRouteId, setAssigningRouteId] = useState<string | null>(null);
+  const [selectedVehicleId, setSelectedVehicleId] = useState<string>('');
+  const [isAssigning, setIsAssigning] = useState(false);
+  const { vehicles } = useVehicles();
   const [routeGroups, setRouteGroups] = useState<any[]>([]);
 
   React.useEffect(() => {
@@ -47,8 +52,30 @@ export function RouteFeature({ locale = 'id' }: RouteFeatureProps) {
     setIsEditing(true);
   };
 
-  const handleDelete = (id: string) => {
+const handleDelete = (id: string) => {
     setRouteToDelete(id);
+  };
+
+  const handleAssign = (id: string) => {
+    setAssigningRouteId(id);
+    setSelectedVehicleId('');
+  };
+
+  const submitAssign = async () => {
+    if (!assigningRouteId || !selectedVehicleId) return;
+    setIsAssigning(true);
+    try {
+      await api.post(`/routes/${assigningRouteId}/assignments`, {
+        vehicle_id: parseInt(selectedVehicleId, 10)
+      });
+      toast.success('Rute berhasil ditugaskan ke kendaraan');
+      setAssigningRouteId(null);
+    } catch (err) {
+      console.error('Failed to assign route', err);
+      toast.error('Gagal menugaskan rute');
+    } finally {
+      setIsAssigning(false);
+    }
   };
 
   const confirmDelete = async () => {
@@ -135,16 +162,45 @@ export function RouteFeature({ locale = 'id' }: RouteFeatureProps) {
           onCreateNew={handleCreateNew}
           onEdit={handleEdit}
           onDelete={handleDelete}
+          onAssign={handleAssign}
           locale={locale}
         />
       )}
-      <ConfirmDialog
+<ConfirmDialog
         open={!!routeToDelete}
         onOpenChange={(open) => !open && setRouteToDelete(null)}
         title="Delete Route"
         description="Are you sure you want to delete this route? This action cannot be undone."
         onConfirm={confirmDelete}
       />
+      <Dialog 
+        open={!!assigningRouteId} 
+        onOpenChange={(isOpen) => !isOpen && setAssigningRouteId(null)}
+        title="Tugaskan Rute ke Kendaraan"
+        description="Pilih kendaraan yang akan ditugaskan untuk rute ini."
+      >
+        <div className="space-y-4 py-4">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Pilih Kendaraan</label>
+            <Select value={selectedVehicleId} onValueChange={setSelectedVehicleId}>
+              <SelectTrigger>
+                <SelectValue placeholder="Pilih Kendaraan..." />
+              </SelectTrigger>
+              <SelectContent>
+                {vehicles?.map(v => (
+                  <SelectItem key={v.id} value={String(v.id)}>
+                    {v.name || v.license_plate}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex justify-end gap-2 pt-2">
+            <Button variant="outline" onClick={() => setAssigningRouteId(null)} disabled={isAssigning}>Batal</Button>
+            <Button variant="primary" onClick={submitAssign} disabled={!selectedVehicleId || isAssigning} loading={isAssigning}>Tugaskan</Button>
+          </div>
+        </div>
+      </Dialog>
     </div>
   );
 }
