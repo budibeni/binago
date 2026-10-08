@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Button, FormShell, FormCard, InputDateTime, InputTextarea, Label } from '@adatrack/ui';
-import { Search, User, Car, Calendar, DollarSign, Info, FileText, CheckCircle2, ChevronRight, Hash, ClipboardList } from 'lucide-react';
+import { Search, User, Car, Calendar, DollarSign, Info, FileText, CheckCircle2, ChevronRight, Hash, ClipboardList, ClipboardCheck } from 'lucide-react';
 import type { Booking } from '@/features/modules/rental/bookings/types/booking';
 import type { RentalContract } from '../types/contract';
 import { BookingView } from '@/features/modules/rental/bookings/components/BookingView';
@@ -114,10 +114,10 @@ export function ContractForm({
           <FormCard
             title={labels.titleSelectBooking || 'Pilih Booking'}
             description={labels.descSelectBooking || 'Pilih booking untuk dibuatkan kontrak.'}
-            icon={<Search className="w-5 h-5 text-primary" />}
-            iconWrapperClassName="bg-primary/10"
+            icon={<ClipboardCheck className="w-5 h-5 text-emerald-500" />}
+            iconWrapperClassName="bg-emerald-100 dark:bg-emerald-900/30"
             className="h-full"
-            contentClassName="flex flex-col h-[calc(100vh-220px)] min-h-[400px] max-h-[700px]"
+            contentClassName="flex flex-col"
           >
             <div className="relative mb-3 shrink-0 group">
               <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" />
@@ -130,7 +130,7 @@ export function ContractForm({
               />
             </div>
 
-            <div className="flex-1 overflow-y-auto pr-1 -mr-1 space-y-1.5">
+            <div className="flex-1 overflow-y-auto pr-1 -mr-1 space-y-2.5 max-h-[450px]">
               {filteredBookings.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-center p-4">
                   <Search className="w-6 h-6 text-neutral-400 mb-2 opacity-50" />
@@ -138,25 +138,45 @@ export function ContractForm({
                   <p className="text-xs text-muted-foreground mt-1">{labels.notFoundDesc || 'Coba kata kunci lain.'}</p>
                 </div>
               ) : (
-                filteredBookings.map(r => (
-                  <div 
-                    key={r.id} 
-                    className="py-2 px-3 border border-border/60 rounded-lg hover:border-primary hover:bg-primary/[0.02] cursor-pointer transition-all group relative overflow-hidden"
-                    onClick={() => setSelectedRes(r)}
-                  >
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="text-[10px] font-bold bg-primary/10 text-primary px-1.5 py-0.5 rounded uppercase tracking-wider">{r.bookingNumber}</span>
-                      <span className="text-[10px] font-medium text-muted-foreground bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 rounded flex items-center gap-1">
-                        <Car className="w-3 h-3" /> {r.items?.length || 0}
-                      </span>
+                filteredBookings.map(r => {
+                  const startDate = r.startDate ? new Date(r.startDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' }) : '-';
+                  const maxEndStr = getMaxEndDate(r.items || []);
+                  const endDate = maxEndStr ? new Date(maxEndStr).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' }) : '-';
+                  
+                  return (
+                    <div 
+                      key={r.id} 
+                      className="p-3 border border-border/60 rounded-xl bg-card hover:border-primary/50 hover:shadow-sm hover:bg-primary/[0.02] cursor-pointer transition-all group relative overflow-hidden flex flex-col gap-2.5"
+                      onClick={() => setSelectedRes(r)}
+                    >
+                      <div className="flex justify-between items-start">
+                        <div className="flex flex-col gap-1">
+                          <span className="text-[10px] font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded w-fit tracking-wider">{r.bookingNumber}</span>
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            <User className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                            <h4 className="font-semibold text-foreground text-[13px] truncate max-w-[140px]" title={r.customerSnapshot?.name}>{r.customerSnapshot?.name}</h4>
+                          </div>
+                        </div>
+                        <div className="flex flex-col items-end gap-1.5">
+                          <span className="text-[10px] font-medium text-foreground bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 rounded flex items-center gap-1 border border-border/50">
+                            <Car className="w-3 h-3 text-muted-foreground" /> {r.items?.length || 0} {labels.unit || 'Unit'}
+                          </span>
+                          <p className="text-[13px] font-bold text-foreground">{formatCurrency(r.totalAmount)}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-2.5 border-t border-border/40">
+                        <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground font-medium">
+                          <Calendar className="w-3.5 h-3.5" />
+                          <span>{startDate} - {endDate}</span>
+                        </div>
+                        <div className="flex items-center px-2 py-1 rounded bg-primary/10 text-[10px] font-semibold text-primary transition-all hover:bg-danger hover:text-white dark:hover:bg-danger dark:hover:text-white">
+                          {labels.btnSelect || 'Pilih'} <ChevronRight className="w-3 h-3 ml-0.5" />
+                        </div>
+                      </div>
                     </div>
-                    <h4 className="font-bold text-foreground text-[13px] truncate">{r.customerSnapshot?.name}</h4>
-                    <div className="flex justify-between items-end mt-1">
-                      <p className="text-[11px] text-muted-foreground font-medium">{formatDate(r.startDate).split(' ')[0]} - {formatDate(getMaxEndDate(r.items)).split(' ')[0]}</p>
-                      <p className="text-xs font-bold text-foreground">{formatCurrency(r.totalAmount)}</p>
-                    </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           </FormCard>
@@ -172,7 +192,7 @@ export function ContractForm({
                 <button
                   type="button"
                   onClick={() => setSelectedRes(null)}
-                  className="text-xs text-muted-foreground hover:text-primary font-medium underline underline-offset-4"
+                  className="text-xs text-muted-foreground hover:text-danger font-medium underline underline-offset-4 transition-colors"
                 >
                   {labels.btnChange || 'Ganti'}
                 </button>
@@ -200,14 +220,14 @@ export function ContractForm({
                     <p className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] font-bold">{displayRes?.rentalType === 'SELF_DRIVE' ? (labels.rentalTypeSelfDrive || 'Lepas Kunci') : (labels.rentalTypeWithDriver || 'Dgn Pengemudi')}</p>
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-[11px] group-data-[layout=drawer]/form:!text-[10px] group-data-[layout=dialog]/form:!text-[10px] text-muted-foreground font-medium mb-1">{labels.fieldStart || 'Mulai'}</p>
-                    <p className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] font-bold">{formatDate(displayRes?.startDate || '').split(' ')[0]}</p>
+                <div className="grid grid-cols-1 gap-2 pt-3 mt-1 border-t border-border/40">
+                  <div className="flex justify-between items-center">
+                    <p className="text-[11px] text-muted-foreground font-medium">{labels.fieldStart || 'Waktu Ambil'}</p>
+                    <p className="text-[12px] font-bold">{displayRes?.startDate ? new Date(displayRes.startDate).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-'}</p>
                   </div>
-                  <div>
-                    <p className="text-[11px] group-data-[layout=drawer]/form:!text-[10px] group-data-[layout=dialog]/form:!text-[10px] text-muted-foreground font-medium mb-1">{labels.fieldEnd || 'Selesai'}</p>
-                    <p className="text-[13px] group-data-[layout=drawer]/form:!text-[12px] group-data-[layout=dialog]/form:!text-[12px] font-bold">{formatDate(getMaxEndDate(displayRes?.items || []) || '').split(' ')[0]}</p>
+                  <div className="flex justify-between items-center">
+                    <p className="text-[11px] text-muted-foreground font-medium">{labels.fieldEnd || 'Selesai (Maks)'}</p>
+                    <p className="text-[12px] font-bold text-primary">{getMaxEndDate(displayRes?.items || []) ? new Date(getMaxEndDate(displayRes?.items || [])).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-'}</p>
                   </div>
                 </div>
               </div>
@@ -215,7 +235,7 @@ export function ContractForm({
               {displayRes?.items && displayRes.items.length > 0 && (
                 <div className="border border-border/60 rounded-xl overflow-hidden">
                   <div className="bg-neutral-50 dark:bg-neutral-900 px-3 py-2 border-b border-border/60 flex items-center justify-between">
-                    <p className="text-xs font-bold text-foreground">{labels.fieldVehicles || 'Kendaraan'} ({displayRes.items.length})</p>
+                    <p className="text-xs font-bold text-foreground">{labels.vehicles || 'Kendaraan'} ({displayRes.items.length})</p>
                   </div>
                   <div className="divide-y divide-border/60 bg-white dark:bg-neutral-900/50">
                     {displayRes.items.map((item) => (
@@ -225,7 +245,7 @@ export function ContractForm({
                           <p className="text-[11px] text-muted-foreground">{item.vehicleSnapshot?.brand} {item.vehicleSnapshot?.model}</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-[11px] text-muted-foreground">Durasi: {item.duration} {item.rateType === 'HOURLY' ? 'Jam' : 'Hari'}</p>
+                          <p className="text-[11px] text-muted-foreground">{labels.fieldDuration || 'Durasi'}: {item.duration} {item.rateType === 'HOURLY' ? (labels.hour || 'Jam') : (labels.day || 'Hari')}</p>
                         </div>
                       </div>
                     ))}
@@ -233,11 +253,30 @@ export function ContractForm({
                 </div>
               )}
               
-              <div className="mt-auto border-t border-border/50 pt-4">
-                <div className="flex justify-between items-center mb-4">
-                  <span className="text-[13px] text-muted-foreground font-medium">{labels.fieldTotalAmount || 'Total Tagihan'}</span>
+              <div className="mt-auto border-t border-border/50 pt-4 space-y-2.5">
+                <div className="flex justify-between items-center">
+                  <span className="text-[12px] text-muted-foreground">{labels.subtotalRental || 'Subtotal Sewa'}</span>
+                  <span className="text-[12px] font-semibold">{formatCurrency((displayRes?.totalAmount || 0) - (displayRes?.driverFee || 0))}</span>
+                </div>
+                {(displayRes?.driverFee || 0) > 0 && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-[12px] text-muted-foreground">{labels.globalDriverFee || 'Biaya Pengemudi'}</span>
+                    <span className="text-[12px] font-semibold">{formatCurrency(displayRes?.driverFee || 0)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between items-center pt-2.5 border-t border-border/30">
+                  <span className="text-[13px] text-foreground font-bold">{labels.fieldTotalAmount || 'Total Tagihan Sewa'}</span>
                   <span className="text-[16px] font-bold text-primary">{formatCurrency(displayRes?.totalAmount || 0)}</span>
                 </div>
+                {((displayRes?.deposit || 0) > 0) && (
+                  <div className="flex justify-between items-start mt-3 p-2.5 bg-amber-50 dark:bg-amber-900/20 border border-amber-200/50 dark:border-amber-800/50 rounded-lg">
+                    <div className="flex flex-col gap-0.5 max-w-[80%]">
+                      <span className="text-[11px] text-amber-700 dark:text-amber-400 font-semibold uppercase tracking-wider">{labels.depositText || 'Uang Jaminan (Deposit)'}</span>
+                      <span className="text-[9px] text-muted-foreground/90 leading-relaxed mt-0.5">{labels.depositNotes || <>* Ditagih terpisah dari biaya sewa dan akan di-<i>refund</i> utuh saat kendaraan kembali dengan aman.</>}</span>
+                    </div>
+                    <span className="text-[12px] font-semibold text-amber-700/90 dark:text-amber-400/90 whitespace-nowrap ml-2 mt-0.5">{formatCurrency(displayRes?.deposit || 0)}</span>
+                  </div>
+                )}
                 
                 <button 
                   type="button"

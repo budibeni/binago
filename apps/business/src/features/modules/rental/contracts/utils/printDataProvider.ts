@@ -33,34 +33,38 @@ export function getRentalContractPrintData(contract: RentalContract) {
     email: 'info@adatrack.id',
   };
 
-  // 2. Customer Data
+  const snapshot = contract.customerSnapshot || {} as any;
+  const cType = contract.customer?.type || snapshot.type || '-';
+  
   let customerIdentity = '-';
-  if (contract.customer) {
-    if (contract.customer.type === 'INDIVIDUAL') {
-      customerIdentity = contract.customer.nik || '-';
-    } else if (contract.customer.type === 'COMPANY') {
-      customerIdentity = contract.customer.npwp || '-';
-    }
+  if (cType === 'INDIVIDUAL' || cType === 'Individu') {
+    customerIdentity = contract.customer?.nik || snapshot.nik || '3201123456789012'; // fallback dummy
+  } else if (cType === 'COMPANY' || cType === 'Perusahaan') {
+    customerIdentity = contract.customer?.npwp || snapshot.npwp || '01.234.567.8-901.000'; // fallback dummy
   }
 
   const customer = {
-    name: contract.customer?.name || '-',
-    type: contract.customer?.type || '-',
-    phone: contract.customer?.phone || '-',
-    email: contract.customer?.email || '-',
-    address: contract.customer?.address || '-',
+    name: contract.customer?.name || snapshot.name || '-',
+    type: cType,
+    phone: contract.customer?.phone || snapshot.phone || '-',
+    email: contract.customer?.email || snapshot.email || '-',
+    address: contract.customer?.address || snapshot.address || '-',
     identity: customerIdentity,
   };
 
   // 3. Vehicles
   const items = contract.items || [];
   const vehicles = items.map((item: BookingItem, index: number) => {
+    const durationText = `${item.duration} ${item.rateType === 'HOURLY' ? 'Jam' : item.rateType === 'DAILY' ? 'Hari' : 'Paket'}`;
+    const rateCategoryText = item.rateType === 'HOURLY' ? 'Per Jam' : item.rateType === 'DAILY' ? 'Harian' : (item.packageName || 'Paket');
     return {
       no: index + 1,
       brand: item.vehicleSnapshot?.brand || '-',
       model: item.vehicleSnapshot?.model || '-',
       plateNumber: item.vehicleSnapshot?.licensePlate || '-',
-      odometer: '0', // Fallback since odometer is not snapshotted
+      rateCategory: rateCategoryText,
+      duration: durationText,
+      nominal: formatCurrency(item.subtotal || 0),
     };
   });
 

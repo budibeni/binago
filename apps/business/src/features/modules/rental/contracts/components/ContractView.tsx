@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Button, DetailShell, PhoneLink } from '@adatrack/ui';
-import { User, Car, Calendar, DollarSign, FileText, CheckCircle2, XCircle, Trash2, ClipboardList, Clock, CreditCard, Tag, MapPin, Package, Pencil } from 'lucide-react';
+import { User, Car, Calendar, DollarSign, FileText, CheckCircle2, XCircle, Trash2, ClipboardList, Clock, CreditCard, Tag, MapPin, Package, Pencil, Printer } from 'lucide-react';
 import type { RentalContract } from '../types/contract';
 import { PaymentsFeature } from '../../payments/PaymentsFeature';
 import { cn, formatCurrency, formatDate } from '@adatrack/utils';
@@ -128,20 +128,10 @@ export function ContractView({
       open={open}
       onOpenChange={(isOpen) => !isOpen && onClose()}
       title={labels.contractDetail || "Detail Kontrak"}
-      closeLabel={labels.cancel || "Tutup"}
+      closeLabel={labels.btnClose || "Tutup"}
       layout={layout}
       extraFooterActions={
         <>
-
-          {onPrint && (
-            <Button 
-              size="sm" 
-              variant="outline" 
-              onClick={() => onPrint(contract)} 
-              className="h-7 text-xs px-3 bg-background"
-            >
-              {labels.actionPrint || 'Cetak Kontrak'}</Button>
-          )}
           <Button
             size="sm"
             onClick={() => {
@@ -173,6 +163,18 @@ export function ContractView({
         {/* Quick Actions */}
         {contract.status === 'CONTRACTED' && (
           <div className="px-4 py-2.5 bg-background flex gap-2 border-b border-border/40">
+            {onPrint && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="flex-1 h-8 text-[11px] font-semibold hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all"
+                onClick={() => onPrint(contract)}
+                leftIcon={<Printer className="w-3.5 h-3.5" />}
+                title={labels.actionPrintTitle || 'Cetak dokumen kontrak'}
+              >
+                {labels.actionPrint || 'Cetak Kontrak'}
+              </Button>
+            )}
             {onDelete && (
               <Button 
                 variant="outline" 
@@ -252,7 +254,7 @@ export function ContractView({
           >
             <InfoItem label={labels.fieldStartDate || 'Tgl Mulai'} value={formatDate(contract.startDate)} />
             <InfoItem label={labels.fieldEndDate || 'Tgl Selesai'} value={formatDate(getMaxEndDate(contract.items))} />
-            <InfoItem label={labels.fieldDuration || 'Durasi'} value={`${(contract.items?.[0]?.duration || 1)} ${labels.day || 'Hari'}`} />
+            <InfoItem label={labels.fieldDuration || 'Durasi'} value={`${(contract.items?.[0]?.duration || 1)} ${contract.items?.[0]?.rateType === 'HOURLY' ? (labels.hour || 'Jam') : (labels.day || 'Hari')}`} />
             <InfoItem label={labels.fieldRentalType || 'Jenis Sewa'} value={contract.rentalType === 'SELF_DRIVE' ? (labels.selfDrive || 'Lepas Kunci') : (labels.withDriver || 'Dengan Pengemudi')} />
           </SectionCard>
 
@@ -298,7 +300,7 @@ export function ContractView({
                       {item.vehicleSnapshot && (
                         <div className="flex flex-col gap-0.5 mt-1 ml-6">
                           <span className="text-[11px] font-medium text-foreground">{item.vehicleSnapshot.brand} {item.vehicleSnapshot.model}</span>
-                          <span className="text-[10px] text-muted-foreground">Tarif: {formatCurrency(item.unitPrice)} / {item.rateType === 'DAILY' ? (labels.daily || 'Hari') : item.rateType === 'HOURLY' ? 'Jam' : (item.packageName || 'Paket')}</span>
+                          <span className="text-[10px] text-muted-foreground">{labels.tariff || 'Tarif'}: {formatCurrency(item.unitPrice)} / {item.rateType === 'DAILY' ? (labels.daily || 'Hari') : item.rateType === 'HOURLY' ? (labels.hour || 'Jam') : (item.packageName || labels.package || 'Paket')}</span>
                         </div>
                       )}
                     </div>
@@ -322,7 +324,7 @@ export function ContractView({
           >
             <div className="col-span-2 w-full bg-neutral-50/80 dark:bg-neutral-900/50 p-3 rounded-xl border border-border/60 flex flex-col gap-2.5 mb-3">
               <div className="flex justify-between items-center pb-2 border-b border-border/40">
-                <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">{labels.subtotalRental || "Subtotal RentalContract"}</span>
+                <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">{labels.subtotalRental || "Subtotal Sewa"}</span>
                 <span className="text-[11px] font-bold text-foreground">{formatCurrency(contract.totalAmount || 0)}</span>
               </div>
               {(contract.driverFee || 0) > 0 && (

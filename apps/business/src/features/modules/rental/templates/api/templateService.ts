@@ -14,7 +14,7 @@ const defaultHtml = `
     <tr>
       <td><p><strong>Tanggal</strong></p></td>
       <td><p>:</p></td>
-      <td><p>{{(contract.contractDate || contract.startDate)}}</p></td>
+      <td><p>{{contract.contractDate}}</p></td>
     </tr>
   </tbody>
 </table>
@@ -43,16 +43,21 @@ const defaultHtml = `
   <tbody>
     <tr>
       <th><p><strong>No</strong></p></th>
-      <th><p><strong>Merek / Model</strong></p></th>
-      <th><p><strong>Plat Nomor</strong></p></th>
-      <th><p><strong>Odometer</strong></p></th>
+      <th><p><strong>Kendaraan</strong></p></th>
+      <th><p><strong>Paket</strong></p></th>
+      <th><p><strong>Durasi</strong></p></th>
+      <th><p><strong>Nominal</strong></p></th>
     </tr>
     {{#each vehicles}}
     <tr>
       <td><p>{{no}}</p></td>
-      <td><p>{{brand}} {{model}}</p></td>
-      <td><p>{{plateNumber}}</p></td>
-      <td><p>{{odometer}}</p></td>
+      <td>
+        <p>{{brand}} {{model}}</p>
+        <p>{{plateNumber}}</p>
+      </td>
+      <td><p>{{rateCategory}}</p></td>
+      <td><p>{{duration}}</p></td>
+      <td><p>{{nominal}}</p></td>
     </tr>
     {{/each}}
   </tbody>
@@ -69,7 +74,6 @@ const defaultHtml = `
 <table class="form-table">
   <tbody>
     <tr><td><p>Total Biaya Sewa</p></td><td><p>:</p></td><td><p>{{contract.totalAmount}}</p></td></tr>
-    <tr><td><p>Deposit / Jaminan</p></td><td><p>:</p></td><td><p>{{contract.deposit}}</p></td></tr>
     <tr><td><p>Sisa Pembayaran</p></td><td><p>:</p></td><td><p><strong>{{contract.remainingAmount}}</strong></p></td></tr>
   </tbody>
 </table>
@@ -78,6 +82,7 @@ const defaultHtml = `
   <li><p>Kendaraan wajib dikembalikan tepat pada waktunya dan dalam kondisi yang sama seperti saat diserahterimakan.</p></li>
   <li><p>Pihak Kedua bertanggung jawab sepenuhnya atas segala kerusakan, kehilangan, atau kecelakaan selama masa sewa.</p></li>
   <li><p>Segala bentuk pelanggaran lalu lintas dan denda yang ditimbulkan menjadi tanggung jawab Pihak Kedua.</p></li>
+  <li><p>Pihak Kedua menyerahkan uang jaminan (deposit) sebesar <strong>{{contract.deposit}}</strong>. Uang jaminan tersebut akan dikembalikan utuh setelah kendaraan selesai disewa, apabila tidak terdapat denda, kerusakan, maupun kerugian lainnya.</p></li>
 </ol>
 <table class="form-table">
   <tbody>

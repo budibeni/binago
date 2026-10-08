@@ -11,9 +11,10 @@ interface ContractPrintModalProps {
   contract: RentalContract | null;
   open: boolean;
   onClose: () => void;
+  labels?: Record<string, any>;
 }
 
-export function ContractPrintModal({ contract, open, onClose }: ContractPrintModalProps) {
+export function ContractPrintModal({ contract, open, onClose, labels = {} }: ContractPrintModalProps) {
   const [activeTemplate, setActiveTemplate] = useState<DocumentTemplate | null>(null);
   const [printData, setPrintData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
@@ -36,7 +37,7 @@ export function ContractPrintModal({ contract, open, onClose }: ContractPrintMod
 
     } catch (err: any) {
       console.error('Failed to prepare print template:', err);
-      setError(err.message || 'Terjadi kesalahan saat menyiapkan cetakan kontrak.');
+      setError(err.message || labels.errorPrintPrepare || 'Terjadi kesalahan saat menyiapkan cetakan kontrak.');
     } finally {
       setLoading(false);
     }
@@ -60,7 +61,7 @@ export function ContractPrintModal({ contract, open, onClose }: ContractPrintMod
       <div className="fixed inset-0 z-[9999] bg-black/50 flex items-center justify-center">
         <div className="bg-white p-6 rounded-lg flex flex-col items-center shadow-xl">
           <Loader2 className="w-8 h-8 animate-spin text-red-600 mb-4" />
-          <p className="font-medium text-neutral-800">Menyiapkan dokumen kontrak...</p>
+          <p className="font-medium text-neutral-800">{labels.preparingPrint || 'Menyiapkan dokumen kontrak...'}</p>
         </div>
       </div>
     );
@@ -70,14 +71,14 @@ export function ContractPrintModal({ contract, open, onClose }: ContractPrintMod
     return (
       <div className="fixed inset-0 z-[9999] bg-black/50 flex items-center justify-center">
         <div className="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full">
-          <h3 className="text-lg font-bold text-red-600 mb-2">Gagal Mencetak</h3>
+          <h3 className="text-lg font-bold text-red-600 mb-2">{labels.errorPrintTitle || 'Gagal Mencetak'}</h3>
           <p className="text-neutral-700 text-sm mb-6">{error}</p>
           <div className="flex justify-end">
             <button 
               onClick={onClose}
               className="px-4 py-2 bg-neutral-200 hover:bg-neutral-300 rounded text-sm font-medium"
             >
-              Tutup
+              {labels.btnClose || 'Tutup'}
             </button>
           </div>
         </div>

@@ -304,6 +304,7 @@ export function ContractFeature() {
         contract={printContract}
         open={!!printContract}
         onClose={() => setPrintContract(null)}
+        labels={labels}
       />
 
       <ConfirmDialog
