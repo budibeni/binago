@@ -16,6 +16,7 @@ interface RouteListPanelProps {
   onCreateNew: () => void;
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
+  onAssign?: (id: string) => void;
   locale?: Locale;
   onClose?: () => void;
 }
