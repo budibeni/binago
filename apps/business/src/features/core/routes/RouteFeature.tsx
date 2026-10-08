@@ -61,6 +61,16 @@ const handleDelete = (id: string) => {
     setSelectedVehicleId('');
   };
 
+  const handleCompleteAssignment = async (id: string) => {
+    if (!confirm('Akhiri penugasan aktif untuk rute ini (Ubah status menjadi Selesai)?')) return;
+    try {
+      await api.put(`/routes/${id}/status`, { status: 'completed' });
+      toast.success('Penugasan rute berhasil diakhiri');
+    } catch (err: any) {
+      toast.error(err.message || 'Gagal mengakhiri penugasan');
+    }
+  };
+
   const submitAssign = async () => {
     if (!assigningRouteId || !selectedVehicleId) return;
     setIsAssigning(true);
