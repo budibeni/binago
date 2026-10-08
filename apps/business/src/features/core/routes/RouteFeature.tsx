@@ -163,6 +163,7 @@ const handleDelete = (id: string) => {
           onEdit={handleEdit}
           onDelete={handleDelete}
           onAssign={handleAssign}
+          onCompleteAssignment={handleCompleteAssignment}
           locale={locale}
         />
       )}

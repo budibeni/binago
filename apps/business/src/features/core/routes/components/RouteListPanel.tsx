@@ -17,6 +17,7 @@ interface RouteListPanelProps {
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
   onAssign?: (id: string) => void;
+  onCompleteAssignment?: (id: string) => void;
   locale?: Locale;
   onClose?: () => void;
 }
@@ -31,6 +32,7 @@ export function RouteListPanel({
   onEdit,
   onDelete,
   onAssign,
+  onCompleteAssignment,
   locale = 'id',
   onClose
 }: RouteListPanelProps) {
@@ -135,6 +137,9 @@ export function RouteListPanel({
               </DropdownMenuItem>
               <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onAssign && onAssign(route.id); }}>
                 Tugaskan (Assign)
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onCompleteAssignment && onCompleteAssignment(route.id); }}>
+                Akhiri Tugas (Selesai)
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-red-600 focus:bg-red-50 focus:text-red-700 dark:focus:bg-red-950"
