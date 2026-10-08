@@ -154,6 +154,8 @@ export function MapControlPanel({
     { id: 'standard',  label: bm.standard,  Icon: BASEMAP_ICONS.standard },
     { id: 'osm',       label: bm.osm,       Icon: BASEMAP_ICONS.osm },
     { id: 'satellite', label: bm.satellite, Icon: BASEMAP_ICONS.satellite },
+    { id: 'google_streets', label: (bm as any).google_streets || 'Google Maps', Icon: BASEMAP_ICONS.google_streets },
+    { id: 'google_hybrid', label: (bm as any).google_hybrid || 'Google Satelit', Icon: BASEMAP_ICONS.google_hybrid },
   ];
 
   const moreTools = [
