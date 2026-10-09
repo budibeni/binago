@@ -71,21 +71,29 @@ export function PlaybackMapLayers({ selectedGeofenceIds, selectedRouteIds }: Pla
         // Routes from useRoutes might not have plannedPath yet, but they have stops and origin/dest
         // Wait, useRoutes currently maps it to origin, destination, stops. We need to draw the line!
         // For playback we just need a line. If they have stops, we can draw a straight line through stops.
-        const points = [];
-        if (rt.origin) points.push([rt.origin.longitude || (rt.origin as any).lng || 0, rt.origin.latitude || (rt.origin as any).lat || 0]);
-        if (rt.stops) rt.stops.forEach((s: any) => points.push([s.location.longitude || s.location.lng || 0, s.location.latitude || s.location.lat || 0]));
-        if (rt.destination) points.push([rt.destination.longitude || (rt.destination as any).lng || 0, rt.destination.latitude || (rt.destination as any).lat || 0]);
+        let isPlanned = false;
+        
+        if (rt.plannedPath) {
+          // If we have a planned path from OSRM/Google Maps in DB, use it!
+          geometry = rt.plannedPath.geometry || rt.plannedPath; 
+          isPlanned = true;
+        } else {
+          const points = [];
+          if (rt.origin) points.push([rt.origin.longitude || (rt.origin as any).lng || 0, rt.origin.latitude || (rt.origin as any).lat || 0]);
+          if (rt.stops) rt.stops.forEach((s: any) => points.push([s.location.longitude || s.location.lng || 0, s.location.latitude || s.location.lat || 0]));
+          if (rt.destination) points.push([rt.destination.longitude || (rt.destination as any).lng || 0, rt.destination.latitude || (rt.destination as any).lat || 0]);
 
-        if (points.length > 1) {
-          geometry = {
-            type: 'LineString',
-            coordinates: points
-          };
+          if (points.length > 1) {
+            geometry = {
+              type: 'LineString',
+              coordinates: points
+            };
+          }
         }
 
         return {
           type: 'Feature',
-          properties: { id: rt.id, name: rt.name },
+          properties: { id: rt.id, name: rt.name, isPlanned },
           geometry
         };
       }).filter(f => f.geometry.type !== 'Point');
@@ -150,11 +158,30 @@ export function PlaybackMapLayers({ selectedGeofenceIds, selectedRouteIds }: Pla
       });
     }
 
-    if (!map.getLayer(ROUTE_LAYER)) {
+    if (!map.getLayer(ROUTE_LAYER + '-solid')) {
       map.addLayer({
-        id: ROUTE_LAYER,
+        id: ROUTE_LAYER + '-solid',
         type: 'line',
         source: ROUTE_SOURCE,
+        filter: ['==', ['get', 'isPlanned'], true],
+        layout: {
+          'line-join': 'round',
+          'line-cap': 'round',
+        },
+        paint: {
+          'line-color': '#F59E0B', // Amber / Yellow
+          'line-width': 3,
+          'line-opacity': 0.9,
+        }
+      }, beforeId);
+    }
+    
+    if (!map.getLayer(ROUTE_LAYER + '-dashed')) {
+      map.addLayer({
+        id: ROUTE_LAYER + '-dashed',
+        type: 'line',
+        source: ROUTE_SOURCE,
+        filter: ['!=', ['get', 'isPlanned'], true],
         layout: {
           'line-join': 'round',
           'line-cap': 'round',
@@ -165,7 +192,7 @@ export function PlaybackMapLayers({ selectedGeofenceIds, selectedRouteIds }: Pla
           'line-dasharray': [2, 2], // Dashed pattern
           'line-opacity': 0.9,
         }
-      }, beforeId); // Routes also go below actual track
+      }, beforeId);
     }
 
     updateSources();
