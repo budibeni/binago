@@ -31,6 +31,7 @@ export function RouteFeature({ locale = 'id' }: RouteFeatureProps) {
 const [routeToDelete, setRouteToDelete] = useState<string | null>(null);
   const [assigningRouteId, setAssigningRouteId] = useState<string | null>(null);
   const [completingRouteId, setCompletingRouteId] = useState<string | null>(null);
+  const [assignmentToComplete, setAssignmentToComplete] = useState<number | null>(null);
   const [selectedVehicleId, setSelectedVehicleId] = useState<string>('');
   const [isVehicleOpen, setIsVehicleOpen] = useState(false);
   const [vehicleSearch, setVehicleSearch] = useState('');
@@ -76,13 +77,16 @@ const handleDelete = (id: string) => {
     setCompletingRouteId(id);
   };
 
-  const submitCompleteAssignment = async (assignmentId: number) => {
+  const submitCompleteAssignment = async () => {
+    if (!assignmentToComplete) return;
     try {
-      await api.put(`/routes/assignments/${assignmentId}/status`, { status: 'completed' });
+      await api.put(`/routes/assignments/${assignmentToComplete}/status`, { status: 'completed' });
       toast.success('Penugasan kendaraan berhasil diakhiri');
       refetch();
     } catch (err: any) {
       toast.error(err.message || 'Gagal mengakhiri penugasan');
+    } finally {
+      setAssignmentToComplete(null);
     }
   };
 
@@ -204,18 +208,18 @@ const handleDelete = (id: string) => {
       <Dialog 
         open={!!assigningRouteId} 
         onOpenChange={(isOpen) => { if (!isOpen) { setAssigningRouteId(null); setEndDate(''); setVehicleSearch(''); setIsVehicleOpen(false); } }}
-        title="Tugaskan Rute ke Kendaraan"
-        description="Pilih kendaraan yang akan ditugaskan untuk rute ini."
+        title={t.assignment?.title || "Tugaskan Rute ke Kendaraan"}
+        description={t.assignment?.description || "Pilih kendaraan yang akan ditugaskan untuk rute ini."}
       >
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium">Pilih Kendaraan</label>
+            <label className="text-sm font-medium">{t.assignment?.selectVehicle || "Pilih Kendaraan"}</label>
             <Popover open={isVehicleOpen} onOpenChange={setIsVehicleOpen}>
               <PopoverTrigger asChild>
                 <Button variant="outline" role="combobox" aria-expanded={isVehicleOpen} className="w-full justify-between font-normal">
                   {selectedVehicleId 
                     ? vehicles?.find(v => String(v.id) === selectedVehicleId)?.vehicleName || vehicles?.find(v => String(v.id) === selectedVehicleId)?.plateNumber 
-                    : "Pilih Kendaraan..."}
+                    : (t.assignment?.selectVehicle || "Pilih Kendaraan...")}
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </PopoverTrigger>
@@ -224,14 +228,14 @@ const handleDelete = (id: string) => {
                   <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
                   <input 
                     className="flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50" 
-                    placeholder="Cari kendaraan berdasarkan nama atau plat..." 
+                    placeholder={t.assignment?.searchPlaceholder || "Cari kendaraan berdasarkan nama atau plat..."} 
                     value={vehicleSearch}
                     onChange={(e) => setVehicleSearch(e.target.value)}
                   />
                 </div>
                 <div className="max-h-[300px] overflow-y-auto p-1">
                   {filteredVehicles.length === 0 ? (
-                    <div className="py-6 text-center text-sm">Tidak ada kendaraan.</div>
+                    <div className="py-6 text-center text-sm">{t.assignment?.noVehicles || "Tidak ada kendaraan."}</div>
                   ) : (
                     filteredVehicles.map((v) => (
                       <div 
@@ -258,7 +262,7 @@ const handleDelete = (id: string) => {
             </Popover>
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium">Batas Waktu (Opsional)</label>
+            <label className="text-sm font-medium">{t.assignment?.endDateLabel || "Batas Waktu (Opsional)"}</label>
             <input 
               type="date" 
               className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
@@ -267,23 +271,23 @@ const handleDelete = (id: string) => {
             />
           </div>
           <div className="flex justify-end gap-2 pt-2">
-            <Button variant="outline" onClick={() => { setAssigningRouteId(null); setEndDate(''); }} disabled={isAssigning}>Batal</Button>
-            <Button variant="primary" onClick={submitAssign} disabled={!selectedVehicleId || isAssigning} loading={isAssigning}>Tugaskan</Button>
+            <Button variant="outline" onClick={() => { setAssigningRouteId(null); setEndDate(''); }} disabled={isAssigning}>{t.assignment?.cancelBtn || "Batal"}</Button>
+            <Button variant="primary" onClick={submitAssign} disabled={!selectedVehicleId || isAssigning} loading={isAssigning}>{t.assignment?.assignBtn || "Tugaskan"}</Button>
           </div>
         </div>
       </Dialog>
       <Dialog 
         open={!!completingRouteId} 
         onOpenChange={(isOpen) => { if (!isOpen) setCompletingRouteId(null); }}
-        title="Akhiri Tugas Kendaraan"
-        description="Pilih kendaraan yang ingin diakhiri penugasannya dari rute ini."
+        title={t.assignment?.unassignTitle || "Akhiri Tugas Kendaraan"}
+        description={t.assignment?.unassignDesc || "Pilih kendaraan yang ingin diakhiri penugasannya dari rute ini."}
       >
         <div className="space-y-4 py-4 max-h-[400px] overflow-y-auto">
           {(() => {
             const route = routes.find(r => r.id === completingRouteId);
             const assignments = route?.activeAssignments || [];
             if (assignments.length === 0) {
-              return <div className="text-sm text-neutral-500 text-center py-4">Tidak ada kendaraan yang sedang ditugaskan di rute ini.</div>;
+              return <div className="text-sm text-neutral-500 text-center py-4">{t.assignment?.noActiveVehicles || "Tidak ada kendaraan yang sedang ditugaskan di rute ini."}</div>;
             }
             return (
               <div className="space-y-2">
@@ -293,8 +297,8 @@ const handleDelete = (id: string) => {
                       <div className="font-medium text-sm text-foreground">{a.vehicleName || a.plateNumber}</div>
                       <div className="text-xs text-foreground-muted">{a.plateNumber}</div>
                     </div>
-                    <Button variant="destructive" onClick={() => submitCompleteAssignment(a.id)}>
-                      Akhiri
+                    <Button variant="destructive" onClick={() => setAssignmentToComplete(a.id)}>
+                      {t.assignment?.unassignBtn || "Akhiri"}
                     </Button>
                   </div>
                 ))}
@@ -303,6 +307,13 @@ const handleDelete = (id: string) => {
           })()}
         </div>
       </Dialog>
+      <ConfirmDialog
+        open={!!assignmentToComplete}
+        onOpenChange={(open) => !open && setAssignmentToComplete(null)}
+        title={t.assignment?.confirmUnassignTitle || "Konfirmasi Akhiri Tugas"}
+        description={t.assignment?.confirmUnassignDesc || "Apakah Anda yakin ingin mengakhiri tugas untuk kendaraan ini?"}
+        onConfirm={submitCompleteAssignment}
+      />
     </div>
   );
 }
