@@ -6,10 +6,11 @@ import {
   Car, MapPin, Search, Plus, Map, Focus, Receipt, Hash, User, CalendarRange, Navigation, Crosshair, StickyNote, CornerDownRight
 } from 'lucide-react';
 import { 
-  Button, FormShell, Input, InputNumber, InputSelect, 
+  Button, FormShell, InputText, InputNumber, InputSelect, 
   InputDate, InputTextarea, FormCard, InputCheckbox, Badge,
+  Drawer, DrawerContent
 } from '@adatrack/ui';
-import { cn, formatCurrency,  formatDateTime } from '@adatrack/utils';
+import { cn, formatCurrency, formatIDR, formatDateTime } from '@adatrack/utils';
 import type { RentalContract } from '../../contracts/types/contract';
 import type { ReturnPayload } from '../types/return';
 import type { BookingItem } from '../../bookings/types/booking';
@@ -209,11 +210,12 @@ export function ReturnForm({
   return (
     <FormShell
       title="Proses Pengembalian"
-      
+      description="Catat kondisi akhir dan odometer kendaraan."
       onSave={handleSave}
       onCancel={onCancel}
-      isSubmitting={isSubmitting}
-      layout={layout === 'drawer' ? 'drawer' : 'default'}
+      isSaving={isSubmitting}
+      saveLabel="Simpan Pengembalian"
+      variant={layout === 'drawer' ? 'drawer' : 'default'}
       className={layout === 'drawer' ? "rounded-none sm:rounded-l-2xl h-full border-0 bg-transparent shadow-none" : ""}
     >
       <div className="flex flex-col gap-6 p-6">
@@ -254,7 +256,7 @@ export function ReturnForm({
           icon={<Car className="w-5 h-5" />}
           iconWrapperClassName="text-emerald-500"
           contentClassName="p-0 border-none bg-transparent"
-          
+          headerClassName="px-0 pt-0"
         >
           <div className="flex flex-col border border-border/60 rounded-xl overflow-hidden bg-background shadow-sm">
             {/* TABS NAVIGATION */}
@@ -332,13 +334,13 @@ export function ReturnForm({
                             label="Waktu Pengembalian (Aktual)"
                             value={data.returnDate}
                             onChange={(val) => handleReturnDateChange(activeTab, val)}
-                            
+                            includeTime={true}
                           />
                           {/* Tampilkan denda keterlambatan jika ada */}
                           {data.lateFee !== undefined && data.lateFee > 0 && (
                             <div className="bg-danger/10 border border-danger/20 rounded-md p-2.5 flex justify-between items-center text-[11px]">
                               <span className="text-danger font-semibold">Estimasi Denda Terlambat:</span>
-                              <span className="text-danger font-bold text-sm">{formatCurrency(data.lateFee)}</span>
+                              <span className="text-danger font-bold text-sm">{formatIDR(data.lateFee)}</span>
                             </div>
                           )}
                           <InputNumber
@@ -446,7 +448,7 @@ export function ReturnForm({
                           />
                           <InputNumber
                             label="Taksiran Biaya Perbaikan (Rp)"
-                            value={data.damageFee || null}
+                            value={data.damageFee}
                             onChange={(val) => setVehicleData({ ...vehicleData, [activeTab]: { ...data, damageFee: val || 0 } })}
                           />
                         </div>
@@ -521,45 +523,45 @@ export function ReturnForm({
             <div className="flex flex-col gap-3 text-sm">
               <div className="flex justify-between items-center text-muted-foreground">
                 <span>Sisa Tagihan Kontrak Sewa</span>
-                <span className="font-medium text-foreground">{formatCurrency(remainingContract)}</span>
+                <span className="font-medium text-foreground">{formatIDR(remainingContract)}</span>
               </div>
               
               {totalLateFee > 0 && (
                 <div className="flex justify-between items-center text-muted-foreground">
                   <span>Total Denda Keterlambatan</span>
-                  <span className="font-medium text-foreground">{formatCurrency(totalLateFee)}</span>
+                  <span className="font-medium text-foreground">{formatIDR(totalLateFee)}</span>
                 </div>
               )}
               {totalDamageFee > 0 && (
                 <div className="flex justify-between items-center text-muted-foreground">
                   <span>Total Biaya Perbaikan (Kerusakan)</span>
-                  <span className="font-medium text-foreground">{formatCurrency(totalDamageFee)}</span>
+                  <span className="font-medium text-foreground">{formatIDR(totalDamageFee)}</span>
                 </div>
               )}
               {totalAdditional > 0 && (
                 <div className="flex justify-between items-center text-muted-foreground">
                   <span>Total Biaya Lainnya (Per Kendaraan)</span>
-                  <span className="font-medium text-foreground">{formatCurrency(totalAdditional)}</span>
+                  <span className="font-medium text-foreground">{formatIDR(totalAdditional)}</span>
                 </div>
               )}
               {globalAdditionalFee > 0 && (
                 <div className="flex justify-between items-center text-muted-foreground">
                   <span>Biaya Tambahan Transaksi (Global)</span>
-                  <span className="font-medium text-foreground">{formatCurrency(globalAdditionalFee)}</span>
+                  <span className="font-medium text-foreground">{formatIDR(globalAdditionalFee)}</span>
                 </div>
               )}
 
               {globalDiscount > 0 && (
                 <div className="flex justify-between items-center text-emerald-600 dark:text-emerald-400 mt-1">
                   <span>Potongan / Diskon (Global)</span>
-                  <span className="font-medium">- {formatCurrency(globalDiscount)}</span>
+                  <span className="font-medium">- {formatIDR(globalDiscount)}</span>
                 </div>
               )}
 
               {deposit > 0 && (
                 <div className="flex justify-between items-center text-emerald-600 dark:text-emerald-400 mt-1">
                   <span>Deposit (Jaminan) yang Dipotong</span>
-                  <span className="font-medium">- {formatCurrency(deposit)}</span>
+                  <span className="font-medium">- {formatIDR(deposit)}</span>
                 </div>
               )}
 
@@ -571,7 +573,7 @@ export function ReturnForm({
                   "font-bold text-lg",
                   grandTotal > 0 ? "text-danger" : grandTotal < 0 ? "text-emerald-600 dark:text-emerald-400" : "text-foreground"
                 )}>
-                  {grandTotal < 0 ? `(Refund) ${formatCurrency(Math.abs(grandTotal))}` : formatCurrency(grandTotal)}
+                  {grandTotal < 0 ? `(Refund) ${formatIDR(Math.abs(grandTotal))}` : formatIDR(grandTotal)}
                 </span>
               </div>
 

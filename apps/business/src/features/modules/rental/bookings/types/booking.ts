@@ -60,11 +60,26 @@ export interface BookingItem {
     notes?: string;
     staffName?: string;
   };
+  returnNumber?: string;
   returnDate?: string;
   returnBy?: string; // UUID of admin
   returnOdometer?: number;
-  returnCondition?: Record<string, any>;
+  returnLocation?: {
+    latitude: number;
+    longitude: number;
+    address?: string;
+  };
+  returnCondition?: {
+    fuelLevel: string;
+    vehicleCondition: string;
+    equipmentChecklist: Record<string, boolean>;
+    notes?: string;
+    damageNotes?: string;
+    staffName?: string;
+  };
   extraCharges?: number;
+  lateFee?: number;
+  damageFee?: number;
 
   // Relations (populated for UI)
   vehicle?: RentalVehicle;

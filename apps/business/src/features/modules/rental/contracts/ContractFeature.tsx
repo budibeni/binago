@@ -12,7 +12,7 @@ import { ContractTable } from './components/ContractTable';
 import { ContractView } from './components/ContractView';
 import { ContractPrintModal } from './components/ContractPrintModal';
 import { ContractCreateFeature } from './ContractCreateFeature';
-import { ReturnFeature } from '../returns/ReturnFeature';
+import { ReturnCreateFeature } from '../returns/ReturnCreateFeature';
 import { cn, formatNumber } from '@adatrack/utils';
 import { PanelShell, type DataTableFilterConfig, ConfirmDialog, toast } from '@adatrack/ui';
 

@@ -1,4 +1,4 @@
-'use client';
+content = """'use client';
 
 import React, { useEffect, useState, useMemo } from 'react';
 import { getTranslation } from '@/i18n';
@@ -6,7 +6,7 @@ import { useBusinessLocale } from '@/components/BusinessShellLayout';
 import type { RentalContract } from '../contracts/types/contract';
 import { ReturnCreateFeature } from './ReturnCreateFeature';
 import { ReturnView } from './components/ReturnView';
-import { AlertCircle, CheckCircle2, Car, Search, CalendarRange, User, Building2 } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Car, Search } from 'lucide-react';
 import { cn, formatDateTime } from '@adatrack/utils';
 
 export function ReturnsFeature() {
@@ -68,60 +68,34 @@ export function ReturnsFeature() {
     const s = search.toLowerCase();
     return currentList.filter(c => 
       c.contractNumber?.toLowerCase().includes(s) ||
-      c.customerSnapshot?.name?.toLowerCase().includes(s) ||
+      c.customer?.name?.toLowerCase().includes(s) ||
       c.items?.some(i => i.vehicleSnapshot?.licensePlate?.toLowerCase().includes(s))
     );
   }, [currentList, search]);
 
   const getContractStatus = (contract: RentalContract) => {
-    let safeCount = 0;
-    let warningCount = 0;
     let overdueCount = 0;
     let returnedCount = 0;
-    
     const items = contract.items || [];
     const now = new Date().getTime();
     
     items.forEach(i => {
-       if (i.itemStatus === 'RETURNED') {
-         returnedCount++;
-         return;
-       }
-       if (!i.endDate) {
-         safeCount++;
-         return;
-       }
-       const diffHours = (new Date(i.endDate).getTime() - now) / (1000 * 60 * 60);
-       if (diffHours < 0) overdueCount++;
-       else if (diffHours < 24) warningCount++;
-       else safeCount++;
+       if (i.itemStatus === 'RETURNED') returnedCount++;
+       else if (i.endDate && new Date(i.endDate).getTime() < now) overdueCount++;
     });
     
-    // Find latest end date among items for the period display
-    let latestEnd = 0;
-    items.forEach(i => {
-       if (i.endDate) {
-          const t = new Date(i.endDate).getTime();
-          if (t > latestEnd) latestEnd = t;
-       }
-    });
-    
-    return { 
-      safeCount, warningCount, overdueCount, returnedCount, total: items.length,
-      latestEnd: latestEnd > 0 ? new Date(latestEnd).toISOString() : null
-    };
+    return { overdueCount, returnedCount, total: items.length };
   };
 
-    const selectedContract = useMemo(() => {
-     const found = currentList.find(c => c.id === selectedContractId) || null;
-     return found;
+  const selectedContract = useMemo(() => {
+     return currentList.find(c => c.id === selectedContractId) || null;
   }, [selectedContractId, currentList]);
 
   return (
     <div className="flex flex-col md:flex-row h-full bg-background overflow-hidden border-t border-border">
       
       {/* LEFT PANEL: Master List (30%) */}
-      <div className={cn("w-full md:w-[280px] lg:w-[320px] shrink-0 border-r border-border bg-neutral-50/50 dark:bg-neutral-950/50 flex-col h-full", selectedContractId ? "hidden md:flex" : "flex")}>
+      <div className="w-full md:w-[350px] lg:w-[420px] shrink-0 border-r border-border bg-neutral-50/50 dark:bg-neutral-950/50 flex flex-col h-full">
         {/* Header & Tabs */}
         <div className="p-4 border-b border-border flex flex-col gap-4 bg-background">
           <div className="flex bg-neutral-100 dark:bg-neutral-900 p-1 rounded-lg">
@@ -129,13 +103,13 @@ export function ReturnsFeature() {
               onClick={() => { setActiveTab('PENDING'); setSelectedContractId(null); }}
               className={cn("flex-1 text-[13px] font-semibold py-1.5 rounded-md transition-all", activeTab === 'PENDING' ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground")}
             >
-              Aktif
+              Menunggu Pengembalian
             </button>
             <button 
               onClick={() => { setActiveTab('COMPLETED'); setSelectedContractId(null); }}
               className={cn("flex-1 text-[13px] font-semibold py-1.5 rounded-md transition-all", activeTab === 'COMPLETED' ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground")}
             >
-              Selesai
+              Riwayat
             </button>
           </div>
           
@@ -152,7 +126,7 @@ export function ReturnsFeature() {
         </div>
         
         {/* List */}
-        <div className="flex-1 overflow-y-auto scrollbar-hide bg-background">
+        <div className="flex-1 overflow-y-auto p-3 scrollbar-hide">
           {loading ? (
             <div className="flex justify-center p-8"><div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" /></div>
           ) : filteredList.length === 0 ? (
@@ -161,7 +135,7 @@ export function ReturnsFeature() {
               <p className="text-sm font-medium">Tidak ada data kontrak</p>
             </div>
           ) : (
-            <div className="flex flex-col divide-y divide-border/60">
+            <div className="flex flex-col gap-2">
                {filteredList.map(contract => {
                  const isSelected = selectedContractId === contract.id;
                  const status = getContractStatus(contract);
@@ -171,41 +145,26 @@ export function ReturnsFeature() {
                      key={contract.id}
                      onClick={() => setSelectedContractId(contract.id)}
                      className={cn(
-                       "w-full flex flex-col py-3 px-4 transition-all text-left outline-none",
+                       "w-full flex flex-col p-4 transition-all text-left border rounded-xl shadow-sm",
                        isSelected 
-                         ? "bg-neutral-100 dark:bg-neutral-800" 
-                         : "bg-transparent hover:bg-neutral-50 dark:hover:bg-neutral-900/50"
+                         ? "bg-primary/5 border-primary/30" 
+                         : "bg-background border-border/60 hover:bg-neutral-50 dark:hover:bg-neutral-900/50 hover:border-border"
                      )}
                    >
-                      <div className="flex flex-col w-full text-left">
-                          {/* Baris 1: Kiri :#no kontrak, Kanan : status */}
-                          <div className="flex justify-between items-center w-full mb-0.5">
-                            <div className="text-[11px] font-normal text-muted-foreground truncate max-w-[50%]">
-                              {contract.contractNumber}
-                            </div>
-                            <div className="flex items-center flex-wrap gap-1.5 justify-end text-[11px] font-medium tracking-wide shrink-0 max-w-[50%]">
-                               {status.safeCount > 0 && <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-500"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div> Aman ({status.safeCount})</span>}
-                               {status.warningCount > 0 && <span className="flex items-center gap-1 text-warning"><div className="w-1.5 h-1.5 rounded-full bg-warning"></div> Segera Habis ({status.warningCount})</span>}
-                               {status.overdueCount > 0 && <span className="flex items-center gap-1 text-danger"><div className="w-1.5 h-1.5 rounded-full bg-danger"></div> Overdue ({status.overdueCount})</span>}
-                               {activeTab === 'COMPLETED' && <span className="flex items-center gap-1 text-neutral-500"><CheckCircle2 className="w-3 h-3" /> Selesai</span>}
-                            </div>
-                          </div>
-                          
-                          {/* Baris 2: Periode */}
-                          <div className="flex items-center gap-1 text-[11px] font-normal text-muted-foreground">
-                            <CalendarRange className="w-3 h-3 text-neutral-400" />
-                            <span>{formatDateTime(contract.startDate)} s/d {status.latestEnd ? formatDateTime(status.latestEnd) : '-'}</span>
-                          </div>
-
-                          {/* Baris 3: Customer */}
-                          <div className="flex items-center gap-1.5 text-[13px] font-medium text-foreground w-full mt-1.5">
-                            {contract.customerSnapshot?.type?.toLowerCase().includes('perusahaan') || contract.customerSnapshot?.type?.toLowerCase().includes('b2b') || contract.customerSnapshot?.type?.toLowerCase().includes('company') ? (
-                               <Building2 className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
-                            ) : (
-                               <User className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
-                            )}
-                            <span className="truncate w-full">{contract.customerSnapshot?.name || 'Pelanggan'}</span>
-                          </div>
+                      <div className="flex flex-col gap-1 mb-3">
+                         <span className="font-bold text-[14px] text-foreground">{contract.customer?.name}</span>
+                         <span className="text-[11px] text-muted-foreground font-semibold flex items-center gap-1.5">
+                            {contract.contractNumber}
+                            <span className="w-1 h-1 rounded-full bg-border"></span>
+                            {formatDateTime(contract.startDate)}
+                         </span>
+                      </div>
+                      
+                      <div className="flex items-center flex-wrap gap-2 text-[10px] font-bold tracking-wide">
+                         <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-neutral-400"></div> {status.total} Unit</span>
+                         {status.returnedCount > 0 && <span className="flex items-center gap-1 text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-md"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div> {status.returnedCount} Selesai</span>}
+                         {status.overdueCount > 0 && <span className="flex items-center gap-1 text-danger bg-danger/10 px-1.5 py-0.5 rounded-md"><AlertCircle className="w-3 h-3" /> {status.overdueCount} Overdue</span>}
+                         {activeTab === 'COMPLETED' && <span className="bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-md"><CheckCircle2 className="w-3 h-3 inline mr-0.5" /> COMPLETED</span>}
                       </div>
                    </button>
                  );
@@ -216,15 +175,9 @@ export function ReturnsFeature() {
       </div>
 
       {/* RIGHT PANEL: Detail View (70%) */}
-      <div className={cn("flex-1 bg-neutral-50/50 dark:bg-neutral-950/20 overflow-y-auto relative", !selectedContractId ? "hidden md:block" : "block")}>
+      <div className="flex-1 bg-neutral-50/50 dark:bg-neutral-950/20 overflow-y-auto">
          {selectedContract ? (
             <div className="p-4 md:p-6 lg:p-8 animate-in fade-in zoom-in-95 duration-200 w-full max-w-6xl mx-auto">
-               <button 
-                  onClick={() => setSelectedContractId(null)}
-                  className="md:hidden flex items-center gap-2 text-sm font-semibold text-primary mb-4"
-               >
-                  &larr; Kembali ke Daftar
-               </button>
                {activeTab === 'PENDING' ? (
                   <ReturnCreateFeature
                      contractId={selectedContract.id}
@@ -242,7 +195,7 @@ export function ReturnsFeature() {
                         id: selectedContract.id,
                         contractId: selectedContract.id,
                         contract: selectedContract,
-                        customer: selectedContract.customerSnapshot,
+                        customer: selectedContract.customer,
                         items: selectedContract.items || [],
                         status: 'COMPLETED',
                         handoverAt: selectedContract.startDate,
@@ -265,3 +218,6 @@ export function ReturnsFeature() {
     </div>
   );
 }
+"""
+with open('apps/business/src/features/modules/rental/returns/ReturnsFeature.tsx', 'w') as f:
+    f.write(content)

@@ -4,11 +4,25 @@ import React from 'react';
 import { Button, DetailShell } from '@adatrack/ui';
 import { User, Car, MapPin, Key, CheckCircle, Navigation, Info, FileText, StickyNote } from 'lucide-react';
 import { PaymentsFeature } from '../../payments/PaymentsFeature';
-import type { RentalReturn } from '../types/return';
-import type { ReturnGroup } from './ReturnList';
+import type { BookingItem } from '../../bookings/types/booking';
+export interface ReturnGroup {
+  id: string;
+  contractId: string;
+  contract?: any;
+  customer?: any;
+  handoverAt: string;
+  handoverLatitude?: number;
+  handoverLongitude?: number;
+  handoverAddress?: string;
+  status: 'PARTIAL' | 'COMPLETED';
+  items: any[];
+}
+
 import { cn, formatCurrency, formatDate, formatDateTime, formatNumber } from '@adatrack/utils';
 
 interface ReturnViewProps {
+  inline?: boolean;
+  onProcessReturn?: () => void;
   returnGroup: ReturnGroup | null;
   open: boolean;
   onClose: () => void;
@@ -20,6 +34,8 @@ export function ReturnView({
   open,
   onClose,
   layout = 'drawer',
+  inline = false,
+  onProcessReturn,
 }: ReturnViewProps) {
   const [mainTab, setMainTab] = React.useState<'detail' | 'payment'>('detail');
   const [activeTab, setActiveTab] = React.useState<string>('');
@@ -32,8 +48,8 @@ export function ReturnView({
 
   const totalAdditionalFees = React.useMemo(() => {
     if (!returnGroup?.items) return 0;
-    return returnGroup.items.reduce((sum, item) => {
-      return sum + (item.lateFee || 0) + (item.damageFee || 0) + (item.additionalCharges || 0);
+    return returnGroup.items.reduce((sum: number, item: any) => {
+      return sum + (item.lateFee || 0) + (item.damageFee || 0) + (item.extraCharges || 0);
     }, 0);
   }, [returnGroup?.items]);
 
@@ -134,10 +150,10 @@ export function ReturnView({
             {c.items.length > 1 && (
               <div className="shrink-0 bg-background border-b border-border/40">
                 <div className="flex items-center overflow-x-auto hide-scrollbar px-2">
-                  {c.items.map(item => {
+                  {c.items.map((item: any) => {
                     const id = item.id;
                     const isSelected = activeTab === id;
-                    const cv = item.vehicle?.coreVehicle;
+                    const cv = item.vehicleSnapshot;
 
                     return (
                       <button
@@ -150,7 +166,7 @@ export function ReturnView({
                         )}
                       >
                         <Car className={cn("h-3 w-3", isSelected ? "text-danger" : "opacity-70")} />
-                        {cv?.plateNumber || item.vehicleId}
+                        {cv?.licensePlate || item.vehicleId}
                       </button>
                     );
                   })}
@@ -160,10 +176,10 @@ export function ReturnView({
 
             {/* TAB CONTENT */}
             {activeTab && (() => {
-              const item = c.items.find(i => i.id === activeTab);
+              const item = c.items.find((i: any) => i.id === activeTab);
               if (!item) return null;
-              const cv = item.vehicle?.coreVehicle;
-              const eq = item.equipmentChecklistEnd || {};
+              const cv = item.vehicleSnapshot;
+              const eq = item.returnCondition?.equipmentChecklist || {};
 
               return (
                 <div className="p-4 flex flex-col gap-4 animate-in fade-in duration-300">
@@ -172,22 +188,22 @@ export function ReturnView({
                       <Car className="w-4 h-4 text-danger" />
                     </div>
                     <div>
-                      <p className="font-bold text-[12px] text-foreground">{cv?.brand} {cv?.vehicleName}</p>
-                      <p className="text-[11px] font-semibold text-primary">{cv?.plateNumber}</p>
+                      <p className="font-bold text-[12px] text-foreground">{cv?.brand} {cv?.model}</p>
+                      <p className="text-[11px] font-semibold text-primary">{cv?.licensePlate}</p>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                    <InfoItem label="Tanggal & Jam" value={formatDateTime(item.returnedAt)} />
-                    <InfoItem label="Petugas" value={item.staffName || '-'} />
-                    <InfoItem label="Odometer Akhir" value={formatNumber(item.odometerEnd) + " KM"} />
-                    <InfoItem label="Level BBM" value={item.fuelLevelEnd} />
-                    <InfoItem label="Kondisi" value={getConditionLabel(item.vehicleConditionEnd)} />
+                    <InfoItem label="Tanggal & Jam" value={formatDateTime(item.returnDate)} />
+                    <InfoItem label="Petugas" value={item.returnCondition?.staffName || '-'} />
+                    <InfoItem label="Odometer Akhir" value={formatNumber(item.returnOdometer || 0) + " KM"} />
+                    <InfoItem label="Level BBM" value={item.returnCondition?.fuelLevel} />
+                    <InfoItem label="Kondisi" value={getConditionLabel(item.returnCondition?.vehicleCondition || '')} />
                   </div>
 
-                  {item.vehicleConditionEnd !== 'GOOD' && (item.notes || item.damageNotes) && (
+                  {item.returnCondition?.vehicleCondition !== 'GOOD' && (item.returnCondition?.notes || item.returnCondition?.damageNotes) && (
                     <div className="bg-warning/10 border border-warning/20 p-2.5 rounded-lg">
-                      <InfoItem label="Detail Kerusakan" value={item.damageNotes || item.notes} valueClassName="text-warning-700 dark:text-warning" />
+                      <InfoItem label="Detail Kerusakan" value={item.returnCondition?.damageNotes || item.returnCondition?.notes} valueClassName="text-warning-700 dark:text-warning" />
                     </div>
                   )}
 
@@ -218,14 +234,14 @@ export function ReturnView({
                   {/* LOKASI KHUSUS KENDARAAN INI */}
                   <div className="pt-2.5 border-t border-border/40">
                     <span className="text-[9px] font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-2.5 block flex items-center gap-1.5"><MapPin className="w-3 h-3" /> Lokasi Pengembalian</span>
-                    <InfoItem label="Alamat" value={item.returnAddress || '-'} />
+                    <InfoItem label="Alamat" value={item.returnLocation?.address || '-'} />
                     <div className="grid grid-cols-2 gap-2.5 mt-2">
-                      <InfoItem label="Latitude" value={<span className="font-mono text-[10px]">{item.returnLatitude || '-'}</span>} />
-                      <InfoItem label="Longitude" value={<span className="font-mono text-[10px]">{item.returnLongitude || '-'}</span>} />
+                      <InfoItem label="Latitude" value={<span className="font-mono text-[10px]">{item.returnLocation?.latitude || '-'}</span>} />
+                      <InfoItem label="Longitude" value={<span className="font-mono text-[10px]">{item.returnLocation?.longitude || '-'}</span>} />
                     </div>
-                    {item.returnLatitude && item.returnLongitude ? (
+                    {item.returnLocation?.latitude && item.returnLocation?.longitude ? (
                       <a 
-                        href={`https://maps.google.com/?q=${item.returnLatitude},${item.returnLongitude}`}
+                        href={`https://maps.google.com/?q=${item.returnLocation?.latitude},${item.returnLocation?.longitude}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="block h-24 bg-neutral-100 dark:bg-neutral-900 border border-border rounded-lg overflow-hidden mt-2 relative group hover:opacity-90 transition-opacity cursor-pointer"
@@ -236,7 +252,7 @@ export function ReturnView({
                           width="100%"
                           height="100%"
                           className="border-0 pointer-events-none"
-                          src={"https://www.openstreetmap.org/export/embed.html?bbox=" + (item.returnLongitude - 0.005) + "," + (item.returnLatitude - 0.005) + "," + (item.returnLongitude + 0.005) + "," + (item.returnLatitude + 0.005) + "&layer=mapnik&marker=" + item.returnLatitude + "," + item.returnLongitude}
+                          src={"https://www.openstreetmap.org/export/embed.html?bbox=" + (item.returnLocation?.longitude - 0.005) + "," + (item.returnLocation?.latitude - 0.005) + "," + (item.returnLocation?.longitude + 0.005) + "," + (item.returnLocation?.latitude + 0.005) + "&layer=mapnik&marker=" + item.returnLocation?.latitude + "," + item.returnLocation?.longitude}
                         />
                       </a>
                     ) : (
@@ -259,10 +275,10 @@ export function ReturnView({
               <h3 className="text-[10px] font-bold text-foreground uppercase tracking-wider">Catatan Tambahan</h3>
             </div>
             <div className="p-4 text-[11px] text-muted-foreground">
-              {c.items.some(i => i.notes && i.vehicleConditionEnd === 'GOOD') ? (
+              {c.items.some((i: any) => i.returnCondition?.notes && i.returnCondition?.vehicleCondition === 'GOOD') ? (
                 <ul className="list-disc list-inside space-y-1">
-                  {c.items.filter(i => i.notes && i.vehicleConditionEnd === 'GOOD').map((item, idx) => (
-                    <li key={idx}><span className="font-semibold text-foreground mr-1">{(item as any).vehicleSnapshot?.licensePlate}:</span> {item.notes}</li>
+                  {c.items.filter((i: any) => i.returnCondition?.notes && i.returnCondition?.vehicleCondition === 'GOOD').map((item: any, idx: number) => (
+                    <li key={idx}><span className="font-semibold text-foreground mr-1">{(item as any).vehicleSnapshot?.licensePlate}:</span> {item.returnCondition?.notes}</li>
                   ))}
                 </ul>
               ) : (

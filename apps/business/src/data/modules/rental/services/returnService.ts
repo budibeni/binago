@@ -1,55 +1,14 @@
-import { returnRepository } from '../repositories/returnRepository';
 import { contractService } from './contractService';
-import { handoverService } from './handoverService';
 import { rentalVehicleService } from './vehicleService';
 import { rentalVehicleRepository } from '../repositories/vehicleRepository';
-import { customerRepository } from '../repositories/customerRepository';
-import type { RentalReturn } from '@/features/modules/rental/returns/types/return';
+import type { ReturnPayload } from '@/features/modules/rental/returns/types/return';
 import type { RentalContract } from '@/features/modules/rental/contracts/types/contract';
-
-const populateRelations = async (ret: RentalReturn): Promise<RentalReturn> => {
-  const result = { ...ret };
-
-  try {
-    const contract = await contractService.getContractById(ret.contractId);
-    if (contract) result.contract = contract;
-
-    const customer = customerRepository.getById(ret.customerId);
-    if (customer) result.customer = customer;
-
-    const enrichedVehicle = await rentalVehicleService.getRentalVehicleByVehicleId(ret.vehicleId);
-    if (enrichedVehicle) {
-      result.vehicle = enrichedVehicle;
-    }
-
-    const handover = await handoverService.getHandoverByBookingItemId(ret.contractId, ret.bookingItemId);
-    if (handover) result.handover = handover;
-  } catch (error) {
-    console.error('Error populating relations for return', error);
-  }
-
-  return result;
-};
+import type { BookingItem } from '@/features/modules/rental/bookings/types/booking';
+import { v4 as uuidv4 } from 'uuid';
+import { mockBookings } from '../mock/bookings';
 
 export const returnService = {
-  getReturns: async (): Promise<RentalReturn[]> => {
-    const returns = await returnRepository.getReturns();
-    return Promise.all(returns.map(r => populateRelations(r)));
-  },
-
-  getReturnById: async (id: string): Promise<RentalReturn | undefined> => {
-    const ret = await returnRepository.getReturnById(id);
-    if (!ret) return undefined;
-    return populateRelations(ret);
-  },
-
-  getReturnByBookingItemId: async (contractId: string, bookingItemId: string): Promise<RentalReturn | undefined> => {
-    const ret = await returnRepository.getReturnByBookingItemId(contractId, bookingItemId);
-    if (!ret) return undefined;
-    return populateRelations(ret);
-  },
-
-  /** Returns Contract ACTIVE/COMPLETED that have a Handover but no Return yet */
+  // Returns Contract ACTIVE/COMPLETED that have items IN_USE
   getEligibleContracts: async (): Promise<RentalContract[]> => {
     const allContracts = await contractService.getContracts();
     const activeContracts = allContracts.filter(c => c.status === 'ACTIVE' || c.status === 'COMPLETED');
@@ -58,24 +17,39 @@ export const returnService = {
     for (const contract of activeContracts) {
       if (!contract) continue;
       
-      let hasPendingItems = false;
-      for (const item of contract.items) {
-        const handover = await handoverService.getHandoverByBookingItemId(contract.id, item.id);
-        if (!handover) continue; // Must have handover
-        const existingReturn = await returnRepository.getReturnByBookingItemId(contract.id, item.id);
-        if (!existingReturn) {
-          hasPendingItems = true;
-          break;
-        }
-      }
+      const hasPendingItems = contract.items?.some(i => i.itemStatus === 'IN_USE');
       if (hasPendingItems) eligible.push(contract);
     }
     return eligible;
   },
 
-  createReturn: async (
-    data: Omit<RentalReturn, 'id' | 'createdAt' | 'updatedAt'>
-  ): Promise<RentalReturn> => {
+  // Returns all items that have been RETURNED (for the list view)
+  getReturnedItemsGroupedByContract: async () => {
+    const allContracts = await contractService.getContracts();
+    const groups: any[] = [];
+    
+    for (const contract of allContracts) {
+      const returnedItems = (contract.items || []).filter(i => i.itemStatus === 'RETURNED');
+      if (returnedItems.length > 0) {
+        groups.push({
+          id: contract.id, // Group by contract ID
+          contractId: contract.id,
+          contract: contract,
+          customer: contract.customer,
+          // Use the latest returnDate for the group summary
+          returnedAt: Math.max(...returnedItems.map(i => new Date(i.returnDate || '').getTime())),
+          returnAddress: returnedItems[0]?.returnLocation?.address,
+          returnLatitude: returnedItems[0]?.returnLocation?.latitude,
+          returnLongitude: returnedItems[0]?.returnLocation?.longitude,
+          status: contract.items.every(i => i.itemStatus === 'RETURNED' || i.itemStatus === 'CANCELLED') ? 'COMPLETED' : 'PARTIAL',
+          items: returnedItems
+        });
+      }
+    }
+    return groups.sort((a, b) => b.returnedAt - a.returnedAt);
+  },
+
+  createReturn: async (data: ReturnPayload): Promise<BookingItem> => {
     // 1. Contract exists
     const contract = await contractService.getContractById(data.contractId);
     if (!contract) throw new Error('Kontrak tidak ditemukan.');
@@ -85,49 +59,62 @@ export const returnService = {
       throw new Error('Kontrak ini belum dapat diproses untuk pengembalian.');
     }
 
-    // 3. Contract item must have Handover
-    const handover = await handoverService.getHandoverByBookingItemId(data.contractId, data.bookingItemId);
-    if (!handover) throw new Error('Kendaraan ini belum memiliki data serah terima.');
+    // 3. Find BookingItem
+    const itemIndex = mockBookings.findIndex(b => b.id === data.contractId);
+    if (itemIndex === -1) throw new Error('Booking tidak ditemukan.');
+    
+    const booking = mockBookings[itemIndex];
+    const targetItemIndex = booking.items.findIndex(i => i.id === data.bookingItemId);
+    if (targetItemIndex === -1) throw new Error('Item kendaraan tidak ditemukan.');
+    
+    const targetItem = booking.items[targetItemIndex];
 
-    // 4. No duplicate Return
-    const existing = await returnRepository.getReturnByBookingItemId(data.contractId, data.bookingItemId);
-    if (existing) throw new Error('Kendaraan ini sudah dikembalikan.');
-
-    // 5. Odometer validation
-    if (data.odometerEnd < handover.odometerStart) {
+    // 4. Validate Status and Odometer
+    if (targetItem.itemStatus !== 'IN_USE') {
+      throw new Error('Kendaraan ini tidak dalam status IN_USE.');
+    }
+    if ((targetItem.handoverOdometer || 0) > data.returnOdometer) {
       throw new Error('Odometer akhir tidak boleh lebih kecil dari odometer awal.');
     }
 
-    // 6. Create Return record
-    const newReturn = await returnRepository.createReturn(data);
+    // 5. Update BookingItem
+    const updatedItem: BookingItem = {
+      ...targetItem,
+      itemStatus: 'RETURNED',
+      returnNumber: `RET-${new Date().getFullYear()}-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`,
+      returnDate: data.returnDate,
+      returnLocation: data.returnLocation,
+      returnOdometer: data.returnOdometer,
+      returnCondition: data.returnCondition,
+      extraCharges: data.extraCharges,
+      lateFee: data.lateFee,
+      damageFee: data.damageFee,
+    };
+    
+    mockBookings[itemIndex].items[targetItemIndex] = updatedItem;
 
-    // 7. Check if all items are returned, if so mark contract as COMPLETED
+    // 6. Check if all items are returned, if so mark contract as COMPLETED
     let allReturned = true;
-    for (const item of contract.items || []) {
-      const hndv = await handoverService.getHandoverByBookingItemId(contract.id, item.id);
-      if (hndv) {
-        const ret = await returnRepository.getReturnByBookingItemId(contract.id, item.id);
-        // Compare with newReturn ID as it might not be indexed perfectly depending on execution
-        if (!ret && item.id !== data.bookingItemId) {
-          allReturned = false;
-          break;
-        }
+    for (const item of mockBookings[itemIndex].items || []) {
+      if (item.itemStatus !== 'RETURNED' && item.itemStatus !== 'CANCELLED') {
+        allReturned = false;
+        break;
       }
     }
 
-    if (allReturned && contract.status === 'ACTIVE') {
+    if (allReturned && mockBookings[itemIndex].status === 'ACTIVE') {
       await contractService.updateContractStatus(data.contractId, 'COMPLETED');
     }
 
-    // 8. Rental Vehicle RENTED → READY
+    // 7. Rental Vehicle RENTED → READY
     const vehicleProfile = rentalVehicleRepository.getByVehicleId(data.vehicleId);
     if (vehicleProfile) {
       rentalVehicleService.updateRentalVehicle(vehicleProfile.id, {
         status: 'READY',
-        currentOdometer: data.odometerEnd,
+        currentOdometer: data.returnOdometer,
       });
     }
 
-    return populateRelations(newReturn);
+    return updatedItem;
   },
 };

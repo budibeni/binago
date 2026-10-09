@@ -1,44 +1,30 @@
-import type { RentalContract } from '../../contracts/types/contract';
-import type { Customer } from '../../customers/types/customer';
-import type { RentalVehicle } from '../../vehicles/types/rentalVehicle';
-import type { RentalHandover } from '../../handover/types/handover';
+import type { BookingItem, Booking } from '../../bookings/types/booking';
 
-export interface RentalReturn {
-  id: string;
+export interface ReturnPayload {
   contractId: string;
   bookingItemId: string;
-  customerId: string;
-  vehicleId: string; // CORE Vehicle ID (e.g. 'veh-001')
+  vehicleId: string;
   
-  returnedAt: string;
+  returnDate: string;
   
-  returnLatitude?: number;
-  returnLongitude?: number;
-  returnAddress?: string;
+  returnLocation: {
+    latitude: number;
+    longitude: number;
+    address?: string;
+  };
 
-  odometerEnd: number;
-  fuelLevelEnd: RentalHandover['fuelLevel'];
-  vehicleConditionEnd: RentalHandover['vehicleCondition'];
+  returnOdometer: number;
   
-  equipmentChecklistEnd: RentalHandover['equipmentChecklist'];
-
-  damageNotes?: string;
+  returnCondition: {
+    fuelLevel: string;
+    vehicleCondition: string;
+    equipmentChecklist: Record<string, boolean>;
+    notes?: string;
+    damageNotes?: string;
+    staffName?: string;
+  };
   
-  additionalCharges?: number;
+  extraCharges?: number;
   lateFee?: number;
   damageFee?: number;
-
-  notes?: string;
-
-  staffId: string;
-  staffName: string;
-
-  createdAt: string;
-  updatedAt: string;
-
-  // Populated relations
-  contract?: RentalContract;
-  customer?: Customer;
-  vehicle?: RentalVehicle;
-  handover?: RentalHandover;
 }

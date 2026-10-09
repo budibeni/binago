@@ -2,7 +2,7 @@
 
 import React, { Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { ReturnFeature as ReturnFormFeature } from '@/features/modules/rental/returns/ReturnFeature';
+import { ReturnCreateFeature as ReturnFormFeature } from '@/features/modules/rental/returns/ReturnCreateFeature';
 
 function CreateReturnForm() {
   const router = useRouter();
@@ -13,7 +13,7 @@ function CreateReturnForm() {
     <ReturnFormFeature
       contractId={contractId}
       open={true}
-      onOpenChange={(open) => {
+      onOpenChange={(open: boolean) => {
         if (!open) router.push('/rental/returns');
       }}
       onSuccess={() => {
