@@ -326,18 +326,29 @@ function RouteMapInner({
 
       if (!map.getSource(pathSourceId)) {
         map.addSource(pathSourceId, { type: 'geojson', data: pathData });
+        
+        // Solid layer for planned paths
         map.addLayer({
-          id: pathLayerId,
+          id: pathLayerId + '-solid',
           type: 'line',
           source: pathSourceId,
+          filter: ['==', ['get', 'isPlanned'], true],
           paint: {
-            'line-color': '#8b5cf6', // purple
+            'line-color': '#8b5cf6',
             'line-width': 4,
-            'line-dasharray': [
-              'case',
-              ['==', ['get', 'isPlanned'], true], ['literal', [1, 0]],
-              ['literal', [2, 2]]
-            ]
+          },
+        });
+        
+        // Dashed layer for fallback straight lines
+        map.addLayer({
+          id: pathLayerId + '-dashed',
+          type: 'line',
+          source: pathSourceId,
+          filter: ['!=', ['get', 'isPlanned'], true],
+          paint: {
+            'line-color': '#8b5cf6',
+            'line-width': 4,
+            'line-dasharray': [2, 2]
           },
         });
       } else {
@@ -360,7 +371,8 @@ function RouteMapInner({
         if (map.getLayer(coordPointLayerId)) map.removeLayer(coordPointLayerId);
         if (map.getSource(coordSourceId)) map.removeSource(coordSourceId);
 
-        if (map.getLayer(pathLayerId)) map.removeLayer(pathLayerId);
+        if (map.getLayer(pathLayerId + '-solid')) map.removeLayer(pathLayerId + '-solid');
+        if (map.getLayer(pathLayerId + '-dashed')) map.removeLayer(pathLayerId + '-dashed');
         if (map.getSource(pathSourceId)) map.removeSource(pathSourceId);
       }
     };

@@ -43,7 +43,7 @@ export function RouteEditorView({
   
   const [name, setName] = useState(initialData?.name || '');
   const [description, setDescription] = useState(initialData?.description || '');
-  const [groupId, setGroupId] = useState(initialData?.groupId || '');
+  const [groupId, setGroupId] = useState(initialData?.groupId ? String(initialData.groupId) : 'none');
   
   const [origin, setOrigin] = useState<RouteLocation>(initialData?.origin || { type: 'geofence' });
   const [destination, setDestination] = useState<RouteLocation>(initialData?.destination || { type: 'geofence' });
