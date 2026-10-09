@@ -86,7 +86,36 @@ export function RouteEditorView({
       return null;
     };
 
-    const fetchOSRMRoute = async () => {
+
+    // Polyline decoder for Google Maps
+    const decodePolyline = (encoded: string) => {
+      const points = [];
+      let index = 0, len = encoded.length;
+      let lat = 0, lng = 0;
+      while (index < len) {
+        let b, shift = 0, result = 0;
+        do {
+          b = encoded.charCodeAt(index++) - 63;
+          result |= (b & 0x1f) << shift;
+          shift += 5;
+        } while (b >= 0x20);
+        let dlat = ((result & 1) ? ~(result >> 1) : (result >> 1));
+        lat += dlat;
+        shift = 0;
+        result = 0;
+        do {
+          b = encoded.charCodeAt(index++) - 63;
+          result |= (b & 0x1f) << shift;
+          shift += 5;
+        } while (b >= 0x20);
+        let dlng = ((result & 1) ? ~(result >> 1) : (result >> 1));
+        lng += dlng;
+        points.push({ lat: lat / 1e5, lng: lng / 1e5 });
+      }
+      return points;
+    };
+
+    const fetchRoute = async () => {
       const coords = [];
       const originCoord = getLatLng(origin);
       if (originCoord) coords.push(originCoord);
@@ -101,6 +130,50 @@ export function RouteEditorView({
 
       if (coords.length < 2) return;
 
+      const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+
+      if (apiKey) {
+        try {
+          // Note: Browser CORS policy usually blocks direct requests to maps.googleapis.com/maps/api/directions/json.
+          // In a real-world scenario, you should proxy this through your backend or use the Google Maps JS SDK.
+          // For demo purposes, we fallback to OSRM if this fails.
+          let url = `https://maps.googleapis.com/maps/api/directions/json?origin=${coords[0][1]},${coords[0][0]}&destination=${coords[coords.length-1][1]},${coords[coords.length-1][0]}&key=${apiKey}`;
+          
+          if (coords.length > 2) {
+             const waypointsStr = coords.slice(1, -1).map(c => `${c[1]},${c[0]}`).join('|');
+             url += `&waypoints=${waypointsStr}`;
+          }
+
+          const res = await fetch(url);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.status === 'OK' && data.routes && data.routes.length > 0) {
+              const route = data.routes[0];
+              const decodedCoords = decodePolyline(route.overview_polyline.points);
+              setEditorGeometry({
+                  type: 'multiline',
+                  coordinates: decodedCoords
+              });
+              
+              let totalDistMeters = 0;
+              let totalDurationSecs = 0;
+              for (const leg of route.legs) {
+                 totalDistMeters += leg.distance.value;
+                 totalDurationSecs += leg.duration.value;
+              }
+              setPlannedDistance(Math.round((totalDistMeters / 1000) * 100) / 100);
+              setEstimatedDuration(Math.round(totalDurationSecs / 60));
+              return; // Success, skip OSRM
+            } else if (data.status === 'OVER_QUERY_LIMIT') {
+              console.warn("Google Maps API quota exceeded, falling back to OSRM...");
+            }
+          }
+        } catch (err) {
+          console.warn("Google Maps request failed (possibly CORS or network), falling back to OSRM...", err);
+        }
+      }
+
+      // Fallback to OSRM
       const coordString = coords.map(c => `${c[0]},${c[1]}`).join(';');
       try {
         const res = await fetch(`https://router.project-osrm.org/route/v1/driving/${coordString}?overview=full&geometries=geojson`);
@@ -132,7 +205,7 @@ export function RouteEditorView({
     };
 
     const timeoutId = setTimeout(() => {
-       fetchOSRMRoute();
+       fetchRoute();
     }, 1000);
 
     return () => clearTimeout(timeoutId);
