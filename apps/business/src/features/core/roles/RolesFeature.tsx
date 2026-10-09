@@ -130,7 +130,7 @@ export function RolesFeature({ locale = 'id' }: RolesFeatureProps) {
                     <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground flex flex-col items-center justify-center gap-2">
                       <Shield className="w-10 h-10 opacity-20 mb-2" />
                       <p>{t.noRoles}</p>
-                      <Button variant="link" onClick={handleCreate}>{t.createFirstRole}</Button>
+                      <Button variant="ghost" onClick={handleCreate}>{t.createFirstRole}</Button>
                     </td>
                   </tr>
                 )}
