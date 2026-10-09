@@ -1,12 +1,9 @@
 import React, { useState } from 'react';
 import { useRoles, Role } from './hooks/useRoles';
 import { api } from '@adatrack/utils';
-import { Button } from '@adatrack/ui/button';
-import { Dialog } from '@adatrack/ui/dialog';
-import { toast } from 'sonner';
+import { Button, Dialog, ConfirmDialog, toast } from '@adatrack/ui';
 import { Shield, Edit2, Trash2, Plus, Info } from 'lucide-react';
 import { RoleForm } from './components/RoleForm';
-import { ConfirmDialog } from '@adatrack/ui/dialog/ConfirmDialog';
 
 export function RolesFeature() {
   const { roles, loading, refetch } = useRoles();

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { api } from '@adatrack/utils';
-import { Button } from '@adatrack/ui/button';
-import { toast } from 'sonner';
+import { Button, toast } from '@adatrack/ui';
 import { Role } from '../hooks/useRoles';
 
 // Available permissions in Adatrack
