@@ -162,7 +162,7 @@ export function RolesFeature({ locale = 'id' }: RolesFeatureProps) {
   };
 
   return (
-    <div className="flex flex-col h-full w-full">
+    <div className="flex flex-col h-full w-full relative">
       <div className="flex-1 min-h-0 overflow-y-auto p-0">
         <DataTable<Role>
           data={filteredRoles}
@@ -188,21 +188,28 @@ export function RolesFeature({ locale = 'id' }: RolesFeatureProps) {
         />
       </div>
 
-      <Dialog 
-        open={isFormOpen} 
-        onOpenChange={(open) => !open && setIsFormOpen(false)}
-        title={editingRole ? t.editRole : t.createNewRole}
-      >
+            {(isFormOpen || !!editingRole) && (
         <RoleForm 
+          open={isFormOpen || !!editingRole}
+          onOpenChange={(open) => {
+            if (!open) {
+              setIsFormOpen(false);
+              setEditingRole(null);
+            }
+          }}
           role={editingRole} 
           locale={locale}
           onSuccess={() => {
             setIsFormOpen(false);
+            setEditingRole(null);
             refetch();
           }} 
-          onCancel={() => setIsFormOpen(false)}
+          onCancel={() => {
+            setIsFormOpen(false);
+            setEditingRole(null);
+          }}
         />
-      </Dialog>
+      )}
 
       <ConfirmDialog
         open={!!roleToDelete}
