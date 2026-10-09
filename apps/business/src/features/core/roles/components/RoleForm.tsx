@@ -118,7 +118,7 @@ export function RoleForm({ role, locale = 'id', open, onOpenChange, onSuccess, o
                 id="code"
                 label={t.internalCode}
                 required
-                disabled={isEditing}
+                disabled={true}
                 placeholder={t.internalCodePlaceholder}
                 value={displayCode}
                 onChange={val => setFormData({ ...formData, code: val })}
@@ -134,7 +134,10 @@ export function RoleForm({ role, locale = 'id', open, onOpenChange, onSuccess, o
               required
               placeholder={t.displayNamePlaceholder}
               value={formData.name}
-              onChange={val => setFormData({ ...formData, name: val })}
+              onChange={val => {
+                const newCode = val.toUpperCase().replace(/\s+/g, '_').replace(/[^A-Z0-9_]/g, '');
+                setFormData({ ...formData, name: val, code: isEditing ? formData.code : newCode });
+              }}
             />
           </div>
 
