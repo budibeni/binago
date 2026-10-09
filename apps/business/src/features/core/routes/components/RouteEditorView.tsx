@@ -66,54 +66,79 @@ export function RouteEditorView({
 
   // Auto-calculate distance and duration
   useEffect(() => {
-    let totalDist = 0;
-    let hasValidPoints = false;
-
-    // If drawn path exists, use it
-    if (editorGeometry && editorGeometry.type === 'multiline' && editorGeometry.coordinates && editorGeometry.coordinates.length >= 2) {
-      const coords = editorGeometry.coordinates;
-      for (let i = 0; i < coords.length - 1; i++) {
-        // coords are {lat, lng}
-        const lon1 = coords[i].lng;
-        const lat1 = coords[i].lat;
-        const lon2 = coords[i+1].lng;
-        const lat2 = coords[i+1].lat;
-        totalDist += calculateHaversineDistance(lat1, lon1, lat2, lon2);
+    const getLatLng = (loc: RouteLocation) => {
+      if (loc.type === 'coordinate' && loc.latitude && loc.longitude) {
+        return [loc.longitude, loc.latitude];
       }
-      hasValidPoints = true;
-    } else {
-      // Otherwise, use origin -> stops -> destination straight lines
-      const points: {lat: number, lon: number}[] = [];
-      if (origin.type === 'coordinate' && origin.latitude && origin.longitude) {
-        points.push({ lat: origin.latitude, lon: origin.longitude });
-      }
-      stops.forEach(s => {
-        if (s.location.type === 'coordinate' && s.location.latitude && s.location.longitude) {
-          points.push({ lat: s.location.latitude, lon: s.location.longitude });
+      if (loc.type === 'geofence' && loc.geofenceId) {
+        const gf = geofences.find(g => String(g.id) === loc.geofenceId);
+        if (gf && gf.geometry && gf.geometry.coordinates) {
+          let coords: any = gf.geometry.coordinates;
+          if (Array.isArray(coords) && coords.length > 0) {
+             if (Array.isArray(coords[0])) coords = coords[0]; // Polygon has array of array sometimes depending on implementation
+             else if (coords[0].lat !== undefined) coords = coords[0]; // take first point
+          }
+          if (coords && coords.lat !== undefined && coords.lng !== undefined) {
+             return [coords.lng, coords.lat];
+          }
         }
-      });
-      if (destination.type === 'coordinate' && destination.latitude && destination.longitude) {
-        points.push({ lat: destination.latitude, lon: destination.longitude });
+      }
+      return null;
+    };
+
+    const fetchOSRMRoute = async () => {
+      const coords = [];
+      const originCoord = getLatLng(origin);
+      if (originCoord) coords.push(originCoord);
+      
+      for (const stop of stops) {
+        const stopCoord = getLatLng(stop.location);
+        if (stopCoord) coords.push(stopCoord);
       }
       
-      if (points.length >= 2) {
-        for (let i = 0; i < points.length - 1; i++) {
-          totalDist += calculateHaversineDistance(points[i].lat, points[i].lon, points[i+1].lat, points[i+1].lon);
-        }
-        hasValidPoints = true;
-      }
-    }
+      const destCoord = getLatLng(destination);
+      if (destCoord) coords.push(destCoord);
 
-    if (hasValidPoints) {
-      // Round to 2 decimal places
-      const roundedDist = Math.round(totalDist * 100) / 100;
-      setPlannedDistance(roundedDist);
-      
-      // Estimate duration based on avg 40km/h (1.5 min per km)
-      const durationMin = Math.round(roundedDist * 1.5);
-      setEstimatedDuration(durationMin);
-    }
-  }, [origin, destination, stops, editorGeometry]);
+      if (coords.length < 2) return;
+
+      const coordString = coords.map(c => `${c[0]},${c[1]}`).join(';');
+      try {
+        const res = await fetch(`https://router.project-osrm.org/route/v1/driving/${coordString}?overview=full&geometries=geojson`);
+        const data = await res.json();
+        if (data && data.routes && data.routes.length > 0) {
+          const route = data.routes[0];
+          
+          if (route.geometry && route.geometry.coordinates) {
+             const mappedCoords = route.geometry.coordinates.map((c: number[]) => ({
+                lat: c[1],
+                lng: c[0]
+             }));
+             setEditorGeometry({
+                type: 'multiline',
+                coordinates: mappedCoords
+             });
+          }
+
+          if (route.distance) {
+            setPlannedDistance(Math.round((route.distance / 1000) * 100) / 100);
+          }
+          if (route.duration) {
+            setEstimatedDuration(Math.round(route.duration / 60));
+          }
+        }
+      } catch (err) {
+        console.error("OSRM fetch error", err);
+      }
+    };
+
+    const timeoutId = setTimeout(() => {
+       fetchOSRMRoute();
+    }, 1000);
+
+    return () => clearTimeout(timeoutId);
+  }, [origin, destination, stops, geofences]);
+
+
 
   const handleSearchAddress = async (targetId: string, address: string, onChange: (val: RouteLocation) => void, currentLoc: RouteLocation) => {
 

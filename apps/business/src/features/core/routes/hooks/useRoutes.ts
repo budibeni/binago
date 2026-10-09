@@ -45,7 +45,11 @@ export function useRoutes(filters?: { search?: string; status?: string; groupId?
         return {
           id: String(r.id),
           name: r.name || '-',
-          description: '-',
+          description: r.description || undefined,
+          groupId: r.group_id ? String(r.group_id) : undefined,
+          plannedDistance: r.planned_distance,
+          estimatedDuration: r.estimated_duration,
+          plannedPath: typeof r.planned_path === 'string' ? JSON.parse(r.planned_path) : r.planned_path,
           origin: origin as any,
           destination: destination as any,
           stops,
@@ -58,7 +62,6 @@ export function useRoutes(filters?: { search?: string; status?: string; groupId?
             driverUserId: a.driver_user_id,
             endDate: a.end_date
           })) : [],
-          groupId: r.group_id ? String(r.group_id) : undefined,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         };
