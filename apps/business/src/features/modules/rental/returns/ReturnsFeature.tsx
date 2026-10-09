@@ -8,6 +8,7 @@ import { ReturnCreateFeature } from './ReturnCreateFeature';
 import { ReturnView } from './components/ReturnView';
 import { AlertCircle, CheckCircle2, Car, Search, CalendarRange, User, Building2 } from 'lucide-react';
 import { cn, formatDateTime } from '@adatrack/utils';
+import { DataList, DataListHeader, DataListContent, DataListItem, DataListPagination, DataTableSearch } from '@adatrack/ui';
 
 export function ReturnsFeature() {
   const locale = useBusinessLocale();
@@ -21,6 +22,13 @@ export function ReturnsFeature() {
   // State
   const [activeTab, setActiveTab] = useState<'PENDING' | 'COMPLETED'>('PENDING');
   const [search, setSearch] = useState('');
+  const [pageIndex, setPageIndex] = useState(0);
+  const pageSize = 15;
+
+  // Reset pagination on search or tab change
+  useEffect(() => {
+    setPageIndex(0);
+  }, [search, activeTab]);
   
   // Selection
   const [selectedContractId, setSelectedContractId] = useState<string | null>(null);
@@ -73,6 +81,12 @@ export function ReturnsFeature() {
     );
   }, [currentList, search]);
 
+  const totalRows = filteredList.length;
+  const pageCount = Math.ceil(totalRows / pageSize);
+  const canPrevPage = pageIndex > 0;
+  const canNextPage = pageIndex < pageCount - 1;
+  const currentListPaginated = filteredList.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize);
+
   const getContractStatus = (contract: RentalContract) => {
     let safeCount = 0;
     let warningCount = 0;
@@ -120,100 +134,106 @@ export function ReturnsFeature() {
   return (
     <div className="flex flex-col md:flex-row h-full bg-background overflow-hidden border-t border-border">
       
-      {/* LEFT PANEL: Master List (30%) */}
-      <div className={cn("w-full md:w-[280px] lg:w-[320px] shrink-0 border-r border-border bg-neutral-50/50 dark:bg-neutral-950/50 flex-col h-full", selectedContractId ? "hidden md:flex" : "flex")}>
-        {/* Header & Tabs */}
-        <div className="p-4 border-b border-border flex flex-col gap-4 bg-background">
-          <div className="flex bg-neutral-100 dark:bg-neutral-900 p-1 rounded-lg">
+            {/* LEFT PANEL: Master List (30%) */}
+      <DataList className={cn(selectedContractId ? "hidden md:flex" : "flex")}>
+        <DataListHeader>
+          <div className="flex w-full border-b border-border/60">
             <button 
               onClick={() => { setActiveTab('PENDING'); setSelectedContractId(null); }}
-              className={cn("flex-1 text-[13px] font-semibold py-1.5 rounded-md transition-all", activeTab === 'PENDING' ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground")}
+              className={cn(
+                "flex-1 text-[12px] font-medium pt-0.5 pb-2 transition-all border-b-2 -mb-[1px]", 
+                activeTab === 'PENDING' 
+                  ? "border-primary text-primary" 
+                  : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
+              )}
             >
               Aktif
             </button>
             <button 
               onClick={() => { setActiveTab('COMPLETED'); setSelectedContractId(null); }}
-              className={cn("flex-1 text-[13px] font-semibold py-1.5 rounded-md transition-all", activeTab === 'COMPLETED' ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground")}
+              className={cn(
+                "flex-1 text-[12px] font-medium pt-0.5 pb-2 transition-all border-b-2 -mb-[1px]", 
+                activeTab === 'COMPLETED' 
+                  ? "border-primary text-primary" 
+                  : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
+              )}
             >
               Selesai
             </button>
           </div>
-          
-          <div className="relative">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <input 
-              type="text" 
-              placeholder="Cari kontrak, pelanggan, plat..." 
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 text-sm bg-neutral-100 dark:bg-neutral-900 border-none rounded-lg focus:ring-2 focus:ring-primary/20 outline-none transition-all"
-            />
-          </div>
-        </div>
-        
-        {/* List */}
-        <div className="flex-1 overflow-y-auto scrollbar-hide bg-background">
+          <DataTableSearch 
+            value={search}
+            onChange={setSearch}
+            placeholder="Cari kontrak, pelanggan..."
+            className="max-w-full"
+          />
+        </DataListHeader>
+
+        <DataListContent>
           {loading ? (
             <div className="flex justify-center p-8"><div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" /></div>
-          ) : filteredList.length === 0 ? (
+          ) : currentListPaginated.length === 0 ? (
             <div className="flex flex-col items-center justify-center p-8 text-center text-muted-foreground">
               <Car className="w-8 h-8 mb-3 opacity-20" />
               <p className="text-sm font-medium">Tidak ada data kontrak</p>
             </div>
           ) : (
-            <div className="flex flex-col divide-y divide-border/60">
-               {filteredList.map(contract => {
-                 const isSelected = selectedContractId === contract.id;
-                 const status = getContractStatus(contract);
-                 
-                 return (
-                   <button 
-                     key={contract.id}
-                     onClick={() => setSelectedContractId(contract.id)}
-                     className={cn(
-                       "w-full flex flex-col py-3 px-4 transition-all text-left outline-none",
-                       isSelected 
-                         ? "bg-neutral-100 dark:bg-neutral-800" 
-                         : "bg-transparent hover:bg-neutral-50 dark:hover:bg-neutral-900/50"
-                     )}
-                   >
-                      <div className="flex flex-col w-full text-left">
-                          {/* Baris 1: Kiri :#no kontrak, Kanan : status */}
-                          <div className="flex justify-between items-center w-full mb-0.5">
-                            <div className="text-[11px] font-normal text-muted-foreground truncate max-w-[50%]">
-                              {contract.contractNumber}
-                            </div>
-                            <div className="flex items-center flex-wrap gap-1.5 justify-end text-[11px] font-medium tracking-wide shrink-0 max-w-[50%]">
-                               {status.safeCount > 0 && <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-500"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div> Aman ({status.safeCount})</span>}
-                               {status.warningCount > 0 && <span className="flex items-center gap-1 text-warning"><div className="w-1.5 h-1.5 rounded-full bg-warning"></div> Segera Habis ({status.warningCount})</span>}
-                               {status.overdueCount > 0 && <span className="flex items-center gap-1 text-danger"><div className="w-1.5 h-1.5 rounded-full bg-danger"></div> Overdue ({status.overdueCount})</span>}
-                               {activeTab === 'COMPLETED' && <span className="flex items-center gap-1 text-neutral-500"><CheckCircle2 className="w-3 h-3" /> Selesai</span>}
-                            </div>
-                          </div>
-                          
-                          {/* Baris 2: Periode */}
-                          <div className="flex items-center gap-1 text-[11px] font-normal text-muted-foreground">
-                            <CalendarRange className="w-3 h-3 text-neutral-400" />
-                            <span>{formatDateTime(contract.startDate)} s/d {status.latestEnd ? formatDateTime(status.latestEnd) : '-'}</span>
-                          </div>
+            currentListPaginated.map(contract => {
+              const isSelected = selectedContractId === contract.id;
+              const status = getContractStatus(contract);
 
-                          {/* Baris 3: Customer */}
-                          <div className="flex items-center gap-1.5 text-[13px] font-medium text-foreground w-full mt-1.5">
-                            {contract.customerSnapshot?.type?.toLowerCase().includes('perusahaan') || contract.customerSnapshot?.type?.toLowerCase().includes('b2b') || contract.customerSnapshot?.type?.toLowerCase().includes('company') ? (
-                               <Building2 className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
-                            ) : (
-                               <User className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
-                            )}
-                            <span className="truncate w-full">{contract.customerSnapshot?.name || 'Pelanggan'}</span>
-                          </div>
+              return (
+                <DataListItem 
+                  key={contract.id}
+                  isSelected={isSelected}
+                  onClick={() => setSelectedContractId(contract.id)}
+                >
+                  <div className="flex flex-col w-full text-left">
+                    {/* Baris 1: Kiri :#no kontrak, Kanan : status */}
+                    <div className="flex justify-between items-center w-full mb-0.5">
+                      <div className="text-[11px] font-normal text-muted-foreground truncate max-w-[50%]">
+                        {contract.contractNumber}
                       </div>
-                   </button>
-                 );
-               })}
-            </div>
+                      <div className="flex items-center flex-wrap gap-1 justify-end text-[11px] font-medium tracking-wide shrink-0 max-w-[50%]">
+                         {status.safeCount > 0 && <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-500"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div> Aman ({status.safeCount})</span>}
+                         {status.warningCount > 0 && <span className="flex items-center gap-1 text-warning"><div className="w-1.5 h-1.5 rounded-full bg-warning"></div> Segera Habis ({status.warningCount})</span>}
+                         {status.overdueCount > 0 && <span className="flex items-center gap-1 text-danger"><div className="w-1.5 h-1.5 rounded-full bg-danger"></div> Overdue ({status.overdueCount})</span>}
+                         {activeTab === 'COMPLETED' && <span className="flex items-center gap-1 text-neutral-500"><CheckCircle2 className="w-3 h-3 text-neutral-400" /> Selesai</span>}
+                      </div>
+                    </div>
+                    
+                    {/* Baris 2: Periode */}
+                    <div className="flex items-center gap-1 text-[11px] font-normal text-muted-foreground">
+                      <CalendarRange className="w-3 h-3 text-neutral-400" />
+                      <span className="truncate">{formatDateTime(contract.startDate)} s/d {status.latestEnd ? formatDateTime(status.latestEnd) : '-'}</span>
+                    </div>
+
+                    {/* Baris 3: Customer */}
+                    <div className="flex items-center gap-1 text-[13px] font-medium text-foreground w-full mt-1.5">
+                      {contract.customerSnapshot?.type?.toLowerCase().includes('perusahaan') || contract.customerSnapshot?.type?.toLowerCase().includes('b2b') || contract.customerSnapshot?.type?.toLowerCase().includes('company') ? (
+                         <Building2 className="w-3 h-3 text-neutral-400 shrink-0" />
+                      ) : (
+                         <User className="w-3 h-3 text-neutral-400 shrink-0" />
+                      )}
+                      <span className="truncate w-full">{contract.customerSnapshot?.name || 'Pelanggan'}</span>
+                    </div>
+                  </div>
+                </DataListItem>
+              );
+            })
           )}
-        </div>
-      </div>
+        </DataListContent>
+
+        <DataListPagination 
+          pageIndex={pageIndex}
+          pageSize={pageSize}
+          totalRows={totalRows}
+          onNextPage={() => setPageIndex(p => p + 1)}
+          onPrevPage={() => setPageIndex(p => p - 1)}
+          canNextPage={canNextPage}
+          canPrevPage={canPrevPage}
+        />
+      </DataList>
 
       {/* RIGHT PANEL: Detail View (70%) */}
       <div className={cn("flex-1 bg-neutral-50/50 dark:bg-neutral-950/20 overflow-y-auto relative", !selectedContractId ? "hidden md:block" : "block")}>

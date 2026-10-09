@@ -29,3 +29,4 @@ export * from './providers/UIProvider';
 export * from './ConfirmDialog';
 export * from './Toast';
 export * from './Formatters';
+export * from './DataList';

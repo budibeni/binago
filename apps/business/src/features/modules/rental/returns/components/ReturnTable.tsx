@@ -123,7 +123,7 @@ export function ReturnTable({
       renderGroupHeader={(groupId, rows, isExpanded, toggleExpand) => {
         const firstRow = rows[0].original;
         const contract = firstRow.contract;
-        const customerName = contract.customer?.name || 'Unknown';
+        const customerName = contract.customerSnapshot?.name || 'Unknown';
         const contractNumber = contract.contractNumber;
         
         let overdueCount = 0;
