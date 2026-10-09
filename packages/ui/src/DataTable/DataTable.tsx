@@ -241,6 +241,8 @@ export function DataTable<TData extends RowData = RowData>(
                 emptyDescription={emptyDescription}
                 emptyIcon={emptyIcon}
                 labels={labels}
+                groupBy={props.groupBy}
+                renderGroupHeader={props.renderGroupHeader}
               />
             </table>
           </div>

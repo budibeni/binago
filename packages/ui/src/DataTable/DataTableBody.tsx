@@ -19,6 +19,8 @@ export interface DataTableBodyProps<TData extends RowData = RowData> {
   emptyDescription?: string;
   emptyIcon?: React.ElementType;
   labels?: DataTableLabels;
+  groupBy?: (row: TData) => string;
+  renderGroupHeader?: (groupId: string, rows: import('./types').DataTableRowInstance<TData>[], isExpanded: boolean, toggleExpand: () => void) => React.ReactNode;
 }
 
 export function DataTableBody<TData extends RowData = RowData>({
@@ -30,7 +32,19 @@ export function DataTableBody<TData extends RowData = RowData>({
   emptyDescription,
   emptyIcon,
   labels,
+  groupBy,
+  renderGroupHeader,
 }: DataTableBodyProps<TData>) {
+  const [collapsedGroups, setCollapsedGroups] = React.useState<Set<string>>(new Set());
+
+  const toggleGroup = (groupId: string) => {
+    setCollapsedGroups(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(groupId)) newSet.delete(groupId);
+      else newSet.add(groupId);
+      return newSet;
+    });
+  };
   const columnCount = table.getVisibleFlatColumns().length || 1;
   let rows = table.getRowModel().rows;
   const isFiltered = Boolean(
@@ -102,6 +116,37 @@ export function DataTableBody<TData extends RowData = RowData>({
             )}
           </td>
         </tr>
+      </tbody>
+    );
+  }
+
+  if (groupBy) {
+    const groups = new Map<string, typeof rows>();
+    rows.forEach(row => {
+      const groupId = groupBy(row.original);
+      if (!groups.has(groupId)) groups.set(groupId, []);
+      groups.get(groupId)!.push(row);
+    });
+
+    return (
+      <tbody suppressHydrationWarning>
+        {Array.from(groups.entries()).map(([groupId, groupRows]) => {
+          const isCollapsed = collapsedGroups.has(groupId);
+          return (
+            <React.Fragment key={groupId}>
+              {renderGroupHeader && (
+                <tr className="bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200/60 dark:hover:bg-neutral-700/60 transition-colors">
+                  <td colSpan={columnCount} className="p-0 border-b border-border/40">
+                    {renderGroupHeader(groupId, groupRows, !isCollapsed, () => toggleGroup(groupId))}
+                  </td>
+                </tr>
+              )}
+              {!isCollapsed && groupRows.map(row => (
+                <DataTableRow key={row.id} row={row} />
+              ))}
+            </React.Fragment>
+          );
+        })}
       </tbody>
     );
   }

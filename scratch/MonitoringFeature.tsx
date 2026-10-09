@@ -6,8 +6,6 @@ import { DataTable } from '@adatrack/ui/src/DataTable';
 import { Badge } from '@adatrack/ui/src/Badge';
 import { PanelShell, type DataTableFilterConfig, Button, DetailShell, PhoneLink, Checkbox } from '@adatrack/ui';
 import { Clock, AlertTriangle, CheckCircle2, MapPin, List, Eye, Navigation, ChevronDown } from 'lucide-react';
-import { useBusinessLocale } from '@/components/BusinessShellLayout';
-import { getMonitoringTranslation } from './i18n';
 import { cn, formatDateTime } from '@adatrack/utils';
 import type { DataTableColumnDef } from '@adatrack/ui/src/DataTable/types';
 import { trackingNavigationService } from '@/features/core/tracking/services/trackingNavigationService';
@@ -75,8 +73,6 @@ export interface MonitoredItem extends BookingItem {
 
 export function MonitoringFeature() {
   const router = useRouter();
-  const locale = useBusinessLocale();
-  const labels = getMonitoringTranslation(locale);
   const [data, setData] = useState<MonitoredItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -191,7 +187,7 @@ export function MonitoringFeature() {
             variant="ghost-danger"
             size="icon"
             onClick={() => setSelectedItem(row.original)}
-            title={labels.actionDetail}
+            title="Lihat Detail"
           >
             <Eye className="h-4 w-4" strokeWidth={1.5} />
           </Button>
@@ -200,7 +196,7 @@ export function MonitoringFeature() {
     },
     {
       id: 'ref',
-      header: labels.colRef,
+      header: 'No Ref',
       accessorKey: 'handoverNumber',
       cell: ({ row }) => {
         const item = row.original;
@@ -215,7 +211,7 @@ export function MonitoringFeature() {
     },
     {
       id: 'customer',
-      header: labels.colCustomer,
+      header: 'Pelanggan',
       accessorKey: 'booking.customerSnapshot.name',
       cell: ({ row }) => {
         const b = row.original.booking;
@@ -229,7 +225,7 @@ export function MonitoringFeature() {
     },
     {
       id: 'contact',
-      header: labels.colCustomer, // Will just use colCustomer if we don't have colContact
+      header: 'Kontak',
       accessorKey: 'booking.customerSnapshot.phone',
       cell: ({ row }) => {
         const b = row.original.booking;
@@ -245,7 +241,7 @@ export function MonitoringFeature() {
     },
     {
       id: 'vehicle',
-      header: labels.colVehicle,
+      header: 'Kendaraan',
       accessorKey: 'vehicleSnapshot.licensePlate',
       cell: ({ row }) => {
         const item = row.original;
@@ -265,7 +261,7 @@ export function MonitoringFeature() {
     },
     {
       id: 'status',
-      header: labels.colStatus,
+      header: 'Status',
       accessorKey: 'endDate',
       cell: ({ row }) => {
         const status = getTimeStatus(row.original.endDate);
@@ -274,13 +270,13 @@ export function MonitoringFeature() {
 
         if (status === 'SAFE') {
           dotClass = 'bg-success';
-          label = labels.statusSafe;
+          label = 'Aman';
         } else if (status === 'WARNING') {
           dotClass = 'bg-warning';
-          label = labels.statusWarning;
+          label = 'Segera Habis';
         } else {
           dotClass = 'bg-danger';
-          label = labels.statusOverdue;
+          label = 'Terlambat';
         }
 
         return (
@@ -379,10 +375,10 @@ export function MonitoringFeature() {
         )}
       >
         <div className={cn("gap-2.5 p-3", (panelSide === 'top' || panelSide === 'bottom') ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6" : "flex flex-col h-full")}>
-          <StatCard label={labels.allVehicles} value={stats.total} colorClass="bg-neutral-500" icon={List} />
-          <StatCard label={labels.safe} value={stats.safe} colorClass="bg-success" icon={CheckCircle2} />
-          <StatCard label={labels.warning} value={stats.warning} colorClass="bg-warning" icon={Clock} />
-          <StatCard label={labels.overdue} value={stats.overdue} colorClass="bg-danger" icon={AlertTriangle} />
+          <StatCard label="Semua Kendaraan" value={stats.total} colorClass="bg-neutral-500" icon={List} />
+          <StatCard label="Aman (> 24 Jam)" value={stats.safe} colorClass="bg-success" icon={CheckCircle2} />
+          <StatCard label="Segera Habis (< 24 Jam)" value={stats.warning} colorClass="bg-warning" icon={Clock} />
+          <StatCard label="Terlambat (Overdue)" value={stats.overdue} colorClass="bg-danger" icon={AlertTriangle} />
         </div>
       </PanelShell>
     );
@@ -417,11 +413,11 @@ export function MonitoringFeature() {
             onSelectionChange={setSelectedIds}
             getRowId={(row) => row.id}
             exportable={true}
-            exportFilename={labels.exportFilename}
+            exportFilename="Data_Monitoring"
             groupBy={(row) => row.booking.id}
             renderGroupHeader={(groupId, rows, isExpanded, toggleExpand) => {
               const firstRow = rows[0].original;
-              const customerName = firstRow.booking.customerSnapshot?.name || labels.unknown;
+              const customerName = firstRow.booking.customerSnapshot?.name || 'Unknown';
               const contractNumber = firstRow.booking.contractNumber || firstRow.booking.bookingNumber;
 
               let safeCount = 0;
@@ -464,7 +460,7 @@ export function MonitoringFeature() {
                 onCheckedChange={() => setSelectedIds([])}
                 className="w-4 h-4 data-[state=checked]:bg-muted-foreground data-[state=checked]:border-muted-foreground"
               />
-              <span className="text-[12px] font-medium text-muted-foreground">{labels.selectedItems.replace('{0}', String(selectedIds.length))}</span>
+              <span className="text-[12px] font-medium text-muted-foreground">{selectedIds.length} Data Terpilih</span>
             </div>
             <Button
               variant="destructive"

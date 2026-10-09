@@ -182,4 +182,6 @@ export interface DataTableProps<TData extends RowData = RowData> {
   toolbarActions?: ReactNode; // Secondary actions (e.g., Export, Add Button)
   extraMiddleActions?: ReactNode; // Actions rendered after the search input
   exportFilename?: string;
+  groupBy?: (row: TData) => string;
+  renderGroupHeader?: (groupId: string, rows: DataTableRowInstance<TData>[], isExpanded: boolean, toggleExpand: () => void) => ReactNode;
 }
