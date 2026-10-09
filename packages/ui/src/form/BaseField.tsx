@@ -17,7 +17,7 @@ export const formTextareaClass = cn(
 );
 
 export interface BaseInputProps {
-  label?: string;
+  label?: React.ReactNode;
   id?: string;
   name?: string;
   error?: string;

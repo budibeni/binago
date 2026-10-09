@@ -1,18 +1,20 @@
 'use client';
 
+import { getReturnTranslation } from './i18n';
+import { useBusinessLocale } from '@/components/BusinessShellLayout';
 import React, { useEffect, useState, useMemo } from 'react';
 import { getTranslation } from '@/i18n';
-import { useBusinessLocale } from '@/components/BusinessShellLayout';
 import type { RentalContract } from '../contracts/types/contract';
 import { ReturnCreateFeature } from './ReturnCreateFeature';
 import { ReturnView } from './components/ReturnView';
-import { AlertCircle, CheckCircle2, Car, Search, CalendarRange, User, Building2 } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Car, Search, CalendarRange, User, Building2, Star } from 'lucide-react';
 import { cn, formatDateTime } from '@adatrack/utils';
 import { DataList, DataListHeader, DataListContent, DataListItem, DataListPagination, DataTableSearch } from '@adatrack/ui';
 
 export function ReturnsFeature() {
   const locale = useBusinessLocale();
   const t = getTranslation(locale);
+  const tReturn = getReturnTranslation(locale);
   const [loading, setLoading] = useState(true);
   
   // Data
@@ -44,7 +46,7 @@ export function ReturnsFeature() {
       const allContracts = await contractService.getContracts();
       
       const pending = allContracts.filter(c => c.status === 'ACTIVE' && c.items?.some(i => i.itemStatus === 'IN_USE'));
-      const completed = allContracts.filter(c => c.status === 'COMPLETED' || (c.status === 'ACTIVE' && c.items?.every(i => i.itemStatus !== 'IN_USE')));
+      const completed = allContracts.filter(c => c.status === 'COMPLETED' || (c.status === 'ACTIVE' && c.items && c.items.length > 0 && c.items.every(i => i.itemStatus === 'RETURNED')));
 
       // Sort pending by overdue first
       const sortContracts = (list: RentalContract[]) => {
@@ -126,6 +128,29 @@ export function ReturnsFeature() {
     };
   };
 
+  // Hitung skor bintang rata-rata booking berdasarkan ketepatan pengembalian
+  const calculateReturnScore = (contract: RentalContract): number => {
+    const returnedItems = (contract.items || []).filter(
+      i => i.itemStatus === 'RETURNED' && i.returnDate && i.handoverDate && i.endDate && i.startDate
+    );
+    if (returnedItems.length === 0) return 0;
+
+    const scores = returnedItems.map(i => {
+      const plannedMinutes = (new Date(i.endDate!).getTime() - new Date(i.startDate!).getTime()) / (1000 * 60);
+      const actualMinutes  = (new Date(i.returnDate!).getTime() - new Date(i.handoverDate!).getTime()) / (1000 * 60);
+      const excessMinutes  = actualMinutes - plannedMinutes;
+
+      if (excessMinutes <= 0)   return 5;   // Tepat waktu / lebih awal
+      if (excessMinutes <= 120) return 4;   // Terlambat ≤ 2 jam
+      if (excessMinutes <= 360) return 3;   // Terlambat 3–6 jam
+      if (excessMinutes <= 720) return 2;   // Terlambat 7–12 jam
+      return 1;                             // Terlambat > 12 jam
+    });
+
+    const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
+    return Math.round(avg * 10) / 10;
+  };
+
     const selectedContract = useMemo(() => {
      const found = currentList.find(c => c.id === selectedContractId) || null;
      return found;
@@ -147,7 +172,7 @@ export function ReturnsFeature() {
                   : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
               )}
             >
-              Aktif
+              {t.rentalContractFeature.statusActive}
             </button>
             <button 
               onClick={() => { setActiveTab('COMPLETED'); setSelectedContractId(null); }}
@@ -158,13 +183,13 @@ export function ReturnsFeature() {
                   : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
               )}
             >
-              Selesai
+              {tReturn.summaryCompleted}
             </button>
           </div>
           <DataTableSearch 
             value={search}
             onChange={setSearch}
-            placeholder="Cari kontrak, pelanggan..."
+            placeholder={tReturn.searchPlaceholder}
             className="max-w-full"
           />
         </DataListHeader>
@@ -195,10 +220,30 @@ export function ReturnsFeature() {
                         {contract.contractNumber}
                       </div>
                       <div className="flex items-center flex-wrap gap-1 justify-end text-[11px] font-medium tracking-wide shrink-0 max-w-[50%]">
-                         {status.safeCount > 0 && <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-500"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div> Aman ({status.safeCount})</span>}
-                         {status.warningCount > 0 && <span className="flex items-center gap-1 text-warning"><div className="w-1.5 h-1.5 rounded-full bg-warning"></div> Segera Habis ({status.warningCount})</span>}
-                         {status.overdueCount > 0 && <span className="flex items-center gap-1 text-danger"><div className="w-1.5 h-1.5 rounded-full bg-danger"></div> Overdue ({status.overdueCount})</span>}
-                         {activeTab === 'COMPLETED' && <span className="flex items-center gap-1 text-neutral-500"><CheckCircle2 className="w-3 h-3 text-neutral-400" /> Selesai</span>}
+                         {activeTab === 'PENDING' ? (
+                           <>
+                             {status.safeCount > 0 && <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-500"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div> Aman ({status.safeCount})</span>}
+                             {status.warningCount > 0 && <span className="flex items-center gap-1 text-warning"><div className="w-1.5 h-1.5 rounded-full bg-warning"></div> Segera Habis ({status.warningCount})</span>}
+                             {status.overdueCount > 0 && <span className="flex items-center gap-1 text-danger"><div className="w-1.5 h-1.5 rounded-full bg-danger"></div> Overdue ({status.overdueCount})</span>}
+                           </>
+                         ) : (() => {
+                           const score = calculateReturnScore(contract);
+                           if (score === 0) return null;
+                           const percentage = (score / 5) * 100;
+                           return (
+                             <div className="flex items-center gap-1">
+                               <span className="text-[11px] font-semibold text-foreground">
+                                 {score.toFixed(1)}
+                               </span>
+                               <div className="relative w-3.5 h-3.5 flex items-center justify-center">
+                                 <Star className="absolute top-0 left-0 w-3.5 h-3.5 text-slate-300 dark:text-slate-600 fill-transparent" />
+                                 <div className="absolute top-0 left-0 h-full overflow-hidden" style={{ width: `${percentage}%` }}>
+                                   <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                                 </div>
+                               </div>
+                             </div>
+                           );
+                         })()}
                       </div>
                     </div>
                     
@@ -269,6 +314,7 @@ export function ReturnsFeature() {
                      }}
                      open={true}
                      inline={true}
+                     layout="default"
                      onClose={() => setSelectedContractId(null)}
                   />
                )}

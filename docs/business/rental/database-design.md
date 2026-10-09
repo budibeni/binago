@@ -152,7 +152,9 @@ Pencatatan reservasi (*multi-kendaraan*) dan dokumen legalnya.
 | `return_location`| JSONB | NULL | Detail lokasi (lat, lng, address) saat unit dikembalikan |
 | `return_odometer` | INTEGER | NULL | Jarak Tempuh Akhir (saat Return) |
 | `return_condition` | JSONB | NULL | Log BBM, kondisi, dan checklist kelengkapan saat dikembalikan |
-| `extra_charges` | DECIMAL | NULL | Denda (Jika ada, dihitung saat return) |
+| `extra_charges` | DECIMAL | DEFAULT 0 | Biaya tambahan lainnya di luar denda (opsional) |
+| `late_fee` | DECIMAL | DEFAULT 0 | Denda keterlambatan (Tarif Jam × Jumlah Jam Terlambat, dihitung otomatis) |
+| `damage_fee` | DECIMAL | DEFAULT 0 | Biaya kerusakan kendaraan (dihitung saat return, jika kondisi rusak) |
 
 ## 4. Global Pembayaran
 Rekonsiliasi arus kas.

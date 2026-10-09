@@ -121,8 +121,24 @@ export const mockBookings: Booking[] = [
         "handoverDate": "2026-10-15T08:00:00.000Z",
         "handoverBy": "usr-001",
         "handoverOdometer": 12000,
-        "handoverLocation": { "latitude": -6.203729, "longitude": 106.877172, "address": "Bandara Soekarno Hatta" },
-        "handoverCondition": { "fuelLevel": "FULL", "vehicleCondition": "GOOD", "equipmentChecklist": { "stnkOriginal": true, "spareKey": true, "jackAndTools": true, "spareTire": true, "firstAidKit": true }, "notes": "Siap jalan", "staffName": "Admin" }
+        "handoverLocation": {
+          "latitude": -6.203729,
+          "longitude": 106.877172,
+          "address": "Bandara Soekarno Hatta"
+        },
+        "handoverCondition": {
+          "fuelLevel": "FULL",
+          "vehicleCondition": "GOOD",
+          "equipmentChecklist": {
+            "stnkOriginal": true,
+            "spareKey": true,
+            "jackAndTools": true,
+            "spareTire": true,
+            "firstAidKit": true
+          },
+          "notes": "Siap jalan",
+          "staffName": "Admin"
+        }
       },
       {
         "id": "res-mega-001-item-2",
@@ -146,8 +162,24 @@ export const mockBookings: Booking[] = [
         "handoverDate": "2026-10-15T08:15:00.000Z",
         "handoverBy": "usr-001",
         "handoverOdometer": 15500,
-        "handoverLocation": { "latitude": -6.203729, "longitude": 106.877172, "address": "Bandara Soekarno Hatta" },
-        "handoverCondition": { "fuelLevel": "THREE_QUARTER", "vehicleCondition": "MINOR_DAMAGE", "equipmentChecklist": { "stnkOriginal": true, "spareKey": true, "jackAndTools": false, "spareTire": true, "firstAidKit": true }, "notes": "Baret halus di pintu", "staffName": "Admin" }
+        "handoverLocation": {
+          "latitude": -6.203729,
+          "longitude": 106.877172,
+          "address": "Bandara Soekarno Hatta"
+        },
+        "handoverCondition": {
+          "fuelLevel": "THREE_QUARTER",
+          "vehicleCondition": "MINOR_DAMAGE",
+          "equipmentChecklist": {
+            "stnkOriginal": true,
+            "spareKey": true,
+            "jackAndTools": false,
+            "spareTire": true,
+            "firstAidKit": true
+          },
+          "notes": "Baret halus di pintu",
+          "staffName": "Admin"
+        }
       },
       {
         "id": "res-mega-001-item-3",
@@ -467,8 +499,49 @@ export const mockBookings: Booking[] = [
         "handoverDate": "2026-08-23T12:00:00.000Z",
         "handoverBy": "usr-001",
         "handoverOdometer": 12353,
-        "handoverLocation": { "latitude": -6.203729, "longitude": 106.877172, "address": "Kantor Cabang Utama Jakarta" },
-        "handoverCondition": { "fuelLevel": "FULL", "vehicleCondition": "GOOD", "equipmentChecklist": { "stnkOriginal": true, "spareKey": true, "jackAndTools": true, "spareTire": true, "firstAidKit": true }, "notes": "Kondisi prima", "staffName": "Admin" }
+        "handoverLocation": {
+          "latitude": -6.203729,
+          "longitude": 106.877172,
+          "address": "Kantor Cabang Utama Jakarta"
+        },
+        "handoverCondition": {
+          "fuelLevel": "FULL",
+          "vehicleCondition": "GOOD",
+          "equipmentChecklist": {
+            "stnkOriginal": true,
+            "spareKey": true,
+            "jackAndTools": true,
+            "spareTire": true,
+            "firstAidKit": true
+          },
+          "notes": "Kondisi prima",
+          "staffName": "Admin"
+        },
+        "returnDate": "2026-08-28T12:00:00Z",
+        "lateFee": 0,
+        "damageFee": 0,
+        "returnNumber": "BPK-MOCK-001",
+        "returnBy": "usr-001",
+        "returnOdometer": 12853,
+        "returnLocation": {
+          "latitude": -6.203729,
+          "longitude": 106.877172,
+          "address": "Kantor Cabang Utama Jakarta"
+        },
+        "returnCondition": {
+          "fuelLevel": "FULL",
+          "vehicleCondition": "GOOD",
+          "equipmentChecklist": {
+            "stnkOriginal": true,
+            "spareKey": true,
+            "jackAndTools": true,
+            "spareTire": true,
+            "firstAidKit": true
+          },
+          "notes": "Kondisi prima",
+          "staffName": "Admin"
+        },
+        "extraCharges": 0
       },
       {
         "id": "res-001-item-2",
@@ -486,6 +559,54 @@ export const mockBookings: Booking[] = [
           "brand": "Daihatsu",
           "model": "Mobil",
           "categoryName": "MPV Premium"
+        },
+        "itemStatus": "RETURNED",
+        "returnDate": "2026-08-28T16:49:00Z",
+        "lateFee": 0,
+        "damageFee": 0,
+        "returnNumber": "BPK-MOCK-001",
+        "returnBy": "usr-001",
+        "returnOdometer": 10500,
+        "returnLocation": {
+          "latitude": -6.2,
+          "longitude": 106.816666,
+          "address": "Pool Kendaraan"
+        },
+        "returnCondition": {
+          "fuelLevel": "FULL",
+          "vehicleCondition": "GOOD",
+          "equipmentChecklist": {
+            "stnkOriginal": true,
+            "spareKey": true,
+            "jackAndTools": true,
+            "spareTire": true,
+            "firstAidKit": true
+          },
+          "notes": "Kembali normal",
+          "staffName": "Admin"
+        },
+        "extraCharges": 0,
+        "handoverDate": "2026-08-23T12:00:00.000Z",
+        "handoverNumber": "ST-MOCK-001",
+        "handoverBy": "usr-001",
+        "handoverOdometer": 10000,
+        "handoverLocation": {
+          "latitude": -6.2,
+          "longitude": 106.816666,
+          "address": "Pool Kendaraan"
+        },
+        "handoverCondition": {
+          "fuelLevel": "FULL",
+          "vehicleCondition": "GOOD",
+          "equipmentChecklist": {
+            "stnkOriginal": true,
+            "spareKey": true,
+            "jackAndTools": true,
+            "spareTire": true,
+            "firstAidKit": true
+          },
+          "notes": "Siap jalan",
+          "staffName": "Admin"
         }
       },
       {
@@ -504,6 +625,54 @@ export const mockBookings: Booking[] = [
           "brand": "Toyota",
           "model": "Mobil",
           "categoryName": "MPV Standard"
+        },
+        "itemStatus": "RETURNED",
+        "returnDate": "2026-08-28T19:39:00Z",
+        "lateFee": 0,
+        "damageFee": 0,
+        "returnNumber": "BPK-MOCK-001",
+        "returnBy": "usr-001",
+        "returnOdometer": 10500,
+        "returnLocation": {
+          "latitude": -6.2,
+          "longitude": 106.816666,
+          "address": "Pool Kendaraan"
+        },
+        "returnCondition": {
+          "fuelLevel": "FULL",
+          "vehicleCondition": "GOOD",
+          "equipmentChecklist": {
+            "stnkOriginal": true,
+            "spareKey": true,
+            "jackAndTools": true,
+            "spareTire": true,
+            "firstAidKit": true
+          },
+          "notes": "Kembali normal",
+          "staffName": "Admin"
+        },
+        "extraCharges": 0,
+        "handoverDate": "2026-08-23T12:00:00.000Z",
+        "handoverNumber": "ST-MOCK-001",
+        "handoverBy": "usr-001",
+        "handoverOdometer": 10000,
+        "handoverLocation": {
+          "latitude": -6.2,
+          "longitude": 106.816666,
+          "address": "Pool Kendaraan"
+        },
+        "handoverCondition": {
+          "fuelLevel": "FULL",
+          "vehicleCondition": "GOOD",
+          "equipmentChecklist": {
+            "stnkOriginal": true,
+            "spareKey": true,
+            "jackAndTools": true,
+            "spareTire": true,
+            "firstAidKit": true
+          },
+          "notes": "Siap jalan",
+          "staffName": "Admin"
         }
       }
     ],
@@ -554,8 +723,49 @@ export const mockBookings: Booking[] = [
         "handoverDate": "2026-08-23T12:00:00.000Z",
         "handoverBy": "usr-001",
         "handoverOdometer": 11285,
-        "handoverLocation": { "latitude": -6.182302, "longitude": 106.848099, "address": "Kantor Cabang Utama Jakarta" },
-        "handoverCondition": { "fuelLevel": "FULL", "vehicleCondition": "GOOD", "equipmentChecklist": { "stnkOriginal": true, "spareKey": true, "jackAndTools": true, "spareTire": true, "firstAidKit": true }, "notes": "Kondisi prima", "staffName": "Admin" }
+        "handoverLocation": {
+          "latitude": -6.182302,
+          "longitude": 106.848099,
+          "address": "Kantor Cabang Utama Jakarta"
+        },
+        "handoverCondition": {
+          "fuelLevel": "FULL",
+          "vehicleCondition": "GOOD",
+          "equipmentChecklist": {
+            "stnkOriginal": true,
+            "spareKey": true,
+            "jackAndTools": true,
+            "spareTire": true,
+            "firstAidKit": true
+          },
+          "notes": "Kondisi prima",
+          "staffName": "Admin"
+        },
+        "returnDate": "2026-08-29T08:30:00.000Z",
+        "lateFee": 200000,
+        "damageFee": 500000,
+        "returnNumber": "BPK-MOCK-001",
+        "returnBy": "usr-001",
+        "returnOdometer": 11785,
+        "returnLocation": {
+          "latitude": -6.182302,
+          "longitude": 106.848099,
+          "address": "Kantor Cabang Utama Jakarta"
+        },
+        "returnCondition": {
+          "fuelLevel": "FULL",
+          "vehicleCondition": "GOOD",
+          "equipmentChecklist": {
+            "stnkOriginal": true,
+            "spareKey": true,
+            "jackAndTools": true,
+            "spareTire": true,
+            "firstAidKit": true
+          },
+          "notes": "Kondisi prima",
+          "staffName": "Admin"
+        },
+        "extraCharges": 0
       },
       {
         "id": "res-002-item-2",
@@ -573,6 +783,54 @@ export const mockBookings: Booking[] = [
           "brand": "Honda",
           "model": "Mobil",
           "categoryName": "MPV Standard"
+        },
+        "itemStatus": "RETURNED",
+        "returnDate": "2026-08-28T16:49:00Z",
+        "lateFee": 0,
+        "damageFee": 0,
+        "returnNumber": "BPK-MOCK-001",
+        "returnBy": "usr-001",
+        "returnOdometer": 10500,
+        "returnLocation": {
+          "latitude": -6.2,
+          "longitude": 106.816666,
+          "address": "Pool Kendaraan"
+        },
+        "returnCondition": {
+          "fuelLevel": "FULL",
+          "vehicleCondition": "GOOD",
+          "equipmentChecklist": {
+            "stnkOriginal": true,
+            "spareKey": true,
+            "jackAndTools": true,
+            "spareTire": true,
+            "firstAidKit": true
+          },
+          "notes": "Kembali normal",
+          "staffName": "Admin"
+        },
+        "extraCharges": 0,
+        "handoverDate": "2026-08-23T12:00:00.000Z",
+        "handoverNumber": "ST-MOCK-001",
+        "handoverBy": "usr-001",
+        "handoverOdometer": 10000,
+        "handoverLocation": {
+          "latitude": -6.2,
+          "longitude": 106.816666,
+          "address": "Pool Kendaraan"
+        },
+        "handoverCondition": {
+          "fuelLevel": "FULL",
+          "vehicleCondition": "GOOD",
+          "equipmentChecklist": {
+            "stnkOriginal": true,
+            "spareKey": true,
+            "jackAndTools": true,
+            "spareTire": true,
+            "firstAidKit": true
+          },
+          "notes": "Siap jalan",
+          "staffName": "Admin"
         }
       }
     ],
@@ -618,13 +876,54 @@ export const mockBookings: Booking[] = [
           "model": "Mobil",
           "categoryName": "MPV Standard"
         },
-        "itemStatus": "IN_USE",
+        "itemStatus": "RETURNED",
         "handoverNumber": "ST-2410-003",
         "handoverDate": "2026-08-23T12:00:00.000Z",
         "handoverBy": "usr-001",
         "handoverOdometer": 12222,
-        "handoverLocation": { "latitude": -6.167368, "longitude": 106.873397, "address": "Kantor Cabang Utama Jakarta" },
-        "handoverCondition": { "fuelLevel": "FULL", "vehicleCondition": "GOOD", "equipmentChecklist": { "stnkOriginal": true, "spareKey": true, "jackAndTools": true, "spareTire": true, "firstAidKit": true }, "notes": "Kondisi prima", "staffName": "Admin" }
+        "handoverLocation": {
+          "latitude": -6.167368,
+          "longitude": 106.873397,
+          "address": "Kantor Cabang Utama Jakarta"
+        },
+        "handoverCondition": {
+          "fuelLevel": "FULL",
+          "vehicleCondition": "GOOD",
+          "equipmentChecklist": {
+            "stnkOriginal": true,
+            "spareKey": true,
+            "jackAndTools": true,
+            "spareTire": true,
+            "firstAidKit": true
+          },
+          "notes": "Kondisi prima",
+          "staffName": "Admin"
+        },
+        "returnDate": "2026-08-28T12:10:00Z",
+        "lateFee": 0,
+        "damageFee": 0,
+        "returnNumber": "BPK-MOCK-001",
+        "returnBy": "usr-001",
+        "returnOdometer": 12722,
+        "returnLocation": {
+          "latitude": -6.167368,
+          "longitude": 106.873397,
+          "address": "Kantor Cabang Utama Jakarta"
+        },
+        "returnCondition": {
+          "fuelLevel": "FULL",
+          "vehicleCondition": "GOOD",
+          "equipmentChecklist": {
+            "stnkOriginal": true,
+            "spareKey": true,
+            "jackAndTools": true,
+            "spareTire": true,
+            "firstAidKit": true
+          },
+          "notes": "Kondisi prima",
+          "staffName": "Admin"
+        },
+        "extraCharges": 0
       }
     ],
     "customerSnapshot": {
@@ -669,13 +968,54 @@ export const mockBookings: Booking[] = [
           "model": "Mobil",
           "categoryName": "MPV Premium"
         },
-        "itemStatus": "IN_USE",
+        "itemStatus": "RETURNED",
         "handoverNumber": "ST-2410-004",
         "handoverDate": "2026-08-23T12:00:00.000Z",
         "handoverBy": "usr-001",
         "handoverOdometer": 13251,
-        "handoverLocation": { "latitude": -6.167247, "longitude": 106.881062, "address": "Kantor Cabang Utama Jakarta" },
-        "handoverCondition": { "fuelLevel": "FULL", "vehicleCondition": "GOOD", "equipmentChecklist": { "stnkOriginal": true, "spareKey": true, "jackAndTools": true, "spareTire": true, "firstAidKit": true }, "notes": "Kondisi prima", "staffName": "Admin" }
+        "handoverLocation": {
+          "latitude": -6.167247,
+          "longitude": 106.881062,
+          "address": "Kantor Cabang Utama Jakarta"
+        },
+        "handoverCondition": {
+          "fuelLevel": "FULL",
+          "vehicleCondition": "GOOD",
+          "equipmentChecklist": {
+            "stnkOriginal": true,
+            "spareKey": true,
+            "jackAndTools": true,
+            "spareTire": true,
+            "firstAidKit": true
+          },
+          "notes": "Kondisi prima",
+          "staffName": "Admin"
+        },
+        "returnDate": "2026-08-28T15:56:00Z",
+        "lateFee": 0,
+        "damageFee": 0,
+        "returnNumber": "BPK-MOCK-001",
+        "returnBy": "usr-001",
+        "returnOdometer": 13751,
+        "returnLocation": {
+          "latitude": -6.167247,
+          "longitude": 106.881062,
+          "address": "Kantor Cabang Utama Jakarta"
+        },
+        "returnCondition": {
+          "fuelLevel": "FULL",
+          "vehicleCondition": "GOOD",
+          "equipmentChecklist": {
+            "stnkOriginal": true,
+            "spareKey": true,
+            "jackAndTools": true,
+            "spareTire": true,
+            "firstAidKit": true
+          },
+          "notes": "Kondisi prima",
+          "staffName": "Admin"
+        },
+        "extraCharges": 0
       }
     ],
     "customerSnapshot": {
@@ -719,6 +1059,54 @@ export const mockBookings: Booking[] = [
           "brand": "Toyota",
           "model": "Mobil",
           "categoryName": "MPV Standard"
+        },
+        "itemStatus": "RETURNED",
+        "returnDate": "2026-08-28T18:51:00Z",
+        "lateFee": 0,
+        "damageFee": 0,
+        "returnNumber": "BPK-MOCK-001",
+        "returnBy": "usr-001",
+        "returnOdometer": 10500,
+        "returnLocation": {
+          "latitude": -6.2,
+          "longitude": 106.816666,
+          "address": "Pool Kendaraan"
+        },
+        "returnCondition": {
+          "fuelLevel": "FULL",
+          "vehicleCondition": "GOOD",
+          "equipmentChecklist": {
+            "stnkOriginal": true,
+            "spareKey": true,
+            "jackAndTools": true,
+            "spareTire": true,
+            "firstAidKit": true
+          },
+          "notes": "Kembali normal",
+          "staffName": "Admin"
+        },
+        "extraCharges": 0,
+        "handoverDate": "2026-08-23T12:00:00.000Z",
+        "handoverNumber": "ST-MOCK-001",
+        "handoverBy": "usr-001",
+        "handoverOdometer": 10000,
+        "handoverLocation": {
+          "latitude": -6.2,
+          "longitude": 106.816666,
+          "address": "Pool Kendaraan"
+        },
+        "handoverCondition": {
+          "fuelLevel": "FULL",
+          "vehicleCondition": "GOOD",
+          "equipmentChecklist": {
+            "stnkOriginal": true,
+            "spareKey": true,
+            "jackAndTools": true,
+            "spareTire": true,
+            "firstAidKit": true
+          },
+          "notes": "Siap jalan",
+          "staffName": "Admin"
         }
       }
     ],
@@ -763,6 +1151,54 @@ export const mockBookings: Booking[] = [
           "brand": "Toyota",
           "model": "Mobil",
           "categoryName": "MPV Standard"
+        },
+        "itemStatus": "RETURNED",
+        "returnDate": "2026-08-30T19:55:00Z",
+        "lateFee": 0,
+        "damageFee": 0,
+        "returnNumber": "BPK-MOCK-001",
+        "returnBy": "usr-001",
+        "returnOdometer": 10500,
+        "returnLocation": {
+          "latitude": -6.2,
+          "longitude": 106.816666,
+          "address": "Pool Kendaraan"
+        },
+        "returnCondition": {
+          "fuelLevel": "FULL",
+          "vehicleCondition": "GOOD",
+          "equipmentChecklist": {
+            "stnkOriginal": true,
+            "spareKey": true,
+            "jackAndTools": true,
+            "spareTire": true,
+            "firstAidKit": true
+          },
+          "notes": "Kembali normal",
+          "staffName": "Admin"
+        },
+        "extraCharges": 0,
+        "handoverDate": "2026-08-27T12:00:00.000Z",
+        "handoverNumber": "ST-MOCK-001",
+        "handoverBy": "usr-001",
+        "handoverOdometer": 10000,
+        "handoverLocation": {
+          "latitude": -6.2,
+          "longitude": 106.816666,
+          "address": "Pool Kendaraan"
+        },
+        "handoverCondition": {
+          "fuelLevel": "FULL",
+          "vehicleCondition": "GOOD",
+          "equipmentChecklist": {
+            "stnkOriginal": true,
+            "spareKey": true,
+            "jackAndTools": true,
+            "spareTire": true,
+            "firstAidKit": true
+          },
+          "notes": "Siap jalan",
+          "staffName": "Admin"
         }
       }
     ],
@@ -809,6 +1245,54 @@ export const mockBookings: Booking[] = [
           "brand": "Honda",
           "model": "Mobil",
           "categoryName": "MPV Standard"
+        },
+        "itemStatus": "RETURNED",
+        "returnDate": "2026-08-30T11:53:00Z",
+        "lateFee": 0,
+        "damageFee": 0,
+        "returnNumber": "BPK-MOCK-001",
+        "returnBy": "usr-001",
+        "returnOdometer": 10500,
+        "returnLocation": {
+          "latitude": -6.2,
+          "longitude": 106.816666,
+          "address": "Pool Kendaraan"
+        },
+        "returnCondition": {
+          "fuelLevel": "FULL",
+          "vehicleCondition": "GOOD",
+          "equipmentChecklist": {
+            "stnkOriginal": true,
+            "spareKey": true,
+            "jackAndTools": true,
+            "spareTire": true,
+            "firstAidKit": true
+          },
+          "notes": "Kembali normal",
+          "staffName": "Admin"
+        },
+        "extraCharges": 0,
+        "handoverDate": "2026-08-27T12:00:00.000Z",
+        "handoverNumber": "ST-MOCK-001",
+        "handoverBy": "usr-001",
+        "handoverOdometer": 10000,
+        "handoverLocation": {
+          "latitude": -6.2,
+          "longitude": 106.816666,
+          "address": "Pool Kendaraan"
+        },
+        "handoverCondition": {
+          "fuelLevel": "FULL",
+          "vehicleCondition": "GOOD",
+          "equipmentChecklist": {
+            "stnkOriginal": true,
+            "spareKey": true,
+            "jackAndTools": true,
+            "spareTire": true,
+            "firstAidKit": true
+          },
+          "notes": "Siap jalan",
+          "staffName": "Admin"
         }
       }
     ],
@@ -855,6 +1339,54 @@ export const mockBookings: Booking[] = [
           "brand": "Toyota",
           "model": "Mobil",
           "categoryName": "MPV Standard"
+        },
+        "itemStatus": "RETURNED",
+        "returnDate": "2026-08-30T14:50:00Z",
+        "lateFee": 0,
+        "damageFee": 0,
+        "returnNumber": "BPK-MOCK-001",
+        "returnBy": "usr-001",
+        "returnOdometer": 10500,
+        "returnLocation": {
+          "latitude": -6.2,
+          "longitude": 106.816666,
+          "address": "Pool Kendaraan"
+        },
+        "returnCondition": {
+          "fuelLevel": "FULL",
+          "vehicleCondition": "GOOD",
+          "equipmentChecklist": {
+            "stnkOriginal": true,
+            "spareKey": true,
+            "jackAndTools": true,
+            "spareTire": true,
+            "firstAidKit": true
+          },
+          "notes": "Kembali normal",
+          "staffName": "Admin"
+        },
+        "extraCharges": 0,
+        "handoverDate": "2026-08-27T12:00:00.000Z",
+        "handoverNumber": "ST-MOCK-001",
+        "handoverBy": "usr-001",
+        "handoverOdometer": 10000,
+        "handoverLocation": {
+          "latitude": -6.2,
+          "longitude": 106.816666,
+          "address": "Pool Kendaraan"
+        },
+        "handoverCondition": {
+          "fuelLevel": "FULL",
+          "vehicleCondition": "GOOD",
+          "equipmentChecklist": {
+            "stnkOriginal": true,
+            "spareKey": true,
+            "jackAndTools": true,
+            "spareTire": true,
+            "firstAidKit": true
+          },
+          "notes": "Siap jalan",
+          "staffName": "Admin"
         }
       }
     ],
@@ -901,6 +1433,54 @@ export const mockBookings: Booking[] = [
           "brand": "Toyota",
           "model": "Mobil",
           "categoryName": "MPV Standard"
+        },
+        "itemStatus": "RETURNED",
+        "returnDate": "2026-08-18T13:31:00Z",
+        "lateFee": 0,
+        "damageFee": 0,
+        "returnNumber": "BPK-MOCK-001",
+        "returnBy": "usr-001",
+        "returnOdometer": 10500,
+        "returnLocation": {
+          "latitude": -6.2,
+          "longitude": 106.816666,
+          "address": "Pool Kendaraan"
+        },
+        "returnCondition": {
+          "fuelLevel": "FULL",
+          "vehicleCondition": "GOOD",
+          "equipmentChecklist": {
+            "stnkOriginal": true,
+            "spareKey": true,
+            "jackAndTools": true,
+            "spareTire": true,
+            "firstAidKit": true
+          },
+          "notes": "Kembali normal",
+          "staffName": "Admin"
+        },
+        "extraCharges": 0,
+        "handoverDate": "2026-08-15T12:00:00.000Z",
+        "handoverNumber": "ST-MOCK-001",
+        "handoverBy": "usr-001",
+        "handoverOdometer": 10000,
+        "handoverLocation": {
+          "latitude": -6.2,
+          "longitude": 106.816666,
+          "address": "Pool Kendaraan"
+        },
+        "handoverCondition": {
+          "fuelLevel": "FULL",
+          "vehicleCondition": "GOOD",
+          "equipmentChecklist": {
+            "stnkOriginal": true,
+            "spareKey": true,
+            "jackAndTools": true,
+            "spareTire": true,
+            "firstAidKit": true
+          },
+          "notes": "Siap jalan",
+          "staffName": "Admin"
         }
       }
     ],
@@ -945,6 +1525,54 @@ export const mockBookings: Booking[] = [
           "brand": "Suzuki",
           "model": "Mobil",
           "categoryName": "MPV Standard"
+        },
+        "itemStatus": "RETURNED",
+        "returnDate": "2026-08-18T12:00:00Z",
+        "lateFee": 0,
+        "damageFee": 0,
+        "returnNumber": "BPK-MOCK-001",
+        "returnBy": "usr-001",
+        "returnOdometer": 10500,
+        "returnLocation": {
+          "latitude": -6.2,
+          "longitude": 106.816666,
+          "address": "Pool Kendaraan"
+        },
+        "returnCondition": {
+          "fuelLevel": "FULL",
+          "vehicleCondition": "GOOD",
+          "equipmentChecklist": {
+            "stnkOriginal": true,
+            "spareKey": true,
+            "jackAndTools": true,
+            "spareTire": true,
+            "firstAidKit": true
+          },
+          "notes": "Kembali normal",
+          "staffName": "Admin"
+        },
+        "extraCharges": 0,
+        "handoverDate": "2026-08-15T12:00:00.000Z",
+        "handoverNumber": "ST-MOCK-001",
+        "handoverBy": "usr-001",
+        "handoverOdometer": 10000,
+        "handoverLocation": {
+          "latitude": -6.2,
+          "longitude": 106.816666,
+          "address": "Pool Kendaraan"
+        },
+        "handoverCondition": {
+          "fuelLevel": "FULL",
+          "vehicleCondition": "GOOD",
+          "equipmentChecklist": {
+            "stnkOriginal": true,
+            "spareKey": true,
+            "jackAndTools": true,
+            "spareTire": true,
+            "firstAidKit": true
+          },
+          "notes": "Siap jalan",
+          "staffName": "Admin"
         }
       }
     ],
@@ -989,6 +1617,54 @@ export const mockBookings: Booking[] = [
           "brand": "Isuzu",
           "model": "Mobil",
           "categoryName": "MPV Standard"
+        },
+        "itemStatus": "RETURNED",
+        "returnDate": "2026-08-19T05:06:00Z",
+        "lateFee": 0,
+        "damageFee": 0,
+        "returnNumber": "BPK-MOCK-001",
+        "returnBy": "usr-001",
+        "returnOdometer": 10500,
+        "returnLocation": {
+          "latitude": -6.2,
+          "longitude": 106.816666,
+          "address": "Pool Kendaraan"
+        },
+        "returnCondition": {
+          "fuelLevel": "FULL",
+          "vehicleCondition": "GOOD",
+          "equipmentChecklist": {
+            "stnkOriginal": true,
+            "spareKey": true,
+            "jackAndTools": true,
+            "spareTire": true,
+            "firstAidKit": true
+          },
+          "notes": "Kembali normal",
+          "staffName": "Admin"
+        },
+        "extraCharges": 0,
+        "handoverDate": "2026-08-15T12:00:00.000Z",
+        "handoverNumber": "ST-MOCK-001",
+        "handoverBy": "usr-001",
+        "handoverOdometer": 10000,
+        "handoverLocation": {
+          "latitude": -6.2,
+          "longitude": 106.816666,
+          "address": "Pool Kendaraan"
+        },
+        "handoverCondition": {
+          "fuelLevel": "FULL",
+          "vehicleCondition": "GOOD",
+          "equipmentChecklist": {
+            "stnkOriginal": true,
+            "spareKey": true,
+            "jackAndTools": true,
+            "spareTire": true,
+            "firstAidKit": true
+          },
+          "notes": "Siap jalan",
+          "staffName": "Admin"
         }
       }
     ],
@@ -1033,6 +1709,54 @@ export const mockBookings: Booking[] = [
           "brand": "Daihatsu",
           "model": "Mobil",
           "categoryName": "MPV Standard"
+        },
+        "itemStatus": "RETURNED",
+        "returnDate": "2026-08-22T12:00:00Z",
+        "lateFee": 0,
+        "damageFee": 0,
+        "returnNumber": "BPK-MOCK-001",
+        "returnBy": "usr-001",
+        "returnOdometer": 10500,
+        "returnLocation": {
+          "latitude": -6.2,
+          "longitude": 106.816666,
+          "address": "Pool Kendaraan"
+        },
+        "returnCondition": {
+          "fuelLevel": "FULL",
+          "vehicleCondition": "GOOD",
+          "equipmentChecklist": {
+            "stnkOriginal": true,
+            "spareKey": true,
+            "jackAndTools": true,
+            "spareTire": true,
+            "firstAidKit": true
+          },
+          "notes": "Kembali normal",
+          "staffName": "Admin"
+        },
+        "extraCharges": 0,
+        "handoverDate": "2026-08-20T12:00:00.000Z",
+        "handoverNumber": "ST-MOCK-001",
+        "handoverBy": "usr-001",
+        "handoverOdometer": 10000,
+        "handoverLocation": {
+          "latitude": -6.2,
+          "longitude": 106.816666,
+          "address": "Pool Kendaraan"
+        },
+        "handoverCondition": {
+          "fuelLevel": "FULL",
+          "vehicleCondition": "GOOD",
+          "equipmentChecklist": {
+            "stnkOriginal": true,
+            "spareKey": true,
+            "jackAndTools": true,
+            "spareTire": true,
+            "firstAidKit": true
+          },
+          "notes": "Siap jalan",
+          "staffName": "Admin"
         }
       }
     ],
@@ -1075,6 +1799,54 @@ export const mockBookings: Booking[] = [
           "brand": "Toyota",
           "model": "Mobil",
           "categoryName": "MPV Standard"
+        },
+        "itemStatus": "RETURNED",
+        "returnDate": "2026-09-01T12:00:00Z",
+        "lateFee": 0,
+        "damageFee": 0,
+        "returnNumber": "BPK-MOCK-001",
+        "returnBy": "usr-001",
+        "returnOdometer": 10500,
+        "returnLocation": {
+          "latitude": -6.2,
+          "longitude": 106.816666,
+          "address": "Pool Kendaraan"
+        },
+        "returnCondition": {
+          "fuelLevel": "FULL",
+          "vehicleCondition": "GOOD",
+          "equipmentChecklist": {
+            "stnkOriginal": true,
+            "spareKey": true,
+            "jackAndTools": true,
+            "spareTire": true,
+            "firstAidKit": true
+          },
+          "notes": "Kembali normal",
+          "staffName": "Admin"
+        },
+        "extraCharges": 0,
+        "handoverDate": "2026-08-30T12:00:00.000Z",
+        "handoverNumber": "ST-MOCK-001",
+        "handoverBy": "usr-001",
+        "handoverOdometer": 10000,
+        "handoverLocation": {
+          "latitude": -6.2,
+          "longitude": 106.816666,
+          "address": "Pool Kendaraan"
+        },
+        "handoverCondition": {
+          "fuelLevel": "FULL",
+          "vehicleCondition": "GOOD",
+          "equipmentChecklist": {
+            "stnkOriginal": true,
+            "spareKey": true,
+            "jackAndTools": true,
+            "spareTire": true,
+            "firstAidKit": true
+          },
+          "notes": "Siap jalan",
+          "staffName": "Admin"
         }
       }
     ],
@@ -1121,6 +1893,54 @@ export const mockBookings: Booking[] = [
           "brand": "Toyota",
           "model": "Mobil",
           "categoryName": "MPV Standard"
+        },
+        "itemStatus": "RETURNED",
+        "returnDate": "2026-09-01T16:37:00Z",
+        "lateFee": 0,
+        "damageFee": 0,
+        "returnNumber": "BPK-MOCK-001",
+        "returnBy": "usr-001",
+        "returnOdometer": 10500,
+        "returnLocation": {
+          "latitude": -6.2,
+          "longitude": 106.816666,
+          "address": "Pool Kendaraan"
+        },
+        "returnCondition": {
+          "fuelLevel": "FULL",
+          "vehicleCondition": "GOOD",
+          "equipmentChecklist": {
+            "stnkOriginal": true,
+            "spareKey": true,
+            "jackAndTools": true,
+            "spareTire": true,
+            "firstAidKit": true
+          },
+          "notes": "Kembali normal",
+          "staffName": "Admin"
+        },
+        "extraCharges": 0,
+        "handoverDate": "2026-08-30T12:00:00.000Z",
+        "handoverNumber": "ST-MOCK-001",
+        "handoverBy": "usr-001",
+        "handoverOdometer": 10000,
+        "handoverLocation": {
+          "latitude": -6.2,
+          "longitude": 106.816666,
+          "address": "Pool Kendaraan"
+        },
+        "handoverCondition": {
+          "fuelLevel": "FULL",
+          "vehicleCondition": "GOOD",
+          "equipmentChecklist": {
+            "stnkOriginal": true,
+            "spareKey": true,
+            "jackAndTools": true,
+            "spareTire": true,
+            "firstAidKit": true
+          },
+          "notes": "Siap jalan",
+          "staffName": "Admin"
         }
       }
     ],
@@ -2180,6 +3000,114 @@ export const mockBookings: Booking[] = [
       "address": "Jl. Malioboro No. 40",
       "city": "Yogyakarta",
       "province": "DI Yogyakarta"
+    }
+  },
+  {
+    "id": "res-overdue-001",
+    "bookingNumber": "RES-2609-LATE",
+    "customerId": "cust-ind-001",
+    "rentalType": "SELF_DRIVE",
+    "totalAmount": 2400000,
+    "deposit": 1000000,
+    "remainingAmount": 2400000,
+    "status": "ACTIVE",
+    "contractNumber": "KTR-2609-LATE",
+    "contractDate": "2026-09-28T09:00:00Z",
+    "createdAt": "2026-09-28T09:00:00.000Z",
+    "updatedAt": "2026-09-28T09:00:00.000Z",
+    "startDate": "2026-10-01T08:00:00.000Z",
+    "items": [
+      {
+        "id": "res-overdue-001-item-1",
+        "bookingId": "res-overdue-001",
+        "vehicleId": "veh-005",
+        "rateType": "DAILY",
+        "startDate": "2026-10-01T08:00:00.000Z",
+        "endDate": "2026-10-05T08:00:00.000Z",
+        "duration": 4,
+        "unitPrice": 400000,
+        "depositSnapshot": 500000,
+        "subtotal": 1600000,
+        "vehicleSnapshot": {
+          "licensePlate": "B 10005 GHI",
+          "brand": "Toyota",
+          "model": "Mobil",
+          "categoryName": "MPV Standard"
+        },
+        "itemStatus": "IN_USE",
+        "handoverNumber": "ST-2609-LATE-001",
+        "handoverDate": "2026-10-01T08:00:00.000Z",
+        "handoverBy": "usr-001",
+        "handoverOdometer": 22000,
+        "handoverLocation": {
+          "latitude": -6.2,
+          "longitude": 106.816666,
+          "address": "Pool Kendaraan Jakarta Selatan"
+        },
+        "handoverCondition": {
+          "fuelLevel": "FULL",
+          "vehicleCondition": "GOOD",
+          "equipmentChecklist": {
+            "stnkOriginal": true,
+            "spareKey": true,
+            "jackAndTools": true,
+            "spareTire": true,
+            "firstAidKit": true
+          },
+          "notes": "Kendaraan siap jalan, kondisi prima",
+          "staffName": "Budi"
+        }
+      },
+      {
+        "id": "res-overdue-001-item-2",
+        "bookingId": "res-overdue-001",
+        "vehicleId": "veh-006",
+        "rateType": "HOURLY",
+        "startDate": "2026-10-01T08:00:00.000Z",
+        "endDate": "2026-10-04T08:00:00.000Z",
+        "duration": 72,
+        "unitPrice": 50000,
+        "depositSnapshot": 500000,
+        "subtotal": 3600000,
+        "vehicleSnapshot": {
+          "licensePlate": "B 10006 GHI",
+          "brand": "Toyota",
+          "model": "Mobil",
+          "categoryName": "MPV Standard"
+        },
+        "itemStatus": "IN_USE",
+        "handoverNumber": "ST-2609-LATE-002",
+        "handoverDate": "2026-10-01T09:00:00.000Z",
+        "handoverBy": "usr-001",
+        "handoverOdometer": 18500,
+        "handoverLocation": {
+          "latitude": -6.2,
+          "longitude": 106.816666,
+          "address": "Pool Kendaraan Jakarta Selatan"
+        },
+        "handoverCondition": {
+          "fuelLevel": "THREE_QUARTER",
+          "vehicleCondition": "GOOD",
+          "equipmentChecklist": {
+            "stnkOriginal": true,
+            "spareKey": true,
+            "jackAndTools": true,
+            "spareTire": true,
+            "firstAidKit": true
+          },
+          "notes": "Siap jalan",
+          "staffName": "Budi"
+        }
+      }
+    ],
+    "customerSnapshot": {
+      "name": "Budi Santoso",
+      "type": "Individu",
+      "phone": "081234567890",
+      "email": "budi.santoso@example.com",
+      "address": "Jl. Sudirman No. 10",
+      "city": "Jakarta Pusat",
+      "province": "DKI Jakarta"
     }
   }
 ];

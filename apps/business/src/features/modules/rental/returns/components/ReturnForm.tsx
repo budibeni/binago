@@ -1,12 +1,15 @@
 'use client';
 
+import { getReturnTranslation } from '../i18n';
+import { useBusinessLocale } from '@/components/BusinessShellLayout';
 import React, { useState } from 'react';
 import {
-  Car, MapPin, Search, Receipt, User, CalendarRange, Crosshair, StickyNote, CornerDownRight, FileText, CheckCircle2, ArrowRightLeft, PlayCircle
+  Car, MapPin, Search, Receipt, User, CalendarRange, Crosshair, StickyNote, CornerDownRight, FileText, CheckCircle2, ArrowRightLeft, PlayCircle, HelpCircle
 } from 'lucide-react';
 import {
   Button, FormShell, InputNumber, InputSelect,
-  InputDate, InputTextarea, FormCard, InputCheckbox, Label, InputDateTimeGps, PhoneLink
+  InputDate, InputTextarea, FormCard, InputCheckbox, Label, InputDateTimeGps, PhoneLink,
+  Tooltip, TooltipTrigger, TooltipContent, TooltipProvider
 } from '@adatrack/ui';
 import { cn, formatCurrency, formatDateTime } from '@adatrack/utils';
 import type { RentalContract } from '../../contracts/types/contract';
@@ -47,6 +50,8 @@ export function ReturnForm({
   open,
   onOpenChange
 }: ReturnFormProps) {
+  const locale = useBusinessLocale();
+  const tReturn = getReturnTranslation(locale);
   const [activeTab, setActiveTab] = useState<string>(itemsToReturn[0]?.id || '');
   const [subTab, setSubTab] = useState<'RETURN' | 'HANDOVER'>('RETURN');
 
@@ -87,10 +92,19 @@ export function ReturnForm({
     const end = new Date(item.endDate).getTime();
     const ret = new Date(returnDateStr).getTime();
     if (ret > end) {
-      // 10% of unit price per day late as a simple default
       const diffTime = Math.abs(ret - end);
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      return diffDays * ((item.unitPrice || 0) * 0.1);
+      const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
+      
+      let hourlyRate = 0;
+      if (item.vehicle?.hourlyRate) {
+        hourlyRate = item.vehicle.hourlyRate;
+      } else if (item.rateType === 'HOURLY') {
+        hourlyRate = item.unitPrice || 0;
+      } else {
+        hourlyRate = (item.unitPrice || 0) / 24;
+      }
+      
+      return diffHours * hourlyRate;
     }
     return 0;
   };
@@ -146,37 +160,37 @@ export function ReturnForm({
       onSubmit={handleSave}
       onCancel={onCancel}
       cancelProps={{ disabled: isSubmitting }}
-      cancelText="Batal"
+      cancelText={tReturn.btnCancel}
       saveText={isSubmitting ? 'Menyimpan...' : 'Proses Pengembalian'}
       saveProps={{ disabled: isSubmitting || selectedItems.length === 0 }}
       isSubmitting={isSubmitting}
-      title="Proses Pengembalian"
+      title={tReturn.actionProcess}
     >
       <div className="flex flex-col gap-4">
 
         <FormCard
-          title="Informasi Kontrak"
-          description="Rincian kontrak penyewaan yang menjadi dasar pengembalian."
+          title={tReturn.contractInfo}
+          description={tReturn.contractInfoDesc}
           icon={<FileText className="w-5 h-5 text-blue-500" />}
           iconWrapperClassName="bg-blue-100 dark:bg-blue-900/30 text-blue-500"
         >
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 animate-in fade-in slide-in-from-top-2 duration-300">
             <div className="flex flex-col gap-1">
-              <span className="text-[10px] font-semibold tracking-wider text-slate-400 dark:text-slate-500 uppercase">No Kontrak</span>
+              <span className="text-[10px] font-semibold tracking-wider text-slate-400 dark:text-slate-500 uppercase">{tReturn.noContract}</span>
               <span className="text-[12px] font-semibold text-slate-800 dark:text-slate-200">{contract.contractNumber}</span>
               <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
                 {(contract.contractDate || contract.createdAt) ? new Date(contract.contractDate || contract.createdAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-'}
               </span>
             </div>
             <div className="flex flex-col gap-1">
-              <span className="text-[10px] font-semibold tracking-wider text-slate-400 dark:text-slate-500 uppercase">Nama Pelanggan</span>
+              <span className="text-[10px] font-semibold tracking-wider text-slate-400 dark:text-slate-500 uppercase">{tReturn.customerName}</span>
               <span className="text-[12px] font-semibold text-slate-800 dark:text-slate-200 line-clamp-1" title={contract.customerSnapshot?.name}>{contract.customerSnapshot?.name || '-'}</span>
               <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1">
                 {contract.customerSnapshot?.type || '-'}
               </span>
             </div>
             <div className="flex flex-col gap-1">
-              <span className="text-[10px] font-semibold tracking-wider text-slate-400 dark:text-slate-500 uppercase">Periode Sewa</span>
+              <span className="text-[10px] font-semibold tracking-wider text-slate-400 dark:text-slate-500 uppercase">{tReturn.rentalPeriod}</span>
               <span className={cn(
                 "text-[12px] font-semibold",
                 (contract.startDate && new Date(contract.startDate).toDateString() === new Date().toDateString()) ? "text-destructive" : "text-slate-800 dark:text-slate-200"
@@ -188,8 +202,8 @@ export function ReturnForm({
               </span>
             </div>
             <div className="flex flex-col gap-1">
-              <span className="text-[10px] font-semibold tracking-wider text-slate-400 dark:text-slate-500 uppercase">Layanan</span>
-              <span className="text-[12px] font-semibold text-slate-800 dark:text-slate-200 line-clamp-2">{contract.rentalType === 'SELF_DRIVE' ? 'Lepas Kunci' : 'Dgn Sopir'}</span>
+              <span className="text-[10px] font-semibold tracking-wider text-slate-400 dark:text-slate-500 uppercase">{tReturn.service}</span>
+              <span className="text-[12px] font-semibold text-slate-800 dark:text-slate-200 line-clamp-2">{contract.rentalType === 'SELF_DRIVE' ? tReturn.selfDrive : tReturn.withDriver}</span>
             </div>
           </div>
         </FormCard>
@@ -346,17 +360,17 @@ export function ReturnForm({
                             </div>
                             <div className="flex flex-col gap-4 bg-slate-50/50 dark:bg-slate-800/10 rounded-xl border border-slate-200 dark:border-slate-700 p-4">
                               <div className="flex flex-col gap-1">
-                                <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Odometer Awal</span>
+                                <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">{tReturn.startOdometer}</span>
                                 <span className="text-[13px] font-semibold">{item?.handoverOdometer ? `${item.handoverOdometer} km` : '-'}</span>
                               </div>
                               <div className="flex flex-col gap-1">
-                                <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Sisa BBM Awal</span>
+                                <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">{tReturn.startFuel}</span>
                                 <span className="text-[13px] font-semibold">
                                   {({ EMPTY: 'Kosong', QUARTER: '1/4', HALF: '1/2', THREE_QUARTER: '3/4', FULL: 'Penuh' } as any)[item?.handoverCondition?.fuelLevel || ''] || '-'}
                                 </span>
                               </div>
                               <div className="flex flex-col gap-1">
-                                <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Kondisi Fisik Awal</span>
+                                <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">{tReturn.startCondition}</span>
                                 <span className={cn(
                                   "text-[13px] font-semibold",
                                   item?.handoverCondition?.vehicleCondition === 'GOOD' ? 'text-emerald-600 dark:text-emerald-400' : 'text-warning'
@@ -369,7 +383,7 @@ export function ReturnForm({
 
                           {item?.handoverCondition?.notes && (
                             <div className="bg-warning/10 border border-warning/20 p-4 rounded-xl">
-                              <span className="text-[11px] font-semibold text-warning uppercase tracking-wider mb-1 block">Catatan Kerusakan Awal</span>
+                              <span className="text-[11px] font-semibold text-warning uppercase tracking-wider mb-1 block">{tReturn.startNotes}</span>
                               <span className="text-[13px] font-medium text-warning-foreground">{item.handoverCondition.notes}</span>
                             </div>
                           )}
@@ -401,7 +415,7 @@ export function ReturnForm({
                             {/* Kolom Kiri */}
                             <div className="flex flex-col gap-4 bg-slate-50/50 dark:bg-slate-800/10 rounded-xl border border-dashed border-slate-200 dark:border-slate-700 p-3.5">
                               <InputDateTimeGps
-                                label="Waktu Pengembalian"
+                                label={tReturn.returnTime}
                                 value={data.returnDate}
                                 onChange={(v) => handleReturnDateChange(activeTab, v)}
                                 latitude={data.returnLocation?.latitude}
@@ -410,50 +424,72 @@ export function ReturnForm({
                                 showAddress={false}
                                 required
                               />
-                              {data.lateFee !== undefined && data.lateFee > 0 && (
-                                <div className="bg-danger/10 border border-danger/20 rounded-md p-2 flex justify-between items-center text-[11px] -mt-1">
-                                  <span className="text-danger font-semibold">Estimasi Denda Terlambat:</span>
-                                  <span className="text-danger font-bold text-sm">{formatCurrency(data.lateFee)}</span>
-                                </div>
+                              {item?.endDate && new Date(data.returnDate).getTime() > new Date(item.endDate).getTime() && (
+                                <InputNumber
+                                  label={
+                                    <span className="flex items-center gap-1.5">
+                                      Denda Keterlambatan (Rp)
+                                      <TooltipProvider delayDuration={100}>
+                                        <Tooltip>
+                                          <TooltipTrigger asChild>
+                                            <button 
+                                              type="button" 
+                                              className="text-slate-400 hover:text-indigo-500 cursor-help"
+                                              onClick={(e) => e.preventDefault()}
+                                            >
+                                              <HelpCircle className="w-3.5 h-3.5" />
+                                            </button>
+                                          </TooltipTrigger>
+                                          <TooltipContent side="top" sideOffset={6} className="w-64 p-3 font-normal leading-relaxed text-center z-50">
+                                            Denda dihitung otomatis berdasarkan <b>Tarif Jam</b> dikalikan dengan <b>jumlah jam keterlambatan</b> (pembulatan ke atas). Nominal dapat disesuaikan manual.
+                                          </TooltipContent>
+                                        </Tooltip>
+                                      </TooltipProvider>
+                                    </span>
+                                  }
+                                  value={data.lateFee || null}
+                                  onChange={(val) => setVehicleData({ ...vehicleData, [activeTab]: { ...data, lateFee: val || 0 } })}
+                                  placeholder="0"
+                                />
                               )}
                               <InputTextarea
                                 id={`addr-${activeTab}`}
-                                label="Detail Alamat Pengembalian (Opsional)"
+                                label={tReturn.returnLocation + " (Opsional)"}
                                 value={data.returnLocation?.address || ''}
                                 onChange={(v) => setVehicleData({ ...vehicleData, [activeTab]: { ...data, returnLocation: { ...data.returnLocation, address: v } } })}
-                                placeholder="Cth: Area lobi, nama gedung, lantai..."
+                                placeholder={tReturn.phAddress}
                                 rows={3}
                               />
                             </div>
                             {/* Kolom Kanan */}
                             <div className="flex flex-col gap-3 bg-slate-50/50 dark:bg-slate-800/10 rounded-xl border border-dashed border-slate-200 dark:border-slate-700 p-3.5">
                               <InputNumber
-                                label="Odometer Akhir (km)"
+                                label={tReturn.endOdometer}
                                 value={data.returnOdometer ?? null}
                                 onChange={(val) => setVehicleData({ ...vehicleData, [activeTab]: { ...data, returnOdometer: val || 0 } })}
-                                placeholder="Contoh: 15500"
+                                placeholder={tReturn.phOdo}
                               />
-                              <p className="text-[10px] text-muted-foreground -mt-1.5 ml-1">Odometer Serah Terima: <b>{item?.handoverOdometer} km</b></p>
+                              <p className="text-[10px] text-muted-foreground -mt-1.5 ml-1">{tReturn.startOdometer}: <b>{item?.handoverOdometer} km</b></p>
                               <InputSelect
-                                label="Sisa BBM"
+                                label={tReturn.endFuel}
                                 value={data.returnCondition.fuelLevel}
                                 onChange={(val) => setVehicleData({ ...vehicleData, [activeTab]: { ...data, returnCondition: { ...data.returnCondition, fuelLevel: val as any } } })}
                                 options={[
-                                  { value: 'EMPTY', label: 'Kosong' },
-                                  { value: 'QUARTER', label: '1/4' },
-                                  { value: 'HALF', label: '1/2' },
-                                  { value: 'THREE_QUARTER', label: '3/4' },
-                                  { value: 'FULL', label: 'Penuh' },
+                                  { value: 'EMPTY', label: tReturn.fuelEmpty },
+                                  { value: 'QUARTER', label: tReturn.fuelQuarter },
+                                  { value: 'HALF', label: tReturn.fuelHalf },
+                                  { value: 'THREE_QUARTER', label: tReturn.fuelThreeQuarter },
+                                  { value: 'FULL', label: tReturn.fuelFull },
                                 ]}
                               />
                               <InputSelect
-                                label="Kondisi Kendaraan"
+                                label={tReturn.endCondition}
                                 value={data.returnCondition.vehicleCondition}
                                 onChange={(val) => setVehicleData({ ...vehicleData, [activeTab]: { ...data, returnCondition: { ...data.returnCondition, vehicleCondition: val as any } } })}
                                 options={[
-                                  { value: 'GOOD', label: 'Baik' },
-                                  { value: 'MINOR_DAMAGE', label: 'Kerusakan Ringan' },
-                                  { value: 'NEEDS_REPAIR', label: 'Perlu Perbaikan' },
+                                  { value: 'GOOD', label: tReturn.condGood },
+                                  { value: 'MINOR_DAMAGE', label: tReturn.condMinorDamage },
+                                  { value: 'NEEDS_REPAIR', label: tReturn.condNeedsRepair },
                                 ]}
                               />
                             </div>
@@ -462,14 +498,14 @@ export function ReturnForm({
                           {data.returnCondition.vehicleCondition && data.returnCondition.vehicleCondition !== 'GOOD' && (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50/50 dark:bg-slate-800/10 rounded-xl border border-dashed border-slate-200 dark:border-slate-700 p-3.5">
                               <InputTextarea
-                                label="Detail Kerusakan"
+                                label={tReturn.damageDetail}
                                 value={data.returnCondition.damageNotes || ''}
                                 onChange={(val) => setVehicleData({ ...vehicleData, [activeTab]: { ...data, returnCondition: { ...data.returnCondition, damageNotes: val } } })}
-                                placeholder="Deskripsikan kerusakan yang ditemukan..."
+                                placeholder={tReturn.phDamage}
                                 rows={2}
                               />
                               <InputNumber
-                                label="Taksiran Biaya Perbaikan (Rp)"
+                                label={tReturn.repairCost}
                                 value={data.damageFee || null}
                                 onChange={(val) => setVehicleData({ ...vehicleData, [activeTab]: { ...data, damageFee: val || 0 } })}
                               />
@@ -531,7 +567,7 @@ export function ReturnForm({
                                   returnCondition: { ...data.returnCondition, notes: val }
                                 }
                               })}
-                              placeholder="Tambahkan catatan khusus untuk kendaraan ini (opsional)..."
+                              placeholder={tReturn.phNotes}
                               rows={2}
                             />
                           </div>

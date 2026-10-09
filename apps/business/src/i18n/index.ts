@@ -399,7 +399,7 @@ export const dictionaries = {
       colChassisNumber: 'No. Rangka',
       colAssetNumber: 'No. Aset',
       colCapacityCC: 'Kapasitas Mesin',
-      
+
       stnkStatus: 'Status STNK',
       stnkExpired: 'Kedaluwarsa',
       stnkExpiring: 'Hampir Habis (< 60 Hari)',
@@ -1045,7 +1045,7 @@ export const dictionaries = {
       colChassisNumber: 'Chassis Number',
       colAssetNumber: 'Asset Number',
       colCapacityCC: 'Engine Capacity',
-      
+
       stnkStatus: 'STNK Status',
       stnkExpired: 'Expired',
       stnkExpiring: 'Expiring Soon (< 60 Days)',
@@ -1210,7 +1210,7 @@ export const dictionaries = {
       searchPlaceholder: 'Search...',
       addVehicle: 'Add',
       exportFilename: 'rental-fleet-adatrack',
-      
+
       // Panel
       panelTop: 'Top',
       panelRight: 'Right',
@@ -1222,7 +1222,7 @@ export const dictionaries = {
       // Columns
       colLicensePlate: 'License Plate',
       colPricingCategory: 'Pricing Category',
-      
+
       // Filter & Status
       filterStatus: 'Status',
       filterAll: 'All',
@@ -1231,7 +1231,7 @@ export const dictionaries = {
       statusRented: 'Rented',
       statusMaintenance: 'Maintenance',
       statusUnavailable: 'Unavailable',
-      
+
       // Data Completeness
       dataComplete: 'Rental Data Complete',
       dataCompleteShort: 'Complete',
@@ -1242,7 +1242,7 @@ export const dictionaries = {
       dataNotCompleteBadge: 'Incomplete',
       dataNotCompleteDesc: 'Please complete the rental rates and documents.',
       actionCompleteData: 'Complete Rental Data',
-      
+
       // Detail & Form Section
       detailTitle: 'Fleet Detail',
       tabCoreInfo: 'Vehicle Data',
@@ -1250,7 +1250,7 @@ export const dictionaries = {
       coreInfoNotice: 'Vehicle data is managed in Master Data Fleet. Cannot be edited from the Rental page.',
       alreadyRegistered: 'The vehicle is already registered in Rental Fleet.',
       noCoreVehicles: 'No master vehicles available to register.',
-      
+
       // Table Columns
       colVehicle: 'Fleet',
       colYear: 'Year',
@@ -1261,7 +1261,7 @@ export const dictionaries = {
       colCondition: 'Condition',
       colCompleteness: 'Completeness',
       colActions: 'Actions',
-      
+
       // Form fields
       fieldSelectVehicle: 'Select Vehicle',
       fieldRentalStatus: 'Rental Status',
@@ -1277,7 +1277,7 @@ export const dictionaries = {
       fieldTaxExpiry: 'Tax Expiry Date',
       fieldInsuranceExpiry: 'Insurance Expiry Date',
       fieldEquipment: 'Equipment',
-      
+
       // Equipment options
       equipStnk: 'STNK',
       equipBpkb: 'BPKB',
@@ -1288,12 +1288,12 @@ export const dictionaries = {
       equipFireExtinguisher: 'Fire Extinguisher',
       equipCarpet: 'Carpet',
       equipAudio: 'Audio / Radio',
-      
+
       // Conditions
       conditionGood: 'Good',
       conditionMinor: 'Minor Damage',
       conditionRepair: 'Needs Repair',
-      
+
       // Actions
       actionDetail: 'Detail',
       actionEdit: 'Edit Rental Data',
@@ -1306,7 +1306,7 @@ export const dictionaries = {
       createSuccess: 'Rental Fleet registered successfully.',
       updateSuccess: 'Rental Fleet data updated successfully.',
       deleteSuccess: 'Fleet successfully disabled from Rental.',
-      
+
       // Empty state
       emptyTitle: 'No Rental Fleet yet',
       emptyDescription: 'No rental fleet profiles are registered yet.',
@@ -1322,11 +1322,11 @@ export const dictionaries = {
       sectionDocExpiry: 'Document Expiry',
       sectionEquipmentTitle: 'Vehicle Equipment',
       sectionEquipmentDesc: 'Check the equipment available in this vehicle.',
-      
+
       // Status auto-manage
       statusSystemManaged: 'Status is automatically managed by the system due to an active transaction.',
       statusManualHint: 'Set manually for Maintenance or Unavailable. Other statuses are managed automatically when a transaction occurs.',
-      
+
       // Pricing
       pricingLabel: 'Pricing Settings',
       pricingCategory: 'Category Rate',
@@ -1336,7 +1336,7 @@ export const dictionaries = {
       fieldWeeklyRateRp: 'Weekly Rate (Rp)',
       fieldMonthlyRateRp: 'Monthly Rate (Rp)',
       fieldDepositRp: 'Deposit (Rp)',
-      
+
       // Core vehicle labels
       fieldPlatNomor: 'Plate Number',
       fieldGrup: 'Group',
@@ -1348,7 +1348,7 @@ export const dictionaries = {
       fieldBahanBakar: 'Fuel Type',
       fieldNoStnk: 'STNK No.',
       fieldBerlakuStnk: 'STNK Expiry',
-      
+
       // Notes placeholder
       notesPlaceholder: 'Write notes (optional)',
     },

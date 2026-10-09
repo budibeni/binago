@@ -1,9 +1,11 @@
 'use client';
 
+import { getReturnTranslation } from '../i18n';
+import { useBusinessLocale } from '@/components/BusinessShellLayout';
 import React from 'react';
-import { Button, DetailShell } from '@adatrack/ui';
-import { User, Car, MapPin, Key, CheckCircle, Navigation, Info, FileText, StickyNote } from 'lucide-react';
-import { PaymentsFeature } from '../../payments/PaymentsFeature';
+import { Button, DetailShell, FormShell, FormCard } from '@adatrack/ui';
+import { User, Car, MapPin, Key, CheckCircle, Navigation, Info, FileText, StickyNote, LogOut, LogIn } from 'lucide-react';
+
 import type { BookingItem } from '../../bookings/types/booking';
 export interface ReturnGroup {
   id: string;
@@ -19,6 +21,28 @@ export interface ReturnGroup {
 }
 
 import { cn, formatCurrency, formatDate, formatDateTime, formatNumber } from '@adatrack/utils';
+import { Clock, Route } from 'lucide-react';
+
+const getDuration = (start?: string, end?: string) => {
+  if (!start || !end) return '-';
+  const diff = new Date(end).getTime() - new Date(start).getTime();
+  if (diff < 0) return '-';
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+  const minutes = Math.floor((diff / 1000 / 60) % 60);
+  const parts = [];
+  if (days > 0) parts.push(`${days} Hari`);
+  if (hours > 0) parts.push(`${hours} Jam`);
+  if (minutes > 0 && days === 0) parts.push(`${minutes} Menit`);
+  return parts.join(' ') || '-';
+};
+
+const getDistance = (start?: number, end?: number) => {
+  if (start == null || end == null) return '-';
+  const diff = end - start;
+  if (diff < 0) return '-';
+  return `${formatNumber(diff)} km`;
+};
 
 interface ReturnViewProps {
   inline?: boolean;
@@ -26,7 +50,7 @@ interface ReturnViewProps {
   returnGroup: ReturnGroup | null;
   open: boolean;
   onClose: () => void;
-  layout?: 'drawer' | 'dialog' | 'fullscreen';
+  layout?: 'default' | 'drawer' | 'dialog' | 'fullscreen';
 }
 
 export function ReturnView({
@@ -37,7 +61,8 @@ export function ReturnView({
   inline = false,
   onProcessReturn,
 }: ReturnViewProps) {
-  const [mainTab, setMainTab] = React.useState<'detail' | 'payment'>('detail');
+  const locale = useBusinessLocale();
+  const tReturn = getReturnTranslation(locale);
   const [activeTab, setActiveTab] = React.useState<string>('');
 
   React.useEffect(() => {
@@ -83,73 +108,78 @@ export function ReturnView({
   );
 
   return (
-    <DetailShell
+    <FormShell
       open={open}
-      onOpenChange={(isOpen) => !isOpen && onClose()}
-      title="Detail Pengembalian"
+      onOpenChange={(isOpen: boolean) => !isOpen && onClose()}
       layout={layout}
+      title={tReturn.detailTitle}
+      isSubmitting={false}
+      actions={
+        <Button onClick={onClose} variant="outline">{tReturn.btnClose}</Button>
+      }
     >
-      <div className="flex-1 overflow-y-auto bg-neutral-50/30 dark:bg-neutral-950/20 pb-8">
+      <div className="flex flex-col w-full h-full">
+        <div className="flex flex-col gap-6 w-full max-w-4xl mx-auto py-6 px-4 md:px-6">
 
-        {/* Header Section */}
-        <div className="px-3 py-3 bg-background border-b border-border/40 flex justify-between items-start">
-          <div className="flex flex-col">
-            <h2 className="text-[15px] font-bold tracking-tight text-foreground">{c.id}</h2>
-            <div className="flex items-center gap-2">
-              <span className="text-[11px] text-muted-foreground font-medium">No. Kontrak: {contract?.contractNumber || c.contractId}</span>
+        {/* INFORMASI KONTRAK */}
+        <FormCard
+          title={tReturn.contractInfo}
+          description={tReturn.contractInfoDesc}
+          icon={<FileText className="w-5 h-5 text-blue-500" />}
+          iconWrapperClassName="bg-blue-100 dark:bg-blue-900/30 text-blue-500"
+          action={
+            contract?.status ? (
+              <span className={cn(
+                "px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border",
+                contract.status === 'COMPLETED' ? "bg-indigo-50 text-indigo-600 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-400 dark:border-indigo-800" :
+                contract.status === 'ACTIVE' ? "bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800" :
+                contract.status === 'CONFIRMED' ? "bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800" :
+                contract.status === 'CANCELLED' ? "bg-red-50 text-red-600 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800" :
+                "bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700"
+              )}>
+                {contract.status}
+              </span>
+            ) : null
+          }
+        >
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 animate-in fade-in slide-in-from-top-2 duration-300">
+            <div className="flex flex-col gap-1">
+              <span className="text-[10px] font-semibold tracking-wider text-slate-400 dark:text-slate-500 uppercase">{tReturn.noContract}</span>
+              <span className="text-[12px] font-semibold text-slate-800 dark:text-slate-200">{contract?.contractNumber || c.contractId}</span>
+              <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                {(contract?.contractDate || contract?.createdAt) ? new Date(contract.contractDate || contract.createdAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-'}
+              </span>
+            </div>
+            <div className="flex flex-col gap-1">
+              <span className="text-[10px] font-semibold tracking-wider text-slate-400 dark:text-slate-500 uppercase">{tReturn.customerName}</span>
+              <span className="text-[12px] font-semibold text-slate-800 dark:text-slate-200 line-clamp-1" title={customer?.name}>{customer?.name || '-'}</span>
+              <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1">
+                {customer?.type || '-'}
+              </span>
+            </div>
+            <div className="flex flex-col gap-1">
+              <span className="text-[10px] font-semibold tracking-wider text-slate-400 dark:text-slate-500 uppercase">{tReturn.rentalPeriod}</span>
+              <span className="text-[12px] font-semibold text-slate-800 dark:text-slate-200">
+                {contract?.startDate ? new Date(contract.startDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-'}
+              </span>
+              <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                Selesai: {contract?.endDate ? new Date(contract.endDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-'}
+              </span>
+            </div>
+            <div className="flex flex-col gap-1">
+              <span className="text-[10px] font-semibold tracking-wider text-slate-400 dark:text-slate-500 uppercase">{tReturn.service}</span>
+              <span className="text-[12px] font-semibold text-slate-800 dark:text-slate-200 line-clamp-2">{contract?.rentalType === 'SELF_DRIVE' ? tReturn.selfDrive : tReturn.withDriver}</span>
             </div>
           </div>
-          <div className={cn("px-2.5 py-0.5 rounded text-[11px] font-semibold", isCompleted ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400" : "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400")}>
-            {isCompleted ? 'Selesai' : 'Sebagian'}
-          </div>
-        </div>
+        </FormCard>
 
-        {/* Main Tabs */}
-        <div className="flex px-4 border-b border-border/40 bg-background/50 backdrop-blur-sm sticky top-0 z-10 pt-2">
-          <button
-            className={cn(
-              "px-4 py-3 text-sm font-semibold whitespace-nowrap border-b-2 transition-colors",
-              mainTab === 'detail' ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted"
-            )}
-            onClick={() => setMainTab('detail')}
-          >
-            Detail Pengembalian
-          </button>
-          <button
-            className={cn(
-              "px-4 py-3 text-sm font-semibold whitespace-nowrap border-b-2 transition-colors",
-              mainTab === 'payment' ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted"
-            )}
-            onClick={() => setMainTab('payment')}
-          >
-            Pembayaran
-          </button>
-        </div>
-
-        {mainTab === 'detail' ? (
-          <div className="p-4 flex flex-col gap-4">
-
-          {/* INFORMASI KONTRAK */}
-          <div className="rounded-2xl border border-border/60 bg-background overflow-hidden">
-            <div className="px-3 py-2.5 flex items-center gap-2 border-b border-border/40 bg-neutral-50/50 dark:bg-neutral-900/30">
-              <FileText className="w-3 h-3 text-muted-foreground" />
-              <h3 className="text-[10px] font-bold text-foreground uppercase tracking-wider">Informasi Kontrak</h3>
-            </div>
-            <div className="p-4 grid grid-cols-2 gap-y-4 gap-x-4">
-              <InfoItem label="Nomor Kontrak" value={contract?.contractNumber || c.contractId} />
-              <InfoItem label="Pelanggan" value={customer?.name || '-'} />
-              <InfoItem label="Periode Sewa" value={contract ? `${formatDate(contract.startDate)} - ${formatDate(contract.endDate)}` : '-'} />
-              <InfoItem label="Layanan" value={contract ? (contract.rentalType === 'SELF_DRIVE' ? 'Lepas Kunci' : 'Dgn Sopir') : '-'} />
-            </div>
-          </div>
-
-          {/* DETAIL KENDARAAN (TABS) */}
-          <div className="rounded-2xl border border-border/60 bg-background overflow-hidden">
-
+        {/* DETAIL KENDARAAN (TABS) */}
+        <FormCard>
+          <div className="space-y-3">
             {/* TABS */}
             {c.items.length > 1 && (
-              <div className="shrink-0 bg-background border-b border-border/40">
-                <div className="flex items-center overflow-x-auto hide-scrollbar px-2">
+              <div className="mb-5">
+                <div className="flex items-center gap-2 overflow-x-auto hide-scrollbar p-1.5 bg-slate-100/70 dark:bg-slate-800/40 rounded-xl border border-slate-200/60 dark:border-slate-700/50">
                   {c.items.map((item: any) => {
                     const id = item.id;
                     const isSelected = activeTab === id;
@@ -161,12 +191,16 @@ export function ReturnView({
                         type="button"
                         onClick={() => setActiveTab(id)}
                         className={cn(
-                          "px-2.5 h-[30px] text-[10px] font-semibold border-b-[1.5px] transition-colors focus:outline-none flex items-center gap-1.5 pt-[2px] whitespace-nowrap",
-                          isSelected ? 'border-b-danger text-danger' : 'border-b-transparent text-muted-foreground hover:text-foreground'
+                          "px-3.5 py-1.5 text-[12px] font-semibold rounded-lg transition-all flex items-center gap-2 whitespace-nowrap shrink-0 focus:outline-none",
+                          isSelected
+                            ? 'bg-white dark:bg-neutral-900 shadow-sm border border-slate-200/80 dark:border-slate-600 text-primary'
+                            : 'border border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 hover:bg-white/60 dark:hover:bg-neutral-800/60'
                         )}
                       >
-                        <Car className={cn("h-3 w-3", isSelected ? "text-danger" : "opacity-70")} />
-                        {cv?.licensePlate || item.vehicleId}
+                        <CheckCircle className="w-3.5 h-3.5 text-primary shrink-0" />
+                        <span className={isSelected ? "text-primary" : ""}>
+                          {cv?.licensePlate || item.vehicleId}
+                        </span>
                       </button>
                     );
                   })}
@@ -178,135 +212,259 @@ export function ReturnView({
             {activeTab && (() => {
               const item = c.items.find((i: any) => i.id === activeTab);
               if (!item) return null;
-              const cv = item.vehicleSnapshot;
               const eq = item.returnCondition?.equipmentChecklist || {};
+              const cv = item.vehicleSnapshot;
 
               return (
-                <div className="p-4 flex flex-col gap-4 animate-in fade-in duration-300">
-                  <div className="flex items-center gap-2.5 pb-2.5 border-b border-border/40">
-                    <div className="w-9 h-9 rounded-full bg-danger/10 flex items-center justify-center">
-                      <Car className="w-4 h-4 text-danger" />
-                    </div>
-                    <div>
-                      <p className="font-bold text-[12px] text-foreground">{cv?.brand} {cv?.model}</p>
-                      <p className="text-[11px] font-semibold text-primary">{cv?.licensePlate}</p>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                    <InfoItem label="Tanggal & Jam" value={formatDateTime(item.returnDate)} />
-                    <InfoItem label="Petugas" value={item.returnCondition?.staffName || '-'} />
-                    <InfoItem label="Odometer Akhir" value={formatNumber(item.returnOdometer || 0) + " KM"} />
-                    <InfoItem label="Level BBM" value={item.returnCondition?.fuelLevel} />
-                    <InfoItem label="Kondisi" value={getConditionLabel(item.returnCondition?.vehicleCondition || '')} />
-                  </div>
-
-                  {item.returnCondition?.vehicleCondition !== 'GOOD' && (item.returnCondition?.notes || item.returnCondition?.damageNotes) && (
-                    <div className="bg-warning/10 border border-warning/20 p-2.5 rounded-lg">
-                      <InfoItem label="Detail Kerusakan" value={item.returnCondition?.damageNotes || item.returnCondition?.notes} valueClassName="text-warning-700 dark:text-warning" />
+                <div className="flex flex-col gap-5 animate-in fade-in duration-300 pt-2">
+                  
+                  {/* IDENTITAS KENDARAAN (Khusus saat 1 kendaraan) */}
+                  {c.items.length === 1 && (
+                    <div className="flex items-center gap-3 mb-1">
+                      <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700">
+                        <Car className="w-5 h-5 text-slate-500" />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-[14px] font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wide">{cv?.licensePlate || item.vehicleId}</span>
+                        <span className="text-[11px] font-semibold text-slate-500">{cv?.brand} {cv?.model}</span>
+                      </div>
                     </div>
                   )}
 
-                  <div className="pt-2.5 border-t border-border/40">
-                    <span className="text-[9px] font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-2.5 block">Kelengkapan</span>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-y-1.5 gap-x-2">
-                      {[
-                        { label: 'STNK', key: 'stnk' },
-                        { label: 'Ban Cadangan', key: 'spareTire' },
-                        { label: 'Dongkrak', key: 'jack' },
-                        { label: 'Toolkit', key: 'toolkit' },
-                        { label: 'Segitiga Pengaman', key: 'triangle' },
-                      ].map((eqItem) => (
-                        <div key={eqItem.key} className="flex items-center gap-1.5 text-[11px]">
-                          {eq[eqItem.key as keyof typeof eq] ? (
-                            <span className="text-success font-bold text-[10px]">✓</span>
-                          ) : (
-                            <span className="text-neutral-400 text-[10px]">○</span>
-                          )}
-                          <span className={eq[eqItem.key as keyof typeof eq] ? 'text-foreground font-medium' : 'text-muted-foreground'}>
-                            {eqItem.label}
+                  {/* SUMMARY DURASI & TOTAL KM (GLOBAL) */}
+                  <div className="grid grid-cols-2 gap-4 bg-slate-50/50 dark:bg-slate-800/10 border border-slate-200 dark:border-slate-700 rounded-xl p-3 mb-2">
+                    <div className="flex items-center gap-3 px-2 border-r border-slate-200 dark:border-slate-700">
+                      <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center shrink-0">
+                        <Clock className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">{tReturn.duration}</span>
+                        <span className="text-[13px] font-bold text-slate-800 dark:text-slate-200">{getDuration(item.handoverDate, item.returnDate)}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 px-2">
+                      <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center shrink-0">
+                        <Route className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">{tReturn.distance}</span>
+                        <span className="text-[13px] font-bold text-slate-800 dark:text-slate-200">{getDistance(item.handoverOdometer, item.returnOdometer)}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* HEADER ROW */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-4 border-b border-slate-200/60 dark:border-slate-700/50 pb-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                        <LogOut className="w-3.5 h-3.5 text-slate-500 ml-0.5" />
+                      </div>
+                      <h4 className="text-[13px] font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">{tReturn.handoverData}</h4>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded bg-primary/10 flex items-center justify-center">
+                        <LogIn className="w-3.5 h-3.5 text-primary mr-0.5" />
+                      </div>
+                      <h4 className="text-[13px] font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">{tReturn.returnData}</h4>
+                    </div>
+                  </div>
+
+                  {/* ROW 1: WAKTU & LOKASI */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-4">
+                    {/* Kiri */}
+                    <div className="flex flex-col gap-4 bg-slate-50/50 dark:bg-slate-800/10 rounded-xl border border-slate-200 dark:border-slate-700 p-4 h-full">
+                      <div className="flex flex-col gap-1">
+                        <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Waktu Serah Terima</span>
+                        <span className="text-[13px] font-semibold">{item.handoverDate ? formatDateTime(item.handoverDate) : '-'}</span>
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Lokasi Serah Terima</span>
+                        <span className="text-[13px] font-semibold">{item.handoverLocation?.address || '-'}</span>
+                        {item.handoverLocation?.latitude && (
+                          <a
+                            href={`https://www.google.com/maps/search/?api=1&query=${item.handoverLocation.latitude},${item.handoverLocation.longitude}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-mono hover:text-blue-600 dark:hover:text-blue-400 hover:underline transition-colors w-fit"
+                          >
+                            <MapPin className="w-3 h-3" />
+                            {item.handoverLocation.latitude}, {item.handoverLocation.longitude}
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                    {/* Kanan */}
+                    <div className="flex flex-col gap-4 bg-slate-50/50 dark:bg-slate-800/10 rounded-xl border border-slate-200 dark:border-slate-700 p-4 h-full">
+                      <div className="flex flex-col gap-1">
+                        <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Waktu Pengembalian</span>
+                        <span className="text-[13px] font-semibold">{item.returnDate ? formatDateTime(item.returnDate) : '-'}</span>
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Lokasi Pengembalian</span>
+                        <span className="text-[13px] font-semibold">{item.returnLocation?.address || '-'}</span>
+                        {item.returnLocation?.latitude && (
+                          <a
+                            href={`https://www.google.com/maps/search/?api=1&query=${item.returnLocation.latitude},${item.returnLocation.longitude}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-mono hover:text-blue-600 dark:hover:text-blue-400 hover:underline transition-colors w-fit"
+                          >
+                            <MapPin className="w-3 h-3" />
+                            {item.returnLocation.latitude}, {item.returnLocation.longitude}
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* ROW 2: ODOMETER, BBM, KONDISI */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-4">
+                    {/* Kiri */}
+                    <div className="flex flex-col gap-4 bg-slate-50/50 dark:bg-slate-800/10 rounded-xl border border-slate-200 dark:border-slate-700 p-4 h-full">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="flex flex-col gap-1">
+                          <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">{tReturn.startOdometer}</span>
+                          <span className="text-[13px] font-semibold">{item.handoverOdometer ? `${formatNumber(item.handoverOdometer)} km` : '-'}</span>
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">{tReturn.startFuel}</span>
+                          <span className="text-[13px] font-semibold">
+                            {({ EMPTY: 'Kosong', QUARTER: '1/4', HALF: '1/2', THREE_QUARTER: '3/4', FULL: 'Penuh' } as any)[item.handoverCondition?.fuelLevel || ''] || '-'}
                           </span>
                         </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* LOKASI KHUSUS KENDARAAN INI */}
-                  <div className="pt-2.5 border-t border-border/40">
-                    <span className="text-[9px] font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-2.5 block flex items-center gap-1.5"><MapPin className="w-3 h-3" /> Lokasi Pengembalian</span>
-                    <InfoItem label="Alamat" value={item.returnLocation?.address || '-'} />
-                    <div className="grid grid-cols-2 gap-2.5 mt-2">
-                      <InfoItem label="Latitude" value={<span className="font-mono text-[10px]">{item.returnLocation?.latitude || '-'}</span>} />
-                      <InfoItem label="Longitude" value={<span className="font-mono text-[10px]">{item.returnLocation?.longitude || '-'}</span>} />
-                    </div>
-                    {item.returnLocation?.latitude && item.returnLocation?.longitude ? (
-                      <a 
-                        href={`https://maps.google.com/?q=${item.returnLocation?.latitude},${item.returnLocation?.longitude}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="block h-24 bg-neutral-100 dark:bg-neutral-900 border border-border rounded-lg overflow-hidden mt-2 relative group hover:opacity-90 transition-opacity cursor-pointer"
-                        title="Buka di Google Maps"
-                      >
-                        <iframe
-                          title="Mini Map"
-                          width="100%"
-                          height="100%"
-                          className="border-0 pointer-events-none"
-                          src={"https://www.openstreetmap.org/export/embed.html?bbox=" + (item.returnLocation?.longitude - 0.005) + "," + (item.returnLocation?.latitude - 0.005) + "," + (item.returnLocation?.longitude + 0.005) + "," + (item.returnLocation?.latitude + 0.005) + "&layer=mapnik&marker=" + item.returnLocation?.latitude + "," + item.returnLocation?.longitude}
-                        />
-                      </a>
-                    ) : (
-                      <div className="h-20 bg-neutral-100 dark:bg-neutral-900 border border-border rounded-lg flex flex-col items-center justify-center text-muted-foreground gap-1 mt-2">
-                        <Navigation className="w-4 h-4" />
-                        <span className="text-[10px] uppercase tracking-wider font-semibold">Lokasi Tidak Tersedia</span>
                       </div>
-                    )}
+                      <div className="flex flex-col gap-1">
+                        <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">{tReturn.startCondition}</span>
+                        <span className={cn(
+                          "text-[13px] font-semibold",
+                          item.handoverCondition?.vehicleCondition === 'GOOD' ? 'text-emerald-600 dark:text-emerald-400' : 'text-warning'
+                        )}>
+                          {({ GOOD: 'Baik', MINOR_DAMAGE: 'Rusak Ringan', NEEDS_REPAIR: 'Rusak Berat' } as any)[item.handoverCondition?.vehicleCondition || ''] || '-'}
+                        </span>
+                      </div>
+                    </div>
+                    {/* Kanan */}
+                    <div className="flex flex-col gap-4 bg-slate-50/50 dark:bg-slate-800/10 rounded-xl border border-slate-200 dark:border-slate-700 p-4 h-full">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="flex flex-col gap-1">
+                          <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">{tReturn.endOdometer}</span>
+                          <span className="text-[13px] font-semibold">{item.returnOdometer ? `${formatNumber(item.returnOdometer)} km` : '-'}</span>
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">{tReturn.endFuel}</span>
+                          <span className="text-[13px] font-semibold">
+                            {({ EMPTY: 'Kosong', QUARTER: '1/4', HALF: '1/2', THREE_QUARTER: '3/4', FULL: 'Penuh' } as any)[item.returnCondition?.fuelLevel || ''] || '-'}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">{tReturn.endCondition}</span>
+                        <span className={cn(
+                          "text-[13px] font-semibold",
+                          item.returnCondition?.vehicleCondition === 'GOOD' ? 'text-emerald-600 dark:text-emerald-400' : 'text-warning'
+                        )}>
+                          {({ GOOD: 'Baik', MINOR_DAMAGE: 'Rusak Ringan', NEEDS_REPAIR: 'Rusak Berat' } as any)[item.returnCondition?.vehicleCondition || ''] || '-'}
+                        </span>
+                      </div>
+                    </div>
                   </div>
 
+                  {/* ROW 3: CATATAN KERUSAKAN (Hanya muncul jika ada) */}
+                  {(item.handoverCondition?.notes || item.returnCondition?.notes || item.returnCondition?.damageNotes) && (
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-4 items-start">
+                      {/* Kiri */}
+                      {item.handoverCondition?.notes ? (
+                        <div className="bg-warning/10 border border-warning/20 p-4 rounded-xl h-full">
+                          <span className="text-[11px] font-semibold text-warning uppercase tracking-wider mb-1 block">{tReturn.startNotes}</span>
+                          <span className="text-[13px] font-medium text-warning-foreground">{item.handoverCondition.notes}</span>
+                        </div>
+                      ) : <div />}
+                      
+                      {/* Kanan */}
+                      {(item.returnCondition?.notes || item.returnCondition?.damageNotes) ? (
+                        <div className="bg-warning/10 border border-warning/20 p-4 rounded-xl h-full">
+                          <span className="text-[11px] font-semibold text-warning uppercase tracking-wider mb-1 block">{tReturn.endNotes}</span>
+                          <span className="text-[13px] font-medium text-warning-foreground">{item.returnCondition.damageNotes || item.returnCondition.notes}</span>
+                        </div>
+                      ) : <div />}
+                    </div>
+                  )}
+
+                  {/* ROW 4: KELENGKAPAN KENDARAAN */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-4">
+                    {/* Kiri */}
+                    <div className="bg-slate-50/50 dark:bg-slate-800/10 rounded-xl border border-slate-200 dark:border-slate-700 p-4 h-full">
+                      <span className="text-[11px] uppercase font-semibold text-slate-500 dark:text-slate-400 mb-3 block tracking-wide">{tReturn.startEquipment}</span>
+                      <div className="grid grid-cols-2 gap-3">
+                        {[
+                          { key: 'stnkOriginal', label: 'STNK Original' },
+                          { key: 'spareTire', label: 'Ban Cadangan' },
+                          { key: 'jackAndTools', label: 'Dongkrak & Toolkit' },
+                          { key: 'firstAidKit', label: 'P3K' }
+                        ].map(({ key, label }) => {
+                          const isChecked = (item.handoverCondition?.equipmentChecklist as any)?.[key] || false;
+                          return (
+                            <div key={key} className="flex items-center gap-2 h-8 px-2.5 rounded-md border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-neutral-900/50 opacity-80 cursor-default">
+                              {isChecked ? (
+                                <CheckCircle className="w-3.5 h-3.5 text-success shrink-0" />
+                              ) : (
+                                <div className="w-2 h-2 rounded-full shrink-0 bg-slate-300 dark:bg-slate-600 ml-0.5" />
+                              )}
+                              <span className="text-[12px] font-medium text-slate-700 dark:text-slate-300 ml-1">{label}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                    {/* Kanan */}
+                    <div className="bg-slate-50/50 dark:bg-slate-800/10 rounded-xl border border-slate-200 dark:border-slate-700 p-4 h-full">
+                      <span className="text-[11px] uppercase font-semibold text-slate-500 dark:text-slate-400 mb-3 block tracking-wide">{tReturn.endEquipment}</span>
+                      <div className="grid grid-cols-2 gap-3">
+                        {[
+                          { key: 'stnk', label: 'STNK Original' },
+                          { key: 'spareTire', label: 'Ban Cadangan' },
+                          { key: 'jack', label: 'Dongkrak' },
+                          { key: 'toolkit', label: 'Toolkit' },
+                          { key: 'triangle', label: 'Segitiga Pengaman' }
+                        ].map(({ key, label }) => {
+                          const isChecked = eq[key] || false;
+                          return (
+                            <div key={key} className="flex items-center gap-2 h-8 px-2.5 rounded-md border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-neutral-900/50 opacity-80 cursor-default">
+                              {isChecked ? (
+                                <CheckCircle className="w-3.5 h-3.5 text-success shrink-0" />
+                              ) : (
+                                <div className="w-2 h-2 rounded-full shrink-0 bg-slate-300 dark:bg-slate-600 ml-0.5" />
+                              )}
+                              <span className="text-[12px] font-medium text-slate-700 dark:text-slate-300 ml-1">{label}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               );
             })()}
-          </div>
 
-          {/* CATATAN UMUM */}
-          <div className="rounded-2xl border border-border/60 bg-background overflow-hidden">
-            <div className="px-3 py-2.5 flex items-center gap-2 border-b border-border/40 bg-neutral-50/50 dark:bg-neutral-900/30">
-              <StickyNote className="w-3 h-3 text-muted-foreground" />
-              <h3 className="text-[10px] font-bold text-foreground uppercase tracking-wider">Catatan Tambahan</h3>
-            </div>
-            <div className="p-4 text-[11px] text-muted-foreground">
-              {c.items.some((i: any) => i.returnCondition?.notes && i.returnCondition?.vehicleCondition === 'GOOD') ? (
-                <ul className="list-disc list-inside space-y-1">
-                  {c.items.filter((i: any) => i.returnCondition?.notes && i.returnCondition?.vehicleCondition === 'GOOD').map((item: any, idx: number) => (
-                    <li key={idx}><span className="font-semibold text-foreground mr-1">{(item as any).vehicleSnapshot?.licensePlate}:</span> {item.returnCondition?.notes}</li>
-                  ))}
-                </ul>
-              ) : (
-                <span className="italic">Tidak ada catatan khusus.</span>
-              )}
-            </div>
-          </div>
-
-        </div>
-        ) : (
-          <div className="flex flex-col h-full">
-            {totalAdditionalFees > 0 && (
-              <div className="mx-4 mt-4 p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 rounded-xl flex justify-between items-center">
-                <span className="text-[11px] font-medium text-amber-800 dark:text-amber-400">Total Biaya Tambahan (Denda/Kerusakan/Dll)</span>
-                <span className="text-[13px] font-bold text-amber-900 dark:text-amber-300">+ {formatCurrency(totalAdditionalFees)}</span>
+            {/* CATATAN UMUM */}
+            <div className="p-5 border-t border-slate-200/60 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-900/30">
+              <h3 className="text-[11px] font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider mb-3 flex items-center gap-2"><StickyNote className="w-3.5 h-3.5 text-slate-400" /> Catatan Tambahan</h3>
+              <div className="text-[12px] text-slate-600 dark:text-slate-400">
+                {c.items.some((i: any) => i.returnCondition?.notes) ? (
+                  <ul className="list-disc list-inside space-y-1">
+                    {c.items.filter((i: any) => i.returnCondition?.notes).map((item: any, idx: number) => (
+                      <li key={idx}><span className="font-semibold text-slate-800 dark:text-slate-200 mr-1">{(item as any).vehicleSnapshot?.licensePlate}:</span> {item.returnCondition?.notes}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <span className="italic">Tidak ada catatan khusus.</span>
+                )}
               </div>
-            )}
-            <PaymentsFeature 
-              bookingId={c.id}
-              customerId={customer?.id || ''}
-              totalAmount={grandTotalAmount}
-              deposit={contract?.deposit || 0}
-              remainingAmount={(contract?.remainingAmount || 0) + totalAdditionalFees}
-              defaultStage="RETURN"
-            />
+            </div>
           </div>
-        )}
+        </FormCard>
+        </div>
       </div>
-    </DetailShell>
+    </FormShell>
   );
 }
