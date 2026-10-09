@@ -75,7 +75,7 @@ export function PlaybackMapLayers({ selectedGeofenceIds, selectedRouteIds }: Pla
         
         if (rt.plannedPath) {
           // If we have a planned path from OSRM/Google Maps in DB, use it!
-          geometry = rt.plannedPath.geometry || rt.plannedPath; 
+          geometry = (rt.plannedPath as any).geometry || rt.plannedPath; 
           isPlanned = true;
         } else {
           const points = [];
