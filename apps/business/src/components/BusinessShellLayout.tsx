@@ -224,20 +224,20 @@ function buildNavigation(locale: Locale, userRole?: string, userModules?: string
   // Map frontend NavGroup IDs to backend module codes
   const moduleMap: Record<string, string> = {
     main: 'main',
-    master: 'master-data',
+    master: 'master',
     access: 'access',
     asset: 'asset',
     safety: 'safety',
     analysis: 'analysis',
-    analytics: 'analysis', // Fallback for typo in some cases
+    analytics: 'analysis',
     administration: 'admin',
-    rental: 'industry',
-    transport: 'industry',
-    logistics: 'industry',
-    sales: 'industry',
-    fieldService: 'industry',
-    patrol: 'industry',
-    projectSite: 'industry'
+    rental: 'rental',
+    transport: 'transport',
+    logistics: 'logistics',
+    sales: 'sales',
+    fieldService: 'field_service',
+    patrol: 'patrol',
+    projectSite: 'project_site'
   };
 
   const assignedModules = userModules || [];
