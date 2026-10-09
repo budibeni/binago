@@ -39,6 +39,7 @@ export function RouteEditorView({
   locale = 'id'
 }: RouteEditorViewProps) {
   const t = getRouteTranslation(locale).editor;
+  const tList = getRouteTranslation(locale).list;
   
   const [name, setName] = useState(initialData?.name || '');
   const [description, setDescription] = useState(initialData?.description || '');
@@ -497,7 +498,10 @@ export function RouteEditorView({
                 label="Grup Rute (Opsional)"
                 value={groupId}
                 onChange={setGroupId}
-                options={groups.map(g => ({ value: g.id, label: g.name }))}
+                options={[
+                  { value: '', label: tList.unassignedGroup },
+                  ...groups.map(g => ({ value: g.id, label: g.name }))
+                ]}
                 placeholder="Pilih Grup Rute"
               />
             </div>
