@@ -49,7 +49,7 @@ export function useRoutes(filters?: { search?: string; status?: string; groupId?
           groupId: r.group_id ? String(r.group_id) : undefined,
           plannedDistance: r.planned_distance,
           estimatedDuration: r.estimated_duration,
-          plannedPath: typeof r.planned_path === 'string' ? JSON.parse(r.planned_path) : r.planned_path,
+          plannedPath: (typeof r.planned_path_geojson === 'string' ? JSON.parse(r.planned_path_geojson) : r.planned_path_geojson) || (typeof r.planned_path === 'string' ? JSON.parse(r.planned_path) : r.planned_path),
           origin: origin as any,
           destination: destination as any,
           stops,
