@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { api } from '@adatrack/utils';
-import { Button, toast } from '@adatrack/ui';
+import { Button, toast, InputString, InputTextarea, Checkbox } from '@adatrack/ui';
 import { Role } from '../hooks/useRoles';
 
 // Available permissions in Adatrack
@@ -36,7 +36,6 @@ export function RoleForm({ role, onSuccess, onCancel }: RoleFormProps) {
 
   const isEditing = !!role;
 
-  // If editing, extract the actual code without CUSTOM_ prefix if we want, but it's read-only anyway
   const displayCode = isEditing ? formData.code : formData.code;
 
   const togglePermission = (permId: string) => {
@@ -76,7 +75,6 @@ export function RoleForm({ role, onSuccess, onCancel }: RoleFormProps) {
     }
   };
 
-  // Group permissions by category
   const groupedPermissions = AVAILABLE_PERMISSIONS.reduce((acc, curr) => {
     if (!acc[curr.group]) acc[curr.group] = [];
     acc[curr.group].push(curr);
@@ -84,80 +82,72 @@ export function RoleForm({ role, onSuccess, onCancel }: RoleFormProps) {
   }, {} as Record<string, typeof AVAILABLE_PERMISSIONS>);
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 py-4 w-[500px] max-w-full">
-      <div className="space-y-4">
-        {!isEditing && (
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium">Kode Internal <span className="text-red-500">*</span></label>
-            <input
-              required
-              disabled={isEditing}
-              type="text"
-              className="w-full px-3 py-2 border rounded-md text-sm uppercase disabled:bg-neutral-100 disabled:text-neutral-500"
-              placeholder="Contoh: KEPALA_GUDANG"
-              value={displayCode}
-              onChange={e => setFormData({ ...formData, code: e.target.value })}
-            />
-            <p className="text-xs text-neutral-500">Kode unik yang digunakan oleh sistem (tanpa spasi). Sistem otomatis menambahkan awalan CUSTOM_.</p>
-          </div>
-        )}
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4 py-4 w-full max-w-md sm:w-[500px]">
+      
+      {!isEditing && (
+        <InputString
+          id="code"
+          label="Kode Internal"
+          required
+          disabled={isEditing}
+          placeholder="Cth: KEPALA_GUDANG"
+          value={displayCode}
+          onChange={val => setFormData({ ...formData, code: val })}
+          helpText="Kode unik yang digunakan oleh sistem (tanpa spasi). Sistem otomatis menambahkan awalan CUSTOM_."
+        />
+      )}
 
-        <div className="space-y-1.5">
-          <label className="text-sm font-medium">Nama Tampilan <span className="text-red-500">*</span></label>
-          <input
-            required
-            type="text"
-            className="w-full px-3 py-2 border rounded-md text-sm"
-            placeholder="Contoh: Kepala Gudang Pusat"
-            value={formData.name}
-            onChange={e => setFormData({ ...formData, name: e.target.value })}
-          />
-        </div>
+      <InputString
+        id="name"
+        label="Nama Tampilan"
+        required
+        placeholder="Contoh: Kepala Gudang Pusat"
+        value={formData.name}
+        onChange={val => setFormData({ ...formData, name: val })}
+      />
 
-        <div className="space-y-1.5">
-          <label className="text-sm font-medium">Deskripsi Singkat</label>
-          <textarea
-            className="w-full px-3 py-2 border rounded-md text-sm"
-            placeholder="Tugas dan wewenang role ini..."
-            value={formData.description}
-            onChange={e => setFormData({ ...formData, description: e.target.value })}
-            rows={2}
-          />
-        </div>
+      <InputTextarea
+        id="description"
+        label="Deskripsi Singkat"
+        placeholder="Tugas dan wewenang role ini..."
+        value={formData.description}
+        onChange={val => setFormData({ ...formData, description: val })}
+        rows={2}
+      />
 
-        <div className="space-y-2 mt-4 pt-4 border-t">
-          <label className="text-sm font-semibold flex items-center justify-between">
-            Daftar Hak Akses (Permissions)
-            <span className="text-xs font-normal bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
-              {formData.permissions.length} dipilih
-            </span>
+      <div className="flex flex-col gap-3 mt-2 border-t pt-4 border-border">
+        <div className="flex items-center justify-between">
+          <label className="text-sm font-medium text-foreground">
+            Daftar Hak Akses
           </label>
-          <div className="h-[250px] overflow-y-auto pr-2 space-y-4 border rounded-md p-3 bg-neutral-50 dark:bg-neutral-900/50">
-            {Object.entries(groupedPermissions).map(([group, perms]) => (
-              <div key={group} className="space-y-2">
-                <h4 className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">{group}</h4>
-                <div className="space-y-1.5 ml-1">
-                  {perms.map(perm => (
-                    <label key={perm.id} className="flex items-start gap-2 cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800 p-1 rounded transition-colors">
-                      <input
-                        type="checkbox"
-                        className="mt-1"
-                        checked={formData.permissions.includes(perm.id)}
-                        onChange={() => togglePermission(perm.id)}
-                      />
-                      <span className="text-sm text-neutral-700 dark:text-neutral-300 select-none">
-                        {perm.label}
-                      </span>
-                    </label>
-                  ))}
-                </div>
+          <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">
+            {formData.permissions.length} dipilih
+          </span>
+        </div>
+        <div className="h-[250px] overflow-y-auto pr-2 flex flex-col gap-4 border border-border rounded-md p-4 bg-muted/30">
+          {Object.entries(groupedPermissions).map(([group, perms]) => (
+            <div key={group} className="flex flex-col gap-2">
+              <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{group}</h4>
+              <div className="flex flex-col gap-2 ml-1">
+                {perms.map(perm => (
+                  <label key={perm.id} className="flex items-start gap-2.5 cursor-pointer hover:bg-muted/50 p-1.5 -ml-1.5 rounded transition-colors">
+                    <Checkbox
+                      checked={formData.permissions.includes(perm.id)}
+                      onCheckedChange={() => togglePermission(perm.id)}
+                      className="mt-0.5"
+                    />
+                    <span className="text-sm text-foreground select-none leading-tight mt-0.5">
+                      {perm.label}
+                    </span>
+                  </label>
+                ))}
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
 
-      <div className="flex justify-end gap-3 pt-4 border-t mt-6">
+      <div className="flex justify-end gap-3 pt-4 border-t border-border mt-4">
         <Button type="button" variant="outline" onClick={onCancel}>Batal</Button>
         <Button type="submit" disabled={loading}>
           {loading ? 'Menyimpan...' : 'Simpan Role'}
