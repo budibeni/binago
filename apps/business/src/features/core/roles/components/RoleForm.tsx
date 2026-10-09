@@ -11,6 +11,8 @@ const AVAILABLE_PERMISSIONS = [
   { id: 'vehicles:write', labelKey: 'vehicles:write', groupKey: 'Kendaraan' },
   { id: 'routes:read', labelKey: 'routes:read', groupKey: 'Rute & Penugasan' },
   { id: 'routes:write', labelKey: 'routes:write', groupKey: 'Rute & Penugasan' },
+  { id: 'assignments:read', labelKey: 'assignments:read', groupKey: 'Rute & Penugasan' },
+  { id: 'assignments:write', labelKey: 'assignments:write', groupKey: 'Rute & Penugasan' },
   { id: 'geofences:read', labelKey: 'geofences:read', groupKey: 'Geofence' },
   { id: 'geofences:write', labelKey: 'geofences:write', groupKey: 'Geofence' },
   { id: 'alerts:read', labelKey: 'alerts:read', groupKey: 'Peringatan' },
