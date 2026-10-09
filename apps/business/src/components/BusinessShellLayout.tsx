@@ -249,7 +249,7 @@ function buildNavigation(locale: Locale, userRole?: string, userModules?: string
     if (alwaysOpen.includes(group.id)) return true;
     
     // 2. Platform Admins see everything
-    if (role === 'superadmin' || role === 'admin') return true;
+    if (role === 'superadmin') return true; // only platform superadmin bypasses module checks
     
     // 3. Database assigned modules
     const backendModuleCode = moduleMap[group.id];

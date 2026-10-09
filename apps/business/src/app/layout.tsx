@@ -36,6 +36,7 @@ export default function RootLayout({
         name: parsed.name || parsed.email || 'User',
         email: parsed.email || '',
         role: parsed.role || 'User',
+        modules: parsed.modules || [],
         initials: (parsed.name || parsed.email || 'U').substring(0, 2).toUpperCase(),
       };
     } catch (e) {
