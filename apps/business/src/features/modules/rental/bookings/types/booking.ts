@@ -43,10 +43,23 @@ export interface BookingItem {
   vehicleSnapshot?: VehicleSnapshot; // Historical data
 
   // Operational fields (Handover & Return)
+  itemStatus?: 'PENDING' | 'IN_USE' | 'RETURNED' | 'CANCELLED';
+  handoverNumber?: string;
   handoverDate?: string;
   handoverBy?: string; // UUID of admin
   handoverOdometer?: number;
-  handoverCondition?: Record<string, any>;
+  handoverLocation?: {
+    latitude: number;
+    longitude: number;
+    address?: string;
+  };
+  handoverCondition?: {
+    fuelLevel: string;
+    vehicleCondition: string;
+    equipmentChecklist: Record<string, boolean>;
+    notes?: string;
+    staffName?: string;
+  };
   returnDate?: string;
   returnBy?: string; // UUID of admin
   returnOdometer?: number;

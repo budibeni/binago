@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useEffect, useState, useMemo } from 'react';
-import { Key, FileText, ArrowRight, MapPin, Search, Check } from 'lucide-react';
+import { Key, FileText, ArrowRight, MapPin, Search, Check, Printer } from 'lucide-react';
 import { getHandoverTranslation } from './i18n';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
 import { trackingNavigationService } from '@/features/core/tracking/services/trackingNavigationService';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { handoverService } from '@/data/modules/rental/services/handoverService';
 import { buildRentalVehicleContext } from '@/data/modules/rental/services/vehicleContextBuilder';
 import type { RentalHandover } from './types/handover';
@@ -18,6 +18,7 @@ import { cn } from '@adatrack/utils';
 
 export function HandoverFeature() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const locale = useBusinessLocale();
   const labels = getHandoverTranslation(locale);
   const [handovers, setHandovers] = useState<RentalHandover[]>([]);
@@ -33,8 +34,8 @@ export function HandoverFeature() {
   const [isDetailOpen, setIsDetailOpen] = useState(false);
 
   // Create Handover Drawer State
-  const [selectedContractId, setSelectedContractId] = useState<string | null>(null);
-  const [isHandoverOpen, setIsHandoverOpen] = useState(false);
+  const [selectedContractId, setSelectedContractId] = useState<string | null>(searchParams?.get('contractId') || null);
+  const [isHandoverOpen, setIsHandoverOpen] = useState(searchParams?.get('create') === 'true');
 
   useEffect(() => {
     loadData();
@@ -47,7 +48,7 @@ export function HandoverFeature() {
         handoverService.getHandovers()
       ]);
       // Sort by newest first
-      const sorted = [...data].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      const sorted = [...data].sort((a, b) => new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime());
       setHandovers(sorted);
     } catch (error) {
       console.error('Failed to load data:', error);
@@ -108,9 +109,11 @@ export function HandoverFeature() {
   const groupedHandovers = useMemo(() => {
     const groups: Record<string, any> = {};
     filteredData.forEach(h => {
-      if (!groups[h.contractId]) {
-        groups[h.contractId] = {
-          id: h.contractId,
+      const groupId = h.handoverNumber || h.contractId;
+      if (!groups[groupId]) {
+        groups[groupId] = {
+          id: groupId,
+          handoverNumber: h.handoverNumber,
           contractId: h.contractId,
           contract: h.contract,
           customer: h.customer,
@@ -121,7 +124,7 @@ export function HandoverFeature() {
           items: []
         };
       }
-      groups[h.contractId].items.push(h);
+      groups[groupId].items.push(h);
     });
 
     return Object.values(groups).map(g => {
@@ -146,6 +149,77 @@ export function HandoverFeature() {
   const closeDetail = () => {
     setIsDetailOpen(false);
     setTimeout(() => setSelectedHandover(null), 300);
+  };
+
+  const handlePrint = (group: import('./components/HandoverTable').HandoverGroup) => {
+    // Buka tab baru untuk cetak dokumen Bukti Serah Terima
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+
+    const items = group.items || [];
+    const contract = group.contract;
+    const customer = group.customer;
+
+    const itemRows = items.map((item: any) => {
+      const cv = item.vehicle?.coreVehicle || item.vehicleSnapshot;
+      const plate = cv?.plateNumber || cv?.licensePlate || '-';
+      const brand = cv?.brand || '-';
+      const model = cv?.model || cv?.vehicleName || '-';
+      const fuelMap: Record<string, string> = { EMPTY: 'Kosong', QUARTER: '1/4', HALF: '1/2', THREE_QUARTER: '3/4', FULL: 'Penuh' };
+      const condMap: Record<string, string> = { GOOD: 'Baik', MINOR_DAMAGE: 'Kerusakan Ringan', NEEDS_REPAIR: 'Perlu Perbaikan' };
+      return `
+        <tr>
+          <td>${plate}</td>
+          <td>${brand} ${model}</td>
+          <td>${item.odometerStart?.toLocaleString('id-ID') || '-'} km</td>
+          <td>${fuelMap[item.fuelLevel] || item.fuelLevel || '-'}</td>
+          <td>${condMap[item.vehicleCondition] || item.vehicleCondition || '-'}</td>
+          <td>${item.notes || '-'}</td>
+        </tr>`;
+    }).join('');
+
+    const html = `<!DOCTYPE html><html lang="id"><head>
+      <meta charset="UTF-8"><title>Bukti Serah Terima ${group.handoverNumber || group.id}</title>
+      <style>
+        body { font-family: Arial, sans-serif; font-size: 12px; margin: 30px; color: #000; }
+        h1 { font-size: 16px; text-align: center; margin-bottom: 4px; }
+        .subtitle { text-align: center; font-size: 11px; color: #555; margin-bottom: 20px; }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 24px; margin-bottom: 20px; }
+        .info-row { display: flex; gap: 4px; }
+        .info-label { font-weight: bold; min-width: 120px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+        th { background: #f0f0f0; padding: 6px 8px; text-align: left; border: 1px solid #ccc; font-size: 11px; }
+        td { padding: 6px 8px; border: 1px solid #ddd; font-size: 11px; vertical-align: top; }
+        .signature { margin-top: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+        .sign-box { text-align: center; }
+        .sign-line { border-top: 1px solid #000; margin-top: 60px; padding-top: 4px; font-size: 11px; }
+        @media print { body { margin: 15px; } }
+      </style>
+    </head><body>
+      <h1>BUKTI SERAH TERIMA KENDARAAN</h1>
+      <p class="subtitle">No. ${group.handoverNumber || group.id}</p>
+      <div class="info-grid">
+        <div class="info-row"><span class="info-label">Tanggal:</span><span>${new Date(group.handoverAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })}</span></div>
+        <div class="info-row"><span class="info-label">No. Kontrak:</span><span>${contract?.contractNumber || group.contractId}</span></div>
+        <div class="info-row"><span class="info-label">Pelanggan:</span><span>${customer?.name || '-'}</span></div>
+        <div class="info-row"><span class="info-label">Petugas:</span><span>${items[0]?.staffName || '-'}</span></div>
+        <div class="info-row"><span class="info-label">Lokasi:</span><span>${group.handoverAddress || '-'}</span></div>
+        <div class="info-row"><span class="info-label">Jenis Layanan:</span><span>${contract?.rentalType === 'SELF_DRIVE' ? 'Lepas Kunci' : 'Dengan Pengemudi'}</span></div>
+      </div>
+      <table>
+        <thead><tr><th>Plat Nomor</th><th>Kendaraan</th><th>Odometer</th><th>BBM</th><th>Kondisi</th><th>Catatan</th></tr></thead>
+        <tbody>${itemRows}</tbody>
+      </table>
+      <div class="signature">
+        <div class="sign-box"><p>Diserahkan oleh,</p><div class="sign-line">Petugas / Admin</div></div>
+        <div class="sign-box"><p>Diterima oleh,</p><div class="sign-line">${customer?.name || 'Pelanggan'}</div></div>
+      </div>
+    </body></html>`;
+
+    printWindow.document.write(html);
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => printWindow.print(), 500);
   };
 
 
@@ -182,6 +256,7 @@ export function HandoverFeature() {
         onClose={closeDetail}
         handover={selectedHandover}
         labels={labels}
+        onPrint={handlePrint}
       />
 
       <HandoverCreateFeature

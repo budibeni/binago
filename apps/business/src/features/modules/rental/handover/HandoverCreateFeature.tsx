@@ -68,7 +68,7 @@ export function HandoverCreateFeature({ contractId, open, onOpenChange, onSucces
     loadData();
   }, [contractId, open]);
 
-  const handleSubmit = async (dataArray: Omit<RentalHandover, 'id' | 'createdAt' | 'updatedAt'>[]) => {
+  const handleSubmit = async (dataArray: (Omit<RentalHandover, 'id' | 'createdAt' | 'updatedAt' | 'handoverNumber'> & { handoverNumber?: string })[]) => {
     setIsSubmitting(true);
     try {
       for (const data of dataArray) {

@@ -63,8 +63,8 @@ Menyimpan data identitas pelanggan rental (Single Source of Truth untuk Booking)
 | `updated_by`| UUID | FK `users.id` | |
 | `updated_at`| TIMESTAMP | DEFAULT NOW() | Waktu saldo terakhir diperbarui |
 
-## 2. Kategori Tarif & Profil Armada
-Skema harga berjenjang dan pemetaan armada CORE ke operasional rental.
+## 2. Kategori Tarif & Profil Kendaraan
+Skema harga berjenjang dan pemetaan kendaraan CORE ke operasional rental.
 
 **Table: `rental_pricing_categories`**
 | Column | Type | Constraints | Description |
@@ -102,7 +102,7 @@ Skema harga berjenjang dan pemetaan armada CORE ke operasional rental.
 | `updated_at`| TIMESTAMP | DEFAULT NOW() | |
 
 ## 3. Transaksi Sewa (Booking & Kontrak)
-Pencatatan reservasi (*multi-armada*) dan dokumen legalnya.
+Pencatatan reservasi (*multi-kendaraan*) dan dokumen legalnya.
 
 **Table: `rental_bookings`**
 | Column | Type | Constraints | Description |
@@ -125,12 +125,13 @@ Pencatatan reservasi (*multi-armada*) dan dokumen legalnya.
 | `updated_by` | UUID | FK `users.id` | Admin yang terakhir mengubah |
 | `updated_at` | TIMESTAMP | DEFAULT NOW() | Waktu terakhir diubah |
 
-**Table: `rental_booking_items`** (Menampung armada di dalam Booking)
+**Table: `rental_booking_items`** (Menampung kendaraan di dalam Booking)
 | Column | Type | Constraints | Description |
 |---|---|---|---|
 | `id` | UUID | PRIMARY KEY | |
 | `booking_id` | UUID | FK `rental_bookings.id` | |
 | `vehicle_id` | UUID | FK `core_vehicles.id` | |
+| `item_status`| ENUM | NOT NULL | `PENDING`, `IN_USE`, `RETURNED`, `CANCELLED` (DEFAULT: `PENDING`) |
 | `rate_type` | ENUM | NOT NULL | `HOURLY`, `DAILY`, `PACKAGE` |
 | `package_id` | UUID | NULL | FK ke `packages` milik kategori kendaraan |
 | `package_name` | VARCHAR | NULL | Nama paket saat transaksi (snapshot) |
@@ -139,14 +140,18 @@ Pencatatan reservasi (*multi-armada*) dan dokumen legalnya.
 | `vehicle_snapshot` | JSONB | NOT NULL | Bekuan data kendaraan (plat, merek, model, kategori) |
 | `duration` | INTEGER | NOT NULL | Durasi (jam/hari) sesuai rate_type |
 | `subtotal` | DECIMAL | NOT NULL | Total harga (rate * durasi) untuk unit ini |
+| `handover_number` | VARCHAR | NULL | Nomor dokumen/BAST Serah Terima |
 | `handover_date` | TIMESTAMP | NULL | Tanggal serah terima unit |
 | `handover_by` | UUID | FK `users.id` | Admin/Petugas yang menyerahkan |
+| `handover_location`| JSONB | NULL | Detail lokasi (lat, lng, address) saat unit diserahkan |
 | `handover_odometer` | INTEGER | NULL | Jarak Tempuh Awal (saat Handover) |
-| `handover_condition` | JSONB | NULL | Log kondisi/bahan bakar saat diserahkan |
+| `handover_condition` | JSONB | NULL | Log BBM, kondisi, dan checklist kelengkapan saat diserahkan |
+| `return_number` | VARCHAR | NULL | Nomor dokumen/BAST Pengembalian |
 | `return_date` | TIMESTAMP | NULL | Tanggal pengembalian unit |
 | `return_by` | UUID | FK `users.id` | Admin/Petugas yang menerima kembali |
+| `return_location`| JSONB | NULL | Detail lokasi (lat, lng, address) saat unit dikembalikan |
 | `return_odometer` | INTEGER | NULL | Jarak Tempuh Akhir (saat Return) |
-| `return_condition` | JSONB | NULL | Log kondisi/bahan bakar saat dikembalikan |
+| `return_condition` | JSONB | NULL | Log BBM, kondisi, dan checklist kelengkapan saat dikembalikan |
 | `extra_charges` | DECIMAL | NULL | Denda (Jika ada, dihitung saat return) |
 
 ## 4. Global Pembayaran

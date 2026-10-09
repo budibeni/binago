@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { HandoverFeature } from '@/features/modules/rental/handover/HandoverFeature';
 
 export const metadata = {
@@ -5,5 +6,9 @@ export const metadata = {
 };
 
 export default function HandoversPage() {
-  return <HandoverFeature />;
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <HandoverFeature />
+    </Suspense>
+  );
 }

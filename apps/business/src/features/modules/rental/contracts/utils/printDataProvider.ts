@@ -38,9 +38,9 @@ export function getRentalContractPrintData(contract: RentalContract) {
   
   let customerIdentity = '-';
   if (cType === 'INDIVIDUAL' || cType === 'Individu') {
-    customerIdentity = contract.customer?.nik || snapshot.nik || '3201123456789012'; // fallback dummy
+    customerIdentity = (contract.customer as any)?.nik || snapshot.nik || '3201123456789012'; // fallback dummy
   } else if (cType === 'COMPANY' || cType === 'Perusahaan') {
-    customerIdentity = contract.customer?.npwp || snapshot.npwp || '01.234.567.8-901.000'; // fallback dummy
+    customerIdentity = (contract.customer as any)?.npwp || snapshot.npwp || '01.234.567.8-901.000'; // fallback dummy
   }
 
   const customer = {

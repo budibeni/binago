@@ -205,6 +205,10 @@ class BookingService {
   async updateBookingStatus(id: string, status: BookingStatus): Promise<Booking> {
     return bookingRepository.updateBookingStatus(id, status);
   }
+
+  async updateBookingItem(bookingId: string, itemId: string, updates: Partial<BookingItem>): Promise<Booking> {
+    return bookingRepository.updateBookingItem(bookingId, itemId, updates);
+  }
 }
 
 export const bookingService = new BookingService();

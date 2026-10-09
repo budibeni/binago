@@ -12,7 +12,7 @@ Direktori ini berisi riwayat task (baik yang sudah selesai maupun yang direncana
 | TASK-06 | Kontrak Rental | `/rental/contracts` | ✅ COMPLETED |
 | TASK-07 | Serah Terima (Handover) | `/rental/handovers` | ✅ COMPLETED |
 | TASK-08 | Pengembalian (Return) | `/rental/returns` | 🚧 PENDING |
-| TASK-09 | Monitoring Armada | `/rental/monitoring` | ✅ COMPLETED |
+| TASK-09 | Monitoring Kendaraan | `/rental/monitoring` | ✅ COMPLETED |
 | TASK-10 | Global Pembayaran | `/rental/payments` | ✅ COMPLETED |
 | TASK-11 | Produktivitas | `/rental/productivity` | ✅ COMPLETED |
 | TASK-12 | Integrasi Lintas Modul | (Semua) | 🚧 PENDING |

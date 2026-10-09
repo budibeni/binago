@@ -88,12 +88,6 @@ export function PaymentList({
       {/* Header */}
       <div className="flex items-center justify-between">
         <p className="text-xs font-semibold text-foreground">Riwayat Transaksi</p>
-        {!hideAddButton && (
-          <Button type="button" size="sm" onClick={onAdd} className="gap-1.5 h-7 text-[11px] px-2.5">
-            <Plus className="w-3 h-3" />
-            Tambah Pembayaran
-          </Button>
-        )}
       </div>
 
       {/* List */}

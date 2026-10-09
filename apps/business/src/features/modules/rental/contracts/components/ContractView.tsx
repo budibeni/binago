@@ -16,6 +16,7 @@ interface ContractViewProps {
   onConfirm?: (contract: RentalContract) => void;
   onCancel?: (contract: RentalContract) => void;
   onDelete?: (contract: RentalContract) => void;
+  onHandover?: (contract: RentalContract) => void;
   onOpenMap?: (vehicleIds: string[]) => void;
   layout?: 'drawer' | 'dialog' | 'fullscreen';
 }
@@ -43,6 +44,7 @@ export function ContractView({
   onConfirm,
   onCancel,
   onDelete,
+  onHandover,
   onOpenMap,
   layout = 'drawer',
 }: ContractViewProps) {
@@ -161,8 +163,21 @@ export function ContractView({
         </div>
 
         {/* Quick Actions */}
-        {contract.status === 'CONTRACTED' && (
+        {/* Quick Actions */}
+        {(contract.status === 'CONTRACTED' || contract.status === 'ACTIVE') && (
           <div className="px-4 py-2.5 bg-background flex gap-2 border-b border-border/40">
+            {onHandover && contract.status === 'CONTRACTED' && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="flex-1 h-8 text-[11px] font-semibold hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all"
+                onClick={() => onHandover(contract)}
+                leftIcon={<Package className="w-3.5 h-3.5" />}
+                title="Proses Serah Terima Kendaraan"
+              >
+                Serah Terima
+              </Button>
+            )}
             {onPrint && (
               <Button 
                 variant="outline" 

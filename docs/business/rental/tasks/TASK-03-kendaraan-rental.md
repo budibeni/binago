@@ -1,30 +1,30 @@
-# TASK-03 — HALAMAN ARMADA KENDARAAN RENTAL (RENTAL VEHICLES)
+# TASK-03 — HALAMAN KENDARAAN KENDARAAN RENTAL (RENTAL VEHICLES)
 
 **Halaman/Menu:** Kendaraan Rental (`/rental/vehicles`)  
 **Status:** COMPLETED  
 **Domain:** Rental (Fleet Subdomain)  
 **Label UI:** Kendaraan Rental (Rental Vehicles)  
-**Title Dokumen:** `Armada Rental - ADATRACK Business`  
+**Title Dokumen:** `Kendaraan Rental - ADATRACK Business`  
 **Komponen Utama:** `apps/business/src/features/modules/rental/vehicles/RentalVehiclesFeature.tsx`
 
 ---
 
 ## 1. Fungsi dan Kegunaan Halaman
 
-Halaman Kendaraan Rental (`/rental/vehicles`) berfungsi sebagai **pusat pengelolaan dan pemantauan ketersediaan seluruh armada yang dialokasikan khusus untuk bisnis sewa rental**. Halaman ini memperkaya master data kendaraan CORE (*Single Source of Truth*) dengan atribut operasional komersial sewa, status kesiapan sewa, histori kontrak berjalan, serta integrasi pelacakan GPS langsung.
+Halaman Kendaraan Rental (`/rental/vehicles`) berfungsi sebagai **pusat pengelolaan dan pemantauan ketersediaan seluruh kendaraan yang dialokasikan khusus untuk bisnis sewa rental**. Halaman ini memperkaya master data kendaraan CORE (*Single Source of Truth*) dengan atribut operasional komersial sewa, status kesiapan sewa, histori kontrak berjalan, serta integrasi pelacakan GPS langsung.
 
 ### Ringkasan Kemampuan Utama:
-1. **Pendaftaran Armada dari CORE (SSoT):** Mengalokasikan unit kendaraan dari master CORE `Vehicle` ke inventaris rental melalui dialog pemilih armada (`VehicleSelectionDialog`), sehingga data fisik (plat nomor, nomor mesin, rangka/VIN, merk, model) tetap terpusat dan tidak pernah diduplikasi.
-2. **Monitoring Status Kesiapan Armada (*Rental Fleet Availability*):**
+1. **Pendaftaran Kendaraan dari CORE (SSoT):** Mengalokasikan unit kendaraan dari master CORE `Vehicle` ke inventaris rental melalui dialog pemilih kendaraan (`VehicleSelectionDialog`), sehingga data fisik (plat nomor, nomor mesin, rangka/VIN, merk, model) tetap terpusat dan tidak pernah diduplikasi.
+2. **Monitoring Status Kesiapan Kendaraan (*Rental Fleet Availability*):**
    - **Siap Sewa (*READY*):** Kendaraan prima, bersih, dan tersedia untuk dipesan pelanggan.
    - **Dipesan (*RESERVED*):** Kendaraan telah dipesan dalam booking terkonfirmasi dan menunggu serah terima.
    - **Sedang Disewa (*RENTED*):** Kendaraan sedang berada di tangan penyewa di bawah kontrak aktif.
    - **Perawatan (*MAINTENANCE*):** Kendaraan sedang servis berkala di bengkel atau dalam perbaikan fisik.
    - **Tidak Tersedia (*UNAVAILABLE*):** Kendaraan ditarik sementara dari operasional komersial.
-3. **Kartu Statistik Ketersediaan Cepat (*PanelShell Metrics*):** Menampilkan ringkasan jumlah armada per status (Total Armada, Siap Sewa, Sedang Disewa, Dipesan, Perawatan) di bagian atas halaman.
+3. **Kartu Statistik Ketersediaan Cepat (*PanelShell Metrics*):** Menampilkan ringkasan jumlah kendaraan per status (Total Kendaraan, Siap Sewa, Sedang Disewa, Dipesan, Perawatan) di bagian atas halaman.
 4. **Pemeriksaan Kelengkapan & Dokumen Kendaraan:** Memantau ketersediaan perlengkapan unit (STNK asli, kunci cadangan, dongkrak, toolkit) sebelum diserahkan kepada penyewa.
 5. **Navigasi Langsung ke Pemantauan Spasial (`/tracking`):** Tombol "Buka Lokasi" langsung memindahkan tampilan ke halaman pelacakan live GPS dengan menyuntikkan payload `VehicleContext` (menampilkan nomor kontrak, nama penyewa, dan tanggal sewa pada popup peta) tanpa mengubah query string URL.
-6. **Bilah Aksi Massal (*Bottom Multi-Select Action Bar*):** Memungkinkan staf operasional memilih beberapa armada sekaligus untuk pemantauan batch atau perubahan status.
+6. **Bilah Aksi Massal (*Bottom Multi-Select Action Bar*):** Memungkinkan staf operasional memilih beberapa kendaraan sekaligus untuk pemantauan batch atau perubahan status.
 
 ---
 
@@ -32,19 +32,19 @@ Halaman Kendaraan Rental (`/rental/vehicles`) berfungsi sebagai **pusat pengelol
 
 ```text
 ┌────────────────────────────────────────────────────────────────────────┐
-│  Statistik Armada:                                                     │
+│  Statistik Kendaraan:                                                     │
 │  [Total: 32 Unit]  [Siap Sewa: 18]  [Disewa: 10]  [Dipesan: 3]  [Servis: 1] │
 ├────────────────────────────────────────────────────────────────────────┤
-│  [🔍 Cari Plat/Model/Kategori...]  [🏷 Filter Status]  [+ Daftarkan Armada] │
+│  [🔍 Cari Plat/Model/Kategori...]  [🏷 Filter Status]  [+ Daftarkan Kendaraan] │
 ├────────────────────────────────────────────────────────────────────────┤
-│  DataTable Armada Rental:                                              │
+│  DataTable Kendaraan Rental:                                              │
 │  [Aksi] | Plat Nomor | Model Kendaraan | Status   | Kategori | Tarif/Hari │
 │  ───────┼────────────┼─────────────────┼──────────┼──────────┼────────────┤
 │   [👁]  | B 1234 ABC | Toyota Avanza   | 🟢 READY | MPV Std  | Rp 450.000 │
 │   [👁]  | B 5678 DEF | Mitsubishi Xp   | 🔵 RENTED| MPV Std  | Rp 450.000 │
 └────────────────────────────────────────────────────────────────────────┘
        │                                                      │
-       ▼ (Klik tombol [👁] / Plat Nomor)                       ▼ (Klik [+ Daftarkan Armada])
+       ▼ (Klik tombol [👁] / Plat Nomor)                       ▼ (Klik [+ Daftarkan Kendaraan])
 ┌──────────────────────────────┐              ┌──────────────────────────────┐
 │ Drawer Detail: RentalVehicle │              │ Modal: RentalVehicleForm     │
 │ • Status Sewa & Kontrak Aktif│              │ • Pilih Unit dari Master CORE│
@@ -60,7 +60,7 @@ Halaman Kendaraan Rental (`/rental/vehicles`) berfungsi sebagai **pusat pengelol
 ## 3. Komponen Antarmuka Fitur
 
 - **`RentalVehicleTable.tsx`:**
-  - Tabel data armada rental berbasis `@adatrack/ui` `DataTable`.
+  - Tabel data kendaraan rental berbasis `@adatrack/ui` `DataTable`.
   - **Kolom Data:** Plat Nomor, Model Kendaraan, Status Rental (Badge READY hijau, RESERVED kuning, RENTED biru, MAINTENANCE oranye, UNAVAILABLE merah), Kategori Tarif, Tarif Harian, Transmisi (Manual/Matic), Lokasi Pool, Odometer Terkini, dan Menu Aksi.
   - **Aksi Baris:**
     - `Detail`: Membuka drawer rincian unit.
@@ -120,13 +120,13 @@ export interface RentalVehicleViewModel {
 ## 5. Service Layer & Integrasi CORE
 
 - **`vehicleService.ts` (Modul Rental):**
-  - Mengambil data profil armada rental dan menggabungkannya (*enrich*) dengan spesifikasi fisik master kendaraan dari `coreVehicleService`.
+  - Mengambil data profil kendaraan rental dan menggabungkannya (*enrich*) dengan spesifikasi fisik master kendaraan dari `coreVehicleService`.
   - Mengirimkan payload `VehicleContext` ke `sessionStorage` saat tombol "Buka Lokasi" diklik sehingga popup di `/tracking` menampilkan label "RENTAL", nomor kontrak, dan tanggal masa sewa.
-  - Memperbarui status armada saat terjadi transaksi Booking (menjadi `RESERVED`), Kontrak/Serah Terima (menjadi `RENTED`), dan Pengembalian (kembali menjadi `READY`).
+  - Memperbarui status kendaraan saat terjadi transaksi Booking (menjadi `RESERVED`), Kontrak/Serah Terima (menjadi `RENTED`), dan Pengembalian (kembali menjadi `READY`).
 
 ---
 
 ## 6. Status Verifikasi & Hasil
 
 - **Status:** COMPLETED
-- **Verifikasi:** Alokasi armada dari CORE, visualisasi summary cards, tabel data, filter status, drawer rincian, dan integrasi navigasi bersih ke `/tracking` telah teruji dan bekerja normal.
+- **Verifikasi:** Alokasi kendaraan dari CORE, visualisasi summary cards, tabel data, filter status, drawer rincian, dan integrasi navigasi bersih ke `/tracking` telah teruji dan bekerja normal.

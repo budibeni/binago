@@ -4,10 +4,10 @@
 
 Modul **Booking (Pemesanan Rental)** merupakan titik temu (nexus) dari modul Pelanggan, Kategori Tarif, dan Kendaraan. Modul ini bertanggung jawab atas:
 
-1. **Pembuatan Reservasi (Pemesanan):** Memilih Pelanggan, menentukan durasi sewa, dan memilih unit armada (multi-kendaraan).
+1. **Pembuatan Reservasi (Pemesanan):** Memilih Pelanggan, menentukan durasi sewa, dan memilih unit kendaraan (multi-kendaraan).
 2. **Otomatisasi Kalkulasi Tarif:** Mengambil *rate* harian/mingguan/bulanan dari `categoryId` atau harga kustom kendaraan, dikalikan dengan durasi.
 3. **Manajemen Siklus Pemesanan (State Machine):** Status berawal dari `DRAFT` (menyimpan sementara) -> `CONFIRMED` (dipesan, mengubah status unit jadi `RESERVED`) -> `CANCELLED` atau berlanjut ke Kontrak (`ACTIVE`).
-4. **Alokasi Armada:** Memastikan armada yang dipesan (*booked*) tidak bisa dipesan pelanggan lain di rentang waktu yang sama (melalui validasi ketersediaan).
+4. **Alokasi Kendaraan:** Memastikan kendaraan yang dipesan (*booked*) tidak bisa dipesan pelanggan lain di rentang waktu yang sama (melalui validasi ketersediaan).
 
 ---
 
@@ -31,7 +31,7 @@ Implementasi antarmuka wajib mengikuti standar *Enterprise Grade* ADATRACK:
 - Desain blok kartu informasi (*card section*) harus menggunakan wrapper kustom `<SectionCard>` agar seragam dengan modul-modul lain (seperti `CustomerView` dan `RentalVehicleView`):
   - **Info Booking:** Latar & Ikon Biru Muda (`bg-blue-100`, `text-blue-600`)
   - **Data Pelanggan:** Latar & Ikon Ungu Muda (`bg-purple-100`, `text-purple-600`)
-  - **Armada & Durasi:** Latar & Ikon Hijau Muda (`bg-emerald-100`, `text-emerald-600`)
+  - **Kendaraan & Durasi:** Latar & Ikon Hijau Muda (`bg-emerald-100`, `text-emerald-600`)
   - **Rincian Biaya:** Latar & Ikon Kuning/Amber (`bg-amber-100`, `text-amber-600`)
 - Tipografi nilai data wajib menggunakan `text-[11px] font-medium` dan label field `text-[9px] uppercase font-medium`.
 
@@ -50,7 +50,7 @@ Implementasi antarmuka wajib mengikuti standar *Enterprise Grade* ADATRACK:
 - **`BookingTable.tsx`:** 
   - Komponen murni pemanggil struktur kolom (columns def) dan tabel *headless* `@adatrack/ui`.
 - **`BookingView.tsx`:** 
-  - Drawer detail reservasi, mencakup sub-tabel/daftar (*item list*) yang menyewakan satu atau lebih armada, durasi, total, dan riwayat pesanan pelanggan terkait. 
+  - Drawer detail reservasi, mencakup sub-tabel/daftar (*item list*) yang menyewakan satu atau lebih kendaraan, durasi, total, dan riwayat pesanan pelanggan terkait. 
 - **`BookingForm.tsx` (atau `BookingCreateFeature.tsx`):**
   - Mengelola State UI pengisian data pemesanan secara hierarki step: Pilih Pelanggan -> Pilih Tanggal & Jenis Rental -> Pilih Kendaraan -> Konfirmasi Harga.
 

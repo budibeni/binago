@@ -11,16 +11,16 @@
 
 ## 1. Fungsi dan Kegunaan Halaman
 
-Halaman Kategori Tarif (`/rental/pricing-category`) berfungsi sebagai **pusat standardisasi skema harga sewa armada rental secara terstruktur, transparan, dan terotomasi**. Halaman ini menetapkan struktur harga bertingkat untuk tiap kelas kendaraan, mengelola alokasi armada ke dalam kelas tarif, serta memberikan fleksibilitas melalui penetapan tarif khusus (*custom rate override*) untuk kendaraan tertentu.
+Halaman Kategori Tarif (`/rental/pricing-category`) berfungsi sebagai **pusat standardisasi skema harga sewa kendaraan rental secara terstruktur, transparan, dan terotomasi**. Halaman ini menetapkan struktur harga bertingkat untuk tiap kelas kendaraan, mengelola alokasi kendaraan ke dalam kelas tarif, serta memberikan fleksibilitas melalui penetapan tarif khusus (*custom rate override*) untuk kendaraan tertentu.
 
 ### Ringkasan Kemampuan Utama:
-1. **Pengelompokan Kelas Tarif Kendaraan:** Mengelompokkan armada sewa ke dalam kategori harga yang jelas (misalnya: *City Car Hemat*, *MPV Standar Keluarga*, *Compact SUV*, *Luxury Sedan*, *Commercial Van/Blind Van*).
+1. **Pengelompokan Kelas Tarif Kendaraan:** Mengelompokkan kendaraan sewa ke dalam kategori harga yang jelas (misalnya: *City Car Hemat*, *MPV Standar Keluarga*, *Compact SUV*, *Luxury Sedan*, *Commercial Van/Blind Van*).
 2. **Struktur Tarif Bertingkat (*Tiered Rates*):** Menetapkan harga sewa per periode:
    - **Tarif Per Jam (*Hourly Rate*):** Harga sewa dasar per jam.
    - **Tarif Harian (*Daily Rate*):** Harga sewa dasar per 24 jam.
    - **Paket Sewa (*Rental Packages*):** Kumpulan durasi hari dengan harga paket yang spesifik (misal: paket 7 hari, 15 hari, 30 hari).
    - **Uang Jaminan (*Security Deposit*):** Nominal deposit wajib yang ditahan selama masa sewa sebagai proteksi risiko kerusakan atau tilang elektronik.
-3. **Penugasan Armada ke Kategori Tarif (`PricingVehicleAssignmentDialog`):** Menautkan unit-unit armada rental ke kategori tarif yang sesuai.
+3. **Penugasan Kendaraan ke Kategori Tarif (`PricingVehicleAssignmentDialog`):** Menautkan unit-unit kendaraan rental ke kategori tarif yang sesuai.
 4. **Penetapan Tarif Khusus (*Custom Rate Override*):** Menyediakan mekanisme penyesuaian harga khusus per unit kendaraan tanpa mengubah standar kategori (misalnya unit tahun pembuatan baru atau unit modifikasi audio/chiller).
 5. **Mesin Resolusi Harga Pemesanan (`resolveVehicleRate`):** Menyediakan kalkulator harga otomatis dengan hierarki prioritas (*Override Unit → Kategori Standar → Error*) yang dipanggil saat pembuatan Booking untuk mengunci snapshot harga transaksi.
 
@@ -59,14 +59,14 @@ Halaman Kategori Tarif (`/rental/pricing-category`) berfungsi sebagai **pusat st
   - Tabel data berbasis `@adatrack/ui` `DataTable`.
   - **Kolom Data:** Kategori Tarif, Deskripsi, Harian, Mingguan, Bulanan, Deposit, Kendaraan (*Assigned Vehicles Count*), Status. Mendukung sistem *multilingual* (i18n).
 - **`PricingCategoryView.tsx`:**
-  - Tampilan Detail (Drawer Samping) yang merangkum tarif default kategori beserta daftar lengkap armada rental yang dinaungi.
+  - Tampilan Detail (Drawer Samping) yang merangkum tarif default kategori beserta daftar lengkap kendaraan rental yang dinaungi.
   - Setiap baris kendaraan di dalam drawer menampilkan plat nomor, tipe, nama kendaraan, dan merek.
   - Tombol **"+ Kelola"** untuk membuka *form assignment* kendaraan.
   - Tombol aksi (ikon tong sampah) untuk mengeluarkan kendaraan dari kategori.
 - **`PricingCategoryForm.tsx`:**
   - Drawer form untuk menambah kategori tarif baru atau menyunting kategori yang ada (Nama Kategori Tarif, Status, Deskripsi, Tarif Harian, Tarif Mingguan, Tarif Bulanan, Deposit).
 - **`PricingCategoryAssignmentForm.tsx`:**
-  - Dialog modal yang menampilkan daftar armada rental yang tersedia, lengkap dengan fitur pencarian dan *checkbox* untuk menugaskan banyak unit sekaligus ke dalam kategori tarif (*batch assignment*).
+  - Dialog modal yang menampilkan daftar kendaraan rental yang tersedia, lengkap dengan fitur pencarian dan *checkbox* untuk menugaskan banyak unit sekaligus ke dalam kategori tarif (*batch assignment*).
 
 ---
 
@@ -165,4 +165,4 @@ export interface RentalVehicleProfile {
 ## 7. Status Verifikasi & Hasil
 
 - **Status:** COMPLETED
-- **Verifikasi:** Seluruh alur pembuatan kategori, penugasan armada, penetapan custom override, dan resolusi kalkulasi tarif pada pemesanan booking telah diuji dan bekerja sesuai spesifikasi.
+- **Verifikasi:** Seluruh alur pembuatan kategori, penugasan kendaraan, penetapan custom override, dan resolusi kalkulasi tarif pada pemesanan booking telah diuji dan bekerja sesuai spesifikasi.

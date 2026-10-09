@@ -173,6 +173,11 @@ export function ContractFeature() {
     });
   };
 
+  const handleHandover = (c: RentalContract) => {
+    setDrawerOpen(false);
+    router.push(`/rental/handovers?create=true&contractId=${c.id}`);
+  };
+
   const dtLabels = useMemo(() => {
     const isEn = locale === 'en';
     return {
@@ -298,6 +303,7 @@ export function ContractFeature() {
         onPrint={handlePrint}
         onCancel={handleCancel}
         onDelete={handleDelete}
+        onHandover={handleHandover}
       />
 
       <ContractPrintModal

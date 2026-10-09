@@ -15,12 +15,11 @@ export const mockReturns: RentalReturn[] = [
     "fuelLevelEnd": "HALF",
     "vehicleConditionEnd": "GOOD",
     "equipmentChecklistEnd": {
-      "stnk": true,
+      "stnkOriginal": true,
+      "spareKey": true,
       "spareTire": true,
-      "jack": true,
-      "toolkit": true,
-      "triangle": true,
-      "fireExtinguisher": true
+      "jackAndTools": true,
+      "firstAidKit": true
     },
     "damageNotes": "",
     "additionalCharges": 0,
@@ -46,12 +45,11 @@ export const mockReturns: RentalReturn[] = [
     "fuelLevelEnd": "QUARTER",
     "vehicleConditionEnd": "MINOR_DAMAGE",
     "equipmentChecklistEnd": {
-      "stnk": true,
+      "stnkOriginal": true,
+      "spareKey": true,
       "spareTire": true,
-      "jack": true,
-      "toolkit": true,
-      "triangle": false,
-      "fireExtinguisher": true
+      "jackAndTools": true,
+      "firstAidKit": true
     },
     "damageNotes": "Goresan kecil pada bemper belakang sebelah kiri.",
     "additionalCharges": 150000,
@@ -77,12 +75,11 @@ export const mockReturns: RentalReturn[] = [
     "fuelLevelEnd": "THREE_QUARTER",
     "vehicleConditionEnd": "GOOD",
     "equipmentChecklistEnd": {
-      "stnk": true,
+      "stnkOriginal": true,
+      "spareKey": true,
       "spareTire": true,
-      "jack": true,
-      "toolkit": true,
-      "triangle": true,
-      "fireExtinguisher": true
+      "jackAndTools": true,
+      "firstAidKit": true
     },
     "damageNotes": "",
     "additionalCharges": 200000,

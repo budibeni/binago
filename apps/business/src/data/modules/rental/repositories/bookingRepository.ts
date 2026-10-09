@@ -65,6 +65,40 @@ class BookingRepository {
       }, 500);
     });
   }
+
+  async updateBookingItem(bookingId: string, itemId: string, itemUpdates: Partial<import('@/features/modules/rental/bookings/types/booking').BookingItem>): Promise<Booking> {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        const bookingIndex = this.bookings.findIndex(r => r.id === bookingId);
+        if (bookingIndex === -1) {
+          reject(new Error('Booking not found'));
+          return;
+        }
+
+        const booking = this.bookings[bookingIndex];
+        const itemIndex = booking.items.findIndex(i => i.id === itemId);
+        
+        if (itemIndex === -1) {
+          reject(new Error('Booking item not found'));
+          return;
+        }
+
+        const updatedItems = [...booking.items];
+        updatedItems[itemIndex] = {
+          ...updatedItems[itemIndex],
+          ...itemUpdates,
+        };
+
+        this.bookings[bookingIndex] = {
+          ...booking,
+          items: updatedItems,
+          updatedAt: new Date().toISOString(),
+        };
+
+        resolve({ ...this.bookings[bookingIndex] });
+      }, 300);
+    });
+  }
 }
 
 export const bookingRepository = new BookingRepository();

@@ -324,10 +324,10 @@ export function ReportsFeature() {
         )}
       >
         <div className={cn("gap-2.5 p-3 bg-neutral-50/50 dark:bg-neutral-900/20", (panelSide === 'top' || panelSide === 'bottom') ? "grid grid-cols-2 md:grid-cols-4" : "flex flex-col h-full")}>
-          <StatCard label="Total Armada" value={`${totalArmada} Unit`} colorClass="bg-blue-500" icon={Car} desc="Terdaftar di sistem" />
+          <StatCard label="Total Kendaraan" value={`${totalArmada} Unit`} colorClass="bg-blue-500" icon={Car} desc="Terdaftar di sistem" />
           <StatCard label="Rata-rata Produktivitas" value={`${avgProduktivitas}%`} colorClass="bg-primary" icon={BarChart2} desc={`Periode ini (${totalHoursInPeriod} Jam)`} />
           <StatCard label="Total Transaksi" value={`${totalSewaBulanan} Sewa`} colorClass="bg-amber-500" icon={Calendar} desc="Dalam periode ini" />
-          <StatCard label="Total Jam Tersewa" value={`${totalJamBulanan} Jam`} colorClass="bg-success" icon={TrendingUp} desc="Seluruh armada" />
+          <StatCard label="Total Jam Tersewa" value={`${totalJamBulanan} Jam`} colorClass="bg-success" icon={TrendingUp} desc="Seluruh kendaraan" />
         </div>
       </PanelShell>
     );

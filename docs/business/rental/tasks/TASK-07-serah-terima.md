@@ -44,7 +44,7 @@ COMPLETED
 
 ## Catatan
 - Flow aplikasi kini lebih clean dengan sidebar yang tidak berantakan (Template Kontrak dimasukkan ke Toolbar `Contracts`). Tab aktif telah diubah dari biru ke merah (`danger`) menyesuaikan SSoT Adatrack.
-- **Pembaruan Arsitektur:** Tabel `rental_handovers` kini dihapus dan dilebur ke dalam struktur `BookingItem` sesuai penyederhanaan tabel transaksi (Desain *Single Source of Truth*). Atribut seperti odometer dan kondisi kini melekat langsung pada masing-masing armada sewa.
+- **Pembaruan Arsitektur:** Tabel `rental_handovers` kini dihapus dan dilebur ke dalam struktur `BookingItem` sesuai penyederhanaan tabel transaksi (Desain *Single Source of Truth*). Atribut seperti odometer dan kondisi kini melekat langsung pada masing-masing kendaraan sewa.
 
 ## Task Berikutnya
 - TASK-08 Pengembalian (Return)

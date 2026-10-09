@@ -1,6 +1,6 @@
 import { returnRepository } from '../repositories/returnRepository';
 import { contractService } from './contractService';
-import { handoverRepository } from '../repositories/handoverRepository';
+import { handoverService } from './handoverService';
 import { rentalVehicleService } from './vehicleService';
 import { rentalVehicleRepository } from '../repositories/vehicleRepository';
 import { customerRepository } from '../repositories/customerRepository';
@@ -22,7 +22,7 @@ const populateRelations = async (ret: RentalReturn): Promise<RentalReturn> => {
       result.vehicle = enrichedVehicle;
     }
 
-    const handover = await handoverRepository.getHandoverByBookingItemId(ret.contractId, ret.bookingItemId);
+    const handover = await handoverService.getHandoverByBookingItemId(ret.contractId, ret.bookingItemId);
     if (handover) result.handover = handover;
   } catch (error) {
     console.error('Error populating relations for return', error);
@@ -60,7 +60,7 @@ export const returnService = {
       
       let hasPendingItems = false;
       for (const item of contract.items) {
-        const handover = await handoverRepository.getHandoverByBookingItemId(contract.id, item.id);
+        const handover = await handoverService.getHandoverByBookingItemId(contract.id, item.id);
         if (!handover) continue; // Must have handover
         const existingReturn = await returnRepository.getReturnByBookingItemId(contract.id, item.id);
         if (!existingReturn) {
@@ -86,7 +86,7 @@ export const returnService = {
     }
 
     // 3. Contract item must have Handover
-    const handover = await handoverRepository.getHandoverByBookingItemId(data.contractId, data.bookingItemId);
+    const handover = await handoverService.getHandoverByBookingItemId(data.contractId, data.bookingItemId);
     if (!handover) throw new Error('Kendaraan ini belum memiliki data serah terima.');
 
     // 4. No duplicate Return
@@ -104,7 +104,7 @@ export const returnService = {
     // 7. Check if all items are returned, if so mark contract as COMPLETED
     let allReturned = true;
     for (const item of contract.items || []) {
-      const hndv = await handoverRepository.getHandoverByBookingItemId(contract.id, item.id);
+      const hndv = await handoverService.getHandoverByBookingItemId(contract.id, item.id);
       if (hndv) {
         const ret = await returnRepository.getReturnByBookingItemId(contract.id, item.id);
         // Compare with newReturn ID as it might not be indexed perfectly depending on execution

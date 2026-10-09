@@ -179,7 +179,7 @@ export function MonitoringFeature() {
               type="button"
               onClick={handleTrack}
               className="text-left group flex flex-col focus:outline-none focus:ring-2 focus:ring-primary/50 rounded-sm"
-              title="Klik untuk melacak lokasi armada"
+              title="Klik untuk melacak lokasi kendaraan"
             >
               <span className="font-semibold group-hover:text-primary transition-colors">
                 {row.original.vehicleName}
@@ -333,7 +333,7 @@ export function MonitoringFeature() {
         )}
       >
         <div className={cn("gap-2.5 p-3", (panelSide === 'top' || panelSide === 'bottom') ? "grid grid-cols-1 sm:grid-cols-3" : "flex flex-col h-full")}>
-          <StatCard label="Total Armada Disewa" value={totalActive} colorClass="bg-primary" icon={List} />
+          <StatCard label="Total Kendaraan Disewa" value={totalActive} colorClass="bg-primary" icon={List} />
           <StatCard label="Segera Berakhir (< 24 Jam)" value={totalEndingSoon} colorClass="bg-amber-500" icon={Clock} />
           <StatCard label="Terlambat Kembali" value={totalOverdue} colorClass="bg-danger" icon={AlertTriangle} />
         </div>

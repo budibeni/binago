@@ -2,9 +2,9 @@ import type { Customer } from '../../customers/types/customer';
 import type { RentalVehicle } from '../../vehicles/types/rentalVehicle';
 import type { RentalContract } from '../../contracts/types/contract';
 
-
 export interface RentalHandover {
   id: string;
+  handoverNumber: string;
 
   contractId: string;
   bookingItemId: string;
@@ -14,6 +14,8 @@ export interface RentalHandover {
   contract?: RentalContract;
   customer?: Customer;
   vehicle?: RentalVehicle;
+
+  itemStatus?: 'PENDING' | 'IN_USE' | 'RETURNED' | 'CANCELLED';
 
   handoverAt: string;
 
@@ -37,21 +39,19 @@ export interface RentalHandover {
     | 'NEEDS_REPAIR';
 
   equipmentChecklist: {
-    stnk: boolean;
-    spareTire: boolean;
-    jack: boolean;
-    toolkit: boolean;
-    triangle: boolean;
-    fireExtinguisher?: boolean;
-    other?: boolean;
+    stnkOriginal?: boolean;
+    spareKey?: boolean;
+    jackAndTools?: boolean;
+    spareTire?: boolean;
+    firstAidKit?: boolean;
   };
 
   notes?: string;
 
-  staffId?: string;
+  staffId: string;
   staffName?: string;
+  createdAt?: string;
+  updatedAt?: string;
 
-
-  createdAt: string;
-  updatedAt: string;
+  vehicleSnapshot?: any;
 }

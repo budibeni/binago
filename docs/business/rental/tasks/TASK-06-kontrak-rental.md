@@ -15,15 +15,15 @@ Halaman Kontrak Rental (`/rental/contracts`) berfungsi sebagai **pusat pengelola
 
 ### Ringkasan Kemampuan Utama:
 1. **Penerbitan Kontrak dari Booking Terkonfirmasi (`BookingSelectModal`):** Mengonversi transaksi pemesanan (Booking) yang telah disepakati menjadi Kontrak Sewa resmi dengan mewariskan data pelanggan, jadwal sewa, dan seluruh unit kendaraan yang dipesan.
-2. **Dukungan Multi-Armada dalam Satu Kontrak (*1 Contract → N ContractItems*):** Menampung banyak kendaraan dalam satu dokumen hukum sewa, lengkap dengan rincian nomor polisi, nomor mesin, dan tarif masing-masing unit.
+2. **Dukungan Multi-Kendaraan dalam Satu Kontrak (*1 Contract → N ContractItems*):** Menampung banyak kendaraan dalam satu dokumen hukum sewa, lengkap dengan rincian nomor polisi, nomor mesin, dan tarif masing-masing unit.
 3. **Penyusunan Perjanjian Berbasis Template (`templateService`):** Menggunakan template dokumen HTML WYSIWYG yang dikelola di menu Template Kontrak untuk menghasilkan redaksi surat perjanjian yang rapi dan terstandarisasi.
 4. **Pratinjau & Cetak Dokumen Legalitas (`ContractPrintModal`):** Menyediakan fitur cetak langsung ke printer atau ekspor berkas PDF surat perjanjian sewa resmi dengan injeksi otomatis variabel dinamis (data perusahaan, pelanggan, daftar kendaraan, tabel biaya, dan kolom tanda tangan).
 5. **Siklus Status Kontrak (*Contract Lifecycle*):**
-   - **Diterbitkan (*ISSUED*):** Kontrak baru dibuat dari booking dan siap dilanjutkan ke proses serah terima armada.
-   - **Aktif (*ACTIVE*):** Unit kendaraan telah diserahterimakan kepada penyewa, dan masa sewa sedang berjalan (armada berstatus `RENTED`).
-   - **Selesai (*COMPLETED*):** Seluruh armada sewa telah dikembalikan dalam kondisi baik dan kontrak ditutup (selesai melalui BAST Pengembalian).
-   - **Batal (*CANCELLED*):** Kontrak dibatalkan sebelum unit armada diserahterimakan.
-6. **Gerbang Menuju Serah Terima & Pengembalian:** Menjadi induk alur operasional fisik untuk proses Serah Terima Armada (*Handover*) dan Pengembalian Armada (*Return*).
+   - **Diterbitkan (*ISSUED*):** Kontrak baru dibuat dari booking dan siap dilanjutkan ke proses serah terima kendaraan.
+   - **Aktif (*ACTIVE*):** Unit kendaraan telah diserahterimakan kepada penyewa, dan masa sewa sedang berjalan (kendaraan berstatus `RENTED`).
+   - **Selesai (*COMPLETED*):** Seluruh kendaraan sewa telah dikembalikan dalam kondisi baik dan kontrak ditutup (selesai melalui BAST Pengembalian).
+   - **Batal (*CANCELLED*):** Kontrak dibatalkan sebelum unit kendaraan diserahterimakan.
+6. **Gerbang Menuju Serah Terima & Pengembalian:** Menjadi induk alur operasional fisik untuk proses Serah Terima Kendaraan (*Handover*) dan Pengembalian Kendaraan (*Return*).
 
 ---
 
@@ -45,7 +45,7 @@ Halaman Kontrak Rental (`/rental/contracts`) berfungsi sebagai **pusat pengelola
 │ Drawer Detail: ContractView  │              │ Modal: BookingSelectModal    │
 │ • Nomor Kontrak & Pelanggan  │              │ • Pilih Booking Terkonfirmasi│
 │ • Masa Berlaku Sewa          │              └──────────────┬───────────────┘
-│ • Tabel Armada dalam Kontrak │                             ▼
+│ • Tabel Kendaraan dalam Kontrak │                             ▼
 │ • Total Biaya & Deposit      │              ┌──────────────────────────────┐
 │ [🖨 Cetak Surat Perjanjian] │              │ Form: ContractForm           │
 │ [🚚 Lanjut Serah Terima]     │              │ • Pilih Template Surat Sewa  │
@@ -69,7 +69,7 @@ Halaman Kontrak Rental (`/rental/contracts`) berfungsi sebagai **pusat pengelola
 - **`ContractView.tsx`:**
   - Drawer detail lengkap menampilkan ringkasan hukum kontrak, tabel rincian seluruh kendaraan yang disewa, stempel waktu, dan tombol aksi cepat:
     - **Cetak Kontrak:** Membuka modal preview cetak surat perjanjian.
-    - **Serah Terima Unit:** Mengarahkan ke formulir inspeksi serah terima armada (hanya muncul saat status `ISSUED`).
+    - **Serah Terima Unit:** Mengarahkan ke formulir inspeksi serah terima kendaraan (hanya muncul saat status `ISSUED`).
     - **Batalkan Kontrak:** Membatalkan kontrak sewa (hanya bisa dilakukan saat status `ISSUED`).
 - **`ContractPrintModal.tsx`:**
   - Modal dialog pratinjau dokumen surat perjanjian sewa resmi dengan rendering HTML TipTap yang disuntikkan data kontrak, siap untuk dicetak langsung (*Ctrl+P / window.print*) atau disimpan sebagai PDF.
@@ -95,8 +95,8 @@ Variabel kontrak seperti nomor kontrak dan tanggal kontrak disimpan langsung di 
 - **`contractService.ts`:**
   - `getContracts(filters)`: Mengambil seluruh daftar kontrak sewa dengan filter status dan pencarian.
   - `createContractFromBooking(bookingId, templateId, options)`: Menerbitkan kontrak baru dari booking terkonfirmasi dan memperbarui status booking menjadi `IN_CONTRACT`.
-  - `activateContract(id)`: Mengubah status kontrak menjadi `ACTIVE` saat seluruh unit telah diserahterimakan dan mengubah status unit armada rental menjadi `RENTED`.
-  - `completeContract(id)`: Menutup kontrak sewa menjadi `COMPLETED` setelah seluruh unit kembali diperiksa dan mengembalikan armada ke status `READY`.
+  - `activateContract(id)`: Mengubah status kontrak menjadi `ACTIVE` saat seluruh unit telah diserahterimakan dan mengubah status unit kendaraan rental menjadi `RENTED`.
+  - `completeContract(id)`: Menutup kontrak sewa menjadi `COMPLETED` setelah seluruh unit kembali diperiksa dan mengembalikan kendaraan ke status `READY`.
   - `printContract(id)`: Menghasilkan HTML surat perjanjian yang siap dicetak menggunakan `templateService`.
   - **Catatan:** Kontrak rental tidak dapat diedit setelah diterbitkan (ISSUED). Jika terdapat kesalahan, pengguna harus membatalkan kontrak tersebut (selama belum serah terima) dan menerbitkan ulang.
 
@@ -105,4 +105,4 @@ Variabel kontrak seperti nomor kontrak dan tanggal kontrak disimpan langsung di 
 ## 6. Status Verifikasi & Hasil
 
 - **Status:** 
-- **Verifikasi:** Seluruh alur pembuatan kontrak dari booking, multi-armada sewa, pratinjau cetak PDF surat perjanjian sewa, drawer rincian, dan transisi status sewa telah teruji dan berjalan normal.
+- **Verifikasi:** Seluruh alur pembuatan kontrak dari booking, multi-kendaraan sewa, pratinjau cetak PDF surat perjanjian sewa, drawer rincian, dan transisi status sewa telah teruji dan berjalan normal.

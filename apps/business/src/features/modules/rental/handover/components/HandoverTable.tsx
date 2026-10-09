@@ -1,16 +1,17 @@
 'use client';
 
 import React from 'react';
-import { Eye, Plus } from 'lucide-react';
+import { Eye, Plus, Calendar, MapPin } from 'lucide-react';
 import { cn, formatTime } from '@adatrack/utils';
 import { useRouter } from 'next/navigation';
-import { Button, DataTable } from '@adatrack/ui';
+import { Button, DataTable, PhoneLink } from '@adatrack/ui';
 import type { DataTableColumnDef } from '@adatrack/ui';
 import { trackingNavigationService } from '@/features/core/tracking/services/trackingNavigationService';
 import type { RentalHandover } from '../types/handover';
 
 export interface HandoverGroup {
-  id: string; // group ID (contractId)
+  id: string; // group ID (handoverNumber or contractId)
+  handoverNumber?: string;
   contractId: string;
   contract?: any;
   customer?: any;
@@ -50,6 +51,15 @@ const formatShortDate = (dateStr: string) => {
   return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
 };
 
+const getMaxEndDate = (items: any[]) => {
+  if (!items || items.length === 0) return null;
+  const dates = items
+    .filter(i => i.returnDate)
+    .map(i => new Date(i.returnDate).getTime());
+  if (dates.length === 0) return null;
+  return new Date(Math.max(...dates)).toISOString();
+};
+
 
 function buildColumns(
   onViewDetail: (group: HandoverGroup) => void,
@@ -58,127 +68,129 @@ function buildColumns(
 ): DataTableColumnDef<HandoverGroup>[] {
   return [
     {
-      id: 'detail',
-      header: '',
-      size: 40,
-      enableHiding: false,
-      meta: { exportable: false, fixedWidth: true },
-      cell: ({ row }) => (
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={() => onViewDetail(row.original as any)}
-          title="Detail Serah Terima" 
-          className="h-7 w-7 p-0 flex items-center justify-center transition-colors text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 dark:text-neutral-600 dark:hover:text-neutral-300 dark:hover:bg-neutral-800"
-        >
-          <Eye className="w-3.5 h-3.5" /> 
-        </Button>
-      ),
+      id: 'handoverInfo',
+      accessorKey: 'handoverNumber',
+      header: labels.colHandoverId || 'NO. SERAH TERIMA',
+      size: 170,
+      cell: ({ row }) => {
+        return (
+          <div className="flex flex-col gap-0.5 py-1">
+            <button
+              onClick={(e) => { e.stopPropagation(); onViewDetail(row.original as any); }}
+              className="text-[13px] font-normal text-foreground truncate hover:text-primary hover:underline transition-colors text-left"
+              title={row.original.handoverNumber || row.original.id}
+            >
+              {row.original.handoverNumber || row.original.id}
+            </button>
+            <span className="font-medium text-[11px] text-muted-foreground truncate">{formatShortDate(row.original.handoverAt)} &bull; {formatTime(row.original.handoverAt)}</span>
+          </div>
+        );
+      },
     },
     {
-      id: 'handoverInfo',
-      accessorKey: 'id',
-      header: labels.colHandoverId || 'ID HANDOVER',
+      id: 'contractInfo',
+      accessorKey: 'contract.contractNumber',
+      header: labels.colContractRef || 'REF KONTRAK',
       size: 160,
-      cell: ({ row }) => (
-        <div className="flex flex-col gap-0.5 py-1">
-          <span className="font-normal text-[13px] text-foreground truncate">{row.original.id}</span>
-          <span className="text-[11px] text-muted-foreground truncate">{row.original.contract?.contractNumber || row.original.contractId}</span>
-        </div>
-      ),
+      cell: ({ row }) => {
+        const contract = row.original.contract;
+        return (
+          <div className="flex flex-col gap-0.5 py-1">
+            <span className="text-[13px] font-normal text-foreground truncate">{contract?.contractNumber || row.original.contractId}</span>
+            <span className="text-[11px] text-muted-foreground truncate">
+              {contract?.rentalType === 'SELF_DRIVE' ? (labels.valSelfDrive || 'Lepas Kunci') : (labels.valWithDriverFull || 'Dengan Pengemudi')}
+            </span>
+          </div>
+        );
+      },
     },
     {
       id: 'customer',
       accessorKey: 'customer.name',
-      header: labels.colCustomer || 'CUSTOMER',
-      size: 190,
+      header: labels.colCustomer || 'PELANGGAN',
+      size: 180,
       cell: ({ row }) => {
         const cust = row.original.customer;
         if (!cust) return <span className="text-muted-foreground text-[12px]">-</span>;
         return (
           <div className="flex flex-col gap-0.5 py-1">
-            <span className="font-normal text-[13px] text-foreground truncate">{cust.name}</span>
-            <span className="text-[11px] text-muted-foreground truncate capitalize">{cust.type?.toLowerCase() || '-'}</span>
+            <span className="text-[13px] font-normal text-foreground truncate">{cust.name}</span>
+            <span className="text-[11px] text-muted-foreground truncate capitalize">{cust.type === 'COMPANY' ? (labels.typeCompany || 'Perusahaan') : (labels.typeIndividual || 'Individu')}</span>
           </div>
         );
       },
     },
     {
-      id: 'date',
-      accessorKey: 'handoverAt',
-      header: labels.colDate || 'TGL SERAH TERIMA',
-      size: 150,
-      cell: ({ row }) => (
-        <div className="flex flex-col gap-0.5 py-1">
-          <span className="font-normal text-[13px] text-foreground">{formatShortDate(row.original.handoverAt)}</span>
-          <span className="text-[11px] text-muted-foreground">{formatTime(row.original.handoverAt)}</span>
-        </div>
-      ),
-    },
-    {
-      id: 'status',
-      accessorKey: 'status',
-      header: labels.colStatus || 'STATUS',
-      size: 110,
+      id: 'contact',
+      accessorKey: 'customer.phone',
+      header: labels.colContact || 'KONTAK',
+      size: 180,
       cell: ({ row }) => {
-        const isCompleted = row.original.status === 'COMPLETED';
+        const cust = row.original.customer;
+        if (!cust) return <span className="text-muted-foreground text-[12px]">-</span>;
+        const locationStr = cust.city ? `${cust.city}${cust.province ? ` - ${cust.province}` : ''}` : '-';
         return (
-          <div className={cn(
-            "inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold",
-            isCompleted 
-              ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400" 
-              : "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400"
-          )}>
-            {isCompleted ? labels.statusCompleted || 'Selesai' : labels.statusPartial || 'Sebagian'}
+          <div className="flex flex-col gap-0.5 py-1">
+            <div className="-ml-1">
+              <PhoneLink phone={cust.phone || ''} className="text-[13px] font-normal text-foreground ml-1 truncate" />
+            </div>
+            <span className="text-[11px] text-muted-foreground truncate">{locationStr}</span>
           </div>
         );
-      }
+      },
     },
     {
       id: 'vehicle',
       accessorKey: 'vehicleId',
       header: labels.colVehicle || 'KENDARAAN',
-      size: 550,
-      minSize: 350,
+      size: 250,
       cell: ({ row }) => {
+        const items = row.original.items || [];
+        const plateNumbers = items.map((i: any) => i.vehicle?.coreVehicle?.plateNumber || i.vehicleSnapshot?.licensePlate || i.id).filter(Boolean).join(', ');
+        
         return (
-          <div className="flex flex-wrap gap-1.5 py-1 min-w-[300px]">
-            {row.original.items.map((item, idx) => {
-              const cv = item.vehicle?.coreVehicle;
-              if (!cv) return null;
-              return (
-                <div 
-                  key={idx}
-                  className={cn(
-                    "inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium tracking-wide",
-                    "bg-slate-100 text-slate-700 cursor-pointer hover:bg-slate-200 transition-colors dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
-                  )}
-                  onClick={() => onViewMap(item)}
-                  title="Klik untuk melihat histori tracking map"
-                >
-                  {cv.plateNumber}
-                </div>
-              );
-            })}
+          <div className="flex flex-col gap-0.5 py-1">
+            <span className="text-[13px] font-normal text-foreground truncate">{items.length} {labels.textVehicles || 'Kendaraan'}</span>
+            <span className="mt-0.5 text-[11px] text-muted-foreground truncate" title={plateNumbers}>
+              {plateNumbers}
+            </span>
           </div>
         );
       },
     },
     {
-      id: 'contractDate',
-      accessorKey: '(contract.contractDate || contract.startDate)',
-      header: labels.colContractDate || 'TANGGAL KONTRAK',
-      size: 150,
+      id: 'notes',
+      accessorKey: 'items[0].notes',
+      header: labels.colNotes || 'CATATAN',
+      size: 200,
       cell: ({ row }) => {
-        const cDate = row.original.contract?.contractDate;
+        const notes = row.original.items?.[0]?.notes || '-';
         return (
-          <div className="flex flex-col gap-0.5 py-1">
-            <span className="font-normal text-[13px] text-foreground">{formatShortDate(cDate)}</span>
+          <div className="flex flex-col py-1 pr-4">
+            <span 
+              className="text-[13px] font-normal text-foreground line-clamp-2 whitespace-pre-wrap" 
+              title={notes !== '-' ? notes : undefined}
+            >
+              {notes}
+            </span>
           </div>
         );
-      }
+      },
     },
-    
+    {
+      id: 'staff',
+      accessorKey: 'items[0].staffName',
+      header: labels.colStaff || 'PETUGAS',
+      size: 140,
+      cell: ({ row }) => {
+        const staff = row.original.items?.[0]?.staffName || 'Admin';
+        return (
+          <div className="flex flex-col gap-0.5 py-1">
+            <span className="text-[13px] font-normal text-foreground truncate">{staff}</span>
+          </div>
+        );
+      },
+    }
   ];
 }
 
@@ -219,6 +231,7 @@ export function HandoverTable({
       className={className}
       data={data}
       columns={columns}
+      onRowActionClick={onViewDetail}
       // Capabilities
       searchable
       sortable
@@ -228,8 +241,8 @@ export function HandoverTable({
       // Search
       searchValue={searchValue}
       onSearchChange={onSearchChange}
-      searchPlaceholder="Cari..."
-      exportFilename="Data_Serah_Terima"
+      searchPlaceholder={labels.dtSearchPlaceholder || "Cari..."}
+      exportFilename={labels.dtExportFilename || "Data_Serah_Terima"}
       // Filter
       filterConfig={filterConfig}
       isFilterOpen={isFilterOpen}
@@ -237,6 +250,13 @@ export function HandoverTable({
       // UI Slots
       emptyTitle={labels.emptyTitle || "Tidak ada data serah terima"}
       emptyDescription={labels.emptyDescription || "Belum ada transaksi serah terima yang tercatat atau sesuai dengan pencarian Anda."}
+      labels={{
+        paginationShowing: (from, to, total) => labels.dtPaginationShowing ? labels.dtPaginationShowing.replace('{0}', from.toString()).replace('{1}', to.toString()).replace('{2}', total.toLocaleString(labels.locale || 'id-ID')) : `Menampilkan ${from}-${to} dari ${total.toLocaleString(labels.locale || 'id-ID')} data`,
+        paginationPerPage: labels.dtPaginationPerPage || ' / halaman',
+        toolbarFilter: labels.dtFilter || 'Filter',
+        toolbarColumns: labels.dtColumns || 'Kolom',
+        toolbarExport: labels.dtExport || 'Ekspor',
+      }}
       toolbarActions={
         <div className="flex items-center gap-2">
           {onAdd && (

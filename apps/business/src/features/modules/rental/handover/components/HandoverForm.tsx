@@ -12,7 +12,7 @@ interface HandoverFormProps {
   onSelectContract?: (contract: RentalContract) => void;
   handedOverItemIds?: string[];
   labels?: Record<string, string>;
-  onSubmit: (data: Omit<RentalHandover, 'id' | 'createdAt' | 'updatedAt'>[]) => void;
+  onSubmit: (data: (Omit<RentalHandover, 'id' | 'createdAt' | 'updatedAt' | 'handoverNumber'> & { handoverNumber?: string })[]) => void;
   onCancel: () => void;
   isSubmitting: boolean;
   layout?: 'default' | 'drawer' | 'dialog' | 'fullscreen';

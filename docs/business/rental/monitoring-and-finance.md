@@ -1,8 +1,8 @@
 # Monitoring & Keuangan
 
-## 1. Pemantauan Armada (Live Monitoring)
+## 1. Pemantauan Kendaraan (Live Monitoring)
 Rute: `/rental/monitoring`
-- Menampilkan armada yang saat ini berstatus `RENTED`.
+- Menampilkan kendaraan yang saat ini berstatus `RENTED`.
 - Menyediakan *progress bar* visual sisa durasi kontrak.
 - Memiliki fitur peringatan "*Overdue*" (waktu sewa habis namun belum dikembalikan).
 - Aksi Cepat: Integrasi *Live Tracking* kendaraan di peta, serta tombol *WhatsApp* langsung ke pelanggan.
@@ -14,9 +14,9 @@ Rute: `/rental/payments`
 - Tab 2: **Laporan per Sewa** (Menampilkan agregat DP, Pembayaran, Denda, dan Refund per ID Booking).
 - Komponen Ringkasan diatur posisinya via `PanelShell`.
 
-## 3. Produktivitas Armada (Productivity Report)
+## 3. Produktivitas Kendaraan (Productivity Report)
 Rute: `/rental/productivity`
-- Modul *Business Intelligence* untuk menghitung Utilisasi Armada.
+- Modul *Business Intelligence* untuk menghitung Utilisasi Kendaraan.
 - Pemfilteran dilakukan berbasis **Bulan** dan **Tahun**.
 - Matriks Laporan: Menghitung **Total Jam Sewa** dan **Total Frekuensi Sewa** yang berjalan dan berpotongan (overlap) dengan bulan/tahun yang difilter.
-- Digunakan untuk melihat armada mana yang paling produktif menghasilkan uang dan waktu.
+- Digunakan untuk melihat kendaraan mana yang paling produktif menghasilkan uang dan waktu.

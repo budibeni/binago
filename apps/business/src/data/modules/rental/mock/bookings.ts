@@ -115,7 +115,14 @@ export const mockBookings: Booking[] = [
           "brand": "Daihatsu",
           "model": "Mobil",
           "categoryName": "MPV Standard"
-        }
+        },
+        "itemStatus": "IN_USE",
+        "handoverNumber": "ST-MEGA-2410-001",
+        "handoverDate": "2026-10-15T08:00:00.000Z",
+        "handoverBy": "usr-001",
+        "handoverOdometer": 12000,
+        "handoverLocation": { "latitude": -6.203729, "longitude": 106.877172, "address": "Bandara Soekarno Hatta" },
+        "handoverCondition": { "fuelLevel": "FULL", "vehicleCondition": "GOOD", "equipmentChecklist": { "stnkOriginal": true, "spareKey": true, "jackAndTools": true, "spareTire": true, "firstAidKit": true }, "notes": "Siap jalan", "staffName": "Admin" }
       },
       {
         "id": "res-mega-001-item-2",
@@ -133,7 +140,14 @@ export const mockBookings: Booking[] = [
           "brand": "Toyota",
           "model": "Mobil",
           "categoryName": "MPV Standard"
-        }
+        },
+        "itemStatus": "IN_USE",
+        "handoverNumber": "ST-MEGA-2410-001",
+        "handoverDate": "2026-10-15T08:15:00.000Z",
+        "handoverBy": "usr-001",
+        "handoverOdometer": 15500,
+        "handoverLocation": { "latitude": -6.203729, "longitude": 106.877172, "address": "Bandara Soekarno Hatta" },
+        "handoverCondition": { "fuelLevel": "THREE_QUARTER", "vehicleCondition": "MINOR_DAMAGE", "equipmentChecklist": { "stnkOriginal": true, "spareKey": true, "jackAndTools": false, "spareTire": true, "firstAidKit": true }, "notes": "Baret halus di pintu", "staffName": "Admin" }
       },
       {
         "id": "res-mega-001-item-3",
@@ -447,7 +461,14 @@ export const mockBookings: Booking[] = [
           "brand": "Daihatsu",
           "model": "Mobil",
           "categoryName": "MPV Standard"
-        }
+        },
+        "itemStatus": "RETURNED",
+        "handoverNumber": "ST-2410-001",
+        "handoverDate": "2026-08-23T12:00:00.000Z",
+        "handoverBy": "usr-001",
+        "handoverOdometer": 12353,
+        "handoverLocation": { "latitude": -6.203729, "longitude": 106.877172, "address": "Kantor Cabang Utama Jakarta" },
+        "handoverCondition": { "fuelLevel": "FULL", "vehicleCondition": "GOOD", "equipmentChecklist": { "stnkOriginal": true, "spareKey": true, "jackAndTools": true, "spareTire": true, "firstAidKit": true }, "notes": "Kondisi prima", "staffName": "Admin" }
       },
       {
         "id": "res-001-item-2",
@@ -527,7 +548,14 @@ export const mockBookings: Booking[] = [
           "brand": "Toyota",
           "model": "Mobil",
           "categoryName": "MPV Standard"
-        }
+        },
+        "itemStatus": "RETURNED",
+        "handoverNumber": "ST-2410-002",
+        "handoverDate": "2026-08-23T12:00:00.000Z",
+        "handoverBy": "usr-001",
+        "handoverOdometer": 11285,
+        "handoverLocation": { "latitude": -6.182302, "longitude": 106.848099, "address": "Kantor Cabang Utama Jakarta" },
+        "handoverCondition": { "fuelLevel": "FULL", "vehicleCondition": "GOOD", "equipmentChecklist": { "stnkOriginal": true, "spareKey": true, "jackAndTools": true, "spareTire": true, "firstAidKit": true }, "notes": "Kondisi prima", "staffName": "Admin" }
       },
       {
         "id": "res-002-item-2",
@@ -589,7 +617,14 @@ export const mockBookings: Booking[] = [
           "brand": "Mitsubishi",
           "model": "Mobil",
           "categoryName": "MPV Standard"
-        }
+        },
+        "itemStatus": "IN_USE",
+        "handoverNumber": "ST-2410-003",
+        "handoverDate": "2026-08-23T12:00:00.000Z",
+        "handoverBy": "usr-001",
+        "handoverOdometer": 12222,
+        "handoverLocation": { "latitude": -6.167368, "longitude": 106.873397, "address": "Kantor Cabang Utama Jakarta" },
+        "handoverCondition": { "fuelLevel": "FULL", "vehicleCondition": "GOOD", "equipmentChecklist": { "stnkOriginal": true, "spareKey": true, "jackAndTools": true, "spareTire": true, "firstAidKit": true }, "notes": "Kondisi prima", "staffName": "Admin" }
       }
     ],
     "customerSnapshot": {
@@ -633,7 +668,14 @@ export const mockBookings: Booking[] = [
           "brand": "Daihatsu",
           "model": "Mobil",
           "categoryName": "MPV Premium"
-        }
+        },
+        "itemStatus": "IN_USE",
+        "handoverNumber": "ST-2410-004",
+        "handoverDate": "2026-08-23T12:00:00.000Z",
+        "handoverBy": "usr-001",
+        "handoverOdometer": 13251,
+        "handoverLocation": { "latitude": -6.167247, "longitude": 106.881062, "address": "Kantor Cabang Utama Jakarta" },
+        "handoverCondition": { "fuelLevel": "FULL", "vehicleCondition": "GOOD", "equipmentChecklist": { "stnkOriginal": true, "spareKey": true, "jackAndTools": true, "spareTire": true, "firstAidKit": true }, "notes": "Kondisi prima", "staffName": "Admin" }
       }
     ],
     "customerSnapshot": {

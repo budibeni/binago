@@ -19,7 +19,7 @@ Halaman Template Kontrak (`/rental/templates`) berfungsi sebagai **pusat peranca
    - Data Perusahaan Rental: `{{company.name}}`, `{{company.address}}`, `{{company.phone}}`, `{{company.email}}`.
    - Data Pelanggan Penyewa: `{{customer.name}}`, `{{customer.type}}`, `{{customer.phone}}`, `{{customer.email}}`, `{{customer.address}}`, `{{customer.identity}}`.
    - Data Pokok Kontrak: `{{contract.number}}`, `{{contract.contractDate}}`, `{{contract.startDate}}`, `{{contract.endDate}}`, `{{contract.totalAmount}}`, `{{contract.deposit}}`, `{{contract.terms}}`.
-   - Daftar Multi-Armada (Looping Tabel): `{{#each vehicles}}<tr><td>{{this.no}}</td><td>{{this.plateNumber}}</td><td>{{this.brand}} {{this.model}}</td><td>{{this.odometer}} km</td></tr>{{/each}}`.
+   - Daftar Multi-Kendaraan (Looping Tabel): `{{#each vehicles}}<tr><td>{{this.no}}</td><td>{{this.plateNumber}}</td><td>{{this.brand}} {{this.model}}</td><td>{{this.odometer}} km</td></tr>{{/each}}`.
 3. **Template Default Standar Resmi:** Menyediakan template hukum default (`DEFAULT_RENTAL_CONTRACT_TEMPLATE`) yang mencakup seluruh klausul hukum standar perjanjian rental kendaraan di Indonesia (komparisi para pihak, hak dan kewajiban, klausul asuransi, sanksi keterlambatan/kerusakan, dan kolom tanda tangan kedua belah pihak).
 4. **Pratinjau Hasil Cetak Langsung (*Live Document Preview*):** Menyediakan modal pratinjau (`DocumentTemplatePreview`) yang menyuntikkan data sampel nyata (`PREVIEW_MOCK_DATA`) ke dalam template sebelum disimpan atau diaktifkan.
 5. **Manajemen Siklus Template:** Mengatur aktivasi template (*Activate*), penonaktifan (*Deactivate*), pembuatan template baru (*Create*), dan penghapusan template (*Delete*).
@@ -60,7 +60,7 @@ Halaman Template Kontrak (`/rental/templates`) berfungsi sebagai **pusat peranca
   - Menampilkan daftar template yang tersedia, indikator template aktif, tombol pratinjau, aktivasi, dan penghapusan.
 - **`DocumentTemplateEditor` (dari `@adatrack/document-template`):**
   - Editor layar penuh berbasis TipTap untuk merancang konten HTML dokumen perjanjian.
-  - Memungkinkan penataan tabel daftar armada, kop surat perusahaan, dan pasal-pasal syarat sewa.
+  - Memungkinkan penataan tabel daftar kendaraan, kop surat perusahaan, dan pasal-pasal syarat sewa.
 - **`DocumentTemplatePreview` (dari `@adatrack/document-template`):**
   - Modal dialog pratinjau dokumen berukuran standar cetak A4.
   - Mengompilasi kode template dengan pustaka Handlebars untuk menampilkan hasil akhir dokumen dengan data nyata.
@@ -84,11 +84,11 @@ Halaman Template Kontrak (`/rental/templates`) berfungsi sebagai **pusat peranca
 | | `{{contract.contractDate}}` | Tanggal resmi penerbitan kontrak sewa |
 | | `{{contract.startDate}}` | Tanggal dan waktu awal penyerahan sewa |
 | | `{{contract.endDate}}` | Tanggal dan waktu akhir pengembalian sewa |
-| | `{{contract.totalAmount}}` | Total biaya sewa seluruh armada |
+| | `{{contract.totalAmount}}` | Total biaya sewa seluruh kendaraan |
 | | `{{contract.deposit}}` | Total uang jaminan (deposit) yang ditahan |
 | | `{{contract.terms}}` | Klausul syarat dan ketentuan tambahan |
-| **Multi-Armada** | `{{#each vehicles}}` | Pembuka perulangan daftar kendaraan yang disewa |
-| | `{{this.no}}` | Nomor urut armada |
+| **Multi-Kendaraan** | `{{#each vehicles}}` | Pembuka perulangan daftar kendaraan yang disewa |
+| | `{{this.no}}` | Nomor urut kendaraan |
 | | `{{this.plateNumber}}` | Plat nomor polisi kendaraan |
 | | `{{this.brand}}` | Merek pabrikan kendaraan |
 | | `{{this.model}}` | Model/tipe kendaraan |
