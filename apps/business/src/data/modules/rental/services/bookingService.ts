@@ -31,11 +31,30 @@ export interface CreateBookingPayload {
 
 class BookingService {
   async getBookings(): Promise<Booking[]> {
-    return await bookingRepository.getBookings();
+    const bookings = await bookingRepository.getBookings();
+    const vehicles = await rentalVehicleService.getRentalVehicles();
+    
+    return bookings.map(b => ({
+      ...b,
+      items: b.items.map(item => ({
+        ...item,
+        vehicle: item.vehicle || vehicles.find(v => v.vehicleId === item.vehicleId) as any
+      }))
+    }));
   }
 
   async getBookingById(id: string): Promise<Booking | undefined> {
-    return await bookingRepository.getBookingById(id);
+    const booking = await bookingRepository.getBookingById(id);
+    if (!booking) return undefined;
+    
+    const vehicles = await rentalVehicleService.getRentalVehicles();
+    return {
+      ...booking,
+      items: booking.items.map(item => ({
+        ...item,
+        vehicle: item.vehicle || vehicles.find(v => v.vehicleId === item.vehicleId) as any
+      }))
+    };
   }
 
   async checkVehicleAvailability(vehicleIds: string[], startDateStr: string, endDateStr: string): Promise<{ available: boolean; reason?: string }> {

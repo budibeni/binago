@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, Button, FormShell, FormCard, InputNumber, InputTextarea, Label, InputSelect, InputCheckbox, InputDateTimeGps, PhoneLink } from '@adatrack/ui';
-import { MapPin, Car, Fuel, Wrench, CheckSquare, Clock, FileText, StickyNote, Search, ChevronDown, ChevronUp, CheckCircle2 } from 'lucide-react';
+import { MapPin, Car, Fuel, Wrench, CheckSquare, Clock, FileText, StickyNote, Search, ChevronDown, ChevronUp, CheckCircle2, ArrowRightLeft } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import type { RentalContract } from '../../contracts/types/contract';
 import type { RentalHandover } from '../types/handover';
@@ -64,12 +64,16 @@ export function HandoverForm({ contract, eligibleContracts = [], onSelectContrac
     }
   }, [open]);
 
+  const autoLocationRef = React.useRef<{lat: number, lng: number} | null>(null);
+
   React.useEffect(() => {
     if (open && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
+          autoLocationRef.current = { lat, lng };
+          
           setVehicleData(prev => {
             const next = { ...prev };
             let hasChanges = false;
@@ -85,6 +89,8 @@ export function HandoverForm({ contract, eligibleContracts = [], onSelectContrac
         (err) => console.error("Auto location error:", err),
         { enableHighAccuracy: true, timeout: 10000 }
       );
+    } else if (!open) {
+      autoLocationRef.current = null;
     }
   }, [open]);
 
@@ -121,19 +127,18 @@ export function HandoverForm({ contract, eligibleContracts = [], onSelectContrac
 
           newData[item.id] = {
             handoverAt: defaultHandoverAt,
-            latitude: null,
-            longitude: null,
+            latitude: autoLocationRef.current?.lat ?? null,
+            longitude: autoLocationRef.current?.lng ?? null,
             address: '',
             odometer: null,
             fuelLevel: '',
             vehicleCondition: '',
             equipment: {
-              stnk: false,
-              spareTire: false,
-              jack: false,
-              toolkit: false,
-              triangle: false,
-              fireExtinguisher: false,
+              stnkOriginal: item.vehicle?.completenessChecklist?.stnkOriginal ?? false,
+              spareKey: item.vehicle?.completenessChecklist?.spareKey ?? false,
+              jackAndTools: item.vehicle?.completenessChecklist?.jackAndTools ?? false,
+              spareTire: item.vehicle?.completenessChecklist?.spareTire ?? false,
+              firstAidKit: item.vehicle?.completenessChecklist?.firstAidKit ?? false,
             }
           };
         }
@@ -149,11 +154,11 @@ export function HandoverForm({ contract, eligibleContracts = [], onSelectContrac
     for (const id of selectedItemIds) {
       const data = vehicleData[id];
       if (data.odometer === null || data.fuelLevel === '' || data.vehicleCondition === '') {
-        alert('Mohon lengkapi data Odometer, BBM, dan Kondisi untuk semua kendaraan yang dipilih.');
+        alert(labels.errIncompleteForm || 'Mohon lengkapi data Odometer, BBM, dan Kondisi untuk semua kendaraan yang dipilih.');
         return;
       }
       if (!data.latitude || !data.longitude) {
-        alert('Lokasi serah terima wajib diambil untuk semua kendaraan yang dipilih.');
+        alert(labels.errIncompleteLocation || 'Lokasi serah terima wajib diambil untuk semua kendaraan yang dipilih.');
         return;
       }
     }
@@ -226,7 +231,7 @@ export function HandoverForm({ contract, eligibleContracts = [], onSelectContrac
                   <Search className="w-7 h-7 text-primary" />
                 </div>
                 <h3 className="text-2xl font-bold text-foreground tracking-tight">{labels.formTitle || 'Proses Serah Terima'}</h3>
-                <p className="text-[14px] text-muted-foreground mt-2 max-w-sm mx-auto">Cari nomor kontrak, nama pelanggan, atau plat nomor kendaraan untuk memulai proses serah terima.</p>
+                <p className="text-[14px] text-muted-foreground mt-2 max-w-sm mx-auto">{labels.descSearchContract || 'Cari nomor kontrak, nama pelanggan, atau plat nomor kendaraan untuk memulai proses serah terima.'}</p>
               </div>
             )}
 
@@ -237,7 +242,7 @@ export function HandoverForm({ contract, eligibleContracts = [], onSelectContrac
                 </div>
                 <input
                   type="text"
-                  placeholder="Cari nomor kontrak, nama pelanggan, atau plat nomor..."
+                  placeholder={labels.placeholderSearchContract || "Cari nomor kontrak, nama pelanggan, atau plat nomor..."}
                   value={eligibleSearch}
                   onChange={(e) => {
                     setEligibleSearch(e.target.value);
@@ -262,8 +267,8 @@ export function HandoverForm({ contract, eligibleContracts = [], onSelectContrac
                           setExpandedContracts(newSet);
                         };
 
-                        const formatDt = (d?: string) => d ? new Date(d).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-';
-                        const formatShortD = (d?: string) => d ? new Date(d).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-';
+                        const formatDt = (d?: string) => d ? new Date(d).toLocaleDateString(labels.locale || 'id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-';
+                        const formatShortD = (d?: string) => d ? new Date(d).toLocaleDateString(labels.locale || 'id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-';
                         const isToday = (d?: string) => {
                           if (!d) return false;
                           const date = new Date(d);
@@ -289,26 +294,27 @@ export function HandoverForm({ contract, eligibleContracts = [], onSelectContrac
                             {/* Bagian Atas: 5 Kolom */}
                             <div className="p-4 sm:p-5 grid grid-cols-2 md:grid-cols-5 gap-5 items-start w-full">
                               <div className="flex flex-col gap-1">
-                                <span className="text-[10px] font-semibold tracking-wider text-slate-400 dark:text-slate-500 uppercase">No Kontrak</span>
+                                <span className="text-[10px] font-semibold tracking-wider text-slate-400 dark:text-slate-500 uppercase">{labels.fieldContractNumber || 'No Kontrak'}</span>
                                 <span className="text-[12px] font-semibold text-slate-800 dark:text-slate-200">{c.contractNumber}</span>
                                 <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{contractDate}</span>
                               </div>
 
                               <div className="flex flex-col gap-1">
-                                <span className="text-[10px] font-semibold tracking-wider text-slate-400 dark:text-slate-500 uppercase">Nama Pelanggan</span>
+                                <span className="text-[10px] font-semibold tracking-wider text-slate-400 dark:text-slate-500 uppercase">{labels.fieldCustomer || 'Nama Pelanggan'}</span>
                                 <span className="text-[12px] font-semibold text-slate-800 dark:text-slate-200 line-clamp-1" title={c.customerSnapshot?.name}>{c.customerSnapshot?.name || '-'}</span>
                                 <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1">{custType} - <PhoneLink phone={custPhone} className="text-slate-500 dark:text-slate-400" /></span>
                               </div>
 
                               <div className="flex flex-col gap-1">
-                                <span className="text-[10px] font-semibold tracking-wider text-slate-400 dark:text-slate-500 uppercase">Waktu Ambil</span>
+                                <span className="text-[10px] font-semibold tracking-wider text-slate-400 dark:text-slate-500 uppercase">{labels.fieldRentalPeriod || 'Periode Sewa'}</span>
                                 <span className={cn("text-[12px] font-semibold", isStartDateToday ? "text-destructive" : "text-slate-800 dark:text-slate-200")}>{startDate}</span>
-                                <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Selesai: {endDate}</span>
+                                <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{(labels.textEnd || 'Selesai:')} {endDate}</span>
                               </div>
 
                               <div className="flex flex-col gap-1">
-                                <span className="text-[10px] font-semibold tracking-wider text-slate-400 dark:text-slate-500 uppercase">Lokasi Ambil</span>
+                                <span className="text-[10px] font-semibold tracking-wider text-slate-400 dark:text-slate-500 uppercase">{labels.fieldPickupLocation || 'Lokasi Pengambilan'}</span>
                                 <span className="text-[12px] font-semibold text-slate-800 dark:text-slate-200 line-clamp-2" title={c.pickupLocation || '-'}>{c.pickupLocation || '-'}</span>
+                                <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{(labels.textType || 'Tipe:')} {c.rentalType === 'SELF_DRIVE' ? (labels.valSelfDrive || 'Lepas Kunci') : (labels.valWithDriver || 'Dgn Sopir')}</span>
                               </div>
 
                               <div className="flex md:justify-end md:ml-auto w-full md:w-auto mt-2 md:mt-0">
@@ -317,7 +323,7 @@ export function HandoverForm({ contract, eligibleContracts = [], onSelectContrac
                                   className="h-8 text-[11px] px-6 w-full md:w-auto font-medium rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 hover:bg-red-500 hover:text-white hover:border-red-500 transition-all duration-300"
                                   onClick={() => onSelectContract?.(c)}
                                 >
-                                  Pilih Kontrak
+                                  {labels.btnSelectContract || 'Pilih Kontrak'}
                                 </Button>
                               </div>
                             </div>
@@ -329,7 +335,7 @@ export function HandoverForm({ contract, eligibleContracts = [], onSelectContrac
                                 onClick={toggleExpand}
                               >
                                 <span className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
-                                  {handedOverCount}/{itemsCount} Kendaraan
+                                  {handedOverCount}/{itemsCount} {labels.textVehicles || 'Kendaraan'}
                                 </span>
                                 {isExpanded ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
                               </div>
@@ -377,32 +383,46 @@ export function HandoverForm({ contract, eligibleContracts = [], onSelectContrac
           <FormCard
             title={labels.sectionContract || 'Informasi Kontrak'}
             description={labels.descContract || "Rincian kontrak penyewaan yang menjadi dasar serah terima."}
-            icon={<FileText className="w-4 h-4 text-primary" />}
-            iconWrapperClassName="text-primary"
+            icon={<FileText className="w-5 h-5 text-blue-500" />}
+            iconWrapperClassName="bg-blue-100 dark:bg-blue-900/30 text-blue-500"
             action={
-              <Button variant="outline" size="sm" onClick={() => onSelectContract && onSelectContract(null as any)} className="h-7 text-xs px-3">Ganti Kontrak</Button>
+              <Button variant="outline" size="sm" onClick={() => onSelectContract && onSelectContract(null as any)} className="h-7 text-xs px-3 gap-1.5">
+                <ArrowRightLeft className="w-3.5 h-3.5" />
+                {labels.btnChangeContract || 'Ganti Kontrak'}
+              </Button>
             }
           >
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
-              <div>
-                <p className="text-[13px] font-normal text-neutral-500 mb-1">{labels.fieldContractNumber || 'Nomor Kontrak'}</p>
-                <p className="text-[13px] font-semibold text-foreground">{contract.contractNumber}</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 animate-in fade-in slide-in-from-top-2 duration-300">
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] font-semibold tracking-wider text-slate-400 dark:text-slate-500 uppercase">{labels.fieldContractNumber || 'No Kontrak'}</span>
+                <span className="text-[12px] font-semibold text-slate-800 dark:text-slate-200">{contract.contractNumber}</span>
+                <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                  {(contract.contractDate || contract.createdAt) ? new Date(contract.contractDate || contract.createdAt).toLocaleDateString(labels.locale || 'id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-'}
+                </span>
               </div>
-              <div>
-                <p className="text-[13px] font-normal text-neutral-500 mb-1">{labels.fieldCustomer || 'Pelanggan'}</p>
-                <p className="text-[13px] font-semibold text-foreground">{contract.customerSnapshot?.name || '-'}</p>
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] font-semibold tracking-wider text-slate-400 dark:text-slate-500 uppercase">{labels.fieldCustomer || 'Nama Pelanggan'}</span>
+                <span className="text-[12px] font-semibold text-slate-800 dark:text-slate-200 line-clamp-1" title={contract.customerSnapshot?.name}>{contract.customerSnapshot?.name || '-'}</span>
+                <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1">
+                  {contract.customerSnapshot?.type || '-'} - <PhoneLink phone={contract.customerSnapshot?.phone || '-'} className="text-slate-500 dark:text-slate-400" />
+                </span>
               </div>
-              <div>
-                <p className="text-[13px] font-normal text-neutral-500 mb-1">{labels.fieldRentPeriod || 'Periode Sewa'}</p>
-                <p className="text-[13px] font-semibold text-foreground">
-                  {new Date(contract.startDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })} - {new Date(getMaxEndDate(contract.items || [])).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })}
-                </p>
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] font-semibold tracking-wider text-slate-400 dark:text-slate-500 uppercase">{labels.fieldRentalPeriod || 'Periode Sewa'}</span>
+                <span className={cn(
+                  "text-[12px] font-semibold", 
+                  (contract.startDate && new Date(contract.startDate).toDateString() === new Date().toDateString()) ? "text-destructive" : "text-slate-800 dark:text-slate-200"
+                )}>
+                  {contract.startDate ? new Date(contract.startDate).toLocaleDateString(labels.locale || 'id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-'}
+                </span>
+                <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                  {(labels.textEnd || 'Selesai:')} {(contract.items && contract.items.length > 0) ? new Date(getMaxEndDate(contract.items)).toLocaleDateString(labels.locale || 'id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-'}
+                </span>
               </div>
-              <div>
-                <p className="text-[13px] font-normal text-neutral-500 mb-1">{labels.fieldService || 'Layanan'}</p>
-                <p className="text-[13px] font-semibold text-foreground">
-                  {contract.rentalType === 'SELF_DRIVE' ? labels.typeSelfDrive || 'Lepas Kunci' : labels.typeWithDriver || 'Dgn Sopir'}
-                </p>
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] font-semibold tracking-wider text-slate-400 dark:text-slate-500 uppercase">{labels.fieldPickupLocation || 'Lokasi Pengambilan'}</span>
+                <span className="text-[12px] font-semibold text-slate-800 dark:text-slate-200 line-clamp-2" title={contract.pickupLocation || '-'}>{contract.pickupLocation || '-'}</span>
+                <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{(labels.textType || 'Tipe:')} {contract.rentalType === 'SELF_DRIVE' ? (labels.valSelfDrive || 'Lepas Kunci') : (labels.valWithDriver || 'Dgn Sopir')}</span>
               </div>
             </div>
 
@@ -473,7 +493,7 @@ export function HandoverForm({ contract, eligibleContracts = [], onSelectContrac
                               }}
                             />
                             <span className={cn("font-bold text-sm text-slate-800 dark:text-slate-200 transition-colors", !isSingleVehicle && "group-hover:text-primary")}>
-                              {(isSingleVehicle ? pendingItems[0] : item)?.vehicle?.coreVehicle?.plateNumber || (isSingleVehicle ? pendingItems[0] : item)?.vehicleSnapshot?.licensePlate || "Belum ada Nopol"}
+                              {(isSingleVehicle ? pendingItems[0] : item)?.vehicle?.coreVehicle?.plateNumber || (isSingleVehicle ? pendingItems[0] : item)?.vehicleSnapshot?.licensePlate || (labels.textNoPlate || "Belum ada Nopol")}
                             </span>
                           </label>
                           <span className="text-[13px] font-semibold text-slate-500 dark:text-slate-400">
@@ -545,8 +565,13 @@ export function HandoverForm({ contract, eligibleContracts = [], onSelectContrac
                           <div className="bg-slate-50/50 dark:bg-slate-800/10 rounded-xl border border-dashed border-slate-200 dark:border-slate-700 p-3.5">
                             <Label className="text-[11px] uppercase font-semibold text-slate-500 dark:text-slate-400 mb-2.5 block tracking-wide">{labels.fieldEquipment || 'Kelengkapan Kendaraan'}</Label>
                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                              {Object.keys(vehicleData[activeTab]?.equipment || {}).map((key) => {
-                                if (key === 'other') return null;
+                              {[
+                                { key: 'stnkOriginal', label: labels.equipStnk || 'STNK Original' },
+                                { key: 'spareKey', label: labels.equipSpareKey || 'Kunci Cadangan' },
+                                { key: 'jackAndTools', label: labels.equipJackAndTools || 'Dongkrak & Toolkit' },
+                                { key: 'spareTire', label: labels.equipSpareTire || 'Ban Cadangan' },
+                                { key: 'firstAidKit', label: labels.equipFirstAid || 'P3K' }
+                              ].map(({ key, label }) => {
                                 const isItemChecked = (vehicleData[activeTab]?.equipment as any)?.[key] || false;
                                 return (
                                   <label
@@ -572,7 +597,7 @@ export function HandoverForm({ contract, eligibleContracts = [], onSelectContrac
                                       })}
                                     />
                                     <span className="text-[13px] font-medium text-slate-700 dark:text-slate-300 select-none">
-                                      {key.replace(/([A-Z])/g, ' $1').trim().replace(/^\w/, c => c.toUpperCase())}
+                                      {label}
                                     </span>
                                   </label>
                                 );
@@ -596,8 +621,8 @@ export function HandoverForm({ contract, eligibleContracts = [], onSelectContrac
             <FormCard
               title={labels.sectionNotes || 'Catatan Tambahan'}
               description={labels.descNotes || "Catatan tambahan secara keseluruhan jika ada."}
-              icon={<StickyNote className="w-4 h-4 text-neutral-500" />}
-              iconWrapperClassName="text-neutral-500"
+              icon={<StickyNote className="w-5 h-5 text-amber-500" />}
+              iconWrapperClassName="bg-amber-100 dark:bg-amber-900/30 text-amber-500"
             >
               <InputTextarea
                 id="notes"

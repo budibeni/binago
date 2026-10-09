@@ -94,6 +94,28 @@ const id = {
   btnCancel: 'Batal',
   btnSave: 'Simpan Serah Terima',
   btnSaving: 'Menyimpan...',
+
+  // Baru ditambahkan untuk HandoverForm
+  locale: 'id-ID',
+  errIncompleteForm: 'Mohon lengkapi data Odometer, BBM, dan Kondisi untuk semua kendaraan yang dipilih.',
+  errIncompleteLocation: 'Lokasi serah terima wajib diambil untuk semua kendaraan yang dipilih.',
+  descSearchContract: 'Cari nomor kontrak, nama pelanggan, atau plat nomor kendaraan untuk memulai proses serah terima.',
+  placeholderSearchContract: 'Cari nomor kontrak, nama pelanggan, atau plat nomor...',
+  fieldRentalPeriod: 'Periode Sewa',
+  textEnd: 'Selesai:',
+  fieldPickupLocation: 'Lokasi Pengambilan',
+  textType: 'Tipe:',
+  valSelfDrive: 'Lepas Kunci',
+  valWithDriver: 'Dgn Sopir',
+  btnSelectContract: 'Pilih Kontrak',
+  textVehicles: 'Kendaraan',
+  btnChangeContract: 'Ganti Kontrak',
+  textNoPlate: 'Belum ada Nopol',
+  equipStnk: 'STNK Original',
+  equipSpareKey: 'Kunci Cadangan',
+  equipJackAndTools: 'Dongkrak & Toolkit',
+  equipSpareTire: 'Ban Cadangan',
+  equipFirstAid: 'P3K',
 };
 
 const en: HandoverLocaleDict = {
@@ -190,6 +212,28 @@ const en: HandoverLocaleDict = {
   btnCancel: 'Cancel',
   btnSave: 'Save Handover',
   btnSaving: 'Saving...',
+
+  // Baru ditambahkan untuk HandoverForm
+  locale: 'en-US',
+  errIncompleteForm: 'Please complete Odometer, Fuel, and Condition data for all selected vehicles.',
+  errIncompleteLocation: 'Handover location must be captured for all selected vehicles.',
+  descSearchContract: 'Search for contract number, customer name, or license plate to start the handover process.',
+  placeholderSearchContract: 'Search contract number, customer name, or license plate...',
+  fieldRentalPeriod: 'Rental Period',
+  textEnd: 'End:',
+  fieldPickupLocation: 'Pickup Location',
+  textType: 'Type:',
+  valSelfDrive: 'Self Drive',
+  valWithDriver: 'With Driver',
+  btnSelectContract: 'Select Contract',
+  textVehicles: 'Vehicles',
+  btnChangeContract: 'Change Contract',
+  textNoPlate: 'No Plate',
+  equipStnk: 'Original STNK',
+  equipSpareKey: 'Spare Key',
+  equipJackAndTools: 'Jack & Toolkit',
+  equipSpareTire: 'Spare Tire',
+  equipFirstAid: 'First Aid Kit',
 };
 
 export const getHandoverTranslation = (locale: 'id' | 'en') => {
