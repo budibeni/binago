@@ -2,30 +2,33 @@ import React, { useState } from 'react';
 import { api } from '@adatrack/utils';
 import { Button, toast, InputString, InputTextarea, Checkbox } from '@adatrack/ui';
 import { Role } from '../hooks/useRoles';
+import { getRolesTranslation, RolesLocale } from '../i18n';
 
 // Available permissions in Adatrack
 const AVAILABLE_PERMISSIONS = [
-  { id: 'vehicles:read', label: 'Melihat Kendaraan', group: 'Kendaraan' },
-  { id: 'vehicles:write', label: 'Mengelola Kendaraan (Tambah/Edit/Hapus)', group: 'Kendaraan' },
-  { id: 'routes:read', label: 'Melihat Rute', group: 'Rute & Penugasan' },
-  { id: 'routes:write', label: 'Mengelola Rute & Penugasan (Assign/Selesai)', group: 'Rute & Penugasan' },
-  { id: 'geofences:read', label: 'Melihat Geofence', group: 'Geofence' },
-  { id: 'geofences:write', label: 'Mengelola Geofence', group: 'Geofence' },
-  { id: 'alerts:read', label: 'Melihat Peringatan (Alerts & SOS)', group: 'Peringatan' },
-  { id: 'alerts:write', label: 'Mengelola Peringatan', group: 'Peringatan' },
-  { id: 'reports:read', label: 'Melihat Laporan', group: 'Laporan' },
-  { id: 'users:read', label: 'Melihat Pengguna/Karyawan', group: 'Pengguna' },
-  { id: 'users:write', label: 'Mengelola Pengguna/Karyawan', group: 'Pengguna' },
-  { id: 'settings:write', label: 'Mengelola Pengaturan & Role', group: 'Pengaturan' }
+  { id: 'vehicles:read', labelKey: 'vehicles:read', groupKey: 'Kendaraan' },
+  { id: 'vehicles:write', labelKey: 'vehicles:write', groupKey: 'Kendaraan' },
+  { id: 'routes:read', labelKey: 'routes:read', groupKey: 'Rute & Penugasan' },
+  { id: 'routes:write', labelKey: 'routes:write', groupKey: 'Rute & Penugasan' },
+  { id: 'geofences:read', labelKey: 'geofences:read', groupKey: 'Geofence' },
+  { id: 'geofences:write', labelKey: 'geofences:write', groupKey: 'Geofence' },
+  { id: 'alerts:read', labelKey: 'alerts:read', groupKey: 'Peringatan' },
+  { id: 'alerts:write', labelKey: 'alerts:write', groupKey: 'Peringatan' },
+  { id: 'reports:read', labelKey: 'reports:read', groupKey: 'Laporan' },
+  { id: 'users:read', labelKey: 'users:read', groupKey: 'Pengguna' },
+  { id: 'users:write', labelKey: 'users:write', groupKey: 'Pengguna' },
+  { id: 'settings:write', labelKey: 'settings:write', groupKey: 'Pengaturan' }
 ];
 
 interface RoleFormProps {
   role?: Role | null;
+  locale?: RolesLocale;
   onSuccess: () => void;
   onCancel: () => void;
 }
 
-export function RoleForm({ role, onSuccess, onCancel }: RoleFormProps) {
+export function RoleForm({ role, locale = 'id', onSuccess, onCancel }: RoleFormProps) {
+  const t = getRolesTranslation(locale);
   const [formData, setFormData] = useState({
     name: role?.name || '',
     code: role?.code || '',
@@ -57,7 +60,7 @@ export function RoleForm({ role, onSuccess, onCancel }: RoleFormProps) {
           description: formData.description,
           permissions: formData.permissions
         });
-        toast.success('Role berhasil diperbarui');
+        toast.success(t.successUpdate);
       } else {
         await api.post('/settings/roles', {
           code: formData.code.toUpperCase().replace(/\s+/g, '_'),
@@ -65,21 +68,25 @@ export function RoleForm({ role, onSuccess, onCancel }: RoleFormProps) {
           description: formData.description,
           permissions: formData.permissions
         });
-        toast.success('Role berhasil dibuat');
+        toast.success(t.successCreate);
       }
       onSuccess();
     } catch (err: any) {
-      toast.error(err.message || 'Gagal menyimpan role');
+      toast.error(err.message || t.failedSave);
     } finally {
       setLoading(false);
     }
   };
 
   const groupedPermissions = AVAILABLE_PERMISSIONS.reduce((acc, curr) => {
-    if (!acc[curr.group]) acc[curr.group] = [];
-    acc[curr.group].push(curr);
+    const groupName = t.permGroups[curr.groupKey as keyof typeof t.permGroups] || curr.groupKey;
+    if (!acc[groupName]) acc[groupName] = [];
+    acc[groupName].push({
+      ...curr,
+      label: t.permLabels[curr.labelKey as keyof typeof t.permLabels] || curr.labelKey
+    });
     return acc;
-  }, {} as Record<string, typeof AVAILABLE_PERMISSIONS>);
+  }, {} as Record<string, any[]>);
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4 py-4 w-full max-w-md sm:w-[500px]">
@@ -87,29 +94,29 @@ export function RoleForm({ role, onSuccess, onCancel }: RoleFormProps) {
       {!isEditing && (
         <InputString
           id="code"
-          label="Kode Internal"
+          label={t.internalCode}
           required
           disabled={isEditing}
-          placeholder="Cth: KEPALA_GUDANG"
+          placeholder={t.internalCodePlaceholder}
           value={displayCode}
           onChange={val => setFormData({ ...formData, code: val })}
-          helpText="Kode unik yang digunakan oleh sistem (tanpa spasi). Sistem otomatis menambahkan awalan CUSTOM_."
+          helpText={t.internalCodeHelp}
         />
       )}
 
       <InputString
         id="name"
-        label="Nama Tampilan"
+        label={t.displayName}
         required
-        placeholder="Contoh: Kepala Gudang Pusat"
+        placeholder={t.displayNamePlaceholder}
         value={formData.name}
         onChange={val => setFormData({ ...formData, name: val })}
       />
 
       <InputTextarea
         id="description"
-        label="Deskripsi Singkat"
-        placeholder="Tugas dan wewenang role ini..."
+        label={t.shortDescription}
+        placeholder={t.shortDescriptionPlaceholder}
         value={formData.description}
         onChange={val => setFormData({ ...formData, description: val })}
         rows={2}
@@ -118,10 +125,10 @@ export function RoleForm({ role, onSuccess, onCancel }: RoleFormProps) {
       <div className="flex flex-col gap-3 mt-2 border-t pt-4 border-border">
         <div className="flex items-center justify-between">
           <label className="text-sm font-medium text-foreground">
-            Daftar Hak Akses
+            {t.permissionsList}
           </label>
           <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">
-            {formData.permissions.length} dipilih
+            {formData.permissions.length} {t.selected}
           </span>
         </div>
         <div className="h-[250px] overflow-y-auto pr-2 flex flex-col gap-4 border border-border rounded-md p-4 bg-muted/30">
@@ -148,9 +155,9 @@ export function RoleForm({ role, onSuccess, onCancel }: RoleFormProps) {
       </div>
 
       <div className="flex justify-end gap-3 pt-4 border-t border-border mt-4">
-        <Button type="button" variant="outline" onClick={onCancel}>Batal</Button>
+        <Button type="button" variant="outline" onClick={onCancel}>{t.cancel}</Button>
         <Button type="submit" disabled={loading}>
-          {loading ? 'Menyimpan...' : 'Simpan Role'}
+          {loading ? t.saving : t.saveRole}
         </Button>
       </div>
     </form>

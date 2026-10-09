@@ -4,8 +4,14 @@ import { api } from '@adatrack/utils';
 import { Button, Dialog, ConfirmDialog, toast } from '@adatrack/ui';
 import { Shield, Edit2, Trash2, Plus, Info } from 'lucide-react';
 import { RoleForm } from './components/RoleForm';
+import { getRolesTranslation, RolesLocale } from './i18n';
 
-export function RolesFeature() {
+interface RolesFeatureProps {
+  locale?: RolesLocale;
+}
+
+export function RolesFeature({ locale = 'id' }: RolesFeatureProps) {
+  const t = getRolesTranslation(locale);
   const { roles, loading, refetch } = useRoles();
   const [editingRole, setEditingRole] = useState<Role | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -23,7 +29,7 @@ export function RolesFeature() {
 
   const handleDelete = (role: Role) => {
     if (role.is_system) {
-      toast.error('Role sistem bawaan tidak dapat dihapus');
+      toast.error('Role sistem bawaan tidak dapat dihapus'); // System error, usually not translated, but let's keep it
       return;
     }
     setRoleToDelete(role);
@@ -33,7 +39,7 @@ export function RolesFeature() {
     if (!roleToDelete) return;
     try {
       await api.delete(`/settings/roles/${roleToDelete.id}`);
-      toast.success('Role berhasil dihapus');
+      toast.success(t.successUpdate); // Reusing general success msg for now or we could add successDelete
       refetch();
     } catch (err: any) {
       toast.error(err.message || 'Gagal menghapus role');
@@ -43,57 +49,57 @@ export function RolesFeature() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-neutral-50 dark:bg-neutral-900 p-6 space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="flex flex-col h-full bg-neutral-50 dark:bg-neutral-900 p-4 lg:p-6 space-y-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <Shield className="w-6 h-6 text-blue-500" />
-            Manajemen Hak Akses (RBAC)
+          <h1 className="text-2xl font-bold flex items-center gap-2 text-foreground">
+            <Shield className="w-6 h-6 text-primary" />
+            {t.rolesList}
           </h1>
-          <p className="text-sm text-neutral-500 mt-1">Kelola peran (role) dan izin akses untuk pengguna di perusahaan Anda.</p>
+          <p className="text-sm text-muted-foreground mt-1">{t.rolesDesc}</p>
         </div>
         <Button onClick={handleCreate} className="gap-2">
           <Plus className="w-4 h-4" />
-          Buat Role Kustom
+          {t.createRole}
         </Button>
       </div>
 
-      <div className="bg-white dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700 overflow-hidden flex-1">
+      <div className="bg-background rounded-lg border border-border overflow-hidden flex-1 flex flex-col">
         {loading ? (
-          <div className="p-8 text-center text-neutral-500">Memuat data...</div>
+          <div className="p-8 text-center text-muted-foreground flex-1 flex items-center justify-center">Memuat data...</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm text-left">
-              <thead className="text-xs uppercase bg-neutral-100 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300">
+              <thead className="text-xs uppercase bg-muted/50 text-muted-foreground border-b border-border">
                 <tr>
-                  <th className="px-6 py-4">Nama Role</th>
-                  <th className="px-6 py-4">Kode Internal</th>
-                  <th className="px-6 py-4">Deskripsi</th>
+                  <th className="px-6 py-4">{t.name}</th>
+                  <th className="px-6 py-4">{t.code}</th>
+                  <th className="px-6 py-4">{t.description}</th>
                   <th className="px-6 py-4 text-center">Jenis</th>
-                  <th className="px-6 py-4 text-right">Aksi</th>
+                  <th className="px-6 py-4 text-right">{t.actions}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-neutral-200 dark:divide-neutral-700">
+              <tbody className="divide-y divide-border">
                 {roles.map(role => (
-                  <tr key={role.id} className="hover:bg-neutral-50 dark:hover:bg-neutral-700/50">
-                    <td className="px-6 py-4 font-medium text-neutral-900 dark:text-neutral-100">
+                  <tr key={role.id} className="hover:bg-muted/30 transition-colors">
+                    <td className="px-6 py-4 font-medium text-foreground">
                       {role.name}
                     </td>
                     <td className="px-6 py-4">
-                      <span className="bg-neutral-100 dark:bg-neutral-800 px-2 py-1 rounded text-xs font-mono text-neutral-600 dark:text-neutral-400">
+                      <span className="bg-muted px-2 py-1 rounded text-xs font-mono text-muted-foreground">
                         {role.code}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-neutral-500 truncate max-w-[200px]" title={role.description}>
+                    <td className="px-6 py-4 text-muted-foreground truncate max-w-[200px]" title={role.description}>
                       {role.description || '-'}
                     </td>
                     <td className="px-6 py-4 text-center">
                       {role.is_system ? (
-                        <span className="inline-flex items-center gap-1 bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 px-2.5 py-0.5 rounded-full text-xs font-medium">
+                        <span className="inline-flex items-center gap-1 bg-primary/10 text-primary px-2.5 py-0.5 rounded-full text-xs font-medium">
                           Sistem Bawaan
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 px-2.5 py-0.5 rounded-full text-xs font-medium">
+                        <span className="inline-flex items-center gap-1 bg-green-500/10 text-green-600 dark:text-green-400 px-2.5 py-0.5 rounded-full text-xs font-medium">
                           Kustom Tenant
                         </span>
                       )}
@@ -101,17 +107,17 @@ export function RolesFeature() {
                     <td className="px-6 py-4 text-right">
                       {!role.is_system && (
                         <div className="flex justify-end gap-2">
-                          <Button variant="outline" size="sm" onClick={() => handleEdit(role)} className="h-8 px-2 text-neutral-600">
+                          <Button variant="outline" size="sm" onClick={() => handleEdit(role)} className="h-8 w-8 p-0 text-muted-foreground">
                             <Edit2 className="w-4 h-4" />
                           </Button>
-                          <Button variant="outline" size="sm" onClick={() => handleDelete(role)} className="h-8 px-2 text-red-600 hover:bg-red-50 hover:text-red-700">
+                          <Button variant="outline" size="sm" onClick={() => handleDelete(role)} className="h-8 w-8 p-0 text-destructive hover:bg-destructive/10 hover:border-destructive/30">
                             <Trash2 className="w-4 h-4" />
                           </Button>
                         </div>
                       )}
                       {role.is_system && (
                          <div className="flex justify-end">
-                            <Button variant="ghost" size="sm" className="h-8 px-2 text-neutral-400" onClick={() => toast.info('Role sistem tidak dapat diubah, namun Anda dapat membuat role kustom baru yang menyerupainya.')}>
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-muted-foreground/50" onClick={() => toast.info('Role sistem tidak dapat diubah, namun Anda dapat membuat role kustom baru yang menyerupainya.')}>
                                 <Info className="w-4 h-4" />
                             </Button>
                          </div>
@@ -121,8 +127,10 @@ export function RolesFeature() {
                 ))}
                 {roles.length === 0 && (
                   <tr>
-                    <td colSpan={5} className="px-6 py-8 text-center text-neutral-500">
-                      Belum ada role yang tersedia.
+                    <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground flex flex-col items-center justify-center gap-2">
+                      <Shield className="w-10 h-10 opacity-20 mb-2" />
+                      <p>{t.noRoles}</p>
+                      <Button variant="link" onClick={handleCreate}>{t.createFirstRole}</Button>
                     </td>
                   </tr>
                 )}
@@ -135,10 +143,11 @@ export function RolesFeature() {
       <Dialog 
         open={isFormOpen} 
         onOpenChange={(open) => !open && setIsFormOpen(false)}
-        title={editingRole ? 'Edit Role Kustom' : 'Buat Role Kustom Baru'}
+        title={editingRole ? t.editRole : t.createNewRole}
       >
         <RoleForm 
           role={editingRole} 
+          locale={locale}
           onSuccess={() => {
             setIsFormOpen(false);
             refetch();
@@ -150,8 +159,8 @@ export function RolesFeature() {
       <ConfirmDialog
         open={!!roleToDelete}
         onOpenChange={(open) => !open && setRoleToDelete(null)}
-        title="Hapus Role"
-        description={`Apakah Anda yakin ingin menghapus role "${roleToDelete?.name}"? Pengguna dengan role ini mungkin akan kehilangan akses ke sistem jika tidak diubah ke role lain.`}
+        title={t.deleteRole}
+        description={roleToDelete ? t.deleteConfirm.replace('{name}', roleToDelete.name) : ''}
         onConfirm={confirmDelete}
       />
     </div>
