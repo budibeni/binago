@@ -305,6 +305,7 @@ function RouteMapInner({
       if (selectedRoute && editorMode === 'idle') {
         if (selectedRoute.plannedPath) {
           const pathFeature = geometryToGeoJSON(selectedRoute.plannedPath);
+          pathFeature.properties = { isPlanned: true };
           pathData.features.push(pathFeature as any);
         } else {
           const points: number[][] = [];
@@ -332,7 +333,11 @@ function RouteMapInner({
           paint: {
             'line-color': '#8b5cf6', // purple
             'line-width': 4,
-            'line-dasharray': [2, 2]
+            'line-dasharray': [
+              'case',
+              ['==', ['get', 'isPlanned'], true], ['literal', [1, 0]],
+              ['literal', [2, 2]]
+            ]
           },
         });
       } else {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Route, RouteStop, RouteLocation, MapInteractionMode, ActiveLocationTarget } from '../types';
 import { Geofence } from '../../geofences/types';
 import { Button, Input, Label, InputString, InputNumber, InputDecimal, InputSelect, toast } from '@adatrack/ui';
@@ -283,7 +283,7 @@ export function RouteEditorView({
         id: initialData?.id,
         name,
         description,
-        groupId: groupId || undefined,
+        groupId: (groupId && groupId !== 'none') ? groupId : undefined,
         origin,
         destination,
         stops: validStops,
@@ -499,8 +499,8 @@ export function RouteEditorView({
                 value={groupId}
                 onChange={setGroupId}
                 options={[
-                  { value: '', label: tList.unassignedGroup },
-                  ...groups.map(g => ({ value: g.id, label: g.name }))
+                  { value: 'none', label: tList.unassignedGroup },
+                  ...groups.map(g => ({ value: String(g.id), label: g.name }))
                 ]}
                 placeholder="Pilih Grup Rute"
               />
