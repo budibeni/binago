@@ -27,6 +27,7 @@ export const routeDictionaries = {
       destination: 'Tujuan',
       stops: 'Pemberhentian',
       stopCount: 'titik',
+      unassignedGroup: 'Tidak Masuk Grup',
     },
     editor: {
       createTitle: 'Buat Rute Baru',
@@ -107,6 +108,7 @@ export const routeDictionaries = {
       destination: 'Destination',
       stops: 'Stops',
       stopCount: 'stops',
+      unassignedGroup: 'Unassigned',
     },
     editor: {
       createTitle: 'Create New Route',
