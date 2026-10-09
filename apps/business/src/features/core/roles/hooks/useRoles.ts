@@ -19,7 +19,7 @@ export function useRoles() {
     setLoading(true);
     try {
       const data = await api.get<any>('/settings/roles');
-      setRoles(data.data || []);
+      setRoles(Array.isArray(data) ? data : data.data || []);
       setError(null);
     } catch (err: any) {
       setError(err);
