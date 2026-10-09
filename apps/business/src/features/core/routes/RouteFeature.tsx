@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ConfirmDialog, toast, Dialog, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Button } from '@adatrack/ui';
+import { ConfirmDialog, toast, Dialog, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Button, Popover, PopoverTrigger, PopoverContent } from '@adatrack/ui';
 import type { Locale } from '@adatrack/types';
 import { Route } from './types';
 import { groupService } from '@/data/services';
@@ -11,7 +11,8 @@ import { RouteEditorView } from './components/RouteEditorView';
 import { getRouteTranslation } from './i18n';
 import { useRoutes } from './hooks/useRoutes';
 import { useVehicles } from '../vehicles/hooks/useVehicles';
-import { api } from '@adatrack/utils';
+import { api, cn } from '@adatrack/utils';
+import { Search, Check, ChevronsUpDown } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 
 interface RouteFeatureProps {
@@ -30,10 +31,18 @@ export function RouteFeature({ locale = 'id' }: RouteFeatureProps) {
 const [routeToDelete, setRouteToDelete] = useState<string | null>(null);
   const [assigningRouteId, setAssigningRouteId] = useState<string | null>(null);
   const [selectedVehicleId, setSelectedVehicleId] = useState<string>('');
+  const [isVehicleOpen, setIsVehicleOpen] = useState(false);
+  const [vehicleSearch, setVehicleSearch] = useState('');
   const [endDate, setEndDate] = useState<string>('');
   const [isAssigning, setIsAssigning] = useState(false);
   const { vehicles } = useVehicles();
   const [routeGroups, setRouteGroups] = useState<any[]>([]);
+
+  const filteredVehicles = vehicles?.filter(v => 
+    !v.currentRouteId && 
+    (v.vehicleName?.toLowerCase().includes(vehicleSearch.toLowerCase()) || 
+     v.plateNumber?.toLowerCase().includes(vehicleSearch.toLowerCase()))
+  ) || [];
 
   React.useEffect(() => {
     groupService.getRouteGroups().then(setRouteGroups).catch(console.error);
@@ -189,25 +198,59 @@ const handleDelete = (id: string) => {
       />
       <Dialog 
         open={!!assigningRouteId} 
-        onOpenChange={(isOpen) => { if (!isOpen) { setAssigningRouteId(null); setEndDate(''); } }}
+        onOpenChange={(isOpen) => { if (!isOpen) { setAssigningRouteId(null); setEndDate(''); setVehicleSearch(''); setIsVehicleOpen(false); } }}
         title="Tugaskan Rute ke Kendaraan"
         description="Pilih kendaraan yang akan ditugaskan untuk rute ini."
       >
         <div className="space-y-4 py-4">
           <div className="space-y-2">
             <label className="text-sm font-medium">Pilih Kendaraan</label>
-            <Select value={selectedVehicleId} onValueChange={setSelectedVehicleId}>
-              <SelectTrigger>
-                <SelectValue placeholder="Pilih Kendaraan..." />
-              </SelectTrigger>
-              <SelectContent>
-                {vehicles?.filter(v => !v.currentRouteId).map(v => (
-                  <SelectItem key={v.id} value={String(v.id)}>
-                    {v.vehicleName || v.plateNumber}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Popover open={isVehicleOpen} onOpenChange={setIsVehicleOpen}>
+              <PopoverTrigger asChild>
+                <Button variant="outline" role="combobox" aria-expanded={isVehicleOpen} className="w-full justify-between font-normal">
+                  {selectedVehicleId 
+                    ? vehicles?.find(v => String(v.id) === selectedVehicleId)?.vehicleName || vehicles?.find(v => String(v.id) === selectedVehicleId)?.plateNumber 
+                    : "Pilih Kendaraan..."}
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[400px] p-0" align="start">
+                <div className="flex items-center border-b px-3">
+                  <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+                  <input 
+                    className="flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50" 
+                    placeholder="Cari kendaraan berdasarkan nama atau plat..." 
+                    value={vehicleSearch}
+                    onChange={(e) => setVehicleSearch(e.target.value)}
+                  />
+                </div>
+                <div className="max-h-[300px] overflow-y-auto p-1">
+                  {filteredVehicles.length === 0 ? (
+                    <div className="py-6 text-center text-sm">Tidak ada kendaraan.</div>
+                  ) : (
+                    filteredVehicles.map((v) => (
+                      <div 
+                        key={v.id}
+                        className={cn(
+                          "relative flex w-full cursor-pointer select-none items-center rounded-sm py-2 pl-8 pr-2 text-sm outline-none hover:bg-neutral-100",
+                          selectedVehicleId === String(v.id) ? "bg-neutral-100 font-medium" : ""
+                        )}
+                        onClick={() => {
+                          setSelectedVehicleId(String(v.id));
+                          setIsVehicleOpen(false);
+                          setVehicleSearch('');
+                        }}
+                      >
+                        <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
+                          {selectedVehicleId === String(v.id) && <Check className="h-4 w-4" />}
+                        </span>
+                        {v.vehicleName || v.plateNumber}
+                      </div>
+                    ))
+                  )}
+                </div>
+              </PopoverContent>
+            </Popover>
           </div>
           <div className="space-y-2">
             <label className="text-sm font-medium">Batas Waktu (Opsional)</label>
