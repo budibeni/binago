@@ -30,6 +30,7 @@ export function RouteFeature({ locale = 'id' }: RouteFeatureProps) {
 const [routeToDelete, setRouteToDelete] = useState<string | null>(null);
   const [assigningRouteId, setAssigningRouteId] = useState<string | null>(null);
   const [selectedVehicleId, setSelectedVehicleId] = useState<string>('');
+  const [endTime, setEndTime] = useState<string>('');
   const [isAssigning, setIsAssigning] = useState(false);
   const { vehicles } = useVehicles();
   const [routeGroups, setRouteGroups] = useState<any[]>([]);
@@ -76,10 +77,12 @@ const handleDelete = (id: string) => {
     setIsAssigning(true);
     try {
       await api.post(`/routes/${assigningRouteId}/assignments`, {
-        vehicle_id: parseInt(selectedVehicleId, 10)
+        vehicle_id: parseInt(selectedVehicleId, 10),
+        ...(endTime ? { end_time: new Date(endTime).toISOString() } : {})
       });
       toast.success('Rute berhasil ditugaskan ke kendaraan');
       setAssigningRouteId(null);
+      setEndTime('');
     } catch (err) {
       console.error('Failed to assign route', err);
       toast.error('Gagal menugaskan rute');
@@ -186,7 +189,7 @@ const handleDelete = (id: string) => {
       />
       <Dialog 
         open={!!assigningRouteId} 
-        onOpenChange={(isOpen) => !isOpen && setAssigningRouteId(null)}
+        onOpenChange={(isOpen) => { if (!isOpen) { setAssigningRouteId(null); setEndTime(''); } }}
         title="Tugaskan Rute ke Kendaraan"
         description="Pilih kendaraan yang akan ditugaskan untuk rute ini."
       >
@@ -206,8 +209,17 @@ const handleDelete = (id: string) => {
               </SelectContent>
             </Select>
           </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Batas Waktu (Opsional)</label>
+            <input 
+              type="datetime-local" 
+              className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              value={endTime}
+              onChange={(e) => setEndTime(e.target.value)}
+            />
+          </div>
           <div className="flex justify-end gap-2 pt-2">
-            <Button variant="outline" onClick={() => setAssigningRouteId(null)} disabled={isAssigning}>Batal</Button>
+            <Button variant="outline" onClick={() => { setAssigningRouteId(null); setEndTime(''); }} disabled={isAssigning}>Batal</Button>
             <Button variant="primary" onClick={submitAssign} disabled={!selectedVehicleId || isAssigning} loading={isAssigning}>Tugaskan</Button>
           </div>
         </div>
