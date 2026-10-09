@@ -50,6 +50,14 @@ export function useRoutes(filters?: { search?: string; status?: string; groupId?
           destination: destination as any,
           stops,
           status: r.status === 'active' ? 'active' : 'inactive',
+          activeAssignments: r.active_assignments ? r.active_assignments.map((a: any) => ({
+            id: a.id,
+            vehicleId: a.vehicle_id,
+            vehicleName: a.vehicle_name,
+            plateNumber: a.plate_number,
+            driverUserId: a.driver_user_id,
+            endDate: a.end_date
+          })) : [],
           groupId: r.group_id ? String(r.group_id) : undefined,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),

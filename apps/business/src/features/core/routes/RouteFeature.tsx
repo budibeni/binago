@@ -30,6 +30,7 @@ export function RouteFeature({ locale = 'id' }: RouteFeatureProps) {
   const [isEditing, setIsEditing] = useState(false);
 const [routeToDelete, setRouteToDelete] = useState<string | null>(null);
   const [assigningRouteId, setAssigningRouteId] = useState<string | null>(null);
+  const [completingRouteId, setCompletingRouteId] = useState<string | null>(null);
   const [selectedVehicleId, setSelectedVehicleId] = useState<string>('');
   const [isVehicleOpen, setIsVehicleOpen] = useState(false);
   const [vehicleSearch, setVehicleSearch] = useState('');
@@ -71,11 +72,15 @@ const handleDelete = (id: string) => {
     setSelectedVehicleId('');
   };
 
-  const handleCompleteAssignment = async (id: string) => {
-    if (!confirm('Akhiri penugasan aktif untuk rute ini (Ubah status menjadi Selesai)?')) return;
+  const handleCompleteAssignment = (id: string) => {
+    setCompletingRouteId(id);
+  };
+
+  const submitCompleteAssignment = async (assignmentId: number) => {
     try {
-      await api.put(`/routes/${id}/status`, { status: 'completed' });
-      toast.success('Penugasan rute berhasil diakhiri');
+      await api.put(`/routes/assignments/${assignmentId}/status`, { status: 'completed' });
+      toast.success('Penugasan kendaraan berhasil diakhiri');
+      refetch();
     } catch (err: any) {
       toast.error(err.message || 'Gagal mengakhiri penugasan');
     }
@@ -265,6 +270,37 @@ const handleDelete = (id: string) => {
             <Button variant="outline" onClick={() => { setAssigningRouteId(null); setEndDate(''); }} disabled={isAssigning}>Batal</Button>
             <Button variant="primary" onClick={submitAssign} disabled={!selectedVehicleId || isAssigning} loading={isAssigning}>Tugaskan</Button>
           </div>
+        </div>
+      </Dialog>
+      <Dialog 
+        open={!!completingRouteId} 
+        onOpenChange={(isOpen) => { if (!isOpen) setCompletingRouteId(null); }}
+        title="Akhiri Tugas Kendaraan"
+        description="Pilih kendaraan yang ingin diakhiri penugasannya dari rute ini."
+      >
+        <div className="space-y-4 py-4 max-h-[400px] overflow-y-auto">
+          {(() => {
+            const route = routes.find(r => r.id === completingRouteId);
+            const assignments = route?.activeAssignments || [];
+            if (assignments.length === 0) {
+              return <div className="text-sm text-neutral-500 text-center py-4">Tidak ada kendaraan yang sedang ditugaskan di rute ini.</div>;
+            }
+            return (
+              <div className="space-y-2">
+                {assignments.map(a => (
+                  <div key={a.id} className="flex items-center justify-between p-3 border border-border rounded-md">
+                    <div>
+                      <div className="font-medium text-sm text-foreground">{a.vehicleName || a.plateNumber}</div>
+                      <div className="text-xs text-foreground-muted">{a.plateNumber}</div>
+                    </div>
+                    <Button variant="destructive" onClick={() => submitCompleteAssignment(a.id)}>
+                      Akhiri
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
         </div>
       </Dialog>
     </div>

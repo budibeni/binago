@@ -15,7 +15,17 @@ export interface RouteStop {
   location: RouteLocation;
 }
 
+export interface ActiveAssignment {
+  id: number;
+  vehicleId: number;
+  vehicleName: string;
+  plateNumber: string;
+  driverUserId?: number;
+  endDate?: string;
+}
+
 export interface Route {
+  activeAssignments?: ActiveAssignment[];
   id: string;
   name: string;
   description?: string;
