@@ -133,19 +133,19 @@ export function RouteListPanel({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-36">
               <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onEdit(route.id); }}>
-                Edit
+                {t.menu?.edit || 'Edit'}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onAssign && onAssign(route.id); }}>
-                Tugaskan (Assign)
+                {t.menu?.assign || 'Tugaskan (Assign)'}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onCompleteAssignment && onCompleteAssignment(route.id); }}>
-                Akhiri Tugas (Selesai)
+                {t.menu?.unassign || 'Akhiri Tugas (Selesai)'}
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-red-600 focus:bg-red-50 focus:text-red-700 dark:focus:bg-red-950"
                 onClick={(e) => { e.stopPropagation(); onDelete(route.id); }}
               >
-                Hapus
+                {t.menu?.delete || 'Hapus'}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -239,7 +239,7 @@ export function RouteListPanel({
               onClick={() => setStatusFilter('all')}
               className={statusFilter === 'all' ? 'font-bold' : ''}
             >
-              Semua Status
+              {t.menu?.allStatus || 'Semua Status'}
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => setStatusFilter('active')}
@@ -259,7 +259,7 @@ export function RouteListPanel({
         <button
           onClick={() => setViewMode(v => v === 'detailed' ? 'compact' : 'detailed')}
           className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-[#fafafa] dark:bg-neutral-900 text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors shrink-0"
-          title={viewMode === 'detailed' ? 'Tampilan Ringkas' : 'Tampilan Detail'}
+          title={viewMode === 'detailed' ? (t.menu?.compactView || 'Tampilan Ringkas') : (t.menu?.detailedView || 'Tampilan Detail')}
         >
           {viewMode === 'detailed' ? <AlignJustify className="h-3.5 w-3.5" /> : <LayoutList className="h-3.5 w-3.5" />}
         </button>

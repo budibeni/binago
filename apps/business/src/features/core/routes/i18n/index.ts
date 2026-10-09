@@ -10,6 +10,16 @@ export const routeDictionaries = {
       active: 'Aktif',
       inactive: 'Nonaktif',
     },
+    menu: {
+      edit: 'Edit',
+      assign: 'Tugaskan',
+      unassign: 'Akhiri Tugas',
+      delete: 'Hapus',
+      allStatus: 'Semua Status',
+      compactView: 'Tampilan Ringkas',
+      detailedView: 'Tampilan Detail',
+      openPanel: 'Buka Panel Rute',
+    },
     list: {
       empty: 'Tidak ada rute',
       emptyDesc: 'Klik tombol Tambah Rute untuk membuat rute baru.',
@@ -79,6 +89,16 @@ export const routeDictionaries = {
     status: {
       active: 'Active',
       inactive: 'Inactive',
+    },
+    menu: {
+      edit: 'Edit',
+      assign: 'Assign',
+      unassign: 'End Assignment',
+      delete: 'Delete',
+      allStatus: 'All Status',
+      compactView: 'Compact View',
+      detailedView: 'Detailed View',
+      openPanel: 'Open Route Panel',
     },
     list: {
       empty: 'No routes found',
