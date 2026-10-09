@@ -45,6 +45,7 @@ export function useVehicles(filters?: { search?: string; status?: string; groupI
         color: v.color || '-',
         fuelCapacity: v.fuel_capacity || 0,
         notes: v.notes || '',
+        currentRouteId: v.current_route_id ? String(v.current_route_id) : null,
       }));
       setVehicles(mapped);
       setError(null);

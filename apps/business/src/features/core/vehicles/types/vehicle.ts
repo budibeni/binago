@@ -50,6 +50,7 @@ export interface Vehicle {
   color?: string;
   fuelCapacity?: number;      // liters
   notes?: string;
+  currentRouteId?: string | null;
 }
 
 // --- Status Filter -----------------------------------------------------------

@@ -201,7 +201,7 @@ const handleDelete = (id: string) => {
                 <SelectValue placeholder="Pilih Kendaraan..." />
               </SelectTrigger>
               <SelectContent>
-                {vehicles?.map(v => (
+                {vehicles?.filter(v => !v.currentRouteId).map(v => (
                   <SelectItem key={v.id} value={String(v.id)}>
                     {v.vehicleName || v.plateNumber}
                   </SelectItem>
