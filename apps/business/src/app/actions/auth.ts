@@ -10,6 +10,11 @@ export async function login(formData: FormData) {
   const password = formData.get('password') as string;
   const company_code = formData.get('company_code') as string;
 
+  
+  if (company_code === 'DEFAULT') {
+    return { error: 'Access to system tenant (DEFAULT) is restricted from this portal. Please use the Admin Portal.' };
+  }
+
   if (!email || !password) {
     return { error: 'Email and password are required' };
   }
@@ -35,11 +40,23 @@ export async function login(formData: FormData) {
     }
 
     if (data.status === 'multiple_companies') {
+      // Exclude DEFAULT from business frontend
+      const filteredCompanies = (data.data.companies || []).filter((c: any) => c.code !== 'DEFAULT');
+      
+      if (filteredCompanies.length === 0) {
+        return { error: 'No business tenant access found for this user.' };
+      }
+      
+      if (filteredCompanies.length === 1 && !company_code) {
+        // Auto-login with the only remaining company
+        formData.set('company_code', filteredCompanies[0].code);
+        return login(formData);
+      }
+
       return { 
         multiple_companies: true, 
-        companies: data.data.companies,
-              };
-
+        companies: filteredCompanies,
+      };
     }
 
     if (data.status === 'success' && (data.data?.token || data.data?.access_token)) {
