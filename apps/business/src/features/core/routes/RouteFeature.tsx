@@ -81,10 +81,10 @@ const handleDelete = (id: string) => {
     if (!assignmentToComplete) return;
     try {
       await api.put(`/routes/assignments/${assignmentToComplete}/status`, { status: 'completed' });
-      toast.success('Penugasan kendaraan berhasil diakhiri');
+      toast.success(t.assignment?.successUnassign || 'Penugasan kendaraan berhasil diakhiri');
       refetch();
     } catch (err: any) {
-      toast.error(err.message || 'Gagal mengakhiri penugasan');
+      toast.error(err.message || t.assignment?.errorUnassign || 'Gagal mengakhiri penugasan');
     } finally {
       setAssignmentToComplete(null);
     }
@@ -98,12 +98,12 @@ const handleDelete = (id: string) => {
         vehicle_id: parseInt(selectedVehicleId, 10),
         ...(endDate ? { end_date: endDate } : {})
       });
-      toast.success('Rute berhasil ditugaskan ke kendaraan');
+      toast.success(t.assignment?.successAssign || 'Rute berhasil ditugaskan ke kendaraan');
       setAssigningRouteId(null);
       setEndDate('');
     } catch (err) {
       console.error('Failed to assign route', err);
-      toast.error('Gagal menugaskan rute');
+      toast.error(t.assignment?.errorAssign || 'Gagal menugaskan rute');
     } finally {
       setIsAssigning(false);
     }

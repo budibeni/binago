@@ -80,6 +80,10 @@ export const routeDictionaries = {
       unassignBtn: 'Akhiri',
       confirmUnassignTitle: 'Konfirmasi Akhiri Tugas',
       confirmUnassignDesc: 'Apakah Anda yakin ingin mengakhiri tugas untuk kendaraan ini?',
+      successAssign: 'Rute berhasil ditugaskan ke kendaraan',
+      errorAssign: 'Gagal menugaskan rute',
+      successUnassign: 'Penugasan kendaraan berhasil diakhiri',
+      errorUnassign: 'Gagal mengakhiri penugasan',
     },
   },
   en: {
@@ -161,6 +165,10 @@ export const routeDictionaries = {
       unassignBtn: 'End',
       confirmUnassignTitle: 'Confirm End Assignment',
       confirmUnassignDesc: 'Are you sure you want to end the assignment for this vehicle?',
+      successAssign: 'Route successfully assigned to vehicle',
+      errorAssign: 'Failed to assign route',
+      successUnassign: 'Vehicle assignment successfully ended',
+      errorUnassign: 'Failed to end assignment',
     },
   },
 };
