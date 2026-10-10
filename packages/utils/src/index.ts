@@ -5,3 +5,4 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 export * from './formatters';
+export * from './photo-watermark';

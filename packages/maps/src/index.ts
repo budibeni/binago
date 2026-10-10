@@ -16,6 +16,10 @@ export * from './tracking/types';
 export * from './tracking/utils';
 export * from './tracking/TrackingMap';
 
+// Finder
+export * from './finder/VehicleFinderMap';
+export * from './finder/UserLocationMarker';
+
 // Tools & Basemaps (Unchanged structure)
 export * from './basemaps/types';
 export * from './tools/types';
