@@ -25,6 +25,9 @@ export const dictionaries = {
 
     // Navigation Labels
     nav: {
+      portalDriver: 'Portal Driver',
+      portalCustomer: 'Portal Customer',
+      portalVendor: 'Portal Vendor',
       log: 'Log',
       personel: 'Personel',
       card: 'Kartu',
@@ -163,6 +166,7 @@ export const dictionaries = {
     // Nav Group Titles
     navGroup: {
       access: 'KARTU AKSES',
+      portal: 'PORTAL',
       main: 'Menu Utama',
       master: 'Master Data',
       operational: 'Operasional',
@@ -671,6 +675,9 @@ export const dictionaries = {
 
     // Navigation Labels
     nav: {
+      portalDriver: 'Driver Portal',
+      portalCustomer: 'Customer Portal',
+      portalVendor: 'Vendor Portal',
       log: 'Log',
       personel: 'Personnel',
       card: 'Card',
@@ -809,6 +816,7 @@ export const dictionaries = {
     // Nav Group Titles
     navGroup: {
       access: 'ACCESS CARDS',
+      portal: 'PORTAL',
       main: 'Main Menu',
       master: 'Master Data',
       operational: 'Operational',

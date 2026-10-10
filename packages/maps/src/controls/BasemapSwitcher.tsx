@@ -87,7 +87,7 @@ export function BasemapSwitcher({ value, onChange, className, compact = false, l
 
       {isOpen && (
         <div
-          className="absolute right-0 mt-1.5 w-48 bg-background rounded-xl shadow-lg border border-border overflow-hidden z-[70] origin-top-right p-1"
+          className="absolute right-0 top-full mt-1.5 w-48 bg-background rounded-xl shadow-lg border border-border overflow-hidden z-[70] origin-top-right p-1"
           role="listbox"
           aria-label={t.label}
           tabIndex={-1}

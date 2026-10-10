@@ -4,6 +4,7 @@ import React from 'react';
 import { usePathname } from 'next/navigation';
 import {
   Home,
+  Globe,
   Map,
   Truck,
   UserRound,
@@ -79,6 +80,16 @@ function buildNavigation(locale: Locale): NavGroup[] {
         { id: 'personel', label: t.nav.personel, href: '/personel', icon: Contact },
         { id: 'card', label: t.nav.card, href: '/card', icon: CreditCard },
         { id: 'log', label: t.nav.log, href: '/log', icon: History },
+      ],
+    },
+    {
+      id: 'portal',
+      title: t.navGroup.portal,
+      icon: Globe,
+      items: [
+        { id: 'portalDriver', label: t.nav.portalDriver, href: '/portal/driver', icon: Truck },
+        { id: 'portalCustomer', label: t.nav.portalCustomer, href: '/portal/customer', icon: Users },
+        { id: 'portalVendor', label: t.nav.portalVendor, href: '/portal/vendor', icon: Handshake },
       ],
     },
 
