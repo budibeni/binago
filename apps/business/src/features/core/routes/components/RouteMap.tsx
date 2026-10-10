@@ -304,9 +304,18 @@ function RouteMapInner({
       const pathData: GeoJSON.FeatureCollection = { type: 'FeatureCollection', features: [] };
       if (selectedRoute && editorMode === 'idle') {
         if (selectedRoute.plannedPath) {
-          const pathFeature = geometryToGeoJSON(selectedRoute.plannedPath);
-          pathFeature.properties = { isPlanned: true };
-          pathData.features.push(pathFeature as any);
+          let pathFeature: any = selectedRoute.plannedPath;
+          if (typeof pathFeature === 'string') {
+            try { pathFeature = JSON.parse(pathFeature); } catch (e) {}
+          }
+          // Ensure it's a Feature
+          if (pathFeature && pathFeature.type !== 'Feature') {
+            pathFeature = { type: 'Feature', geometry: pathFeature, properties: {} };
+          }
+          if (pathFeature) {
+            pathFeature.properties = { ...pathFeature.properties, isPlanned: true };
+            pathData.features.push(pathFeature);
+          }
         } else {
           const points: number[][] = [];
           routeLocs.forEach(({ loc }) => {
