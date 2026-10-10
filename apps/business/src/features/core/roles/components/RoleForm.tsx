@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { api } from '@adatrack/utils';
-import { FormShell, FormCard, InputString, InputTextarea, Checkbox, toast } from '@adatrack/ui';
+import { FormShell, FormCard, InputString, InputTextarea, Checkbox, toast, Button } from '@adatrack/ui';
 import { Shield, Lock } from 'lucide-react';
 import { Role } from '../hooks/useRoles';
 import { getRolesTranslation, RolesLocale } from '../i18n';
@@ -43,10 +43,12 @@ export function RoleForm({ role, locale = 'id', open, onOpenChange, onSuccess, o
   const [loading, setLoading] = useState(false);
 
   const isEditing = !!role;
+  const isReadOnly = role?.is_system === true;
 
   const displayCode = isEditing ? formData.code : formData.code;
 
   const togglePermission = (permId: string) => {
+    if (isReadOnly) return;
     setFormData(prev => {
       const perms = prev.permissions.includes(permId)
         ? prev.permissions.filter(p => p !== permId)
@@ -57,6 +59,7 @@ export function RoleForm({ role, locale = 'id', open, onOpenChange, onSuccess, o
 
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
+    if (isReadOnly) return;
 
     setLoading(true);
     try {
@@ -94,18 +97,28 @@ export function RoleForm({ role, locale = 'id', open, onOpenChange, onSuccess, o
     return acc;
   }, {} as Record<string, any[]>);
 
+  // Consider * as all permissions
+  const hasWildcard = formData.permissions.includes('*');
+
   return (
     <FormShell
       layout="default"
       open={open}
       onOpenChange={onOpenChange}
-      title={isEditing ? t.editRole : t.createNewRole}
-      subtitle={isEditing ? "Perbarui informasi dan hak akses role ini" : "Tambahkan role baru dan tentukan hak aksesnya"}
+      title={isEditing ? (isReadOnly ? "Detail Role Sistem" : t.editRole) : t.createNewRole}
+      subtitle={isEditing ? (isReadOnly ? "Melihat informasi dan hak akses role bawaan sistem" : "Perbarui informasi dan hak akses role ini") : "Tambahkan role baru dan tentukan hak aksesnya"}
       onCancel={onCancel}
-      onSave={() => handleSubmit()}
-      onSubmit={handleSubmit}
+      onSave={isReadOnly ? undefined : () => handleSubmit()}
+      onSubmit={isReadOnly ? undefined : handleSubmit}
       isSubmitting={loading}
       columns={1}
+      actions={
+        isReadOnly ? (
+          <Button variant="outline" size="sm" onClick={onCancel} className="h-7 text-xs px-4">
+            Tutup
+          </Button>
+        ) : undefined
+      }
     >
       <div className="flex flex-col gap-6 w-full max-w-4xl mx-auto">
         <FormCard
@@ -114,7 +127,7 @@ export function RoleForm({ role, locale = 'id', open, onOpenChange, onSuccess, o
           icon={<Shield className="w-5 h-5 text-primary" />}
           columns={2}
         >
-          {!isEditing && (
+          {(!isEditing || isReadOnly) && (
             <div className="col-span-2">
               <InputString
                 id="code"
@@ -134,6 +147,7 @@ export function RoleForm({ role, locale = 'id', open, onOpenChange, onSuccess, o
               id="name"
               label={t.displayName}
               required
+              disabled={isReadOnly}
               placeholder={t.displayNamePlaceholder}
               value={formData.name}
               onChange={val => {
@@ -148,6 +162,7 @@ export function RoleForm({ role, locale = 'id', open, onOpenChange, onSuccess, o
               id="description"
               label={t.shortDescription}
               placeholder={t.shortDescriptionPlaceholder}
+              disabled={isReadOnly}
               value={formData.description}
               onChange={val => setFormData({ ...formData, description: val })}
               rows={3}
@@ -164,7 +179,7 @@ export function RoleForm({ role, locale = 'id', open, onOpenChange, onSuccess, o
           <div className="flex items-center justify-between mb-4">
             <span className="text-sm text-muted-foreground">Pilih hak akses yang sesuai</span>
             <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full font-medium">
-              {formData.permissions.length} {t.selected}
+              {hasWildcard ? "Semua Akses" : `${formData.permissions.length} ${t.selected}`}
             </span>
           </div>
           
@@ -173,18 +188,22 @@ export function RoleForm({ role, locale = 'id', open, onOpenChange, onSuccess, o
               <div key={group} className="flex flex-col gap-3 bg-muted/20 p-4 rounded-lg border border-border">
                 <h4 className="text-sm font-semibold text-foreground uppercase tracking-wider">{group}</h4>
                 <div className="flex flex-col gap-2">
-                  {perms.map(perm => (
-                    <label key={perm.id} className="flex items-start gap-2.5 cursor-pointer hover:bg-muted/50 p-2 rounded transition-colors">
-                      <Checkbox
-                        checked={formData.permissions.includes(perm.id)}
-                        onCheckedChange={() => togglePermission(perm.id)}
-                        className="mt-0.5"
-                      />
-                      <span className="text-sm text-foreground select-none leading-tight mt-0.5">
-                        {perm.label}
-                      </span>
-                    </label>
-                  ))}
+                  {perms.map(perm => {
+                    const isChecked = hasWildcard || formData.permissions.includes(perm.id);
+                    return (
+                      <label key={perm.id} className={`flex items-start gap-2.5 p-2 rounded transition-colors ${isReadOnly ? 'cursor-default opacity-80' : 'cursor-pointer hover:bg-muted/50'}`}>
+                        <Checkbox
+                          checked={isChecked}
+                          onCheckedChange={() => togglePermission(perm.id)}
+                          disabled={isReadOnly || hasWildcard}
+                          className="mt-0.5"
+                        />
+                        <span className="text-sm text-foreground select-none leading-tight mt-0.5">
+                          {perm.label}
+                        </span>
+                      </label>
+                    );
+                  })}
                 </div>
               </div>
             ))}

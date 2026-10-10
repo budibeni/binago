@@ -130,7 +130,7 @@ export function RolesFeature({ locale = 'id' }: RolesFeatureProps) {
               </Button>
             </>
           ) : (
-            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-muted-foreground/50 rounded-full" onClick={() => toast.info('Role sistem tidak dapat diubah.')}>
+            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-full" onClick={() => handleEdit(row.original)}>
                 <Info className="w-4 h-4" />
             </Button>
           )}
