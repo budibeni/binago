@@ -76,6 +76,8 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
   const [selectedVehicleId, setSelectedVehicleId] = React.useState<string | null>(null);
   const [selectedVehicleIds, setSelectedVehicleIds] = React.useState<string[]>([]);
   const [isVehicleListVisible, setIsVehicleListVisible] = React.useState(true);
+  const [focusedVehicleId, setFocusedVehicleId] = React.useState<string | null>(null);
+  const [panToVehicleId, setPanToVehicleId] = React.useState<string | undefined>(undefined);
 
   // -- Map Layer state --
   const [selectedGeofenceIds, setSelectedGeofenceIds] = React.useState<string[]>([]);
@@ -252,6 +254,14 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
       return matchStatus && matchSearch;
     });
   }, [search, statusFilter]);
+
+  const activeVehicleId = selectedVehicleId || focusedVehicleId;
+  const activeVehicle = React.useMemo(() => {
+    if (!activeVehicleId) return null;
+    return allVehiclesUnfiltered.find(v => v.id === activeVehicleId)
+      || trackingService.getLiveVehicles().find(v => v.id === activeVehicleId)
+      || null;
+  }, [activeVehicleId, allVehiclesUnfiltered]);
 
   // -- Playback derived state --------------------------------------------------
   const playbackTrack = React.useMemo(() => {
@@ -489,11 +499,28 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
     return () => clearTimeout(timer);
   }, [mode, view]);
 
-  // --- VehicleList handlers ------------------------------------------------------------------
+  // --- Vehicle selection handlers ------------------------------------------------------------------
 
-  const handleVehicleSelect = React.useCallback((vehicleId: string) => {
-    setSelectedVehicleId((prev) => (prev === vehicleId ? null : vehicleId));
+  // Handler saat kendaraan diklik dari peta (marker) -> HANYA update data tanpa zoom/pan kamera
+  const handleMapVehicleSelect = React.useCallback((vehicleId: string | null) => {
+    setFocusedVehicleId(vehicleId);
+    setSelectedVehicleId(vehicleId);
+    setPanToVehicleId(undefined);
   }, []);
+
+  // Handler saat kendaraan diklik dari VehicleList (panel kanan) -> Zoom & pan ke kendaraan
+  const handleVehicleListSelect = React.useCallback((vehicleId: string | null) => {
+    setFocusedVehicleId(vehicleId);
+    setSelectedVehicleId(vehicleId);
+    if (vehicleId) {
+      setSelectedVehicleIds((prev: string[]) => (prev.includes(vehicleId) ? prev : [...prev, vehicleId]));
+      setPanToVehicleId(vehicleId);
+    } else {
+      setPanToVehicleId(undefined);
+    }
+  }, []);
+
+  const handleVehicleSelect = handleVehicleListSelect;
 
   const handleVehicleCheck = React.useCallback((idOrIds: string | string[], checked: boolean) => {
     setSelectedVehicleIds((prev: string[]) => {
@@ -803,7 +830,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
               <LiveTable
                 modeSelector={<TableModeSelector mode={mode} onModeChange={setMode} locale={locale} />}
                 vehicles={allVehiclesUnfiltered.filter(v => selectedVehicleIds.includes(v.id))}
-                onVehicleSelect={(id) => setSelectedVehicleId(id)}
+                onVehicleSelect={handleVehicleSelect}
                 locale={locale}
               />
             )}
@@ -952,10 +979,14 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
             <div className={cn('flex-1 relative', (mode !== 'live' || view !== 'map') && 'hidden')}>
               <LiveMap
                 vehicles={allVehiclesUnfiltered}
-                selectedVehicleId={selectedVehicleId || undefined}
+                selectedVehicleId={selectedVehicleId || focusedVehicleId || undefined}
+                onSelectVehicle={handleMapVehicleSelect}
+                panToVehicleId={panToVehicleId}
+                onPanComplete={() => setPanToVehicleId(undefined)}
                 visibleVehicleIds={allVehiclesUnfiltered.map(v => v.id).filter(id => selectedVehicleIds.includes(id))}
                 onPlaybackRequest={handlePlaybackRequest}
-                initialFocusedVehicleId={selectedVehicleId || undefined}
+                focusedVehicleId={focusedVehicleId || selectedVehicleId}
+                onFocusVehicleChange={setFocusedVehicleId}
               />
             </div>
 
@@ -1061,16 +1092,20 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
         <div
           className={cn(
             'shrink-0 bg-background transition-all duration-300 ease-in-out',
-            (mode === 'live' && selectedVehicleId) ? 'h-[180px] border-t border-border opacity-100 translate-y-0' : 'h-0 opacity-0 translate-y-10 pointer-events-none overflow-hidden'
+            (mode === 'live' && activeVehicle) ? 'h-[135px] border-t border-border opacity-100 translate-y-0' : 'h-0 opacity-0 translate-y-10 pointer-events-none overflow-hidden'
           )}
-          aria-hidden={mode !== 'live' || !selectedVehicleId}
+          aria-hidden={mode !== 'live' || !activeVehicle}
         >
-          <VehicleOverviewPanel
-            vehicle={trackingService.getLiveVehicles().find(v => v.id === selectedVehicleId) || null}
-            onClose={() => setSelectedVehicleId(null)}
-            locale={locale}
-            onShareLocation={() => console.log('Share clicked', selectedVehicleId)}
-          />
+          {activeVehicle && (
+            <VehicleOverviewPanel
+              key={activeVehicle.id}
+              vehicle={activeVehicle}
+              onClose={() => handleVehicleSelect(null)}
+              locale={locale}
+              onPlayback={() => handlePlaybackRequest(activeVehicle.id)}
+              onShareLocation={() => console.log('Share clicked', activeVehicle.id)}
+            />
+          )}
         </div>
 
         {/* Tab Navigation (Map | Table) - Classic Design at Bottom */}
@@ -1133,7 +1168,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
               selectedVehicleIds={selectedVehicleIds}
               search={search}
               statusFilter={statusFilter}
-              onVehicleSelect={handleVehicleSelect}
+              onVehicleSelect={handleVehicleListSelect}
               onSearchChange={setSearch}
               onStatusFilterChange={setStatusFilter}
               onVehicleCheck={handleVehicleCheck}

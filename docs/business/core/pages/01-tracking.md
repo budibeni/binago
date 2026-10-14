@@ -59,7 +59,7 @@ Mode default saat halaman dibuka. Berfungsi untuk mengawasi seluruh unit armada 
     - **Idle (*Idle*):** Oranye/Kuning (`bg-warning`) — Mesin hidup (kontak ACC ON) namun kecepatan 0 km/jam.
     - **Parkir (*Parking*):** Biru (`bg-info`) — Kendaraan berhenti dengan mesin mati (kontak ACC OFF).
     - **Offline (*Offline*):** Abu-abu (`bg-neutral-400`) — Perangkat GPS tidak mengirimkan sinyal telemetri dalam periode tertentu.
-  - Hover/Klik marker memunculkan popup ringkas (`VehiclePopupPanel`).
+  - Klik marker pada peta langsung mengaktifkan armada dan membuka panel ringkasan bawah (`VehicleOverviewPanel`) tanpa elemen popup/tooltip, sehingga kanvas peta tetap 100% bersih dan leluasa.
 
 #### 2. Panel Daftar Armada Kanan (`VehicleList.tsx`)
 Panel sidebar sisi kanan selebar 320px (dapat diciutkan/diperluas hingga 34px):
@@ -74,24 +74,13 @@ Panel sidebar sisi kanan selebar 320px (dapat diciutkan/diperluas hingga 34px):
 - **Kartu Baris Armada:** Menampilkan checkbox seleksi, plat nomor (klik untuk auto-pan kamera peta), tipe kendaraan, nama driver yang bertugas, serta badge status.
 
 #### 3. Panel Ringkasan Kendaraan Bawah (`VehicleOverviewPanel.tsx`)
-Drawer bawah setinggi 180px yang muncul otomatis ketika satu unit kendaraan dipilih:
-- **Header:** Plat nomor, kota operasional, model unit, badge status operasional, tombol "Bagikan Lokasi" (*Share Location*), dan tombol tutup (*X*).
-- **Struktur 4 Kolom Informasi Telemetri:**
+Dock panel bawah setinggi 135px yang menjadi pusat kontrol dan informasi utama saat armada dipilih:
+- **Header:** Plat nomor (nopol), badge status operasional, tab konteks bisnis (jika ada), tombol aksi (Playback, Bagikan, Street View, Maps), dan tombol tutup (*X*). Informasi tipe kendaraan dan kota operasional disajikan terpadu pada kolom telemetri di bawahnya.
+- **Struktur 4 Kolom Informasi Telemetri (Border-free Card dengan Ketinggian Terkunci):**
   - **Kolom 1:** Driver (Nama pengemudi), Kecepatan (*Speed* dalam km/h), Kontak Mesin (ACC ON hijau / OFF merah).
   - **Kolom 2:** Alamat Lokasi (*Reverse-geocoded* alamat jalan terkini), Alarm Event (Peringatan alarm aktif).
   - **Kolom 3:** Lokasi Geofence (Nama geofence tempat kendaraan berada), Area Geofence (Kategori zona wilayah).
   - **Kolom 4:** Koordinat GPS (Latitude & Longitude), GPS SN (Nomor seri perangkat GPS), Update Terakhir (Stempel waktu update data terakhir).
-
-#### 4. Panel Popup Marker Peta (`VehiclePopupPanel.tsx`)
-Popup berukuran 420px di atas marker armada:
-- **Header & Status:** Plat nomor, tipe, status operasional, tombol tutup.
-- **Tab Khusus (Konteks Bisnis):**
-  - **Tab "UMUM":** Rincian telemetri lengkap (Driver, Kecepatan, ACC, Alarm, Alamat, Geofence, Koordinat, GPS SN, Update Terakhir).
-  - **Tab "KONTEKS BISNIS" (misal: RENTAL):** Muncul otomatis jika ada data `VehicleContext` dari modul luar. Menampilkan rincian kontrak sewa, nama penyewa/korporasi, tanggal sewa, status ketersediaan unit sewa (*READY, RESERVED, RENTED*).
-- **Aksi Footer Popup:**
-  - **Tombol "Putar Jejak / Playback":** Berpindah langsung ke mode Playback untuk kendaraan yang bersangkutan.
-  - **Tombol "Bagikan":** Membuka dialog pembagian tautan publik real-time.
-  - **Tombol "Maps":** Membuka tautan koordinat kendaraan di Google Maps pada tab browser baru.
 
 ---
 
@@ -286,8 +275,7 @@ apps/business/src/
     └── components/
         ├── shared/
         │   ├── VehicleList.tsx                 # Sidebar daftar armada (Filter, Search, Groups)
-        │   ├── VehicleOverviewPanel.tsx        # Drawer bawah info unit (4 Kolom telemetri)
-        │   ├── VehiclePopupPanel.tsx           # Popup marker (Tab Umum & Konteks Bisnis)
+        │   ├── VehicleOverviewPanel.tsx        # Dock bawah info unit & aksi utama (4 Kolom telemetri)
         │   ├── VehicleMarker.tsx               # Marker SVG dinamis di atas canvas peta
         │   ├── VehicleSelect.tsx               # Dropdown pemilih unit armada
         │   ├── TableModeSelector.tsx           # Dropdown pemilih sub-mode tabel

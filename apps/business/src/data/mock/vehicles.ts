@@ -17,7 +17,7 @@ const baseVehicles = [
   },
   {
     "id": "veh-002",
-    "plateNumber": "B 1002 ABC",
+    "plateNumber": "B 1002 ABC - BENI",
     "vehicleName": "Toyota Avanza",
     "vehicleCategory": "car",
     "brand": "Toyota",
@@ -612,10 +612,10 @@ export const mockVehicles = baseVehicles.map((v, i) => {
 
   const baseInstallDate = new Date('2024-01-01');
   baseInstallDate.setMonth(baseInstallDate.getMonth() - (i % 24));
-  
+
   // Use a fixed reference date to ensure deterministic mock data for SSR hydration
   const regExpiryDate = new Date('2026-09-21T12:00:00Z');
-  
+
   if (i % 4 === 0) {
     // Expired (e.g. 15 days ago)
     regExpiryDate.setDate(regExpiryDate.getDate() - 15 - (i % 5));
@@ -637,7 +637,14 @@ export const mockVehicles = baseVehicles.map((v, i) => {
 
   return {
     ...v,
-    vehicleCategory: v.vehicleCategory === 'car' ? 'minibus' : v.vehicleCategory,
+    vehicleCategory: (() => {
+      const name = (v.vehicleName || '').toLowerCase();
+      if (name.includes('canter') || name.includes('fuso') || name.includes('hino') || name.includes('truk') || name.includes('truck')) return 'truck';
+      if (name.includes('traga') || name.includes('carry') || name.includes('triton') || name.includes('pickup') || name.includes('hilux')) return 'pickup';
+      if (name.includes('hiace') || name.includes('bus') || name.includes('elf')) return 'minibus';
+      if (name.includes('motor') || name.includes('beat') || name.includes('vario') || name.includes('nmax')) return 'motorcycle';
+      return 'car';
+    })(),
     driverName: driver ? driver.name : 'Unknown Driver',
     groupName: group ? group.name : 'Unknown Group',
     status: 'active' as const,

@@ -160,6 +160,7 @@ class MockTrackingRepository implements TrackingRepository {
       return {
         ...v,
         ...tracking,
+        heading: tracking?.course ?? 0,
         vehicleType: v.vehicleName,
         city: 'Jakarta',
         acc: true,

@@ -4,9 +4,7 @@ import React, { useMemo } from 'react';
 import { cn } from '@adatrack/utils';
 import {
   TrackingMap,
-  MapPopup,
 } from '@adatrack/maps';
-import { VehiclePopupPanel } from '../shared/VehiclePopupPanel';
 import type {
   MapEntityOption,
   MapGeofenceOption,
@@ -28,6 +26,11 @@ import { Truck, Bus } from 'lucide-react';
 export interface LiveMapProps {
   vehicles: TrackingVehicle[];
   selectedVehicleId?: string;
+  onSelectVehicle?: (vehicleId: string | null) => void;
+  /** ID kendaraan untuk kamera terbang/zoom (hanya disuplai saat diklik dari VehicleList) */
+  panToVehicleId?: string;
+  /** Callback opsional setelah kamera selesai/dipicu panTo */
+  onPanComplete?: () => void;
   visibleVehicleIds?: string[];
   onPlaybackRequest?: (vehicleId: string) => void;
   playbackTrack?: { lat: number; lng: number }[];
@@ -35,6 +38,12 @@ export interface LiveMapProps {
   playbackParkingEvents?: { lat: number; lng: number }[];
   /** Kendaraan yang langsung dibuka popupnya saat map mount (dari navigasi modul) */
   initialFocusedVehicleId?: string;
+  /** ID kendaraan yang sedang difokuskan (popup terbuka di peta) */
+  focusedVehicleId?: string | null;
+  /** Callback ketika popup kendaraan di peta dibuka atau ditutup */
+  onFocusVehicleChange?: (vehicleId: string | null) => void;
+  /** Callback ketika popup kendaraan di peta dibuka atau ditutup (boolean) */
+  onPopupOpenChange?: (isOpen: boolean) => void;
 }
 
 // --- Mock geofence data --------------------------------------------------------
@@ -78,7 +87,22 @@ const STATUS_LABEL: Record<TrackingVehicle['status'], string> = {
 
 // --- LiveMap -------------------------------------------------------------------
 
-export function LiveMap({ vehicles, selectedVehicleId, visibleVehicleIds = [], onPlaybackRequest, playbackTrack, playbackPassedTrack, playbackParkingEvents, initialFocusedVehicleId }: LiveMapProps) {
+export function LiveMap({
+  vehicles,
+  selectedVehicleId,
+  onSelectVehicle,
+  panToVehicleId,
+  onPanComplete,
+  visibleVehicleIds = [],
+  onPlaybackRequest,
+  playbackTrack,
+  playbackPassedTrack,
+  playbackParkingEvents,
+  initialFocusedVehicleId,
+  focusedVehicleId,
+  onFocusVehicleChange,
+  onPopupOpenChange,
+}: LiveMapProps) {
   const locale = useBusinessLocale();
   const [internalSelectedId, setInternalSelectedId] = React.useState<string | null>(selectedVehicleId || null);
 
@@ -101,11 +125,20 @@ export function LiveMap({ vehicles, selectedVehicleId, visibleVehicleIds = [], o
         entities={vehicles}
         selectedIds={visibleVehicleIds}
         initialFocusedId={initialFocusedVehicleId}
+        panToId={panToVehicleId && visibleVehicleIds.includes(panToVehicleId) ? panToVehicleId : undefined}
+        onPanComplete={onPanComplete}
+        focusedId={focusedVehicleId || selectedVehicleId}
+        onFocusChange={(id) => {
+          onSelectVehicle?.(id);
+          onFocusVehicleChange?.(id);
+          onPopupOpenChange?.(Boolean(id));
+        }}
 
         // Resolvers
         getId={(v) => v.id}
         getPosition={(v) => v.location}
-        getHeading={(v) => (v as any).heading || Math.floor(Math.random() * 360)}
+        getHeading={(v) => v.heading ?? 0}
+        getColor={(v) => v.status === 'driving' ? '#22c55e' : v.status === 'idle' ? '#f59e0b' : v.status === 'parking' ? '#3b82f6' : '#64748b'}
         
         // Marker Presentation
         getLabel={(v) => v.plateNumber}
@@ -117,33 +150,17 @@ export function LiveMap({ vehicles, selectedVehicleId, visibleVehicleIds = [], o
         }}
 
         // Renderers
-        renderMarker={(vehicle, { selected, focused, onClick }) => (
+        renderMarker={(vehicle, { focused, onClick }) => (
           <VehicleMarker
             key={vehicle.id}
             vehicle={vehicle}
-            selected={selected || focused}
-            onClick={onClick}
+            selected={vehicle.id === selectedVehicleId || vehicle.id === focusedVehicleId || focused}
+            onClick={() => {
+              onSelectVehicle?.(vehicle.id);
+              onFocusVehicleChange?.(vehicle.id);
+              onClick?.();
+            }}
           />
-        )}
-        renderPopup={(focusedVehicle, onClose) => (
-          <MapPopup
-            position={focusedVehicle.location}
-            offset={[0, -15]}
-            className="custom-vehicle-popup"
-          >
-            <VehiclePopupPanel 
-              vehicle={focusedVehicle} 
-              onClose={() => {
-                onClose();
-                setInternalSelectedId(null);
-              }}
-              locale={locale}
-              onPlayback={() => {
-                if (onPlaybackRequest) onPlaybackRequest(focusedVehicle.id);
-              }}
-              onShareLocation={() => console.log('Share clicked', focusedVehicle.id)}
-            />
-          </MapPopup>
         )}
 
         geofences={MOCK_GEOFENCES}

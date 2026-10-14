@@ -70,6 +70,7 @@ export function useStyleLoadCallback(callback: (() => void) | null) {
 // Hook publik dengan minimal API - tipe maplibre tidak diekspos ke layer aplikasi
 export interface MapActions {
   panTo: (coordinates: { lat: number; lng: number }) => void;
+  flyTo: (options: { center: { lat: number; lng: number }; zoom?: number; duration?: number }) => void;
   fitBounds: (bounds: [[number, number], [number, number]], options?: { padding?: number }) => void;
   zoomIn: () => void;
   zoomOut: () => void;
@@ -84,6 +85,16 @@ export function useMapActions(): MapActions {
     () => ({
       panTo: (coordinates) => {
         if (map) map.panTo([coordinates.lng, coordinates.lat]);
+      },
+      flyTo: (options) => {
+        if (map) {
+          map.flyTo({
+            center: [options.center.lng, options.center.lat],
+            zoom: options.zoom ?? 16,
+            duration: options.duration ?? 1000,
+            essential: true,
+          });
+        }
       },
       fitBounds: (bounds, options) => {
         if (map) map.fitBounds(bounds, { padding: options?.padding ?? 50, duration: 1000 });

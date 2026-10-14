@@ -75,6 +75,14 @@ export interface TrackingMapProps<T> {
   children?: React.ReactNode;
   /** ID entitas yang langsung difokuskan (popup terbuka) saat map pertama kali dimount */
   initialFocusedId?: string;
+  /** ID entitas untuk pan/center kamera tanpa membuka popup */
+  panToId?: string;
+  /** Callback opsional setelah pan/zoom ke entitas dipicu */
+  onPanComplete?: () => void;
+  /** ID entitas yang sedang difokuskan (popup terbuka). Jika disediakan, state popup dikontrol dari parent */
+  focusedId?: string | null;
+  /** Callback saat entitas difokuskan (popup dibuka) atau ditutup */
+  onFocusChange?: (focusedId: string | null) => void;
 }
 
 function TrackingMapInner<T>({
@@ -101,30 +109,60 @@ function TrackingMapInner<T>({
   playbackParkingEvents,
   children,
   initialFocusedId,
+  panToId,
+  onPanComplete,
+  focusedId,
+  onFocusChange,
 }: TrackingMapProps<T>) {
   const [basemap, setBasemap] = useState<BasemapId>('standard');
   const [viewport, setViewport] = useState({ center: { lat: -6.2, lng: 106.816667 }, zoom: 12 });
   const mapContainerRef = useRef<HTMLDivElement>(null);
-  const { fitBounds, panTo } = useMapActions();
+  const { fitBounds, panTo, flyTo } = useMapActions();
 
   const map = useInternalMap();
 
-  // Internal state: entitas mana yang sedang diklik (ditampilkan popup)
-  const [focusedEntityId, setFocusedEntityId] = useState<string | null>(initialFocusedId || null);
+  // Controlled or uncontrolled focused entity id
+  const isControlled = focusedId !== undefined;
+  const [internalFocusedId, setInternalFocusedId] = useState<string | null>(initialFocusedId || null);
+  const currentFocusedId = isControlled ? focusedId : internalFocusedId;
+
+  const setFocusedId = useCallback((id: string | null) => {
+    if (!isControlled) {
+      setInternalFocusedId(id);
+    }
+    onFocusChange?.(id);
+  }, [isControlled, onFocusChange]);
 
   // Sync focusedEntityId with initialFocusedId and fly to it
   useEffect(() => {
     if (!initialFocusedId || !map) return;
-    setFocusedEntityId(initialFocusedId);
+    setFocusedId(initialFocusedId);
     const entity = entities.find((e) => getId(e) === initialFocusedId);
     if (entity) {
       const pos = getPosition(entity);
       panTo({ lat: pos.lat, lng: pos.lng });
     }
-  }, [initialFocusedId, map, entities, getId, panTo]);
+  }, [initialFocusedId, map, entities, getId, panTo, setFocusedId]);
 
-  // Marker style state
-  const [markerStyle, setMarkerStyle] = useState<'default' | 'custom'>('default');
+  // Zoom & fly to entity, ONLY IF entity is in selectedIds (checked / diceklist)
+  useEffect(() => {
+    if (!panToId || !map) return;
+    // Hanya fokuskan dan zoom ke kendaraan di peta jika kendaraan tersebut diceklist
+    if (!selectedIds.includes(panToId)) return;
+    const entity = entities.find((e) => getId(e) === panToId);
+    if (entity) {
+      const pos = getPosition(entity);
+      flyTo({
+        center: { lat: pos.lat, lng: pos.lng },
+        zoom: 16,
+        duration: 1000,
+      });
+      onPanComplete?.();
+    }
+  }, [panToId, map, entities, selectedIds, getId, flyTo, onPanComplete]);
+
+  // Marker style state (defaults to custom)
+  const [markerStyle, setMarkerStyle] = useState<'default' | 'custom'>('custom');
 
   // Clustering states
   const [bounds, setBounds] = useState<[number, number, number, number] | undefined>(undefined);
@@ -178,8 +216,8 @@ function TrackingMapInner<T>({
   });
 
   const focusedEntity = useMemo(() => {
-    return focusedEntityId ? entities.find((e) => getId(e) === focusedEntityId) : null;
-  }, [focusedEntityId, entities, getId]);
+    return currentFocusedId ? entities.find((e) => getId(e) === currentFocusedId) : null;
+  }, [currentFocusedId, entities, getId]);
 
   const handleFitSelected = useCallback(() => {
     const positions = visibleEntities.map(getPosition);
@@ -269,12 +307,10 @@ function TrackingMapInner<T>({
           const entity = props.entity as T;
           const id = props.entityId;
           const selected = selectedIds.includes(id);
-          const focused = focusedEntityId === id;
+          const focused = currentFocusedId === id;
 
           const onClickEntity = () => {
-            setFocusedEntityId(id);
-            const pos = getPosition(entity);
-            panTo({ lat: pos.lat, lng: pos.lng });
+            setFocusedId(id);
           };
 
           return (
@@ -305,7 +341,7 @@ function TrackingMapInner<T>({
         {/* Render popup untuk entitas yang sedang difokuskan */}
         {focusedEntity && renderPopup && renderPopup(
           focusedEntity,
-          () => setFocusedEntityId(null)
+          () => setFocusedId(null)
         )}
 
         {/* Playback route polyline */}

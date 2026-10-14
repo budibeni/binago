@@ -95,7 +95,7 @@ export function MapControlPanel({
   className,
   locale = 'id',
   hasCustomMarker,
-  markerStyle = 'default',
+  markerStyle = 'custom',
   onMarkerStyleChange,
   showGeofenceTool = true,
   showMeasureTool = true,

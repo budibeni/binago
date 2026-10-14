@@ -3,7 +3,7 @@
 import React, { useMemo, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { TrackingMap, useMapActions, MapMarker, MapPopup } from '@adatrack/maps';
-import { Truck, Bus, CircleParking, Clock, Navigation, ExternalLink, X, Gauge, Activity, MapPin, Crosshair, Shield, Plus } from 'lucide-react';
+import { Truck, Bus, CircleParking, Clock, ExternalLink, X, Gauge, Activity, MapPin, Crosshair, Shield, Plus } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import type { TrackingVehicle } from '../../types/tracking';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
@@ -539,7 +539,12 @@ export function PlaybackMap({
                 className="transition-transform duration-300 ease-out flex items-center justify-center"
                 style={{ transform: `rotate(${displayHeading}deg)` }}
               >
-                <Navigation className="w-3 h-3 text-accent fill-accent" />
+                <svg
+                  viewBox="0 0 24 24"
+                  className="w-3.5 h-3.5 text-accent fill-accent"
+                >
+                  <path d="M12 2L21 21L12 17L3 21L12 2Z" />
+                </svg>
               </div>
             </div>
 

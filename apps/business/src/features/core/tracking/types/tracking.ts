@@ -41,14 +41,17 @@ export interface VehicleContext {
 export interface TrackingVehicle {
   id: string;
   plateNumber: string;
+  vehicleName?: string;
   driverName: string | null;
   groupId: string;
   groupName: string;
   status: VehicleStatus;
   speed: number;             // km/h
+  heading?: number;          // degrees 0-360
   location: VehicleLocation;
   lastUpdate: string;        // ISO 8601
   vehicleType?: string;      // e.g. 'Truk', 'Minibus', 'CDE Long Chiller'
+  vehicleCategory?: string;  // e.g. 'truck', 'pickup', 'minibus', 'car', 'motorcycle'
   city?: string;             // e.g. 'Jakarta', 'Bandung'
   acc?: boolean;             // Ignition status
   geofenceName?: string;     // Current geofence name
