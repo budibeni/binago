@@ -74,10 +74,15 @@ function PlaybackFitBounds({ track }: { track?: { lat: number; lng: number }[] }
 
 // --- Helpers -------------------------------------------------------------------
 
-function formatDuration(secs: number): string {
+function formatDuration(secs: number, locale: string = 'id'): string {
   const h = Math.floor(secs / 3600);
   const m = Math.floor((secs % 3600) / 60);
   const s = secs % 60;
+  if (locale === 'en') {
+    if (h > 0) return `${h}h ${m}m`;
+    if (m > 0) return `${m}m ${s}s`;
+    return `${s}s`;
+  }
   if (h > 0) return `${h} jam ${m} mnt`;
   if (m > 0) return `${m} mnt ${s} dtk`;
   return `${s} dtk`;
@@ -149,7 +154,8 @@ function ParkingMarkerWithPopup({
   vehicleName,
   isOpen,
   onToggle,
-  tTracking
+  tTracking,
+  locale = 'id',
 }: {
   event: ParkingEvent;
   index: number;
@@ -157,6 +163,7 @@ function ParkingMarkerWithPopup({
   isOpen: boolean;
   onToggle: () => void;
   tTracking: any;
+  locale?: string;
 }) {
   const router = useRouter();
   const [geofenceRadius, setGeofenceRadius] = useState<number>(50);
@@ -173,8 +180,10 @@ function ParkingMarkerWithPopup({
     const draftGeofence = {
       name: event.address && event.address !== `${event.lat.toFixed(5)}, ${event.lng.toFixed(5)}`
         ? `Area ${event.address.split(',')[0].trim()}`
-        : `Geofence Parkir #${index + 1}`,
-      description: `Titik parkir ${vehicleName} pada ${formatTimestamp(event.startTimestamp)} (Radius ${geofenceRadius}m)`,
+        : (locale === 'en' ? `Parking Geofence #${index + 1}` : `Geofence Parkir #${index + 1}`),
+      description: locale === 'en'
+        ? `Parking spot of ${vehicleName} at ${formatTimestamp(event.startTimestamp)} (Radius ${geofenceRadius}m)`
+        : `Titik parkir ${vehicleName} pada ${formatTimestamp(event.startTimestamp)} (Radius ${geofenceRadius}m)`,
       status: 'active',
       geometry: {
         type: 'polygon' as const,
@@ -249,7 +258,7 @@ function ParkingMarkerWithPopup({
                 type="button"
                 onClick={onToggle}
                 className="flex h-6 w-6 items-center justify-center rounded-md text-foreground-muted hover:text-foreground hover:bg-surface-elevated transition-colors focus:outline-none shrink-0"
-                title="Tutup"
+                title={tTracking.playbackClose}
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -277,7 +286,7 @@ function ParkingMarkerWithPopup({
                       {tTracking.playbackDuration}
                     </span>
                     <span className="text-[10.5px] font-semibold text-foreground leading-tight block whitespace-nowrap">
-                      {formatDuration(event.durationSecs)}
+                      {formatDuration(event.durationSecs, locale)}
                     </span>
                   </div>
                 </div>
@@ -293,7 +302,7 @@ function ParkingMarkerWithPopup({
                   <InfoRow
                     icon={Gauge}
                     label={tTracking.playbackOdometer}
-                    value={`${event.odometer.toLocaleString('id-ID', { minimumFractionDigits: 1 })} km`}
+                    value={`${event.odometer.toLocaleString(locale === 'en' ? 'en-US' : 'id-ID', { minimumFractionDigits: 1 })} km`}
                   />
                 </div>
               </div>
@@ -341,7 +350,7 @@ function ParkingMarkerWithPopup({
                     className="w-full flex items-center justify-center gap-1 py-1 px-2 rounded-md bg-danger hover:bg-danger/90 active:scale-[0.98] text-white text-[10.5px] font-bold shadow-2xs transition-all cursor-pointer"
                   >
                     <Plus className="w-3 h-3" />
-                    Buat Geofence
+                    {tTracking.playbackBtnCreateGeofence}
                   </button>
                 </div>
               )}
@@ -360,7 +369,7 @@ function ParkingMarkerWithPopup({
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-surface hover:bg-surface-elevated border border-border text-[9.5px] font-semibold text-foreground-muted hover:text-foreground transition-colors shrink-0"
                       style={{ textDecoration: 'none' }}
-                      title="Buka Google Maps"
+                      title={tTracking.playbackOpenGoogleMaps}
                     >
                       <span>Maps</span>
                       <ExternalLink className="w-2.5 h-2.5" />
@@ -395,7 +404,7 @@ export function PlaybackMap({
   const locale = useBusinessLocale();
   const tTracking = getTranslation(locale).tracking;
 
-  const vehicleName = vehicle?.plateNumber ?? 'Kendaraan';
+  const vehicleName = vehicle?.plateNumber ?? (locale === 'en' ? 'Vehicle' : 'Kendaraan');
   const [activePopupIndex, setActivePopupIndex] = useState<number | null>(null);
 
   // Telemetry values for HUD
@@ -428,7 +437,7 @@ export function PlaybackMap({
         getLabel={(v) => v.plateNumber}
 
         enableClustering={false}
-        entityLabel="Kendaraan"
+        entityLabel={locale === 'en' ? 'Vehicle' : 'Kendaraan'}
         locale={locale}
 
         playbackTrack={playbackTrack}
@@ -461,7 +470,7 @@ export function PlaybackMap({
                 {/* Badge Caption AWAL mengambang tepat di atas lingkaran titik */}
                 <div className="absolute bottom-full mb-1 flex flex-col items-center">
                   <div className="px-2 py-0.5 rounded bg-amber-500 text-white text-[9.5px] font-bold font-mono tracking-wider uppercase shadow-md ring-1 ring-white/90 whitespace-nowrap">
-                    Awal
+                    {tTracking.playbackCropStart}
                   </div>
                   <div className="w-0 h-0 border-l-[3.5px] border-l-transparent border-r-[3.5px] border-r-transparent border-t-[4px] border-t-amber-500" />
                 </div>
@@ -479,7 +488,7 @@ export function PlaybackMap({
                 {/* Badge Caption AKHIR mengambang tepat di atas lingkaran titik */}
                 <div className="absolute bottom-full mb-1 flex flex-col items-center">
                   <div className="px-2 py-0.5 rounded bg-amber-500 text-white text-[9.5px] font-bold font-mono tracking-wider uppercase shadow-md ring-1 ring-white/90 whitespace-nowrap">
-                    Akhir
+                    {tTracking.playbackCropEnd}
                   </div>
                   <div className="w-0 h-0 border-l-[3.5px] border-l-transparent border-r-[3.5px] border-r-transparent border-t-[4px] border-t-amber-500" />
                 </div>
@@ -498,6 +507,7 @@ export function PlaybackMap({
             isOpen={activePopupIndex === idx}
             onToggle={() => setActivePopupIndex(prev => prev === idx ? null : idx)}
             tTracking={tTracking}
+            locale={locale}
           />
         ))}
 
@@ -523,7 +533,7 @@ export function PlaybackMap({
             {/* Heading Indicator Icon */}
             <div
               className="w-6 h-6 rounded bg-surface border border-border flex items-center justify-center shrink-0"
-              title={`Arah: ${displayHeading}°`}
+              title={typeof tTracking.playbackHudArahTooltip === 'function' ? tTracking.playbackHudArahTooltip(displayHeading) : `Arah: ${displayHeading}°`}
             >
               <div
                 className="transition-transform duration-300 ease-out flex items-center justify-center"
@@ -538,7 +548,7 @@ export function PlaybackMap({
               {/* Kecepatan */}
               <div className="flex flex-col justify-center h-full">
                 <span className="text-[7.5px] uppercase tracking-wider text-foreground-muted font-semibold leading-none select-none">
-                  Kecepatan
+                  {tTracking.playbackHudSpeed}
                 </span>
                 <div className="flex items-baseline gap-0.5 mt-0.5">
                   <span className="text-[11px] font-bold text-foreground tabular-nums leading-none">
@@ -556,7 +566,7 @@ export function PlaybackMap({
               {/* Waktu */}
               <div className="flex flex-col justify-center h-full">
                 <span className="text-[7.5px] uppercase tracking-wider text-foreground-muted font-semibold leading-none select-none">
-                  Waktu
+                  {tTracking.playbackHudTime}
                 </span>
                 <div className="flex items-baseline mt-0.5">
                   <span className="text-[11px] font-semibold text-foreground tabular-nums leading-none font-mono tracking-tight">
@@ -571,7 +581,7 @@ export function PlaybackMap({
               {/* Heading */}
               <div className="hidden sm:flex flex-col justify-center h-full">
                 <span className="text-[7.5px] uppercase tracking-wider text-foreground-muted font-semibold leading-none select-none">
-                  Heading
+                  {tTracking.playbackHudHeading}
                 </span>
                 <div className="flex items-baseline mt-0.5">
                   <span className="text-[11px] font-bold text-foreground tabular-nums leading-none">

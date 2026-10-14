@@ -315,7 +315,7 @@ function RouteMapInner({
           source: pathSourceId,
           paint: {
             'line-color': '#F59E0B', // Gold / Amber
-            'line-width': 5,
+            'line-width': 4,
             'line-dasharray': [2, 2]
           },
         });

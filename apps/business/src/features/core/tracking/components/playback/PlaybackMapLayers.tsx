@@ -135,7 +135,7 @@ export function PlaybackMapLayers({ selectedGeofenceIds, selectedRouteIds, cropT
 
   // Register sources and layers into the MapLibre instance when style is ready
   const registerLayersAndSources = useCallback(() => {
-    if (!map || !map.isStyleLoaded()) return;
+    if (!map || !map.getStyle()) return;
 
     // Bersihkan casing layer lama jika masih tertinggal di instance map
     if (map.getLayer(CROP_ROUTE_CASING_LAYER)) {
@@ -235,7 +235,7 @@ export function PlaybackMapLayers({ selectedGeofenceIds, selectedRouteIds, cropT
         },
         paint: {
           'line-color': '#F59E0B',
-          'line-width': 6,
+          'line-width': 4,
           'line-opacity': 1.0,
         },
       });
@@ -297,7 +297,7 @@ export function PlaybackMapLayers({ selectedGeofenceIds, selectedRouteIds, cropT
     }
 
     // Jika salah satu source belum terdaftar dan style sudah siap, daftarkan sekarang
-    if (needsRegister && map.isStyleLoaded()) {
+    if (needsRegister && map.getStyle()) {
       registerLayersAndSources();
     }
   }, [map, buildGeofenceGeoJSON, buildRouteGeoJSON, buildCropGeoJSON, registerLayersAndSources]);
@@ -309,19 +309,18 @@ export function PlaybackMapLayers({ selectedGeofenceIds, selectedRouteIds, cropT
   useEffect(() => {
     if (!map) return;
 
-    if (map.isStyleLoaded()) {
+    if (map.getStyle()) {
       registerLayersAndSources();
-    } else {
-      const handleReady = () => {
-        registerLayersAndSources();
-      };
-      map.once('style.load', handleReady);
-      map.once('load', handleReady);
-      return () => {
-        map.off('style.load', handleReady);
-        map.off('load', handleReady);
-      };
     }
+
+    const handleStyleLoad = () => {
+      registerLayersAndSources();
+    };
+
+    map.on('style.load', handleStyleLoad);
+    return () => {
+      map.off('style.load', handleStyleLoad);
+    };
   }, [map, registerLayersAndSources]);
 
   // Synchronize on every prop change (selected geofences, selected routes, crop track)

@@ -623,11 +623,16 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
   }, []);
 
   // -- Route Crop Action Handlers --
-  const handleStartRouteCrop = React.useCallback(() => {
+  const handleToggleRouteCrop = React.useCallback(() => {
     if (!playbackData?.points || playbackData.points.length === 0) return;
-    setIsRouteCropMode(true);
-    setCropStartIndex(0);
-    setCropEndIndex(playbackData.points.length - 1);
+    setIsRouteCropMode((prev) => {
+      if (!prev) {
+        setCropStartIndex(0);
+        setCropEndIndex(playbackData.points.length - 1);
+        return true;
+      }
+      return false;
+    });
   }, [playbackData]);
 
   const handleSetCropStartToCurrent = React.useCallback(() => {
@@ -736,12 +741,12 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
 
     const sampled = downsamplePoints(trimmed, 120);
     const odoDiff = Math.max(0, Math.round((endPt.odometer - startPt.odometer) * 10) / 10);
-    const fromLabel = startGf?.name || 'Asal';
-    const toLabel = endGf?.name || 'Tujuan';
+    const fromLabel = startGf?.name || tTracking.playbackRouteOriginDefault;
+    const toLabel = endGf?.name || tTracking.playbackRouteDestDefault;
 
     const draftRoute: Partial<Route> = {
-      name: `Rute ${playbackVehicle?.plateNumber ?? ''} (${fromLabel} - ${toLabel})`,
-      description: `Dibuat dari riwayat perjalanan playback armada ${playbackVehicle?.plateNumber ?? ''} (${startPt.timestamp.slice(0, 10)})`,
+      name: tTracking.playbackDraftRouteName(playbackVehicle?.plateNumber ?? '', fromLabel, toLabel),
+      description: tTracking.playbackDraftRouteDesc(playbackVehicle?.plateNumber ?? '', startPt.timestamp.slice(0, 10)),
       origin: originLocation,
       destination: destLocation,
       stops,
@@ -757,7 +762,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
     sessionStorage.setItem('adatrack_draft_route', JSON.stringify(draftRoute));
     setIsRouteCropMode(false);
     router.push('/routes');
-  }, [playbackData, cropStartIndex, cropEndIndex, playbackParkingEvents, playbackVehicle, router]);
+  }, [playbackData, cropStartIndex, cropEndIndex, playbackParkingEvents, playbackVehicle, router, tTracking]);
 
   // â"€â"€ VehicleList labels â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
   const vehicleListLabels = React.useMemo(() => ({
@@ -1187,8 +1192,9 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
               traversedGeofenceIds={detectedGeofenceIds}
               similarRouteIds={eligibleRouteIds}
               routeSimilarityMap={routeSimilarityMap}
-              onCreateRoute={handleStartRouteCrop}
+              onCreateRoute={handleToggleRouteCrop}
               hasPlaybackData={Boolean(playbackData && playbackData.points.length > 0)}
+              isRouteCropMode={isRouteCropMode}
             />
           ) : (
             <div className="flex flex-col items-center gap-2.5 h-full w-full">

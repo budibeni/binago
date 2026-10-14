@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { Search, ChevronRight, ChevronLeft, Route as RouteIcon } from 'lucide-react';
+import { Search, ChevronRight, ChevronLeft, Route as RouteIcon, X } from 'lucide-react';
 import { Checkbox } from '@adatrack/ui';
 import { cn } from '@adatrack/utils';
 import { geofenceService, routeService } from '@/data/services';
@@ -19,6 +19,7 @@ export interface PlaybackMapLayerPanelProps {
   routeSimilarityMap?: Record<string, number>;
   onCreateRoute?: () => void;
   hasPlaybackData?: boolean;
+  isRouteCropMode?: boolean;
 }
 
 export function PlaybackMapLayerPanel({
@@ -32,6 +33,7 @@ export function PlaybackMapLayerPanel({
   routeSimilarityMap = {},
   onCreateRoute,
   hasPlaybackData = false,
+  isRouteCropMode = false,
 }: PlaybackMapLayerPanelProps) {
   // Geofence states
   const [geoFilterMode, setGeoFilterMode] = useState<'relevant' | 'all'>('relevant');
@@ -177,7 +179,7 @@ export function PlaybackMapLayerPanel({
         <button
           onClick={onClose}
           className="flex h-6 w-6 items-center justify-center rounded text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800 hover:text-foreground transition-colors"
-          title="Tutup Panel Layer"
+          title={tTracking.playbackCloseLayerPanel}
         >
           <ChevronRight className="h-3.5 w-3.5" />
         </button>
@@ -190,28 +192,28 @@ export function PlaybackMapLayerPanel({
           <div className="flex items-center gap-2">
             <div className="w-4 h-1 bg-blue-500 rounded-full shrink-0" />
             <span className="text-[10px] font-medium text-foreground-muted leading-tight">
-              Track (Belum dilewati)
+              {tTracking.playbackLegendTrackPending}
             </span>
           </div>
 
           <div className="flex items-center gap-2">
             <div className="w-4 h-1 bg-danger rounded-full shrink-0" />
             <span className="text-[10px] font-medium text-foreground-muted leading-tight">
-              Track (Sudah dilewati)
+              {tTracking.playbackLegendTrackPassed}
             </span>
           </div>
 
           <div className="flex items-center gap-2">
             <div className="w-4 h-0 border-t-[2px] border-dashed border-amber-500 shrink-0" />
             <span className="text-[10px] font-medium text-foreground-muted leading-tight">
-              Rute
+              {tTracking.playbackLegendRoute}
             </span>
           </div>
 
           <div className="flex items-center gap-2">
             <div className="w-4 h-2.5 bg-green-500/20 border border-green-500 shrink-0 rounded-sm" />
             <span className="text-[10px] font-medium text-foreground-muted leading-tight">
-              Geofence
+              {tTracking.playbackLegendGeofence}
             </span>
           </div>
         </div>
@@ -242,9 +244,9 @@ export function PlaybackMapLayerPanel({
                     ? 'bg-background text-foreground font-semibold shadow-xs border border-border/50'
                     : 'text-foreground-muted hover:text-foreground font-medium'
                 )}
-                title="Hanya tampilkan geofence yang terlewati oleh perjalanan"
+                title={tTracking.playbackTitleFilterRelevantGeo}
               >
-                Terkait ({relevantGeofenceCount})
+                {tTracking.playbackFilterRelevant} ({relevantGeofenceCount})
               </button>
               <button
                 type="button"
@@ -258,9 +260,9 @@ export function PlaybackMapLayerPanel({
                     ? 'bg-background text-foreground font-semibold shadow-xs border border-border/50'
                     : 'text-foreground-muted hover:text-foreground font-medium'
                 )}
-                title="Tampilkan semua master geofence"
+                title={tTracking.playbackTitleFilterAllGeo}
               >
-                Semua ({allGeofenceCount})
+                {tTracking.playbackFilterAll} ({allGeofenceCount})
               </button>
             </div>
           </div>
@@ -277,7 +279,7 @@ export function PlaybackMapLayerPanel({
                 }}
                 placeholder={
                   geoFilterMode === 'relevant'
-                    ? 'Cari geofence terlewati...'
+                    ? tTracking.playbackSearchTraversedGeofence
                     : tTracking.playbackSearchGeofence
                 }
                 className="w-full pl-8 pr-2 py-1.5 text-[11px] rounded border border-border bg-surface text-foreground placeholder:text-foreground-muted focus:outline-none focus:ring-1 focus:ring-danger focus:border-danger transition-shadow"
@@ -313,7 +315,7 @@ export function PlaybackMapLayerPanel({
                       {isTraversed && (
                         <span
                           className="shrink-0 w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1"
-                          title="Terlewati"
+                          title={tTracking.playbackBadgeTraversed}
                         />
                       )}
                     </label>
@@ -323,7 +325,7 @@ export function PlaybackMapLayerPanel({
             ) : (
               <div className="text-center text-[11px] text-foreground-muted py-3 px-2 bg-surface/40 rounded border border-dashed border-border">
                 {geoFilterMode === 'relevant'
-                  ? 'Belum ada geofence yang terlewati oleh perjalanan ini'
+                  ? tTracking.playbackEmptyTraversedGeofence
                   : tTracking.playbackNoGeofenceRoute}
               </div>
             )}
@@ -346,7 +348,7 @@ export function PlaybackMapLayerPanel({
                   <option value={15}>15</option>
                   <option value={20}>20</option>
                 </select>
-                <span className="text-[10px] text-foreground-muted">/hal</span>
+                <span className="text-[10px] text-foreground-muted">{tTracking.playbackPerPage}</span>
               </div>
               <div className="flex items-center gap-0.5">
                 <button
@@ -410,9 +412,9 @@ export function PlaybackMapLayerPanel({
                     ? 'bg-background text-foreground font-semibold shadow-xs border border-border/50'
                     : 'text-foreground-muted hover:text-foreground font-medium'
                 )}
-                title="Hanya tampilkan rute master dengan kemiripan ≥ 80%"
+                title={tTracking.playbackTitleFilterRelevantRoute}
               >
-                Terkait ({relevantRouteCount})
+                {tTracking.playbackFilterRelevant} ({relevantRouteCount})
               </button>
               <button
                 type="button"
@@ -426,9 +428,9 @@ export function PlaybackMapLayerPanel({
                     ? 'bg-background text-foreground font-semibold shadow-xs border border-border/50'
                     : 'text-foreground-muted hover:text-foreground font-medium'
                 )}
-                title="Tampilkan semua master rute"
+                title={tTracking.playbackTitleFilterAllRoute}
               >
-                Semua ({allRouteCount})
+                {tTracking.playbackFilterAll} ({allRouteCount})
               </button>
             </div>
           </div>
@@ -445,7 +447,7 @@ export function PlaybackMapLayerPanel({
                 }}
                 placeholder={
                   routeFilterMode === 'relevant'
-                    ? 'Cari rute terkait (≥ 80%)...'
+                    ? tTracking.playbackSearchRelevantRoute
                     : tTracking.playbackSearchRoute
                 }
                 className="w-full pl-8 pr-2 py-1.5 text-[11px] rounded border border-border bg-surface text-foreground placeholder:text-foreground-muted focus:outline-none focus:ring-1 focus:ring-danger focus:border-danger transition-shadow"
@@ -482,7 +484,7 @@ export function PlaybackMapLayerPanel({
                       {isSimilar && (
                         <span
                           className="shrink-0 w-1.5 h-1.5 rounded-full bg-amber-500 mr-1"
-                          title={similarity > 0 ? `${similarity}% Mirip` : 'Terkait'}
+                          title={similarity > 0 ? tTracking.playbackBadgeMatch(similarity) : tTracking.playbackBadgeRelevant}
                         />
                       )}
                     </label>
@@ -492,7 +494,7 @@ export function PlaybackMapLayerPanel({
             ) : (
               <div className="text-center text-[11px] text-foreground-muted py-3 px-2 bg-surface/40 rounded border border-dashed border-border">
                 {routeFilterMode === 'relevant'
-                  ? 'Tidak ada rute dengan kemiripan ≥ 80%'
+                  ? tTracking.playbackEmptyRelevantRoute
                   : tTracking.playbackNoGeofenceRoute}
               </div>
             )}
@@ -515,7 +517,7 @@ export function PlaybackMapLayerPanel({
                   <option value={15}>15</option>
                   <option value={20}>20</option>
                 </select>
-                <span className="text-[10px] text-foreground-muted">/hal</span>
+                <span className="text-[10px] text-foreground-muted">{tTracking.playbackPerPage}</span>
               </div>
               <div className="flex items-center gap-0.5">
                 <button
@@ -559,18 +561,38 @@ export function PlaybackMapLayerPanel({
             onClick={handleReset}
             className="w-full py-1.5 text-[11px] font-semibold text-danger border border-danger/30 hover:bg-danger/5 rounded transition-colors"
           >
-            Reset
+            {tTracking.playbackReset}
           </button>
 
           <button
             type="button"
             onClick={onCreateRoute}
             disabled={!hasPlaybackData}
-            className="w-full py-1.5 px-3 flex items-center justify-center gap-2 text-[11px] font-semibold text-foreground bg-surface hover:bg-muted border border-border rounded transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-            title={hasPlaybackData ? "Konversi riwayat playback ini menjadi Master Rute baru" : "Muat riwayat playback terlebih dahulu"}
+            className={cn(
+              "w-full py-1.5 px-3 flex items-center justify-center gap-2 text-[11px] font-semibold rounded transition-colors disabled:opacity-40 disabled:cursor-not-allowed border",
+              isRouteCropMode
+                ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/40 hover:bg-amber-500/20"
+                : "text-foreground bg-surface hover:bg-muted border-border"
+            )}
+            title={
+              !hasPlaybackData
+                ? tTracking.playbackTitleLoadPlaybackFirst
+                : isRouteCropMode
+                  ? tTracking.playbackTitleCloseCreateRoute
+                  : tTracking.playbackTitleOpenCreateRoute
+            }
           >
-            <RouteIcon className="w-3.5 h-3.5 text-foreground-muted" />
-            Buat Rute dari Playback
+            {isRouteCropMode ? (
+              <>
+                <X className="w-3.5 h-3.5 text-amber-500" />
+                <span>{tTracking.playbackBtnCloseCreateRoute}</span>
+              </>
+            ) : (
+              <>
+                <RouteIcon className="w-3.5 h-3.5 text-foreground-muted" />
+                <span>{tTracking.playbackBtnCreateRoute}</span>
+              </>
+            )}
           </button>
         </div>
       </div>

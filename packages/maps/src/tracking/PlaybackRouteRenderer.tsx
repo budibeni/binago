@@ -20,51 +20,55 @@ export function PlaybackRouteRenderer({ track, passedTrack }: PlaybackRouteRende
   const trackRef = useRef(track);
   const passedTrackRef = useRef(passedTrack);
   
-  useEffect(() => {
-    trackRef.current = track;
-  }, [track]);
+  // Synchronize latest props to refs synchronously on every render
+  trackRef.current = track;
+  passedTrackRef.current = passedTrack;
 
-  useEffect(() => {
-    passedTrackRef.current = passedTrack;
-  }, [passedTrack]);
+  const buildBaseTrackGeoJSON = useCallback((): GeoJSON.FeatureCollection => {
+    return {
+      type: 'FeatureCollection',
+      features: trackRef.current && trackRef.current.length > 1
+        ? [{
+            type: 'Feature',
+            properties: {},
+            geometry: {
+              type: 'LineString',
+              coordinates: trackRef.current.map(p => [p.lng, p.lat]),
+            }
+          }]
+        : [],
+    };
+  }, []);
+
+  const buildPassedTrackGeoJSON = useCallback((): GeoJSON.FeatureCollection => {
+    return {
+      type: 'FeatureCollection',
+      features: passedTrackRef.current && passedTrackRef.current.length > 1
+        ? [{
+            type: 'Feature',
+            properties: {},
+            geometry: {
+              type: 'LineString',
+              coordinates: passedTrackRef.current.map(p => [p.lng, p.lat]),
+            }
+          }]
+        : [],
+    };
+  }, []);
 
   const updateSource = useCallback(() => {
-    if (!map) return;
+    if (!map || !map.getStyle()) return;
     
     // Update Base Track (Blue)
-    const source = map.getSource(SOURCE_ID) as maplibregl.GeoJSONSource;
+    const source = map.getSource(SOURCE_ID) as maplibregl.GeoJSONSource | undefined;
     if (source) {
-      source.setData({
-        type: 'FeatureCollection',
-        features: trackRef.current && trackRef.current.length > 1
-          ? [{
-              type: 'Feature',
-              properties: {},
-              geometry: {
-                type: 'LineString',
-                coordinates: trackRef.current.map(p => [p.lng, p.lat]),
-              }
-            }]
-          : [],
-      });
+      source.setData(buildBaseTrackGeoJSON());
     }
 
     // Update Passed Track (Red)
-    const passedSource = map.getSource(SOURCE_PASSED_ID) as maplibregl.GeoJSONSource;
+    const passedSource = map.getSource(SOURCE_PASSED_ID) as maplibregl.GeoJSONSource | undefined;
     if (passedSource) {
-      passedSource.setData({
-        type: 'FeatureCollection',
-        features: passedTrackRef.current && passedTrackRef.current.length > 1
-          ? [{
-              type: 'Feature',
-              properties: {},
-              geometry: {
-                type: 'LineString',
-                coordinates: passedTrackRef.current.map(p => [p.lng, p.lat]),
-              }
-            }]
-          : [],
-      });
+      passedSource.setData(buildPassedTrackGeoJSON());
     }
 
     // Enforce layer order:
@@ -77,18 +81,22 @@ export function PlaybackRouteRenderer({ track, passedTrack }: PlaybackRouteRende
     if (map.getLayer('playback-layer-crop-route-layer')) {
       map.moveLayer('playback-layer-crop-route-layer');
     }
-  }, [map]);
+  }, [map, buildBaseTrackGeoJSON, buildPassedTrackGeoJSON]);
 
   const registerMapSources = useCallback(() => {
-    if (!map) return;
+    if (!map || !map.getStyle()) return;
 
     // 1. Base Track Source & Layer (Biru)
-    if (!map.getSource(SOURCE_ID)) {
+    const source = map.getSource(SOURCE_ID) as maplibregl.GeoJSONSource | undefined;
+    if (!source) {
       map.addSource(SOURCE_ID, {
         type: 'geojson',
-        data: { type: 'FeatureCollection', features: [] },
+        data: buildBaseTrackGeoJSON(),
       });
+    } else {
+      source.setData(buildBaseTrackGeoJSON());
     }
+
     if (!map.getLayer(LAYER_ID)) {
       map.addLayer({
         id: LAYER_ID,
@@ -107,12 +115,16 @@ export function PlaybackRouteRenderer({ track, passedTrack }: PlaybackRouteRende
     }
 
     // 2. Passed Track Source & Layer (Merah)
-    if (!map.getSource(SOURCE_PASSED_ID)) {
+    const passedSource = map.getSource(SOURCE_PASSED_ID) as maplibregl.GeoJSONSource | undefined;
+    if (!passedSource) {
       map.addSource(SOURCE_PASSED_ID, {
         type: 'geojson',
-        data: { type: 'FeatureCollection', features: [] },
+        data: buildPassedTrackGeoJSON(),
       });
+    } else {
+      passedSource.setData(buildPassedTrackGeoJSON());
     }
+
     if (!map.getLayer(LAYER_PASSED_ID)) {
       map.addLayer({
         id: LAYER_PASSED_ID,
@@ -137,18 +149,27 @@ export function PlaybackRouteRenderer({ track, passedTrack }: PlaybackRouteRende
     if (map.getLayer('playback-layer-crop-route-layer')) {
       map.moveLayer('playback-layer-crop-route-layer');
     }
+  }, [map, buildBaseTrackGeoJSON, buildPassedTrackGeoJSON]);
 
-    updateSource();
-  }, [map, updateSource]);
-
-  // Handle style loads (e.g. changing basemap)
+  // Handle style loads via context callback
   useStyleLoadCallback(registerMapSources);
 
-  // Initial registration
+  // Initial registration & direct style.load event listener on map instance
   useEffect(() => {
-    if (map && map.isStyleLoaded()) {
+    if (!map) return;
+
+    if (map.getStyle()) {
       registerMapSources();
     }
+
+    const handleStyleLoad = () => {
+      registerMapSources();
+    };
+
+    map.on('style.load', handleStyleLoad);
+    return () => {
+      map.off('style.load', handleStyleLoad);
+    };
   }, [map, registerMapSources]);
 
   // Update on track change

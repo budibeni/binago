@@ -100,14 +100,6 @@ function MapContainerInner({
     });
 
     // Fire style load listeners whenever style reloads (basemap switch)
-    map.on('styledata', () => {
-      // styledata fires on every style change, including basemap switch.
-      // This is more reliable than style.load when switching styles using setStyle()
-      if (map.isStyleLoaded()) {
-        styleLoadListeners.current.forEach((l) => l.callback());
-      }
-    });
-
     map.on('style.load', () => {
       styleLoadListeners.current.forEach((l) => l.callback());
     });
@@ -155,8 +147,8 @@ function MapContainerInner({
     currentBasemapRef.current = effectiveBasemap;
     const newStyle = resolveStyle(effectiveBasemap) as string | maplibregl.StyleSpecification;
 
-    mapRef.current.setStyle(newStyle);
-    // After setStyle(), map fires 'style.load' → we dispatch to styleLoadListeners in the 'style.load' handler above
+    mapRef.current.setStyle(newStyle, { diff: false });
+    // After setStyle({ diff: false }), map reliably fires 'style.load' → dispatches to styleLoadListeners
   }, [effectiveBasemap]);
 
   // Active attribution from current basemap

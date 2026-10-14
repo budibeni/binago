@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
-import { cn, formatDate } from '@adatrack/utils';
+import { cn } from '@adatrack/utils';
 import { getTranslation } from '@/i18n';
-import { Maximize, Minimize, Calendar, ChevronDown, RefreshCw, MapPin } from 'lucide-react';
+import { Calendar, RefreshCw, MapPin } from 'lucide-react';
 import { DataTable, type DataTableColumnDef } from '@adatrack/ui';
 import { TrackingVehicle, DateRange } from '../../types/tracking';
 import { TableFilterPopover } from '../shared/TableFilterPopover';
@@ -22,12 +22,15 @@ export interface PlaybackTableProps {
   isLoading?: boolean;
 }
 
-function StatusBadge({ speed }: { speed: number }) {
+function StatusBadge({ speed, locale }: { speed: number; locale: 'id' | 'en' }) {
   const isDriving = speed > 0;
+  const tTrackingLocal = getTrackingTranslation(locale);
   return (
     <div className="flex items-center gap-1.5">
       <div className={cn("h-1.5 w-1.5 rounded-full shrink-0", isDriving ? "bg-emerald-500" : "bg-blue-500")} />
-      <span className="text-[12px] text-foreground-muted truncate">{isDriving ? 'Berjalan' : 'Parkir'}</span>
+      <span className="text-[12px] text-foreground-muted truncate">
+        {isDriving ? tTrackingLocal.filters.statusDriving : tTrackingLocal.filters.statusParking}
+      </span>
     </div>
   );
 }
@@ -100,7 +103,7 @@ export function PlaybackTable({
   const columns = useMemo<DataTableColumnDef<MockPlaybackTrackPoint>[]>(() => [
     {
       id: 'no',
-      header: 'No',
+      header: tTrackingLocal.columns.no || 'No',
       cell: ({ row }) => <span className="text-foreground-muted">{row.index + 1}</span>,
       size: 60,
     },
@@ -123,11 +126,11 @@ export function PlaybackTable({
       id: 'status',
       header: tTrackingLocal.columns.status,
       size: 120,
-      cell: ({ row }) => <StatusBadge speed={row.original.speed} />
+      cell: ({ row }) => <StatusBadge speed={row.original.speed} locale={locale} />
     },
     {
       accessorKey: 'odometer',
-      header: 'Odometer',
+      header: tTrackingLocal.columns.odometer || 'Odometer',
       size: 130,
       cell: ({ row }) => <span className="text-foreground-muted tabular-nums">{row.original.odometer}</span>,
     },
@@ -153,7 +156,7 @@ export function PlaybackTable({
         );
       },
     },
-  ], [tTracking, tTrackingLocal]);
+  ], [tTracking, tTrackingLocal, locale]);
 
   const toolbarActions = (
     <>
@@ -242,7 +245,7 @@ export function PlaybackTable({
           toolbarActions={toolbarActions}
           onRefresh={onLoad}
           isLoading={isLoading}
-          emptyTitle={tTracking.playbackNoVehicle || 'Playback'}
+          emptyTitle={tTracking.playbackEmpty || 'Playback'}
           emptyDescription={
             !playbackData ? tTrackingLocal.messages.loadPlaybackFirst :
             searchQuery ? tTrackingLocal.messages.noPointsMatch : 

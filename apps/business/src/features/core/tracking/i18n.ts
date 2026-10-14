@@ -27,6 +27,8 @@ export const trackingDictionaries = {
       minSpeed: 'Min. Kecepatan',
       vehicleType: 'Tipe Kendaraan',
       time: 'Waktu',
+      odometer: 'Odometer',
+      no: 'No',
     },
     filters: {
       startDate: 'Tanggal Mulai',
@@ -104,6 +106,8 @@ export const trackingDictionaries = {
       minSpeed: 'Min. Speed',
       vehicleType: 'Vehicle Type',
       time: 'Time',
+      odometer: 'Odometer',
+      no: 'No',
     },
     filters: {
       startDate: 'Start Date',

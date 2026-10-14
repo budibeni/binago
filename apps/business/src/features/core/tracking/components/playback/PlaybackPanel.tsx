@@ -468,7 +468,7 @@ export function PlaybackPanel({
               <button
                 onClick={onStop}
                 className="flex items-center justify-center h-8 w-8 rounded-full text-foreground-muted hover:text-foreground hover:bg-surface-elevated transition-colors"
-                title="Reset ke awal"
+                title={tTracking.playbackResetToStart}
               >
                 <SkipBack className="h-3.5 w-3.5" fill="currentColor" />
               </button>
@@ -476,7 +476,7 @@ export function PlaybackPanel({
               <button
                 onClick={isPlaying ? onPause : onPlay}
                 className="flex items-center justify-center h-9 w-9 rounded-full bg-danger hover:bg-red-600 text-white hover:scale-105 active:scale-95 transition-all shadow-sm"
-                title={isPlaying ? "Jeda (Pause)" : "Putar (Play)"}
+                title={isPlaying ? tTracking.playbackPause : tTracking.playbackPlay}
               >
                 {isPlaying ? <Pause className="h-4 w-4" fill="currentColor" /> : <Play className="h-4 w-4 ml-0.5" fill="currentColor" />}
               </button>
@@ -572,7 +572,7 @@ export function PlaybackPanel({
                       onMouseDown={handleStartDrag('window')}
                       onTouchStart={handleStartDrag('window')}
                       onClick={(e) => e.stopPropagation()}
-                      title="Klik & tahan untuk menggeser rentang rute"
+                      title={tTracking.playbackDragWindowHint}
                     />
 
                     {/* Badge Mengambang Saat Menggeser Window Tengah */}
@@ -593,7 +593,7 @@ export function PlaybackPanel({
                       onMouseDown={handleStartDrag('start')}
                       onTouchStart={handleStartDrag('start')}
                       onClick={(e) => e.stopPropagation()}
-                      title="Tarik dari samping kiri untuk memotong awal rute"
+                      title={tTracking.playbackDragLeftHint}
                     >
                       {/* 2 Garis vertikal grip khas video trimmer */}
                       <div className="flex gap-[2px] items-center pointer-events-none">
@@ -630,7 +630,7 @@ export function PlaybackPanel({
                       onMouseDown={handleStartDrag('end')}
                       onTouchStart={handleStartDrag('end')}
                       onClick={(e) => e.stopPropagation()}
-                      title="Tarik dari samping kanan untuk memotong akhir rute"
+                      title={tTracking.playbackDragRightHint}
                     >
                       {/* 2 Garis vertikal grip khas video trimmer */}
                       <div className="flex gap-[2px] items-center pointer-events-none">
@@ -678,17 +678,17 @@ export function PlaybackPanel({
                     type="button"
                     onClick={onCancelRouteCrop}
                     className="flex items-center justify-center h-9 px-3 text-xs font-medium text-foreground-muted hover:text-foreground hover:bg-surface-elevated rounded-lg transition-colors shrink-0"
-                    title="Batal mode crop rute"
+                    title={tTracking.playbackTitleCancelCrop}
                   >
-                    Batal
+                    {tTracking.playbackCancelCrop}
                   </button>
                   <button
                     type="button"
                     onClick={onConfirmRouteCrop}
                     className="flex items-center justify-center gap-1.5 h-8 px-4 rounded-lg bg-zinc-600 hover:bg-zinc-700 active:bg-zinc-800 text-white font-bold text-xs shadow-sm hover:shadow transition-all shrink-0"
-                    title="Simpan dan buka di halaman Rute"
+                    title={tTracking.playbackTitleConfirmCrop}
                   >
-                    <span>Buat Rute</span>
+                    <span>{tTracking.playbackBtnConfirmCrop}</span>
                     <ArrowRight className="h-3.5 w-3.5" strokeWidth={2.5} />
                   </button>
                 </div>

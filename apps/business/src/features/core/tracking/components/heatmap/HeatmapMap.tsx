@@ -105,7 +105,7 @@ function HeatmapLayer({
   }, [isGenerating, selectedVehicleIds, dateRange, statusFilter]);
 
   const updateSource = useCallback(() => {
-    if (!map || !map.isStyleLoaded()) return;
+    if (!map || !map.getStyle()) return;
 
     if (!map.getSource(HEATMAP_SOURCE)) {
       map.addSource(HEATMAP_SOURCE, {
@@ -169,8 +169,18 @@ function HeatmapLayer({
   useStyleLoadCallback(updateSource);
 
   useEffect(() => {
-    updateSource();
-  }, [updateSource]);
+    if (!map) return;
+    if (map.getStyle()) {
+      updateSource();
+    }
+    const handleStyleLoad = () => {
+      updateSource();
+    };
+    map.on('style.load', handleStyleLoad);
+    return () => {
+      map.off('style.load', handleStyleLoad);
+    };
+  }, [map, updateSource]);
 
   // Map is handled natively by TrackingMap since we're passing entities and selectedIds.
 
