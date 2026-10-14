@@ -18,21 +18,45 @@ export function RouteFeature({ locale = 'id' }: RouteFeatureProps) {
   const t = getRouteTranslation(locale);
   const searchParams = useSearchParams();
   const initialRouteId = searchParams?.get('routeId') || undefined;
+  const action = searchParams?.get('action') || undefined;
+  const source = searchParams?.get('source') || undefined;
 
   const [routes, setRoutes] = useState<Route[]>(() => routeService.getRoutes());
   const [selectedRouteId, setSelectedRouteId] = useState<string | undefined>(initialRouteId);
   const [isEditing, setIsEditing] = useState(false);
+  const [draftRouteData, setDraftRouteData] = useState<Route | undefined>(undefined);
+
+  // Load draft route from playback if present in sessionStorage
+  React.useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem('adatrack_draft_route');
+      if (raw) {
+        const draft = JSON.parse(raw) as Route;
+        setDraftRouteData(draft);
+        setSelectedRouteId(undefined);
+        setIsEditing(true);
+        // Ensure URL stays clean without query parameters
+        if (typeof window !== 'undefined' && window.location.search) {
+          window.history.replaceState(null, '', '/routes');
+        }
+      }
+    } catch (err) {
+      console.error('Failed to parse draft route from playback:', err);
+    }
+  }, []);
 
   const handleSelectRoute = (id: string | undefined) => {
     setSelectedRouteId(id);
   };
 
   const handleCreateNew = () => {
+    setDraftRouteData(undefined);
     setSelectedRouteId(undefined);
     setIsEditing(true);
   };
 
   const handleEdit = (id: string) => {
+    setDraftRouteData(undefined);
     setSelectedRouteId(id);
     setIsEditing(true);
   };
@@ -63,19 +87,24 @@ export function RouteFeature({ locale = 'id' }: RouteFeatureProps) {
       setSelectedRouteId(newRoute.id);
     }
 
+    setDraftRouteData(undefined);
+    sessionStorage.removeItem('adatrack_draft_route');
     setIsEditing(false);
   };
 
   const handleCancelEdit = () => {
+    setDraftRouteData(undefined);
+    sessionStorage.removeItem('adatrack_draft_route');
     setIsEditing(false);
   };
 
   if (isEditing) {
     const selectedRoute = routes.find(r => r.id === selectedRouteId) || undefined;
+    const initialData = draftRouteData || selectedRoute;
     return (
       <div className="relative w-full overflow-hidden" style={{ height: 'calc(100dvh - 52px)' }}>
         <RouteEditorView
-          initialData={selectedRoute}
+          initialData={initialData}
           geofences={geofenceService.getGeofences()}
           groups={groupService.getRouteGroups()}
           onSave={handleSave}

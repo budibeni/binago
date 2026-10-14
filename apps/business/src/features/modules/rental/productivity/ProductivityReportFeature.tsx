@@ -1,4 +1,6 @@
 
+'use client';
+
 const getMaxEndDate = (items: any[]) => {
   if (!items || items.length === 0) return "";
   let max = new Date(items[0].startDate || "");
@@ -11,8 +13,6 @@ const getMaxEndDate = (items: any[]) => {
   }
   return max.toISOString();
 };
-
-'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';

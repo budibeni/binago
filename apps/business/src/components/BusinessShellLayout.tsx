@@ -339,6 +339,24 @@ export function BusinessShellLayout({ children }: { children: React.ReactNode })
     breadcrumbItems.push({ label: t.nav.home });
   }
 
+  const isAuthPage = currentPath === '/login' || currentPath.startsWith('/login');
+
+  if (isAuthPage) {
+    return (
+      <UIProvider config={{ 
+        cancelText: t.common.cancel, 
+        saveText: t.common.save,
+        detailTitle: (t.common as any).detailTitle || 'Detail',
+        editText: (t.common as any).editText || 'Edit',
+        deleteText: (t.common as any).deleteText || 'Hapus',
+      }}>
+        <BusinessLocaleContext.Provider value={locale}>
+          {children}
+        </BusinessLocaleContext.Provider>
+      </UIProvider>
+    );
+  }
+
   return (
     <UIProvider config={{ 
       cancelText: t.common.cancel, 
@@ -359,6 +377,11 @@ export function BusinessShellLayout({ children }: { children: React.ReactNode })
         currentTheme={theme}
         onThemeChange={handleThemeChange}
         userMenuLabels={t.userMenu}
+        onLogoutClick={() => {
+          if (typeof window !== 'undefined') {
+            window.location.href = '/login';
+          }
+        }}
       >
         <ShareLocationProvider>
           <BusinessLocaleContext.Provider value={locale}>

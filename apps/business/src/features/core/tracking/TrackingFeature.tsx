@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import { Map, History, ChevronLeft, Filter, Activity, MapPin } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import { VehicleList } from './components/shared/VehicleList';
@@ -20,13 +21,32 @@ import { TableModeSelector } from './components/shared/TableModeSelector';
 import { LiveTable } from './components/live/LiveTable';
 import { TrackingNotificationPanel } from './components/activity/TrackingNotificationPanel';
 import { trackingService } from '@/data/services/trackingService';
+import { geofenceService, routeService } from '@/data/services';
+import {
+  detectTraversedGeofenceIds,
+  detectSimilarRoutes,
+  isPointInGeofence,
+  findGeofenceForCoordinate,
+} from './utils/playbackLayerMatcher';
 import { trackingNavigationService } from './services/trackingNavigationService';
-import type { MockPlaybackData } from './data/mockTrackingData';
+import type { MockPlaybackData, MockPlaybackTrackPoint } from './data/mockTrackingData';
+import type { Route, RouteLocation, RouteStop } from '@/features/core/routes/types';
 import { getTranslation } from '../../../i18n';
 import { useBusinessLocale } from '../../../components/BusinessShellLayout';
 import { getTrackingTranslation } from './i18n';
 import type { StatusFilter, DateRange, PlaybackState, TrackingView } from './types/tracking';
 import type { Locale } from '@adatrack/types';
+
+function downsamplePoints(pts: MockPlaybackTrackPoint[], maxPoints = 120): MockPlaybackTrackPoint[] {
+  if (pts.length <= maxPoints) return pts;
+  const step = (pts.length - 1) / (maxPoints - 1);
+  const result: MockPlaybackTrackPoint[] = [];
+  for (let i = 0; i < maxPoints - 1; i++) {
+    result.push(pts[Math.round(i * step)]);
+  }
+  result.push(pts[pts.length - 1]);
+  return result;
+}
 
 // â"€â"€â"€ Mode â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
@@ -39,6 +59,7 @@ interface TrackingFeatureProps {
 }
 
 export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
+  const router = useRouter();
   const contextLocale = useBusinessLocale();
   const locale = localeProp ?? contextLocale ?? 'id';
   const t = getTranslation(locale);
@@ -60,6 +81,11 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
   const [selectedGeofenceIds, setSelectedGeofenceIds] = React.useState<string[]>([]);
   const [selectedRouteIds, setSelectedRouteIds] = React.useState<string[]>([]);
   const [isMapLayerPanelVisible, setIsMapLayerPanelVisible] = React.useState(true);
+
+  // -- Route Crop Mode state (Inline toolbar on top of playback player panel) --
+  const [isRouteCropMode, setIsRouteCropMode] = React.useState(false);
+  const [cropStartIndex, setCropStartIndex] = React.useState(0);
+  const [cropEndIndex, setCropEndIndex] = React.useState(0);
 
   // â"€â"€ Playback state â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
   const [playbackVehicleId, setPlaybackVehicleId] = React.useState<string | null>(null);
@@ -238,8 +264,59 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
     return playbackTrack.slice(0, playbackPointIndex + 1);
   }, [playbackTrack, playbackPointIndex]);
 
+  // -- Route Crop Track & Metrics (Segmen kuning yang sedang dipotong) ---------
+  const cropTrack = React.useMemo(() => {
+    if (!playbackData?.points || playbackData.points.length === 0) return undefined;
+    const s = Math.max(0, Math.min(cropStartIndex, playbackData.points.length - 1));
+    const e = Math.max(s, Math.min(cropEndIndex, playbackData.points.length - 1));
+    const trackSlice = playbackData.points.slice(s, e + 1).map(p => ({ lat: p.lat, lng: p.lng }));
+    console.log('[TrackingFeature] cropTrack calc:', {
+      cropStartIndex,
+      cropEndIndex,
+      s,
+      e,
+      sliceLen: trackSlice.length,
+      startPt: trackSlice[0],
+      endPt: trackSlice[trackSlice.length - 1]
+    });
+    return trackSlice;
+  }, [playbackData, cropStartIndex, cropEndIndex]);
+
+  const { cropDistanceKm, cropDurationSecs, cropStartLabel, cropEndLabel, cropStartTimestamp, cropEndTimestamp } = React.useMemo(() => {
+    if (!playbackData?.points || playbackData.points.length === 0) {
+      return { cropDistanceKm: 0, cropDurationSecs: 0, cropStartLabel: '', cropEndLabel: '', cropStartTimestamp: '', cropEndTimestamp: '' };
+    }
+    const s = Math.max(0, Math.min(cropStartIndex, playbackData.points.length - 1));
+    const e = Math.max(s, Math.min(cropEndIndex, playbackData.points.length - 1));
+    const startPt = playbackData.points[s];
+    const endPt = playbackData.points[e];
+    if (!startPt || !endPt) {
+      return { cropDistanceKm: 0, cropDurationSecs: 0, cropStartLabel: '', cropEndLabel: '', cropStartTimestamp: '', cropEndTimestamp: '' };
+    }
+
+    const dist = Math.max(0, Math.round((endPt.odometer - startPt.odometer) * 10) / 10);
+    const dur = Math.max(0, (e - s) * 15);
+
+    const allGeofences = geofenceService.getGeofences();
+    const startGf = findGeofenceForCoordinate({ lat: startPt.lat, lng: startPt.lng }, allGeofences);
+    const endGf = findGeofenceForCoordinate({ lat: endPt.lat, lng: endPt.lng }, allGeofences);
+
+    const sLabel = startGf?.name || startPt.timestamp.slice(11, 16);
+    const eLabel = endGf?.name || endPt.timestamp.slice(11, 16);
+
+    return {
+      cropDistanceKm: dist,
+      cropDurationSecs: dur,
+      cropStartLabel: sLabel,
+      cropEndLabel: eLabel,
+      cropStartTimestamp: startPt.timestamp,
+      cropEndTimestamp: endPt.timestamp,
+    };
+  }, [playbackData, cropStartIndex, cropEndIndex]);
+
   const playbackParkingEvents = React.useMemo(() => {
     if (!playbackData) return undefined;
+    const allGeofences = geofenceService.getGeofences();
     const events: {
       lat: number;
       lng: number;
@@ -249,6 +326,8 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
       pointIndex: number;
       speed: number;
       odometer: number;
+      geofenceName?: string;
+      geofenceId?: string;
     }[] = [];
     let parkingStart: number | null = null;
     let parkingStartTimestamp = '';
@@ -263,6 +342,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
         if (parkingStart !== null) {
           const durationSecs = (idx - parkingStart) * 15;
           const point = playbackData.points[parkingStart];
+          const matchedGf = findGeofenceForCoordinate({ lat: point.lat, lng: point.lng }, allGeofences);
           events.push({
             lat: point.lat,
             lng: point.lng,
@@ -272,6 +352,8 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
             pointIndex: parkingStart,
             speed: 0,
             odometer: point.odometer,
+            geofenceName: matchedGf?.name,
+            geofenceId: matchedGf?.id,
           });
           parkingStart = null;
         }
@@ -282,6 +364,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
     if (parkingStart !== null) {
       const durationSecs = (playbackData.points.length - parkingStart) * 15;
       const point = playbackData.points[parkingStart];
+      const matchedGf = findGeofenceForCoordinate({ lat: point.lat, lng: point.lng }, allGeofences);
       events.push({
         lat: point.lat,
         lng: point.lng,
@@ -291,6 +374,8 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
         pointIndex: parkingStart,
         speed: 0,
         odometer: point.odometer,
+        geofenceName: matchedGf?.name,
+        geofenceId: matchedGf?.id,
       });
     }
 
@@ -313,19 +398,75 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
     });
   }, [allVehiclesUnfiltered, mode, playbackData, playbackVehicleId, playbackPointIndex]);
 
+  // Current point during playback simulation
+  const currentPlaybackPoint = React.useMemo(() => {
+    if (!playbackData || playbackPointIndex < 0 || playbackPointIndex >= playbackData.points.length) return null;
+    return playbackData.points[playbackPointIndex] ?? null;
+  }, [playbackData, playbackPointIndex]);
+
+  // -- Auto-detect traversed geofences and similar routes from playback track (min 80% similarity) --
+  const { detectedGeofenceIds, detectedRouteIds, eligibleRouteIds, routeSimilarityMap } = React.useMemo(() => {
+    if (!playbackData?.points || playbackData.points.length === 0) {
+      return { detectedGeofenceIds: [], detectedRouteIds: [], eligibleRouteIds: [], routeSimilarityMap: {} };
+    }
+    const allGeofences = geofenceService.getGeofences();
+    const allRoutes = routeService.getRoutes();
+    const traversed = detectTraversedGeofenceIds(allGeofences, playbackData.points);
+    // Syarat minimal kemiripan 80% (0.80) & HANYA centang 1 rute paling mirip (top match)
+    const { matchedRouteIds, eligibleRouteIds, routeSimilarityMap } = detectSimilarRoutes(
+      allRoutes,
+      playbackData.points,
+      traversed,
+      allGeofences,
+      0.80
+    );
+    return { detectedGeofenceIds: traversed, detectedRouteIds: matchedRouteIds, eligibleRouteIds, routeSimilarityMap };
+  }, [playbackData]);
+
+  // Synchronize detected geofences and routes to selected state when playbackData changes
+  React.useEffect(() => {
+    if (playbackData) {
+      setSelectedGeofenceIds(detectedGeofenceIds);
+      setSelectedRouteIds(detectedRouteIds);
+    } else {
+      setSelectedGeofenceIds([]);
+      setSelectedRouteIds([]);
+    }
+  }, [detectedGeofenceIds, detectedRouteIds, playbackData]);
+
+  // Progressive check: dynamically auto-check geofences as vehicle passes through them during active playback
+  React.useEffect(() => {
+    if (!playbackData || playbackPointIndex <= 0 || playbackState.status !== 'playing') return;
+    const currentPt = playbackData.points[playbackPointIndex];
+    if (!currentPt) return;
+
+    const allGeofences = geofenceService.getGeofences();
+    const newlyHit = allGeofences.filter(
+      (gf) => !selectedGeofenceIds.includes(gf.id) && isPointInGeofence(currentPt, gf)
+    );
+
+    if (newlyHit.length > 0) {
+      setSelectedGeofenceIds((prev) => [
+        ...prev,
+        ...newlyHit.map((g) => g.id).filter((id) => !prev.includes(id)),
+      ]);
+    }
+  }, [playbackPointIndex, playbackData, selectedGeofenceIds, playbackState.status]);
+
   // Vehicle with position overridden for PlaybackMap
   const playbackVehicle = React.useMemo(() => {
     if (!playbackVehicleId) return null;
     const base = allVehiclesUnfiltered.find(v => v.id === playbackVehicleId) ?? null;
-    if (!base || !playbackData) return base;
-    const currentPoint = playbackData.points[playbackPointIndex];
-    if (!currentPoint) return base;
+    if (!base) return null;
+    if (!playbackData || playbackData.points.length === 0) return base;
+    const currentPoint = playbackData.points[playbackPointIndex] || playbackData.points[0];
     return {
       ...base,
       location: { lat: currentPoint.lat, lng: currentPoint.lng, address: base.location.address },
       speed: currentPoint.speed,
       heading: currentPoint.heading,
       status: currentPoint.speed > 0 ? 'driving' as const : 'parking' as const,
+      lastUpdate: currentPoint.timestamp,
     };
   }, [allVehiclesUnfiltered, playbackVehicleId, playbackData, playbackPointIndex]);
 
@@ -339,6 +480,14 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
   React.useEffect(() => {
     return () => stopTimer();
   }, [stopTimer]);
+
+  // Trigger map resize when switching between live/playback mode or map view to ensure MapLibre recalculates projections
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      window.dispatchEvent(new Event('resize'));
+    }, 50);
+    return () => clearTimeout(timer);
+  }, [mode, view]);
 
   // --- VehicleList handlers ------------------------------------------------------------------
 
@@ -379,6 +528,9 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
     setPlaybackState({ status: 'idle', totalDuration: 0, currentTime: 0 });
     setPlaybackData(null);
     setPlaybackPointIndex(0);
+    setSelectedGeofenceIds([]);
+    setSelectedRouteIds([]);
+    setIsRouteCropMode(false);
     stopTimer();
   }, [stopTimer]);
 
@@ -388,11 +540,14 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
     setPlaybackState({ status: 'loading', totalDuration: 0, currentTime: 0 });
     setPlaybackData(null);
     setPlaybackPointIndex(0);
+    setIsRouteCropMode(false);
     setTimeout(() => {
       const startDatetime = new Date(`${dateRange.startDate}T${dateRange.startTime}:00`);
       const data = trackingService.getPlaybackData(playbackVehicleId, startDatetime);
       setPlaybackData(data);
       playbackDataRef.current = data;
+      setCropStartIndex(0);
+      setCropEndIndex(data.points.length - 1);
       setPlaybackState({ status: 'ready', totalDuration: data.totalDurationSecs, currentTime: 0 });
     }, 1200);
   }, [playbackVehicleId, dateRange, stopTimer]);
@@ -408,10 +563,13 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
     setPlaybackState({ status: 'loading', totalDuration: 0, currentTime: 0 });
     setPlaybackData(null);
     setPlaybackPointIndex(0);
+    setIsRouteCropMode(false);
     setTimeout(() => {
       const data = trackingService.getPlaybackData(pending.vehicleId, pending.startDate);
       setPlaybackData(data);
       playbackDataRef.current = data;
+      setCropStartIndex(0);
+      setCropEndIndex(data.points.length - 1);
       setPlaybackState({ status: 'ready', totalDuration: data.totalDurationSecs, currentTime: 0 });
     }, 1200);
   }, [playbackVehicleId, stopTimer]);
@@ -463,6 +621,143 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
       currentTime: clampedIndex * 15,
     }));
   }, []);
+
+  // -- Route Crop Action Handlers --
+  const handleStartRouteCrop = React.useCallback(() => {
+    if (!playbackData?.points || playbackData.points.length === 0) return;
+    setIsRouteCropMode(true);
+    setCropStartIndex(0);
+    setCropEndIndex(playbackData.points.length - 1);
+  }, [playbackData]);
+
+  const handleSetCropStartToCurrent = React.useCallback(() => {
+    if (!playbackData?.points || playbackData.points.length === 0) return;
+    const cur = Math.max(0, Math.min(playbackPointIndex, playbackData.points.length - 1));
+    if (cur <= cropEndIndex) {
+      setCropStartIndex(cur);
+    } else {
+      setCropStartIndex(cur);
+      setCropEndIndex(playbackData.points.length - 1);
+    }
+  }, [playbackData, playbackPointIndex, cropEndIndex]);
+
+  const handleSetCropEndToCurrent = React.useCallback(() => {
+    if (!playbackData?.points || playbackData.points.length === 0) return;
+    const cur = Math.max(0, Math.min(playbackPointIndex, playbackData.points.length - 1));
+    if (cur >= cropStartIndex) {
+      setCropEndIndex(cur);
+    } else {
+      setCropStartIndex(0);
+      setCropEndIndex(cur);
+    }
+  }, [playbackData, playbackPointIndex, cropStartIndex]);
+
+  const handleResetCropRange = React.useCallback(() => {
+    if (!playbackData?.points || playbackData.points.length === 0) return;
+    setCropStartIndex(0);
+    setCropEndIndex(playbackData.points.length - 1);
+  }, [playbackData]);
+
+  const handleCancelRouteCrop = React.useCallback(() => {
+    setIsRouteCropMode(false);
+  }, []);
+
+  const handleConfirmRouteCrop = React.useCallback(() => {
+    if (!playbackData?.points || playbackData.points.length === 0) return;
+    const s = Math.max(0, Math.min(cropStartIndex, playbackData.points.length - 1));
+    const e = Math.max(s, Math.min(cropEndIndex, playbackData.points.length - 1));
+    const trimmed = playbackData.points.slice(s, e + 1);
+    if (trimmed.length === 0) return;
+
+    const startPt = trimmed[0];
+    const endPt = trimmed[trimmed.length - 1];
+
+    const allGeofences = geofenceService.getGeofences();
+    const startGf = findGeofenceForCoordinate({ lat: startPt.lat, lng: startPt.lng }, allGeofences);
+    const endGf = findGeofenceForCoordinate({ lat: endPt.lat, lng: endPt.lng }, allGeofences);
+
+    const originLocation: RouteLocation = startGf
+      ? {
+          type: 'geofence',
+          geofenceId: startGf.id,
+          latitude: startPt.lat,
+          longitude: startPt.lng,
+          address: startGf.name,
+        }
+      : {
+          type: 'coordinate',
+          latitude: startPt.lat,
+          longitude: startPt.lng,
+          address: startPt.address ?? `${startPt.lat.toFixed(5)}, ${startPt.lng.toFixed(5)}`,
+        };
+
+    const destLocation: RouteLocation = endGf
+      ? {
+          type: 'geofence',
+          geofenceId: endGf.id,
+          latitude: endPt.lat,
+          longitude: endPt.lng,
+          address: endGf.name,
+        }
+      : {
+          type: 'coordinate',
+          latitude: endPt.lat,
+          longitude: endPt.lng,
+          address: endPt.address ?? `${endPt.lat.toFixed(5)}, ${endPt.lng.toFixed(5)}`,
+        };
+
+    const stopsInRange = (playbackParkingEvents || []).filter(
+      (p) => p.pointIndex >= s && p.pointIndex <= e
+    );
+
+    const stops: RouteStop[] = stopsInRange.map((p, i) => {
+      const stopGf =
+        p.geofenceId ||
+        (p.geofenceName ? allGeofences.find((g) => g.name === p.geofenceName)?.id : undefined);
+      return {
+        id: `stop-${i + 1}`,
+        sequence: i + 1,
+        location: stopGf
+          ? {
+              type: 'geofence',
+              geofenceId: stopGf,
+              latitude: p.lat,
+              longitude: p.lng,
+              address: p.geofenceName,
+            }
+          : {
+              type: 'coordinate',
+              latitude: p.lat,
+              longitude: p.lng,
+              address: p.address,
+            },
+      };
+    });
+
+    const sampled = downsamplePoints(trimmed, 120);
+    const odoDiff = Math.max(0, Math.round((endPt.odometer - startPt.odometer) * 10) / 10);
+    const fromLabel = startGf?.name || 'Asal';
+    const toLabel = endGf?.name || 'Tujuan';
+
+    const draftRoute: Partial<Route> = {
+      name: `Rute ${playbackVehicle?.plateNumber ?? ''} (${fromLabel} - ${toLabel})`,
+      description: `Dibuat dari riwayat perjalanan playback armada ${playbackVehicle?.plateNumber ?? ''} (${startPt.timestamp.slice(0, 10)})`,
+      origin: originLocation,
+      destination: destLocation,
+      stops,
+      plannedPath: {
+        type: 'multiline',
+        coordinates: sampled.map((p) => ({ lat: p.lat, lng: p.lng })),
+      },
+      plannedDistance: odoDiff,
+      estimatedDuration: Math.round(((trimmed.length - 1) * 15) / 60),
+      status: 'active',
+    };
+
+    sessionStorage.setItem('adatrack_draft_route', JSON.stringify(draftRoute));
+    setIsRouteCropMode(false);
+    router.push('/routes');
+  }, [playbackData, cropStartIndex, cropEndIndex, playbackParkingEvents, playbackVehicle, router]);
 
   // â"€â"€ VehicleList labels â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
   const vehicleListLabels = React.useMemo(() => ({
@@ -663,11 +958,14 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
             <div className={cn('flex-1 relative', (mode !== 'playback' || view !== 'map') && 'hidden')}>
               <PlaybackMap
                 vehicle={playbackVehicle}
+                currentPoint={currentPlaybackPoint || (playbackData?.points ? playbackData.points[0] : null)}
                 playbackTrack={playbackTrack}
                 playbackPassedTrack={playbackPassedTrack}
                 playbackParkingEvents={playbackParkingEvents}
                 selectedGeofenceIds={selectedGeofenceIds}
                 selectedRouteIds={selectedRouteIds}
+                cropTrack={isRouteCropMode ? cropTrack : undefined}
+                isRouteCropMode={isRouteCropMode}
               />
             </div>
 
@@ -692,7 +990,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
           className={cn(
             'shrink-0 border-t border-border bg-background transition-all duration-300 ease-in-out relative z-[400]',
             (mode === 'playback' && view === 'map')
-              ? 'h-[56px] opacity-100 translate-y-0'
+              ? 'h-[56px] opacity-100 translate-y-0 overflow-visible'
               : 'h-0 opacity-0 translate-y-10 pointer-events-none overflow-hidden'
           )}
           aria-hidden={mode !== 'playback' || view !== 'map'}
@@ -712,6 +1010,24 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
             onSeek={handleSeek}
             speed={playbackSpeed}
             onSpeedChange={setPlaybackSpeed}
+            currentPoint={currentPlaybackPoint}
+            isRouteCropMode={isRouteCropMode}
+            cropStartIndex={cropStartIndex}
+            cropEndIndex={cropEndIndex}
+            totalPoints={playbackData?.points?.length ?? 0}
+            cropStartLabel={cropStartLabel}
+            cropEndLabel={cropEndLabel}
+            cropStartTimestamp={cropStartTimestamp}
+            cropEndTimestamp={cropEndTimestamp}
+            cropDistanceKm={cropDistanceKm}
+            cropDurationSecs={cropDurationSecs}
+            onCropStartChange={setCropStartIndex}
+            onCropEndChange={setCropEndIndex}
+            onSetCropStartToCurrent={handleSetCropStartToCurrent}
+            onSetCropEndToCurrent={handleSetCropEndToCurrent}
+            onResetCropRange={handleResetCropRange}
+            onCancelRouteCrop={handleCancelRouteCrop}
+            onConfirmRouteCrop={handleConfirmRouteCrop}
           />
         </div>
 
@@ -868,6 +1184,11 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
               onGeofenceChange={setSelectedGeofenceIds}
               onRouteChange={setSelectedRouteIds}
               onClose={() => setIsMapLayerPanelVisible(false)}
+              traversedGeofenceIds={detectedGeofenceIds}
+              similarRouteIds={eligibleRouteIds}
+              routeSimilarityMap={routeSimilarityMap}
+              onCreateRoute={handleStartRouteCrop}
+              hasPlaybackData={Boolean(playbackData && playbackData.points.length > 0)}
             />
           ) : (
             <div className="flex flex-col items-center gap-2.5 h-full w-full">

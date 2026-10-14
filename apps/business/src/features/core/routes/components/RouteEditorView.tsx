@@ -260,7 +260,7 @@ export function RouteEditorView({
             className="flex items-center justify-between px-3 py-2 border-b border-border bg-surface cursor-pointer hover:bg-surface-hover shrink-0"
           >
             <h3 className="text-[11px] font-bold text-foreground uppercase tracking-wider">
-              {initialData ? t.editTitle : t.createTitle}
+              {initialData?.id ? t.editTitle : t.createTitle}
             </h3>
             <button className="text-foreground-muted hover:text-foreground">
               {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
@@ -396,7 +396,7 @@ export function RouteEditorView({
       <div className="flex shrink-0 items-center justify-between px-6 py-4 bg-background border-t border-border/40 z-20">
         <div className="flex flex-col">
           <span className="text-sm font-semibold text-foreground">
-            {initialData ? t.editTitle : t.createTitle}
+            {initialData?.id ? t.editTitle : t.createTitle}
           </span>
           <span className="text-xs text-foreground-muted mt-0.5">
             Mohon isi data dengan benar.

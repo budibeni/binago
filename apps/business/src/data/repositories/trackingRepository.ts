@@ -84,6 +84,9 @@ const VEHICLE_ROUTES: Record<string, Waypoint[]> = {
     { lat: -6.2300, lng: 106.8500, speedKph: 85  },
     { lat: -6.2200, lng: 106.7000, speedKph: 90  },
     { lat: -6.2100, lng: 106.5500, speedKph: 90  },
+    // Contoh titik koordinat integrasi real API (-6.3207683, 106.4842516, 46 km/h, heading 333)
+    { lat: -6.3207683, lng: 106.4842516, speedKph: 46, address: 'Jl. Raya Cikande - Rangkasbitung, Jawilan, Kab. Serang, Banten' },
+    { lat: -6.2905412, lng: 106.4688210, speedKph: 55 },
     { lat: -6.1900, lng: 106.4200, speedKph: 85  },
     { lat: -6.1650, lng: 106.3000, speedKph: 80  },
     { lat: -6.1300, lng: 106.2000, speedKph: 70  },
@@ -132,7 +135,7 @@ function calcHeading(from: { lat: number; lng: number }, to: { lat: number; lng:
   const dLng = to.lng - from.lng;
   const dLat = to.lat - from.lat;
   const radians = Math.atan2(dLng, dLat);
-  return ((radians * 180) / Math.PI + 360) % 360;
+  return Math.round(((radians * 180) / Math.PI + 360) % 360);
 }
 
 // --- Repository Interface ------------------------------------------------------
@@ -190,7 +193,8 @@ class MockTrackingRepository implements TrackingRepository {
   /**
    * Generate realistic GPS playback track for a given vehicle.
    * Uses VEHICLE_ROUTES with interpolated points (15s interval).
-   * This is simulation logic — in production, data comes from the GPS backend.
+   * Format disesuaikan dengan contoh data real API:
+   * { lat, lng, speed, heading, timestamp: "YYYY-MM-DDTHH:mm:ssZ", odometer }
    */
   getPlaybackData(vehicleId: string, startDatetime: Date): MockPlaybackData {
     const waypoints = VEHICLE_ROUTES[vehicleId] ?? VEHICLE_ROUTES['default'];
@@ -199,12 +203,17 @@ class MockTrackingRepository implements TrackingRepository {
 
     const points: MockPlaybackTrackPoint[] = [];
     let currentTime = startDatetime.getTime();
-    let odoMeter = 48000.000;
+    let odoMeter = 0;
 
+    let currentHeading = 0;
     for (let i = 0; i < waypoints.length - 1; i++) {
       const from = waypoints[i];
       const to = waypoints[i + 1];
-      const heading = calcHeading(from, to);
+      const isStopped = from.lat === to.lat && from.lng === to.lng;
+      if (!isStopped) {
+        currentHeading = calcHeading(from, to);
+      }
+      const heading = currentHeading;
 
       const dLat = (to.lat - from.lat) * Math.PI / 180;
       const dLng = (to.lng - from.lng) * Math.PI / 180;
@@ -212,13 +221,15 @@ class MockTrackingRepository implements TrackingRepository {
       const segmentDistKm = 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
       const distPerPoint = segmentDistKm / POINTS_PER_SEGMENT;
 
-      for (let j = 0; j <= POINTS_PER_SEGMENT; j++) {
+      for (let j = 0; j < POINTS_PER_SEGMENT; j++) {
         const t = j / POINTS_PER_SEGMENT;
         const lat = from.lat + (to.lat - from.lat) * t;
         const lng = from.lng + (to.lng - from.lng) * t;
-        const speedBase = from.speedKph + (to.speedKph - from.speedKph) * t;
-        const jitter = (Math.random() - 0.5) * 4;
-        const speed = Math.max(0, Math.round(speedBase + jitter));
+        
+        // Exact speed pada titik awal waypoint, atau interpolasi dengan jitter halus
+        const speed = j === 0
+          ? from.speedKph
+          : Math.max(0, Math.round(from.speedKph + (to.speedKph - from.speedKph) * t + (from.speedKph > 0 ? (Math.random() - 0.5) * 2 : 0)));
 
         if (speed > 0) {
           odoMeter += distPerPoint;
@@ -227,10 +238,13 @@ class MockTrackingRepository implements TrackingRepository {
         const address = (j === 0 && from.address) ? from.address : undefined;
 
         points.push({
-          lat, lng, speed, heading,
-          timestamp: new Date(currentTime).toISOString(),
+          lat: parseFloat(lat.toFixed(7)),
+          lng: parseFloat(lng.toFixed(7)),
+          speed,
+          heading,
+          timestamp: new Date(currentTime).toISOString().replace(/\.\d{3}Z$/, 'Z'),
           address,
-          odometer: parseFloat(odoMeter.toFixed(3)),
+          odometer: parseFloat(odoMeter.toFixed(2)),
         });
         currentTime += INTERVAL_SECS * 1000;
       }
@@ -238,13 +252,13 @@ class MockTrackingRepository implements TrackingRepository {
 
     const last = waypoints[waypoints.length - 1];
     points.push({
-      lat: last.lat,
-      lng: last.lng,
+      lat: parseFloat(last.lat.toFixed(7)),
+      lng: parseFloat(last.lng.toFixed(7)),
       speed: 0,
       heading: points[points.length - 1]?.heading ?? 0,
-      timestamp: new Date(currentTime).toISOString(),
+      timestamp: new Date(currentTime).toISOString().replace(/\.\d{3}Z$/, 'Z'),
       address: last.address,
-      odometer: parseFloat(odoMeter.toFixed(3)),
+      odometer: parseFloat(odoMeter.toFixed(2)),
     });
 
     return {

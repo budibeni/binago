@@ -66,12 +66,23 @@ export function PlaybackRouteRenderer({ track, passedTrack }: PlaybackRouteRende
           : [],
       });
     }
+
+    // Enforce layer order:
+    // 1. Biru (LAYER_ID)
+    // 2. Merah (LAYER_PASSED_ID) di atas Biru
+    // 3. Gold (playback-layer-crop-route-layer) di atas Merah (paling atas)
+    if (map.getLayer(LAYER_ID) && map.getLayer(LAYER_PASSED_ID)) {
+      map.moveLayer(LAYER_PASSED_ID);
+    }
+    if (map.getLayer('playback-layer-crop-route-layer')) {
+      map.moveLayer('playback-layer-crop-route-layer');
+    }
   }, [map]);
 
   const registerMapSources = useCallback(() => {
     if (!map) return;
 
-    // 1. Base Track Source & Layer
+    // 1. Base Track Source & Layer (Biru)
     if (!map.getSource(SOURCE_ID)) {
       map.addSource(SOURCE_ID, {
         type: 'geojson',
@@ -90,12 +101,12 @@ export function PlaybackRouteRenderer({ track, passedTrack }: PlaybackRouteRende
         paint: {
           'line-color': '#3B82F6', // Tailwind blue-500
           'line-width': 4,
-          'line-opacity': 0.8,
+          'line-opacity': 0.85,
         },
       });
     }
 
-    // 2. Passed Track Source & Layer
+    // 2. Passed Track Source & Layer (Merah)
     if (!map.getSource(SOURCE_PASSED_ID)) {
       map.addSource(SOURCE_PASSED_ID, {
         type: 'geojson',
@@ -114,8 +125,17 @@ export function PlaybackRouteRenderer({ track, passedTrack }: PlaybackRouteRende
         paint: {
           'line-color': '#EF4444', // Tailwind red-500
           'line-width': 4,
+          'line-opacity': 1.0,
         },
       });
+    }
+
+    // Enforce layer hierarchy: Biru -> Merah -> Gold (paling atas)
+    if (map.getLayer(LAYER_ID) && map.getLayer(LAYER_PASSED_ID)) {
+      map.moveLayer(LAYER_PASSED_ID);
+    }
+    if (map.getLayer('playback-layer-crop-route-layer')) {
+      map.moveLayer('playback-layer-crop-route-layer');
     }
 
     updateSource();

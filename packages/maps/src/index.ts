@@ -15,6 +15,7 @@ export * from './controls/MapToolbar';
 export * from './tracking/types';
 export * from './tracking/utils';
 export * from './tracking/TrackingMap';
+export * from './tracking/EntityMarker';
 
 // Finder
 export * from './finder/VehicleFinderMap';

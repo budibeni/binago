@@ -19,6 +19,32 @@ export function GeofenceFeature({ locale = 'id' }: GeofenceFeatureProps) {
   const [geofences, setGeofences] = useState<Geofence[]>(() => geofenceService.getGeofences());
   const [editingGeofence, setEditingGeofence] = useState<Geofence | null>(null);
 
+  // Load draft geofence from playback / parking spot if present in sessionStorage
+  React.useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem('adatrack_draft_geofence');
+      if (raw) {
+        const draft = JSON.parse(raw);
+        sessionStorage.removeItem('adatrack_draft_geofence');
+        setEditingGeofence({
+          id: `gf-draft-${Date.now()}`,
+          name: draft.name || 'Geofence Baru',
+          description: draft.description || '',
+          status: 'active',
+          geometry: draft.geometry,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        });
+        setView('create');
+        if (typeof window !== 'undefined' && window.location.search) {
+          window.history.replaceState(null, '', '/geofences');
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load draft geofence from sessionStorage:', err);
+    }
+  }, []);
+
   const handleAdd = () => {
     setEditingGeofence(null);
     setView('create');

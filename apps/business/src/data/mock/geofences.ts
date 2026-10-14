@@ -2,11 +2,11 @@ export const mockGeofences = [
   // Jakarta (grp-001)
   {
     id: 'geo-001', groupId: 'grp-g-001', name: 'Gudang Pusat Jakarta', description: 'Gudang logistik utama', status: 'active' as const,
-    geometry: { type: 'polygon' as const, coordinates: [{ lat: -6.1751, lng: 106.8271 }, { lat: -6.1751, lng: 106.8281 }, { lat: -6.1761, lng: 106.8281 }, { lat: -6.1761, lng: 106.8271 }] }
+    geometry: { type: 'polygon' as const, coordinates: [{ lat: -6.1751, lng: 106.8271 }, { lat: -6.1751, lng: 106.8281 }, { lat: -6.1761, lng: 106.8281 }, { lat: -6.1761, lng: 106.8271 }, { lat: -6.1751, lng: 106.8271 }] }
   },
   {
     id: 'geo-002', groupId: 'grp-g-004', name: 'Pelabuhan Tanjung Priok', description: 'Pelabuhan bongkar muat', status: 'active' as const,
-    geometry: { type: 'polygon' as const, coordinates: [{ lat: -6.1086, lng: 106.8821 }, { lat: -6.1086, lng: 106.8851 }, { lat: -6.1116, lng: 106.8851 }, { lat: -6.1116, lng: 106.8821 }] }
+    geometry: { type: 'polygon' as const, coordinates: [{ lat: -6.1086, lng: 106.8821 }, { lat: -6.1086, lng: 106.8851 }, { lat: -6.1116, lng: 106.8851 }, { lat: -6.1116, lng: 106.8821 }, { lat: -6.1086, lng: 106.8821 }] }
   },
   {
     id: 'geo-003', groupId: 'grp-g-003', name: 'Pool Cakung', description: 'Pool armada timur', status: 'active' as const,
@@ -20,7 +20,7 @@ export const mockGeofences = [
   // Tangerang (grp-002)
   {
     id: 'geo-005', groupId: 'grp-g-003', name: 'Gudang Tangerang', description: 'Distribusi area barat', status: 'active' as const,
-    geometry: { type: 'polygon' as const, coordinates: [{ lat: -6.1823, lng: 106.6277 }, { lat: -6.1823, lng: 106.6307 }, { lat: -6.1853, lng: 106.6307 }, { lat: -6.1853, lng: 106.6277 }] }
+    geometry: { type: 'polygon' as const, coordinates: [{ lat: -6.1823, lng: 106.6277 }, { lat: -6.1823, lng: 106.6307 }, { lat: -6.1853, lng: 106.6307 }, { lat: -6.1853, lng: 106.6277 }, { lat: -6.1823, lng: 106.6277 }] }
   },
   {
     id: 'geo-006', groupId: 'grp-g-002', name: 'Bandara Soekarno Hatta', description: 'Kargo udara', status: 'active' as const,
@@ -34,7 +34,7 @@ export const mockGeofences = [
   // Bekasi (grp-003)
   {
     id: 'geo-008', groupId: 'grp-g-003', name: 'Kawasan Industri MM2100', description: 'Pabrik perakitan', status: 'active' as const,
-    geometry: { type: 'polygon' as const, coordinates: [{ lat: -6.3061, lng: 107.0865 }, { lat: -6.3061, lng: 107.0905 }, { lat: -6.3101, lng: 107.0905 }, { lat: -6.3101, lng: 107.0865 }] }
+    geometry: { type: 'polygon' as const, coordinates: [{ lat: -6.3061, lng: 107.0865 }, { lat: -6.3061, lng: 107.0905 }, { lat: -6.3101, lng: 107.0905 }, { lat: -6.3101, lng: 107.0865 }, { lat: -6.3061, lng: 107.0865 }] }
   },
   {
     id: 'geo-009', groupId: 'grp-g-002', name: 'Gudang Tambun', description: 'Area transit', status: 'active' as const,
@@ -52,7 +52,7 @@ export const mockGeofences = [
   },
   {
     id: 'geo-012', groupId: 'grp-g-001', name: 'Pool Gedebage', description: 'Pool timur Bandung', status: 'active' as const,
-    geometry: { type: 'polygon' as const, coordinates: [{ lat: -6.9455, lng: 107.6823 }, { lat: -6.9455, lng: 107.6853 }, { lat: -6.9485, lng: 107.6853 }, { lat: -6.9485, lng: 107.6823 }] }
+    geometry: { type: 'polygon' as const, coordinates: [{ lat: -6.9455, lng: 107.6823 }, { lat: -6.9455, lng: 107.6853 }, { lat: -6.9485, lng: 107.6853 }, { lat: -6.9485, lng: 107.6823 }, { lat: -6.9455, lng: 107.6823 }] }
   },
   {
     id: 'geo-013', groupId: 'grp-g-002', name: 'Customer B - Dago', description: 'Drop point retail', status: 'active' as const,
@@ -66,7 +66,7 @@ export const mockGeofences = [
   },
   {
     id: 'geo-015', groupId: 'grp-g-003', name: 'Pelabuhan Tanjung Perak', description: 'Bongkar muat kapal laut', status: 'active' as const,
-    geometry: { type: 'polygon' as const, coordinates: [{ lat: -7.1953, lng: 112.7335 }, { lat: -7.1953, lng: 112.7385 }, { lat: -7.2003, lng: 112.7385 }, { lat: -7.2003, lng: 112.7335 }] }
+    geometry: { type: 'polygon' as const, coordinates: [{ lat: -7.1953, lng: 112.7335 }, { lat: -7.1953, lng: 112.7385 }, { lat: -7.2003, lng: 112.7385 }, { lat: -7.2003, lng: 112.7335 }, { lat: -7.1953, lng: 112.7335 }] }
   },
   {
     id: 'geo-016', groupId: 'grp-g-003', name: 'Pool Margomulyo', description: 'Workshop Surabaya', status: 'active' as const,
@@ -80,7 +80,7 @@ export const mockGeofences = [
   },
   {
     id: 'geo-018', groupId: 'grp-g-002', name: 'Pelabuhan Merak', description: 'Penyeberangan Sumatera', status: 'active' as const,
-    geometry: { type: 'polygon' as const, coordinates: [{ lat: -5.9282, lng: 105.9983 }, { lat: -5.9282, lng: 106.0023 }, { lat: -5.9322, lng: 106.0023 }, { lat: -5.9322, lng: 105.9983 }] }
+    geometry: { type: 'polygon' as const, coordinates: [{ lat: -5.9282, lng: 105.9983 }, { lat: -5.9282, lng: 106.0023 }, { lat: -5.9322, lng: 106.0023 }, { lat: -5.9322, lng: 105.9983 }, { lat: -5.9282, lng: 105.9983 }] }
   },
   {
     id: 'geo-019', groupId: 'grp-g-004', name: 'Kawasan Industri Cilegon', description: 'Pabrik baja', status: 'active' as const,
@@ -88,7 +88,46 @@ export const mockGeofences = [
   },
   {
     id: 'geo-020', groupId: 'grp-g-004', name: 'Area Terlarang Monas', description: 'Zona larangan melintas kargo', status: 'inactive' as const,
-    geometry: { type: 'polygon' as const, coordinates: [{ lat: -6.1725, lng: 106.8242 }, { lat: -6.1725, lng: 106.8292 }, { lat: -6.1775, lng: 106.8292 }, { lat: -6.1775, lng: 106.8242 }] }
+    geometry: { type: 'polygon' as const, coordinates: [{ lat: -6.1725, lng: 106.8242 }, { lat: -6.1725, lng: 106.8292 }, { lat: -6.1775, lng: 106.8292 }, { lat: -6.1775, lng: 106.8242 }, { lat: -6.1725, lng: 106.8242 }] }
+  },
+  {
+    id: 'geo-021', groupId: 'grp-g-004', name: 'Rest Area KM 97 Tol Cipularang', description: 'Titik istirahat dan SPBU Tol Cipularang', status: 'active' as const,
+    geometry: {
+      type: 'polygon' as const,
+      coordinates: [
+        { lat: -6.6450, lng: 107.3900 },
+        { lat: -6.6450, lng: 107.4000 },
+        { lat: -6.6550, lng: 107.4000 },
+        { lat: -6.6550, lng: 107.3900 },
+        { lat: -6.6450, lng: 107.3900 }
+      ]
+    }
+  },
+  {
+    id: 'geo-022', groupId: 'grp-g-001', name: 'Hub Pasteur Bandung', description: 'Hub logistik Pasteur Bandung', status: 'active' as const,
+    geometry: {
+      type: 'polygon' as const,
+      coordinates: [
+        { lat: -6.9125, lng: 107.6141 },
+        { lat: -6.9125, lng: 107.6241 },
+        { lat: -6.9225, lng: 107.6241 },
+        { lat: -6.9225, lng: 107.6141 },
+        { lat: -6.9125, lng: 107.6141 }
+      ]
+    }
+  },
+  {
+    id: 'geo-023', groupId: 'grp-g-002', name: 'Hub Logistik Jawilan', description: 'Hub distribusi Jawilan Serang', status: 'active' as const,
+    geometry: {
+      type: 'polygon' as const,
+      coordinates: [
+        { lat: -6.1750, lng: 106.0950 },
+        { lat: -6.1750, lng: 106.1050 },
+        { lat: -6.1850, lng: 106.1050 },
+        { lat: -6.1850, lng: 106.0950 },
+        { lat: -6.1750, lng: 106.0950 }
+      ]
+    }
   }
 ];
 

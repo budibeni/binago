@@ -11,6 +11,7 @@ export interface EntityMarkerProps {
   color?: string; // Hex color or fallback class string
   selected?: boolean;
   focused?: boolean;
+  fastTransition?: boolean;
   onClick?: () => void;
 }
 
@@ -23,6 +24,7 @@ export function EntityMarker({
   color,
   selected = false,
   focused = false,
+  fastTransition = false,
   onClick,
 }: EntityMarkerProps) {
   // Gunakan warna merah (sesuai logo ADATRACK) jika tidak ada warna spesifik yang diberikan
@@ -56,10 +58,16 @@ export function EntityMarker({
           style={{ backgroundColor: markerColor, animationDuration: '3s' }}
         />
 
-        {/* Directional Beacon Arrow (Rotates) */}
+        {/* Directional Beacon Arrow (Rotates precisely according to vehicle heading) */}
         <div
-          className="relative transition-transform duration-500 ease-out flex items-center justify-center pointer-events-none z-10"
-          style={{ transform: `rotate(${heading}deg)` }}
+          className={cn(
+            "relative flex items-center justify-center pointer-events-none z-10 transition-transform",
+            fastTransition ? "duration-150 ease-linear" : "duration-500 ease-out"
+          )}
+          style={{
+            transform: `rotate(${heading}deg)`,
+            transformOrigin: '50% 50%',
+          }}
         >
           {/* Navigation Arrow */}
           <svg

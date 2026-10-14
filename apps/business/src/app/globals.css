@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -115,6 +117,10 @@
 }
 
 @layer components {
+  .custom-vehicle-popup {
+    z-index: 500 !important;
+  }
+
   .custom-vehicle-popup .maplibregl-popup-content {
     padding: 0 !important;
     background: transparent !important;
@@ -122,7 +128,11 @@
     border-radius: 0 !important;
   }
 
-  /* Parking popup — same transparent treatment */
+  /* Parking popup — high z-index to prevent being covered by bottom bar or side panels */
+  .custom-parking-popup {
+    z-index: 500 !important;
+  }
+
   .custom-parking-popup .maplibregl-popup-content {
     padding: 0 !important;
     background: transparent !important;
@@ -154,5 +164,41 @@
 
   .custom-parking-popup.maplibregl-popup-anchor-top .maplibregl-popup-tip {
     border-bottom-color: var(--color-background);
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: 'Plus Jakarta Sans', 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  }
+  .font-outfit {
+    font-family: 'Outfit', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  }
+  .font-bold-real {
+    font-weight: 700 !important;
+  }
+  .font-semibold-real {
+    font-weight: 600 !important;
+  }
+  .font-extrabold-real {
+    font-weight: 800 !important;
+  }
+  .bg-telemetry-grid {
+    background-size: 40px 40px;
+    background-image: 
+      linear-gradient(to right, rgba(148, 163, 184, 0.07) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(148, 163, 184, 0.07) 1px, transparent 1px);
+  }
+  .dark .bg-telemetry-grid {
+    background-image: 
+      linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  }
+  .bg-radial-dots {
+    background-image: radial-gradient(rgba(148, 163, 184, 0.22) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+  .dark .bg-radial-dots {
+    background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
   }
 }

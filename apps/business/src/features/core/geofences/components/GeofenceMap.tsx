@@ -80,6 +80,15 @@ function GeofenceMapInner({
     }
   }, [map, selectedGeofenceId, geofences, actions]);
 
+  // Auto-fit to editor geometry when present (e.g. created from parking point draft)
+  useEffect(() => {
+    if (!map || !editorGeometry?.coordinates || editorGeometry.coordinates.length === 0) return;
+    const bounds = calcEntityBounds(editorGeometry.coordinates);
+    if (bounds) {
+      actions.fitBounds(bounds, { padding: 80 });
+    }
+  }, [map, editorGeometry, actions]);
+
   // Render all geofences as GeoJSON layers
   useEffect(() => {
     if (!map) return;

@@ -34,11 +34,28 @@ export function GeofenceEditorView({
   });
 
   const [drawMode, setDrawMode] = useState<'polygon' | 'rectangle' | 'multiline'>('polygon');
-  const [editorMode, setEditorMode] = useState<'idle' | 'draw_polygon' | 'draw_rectangle' | 'draw_multiline' | 'edit'>('idle');
+  const [editorMode, setEditorMode] = useState<'idle' | 'draw_polygon' | 'draw_rectangle' | 'draw_multiline' | 'edit'>(
+    geofence?.geometry ? 'edit' : 'idle'
+  );
   const [currentGeometry, setCurrentGeometry] = useState<MapGeometry | null>(geofence?.geometry || null);
 
   useEffect(() => {
-    if (editorMode !== 'idle' || !currentGeometry) {
+    if (geofence) {
+      setFormData({
+        name: geofence.name || '',
+        groupId: geofence.groupId || '',
+        description: geofence.description || '',
+        status: geofence.status || 'active',
+      });
+      if (geofence.geometry) {
+        setCurrentGeometry(geofence.geometry);
+        setEditorMode('edit');
+      }
+    }
+  }, [geofence]);
+
+  useEffect(() => {
+    if (editorMode !== 'idle' && editorMode !== 'edit' && !currentGeometry) {
       setEditorMode(`draw_${drawMode}` as any);
     }
   }, [drawMode]);

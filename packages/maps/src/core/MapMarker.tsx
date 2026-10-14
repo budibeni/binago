@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import * as maplibregl from 'maplibre-gl';
 import { useInternalMap } from './MapContext';
@@ -30,50 +30,70 @@ export function MapMarker({
 }: MapMarkerProps) {
   const map = useInternalMap();
   const markerRef = useRef<maplibregl.Marker | null>(null);
-  const [markerElement, setMarkerElement] = useState<HTMLDivElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    console.log(`[MapMarker ${id}] map:`, !!map, 'markerElement:', !!markerElement);
-  }, [map, markerElement, id]);
-
-  // Initialize the DOM element exactly once
-  useEffect(() => {
+  // Lazy initialize DOM element once
+  if (!containerRef.current && typeof document !== 'undefined') {
     const el = document.createElement('div');
     el.className = 'map-marker-container';
-    el.setAttribute('data-marker-id', id);
-    setMarkerElement(el);
-    
-    return () => {
-      // Cleanup happens via markerRef.current.remove()
-    };
-  }, [id]);
+    containerRef.current = el;
+  }
 
-  // Add/update/remove marker from map
+  // Manage Marker lifecycle on map
   useEffect(() => {
-    if (!map || !markerElement) return;
+    if (!map || !containerRef.current || !position || isNaN(position.lat) || isNaN(position.lng)) {
+      return;
+    }
 
+    const el = containerRef.current;
+    el.setAttribute('data-marker-id', id);
+
+    // If marker doesn't exist, create and add it
     if (!markerRef.current) {
       markerRef.current = new maplibregl.Marker({
-        element: markerElement,
+        element: el,
         rotation: heading,
       })
         .setLngLat([position.lng, position.lat])
         .addTo(map);
-      
-      console.log(`[MapMarker ${id}] addTo(map) called! parentNode:`, markerElement.parentNode?.nodeName, 'in DOM?', document.body.contains(markerElement));
     } else {
+      // If marker exists, update coordinate and rotation
       markerRef.current.setLngLat([position.lng, position.lat]);
       markerRef.current.setRotation(heading);
-      
-      // Ensure it is on map if it was previously removed
-      const currentEl = markerRef.current.getElement();
-      if (!currentEl.parentNode) {
+
+      // Verify DOM attachment in MapLibre canvas container
+      if (!el.parentNode) {
         markerRef.current.addTo(map);
       }
     }
-  }, [map, markerElement, position.lat, position.lng, heading]);
+  }, [map, id, position?.lat, position?.lng, heading]);
 
-  // Clean up on unmount
+  // Robust re-attachment listener for style changes, basemap switches, styledata, and window resize
+  useEffect(() => {
+    if (!map) return;
+
+    const handleReattach = () => {
+      if (markerRef.current && containerRef.current) {
+        if (!containerRef.current.parentNode) {
+          markerRef.current.addTo(map);
+        }
+      }
+    };
+
+    map.on('style.load', handleReattach);
+    map.on('styledata', handleReattach);
+    map.on('load', handleReattach);
+    map.on('resize', handleReattach);
+
+    return () => {
+      map.off('style.load', handleReattach);
+      map.off('styledata', handleReattach);
+      map.off('load', handleReattach);
+      map.off('resize', handleReattach);
+    };
+  }, [map]);
+
+  // Cleanup on unmount or id change
   useEffect(() => {
     return () => {
       if (markerRef.current) {
@@ -81,10 +101,10 @@ export function MapMarker({
         markerRef.current = null;
       }
     };
-  }, []);
+  }, [id]);
 
-  if (!markerElement) return null;
+  if (!containerRef.current) return null;
 
   // Render children into the DOM element controlled by MapLibre
-  return createPortal(children, markerElement);
+  return createPortal(children, containerRef.current);
 }
