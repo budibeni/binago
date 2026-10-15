@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Smartphone, Radio, Truck, Cpu, Phone } from 'lucide-react';
+import { Smartphone, Truck, Phone } from 'lucide-react';
 import { FormShell, FormCard, InputString, InputSelect, useForm } from '@adatrack/ui';
 import { api } from '@adatrack/utils';
 import { getDeviceFormSchema, type Device } from '../types/device';
@@ -80,28 +80,9 @@ export function DeviceForm({
   });
 
   const protocolOptions = [
-    { value: 'SMARTPHONE', label: 'Smartphone / Mobile App Driver' },
-    { value: 'HTTP_MOBILE', label: 'Mobile HTTP Custom' },
-    { value: 'GT06', label: 'Concox GT06 / GT06N' },
-    { value: 'TELTONIKA', label: 'Teltonika (FMB920 / FMC)' },
-    { value: 'TK103', label: 'TK103 Protocol' },
-    { value: 'JT808', label: 'JT808 Protocol' },
-    { value: 'OTHER', label: 'Lainnya (Universal)' },
+    { value: 'SMARTPHONE', label: 'Smartphone App Driver (Android / iOS)' },
+    { value: 'HTTP_MOBILE', label: 'Mobile Tracking HTTP Protocol' },
   ];
-
-  const applyPreset = (type: 'smartphone' | 'gps') => {
-    if (type === 'smartphone') {
-      handleChange('protocol', 'SMARTPHONE');
-      handleChange('deviceBrand', 'Android / iOS');
-      handleChange('deviceModel', 'Mobile Tracking App');
-    } else {
-      handleChange('protocol', 'GT06');
-      handleChange('deviceBrand', 'Concox');
-      handleChange('deviceModel', 'GT06N Tracker');
-    }
-  };
-
-  const isMobile = formData.protocol === 'SMARTPHONE' || formData.protocol === 'HTTP_MOBILE';
 
   return (
     <FormShell
@@ -118,54 +99,11 @@ export function DeviceForm({
     >
       {/* Kolom Kiri */}
       <div className="flex flex-col gap-6">
-        {/* Preset & Tipe Perangkat */}
-        {!isEdit && (
-          <FormCard
-            title={tF.sectionDeviceType}
-            description={tF.descDeviceType}
-            icon={<Cpu className="w-5 h-5 text-primary" />}
-          >
-            <div className="grid grid-cols-2 gap-3 col-span-2">
-              <button
-                type="button"
-                onClick={() => applyPreset('smartphone')}
-                className={`p-3 rounded-lg border text-left transition-all flex items-start gap-2.5 ${
-                  isMobile
-                    ? 'border-primary bg-primary/5 text-primary'
-                    : 'border-border hover:border-neutral-400 bg-background text-foreground'
-                }`}
-              >
-                <Smartphone className="w-5 h-5 mt-0.5 shrink-0" />
-                <div>
-                  <p className="text-[13px] font-bold">Smartphone App</p>
-                  <p className="text-[11px] text-foreground-muted">Pelacakan via HP Driver</p>
-                </div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => applyPreset('gps')}
-                className={`p-3 rounded-lg border text-left transition-all flex items-start gap-2.5 ${
-                  !isMobile
-                    ? 'border-primary bg-primary/5 text-primary'
-                    : 'border-border hover:border-neutral-400 bg-background text-foreground'
-                }`}
-              >
-                <Radio className="w-5 h-5 mt-0.5 shrink-0" />
-                <div>
-                  <p className="text-[13px] font-bold">GPS Fisik</p>
-                  <p className="text-[11px] text-foreground-muted">Tracker Concox, dll.</p>
-                </div>
-              </button>
-            </div>
-          </FormCard>
-        )}
-
-        {/* Identitas Perangkat */}
+        {/* Identitas Perangkat Smartphone */}
         <FormCard
           title={tF.sectionIdentity}
           description={tF.descIdentity}
-          icon={isMobile ? <Smartphone className="w-5 h-5 text-primary" /> : <Radio className="w-5 h-5 text-neutral-500" />}
+          icon={<Smartphone className="w-5 h-5 text-primary" />}
           columns={2}
         >
           <div className="col-span-1 group-data-[layout=default]/form:md:col-span-2 group-data-[layout=fullscreen]/form:md:col-span-2">

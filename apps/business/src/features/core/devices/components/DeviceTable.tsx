@@ -190,30 +190,46 @@ function buildColumns(
       id: 'rowActions',
       header: '',
       enableSorting: false,
-      size: 80,
+      size: 90,
       meta: { fixedWidth: true },
-      cell: ({ row }) => (
-        <div className="flex items-center gap-1 justify-end">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-7 w-7 p-0 text-foreground-muted hover:text-primary hover:bg-neutral-100 rounded-md"
-            onClick={() => onEdit(row.original)}
-            title="Edit"
-          >
-            <Edit2 className="h-3.5 w-3.5" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-7 w-7 p-0 text-foreground-muted hover:text-destructive hover:bg-destructive/10 rounded-md"
-            onClick={() => onDelete(row.original)}
-            title="Hapus"
-          >
-            <Trash2 className="h-3.5 w-3.5" />
-          </Button>
-        </div>
-      ),
+      cell: ({ row }) => {
+        const d = row.original;
+        const proto = (d.protocol || '').toUpperCase();
+        const isSmartphone = proto === 'SMARTPHONE' || proto === 'HTTP_MOBILE';
+
+        if (!isSmartphone) {
+          return (
+            <div className="flex items-center gap-1 justify-end">
+              <span className="text-[10px] font-medium text-foreground-muted px-2 py-0.5 rounded border border-border/80 bg-neutral-50 dark:bg-neutral-800/60 whitespace-nowrap">
+                Hanya Lihat
+              </span>
+            </div>
+          );
+        }
+
+        return (
+          <div className="flex items-center gap-1 justify-end">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 w-7 p-0 text-foreground-muted hover:text-primary hover:bg-neutral-100 rounded-md"
+              onClick={() => onEdit(row.original)}
+              title="Edit"
+            >
+              <Edit2 className="h-3.5 w-3.5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 w-7 p-0 text-foreground-muted hover:text-destructive hover:bg-destructive/10 rounded-md"
+              onClick={() => onDelete(row.original)}
+              title="Hapus"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+        );
+      },
     },
   ];
 }

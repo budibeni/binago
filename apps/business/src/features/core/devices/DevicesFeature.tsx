@@ -44,11 +44,21 @@ export function DevicesFeature() {
   }, []);
 
   const handleEdit = React.useCallback((device: Device) => {
+    const proto = (device.protocol || '').toUpperCase();
+    if (proto !== 'SMARTPHONE' && proto !== 'HTTP_MOBILE') {
+      toast.error('Perangkat GPS fisik hanya dapat diedit melalui Admin Portal.');
+      return;
+    }
     setDrawerOpen(false);
     setEditDevice(device);
   }, []);
 
   const handleDelete = React.useCallback((device: Device) => {
+    const proto = (device.protocol || '').toUpperCase();
+    if (proto !== 'SMARTPHONE' && proto !== 'HTTP_MOBILE') {
+      toast.error('Perangkat GPS fisik hanya dapat dihapus melalui Admin Portal.');
+      return;
+    }
     setDrawerOpen(false);
     setDeviceToDelete(device);
   }, []);

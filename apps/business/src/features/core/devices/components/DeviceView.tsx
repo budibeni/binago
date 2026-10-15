@@ -87,8 +87,8 @@ export function DeviceView({
       open={isOpen}
       onOpenChange={(val) => !val && onClose()}
       title={labels.title}
-      onEdit={onEdit}
-      onDelete={onDelete}
+      onEdit={isMobile ? onEdit : undefined}
+      onDelete={isMobile ? onDelete : undefined}
     >
       <div className="flex-1 overflow-y-auto px-4 py-3">
         {/* Profile Header */}
@@ -108,6 +108,13 @@ export function DeviceView({
             </span>
           </div>
         </div>
+
+        {!isMobile && (
+          <div className="mb-4 p-2.5 rounded-lg border border-border/80 bg-neutral-50 dark:bg-neutral-900/40 flex items-center gap-2.5 text-[12px] text-foreground-muted">
+            <Radio className="h-4 w-4 text-primary shrink-0" />
+            <span>Perangkat GPS Fisik hanya dapat dilihat (Read-only). Pengelolaan dilakukan melalui Admin Portal.</span>
+          </div>
+        )}
 
         {/* Tabs */}
         <div className="mb-4">
