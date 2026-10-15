@@ -7,7 +7,13 @@ import { Button, InputString, InputSelect, InputTextarea } from '@adatrack/ui';
 import { geofenceService } from '@/data/services';
 import { GeofenceMap } from './GeofenceMap';
 import type { Geofence } from '../types';
-import type { MapGeometry } from '@adatrack/maps';
+import {
+  type MapGeometry,
+  calculateGeometryArea,
+  calculateGeometryPerimeter,
+  formatGeometryArea,
+  formatGeometryDistance,
+} from '@adatrack/maps';
 import { type GeofenceLocale, getGeofencesTranslation } from '../i18n';
 
 interface GeofenceEditorViewProps {
@@ -38,6 +44,23 @@ export function GeofenceEditorView({
     geofence?.geometry ? 'edit' : 'idle'
   );
   const [currentGeometry, setCurrentGeometry] = useState<MapGeometry | null>(geofence?.geometry || null);
+
+  const areaM2 = React.useMemo(() => calculateGeometryArea(currentGeometry), [currentGeometry]);
+  const perimeterMeters = React.useMemo(() => calculateGeometryPerimeter(currentGeometry), [currentGeometry]);
+
+  // Deteksi radius jika geometri adalah lingkaran beraturan (misal hasil buatan dari dialog kendaraan)
+  const circleRadius = React.useMemo(() => {
+    if (!currentGeometry || currentGeometry.type !== 'polygon') return null;
+    const coords = currentGeometry.coordinates;
+    if (!coords || coords.length < 16) return null;
+
+    if (areaM2 <= 0 || perimeterMeters <= 0) return null;
+    const isoperimetric = (4 * Math.PI * areaM2) / (perimeterMeters * perimeterMeters);
+    if (isoperimetric >= 0.90 && isoperimetric <= 1.10) {
+      return Math.round(Math.sqrt(areaM2 / Math.PI));
+    }
+    return null;
+  }, [currentGeometry, areaM2, perimeterMeters]);
 
   useEffect(() => {
     if (geofence) {
@@ -224,15 +247,31 @@ export function GeofenceEditorView({
               <div className="space-y-2">
                 <div className="flex justify-between items-center text-[11px]">
                   <span className="text-foreground-muted">{t.pointCount}</span>
-                  <span className="font-semibold">{currentGeometry?.type === 'polygon' ? (currentGeometry.coordinates?.length || 0) : '-'}</span>
+                  <span className="font-semibold">
+                    {currentGeometry?.type === 'polygon'
+                      ? currentGeometry.coordinates?.length || 0
+                      : currentGeometry?.type === 'rectangle'
+                        ? 4
+                        : currentGeometry?.type === 'multiline'
+                          ? currentGeometry.coordinates?.length || 0
+                          : '-'}
+                  </span>
                 </div>
+                {circleRadius && (
+                  <div className="flex justify-between items-center text-[11px]">
+                    <span className="text-foreground-muted">Radius</span>
+                    <span className="font-semibold text-primary font-mono">
+                      {circleRadius >= 1000 ? `${(circleRadius / 1000).toFixed(2)} km` : `${circleRadius} m`}
+                    </span>
+                  </div>
+                )}
                 <div className="flex justify-between items-center text-[11px]">
                   <span className="text-foreground-muted">{t.areaSize}</span>
-                  <span className="font-semibold">{currentGeometry ? '12.45 km²' : '-'}</span>
+                  <span className="font-semibold">{currentGeometry ? formatGeometryArea(areaM2, locale) : '-'}</span>
                 </div>
                 <div className="flex justify-between items-center text-[11px]">
                   <span className="text-foreground-muted">{t.perimeter}</span>
-                  <span className="font-semibold">{currentGeometry ? '8.2 km' : '-'}</span>
+                  <span className="font-semibold">{currentGeometry ? formatGeometryDistance(perimeterMeters, locale) : '-'}</span>
                 </div>
 
                 {isGeometryValid && currentGeometry?.coordinates && currentGeometry.coordinates.length > 0 && (

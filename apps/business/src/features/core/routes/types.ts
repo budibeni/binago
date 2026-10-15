@@ -7,6 +7,7 @@ export interface RouteLocation {
   longitude?: number;
   radius?: number;
   address?: string;
+  sourceMode?: 'geofence' | 'coordinate' | 'address' | 'my_location';
 }
 
 export interface RouteStop {

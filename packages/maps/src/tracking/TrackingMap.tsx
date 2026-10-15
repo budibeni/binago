@@ -12,13 +12,18 @@ import type {
   MapGeofenceOption,
   GeofenceCheckRequest,
   GeofenceCheckResult,
+  SearchGeofenceOption,
+  SearchRouteOption,
+  SearchAreaVehicleResult,
+  ActiveSearchAreaHighlight,
 } from '../tools/types';
-import { defaultNominatimSearch, calcEntityBounds } from './utils';
+import { defaultNominatimSearch, calcEntityBounds, haversineMeters } from './utils';
 
 import useSupercluster from 'use-supercluster';
 import { ClusterMarker } from './ClusterMarker';
 import { EntityMarker } from './EntityMarker';
 import { PlaybackRouteRenderer } from './PlaybackRouteRenderer';
+import { ActiveSearchAreaRenderer } from './ActiveSearchAreaRenderer';
 import { MapMarker } from '../core/MapMarker';
 
 export interface TrackingMapProps<T> {
@@ -58,6 +63,21 @@ export interface TrackingMapProps<T> {
   /** Fungsi untuk validasi geofence (mock atau real API) */
   checkGeofenceFn?: (req: GeofenceCheckRequest) => Promise<GeofenceCheckResult>;
 
+  /** Opsi geofence untuk pencarian unit di SearchLocationTool */
+  geofenceSearchOptions?: SearchGeofenceOption[];
+  /** Opsi rute untuk pencarian unit di SearchLocationTool */
+  routeSearchOptions?: SearchRouteOption[];
+  /** Callback untuk mencari unit di dalam geofence tertentu */
+  onFindVehiclesInGeofence?: (geofenceId: string) => SearchAreaVehicleResult[];
+  /** Callback untuk mencari unit di sepanjang rute tertentu */
+  onFindVehiclesOnRoute?: (routeId: string) => SearchAreaVehicleResult[];
+  /** Callback untuk mencari unit di dalam radius koordinat tertentu */
+  onFindVehiclesInRadius?: (center: { lat: number; lng: number }, radiusMeters: number) => SearchAreaVehicleResult[];
+  /** Callback ketika unit dipilih dari search panel */
+  onSelectSearchVehicle?: (vehicleId: string) => void;
+  /** Callback untuk me-resolve short URL Google Maps ke koordinat */
+  onResolveMapsUrl?: (url: string) => Promise<{ lat: number; lng: number } | null>;
+
   /** Label UI untuk entitas (misal: "Kendaraan", "Perangkat") */
   entityLabel?: string;
   /** Bahasa interface map */
@@ -83,9 +103,12 @@ export interface TrackingMapProps<T> {
   focusedId?: string | null;
   /** Callback saat entitas difokuskan (popup dibuka) atau ditutup */
   onFocusChange?: (focusedId: string | null) => void;
+  /** Mode live tracking: jika true, tampilkan 5 tab dan pencarian armada. Jika false, hanya navigasi lokasi peta (3 tab) */
+  isLiveTracking?: boolean;
 }
 
 function TrackingMapInner<T>({
+  isLiveTracking,
   entities,
   selectedIds,
   getId,
@@ -113,6 +136,13 @@ function TrackingMapInner<T>({
   onPanComplete,
   focusedId,
   onFocusChange,
+  geofenceSearchOptions,
+  routeSearchOptions,
+  onFindVehiclesInGeofence,
+  onFindVehiclesOnRoute,
+  onFindVehiclesInRadius,
+  onSelectSearchVehicle,
+  onResolveMapsUrl,
 }: TrackingMapProps<T>) {
   const [basemap, setBasemap] = useState<BasemapId>('standard');
   const [viewport, setViewport] = useState({ center: { lat: -6.2, lng: 106.816667 }, zoom: 12 });
@@ -121,17 +151,60 @@ function TrackingMapInner<T>({
 
   const map = useInternalMap();
 
+  // Active search area highlight (Geofence polygon / Route line / Radius circle)
+  const [highlightedArea, setHighlightedArea] = useState<ActiveSearchAreaHighlight | null>(null);
+
+  // Default vehicle scanner within radius based on entities
+  const handleFindVehiclesInRadius = useCallback(
+    (center: { lat: number; lng: number }, radiusMeters: number): SearchAreaVehicleResult[] => {
+      if (onFindVehiclesInRadius) {
+        return onFindVehiclesInRadius(center, radiusMeters);
+      }
+      if (!entities || !getPosition || !getId) return [];
+      const found: SearchAreaVehicleResult[] = [];
+      for (const e of entities) {
+        const pos = getPosition(e);
+        if (!pos || isNaN(pos.lat) || isNaN(pos.lng)) continue;
+        const dist = haversineMeters(center.lat, center.lng, pos.lat, pos.lng);
+        if (dist <= radiusMeters) {
+          found.push({
+            id: getId(e),
+            plateNumber: (getLabel ? getLabel(e) : null) || getId(e) || '',
+            lat: pos.lat,
+            lng: pos.lng,
+            status: (e as any).status,
+            vehicleType: (e as any).vehicleType,
+            distance: Math.round(dist),
+          });
+        }
+      }
+      found.sort((a, b) => (a.distance ?? 0) - (b.distance ?? 0));
+      return found;
+    },
+    [onFindVehiclesInRadius, entities, getPosition, getId, getLabel]
+  );
+
   // Controlled or uncontrolled focused entity id
   const isControlled = focusedId !== undefined;
   const [internalFocusedId, setInternalFocusedId] = useState<string | null>(initialFocusedId || null);
   const currentFocusedId = isControlled ? focusedId : internalFocusedId;
 
   const setFocusedId = useCallback((id: string | null) => {
-    if (!isControlled) {
-      setInternalFocusedId(id);
-    }
+    setInternalFocusedId(id);
     onFocusChange?.(id);
-  }, [isControlled, onFocusChange]);
+  }, [onFocusChange]);
+
+  // Deselect / return marker to normal on clicking empty map canvas (klik sembarangan di peta)
+  useEffect(() => {
+    if (!map) return;
+    const handleMapClick = () => {
+      setFocusedId(null);
+    };
+    map.on('click', handleMapClick);
+    return () => {
+      map.off('click', handleMapClick);
+    };
+  }, [map, setFocusedId]);
 
   // Sync focusedEntityId with initialFocusedId and fly to it
   useEffect(() => {
@@ -256,20 +329,28 @@ function TrackingMapInner<T>({
         onViewportChange={setViewport}
         toolbarSlot={
           <MapControlPanel
+            isLiveTracking={isLiveTracking}
             basemap={basemap}
             onBasemapChange={setBasemap}
             mapContainerRef={mapContainerRef}
             onFitSelected={handleFitSelected}
             onResetNorth={handleResetNorth}
             onSearchAddress={searchAddressFn}
-            entities={entityOptions}
-            geofences={geofences}
-            onCheckEntityGeofence={checkGeofenceFn}
-            entityLabel={entityLabel}
             locale={locale}
             hasCustomMarker={!!renderMarker}
             markerStyle={markerStyle}
             onMarkerStyleChange={setMarkerStyle}
+            geofenceSearchOptions={geofenceSearchOptions}
+            routeSearchOptions={routeSearchOptions}
+            onFindVehiclesInGeofence={onFindVehiclesInGeofence}
+            onFindVehiclesOnRoute={onFindVehiclesOnRoute}
+            onFindVehiclesInRadius={handleFindVehiclesInRadius}
+            onSelectSearchVehicle={(vId) => {
+              onSelectSearchVehicle?.(vId);
+              onFocusChange?.(vId);
+            }}
+            onHighlightArea={setHighlightedArea}
+            onResolveMapsUrl={onResolveMapsUrl}
           />
         }
       >
@@ -361,6 +442,9 @@ function TrackingMapInner<T>({
             </div>
           </MapMarker>
         ))}
+
+        {/* Active Search Area Renderer (Highlighted Geofence or Route from Search Tool) */}
+        <ActiveSearchAreaRenderer highlight={highlightedArea} />
       </MapContainer>
       {/* Children rendered inside MapProvider for context access */}
       {children}

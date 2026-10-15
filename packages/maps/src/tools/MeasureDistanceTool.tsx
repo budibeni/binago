@@ -167,9 +167,13 @@ export function MeasureDistanceTool({ active, onDeactivate, className, locale = 
 
   // Remove sources/layers when tool deactivated
   const clearMapLayers = useCallback(() => {
-    if (!map) return;
-    if (map.getLayer(LAYER_LINE_ID)) map.removeLayer(LAYER_LINE_ID);
-    if (map.getSource(SOURCE_ID)) map.removeSource(SOURCE_ID);
+    try {
+      if (!map || !(map as any).style || !map.getStyle()) return;
+      if (map.getLayer(LAYER_LINE_ID)) map.removeLayer(LAYER_LINE_ID);
+      if (map.getSource(SOURCE_ID)) map.removeSource(SOURCE_ID);
+    } catch (e) {
+      // Map or style might be destroyed on unmount
+    }
     if (markerARef.current) {
       markerARef.current.remove();
       markerARef.current = null;

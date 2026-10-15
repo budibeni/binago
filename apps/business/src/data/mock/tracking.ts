@@ -8,18 +8,42 @@ export const mockTrackingState = Array.from({ length: 50 }, (_, i) => {
   const status = statuses[i % statuses.length] as 'driving' | 'idle' | 'parking' | 'offline';
   
   let geofenceName = undefined;
-  if (num === '016' || num === '017') {
+  let locLat = baseLat + latOffset;
+  let locLng = baseLng + lngOffset;
+  let locAddress = `Jl. Dummy Location ${i + 1}, Jakarta`;
+
+  if (num === '016') {
     geofenceName = 'Gudang Pusat Jakarta'; // geo-001
-  } else if (num === '018' || num === '019') {
+    locLat = -6.1755;
+    locLng = 106.8275;
+    locAddress = 'Gudang Pusat Jakarta, Gambir';
+  } else if (num === '017') {
+    geofenceName = 'Gudang Pusat Jakarta'; // geo-001
+    locLat = -6.1758;
+    locLng = 106.8278;
+    locAddress = 'Gudang Pusat Jakarta, Gambir';
+  } else if (num === '018') {
     geofenceName = 'Gudang Pasteur'; // geo-011
+    locLat = -6.8895;
+    locLng = 107.5901;
+    locAddress = 'Gudang Pasteur, Sukajadi, Bandung';
+  } else if (num === '019') {
+    geofenceName = 'Gudang Pasteur'; // geo-011
+    locLat = -6.8898;
+    locLng = 107.5903;
+    locAddress = 'Gudang Pasteur, Sukajadi, Bandung';
+  } else if (num === '001') {
+    locLat = -6.2300;
+    locLng = 106.8500;
+    locAddress = 'Tol Dalam Kota KM 5, Jakarta';
   }
 
   return {
     vehicleId: `veh-${num}`,
     location: { 
-      lat: baseLat + latOffset, 
-      lng: baseLng + lngOffset, 
-      address: `Jl. Dummy Location ${i + 1}, Jakarta`
+      lat: locLat, 
+      lng: locLng, 
+      address: locAddress
     },
     speed: status === 'driving' ? Math.floor(Math.random() * 60 + 20) : 0,
     course: Math.floor(Math.random() * 360),

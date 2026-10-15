@@ -12,6 +12,8 @@ import { cn, applyPhotoWatermark } from '@adatrack/utils';
 import { VehicleFinderMap } from '@adatrack/maps';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
 import { getDriverPortalTranslation } from './i18n';
+import { emergencyReportStore } from './emergencyReportStore';
+import type { EmergencyCategory } from './emergencyReportStore';
 
 export function DriverPortalFeature() {
   const locale = useBusinessLocale();
@@ -387,6 +389,18 @@ function VehiclesTab({ locale }: { locale: 'id' | 'en' }) {
                   <button
                     disabled={!sosCategory}
                     onClick={() => {
+                      // Simpan laporan ke emergencyReportStore (shared in-memory store)
+                      emergencyReportStore.add({
+                        timestamp: new Date().toISOString(),
+                        driverName: 'Ahmad Fauzi',           // dummy: akan dari auth session
+                        driverPhone: '08123456789',           // dummy
+                        vehiclePlate: 'B 1001 GHI',           // dummy: dari kendaraan yang sedang ditugaskan
+                        vehicleType: 'Truk Box',              // dummy
+                        category: sosCategory as EmergencyCategory,
+                        description: sosDescription,
+                        location: VEHICLE_ADDRESS,            // alamat kendaraan saat ini
+                        coordinates: vehicleCoord,
+                      });
                       alert(t.vehicles.sosSuccess);
                       setShowSosForm(false);
                       setSosCategory('');

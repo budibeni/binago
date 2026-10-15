@@ -247,6 +247,9 @@ importers:
       '@adatrack/types':
         specifier: workspace:*
         version: link:../types
+      '@adatrack/ui':
+        specifier: workspace:*
+        version: link:../ui
       '@adatrack/utils':
         specifier: workspace:*
         version: link:../utils

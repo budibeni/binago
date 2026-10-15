@@ -30,75 +30,94 @@ export function EntityMarker({
   // Gunakan warna merah (sesuai logo ADATRACK) jika tidak ada warna spesifik yang diberikan
   const markerColor = color || '#ef4444'; // red-500
 
-  // Selection or focus state
-  const isHighlighted = selected || focused;
+  // Highlight state is only active when this entity is specifically focused (active / clicked)
+  const isHighlighted = Boolean(focused);
 
   return (
     <MapMarker id={id} position={position} heading={0}>
       <div
-        className="relative flex flex-col items-center pointer-events-auto group"
+        className={cn(
+          "relative flex flex-col items-center cursor-pointer pointer-events-auto select-none",
+          isHighlighted ? "z-40" : "z-10"
+        )}
         onClick={(e) => {
           e.stopPropagation();
           if (onClick) onClick();
         }}
       >
-        {/* Static Base Glow (Very thin and subtle) */}
-        <div
-          className="absolute top-3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-full blur-sm pointer-events-none opacity-[0.05]"
-          style={{ backgroundColor: markerColor }}
-        />
-
-        {/* Signal Ping Animation (Simulates emitting a signal) */}
+        {/* Beacon Arrow Body (Only the arrow scales, exactly like custom icon) */}
         <div
           className={cn(
-            "absolute top-3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-5 h-5 rounded-full blur-[2px] pointer-events-none",
-            "animate-ping motion-reduce:animate-none",
-            isHighlighted ? "opacity-25" : "opacity-10"
+            "relative flex flex-col items-center origin-center transition-transform duration-300 ease-out",
+            isHighlighted
+              ? "scale-125 -translate-y-1"
+              : "scale-100 translate-y-0"
           )}
-          style={{ backgroundColor: markerColor, animationDuration: '3s' }}
-        />
-
-        {/* Directional Beacon Arrow (Rotates precisely according to vehicle heading) */}
-        <div
-          className={cn(
-            "relative flex items-center justify-center pointer-events-none z-10 transition-transform",
-            fastTransition ? "duration-150 ease-linear" : "duration-500 ease-out"
-          )}
-          style={{
-            transform: `rotate(${heading}deg)`,
-            transformOrigin: '50% 50%',
-          }}
         >
-          {/* Navigation Arrow */}
-          <svg
-            viewBox="0 0 24 24"
+          {/* Subtle selected pulsing halo behind beacon */}
+          {isHighlighted && (
+            <div
+              className="absolute top-0 w-7 h-7 rounded-full pointer-events-none animate-ping opacity-35"
+              style={{ backgroundColor: markerColor }}
+            />
+          )}
+
+          {/* Directional Beacon Arrow (Rotates precisely according to vehicle heading) */}
+          <div
             className={cn(
-              "w-6 h-6 md:w-7 md:h-7 transition-transform duration-300",
-              isHighlighted ? "scale-110 drop-shadow-md" : "scale-100 drop-shadow-sm"
+              "relative flex items-center justify-center pointer-events-none z-10 transition-transform",
+              fastTransition ? "duration-150 ease-linear" : "duration-500 ease-out"
             )}
             style={{
-              fill: markerColor,
-              stroke: '#ffffff',
-              strokeWidth: 1.25,
-              strokeLinejoin: 'round',
-              strokeLinecap: 'round'
+              transform: `rotate(${heading}deg)`,
+              transformOrigin: '50% 50%',
             }}
           >
-            <path d="M12 2L21 21L12 17L3 21L12 2Z" />
-          </svg>
+            {/* Navigation Arrow */}
+            <svg
+              viewBox="0 0 24 24"
+              className={cn(
+                "w-[26px] h-[26px] transition-all duration-300",
+                isHighlighted
+                  ? "drop-shadow-[0_8px_16px_rgba(0,0,0,0.35)]"
+                  : "drop-shadow-sm"
+              )}
+              style={{
+                fill: markerColor,
+                stroke: '#ffffff',
+                strokeWidth: isHighlighted ? 1.75 : 1.25,
+                strokeLinejoin: 'round',
+                strokeLinecap: 'round'
+              }}
+            >
+              <path d="M12 2L21 21L12 17L3 21L12 2Z" />
+            </svg>
+          </div>
         </div>
 
-        {/* The Pill Label */}
+        {/* Plate Number Pill Label with Heading Arrow (Exact match to VehicleMarker) */}
         {label && (
           <div
             className={cn(
-              "mt-0.5 px-1.5 py-[2px] whitespace-nowrap rounded shadow-sm transition-all duration-200 z-30",
-              "text-[9px] font-bold tracking-wider uppercase leading-none",
-              isHighlighted ? "opacity-100 scale-105 shadow-md" : "opacity-95 scale-100",
-              "bg-black text-white dark:bg-white dark:text-black border border-black/20 dark:border-white/20"
+              "mt-1 px-1.5 py-[2px] whitespace-nowrap rounded shadow-md pointer-events-none select-none z-20 flex items-center gap-1 max-w-[120px] transition-colors duration-200",
+              "text-[8px] font-bold font-mono tracking-wide uppercase leading-none",
+              isHighlighted
+                ? "bg-red-600 text-white ring-2 ring-white/90 shadow-lg font-black"
+                : "bg-foreground text-background ring-1 ring-primary"
             )}
           >
-            {label}
+            {/* Panah arah heading */}
+            <svg
+              viewBox="0 0 12 12"
+              className="w-2.5 h-2.5 shrink-0 transition-transform duration-300 ease-out"
+              style={{
+                transform: `rotate(${heading}deg)`,
+                fill: isHighlighted ? '#ffffff' : markerColor,
+              }}
+            >
+              <path d="M6 1L10.5 10.5L6 8.5L1.5 10.5L6 1Z" />
+            </svg>
+            <span className="truncate">{label}</span>
           </div>
         )}
       </div>

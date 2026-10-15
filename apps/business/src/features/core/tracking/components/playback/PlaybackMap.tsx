@@ -428,6 +428,7 @@ export function PlaybackMap({
   return (
     <div className="w-full h-full relative">
       <TrackingMap<TrackingVehicle>
+        isLiveTracking={false}
         entities={[]}
         selectedIds={[]}
 

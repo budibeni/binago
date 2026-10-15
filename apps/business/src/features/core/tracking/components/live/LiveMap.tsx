@@ -6,11 +6,15 @@ import {
   TrackingMap,
 } from '@adatrack/maps';
 import type {
-  MapEntityOption,
-  MapGeofenceOption,
-  GeofenceCheckRequest,
-  GeofenceCheckResult,
+  SearchGeofenceOption,
+  SearchRouteOption,
+  SearchAreaVehicleResult,
 } from '@adatrack/maps';
+import { geofenceService, routeService } from '@/data/services';
+import {
+  findVehiclesInGeofence,
+  findVehiclesOnRoute,
+} from '../../utils/playbackLayerMatcher';
 import type { TrackingVehicle } from '../../types/tracking';
 import { VehicleMarker } from '../shared/VehicleMarker';
 import { useBusinessLocale } from '../../../../../components/BusinessShellLayout';
@@ -44,46 +48,10 @@ export interface LiveMapProps {
   onFocusVehicleChange?: (vehicleId: string | null) => void;
   /** Callback ketika popup kendaraan di peta dibuka atau ditutup (boolean) */
   onPopupOpenChange?: (isOpen: boolean) => void;
+  /** Status visibilitas panel overview di bawah */
+  isOverviewVisible?: boolean;
+  locale?: Locale;
 }
-
-// --- Mock geofence data --------------------------------------------------------
-
-const MOCK_GEOFENCES: MapGeofenceOption[] = [
-  { id: 'g-b-001', label: 'Geofence Gudang Utama' },
-  { id: 'g-b-002', label: 'Geofence Pelabuhan Tanjung Priok' },
-  { id: 'g-b-003', label: 'Geofence Kantor Pusat' },
-  { id: 'g-b-004', label: 'Geofence Pool Kendaraan Slipi' },
-];
-
-// --- Mock geofence check -------------------------------------------------------
-
-async function mockCheckEntityGeofence(req: GeofenceCheckRequest): Promise<GeofenceCheckResult> {
-  await new Promise((r) => setTimeout(r, 800));
-  const inside = req.geofenceId === 'g-b-001' && req.entityId === 'veh-004';
-  return {
-    inside,
-    distance: inside ? 0 : Math.floor(Math.random() * 5000) + 100,
-    label: inside
-      ? 'Kendaraan berada di dalam geofence.'
-      : 'Kendaraan berada di luar geofence.',
-  };
-}
-
-// --- Status helpers ------------------------------------------------------------
-
-const STATUS_DOT: Record<TrackingVehicle['status'], string> = {
-  driving: 'bg-success',
-  idle:    'bg-warning',
-  parking: 'bg-info',
-  offline: 'bg-neutral-400',
-};
-
-const STATUS_LABEL: Record<TrackingVehicle['status'], string> = {
-  driving: 'Berjalan',
-  idle:    'Idle',
-  parking: 'Parkir',
-  offline: 'Offline',
-};
 
 // --- LiveMap -------------------------------------------------------------------
 
@@ -102,32 +70,104 @@ export function LiveMap({
   focusedVehicleId,
   onFocusVehicleChange,
   onPopupOpenChange,
+  isOverviewVisible,
+  locale: localeProp,
 }: LiveMapProps) {
-  const locale = useBusinessLocale();
+  const contextLocale = useBusinessLocale();
+  const locale = localeProp ?? contextLocale ?? 'id';
   const [internalSelectedId, setInternalSelectedId] = React.useState<string | null>(selectedVehicleId || null);
 
   React.useEffect(() => {
     setInternalSelectedId(selectedVehicleId || null);
   }, [selectedVehicleId]);
 
-  const entityOptions: MapEntityOption[] = useMemo(
-    () =>
-      vehicles.map((v) => ({
+  // Master Geofence & Route search options untuk SearchLocationTool
+  const geofenceSearchOptions: SearchGeofenceOption[] = useMemo(() => {
+    const allGfs = geofenceService.getGeofences('active');
+    return allGfs.map((gf) => ({
+      id: gf.id,
+      label: gf.name,
+      type: gf.geometry.type as 'polygon' | 'circle',
+      coordinates: gf.geometry.coordinates,
+      radius: 'radius' in gf.geometry ? (gf.geometry as { radius?: number }).radius : undefined,
+    }));
+  }, []);
+
+  const routeSearchOptions: SearchRouteOption[] = useMemo(() => {
+    const allRoutes = routeService.getRoutes().filter((r) => r.status === 'active');
+    return allRoutes.map((rt) => {
+      let coords: { lat: number; lng: number }[] = [];
+      if (rt.plannedPath?.type === 'multiline' && rt.plannedPath.coordinates) {
+        coords = rt.plannedPath.coordinates;
+      } else {
+        if (rt.origin?.latitude && rt.origin?.longitude) {
+          coords.push({ lat: rt.origin.latitude, lng: rt.origin.longitude });
+        }
+        if (rt.destination?.latitude && rt.destination?.longitude) {
+          coords.push({ lat: rt.destination.latitude, lng: rt.destination.longitude });
+        }
+      }
+      return {
+        id: rt.id,
+        label: rt.name,
+        coordinates: coords,
+      };
+    });
+  }, []);
+
+  const handleFindVehiclesInGeofence = React.useCallback(
+    (geofenceId: string): SearchAreaVehicleResult[] => {
+      const gf = geofenceService.getGeofenceById(geofenceId);
+      if (!gf) return [];
+      const matched = findVehiclesInGeofence(vehicles, gf, 0.08);
+      return matched.map((v) => ({
         id: v.id,
-        label: `${v.plateNumber}${v.driverName ? ` · ${v.driverName}` : ''}`,
-      })),
-    [vehicles],
+        plateNumber: v.plateNumber,
+        lat: v.location.lat,
+        lng: v.location.lng,
+        status: v.status,
+        vehicleType: v.vehicleType,
+      }));
+    },
+    [vehicles]
+  );
+
+  const handleFindVehiclesOnRoute = React.useCallback(
+    (routeId: string): SearchAreaVehicleResult[] => {
+      const rt = routeService.getRouteById(routeId);
+      if (!rt) return [];
+      const matched = findVehiclesOnRoute(vehicles, rt, 0.8);
+      return matched.map((v) => ({
+        id: v.id,
+        plateNumber: v.plateNumber,
+        lat: v.location.lat,
+        lng: v.location.lng,
+        status: v.status,
+        vehicleType: v.vehicleType,
+      }));
+    },
+    [vehicles]
+  );
+
+  const handleSelectSearchVehicle = React.useCallback(
+    (vehicleId: string) => {
+      onSelectVehicle?.(vehicleId);
+      onFocusVehicleChange?.(vehicleId);
+      onPopupOpenChange?.(true);
+    },
+    [onSelectVehicle, onFocusVehicleChange, onPopupOpenChange]
   );
 
   return (
     <div className="w-full h-full relative">
       <TrackingMap<TrackingVehicle>
+        isLiveTracking={true}
         entities={vehicles}
         selectedIds={visibleVehicleIds}
         initialFocusedId={initialFocusedVehicleId}
         panToId={panToVehicleId && visibleVehicleIds.includes(panToVehicleId) ? panToVehicleId : undefined}
         onPanComplete={onPanComplete}
-        focusedId={focusedVehicleId || selectedVehicleId}
+        focusedId={isOverviewVisible ? (focusedVehicleId || selectedVehicleId) : null}
         onFocusChange={(id) => {
           onSelectVehicle?.(id);
           onFocusVehicleChange?.(id);
@@ -150,27 +190,34 @@ export function LiveMap({
         }}
 
         // Renderers
-        renderMarker={(vehicle, { focused, onClick }) => (
-          <VehicleMarker
-            key={vehicle.id}
-            vehicle={vehicle}
-            selected={vehicle.id === selectedVehicleId || vehicle.id === focusedVehicleId || focused}
-            onClick={() => {
-              onSelectVehicle?.(vehicle.id);
-              onFocusVehicleChange?.(vehicle.id);
-              onClick?.();
-            }}
-          />
-        )}
+        renderMarker={(vehicle, { focused, onClick }) => {
+          const isMarkerActive = isOverviewVisible !== undefined
+            ? (isOverviewVisible && (vehicle.id === selectedVehicleId || vehicle.id === focusedVehicleId || focused))
+            : Boolean(vehicle.id === selectedVehicleId || vehicle.id === focusedVehicleId || focused);
 
-        geofences={MOCK_GEOFENCES}
-        entityOptions={entityOptions}
-        checkGeofenceFn={mockCheckEntityGeofence}
-        entityLabel="Kendaraan"
+          return (
+            <VehicleMarker
+              key={vehicle.id}
+              selected={isMarkerActive}
+              vehicle={vehicle}
+              onClick={() => {
+                onSelectVehicle?.(vehicle.id);
+                onFocusVehicleChange?.(vehicle.id);
+                onClick?.();
+              }}
+            />
+          );
+        }}
+
         locale={locale}
         playbackTrack={playbackTrack}
         playbackPassedTrack={playbackPassedTrack}
         playbackParkingEvents={playbackParkingEvents}
+        geofenceSearchOptions={geofenceSearchOptions}
+        routeSearchOptions={routeSearchOptions}
+        onFindVehiclesInGeofence={handleFindVehiclesInGeofence}
+        onFindVehiclesOnRoute={handleFindVehiclesOnRoute}
+        onSelectSearchVehicle={handleSelectSearchVehicle}
         className="w-full h-full border-0 rounded-none min-h-0"
       />
     </div>

@@ -165,6 +165,34 @@
   .custom-parking-popup.maplibregl-popup-anchor-top .maplibregl-popup-tip {
     border-bottom-color: var(--color-background);
   }
+
+  /* User distance popup — high z-index and transparent maplibre container wrapper */
+  .custom-user-distance-popup {
+    z-index: 500 !important;
+  }
+
+  .custom-user-distance-popup .maplibregl-popup-content {
+    padding: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+
+  .custom-user-distance-popup.maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
+    border-top-color: #ffffff;
+  }
+
+  .dark .custom-user-distance-popup.maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
+    border-top-color: #171717;
+  }
+
+  .custom-user-distance-popup.maplibregl-popup-anchor-top .maplibregl-popup-tip {
+    border-bottom-color: #ffffff;
+  }
+
+  .dark .custom-user-distance-popup.maplibregl-popup-anchor-top .maplibregl-popup-tip {
+    border-bottom-color: #171717;
+  }
 }
 
 @layer utilities {

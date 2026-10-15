@@ -191,6 +191,7 @@ export function HeatmapMap(props: HeatmapMapProps) {
   return (
     <div className="w-full h-full relative">
       <TrackingMap<TrackingVehicle>
+        isLiveTracking={false}
         entities={props.vehicles}
         selectedIds={props.selectedVehicleId ? [props.selectedVehicleId] : []}
         getId={(v) => v.id}

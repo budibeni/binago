@@ -1,13 +1,759 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Route, RouteStop, RouteLocation, MapInteractionMode, ActiveLocationTarget } from '../types';
 import { Geofence } from '../../geofences/types';
 import { Button, Input, Label, InputString, InputNumber, InputSelect } from '@adatrack/ui';
 import { getRouteTranslation } from '../i18n';
 import type { Locale } from '@adatrack/types';
-import { MapGeometry } from '@adatrack/maps';
-import { PenTool, Trash2, Plus, MapPin, ChevronUp, ChevronDown } from 'lucide-react';
+import {
+  MapGeometry,
+  parseCoordinateInput,
+  isGoogleMapsShortLink,
+  defaultNominatimSearch,
+  type LocationSearchResult,
+} from '@adatrack/maps';
+import {
+  PenTool,
+  Trash2,
+  Plus,
+  MapPin,
+  ChevronUp,
+  ChevronDown,
+  Loader2,
+  Check,
+  X,
+  Search,
+  LocateFixed,
+  RefreshCw,
+  AlertCircle,
+} from 'lucide-react';
 import { RouteMap } from './RouteMap';
 import { cn } from '@adatrack/utils';
+
+const MOCK_FALLBACK_ADDRESSES: LocationSearchResult[] = [
+  { lat: -6.2088, lng: 106.8456, label: 'Jl. Jenderal Sudirman, Jakarta Pusat' },
+  { lat: -6.1944, lng: 106.8229, label: 'Monumen Nasional (Monas), Gambir, Jakarta Pusat' },
+  { lat: -6.2500, lng: 106.8000, label: 'Kebayoran Baru, Jakarta Selatan' },
+  { lat: -6.1264, lng: 106.8906, label: 'Pelabuhan Tanjung Priok, Jakarta Utara' },
+  { lat: -6.1256, lng: 106.6559, label: 'Bandara Internasional Soekarno-Hatta (CGK), Tangerang' },
+  { lat: -6.9147, lng: 107.6098, label: 'Jl. Asia Afrika, Bandung, Jawa Barat' },
+  { lat: -7.2575, lng: 112.7521, label: 'Jl. Tunjungan, Surabaya, Jawa Timur' },
+  { lat: -7.7956, lng: 110.3695, label: 'Jl. Malioboro, Yogyakarta' },
+  { lat: -6.9932, lng: 110.4203, label: 'Simpang Lima, Semarang, Jawa Tengah' },
+];
+
+interface CoordinateLocationFieldProps {
+  targetId: ActiveLocationTarget;
+  loc: RouteLocation;
+  onChange: (val: RouteLocation) => void;
+  isSelecting: boolean;
+  onToggleSelect: () => void;
+  error?: string;
+  locale: Locale;
+  t: any;
+}
+
+function CoordinateLocationField({
+  targetId,
+  loc,
+  onChange,
+  isSelecting,
+  onToggleSelect,
+  error,
+  locale,
+  t,
+}: CoordinateLocationFieldProps) {
+  const [inputValue, setInputValue] = useState<string>(loc.address || '');
+  const [resolving, setResolving] = useState<boolean>(false);
+  const [notice, setNotice] = useState<string | null>(null);
+
+  // Sinkronkan input jika loc.address atau loc.latitude/longitude berubah dari luar (misal klik peta)
+  useEffect(() => {
+    if (loc.address) {
+      setInputValue(loc.address);
+    } else if (loc.latitude !== undefined && loc.longitude !== undefined) {
+      setInputValue(`${loc.latitude.toFixed(5)}, ${loc.longitude.toFixed(5)}`);
+    }
+  }, [loc.address, loc.latitude, loc.longitude]);
+
+  const handleInputChange = async (rawText: string) => {
+    setInputValue(rawText);
+    const text = rawText.trim();
+
+    if (!text) {
+      setNotice(null);
+      onChange({
+        ...loc,
+        type: 'coordinate',
+        sourceMode: 'coordinate',
+        address: '',
+        latitude: undefined,
+        longitude: undefined,
+      });
+      return;
+    }
+
+    // 1. Cek shortlink Google Maps (maps.app.goo.gl atau goo.gl/maps)
+    if (isGoogleMapsShortLink(text)) {
+      setResolving(true);
+      setNotice(locale === 'id' ? 'Mengurai tautan Google Maps...' : 'Resolving Google Maps link...');
+      try {
+        const res = await fetch('/api/resolve-maps-url', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: text }),
+        });
+        const data = await res.json();
+        if (data.success && typeof data.lat === 'number' && typeof data.lng === 'number') {
+          onChange({
+            ...loc,
+            type: 'coordinate',
+            sourceMode: 'coordinate',
+            address: text,
+            latitude: Number(data.lat.toFixed(6)),
+            longitude: Number(data.lng.toFixed(6)),
+            radius: loc.radius || 100,
+          });
+          setNotice(
+            locale === 'id'
+              ? `Tautan Google Maps terurai (${data.lat.toFixed(5)}, ${data.lng.toFixed(5)})`
+              : `Google Maps link resolved (${data.lat.toFixed(5)}, ${data.lng.toFixed(5)})`
+          );
+        } else {
+          setNotice(
+            locale === 'id'
+              ? 'Tautan tidak mengandung koordinat valid'
+              : 'Link did not contain valid coordinates'
+          );
+        }
+      } catch (err) {
+        console.error('Failed to resolve maps link', err);
+        setNotice(
+          locale === 'id'
+            ? 'Gagal memproses tautan Google Maps'
+            : 'Failed to resolve Google Maps link'
+        );
+      } finally {
+        setResolving(false);
+      }
+      return;
+    }
+
+    // 2. Parse menggunakan coordinateParser (mendukung full Google Maps URL, DMS, Decimal, Key-Value)
+    const parsed = parseCoordinateInput(text);
+    if (parsed) {
+      onChange({
+        ...loc,
+        type: 'coordinate',
+        sourceMode: 'coordinate',
+        address: text,
+        latitude: Number(parsed.lat.toFixed(6)),
+        longitude: Number(parsed.lng.toFixed(6)),
+        radius: loc.radius || 100,
+      });
+
+      let noticeType = locale === 'id' ? 'Koordinat terdeteksi' : 'Coordinate detected';
+      if (parsed.type === 'google_maps_url') {
+        noticeType = locale === 'id' ? 'Tautan Google Maps terdeteksi' : 'Google Maps URL detected';
+      } else if (parsed.type === 'dms') {
+        noticeType = locale === 'id' ? 'Format DMS terdeteksi' : 'DMS format detected';
+      }
+      setNotice(`${noticeType} (${parsed.lat.toFixed(5)}, ${parsed.lng.toFixed(5)})`);
+      return;
+    }
+
+    // 3. Jika bukan format koordinat/link, simpan sebagai deskripsi/alamat teks
+    setNotice(null);
+    onChange({ ...loc, type: 'coordinate', sourceMode: 'coordinate', address: rawText });
+  };
+
+  const handleClear = () => {
+    setInputValue('');
+    setNotice(null);
+    onChange({
+      ...loc,
+      type: 'coordinate',
+      sourceMode: 'coordinate',
+      address: '',
+      latitude: undefined,
+      longitude: undefined,
+    });
+  };
+
+  return (
+    <div className="space-y-2 border border-neutral-200 dark:border-neutral-800 rounded-md p-2.5 bg-white dark:bg-neutral-900 shadow-sm">
+      {/* Smart Input Field: Link Google Maps, DMS, Decimal, atau Alamat */}
+      <div>
+        <div className="relative flex items-center">
+          <Input
+            placeholder={
+              locale === 'id'
+                ? 'Ketik koordinat, alamat, atau tempel link Google Maps...'
+                : 'Enter coordinates, address, or paste Google Maps link...'
+            }
+            value={inputValue}
+            onChange={(e) => handleInputChange(e.target.value)}
+            className="h-8 text-xs pr-8"
+          />
+          <div className="absolute right-2 flex items-center gap-1">
+            {resolving && (
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-primary" />
+            )}
+            {!resolving && inputValue && (
+              <button
+                type="button"
+                onClick={handleClear}
+                className="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 transition-colors"
+                title="Hapus"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Notice Info Hasil Deteksi */}
+        {notice && (
+          <div className="flex items-center gap-1 mt-1 text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">
+            <Check className="w-3 h-3 shrink-0" />
+            <span className="truncate">{notice}</span>
+          </div>
+        )}
+      </div>
+
+      {/* Baris Koordinat & Radius (Manual Edit / Review) */}
+      <div className="flex gap-1.5 items-center">
+        <Button
+          type="button"
+          variant={isSelecting ? 'primary' : 'outline'}
+          size="sm"
+          onClick={onToggleSelect}
+          className={`h-7 w-7 p-0 shrink-0 ${isSelecting ? 'bg-blue-600 hover:bg-blue-700 text-white' : ''}`}
+          title={isSelecting ? (locale === 'id' ? 'Batal Pilih' : 'Cancel Selection') : (locale === 'id' ? 'Pilih dari Peta' : 'Pick from Map')}
+        >
+          <MapPin className="w-3.5 h-3.5" />
+        </Button>
+
+        <div className="flex gap-1.5 flex-1">
+          <Input
+            type="number"
+            step="any"
+            placeholder={t.latPlaceholder || 'Lat'}
+            value={loc.latitude ?? ''}
+            onChange={(e) =>
+              onChange({
+                ...loc,
+                type: 'coordinate',
+                sourceMode: 'coordinate',
+                latitude: e.target.value !== '' ? Number(e.target.value) : undefined,
+                address: loc.address || (e.target.value !== '' && loc.longitude !== undefined ? `${e.target.value}, ${loc.longitude}` : loc.address),
+              })
+            }
+            className={`h-7 text-xs w-full font-mono ${error ? 'border-red-500' : ''}`}
+          />
+          <Input
+            type="number"
+            step="any"
+            placeholder={t.lngPlaceholder || 'Lng'}
+            value={loc.longitude ?? ''}
+            onChange={(e) =>
+              onChange({
+                ...loc,
+                type: 'coordinate',
+                sourceMode: 'coordinate',
+                longitude: e.target.value !== '' ? Number(e.target.value) : undefined,
+                address: loc.address || (e.target.value !== '' && loc.latitude !== undefined ? `${loc.latitude}, ${e.target.value}` : loc.address),
+              })
+            }
+            className={`h-7 text-xs w-full font-mono ${error ? 'border-red-500' : ''}`}
+          />
+          <Input
+            type="number"
+            min={10}
+            max={50000}
+            placeholder="Rad (m)"
+            title={locale === 'id' ? 'Radius Toleransi (meter)' : 'Tolerance Radius (meters)'}
+            value={loc.radius || ''}
+            onChange={(e) =>
+              onChange({
+                ...loc,
+                type: 'coordinate',
+                sourceMode: 'coordinate',
+                radius: e.target.value !== '' ? Number(e.target.value) : undefined,
+              })
+            }
+            className="h-7 text-xs w-[68px] shrink-0 font-mono"
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+interface AddressLocationFieldProps {
+  targetId: ActiveLocationTarget;
+  loc: RouteLocation;
+  onChange: (val: RouteLocation) => void;
+  isSelecting: boolean;
+  onToggleSelect: () => void;
+  error?: string;
+  locale: Locale;
+  t: any;
+}
+
+function AddressLocationField({
+  targetId,
+  loc,
+  onChange,
+  isSelecting,
+  onToggleSelect,
+  error,
+  locale,
+  t,
+}: AddressLocationFieldProps) {
+  const [query, setQuery] = useState<string>(loc.address || '');
+  const [results, setResults] = useState<LocationSearchResult[]>([]);
+  const [searching, setSearching] = useState<boolean>(false);
+  const [showDropdown, setShowDropdown] = useState<boolean>(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Sinkronkan text pencarian jika alamat atau koordinat diubah dari luar (misal klik peta)
+  useEffect(() => {
+    if (loc.address) {
+      setQuery(loc.address);
+    } else if (loc.latitude !== undefined && loc.longitude !== undefined) {
+      setQuery(`${loc.latitude.toFixed(5)}, ${loc.longitude.toFixed(5)}`);
+    }
+  }, [loc.address, loc.latitude, loc.longitude]);
+
+  // Close dropdown saat klik di luar
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setShowDropdown(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Debounced address search
+  useEffect(() => {
+    const trimmed = query.trim();
+    if (trimmed.length < 2) {
+      setResults([]);
+      setShowDropdown(false);
+      return;
+    }
+
+    // Jika query persis sama dengan address yang sudah terpilih, jangan otomatis buka dropdown
+    if (trimmed === loc.address) {
+      return;
+    }
+
+    let active = true;
+    setSearching(true);
+
+    const timer = setTimeout(async () => {
+      try {
+        let items = await defaultNominatimSearch(trimmed, { countryCode: 'id', limit: 5 });
+        if (!items || items.length === 0) {
+          // Fallback ke pencarian lokal
+          const lower = trimmed.toLowerCase();
+          items = MOCK_FALLBACK_ADDRESSES.filter((m) =>
+            m.label.toLowerCase().includes(lower)
+          );
+        }
+        if (active) {
+          setResults(items);
+          setShowDropdown(true);
+        }
+      } catch (err) {
+        if (active) {
+          const lower = trimmed.toLowerCase();
+          const items = MOCK_FALLBACK_ADDRESSES.filter((m) =>
+            m.label.toLowerCase().includes(lower)
+          );
+          setResults(items);
+          setShowDropdown(true);
+        }
+      } finally {
+        if (active) setSearching(false);
+      }
+    }, 350);
+
+    return () => {
+      active = false;
+      clearTimeout(timer);
+    };
+  }, [query, loc.address]);
+
+  const handleSelectResult = (item: LocationSearchResult) => {
+    setShowDropdown(false);
+    setQuery(item.label);
+    onChange({
+      ...loc,
+      type: 'coordinate',
+      sourceMode: 'address',
+      address: item.label,
+      latitude: Number(item.lat.toFixed(6)),
+      longitude: Number(item.lng.toFixed(6)),
+      radius: loc.radius || 100,
+    });
+  };
+
+  const handleClear = () => {
+    setQuery('');
+    setResults([]);
+    setShowDropdown(false);
+    onChange({
+      ...loc,
+      type: 'coordinate',
+      sourceMode: 'address',
+      address: '',
+      latitude: undefined,
+      longitude: undefined,
+    });
+  };
+
+  return (
+    <div ref={containerRef} className="space-y-2 border border-neutral-200 dark:border-neutral-800 rounded-md p-2.5 bg-white dark:bg-neutral-900 shadow-sm relative">
+      {/* Input Pencarian Alamat */}
+      <div className="relative">
+        <div className="relative flex items-center">
+          <Search className="w-3.5 h-3.5 text-neutral-400 absolute left-2.5 pointer-events-none" />
+          <Input
+            placeholder={t.searchAddressPlaceholder || 'Ketik nama jalan, tempat, gedung...'}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onFocus={() => {
+              if (results.length > 0 && query.trim() !== loc.address) {
+                setShowDropdown(true);
+              }
+            }}
+            className="h-8 text-xs pl-8 pr-8"
+          />
+          <div className="absolute right-2 flex items-center gap-1">
+            {searching && (
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-primary" />
+            )}
+            {!searching && query && (
+              <button
+                type="button"
+                onClick={handleClear}
+                className="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 transition-colors"
+                title="Hapus"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Dropdown Hasil Pencarian Alamat */}
+        {showDropdown && (
+          <div className="absolute left-0 right-0 top-full mt-1 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-md shadow-lg z-50 max-h-48 overflow-y-auto divide-y divide-neutral-100 dark:divide-neutral-800">
+            {results.length > 0 ? (
+              results.map((item, idx) => (
+                <button
+                  key={`${item.lat}-${item.lng}-${idx}`}
+                  type="button"
+                  onClick={() => handleSelectResult(item)}
+                  className="w-full text-left px-3 py-2 hover:bg-neutral-50 dark:hover:bg-neutral-800/60 transition-colors flex items-start gap-2 group"
+                >
+                  <MapPin className="w-3.5 h-3.5 text-blue-500 shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs text-neutral-800 dark:text-neutral-200 font-medium line-clamp-2">
+                      {item.label}
+                    </p>
+                    <span className="text-[10px] text-neutral-400 font-mono">
+                      {item.lat.toFixed(5)}, {item.lng.toFixed(5)}
+                    </span>
+                  </div>
+                </button>
+              ))
+            ) : (
+              <div className="px-3 py-2 text-xs text-neutral-400 text-center">
+                {t.searchAddressEmpty || 'Tidak ada hasil alamat ditemukan'}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Feedback Alamat Terpilih */}
+        {loc.latitude !== undefined && loc.longitude !== undefined && (
+          <div className="flex items-center gap-1 mt-1 text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">
+            <Check className="w-3 h-3 shrink-0" />
+            <span className="truncate">
+              {locale === 'id' ? 'Alamat dipilih' : 'Address selected'} ({loc.latitude.toFixed(5)}, {loc.longitude.toFixed(5)})
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* Baris Koordinat & Radius (Manual Edit / Review) */}
+      <div className="flex gap-1.5 items-center">
+        <Button
+          type="button"
+          variant={isSelecting ? 'primary' : 'outline'}
+          size="sm"
+          onClick={onToggleSelect}
+          className={`h-7 w-7 p-0 shrink-0 ${isSelecting ? 'bg-blue-600 hover:bg-blue-700 text-white' : ''}`}
+          title={isSelecting ? (locale === 'id' ? 'Batal Pilih' : 'Cancel Selection') : (locale === 'id' ? 'Pilih dari Peta' : 'Pick from Map')}
+        >
+          <MapPin className="w-3.5 h-3.5" />
+        </Button>
+
+        <div className="flex gap-1.5 flex-1">
+          <Input
+            type="number"
+            step="any"
+            placeholder={t.latPlaceholder || 'Lat'}
+            value={loc.latitude ?? ''}
+            onChange={(e) =>
+              onChange({
+                ...loc,
+                type: 'coordinate',
+                sourceMode: 'address',
+                latitude: e.target.value !== '' ? Number(e.target.value) : undefined,
+              })
+            }
+            className={`h-7 text-xs w-full font-mono ${error ? 'border-red-500' : ''}`}
+          />
+          <Input
+            type="number"
+            step="any"
+            placeholder={t.lngPlaceholder || 'Lng'}
+            value={loc.longitude ?? ''}
+            onChange={(e) =>
+              onChange({
+                ...loc,
+                type: 'coordinate',
+                sourceMode: 'address',
+                longitude: e.target.value !== '' ? Number(e.target.value) : undefined,
+              })
+            }
+            className={`h-7 text-xs w-full font-mono ${error ? 'border-red-500' : ''}`}
+          />
+          <Input
+            type="number"
+            min={10}
+            max={50000}
+            placeholder="Rad (m)"
+            title={locale === 'id' ? 'Radius Toleransi (meter)' : 'Tolerance Radius (meters)'}
+            value={loc.radius || ''}
+            onChange={(e) =>
+              onChange({
+                ...loc,
+                type: 'coordinate',
+                sourceMode: 'address',
+                radius: e.target.value !== '' ? Number(e.target.value) : undefined,
+              })
+            }
+            className="h-7 text-xs w-[68px] shrink-0 font-mono"
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+interface MyLocationLocationFieldProps {
+  targetId: ActiveLocationTarget;
+  loc: RouteLocation;
+  onChange: (val: RouteLocation) => void;
+  isSelecting: boolean;
+  onToggleSelect: () => void;
+  error?: string;
+  locale: Locale;
+  t: any;
+}
+
+function MyLocationLocationField({
+  targetId,
+  loc,
+  onChange,
+  isSelecting,
+  onToggleSelect,
+  error,
+  locale,
+  t,
+}: MyLocationLocationFieldProps) {
+  const [isLocating, setIsLocating] = useState<boolean>(false);
+  const [locationError, setLocationError] = useState<string | null>(null);
+
+  const requestLocation = () => {
+    if (typeof window === 'undefined' || !navigator.geolocation) {
+      setLocationError(locale === 'id' ? 'Geolokasi tidak didukung oleh browser Anda.' : 'Geolocation not supported by browser.');
+      return;
+    }
+
+    setIsLocating(true);
+    setLocationError(null);
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setIsLocating(false);
+        const lat = Number(pos.coords.latitude.toFixed(6));
+        const lng = Number(pos.coords.longitude.toFixed(6));
+        const label = locale === 'id' ? `Lokasi GPS Saya (${lat}, ${lng})` : `My GPS Location (${lat}, ${lng})`;
+        onChange({
+          ...loc,
+          type: 'coordinate',
+          sourceMode: 'my_location',
+          latitude: lat,
+          longitude: lng,
+          radius: loc.radius || 100,
+          address: label,
+        });
+      },
+      (err) => {
+        setIsLocating(false);
+        if (err.code === 1) {
+          setLocationError(locale === 'id' ? 'Izin lokasi ditolak browser.' : 'Location permission denied.');
+        } else if (err.code === 2) {
+          setLocationError(locale === 'id' ? 'Posisi lokasi tidak tersedia.' : 'Position unavailable.');
+        } else if (err.code === 3) {
+          setLocationError(locale === 'id' ? 'Waktu deteksi lokasi habis (timeout).' : 'Detection timed out.');
+        } else {
+          setLocationError(locale === 'id' ? 'Gagal mendeteksi lokasi.' : 'Failed to detect location.');
+        }
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 }
+    );
+  };
+
+  // Otomatis minta izin lokasi jika koordinat belum terisi saat pertama kali memilih Lokasi Saya
+  useEffect(() => {
+    if (loc.latitude === undefined || loc.longitude === undefined) {
+      requestLocation();
+    }
+  }, []);
+
+  const hasCoords = loc.latitude !== undefined && loc.longitude !== undefined;
+
+  return (
+    <div className="space-y-2 border border-neutral-200 dark:border-neutral-800 rounded-md p-2.5 bg-white dark:bg-neutral-900 shadow-sm">
+      {/* Status Bar Deteksi GPS */}
+      <div>
+        {isLocating ? (
+          <div className="flex items-center gap-2 py-1.5 px-2.5 rounded-md bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900/50 text-blue-700 dark:text-blue-300 text-xs">
+            <Loader2 className="w-3.5 h-3.5 animate-spin shrink-0 text-blue-600 dark:text-blue-400" />
+            <span className="truncate">{t.detectingLocation || 'Mendeteksi sinyal GPS...'}</span>
+          </div>
+        ) : locationError ? (
+          <div className="flex items-center justify-between gap-2 py-1.5 px-2.5 rounded-md bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 text-red-700 dark:text-red-300 text-xs">
+            <div className="flex items-center gap-1.5 min-w-0">
+              <AlertCircle className="w-3.5 h-3.5 text-red-500 shrink-0" />
+              <span className="truncate">{locationError}</span>
+            </div>
+            <button
+              type="button"
+              onClick={requestLocation}
+              className="text-[11px] font-semibold text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-200 underline shrink-0"
+            >
+              {locale === 'id' ? 'Coba Lagi' : 'Retry'}
+            </button>
+          </div>
+        ) : hasCoords ? (
+          <div className="flex items-center justify-between gap-2 py-1 px-2.5 rounded-md bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/50 text-emerald-800 dark:text-emerald-300 text-xs">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="relative flex h-2 w-2 shrink-0">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+              <span className="font-medium truncate">
+                {t.gpsDetected || 'Lokasi GPS terdeteksi'} ({loc.latitude?.toFixed(5)}, {loc.longitude?.toFixed(5)})
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={requestLocation}
+              title={t.refreshLocation || 'Perbarui Lokasi GPS'}
+              className="p-1 text-emerald-700 hover:text-emerald-900 dark:text-emerald-300 dark:hover:text-white rounded hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        ) : (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={requestLocation}
+            className="w-full h-8 text-xs flex items-center justify-center gap-1.5 text-neutral-700 dark:text-neutral-300"
+          >
+            <LocateFixed className="w-3.5 h-3.5 text-primary-600" />
+            <span>{t.detectLocationBtn || 'Deteksi Lokasi GPS'}</span>
+          </Button>
+        )}
+      </div>
+
+      {/* Baris Koordinat & Radius (Manual Edit / Review) */}
+      <div className="flex gap-1.5 items-center">
+        <Button
+          type="button"
+          variant={isSelecting ? 'primary' : 'outline'}
+          size="sm"
+          onClick={onToggleSelect}
+          className={`h-7 w-7 p-0 shrink-0 ${isSelecting ? 'bg-blue-600 hover:bg-blue-700 text-white' : ''}`}
+          title={isSelecting ? (locale === 'id' ? 'Batal Pilih' : 'Cancel Selection') : (locale === 'id' ? 'Pilih dari Peta' : 'Pick from Map')}
+        >
+          <MapPin className="w-3.5 h-3.5" />
+        </Button>
+
+        <div className="flex gap-1.5 flex-1">
+          <Input
+            type="number"
+            step="any"
+            placeholder={t.latPlaceholder || 'Lat'}
+            value={loc.latitude ?? ''}
+            onChange={(e) =>
+              onChange({
+                ...loc,
+                type: 'coordinate',
+                sourceMode: 'my_location',
+                latitude: e.target.value !== '' ? Number(e.target.value) : undefined,
+              })
+            }
+            className={`h-7 text-xs w-full font-mono ${error ? 'border-red-500' : ''}`}
+          />
+          <Input
+            type="number"
+            step="any"
+            placeholder={t.lngPlaceholder || 'Lng'}
+            value={loc.longitude ?? ''}
+            onChange={(e) =>
+              onChange({
+                ...loc,
+                type: 'coordinate',
+                sourceMode: 'my_location',
+                longitude: e.target.value !== '' ? Number(e.target.value) : undefined,
+              })
+            }
+            className={`h-7 text-xs w-full font-mono ${error ? 'border-red-500' : ''}`}
+          />
+          <Input
+            type="number"
+            min={10}
+            max={50000}
+            placeholder="Rad (m)"
+            title={locale === 'id' ? 'Radius Toleransi (meter)' : 'Tolerance Radius (meters)'}
+            value={loc.radius || ''}
+            onChange={(e) =>
+              onChange({
+                ...loc,
+                type: 'coordinate',
+                sourceMode: 'my_location',
+                radius: e.target.value !== '' ? Number(e.target.value) : undefined,
+              })
+            }
+            className="h-7 text-xs w-[68px] shrink-0 font-mono"
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 interface RouteEditorViewProps {
   initialData?: Route;
@@ -103,17 +849,48 @@ export function RouteEditorView({
   const handleMapClick = (lat: number, lng: number) => {
     if (!activeLocationTarget) return;
 
+    const formattedCoord = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+
     if (activeLocationTarget === 'origin') {
-      setOrigin({ ...origin, type: 'coordinate', latitude: lat, longitude: lng, radius: origin.radius || 100 });
+      setOrigin({
+        ...origin,
+        type: 'coordinate',
+        latitude: lat,
+        longitude: lng,
+        radius: origin.radius || 100,
+        address: formattedCoord,
+      });
     } else if (activeLocationTarget === 'destination') {
-      setDestination({ ...destination, type: 'coordinate', latitude: lat, longitude: lng, radius: destination.radius || 100 });
+      setDestination({
+        ...destination,
+        type: 'coordinate',
+        latitude: lat,
+        longitude: lng,
+        radius: destination.radius || 100,
+        address: formattedCoord,
+      });
     } else if (activeLocationTarget.startsWith('stop-')) {
       const stopId = activeLocationTarget;
-      setStops(stops.map(s => s.id === stopId ? { ...s, location: { ...s.location, type: 'coordinate', latitude: lat, longitude: lng, radius: s.location.radius || 100 } } : s));
+      setStops(
+        stops.map((s) =>
+          s.id === stopId
+            ? {
+                ...s,
+                location: {
+                  ...s.location,
+                  type: 'coordinate',
+                  latitude: lat,
+                  longitude: lng,
+                  radius: s.location.radius || 100,
+                  address: formattedCoord,
+                },
+              }
+            : s
+        )
+      );
     }
     
-    // Optional: Return to idle after selection, or keep active to allow re-clicking. 
-    // Usually it's better to return to idle so they can continue filling the form.
+    // Return to idle after selection
     setEditorMode('idle');
     setActiveLocationTarget(null);
   };
@@ -130,88 +907,134 @@ export function RouteEditorView({
     }
   };
 
-  const selectClass = "flex h-9 w-full rounded-md border border-neutral-200 bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary-950 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-800 dark:focus-visible:ring-primary-300";
-
-  const renderLocationPicker = (targetId: ActiveLocationTarget, loc: RouteLocation, onChange: (val: RouteLocation) => void, error?: string) => {
+  const renderLocationPicker = (
+    targetId: ActiveLocationTarget,
+    loc: RouteLocation,
+    onChange: (val: RouteLocation) => void,
+    error?: string
+  ) => {
     const isSelecting = editorMode === 'select-location' && activeLocationTarget === targetId;
+    const currentMode: 'geofence' | 'coordinate' | 'address' | 'my_location' =
+      loc.type === 'geofence' ? 'geofence' : loc.sourceMode || 'coordinate';
+
+    const radioGroupKey = targetId || 'default-target';
 
     return (
       <div className="space-y-2 mt-1">
-        <div className="flex gap-4 mb-2">
-          <label className="flex items-center gap-1.5 text-xs font-medium cursor-pointer">
+        {/* 4 Pilihan Radio Sejajar: Geofence, Koordinat, Alamat, Lokasi Saya */}
+        <div className="flex flex-wrap items-center gap-x-3.5 gap-y-1.5 mb-2 py-0.5">
+          <label className="flex items-center gap-1.5 text-xs font-medium cursor-pointer text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white select-none">
             <input 
               type="radio" 
-              name={`loc-type-${Math.random()}`}
-              checked={loc.type === 'geofence'} 
-              onChange={() => onChange({ type: 'geofence' })}
+              name={`loc-type-${radioGroupKey}`}
+              checked={currentMode === 'geofence'} 
+              onChange={() => onChange({ type: 'geofence', sourceMode: 'geofence', geofenceId: loc.geofenceId })}
               className="accent-primary-600"
             />
             {t.locationType.geofence}
           </label>
-          <label className="flex items-center gap-1.5 text-xs font-medium cursor-pointer">
+          <label className="flex items-center gap-1.5 text-xs font-medium cursor-pointer text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white select-none">
             <input 
               type="radio" 
-              checked={loc.type === 'coordinate'} 
-              onChange={() => onChange({ type: 'coordinate', address: loc.address, radius: loc.radius || 100 })}
+              name={`loc-type-${radioGroupKey}`}
+              checked={currentMode === 'coordinate'} 
+              onChange={() => onChange({ 
+                type: 'coordinate', 
+                sourceMode: 'coordinate',
+                latitude: loc.latitude, 
+                longitude: loc.longitude, 
+                radius: loc.radius || 100, 
+                address: loc.address 
+              })}
               className="accent-primary-600"
             />
             {t.locationType.coordinate}
           </label>
+          <label className="flex items-center gap-1.5 text-xs font-medium cursor-pointer text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white select-none">
+            <input 
+              type="radio" 
+              name={`loc-type-${radioGroupKey}`}
+              checked={currentMode === 'address'} 
+              onChange={() => onChange({ 
+                type: 'coordinate', 
+                sourceMode: 'address',
+                latitude: loc.latitude, 
+                longitude: loc.longitude, 
+                radius: loc.radius || 100, 
+                address: loc.address 
+              })}
+              className="accent-primary-600"
+            />
+            {t.locationType.address}
+          </label>
+          <label className="flex items-center gap-1.5 text-xs font-medium cursor-pointer text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white select-none">
+            <input 
+              type="radio" 
+              name={`loc-type-${radioGroupKey}`}
+              checked={currentMode === 'my_location'} 
+              onChange={() => onChange({ 
+                type: 'coordinate', 
+                sourceMode: 'my_location',
+                latitude: loc.latitude, 
+                longitude: loc.longitude, 
+                radius: loc.radius || 100, 
+                address: loc.address 
+              })}
+              className="accent-primary-600"
+            />
+            {t.locationType.my_location}
+          </label>
         </div>
 
-        {loc.type === 'geofence' ? (
+        {currentMode === 'geofence' && (
           <InputSelect
             value={loc.geofenceId || ''}
-            onChange={(val) => onChange({ ...loc, geofenceId: val })}
+            onChange={(val) => onChange({ type: 'geofence', sourceMode: 'geofence', geofenceId: val })}
             options={geofences.map(gf => ({ value: gf.id, label: gf.name }))}
             placeholder={t.geofencePlaceholder}
             error={error}
           />
-        ) : (
-          <div className="space-y-2 border border-neutral-200 dark:border-neutral-800 rounded-md p-3 bg-white dark:bg-neutral-900 shadow-sm">
-            <Input 
-              placeholder={t.addressPlaceholder} 
-              value={loc.address || ''} 
-              onChange={(e) => onChange({ ...loc, address: e.target.value })}
-              className="h-8 text-xs"
-            />
-            <div className="flex gap-2 items-center">
-              <Button 
-                variant={isSelecting ? "primary" : "outline"} 
-                size="sm" 
-                onClick={() => toggleLocationSelectMode(targetId)}
-                className={`h-8 w-8 p-0 shrink-0 ${isSelecting ? "bg-blue-600 hover:bg-blue-700 text-white" : ""}`}
-                title={isSelecting ? "Batal Pilih (Kembali ke Normal)" : "Pilih dari Peta"}
-              >
-                <MapPin className="w-4 h-4" />
-              </Button>
-              <div className="flex gap-2 flex-1">
-                <Input 
-                  type="number" 
-                  placeholder={t.latPlaceholder} 
-                  value={loc.latitude || ''} 
-                  onChange={(e) => onChange({ ...loc, latitude: e.target.value ? Number(e.target.value) : undefined })}
-                  className={`h-8 text-xs w-full ${error ? 'border-red-500' : ''}`}
-                />
-                <Input 
-                  type="number" 
-                  placeholder={t.lngPlaceholder} 
-                  value={loc.longitude || ''} 
-                  onChange={(e) => onChange({ ...loc, longitude: e.target.value ? Number(e.target.value) : undefined })}
-                  className={`h-8 text-xs w-full ${error ? 'border-red-500' : ''}`}
-                />
-                <Input 
-                  type="number" 
-                  placeholder="Rad (m)" 
-                  title="Radius Toleransi (meter)"
-                  value={loc.radius || ''} 
-                  onChange={(e) => onChange({ ...loc, radius: e.target.value ? Number(e.target.value) : undefined })}
-                  className={`h-8 text-xs w-[65px] shrink-0 ${error ? 'border-red-500' : ''}`}
-                />
-              </div>
-            </div>
-          </div>
         )}
+
+        {currentMode === 'coordinate' && (
+          <CoordinateLocationField
+            targetId={targetId}
+            loc={loc}
+            onChange={onChange}
+            isSelecting={isSelecting}
+            onToggleSelect={() => toggleLocationSelectMode(targetId)}
+            error={error}
+            locale={locale}
+            t={t}
+          />
+        )}
+
+        {currentMode === 'address' && (
+          <AddressLocationField
+            targetId={targetId}
+            loc={loc}
+            onChange={onChange}
+            isSelecting={isSelecting}
+            onToggleSelect={() => toggleLocationSelectMode(targetId)}
+            error={error}
+            locale={locale}
+            t={t}
+          />
+        )}
+
+        {currentMode === 'my_location' && (
+          <MyLocationLocationField
+            targetId={targetId}
+            loc={loc}
+            onChange={onChange}
+            isSelecting={isSelecting}
+            onToggleSelect={() => toggleLocationSelectMode(targetId)}
+            error={error}
+            locale={locale}
+            t={t}
+          />
+        )}
+
         {error && <p className="text-[10px] text-red-500 mt-1">{error}</p>}
       </div>
     );

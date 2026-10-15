@@ -49,3 +49,46 @@ export interface GeofenceCheckResult {
   /** Label deskriptif hasil. */
   label?: string;
 }
+
+/**
+ * Opsi geofence untuk pencarian armada di SearchLocationTool.
+ */
+export interface SearchGeofenceOption {
+  id: string;
+  label: string;
+  coordinates?: { lat: number; lng: number }[];
+  type?: 'polygon' | 'circle';
+  radius?: number;
+}
+
+/**
+ * Opsi rute untuk pencarian armada di SearchLocationTool.
+ */
+export interface SearchRouteOption {
+  id: string;
+  label: string;
+  coordinates?: { lat: number; lng: number }[];
+}
+
+/**
+ * Hasil kendaraan yang berada di geofence atau rute terpilih.
+ */
+export interface SearchAreaVehicleResult {
+  id: string;
+  plateNumber: string;
+  lat: number;
+  lng: number;
+  status?: 'driving' | 'idle' | 'parking' | 'offline' | string;
+  vehicleType?: string;
+  distance?: number;
+}
+
+/**
+ * Highlight area atau rute aktif di atas kanvas peta.
+ */
+export interface ActiveSearchAreaHighlight {
+  type: 'geofence' | 'route';
+  coordinates: { lat: number; lng: number }[];
+  geofenceType?: 'polygon' | 'circle';
+  radius?: number;
+}

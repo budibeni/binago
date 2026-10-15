@@ -24,6 +24,7 @@ export * from './finder/UserLocationMarker';
 // Tools & Basemaps (Unchanged structure)
 export * from './basemaps/types';
 export * from './tools/types';
+export * from './tools/coordinateParser';
 export * from './tools/SearchLocationTool';
 export * from './i18n';
 export * from './geometry/types';

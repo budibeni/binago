@@ -50,6 +50,7 @@ Saat berada pada tampilan Peta (`view === 'map'`), pengguna dapat beralih antara
 Mode default saat halaman dibuka. Berfungsi untuk mengawasi seluruh unit armada yang beroperasi saat ini.
 
 #### 1. Kanvas Peta Live (`LiveMap.tsx`)
+- Area peta dibungkus dalam kontainer kartu (*Card*) berbingkai tajam tanpa bayangan (`rounded-lg border border-gray-300 dark:border-gray-700 bg-card overflow-hidden`) dengan margin/padding luar (`p-2 sm:p-2.5`), memberikan pemisahan spasial yang bersih dari sidebar armada dan panel docked bawah.
 - Menggunakan engine peta `@adatrack/maps` (`TrackingMap`).
 - **Marker Kendaraan (`VehicleMarker.tsx`):**
   - Menampilkan ikon spesifik kendaraan (ikon Truk untuk angkutan barang/box, ikon Bus untuk minibus/Hiace).
@@ -59,7 +60,8 @@ Mode default saat halaman dibuka. Berfungsi untuk mengawasi seluruh unit armada 
     - **Idle (*Idle*):** Oranye/Kuning (`bg-warning`) — Mesin hidup (kontak ACC ON) namun kecepatan 0 km/jam.
     - **Parkir (*Parking*):** Biru (`bg-info`) — Kendaraan berhenti dengan mesin mati (kontak ACC OFF).
     - **Offline (*Offline*):** Abu-abu (`bg-neutral-400`) — Perangkat GPS tidak mengirimkan sinyal telemetri dalam periode tertentu.
-  - Klik marker pada peta langsung mengaktifkan armada dan membuka panel ringkasan bawah (`VehicleOverviewPanel`) tanpa elemen popup/tooltip, sehingga kanvas peta tetap 100% bersih dan leluasa.
+  - Klik marker pada peta (atau dari daftar armada) langsung mengaktifkan armada, memperbesar ikon kendaraan di peta (skala membesar +25% dengan elevasi dan halo fokus), serta membuka panel ringkasan bawah (`VehicleOverviewPanel`).
+  - Klik pada area kosong peta secara otomatis menutup overview dan mengembalikan ikon kendaraan ke ukuran normal.
 
 #### 2. Panel Daftar Armada Kanan (`VehicleList.tsx`)
 Panel sidebar sisi kanan selebar 320px (dapat diciutkan/diperluas hingga 34px):
@@ -74,13 +76,14 @@ Panel sidebar sisi kanan selebar 320px (dapat diciutkan/diperluas hingga 34px):
 - **Kartu Baris Armada:** Menampilkan checkbox seleksi, plat nomor (klik untuk auto-pan kamera peta), tipe kendaraan, nama driver yang bertugas, serta badge status.
 
 #### 3. Panel Ringkasan Kendaraan Bawah (`VehicleOverviewPanel.tsx`)
-Dock panel bawah setinggi 135px yang menjadi pusat kontrol dan informasi utama saat armada dipilih:
-- **Header:** Plat nomor (nopol), badge status operasional, tab konteks bisnis (jika ada), tombol aksi (Playback, Bagikan, Street View, Maps), dan tombol tutup (*X*). Informasi tipe kendaraan dan kota operasional disajikan terpadu pada kolom telemetri di bawahnya.
-- **Struktur 4 Kolom Informasi Telemetri (Border-free Card dengan Ketinggian Terkunci):**
-  - **Kolom 1:** Driver (Nama pengemudi), Kecepatan (*Speed* dalam km/h), Kontak Mesin (ACC ON hijau / OFF merah).
-  - **Kolom 2:** Alamat Lokasi (*Reverse-geocoded* alamat jalan terkini), Alarm Event (Peringatan alarm aktif).
-  - **Kolom 3:** Lokasi Geofence (Nama geofence tempat kendaraan berada), Area Geofence (Kategori zona wilayah).
-  - **Kolom 4:** Koordinat GPS (Latitude & Longitude), GPS SN (Nomor seri perangkat GPS), Update Terakhir (Stempel waktu update data terakhir).
+Dock panel bawah setinggi 120px yang menjadi pusat kontrol dan informasi telemetri utama saat armada dipilih:
+- **Tampilan Docked Bawah (Non-Occlusion):** Terletak di bawah kanvas peta live sehingga area peta 100% bebas rintangan tanpa ada jalan atau marker lain yang tertutup.
+- **Header Kompak (34px):** Bilah header dengan background putih bersih (`bg-white dark:bg-background`), pembatas `border-b border-gray-200 dark:border-gray-800`, nopol teks tebal monospace tanpa background badge (`font-mono text-xs font-black uppercase text-foreground`), badge status operasional, tab konteks bisnis (jika ada), tombol aksi (Playback, Bagikan, Street View, Maps, Tutup) berlatar putih dengan border abu-abu bersih (`border-gray-300 dark:border-gray-700`), dan tombol tutup (*X*).
+- **Grid 4 Kartu Metrik Modular / KPI Grid (Tinggi 74px):**
+  - **Kartu 1 (Kecepatan & Kontak Mesin):** Ikon speedometer, status kontak mesin (`ACC ON` hijau / `ACC OFF` merah), nilai kecepatan real-time (`font-mono text-xl font-black`), dan tipe kendaraan.
+  - **Kartu 2 (Pengemudi & Perangkat):** Ikon pengemudi, badge status `ONLINE`, nama pengemudi, dan nomor seri GPS (SN) beserta indikator sinyal WiFi.
+  - **Kartu 3 (Lokasi Terkini & Alamat):** Ikon penanda lokasi, peringatan alarm aktif, teks alamat ringkas 1-baris dengan tooltip, koordinat lintang & bujur (lat/lng), serta kota operasional.
+  - **Kartu 4 (Geofence & Navigasi):** Ikon geofence, sudut arah kompas/heading (`heading°`), nama geofence dengan badge status Dalam/Luar zona, serta stempel waktu pembaruan terakhir.
 
 ---
 

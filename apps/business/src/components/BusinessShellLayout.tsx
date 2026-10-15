@@ -35,7 +35,7 @@ import {
   CalendarDays, HardHat, CheckCircle,
   Shield, UserCheck, Search, AlertTriangle, History,
   Building, FolderKanban,
-  Database, Tag, BarChart2
+  Database, Tag, BarChart2, Siren
 } from 'lucide-react';
 import { AppShell, UIProvider } from '@adatrack/ui';
 import type { NavGroup, NavItem, UserInfo, Locale } from '@adatrack/types';
@@ -109,6 +109,7 @@ function buildNavigation(locale: Locale): NavGroup[] {
       items: [
         { id: 'safety', label: t.nav.safety, href: '/safety', icon: ShieldCheck },
         { id: 'incidents', label: t.nav.incidents, href: '/incidents', icon: CircleAlert },
+        { id: 'emergencyReports', label: t.nav.emergencyReports, href: '/safety/emergency-reports', icon: Siren },
       ],
     },
     {

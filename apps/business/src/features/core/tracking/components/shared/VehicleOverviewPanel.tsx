@@ -14,14 +14,15 @@ import {
   Share2,
   History,
   ExternalLink,
+  Hexagon,
 } from 'lucide-react';
 import { cn } from '@adatrack/utils';
-import { Button } from '@adatrack/ui';
 import type { Locale } from '@adatrack/types';
 import { getTranslation } from '../../../../../i18n';
 import type { TrackingVehicle, VehicleContext } from '../../types/tracking';
 import { ShareLocationDialog } from '../../../sharing/components/ShareLocationDialog';
 import { useShareLocation } from '../../../sharing/context/ShareLocationContext';
+import { CreateGeofenceFromVehicleModal } from './CreateGeofenceFromVehicleModal';
 
 interface VehicleOverviewPanelProps {
   vehicle: TrackingVehicle | null;
@@ -58,10 +59,10 @@ const STATUS_CONFIG = {
   },
   offline: {
     label: 'Offline',
-    color: 'text-neutral-500 dark:text-neutral-400',
-    bg: 'bg-neutral-100 dark:bg-neutral-800',
-    border: 'border-neutral-500/20',
-    dot: 'bg-neutral-400',
+    color: 'text-gray-500 dark:text-neutral-400',
+    bg: 'bg-gray-100 dark:bg-neutral-800',
+    border: 'border-gray-500/20',
+    dot: 'bg-gray-400',
   },
 } as const;
 
@@ -79,9 +80,20 @@ export function VehicleOverviewPanel({
 
   const t = getTranslation(locale);
   const tTracking = t.tracking;
-  const status = STATUS_CONFIG[vehicle.status] || STATUS_CONFIG.offline;
+  const statusLabels: Record<string, string> = {
+    driving: locale === 'en' ? 'Driving' : 'Berjalan',
+    idle: 'Idle',
+    parking: locale === 'en' ? 'Parking' : 'Parkir',
+    offline: 'Offline',
+  };
+  const baseStatus = STATUS_CONFIG[vehicle.status] || STATUS_CONFIG.offline;
+  const status = {
+    ...baseStatus,
+    label: statusLabels[vehicle.status] || baseStatus.label,
+  };
 
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [geofenceModalOpen, setGeofenceModalOpen] = useState(false);
   const shareContext = useShareLocation();
   const activeShare = shareContext?.getActiveSession(vehicle.id);
 
@@ -126,35 +138,32 @@ export function VehicleOverviewPanel({
 
   const coords = `${vehicle.location.lat.toFixed(4)}, ${vehicle.location.lng.toFixed(4)}`;
   const heading = vehicle.heading ?? 0;
-  const headingTitle = locale === 'id' ? `Arah: ${heading}°` : `Heading: ${heading}°`;
+  const headingTitle = locale === 'id' ? `Arah: ${heading}°` : `Heading: ${heading}°`; return (
+    <div
+      className={cn(
+        'flex flex-col h-full w-full bg-gray-50 dark:bg-neutral-950 select-none justify-between overflow-hidden relative animate-overview-in',
+        className
+      )}
+    >
+      {/* -- Row 1: Header Bar (34px) --------------------------------- */}
+      <div className="flex items-center justify-between gap-2 px-3 py-1 border-b border-gray-200 dark:border-neutral-800 bg-gray-50 dark:bg-neutral-900 shrink-0 h-[34px]">
 
-  return (
-    <div className={cn('flex flex-col h-full w-full bg-background select-none justify-between overflow-hidden relative animate-overview-in', className)}>
+        {/* Left: Plate + Status + Context Tabs */}
+        <div className="flex items-center gap-2.5 min-w-0">
 
-      {/* Telemetry connection beam indicator on vehicle switch */}
-      <div className="absolute top-0 left-0 right-0 h-[2px] overflow-hidden pointer-events-none z-20">
-        <div className="w-full h-full bg-gradient-to-r from-transparent via-red-600 dark:via-red-500 to-transparent animate-overview-scan" />
-      </div>
-
-      {/* -- Row 1: Compact Header Bar (32px) --------------------------------- */}
-      <div className="flex items-center justify-between gap-2 px-3 py-1 border-b border-border bg-surface/30 shrink-0 h-[34px]">
-
-        {/* Left: Plate + Name + Subtitle + Status + Context Tabs */}
-        <div className="flex items-center gap-2 min-w-0">
-          
-          {/* License Plate Badge */}
+          {/* License Plate (Bold Clean Monospace) */}
           <div
-            className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-neutral-900 text-white dark:bg-neutral-100 dark:text-neutral-900 shadow-xs border border-neutral-700/60 dark:border-neutral-300 shrink-0 animate-overview-badge"
+            className="flex items-center gap-1.5 shrink-0"
             title={headingTitle}
           >
             <svg
               viewBox="0 0 24 24"
-              className="w-2.5 h-2.5 fill-current transition-transform duration-300 ease-out"
+              className="w-2.5 h-2.5 fill-current text-gray-400 dark:text-neutral-500 transition-transform duration-300 ease-out"
               style={{ transform: `rotate(${heading}deg)` }}
             >
               <path d="M12 2L21 21L12 17L3 21L12 2Z" />
             </svg>
-            <span className="font-mono text-[10px] font-black tracking-wider uppercase">
+            <span className="font-mono text-xs font-bold tracking-wider uppercase text-foreground">
               {vehicle.plateNumber}
             </span>
           </div>
@@ -162,7 +171,7 @@ export function VehicleOverviewPanel({
           {/* Status Badge */}
           <span
             className={cn(
-              'inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-bold border shrink-0',
+              'inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-medium border shrink-0',
               status.bg,
               status.color,
               status.border
@@ -174,14 +183,14 @@ export function VehicleOverviewPanel({
 
           {/* Context Tab Switcher */}
           {vehicleContext && (
-            <div className="hidden sm:flex items-center h-full ml-2 shrink-0 gap-3 border-l border-border/60 pl-3">
+            <div className="hidden sm:flex items-center h-full ml-1 shrink-0 gap-2 border-l border-gray-200 dark:border-neutral-800 pl-2">
               <button
                 type="button"
                 onClick={() => setActiveTab('umum')}
                 className={cn(
-                  "h-full text-[10px] transition-colors border-b-2 -mb-[1px] flex items-center justify-center px-1 font-semibold",
+                  "h-full text-[10px] transition-colors border-b-2 -mb-[1px] flex items-center justify-center px-1 font-medium",
                   activeTab === 'umum'
-                    ? "border-red-600 text-foreground"
+                    ? "border-red-600 text-foreground font-semibold"
                     : "border-transparent text-foreground-muted hover:text-foreground"
                 )}
               >
@@ -191,9 +200,9 @@ export function VehicleOverviewPanel({
                 type="button"
                 onClick={() => setActiveTab('context')}
                 className={cn(
-                  "h-full text-[10px] transition-colors border-b-2 -mb-[1px] flex items-center justify-center px-1 font-semibold",
+                  "h-full text-[10px] transition-colors border-b-2 -mb-[1px] flex items-center justify-center px-1 font-medium",
                   activeTab === 'context'
-                    ? "border-red-600 text-foreground"
+                    ? "border-red-600 text-foreground font-semibold"
                     : "border-transparent text-foreground-muted hover:text-foreground"
                 )}
               >
@@ -205,211 +214,223 @@ export function VehicleOverviewPanel({
 
         {/* Right: Actions */}
         <div className="flex items-center gap-1 shrink-0">
-          <Button
+          {/* 1. Playback */}
+          <button
             type="button"
             onClick={onPlayback}
-            variant="outline"
-            size="sm"
-            className="rounded shadow-xs text-[11px] font-semibold h-6 px-2.5 border-red-500/35 text-red-600 bg-red-50/60 hover:bg-red-100/70 dark:bg-red-950/20 dark:text-red-400 dark:border-red-500/35 transition-colors"
-            leftIcon={<History className="w-3 h-3 text-red-600 dark:text-red-400 shrink-0" />}
+            title={tTracking.popupPlayback}
+            className="flex items-center gap-1.5 h-6 px-2.5 rounded border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-neutral-700 text-[11px] font-medium transition-colors focus:outline-none"
           >
-            {tTracking.popupPlayback}
-          </Button>
+            <History className="w-3 h-3 shrink-0 text-gray-500 dark:text-neutral-400" />
+            <span className="hidden sm:inline">{tTracking.popupPlayback}</span>
+          </button>
 
-          {activeShare ? (
-            <Button
-              type="button"
-              onClick={() => setShareDialogOpen(true)}
-              variant="outline"
-              size="sm"
-              className="rounded border-emerald-500/30 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 text-[11px] font-semibold h-6 px-2"
-              leftIcon={<Share2 className="w-3 h-3 fill-current shrink-0" />}
-            >
-              {locale === 'id' ? 'Dibagikan' : 'Shared'}
-            </Button>
-          ) : (
-            <Button
-              type="button"
-              onClick={() => {
-                if (onShareLocation) onShareLocation();
-                setShareDialogOpen(true);
-              }}
-              variant="outline"
-              size="sm"
-              className="rounded text-[11px] font-semibold border-border h-6 px-2 text-foreground hover:bg-muted"
-              leftIcon={<Share2 className="w-3 h-3 shrink-0" />}
-            >
-              {locale === 'id' ? 'Bagikan' : 'Share'}
-            </Button>
-          )}
+          {/* 2. Create Geofence */}
+          <button
+            type="button"
+            onClick={() => setGeofenceModalOpen(true)}
+            title={locale === 'id' ? 'Buat Geofence' : 'Create Geofence'}
+            className="flex items-center gap-1.5 h-6 px-2 rounded border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-neutral-700 text-[11px] font-medium transition-colors focus:outline-none"
+          >
+            <Hexagon className="w-3 h-3 shrink-0 text-gray-500 dark:text-neutral-400" />
+            <span className="hidden sm:inline">Geofence</span>
+          </button>
 
-          <Button
+          {/* 3. Google Maps */}
+          <button
+            type="button"
+            onClick={() => {
+              const url = `https://www.google.com/maps?q=${vehicle.location.lat},${vehicle.location.lng}`;
+              window.open(url, '_blank', 'noopener,noreferrer');
+            }}
+            title={locale === 'id' ? 'Buka Google Maps' : 'Open Google Maps'}
+            className="flex items-center gap-1.5 h-6 px-2 rounded border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-neutral-700 text-[11px] font-medium transition-colors focus:outline-none"
+          >
+            <ExternalLink className="w-3 h-3 shrink-0 text-gray-500 dark:text-neutral-400" />
+            <span className="hidden sm:inline">Maps</span>
+          </button>
+
+          {/* 4. Google Maps Street View */}
+          <button
             type="button"
             onClick={() => {
               const streetViewUrl = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${vehicle.location.lat},${vehicle.location.lng}${heading !== undefined ? `&heading=${heading}` : ''}`;
               window.open(streetViewUrl, '_blank', 'noopener,noreferrer');
             }}
             title="Google Maps Street View"
-            aria-label="Google Maps Street View"
-            variant="outline"
-            size="sm"
-            className="rounded text-[11px] font-semibold border-border text-foreground hover:bg-muted h-6 px-2"
-            leftIcon={
-              <svg viewBox="0 0 24 24" className="w-3 h-3 fill-current shrink-0">
-                <circle cx="12" cy="4.5" r="2.5" />
-                <path d="M15 8.5H9c-1.1 0-2 .9-2 2v4.5h2v6h2v-6h2v6h2v-6h2v-4.5c0-1.1-.9-2-2-2z" />
-              </svg>
-            }
+            className="flex items-center gap-1.5 h-6 px-2 rounded border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-neutral-700 text-[11px] font-medium transition-colors focus:outline-none"
           >
-            Street
-          </Button>
+            <svg viewBox="0 0 24 24" className="w-3 h-3 fill-current shrink-0 text-gray-500 dark:text-neutral-400">
+              <circle cx="12" cy="4.5" r="2.5" />
+              <path d="M15 8.5H9c-1.1 0-2 .9-2 2v4.5h2v6h1.5v-5.5h3v5.5H15v-6h2v-4.5c0-1.1-.9-2-2-2z" />
+            </svg>
+            <span className="hidden sm:inline">Street</span>
+          </button>
 
-          <Button
+          {/* 5. Share Location (Bagikan) */}
+          <button
             type="button"
             onClick={() => {
-              const url = `https://www.google.com/maps?q=${vehicle.location.lat},${vehicle.location.lng}`;
-              window.open(url, '_blank', 'noopener,noreferrer');
+              if (onShareLocation) onShareLocation();
+              setShareDialogOpen(true);
             }}
-            title="Google Maps"
-            aria-label="Google Maps"
-            variant="outline"
-            size="sm"
-            className="rounded text-[11px] font-semibold border-border text-foreground hover:bg-muted h-6 px-2"
-            leftIcon={<ExternalLink className="w-3 h-3 shrink-0" />}
+            title={activeShare ? (locale === 'id' ? 'Tautan Dibagikan (Aktif)' : 'Shared Link (Active)') : (locale === 'id' ? 'Bagikan Lokasi' : 'Share Location')}
+            className={cn(
+              "flex items-center gap-1.5 h-6 px-2 rounded border text-[11px] font-medium transition-colors focus:outline-none",
+              activeShare
+                ? "border-emerald-500/40 bg-emerald-50/40 text-gray-700 dark:bg-emerald-950/20 dark:text-neutral-300"
+                : "border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-neutral-700"
+            )}
           >
-            Maps
-          </Button>
+            <Share2 className={cn("w-3 h-3 shrink-0", activeShare ? "text-emerald-600 dark:text-emerald-400 fill-current" : "text-gray-500 dark:text-neutral-400")} />
+            <span className="hidden sm:inline">{activeShare ? (locale === 'id' ? 'Dibagikan' : 'Shared') : (locale === 'id' ? 'Bagikan' : 'Share')}</span>
+          </button>
 
-          <div className="h-3.5 w-px bg-border mx-0.5 hidden sm:block" />
+          <div className="h-3.5 w-px bg-gray-200 dark:bg-neutral-800 mx-0.5 hidden sm:block" />
 
+          {/* 6. Close button (X) */}
           <button
             type="button"
             onClick={onClose}
-            className="flex h-6 w-6 items-center justify-center rounded border border-border text-foreground-muted hover:bg-neutral-100 hover:text-foreground dark:hover:bg-neutral-800 transition-colors focus:outline-none"
-            aria-label="Tutup"
+            className="flex h-6 w-6 items-center justify-center rounded border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-neutral-700 transition-colors focus:outline-none"
+            aria-label={locale === 'id' ? 'Tutup' : 'Close'}
+            title={locale === 'id' ? 'Tutup (Esc)' : 'Close (Esc)'}
           >
-            <X className="w-3 h-3" />
+            <X className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
 
-      {/* -- Row 2: Compact Telemetry Strip ----------------------------------- */}
+      {/* -- Row 2: Modular KPI Cards Grid ---------------------------- */}
       <div className="flex-1 px-3 py-1.5 overflow-hidden flex flex-col justify-center">
         {activeTab === 'umum' ? (
-          <div className="h-[88px] min-h-[88px] max-h-[88px] grid grid-cols-2 md:grid-cols-4 divide-x divide-border/50 bg-surface/50 rounded-lg animate-overview-tab">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-2.5 h-[74px] animate-overview-tab">
 
-            {/* Col 1: Driver, Speed, ACC */}
-            <div className="flex flex-col justify-between py-1.5 px-3 min-w-0">
+            {/* KPI Card 1: Speed & Ignition */}
+            <div className="bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg p-2 flex flex-col justify-between min-w-0 transition-all hover:border-gray-300 dark:hover:border-neutral-600">
               <div className="flex items-center justify-between gap-1">
-                <span className="text-[10px] text-foreground-muted font-medium flex items-center gap-1 truncate">
-                  <User className="w-3.5 h-3.5 text-foreground-subtle shrink-0" />
-                  <strong className="text-foreground truncate">{vehicle.driverName || '-'}</strong>
+                <span className="text-[10px] font-bold text-gray-500 dark:text-neutral-400 flex items-center gap-1 uppercase tracking-wider">
+                  <Gauge className="w-3 h-3 text-primary shrink-0" />
+                  {locale === 'id' ? 'Kecepatan' : 'Speed'}
                 </span>
                 {vehicle.acc !== undefined && (
                   <span
                     className={cn(
-                      "text-[9px] font-bold px-1.5 py-0.5 rounded uppercase shrink-0 border",
+                      "text-[9px] font-bold px-1.5 py-[1px] rounded uppercase shrink-0 border leading-none tracking-wide",
                       vehicle.acc
-                        ? "text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/20"
-                        : "text-danger bg-danger/10 border-danger/20"
+                        ? "text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500/30"
+                        : "text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 border-rose-500/30"
                     )}
                   >
                     ACC {vehicle.acc ? 'ON' : 'OFF'}
                   </span>
                 )}
               </div>
-              <div className="flex items-baseline gap-1.5 my-0.5">
-                <Gauge className="w-3.5 h-3.5 text-primary shrink-0 self-center" />
-                <span className="text-lg font-black font-mono tracking-tight text-foreground leading-none">
+              <div className="flex items-baseline gap-1 my-0.5">
+                <span className="text-xl font-black font-mono tracking-tight text-foreground leading-none">
                   {vehicle.speed}
                 </span>
-                <span className="text-[11px] font-bold text-foreground-muted">km/h</span>
+                <span className="text-[10px] font-bold text-gray-500 dark:text-neutral-400">km/h</span>
               </div>
-              <span className="text-[10px] text-foreground-muted truncate">
-                Tipe: <strong className="text-foreground font-semibold">{vehicle.vehicleType || '-'}</strong>
-              </span>
+              <div className="flex items-center gap-1 text-[10px] text-gray-500 dark:text-neutral-400 truncate">
+                <span>{locale === 'id' ? 'Tipe:' : 'Type:'}</span>
+                <span className="font-semibold text-foreground truncate">{vehicle.vehicleType || '-'}</span>
+              </div>
             </div>
 
-            {/* Col 2: Address & Alarm */}
-            <div className="flex flex-col justify-between py-1.5 px-3 min-w-0">
+            {/* KPI Card 2: Driver & Hardware */}
+            <div className="bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg p-2 flex flex-col justify-between min-w-0 transition-all hover:border-gray-300 dark:hover:border-neutral-600">
               <div className="flex items-center justify-between gap-1">
-                <span className="text-[10px] text-foreground-muted font-medium flex items-center gap-1 truncate">
-                  <MapPin className="w-3.5 h-3.5 text-accent shrink-0" />
-                  <span className="font-semibold">{tTracking.popupAddress}</span>
+                <span className="text-[10px] font-bold text-gray-500 dark:text-neutral-400 flex items-center gap-1 uppercase tracking-wider">
+                  <User className="w-3 h-3 text-primary shrink-0" />
+                  {locale === 'id' ? 'Pengemudi' : 'Driver'}
+                </span>
+                <span className="text-[9px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-500/30 px-1.5 py-[1px] rounded leading-none shrink-0">
+                  ONLINE
+                </span>
+              </div>
+              <div className="font-bold text-xs text-foreground truncate my-0.5" title={vehicle.driverName || (locale === 'id' ? 'Tidak Ada Pengemudi' : 'No Driver')}>
+                {vehicle.driverName || (locale === 'id' ? 'Tidak Ada Pengemudi' : 'No Driver')}
+              </div>
+              <div className="flex items-center gap-1 text-[10px] font-mono text-gray-500 dark:text-neutral-400 truncate">
+                <Wifi className="w-3 h-3 text-emerald-500 shrink-0" />
+                <span className="truncate">SN: {vehicle.gpsSerialNumber || '-'}</span>
+              </div>
+            </div>
+
+            {/* KPI Card 3: Location & Address */}
+            <div className="bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg p-2 flex flex-col justify-between min-w-0 transition-all hover:border-gray-300 dark:hover:border-neutral-600">
+              <div className="flex items-center justify-between gap-1">
+                <span className="text-[10px] font-bold text-gray-500 dark:text-neutral-400 flex items-center gap-1 uppercase tracking-wider">
+                  <MapPin className="w-3 h-3 text-rose-500 shrink-0" />
+                  {locale === 'id' ? 'Lokasi Terkini' : 'Current Location'}
                 </span>
                 {vehicle.alarmEvent && vehicle.alarmEvent !== '-' && (
-                  <span className="text-[9px] font-bold text-danger bg-danger/10 border border-danger/20 px-1.5 py-0.5 rounded truncate">
+                  <span className="text-[9px] font-bold text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 border border-rose-500/30 px-1.5 py-[1px] rounded truncate leading-none">
                     {vehicle.alarmEvent}
                   </span>
                 )}
               </div>
               <p
-                className="text-[11px] font-medium text-foreground leading-snug line-clamp-1 my-0.5"
+                className="text-[11px] font-medium text-foreground leading-tight line-clamp-1 my-0.5"
                 title={vehicle.location.address}
               >
                 {vehicle.location.address || '-'}
               </p>
-              <div className="flex items-center gap-1 text-[10px] font-mono text-foreground-muted truncate">
-                <Crosshair className="w-3 h-3 text-foreground-subtle shrink-0" />
-                <span className="truncate">{coords}</span>
+              <div className="flex items-center justify-between gap-1 text-[10px] truncate">
+                <span className="flex items-center gap-1 font-mono text-gray-500 dark:text-neutral-400 truncate">
+                  <Crosshair className="w-3 h-3 text-gray-400 shrink-0" />
+                  <span className="truncate">{coords}</span>
+                </span>
+                {vehicle.city && (
+                  <span className="font-medium text-foreground-muted shrink-0 text-[10px] hidden sm:inline">
+                    {vehicle.city}
+                  </span>
+                )}
               </div>
             </div>
 
-            {/* Col 3: Geofence & Heading */}
-            <div className="flex flex-col justify-between py-1.5 px-3 min-w-0">
+            {/* KPI Card 4: Geofence & Heading */}
+            <div className="bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg p-2 flex flex-col justify-between min-w-0 transition-all hover:border-gray-300 dark:hover:border-neutral-600">
               <div className="flex items-center justify-between gap-1">
-                <span className="text-[10px] text-foreground-muted font-medium flex items-center gap-1 truncate">
-                  <SquareDashedBottom className="w-3.5 h-3.5 text-sky-500 shrink-0" />
-                  <strong className="text-foreground truncate">
-                    {vehicle.geofenceName && vehicle.geofenceName !== '-' ? vehicle.geofenceName : 'Luar Geofence'}
-                  </strong>
+                <span className="text-[10px] font-bold text-gray-500 dark:text-neutral-400 flex items-center gap-1 uppercase tracking-wider">
+                  <SquareDashedBottom className="w-3 h-3 text-sky-500 shrink-0" />
+                  Geofence
                 </span>
-                <span className="text-[9px] font-mono font-bold text-foreground-muted shrink-0 flex items-center gap-0.5">
+                <span className={cn(
+                  "text-[9px] font-bold px-1.5 py-[1px] rounded uppercase shrink-0 border leading-none",
+                  vehicle.geofenceName && vehicle.geofenceName !== '-'
+                    ? "text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500/30"
+                    : "text-gray-500 dark:text-neutral-400 bg-gray-100 dark:bg-neutral-800 border-gray-200 dark:border-neutral-700"
+                )}>
+                  {vehicle.geofenceName && vehicle.geofenceName !== '-' ? (locale === 'id' ? 'Dalam' : 'Inside') : (locale === 'id' ? 'Luar' : 'Outside')}
+                </span>
+              </div>
+              <div className="flex items-center justify-between gap-1.5 my-0.5 min-w-0">
+                <span className="font-bold text-xs text-foreground truncate" title={vehicle.geofenceName || (locale === 'id' ? 'Luar Geofence' : 'Outside Geofence')}>
+                  {vehicle.geofenceName && vehicle.geofenceName !== '-' ? vehicle.geofenceName : (locale === 'id' ? 'Luar Geofence' : 'Outside Geofence')}
+                </span>
+                <span className="inline-flex items-center gap-1 shrink-0 font-mono font-bold text-[11px] text-foreground bg-gray-100 dark:bg-neutral-700 px-1.5 py-[2px] rounded border border-gray-200 dark:border-neutral-700 leading-none" title={headingTitle}>
                   <svg
                     viewBox="0 0 24 24"
-                    className="w-3 h-3 fill-current text-primary"
+                    className="w-2.5 h-2.5 fill-current text-primary shrink-0 transition-transform duration-300"
                     style={{ transform: `rotate(${heading}deg)` }}
                   >
                     <path d="M12 2L21 21L12 17L3 21L12 2Z" />
                   </svg>
-                  {heading}°
+                  <span>{heading}°</span>
                 </span>
               </div>
-              <div className="flex items-center gap-1.5 text-[10px] text-foreground-muted my-0.5 truncate">
-                <Layers className="w-3.5 h-3.5 text-foreground-subtle shrink-0" />
-                <span className="truncate">{vehicle.geofenceArea && vehicle.geofenceArea !== '-' ? vehicle.geofenceArea : '-'}</span>
-              </div>
-              <span className="text-[10px] text-foreground-muted truncate">
-                Status: <strong className={vehicle.geofenceName && vehicle.geofenceName !== '-' ? 'text-emerald-600 dark:text-emerald-400' : 'text-foreground-muted'}>
-                  {vehicle.geofenceName && vehicle.geofenceName !== '-' ? 'Di Dalam Area' : 'Di Luar Area'}
-                </strong>
-              </span>
-            </div>
-
-            {/* Col 4: Coordinates, GPS SN, Last Update */}
-            <div className="flex flex-col justify-between py-1.5 px-3 min-w-0">
-              <div className="flex items-center justify-between gap-1">
-                <span className="text-[10px] text-foreground-muted font-medium flex items-center gap-1 truncate">
-                  <Wifi className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                  <span className="font-mono font-bold text-foreground">{vehicle.gpsSerialNumber || '-'}</span>
-                </span>
-                <span className="text-[9px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-1.5 py-0.2 rounded border border-emerald-500/20">
-                  ONLINE
-                </span>
-              </div>
-              <div className="flex items-center gap-1.5 text-[10px] font-mono text-foreground-muted my-0.5 truncate">
-                <Clock className="w-3.5 h-3.5 text-foreground-subtle shrink-0" />
+              <div className="flex items-center gap-1 text-[10px] font-mono text-gray-500 dark:text-neutral-400 truncate">
+                <Clock className="w-3 h-3 text-gray-400 shrink-0" />
                 <span className="truncate">{formattedDate}</span>
-              </div>
-              <div className="text-[10px] text-foreground-muted truncate">
-                Kota: <strong className="text-foreground font-semibold">{vehicle.city || '-'}</strong>
               </div>
             </div>
 
           </div>
         ) : (
-          /* Context Data View (Compact) */
-          <div className="h-[88px] min-h-[88px] max-h-[88px] grid grid-cols-2 md:grid-cols-4 divide-x divide-border/50 bg-surface/50 rounded-lg animate-overview-tab">
+          /* Context Data View (Matching 4 Modular KPI Cards) */
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-2.5 h-[74px] animate-overview-tab">
             {(() => {
               const items = vehicleContext?.data || [];
               const perCol = Math.ceil(items.length / 4);
@@ -418,18 +439,18 @@ export function VehicleOverviewPanel({
                 return (
                   <div
                     key={colIndex}
-                    className="flex flex-col justify-center px-2.5 py-0.5 min-w-0"
+                    className="bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg p-2 flex flex-col justify-center min-w-0"
                   >
                     {chunk.map((field, idx) => (
-                      <div key={idx} className="flex items-center justify-between gap-1 min-w-0 py-0.2">
-                        <span className="text-[9px] font-medium text-foreground-muted truncate">
+                      <div key={idx} className="flex items-center justify-between gap-1 min-w-0 py-0.5">
+                        <span className="text-[10px] font-medium text-gray-500 dark:text-neutral-400 truncate">
                           {field.label}:
                         </span>
                         <span className={cn(
-                          "text-[10px] font-bold truncate text-foreground",
+                          "text-xs font-bold truncate text-foreground",
                           field.type === 'status' && field.value === 'RENTED' && 'text-primary',
-                          field.type === 'status' && field.value === 'READY' && 'text-success',
-                          field.type === 'status' && field.value === 'RESERVED' && 'text-warning',
+                          field.type === 'status' && field.value === 'READY' && 'text-emerald-600 dark:text-emerald-400',
+                          field.type === 'status' && field.value === 'RESERVED' && 'text-amber-600 dark:text-amber-400',
                           field.type === 'currency' && 'text-accent font-extrabold'
                         )}>
                           {field.value}
@@ -448,6 +469,13 @@ export function VehicleOverviewPanel({
         vehicle={vehicle}
         open={shareDialogOpen}
         onOpenChange={setShareDialogOpen}
+      />
+
+      <CreateGeofenceFromVehicleModal
+        isOpen={geofenceModalOpen}
+        onClose={() => setGeofenceModalOpen(false)}
+        vehicle={vehicle}
+        locale={locale}
       />
     </div>
   );

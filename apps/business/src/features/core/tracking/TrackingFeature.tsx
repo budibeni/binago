@@ -185,7 +185,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
   React.useEffect(() => {
     if (typeof window === 'undefined') return;
     if (initializedRef.current) return;
-    
+
     const navState = trackingNavigationService.getState();
     if (!navState) {
       // Default: no state, show all live vehicles
@@ -501,10 +501,13 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
 
   // --- Vehicle selection handlers ------------------------------------------------------------------
 
-  // Handler saat kendaraan diklik dari peta (marker) -> HANYA update data tanpa zoom/pan kamera
+  // Handler saat kendaraan diklik dari peta (marker/search) -> HANYA update data tanpa zoom/pan kamera
   const handleMapVehicleSelect = React.useCallback((vehicleId: string | null) => {
     setFocusedVehicleId(vehicleId);
     setSelectedVehicleId(vehicleId);
+    if (vehicleId) {
+      setSelectedVehicleIds((prev: string[]) => (prev.includes(vehicleId) ? prev : [...prev, vehicleId]));
+    }
     setPanToVehicleId(undefined);
   }, []);
 
@@ -710,33 +713,33 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
 
     const originLocation: RouteLocation = startGf
       ? {
-          type: 'geofence',
-          geofenceId: startGf.id,
-          latitude: startPt.lat,
-          longitude: startPt.lng,
-          address: startGf.name,
-        }
+        type: 'geofence',
+        geofenceId: startGf.id,
+        latitude: startPt.lat,
+        longitude: startPt.lng,
+        address: startGf.name,
+      }
       : {
-          type: 'coordinate',
-          latitude: startPt.lat,
-          longitude: startPt.lng,
-          address: startPt.address ?? `${startPt.lat.toFixed(5)}, ${startPt.lng.toFixed(5)}`,
-        };
+        type: 'coordinate',
+        latitude: startPt.lat,
+        longitude: startPt.lng,
+        address: startPt.address ?? `${startPt.lat.toFixed(5)}, ${startPt.lng.toFixed(5)}`,
+      };
 
     const destLocation: RouteLocation = endGf
       ? {
-          type: 'geofence',
-          geofenceId: endGf.id,
-          latitude: endPt.lat,
-          longitude: endPt.lng,
-          address: endGf.name,
-        }
+        type: 'geofence',
+        geofenceId: endGf.id,
+        latitude: endPt.lat,
+        longitude: endPt.lng,
+        address: endGf.name,
+      }
       : {
-          type: 'coordinate',
-          latitude: endPt.lat,
-          longitude: endPt.lng,
-          address: endPt.address ?? `${endPt.lat.toFixed(5)}, ${endPt.lng.toFixed(5)}`,
-        };
+        type: 'coordinate',
+        latitude: endPt.lat,
+        longitude: endPt.lng,
+        address: endPt.address ?? `${endPt.lat.toFixed(5)}, ${endPt.lng.toFixed(5)}`,
+      };
 
     const stopsInRange = (playbackParkingEvents || []).filter(
       (p) => p.pointIndex >= s && p.pointIndex <= e
@@ -751,18 +754,18 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
         sequence: i + 1,
         location: stopGf
           ? {
-              type: 'geofence',
-              geofenceId: stopGf,
-              latitude: p.lat,
-              longitude: p.lng,
-              address: p.geofenceName,
-            }
+            type: 'geofence',
+            geofenceId: stopGf,
+            latitude: p.lat,
+            longitude: p.lng,
+            address: p.geofenceName,
+          }
           : {
-              type: 'coordinate',
-              latitude: p.lat,
-              longitude: p.lng,
-              address: p.address,
-            },
+            type: 'coordinate',
+            latitude: p.lat,
+            longitude: p.lng,
+            address: p.address,
+          },
       };
     });
 
@@ -816,7 +819,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
 
   // â"€â"€ Render â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
   return (
-    <div className="flex h-full w-full overflow-hidden bg-surface">
+    <div className="flex h-full w-full overflow-hidden bg-background">
 
       {/* Main Area: Map & Playback */}
       <div className="flex-1 flex flex-col h-full min-w-0 relative bg-background">
@@ -907,74 +910,75 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
           />
         )}
 
-        {/* Mode Toggle (hidden in non-map views) */}
-        <div className={cn("absolute top-3 left-3 sm:top-4 sm:left-4 z-20 transition-all duration-500 ease-out", view !== 'map' && 'opacity-0 translate-y-[-10px] pointer-events-none')}>
-          <div
-            className="flex items-center bg-background rounded-lg border border-border shadow-lg p-0.5 gap-0.5"
-            role="tablist"
-            aria-label="Mode Pemantauan"
-          >
-            {/* Tab: Live */}
-            <button
-              role="tab"
-              type="button"
-              aria-selected={mode === 'live'}
-              onClick={() => setMode('live')}
-              className={cn(
-                'flex items-center justify-center h-7 px-2.5 rounded-md text-[12px] font-medium transition-all gap-1.5',
-                mode === 'live'
-                  ? 'bg-accent/10 text-accent'
-                  : 'text-foreground-muted hover:bg-surface hover:text-foreground'
-              )}
-            >
-              {/* Live Dot Icon */}
-              <svg className={cn("h-3.5 w-3.5 shrink-0", mode === 'live' ? "text-accent" : "text-foreground-muted")} viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-                <circle cx="8" cy="8" r="6" fill="currentColor" />
-                <circle cx="8" cy="8" r="2" fill="white" />
-              </svg>
-              {tTracking.modeLive}
-            </button>
+        {/* Wrapper for Map and Playback Sidebar with Padding / Margin */}
+        <div className={cn("flex-1 flex min-h-0 relative w-full p-2 sm:p-2.5", view !== 'map' && 'hidden')}>
+          {/* Map Area Wrapper (Card with Sharp Solid Gray Border) */}
+          <div className="flex-1 flex flex-col min-w-0 relative rounded-lg border border-gray-300 dark:border-neutral-700 bg-card overflow-hidden">
 
-            {/* Tab: Playback */}
-            <button
-              role="tab"
-              type="button"
-              aria-selected={mode === 'playback'}
-              onClick={() => setMode('playback')}
-              className={cn(
-                'flex items-center justify-center h-7 px-2.5 rounded-md text-[12px] font-medium transition-all gap-1.5',
-                mode === 'playback'
-                  ? 'bg-accent/10 text-accent'
-                  : 'text-foreground-muted hover:bg-surface hover:text-foreground'
-              )}
-            >
-              <History className={cn("h-3.5 w-3.5 shrink-0", mode === 'playback' ? "text-accent" : "text-foreground-muted")} aria-hidden="true" strokeWidth={2.5} />
-              {tTracking.modePlayback}
-            </button>
+            {/* Mode Toggle (Floating inside Map Card - Clean Crisp Gray Border) */}
+            <div className="absolute top-3 left-3 z-20 transition-all duration-300 ease-out">
+              <div
+                className="flex items-center bg-background rounded-lg border border-gray-300 dark:border-neutral-700 p-0.5 gap-0.5"
+                role="tablist"
+                aria-label="Mode Pemantauan"
+              >
+                {/* Tab: Live */}
+                <button
+                  role="tab"
+                  type="button"
+                  aria-selected={mode === 'live'}
+                  onClick={() => setMode('live')}
+                  className={cn(
+                    'flex items-center justify-center h-7 px-2.5 rounded-md text-[12px] font-medium transition-all gap-1.5',
+                    mode === 'live'
+                      ? 'bg-accent/10 text-accent font-semibold'
+                      : 'text-foreground-muted hover:bg-surface hover:text-foreground'
+                  )}
+                >
+                  {/* Live Dot Icon */}
+                  <svg className={cn("h-3.5 w-3.5 shrink-0", mode === 'live' ? "text-accent" : "text-foreground-muted")} viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                    <circle cx="8" cy="8" r="6" fill="currentColor" />
+                    <circle cx="8" cy="8" r="2" fill="white" />
+                  </svg>
+                  {tTracking.modeLive}
+                </button>
 
-            {/* Tab: Heatmap */}
-            <button
-              role="tab"
-              type="button"
-              aria-selected={mode === 'heatmap'}
-              onClick={() => setMode('heatmap')}
-              className={cn(
-                'flex items-center justify-center h-7 px-2.5 rounded-md text-[12px] font-medium transition-all gap-1.5',
-                mode === 'heatmap'
-                  ? 'bg-accent/10 text-accent'
-                  : 'text-foreground-muted hover:bg-surface hover:text-foreground'
-              )}
-            >
-              <MapPin className={cn("h-3.5 w-3.5 shrink-0", mode === 'heatmap' ? "text-accent" : "text-foreground-muted")} aria-hidden="true" strokeWidth={2.5} />
-              {tTracking.modeHeatmap}
-            </button>
-          </div>
-        </div>
+                {/* Tab: Playback */}
+                <button
+                  role="tab"
+                  type="button"
+                  aria-selected={mode === 'playback'}
+                  onClick={() => setMode('playback')}
+                  className={cn(
+                    'flex items-center justify-center h-7 px-2.5 rounded-md text-[12px] font-medium transition-all gap-1.5',
+                    mode === 'playback'
+                      ? 'bg-accent/10 text-accent font-semibold'
+                      : 'text-foreground-muted hover:bg-surface hover:text-foreground'
+                  )}
+                >
+                  <History className={cn("h-3.5 w-3.5 shrink-0", mode === 'playback' ? "text-accent" : "text-foreground-muted")} aria-hidden="true" strokeWidth={2.5} />
+                  {tTracking.modePlayback}
+                </button>
 
-        {/* Wrapper for Map and Playback Sidebar */}
-        <div className={cn("flex-1 flex min-h-0 relative w-full", view !== 'map' && 'hidden')}>
-          {/* Map Area Wrapper */}
-          <div className="flex-1 flex flex-col min-w-0 relative">
+                {/* Tab: Heatmap */}
+                <button
+                  role="tab"
+                  type="button"
+                  aria-selected={mode === 'heatmap'}
+                  onClick={() => setMode('heatmap')}
+                  className={cn(
+                    'flex items-center justify-center h-7 px-2.5 rounded-md text-[12px] font-medium transition-all gap-1.5',
+                    mode === 'heatmap'
+                      ? 'bg-accent/10 text-accent font-semibold'
+                      : 'text-foreground-muted hover:bg-surface hover:text-foreground'
+                  )}
+                >
+                  <MapPin className={cn("h-3.5 w-3.5 shrink-0", mode === 'heatmap' ? "text-accent" : "text-foreground-muted")} aria-hidden="true" strokeWidth={2.5} />
+                  {tTracking.modeHeatmap}
+                </button>
+              </div>
+            </div>
+
             {/* Map Area: Live (always mounted, hidden in playback mode or table view) */}
             <div className={cn('flex-1 relative', (mode !== 'live' || view !== 'map') && 'hidden')}>
               <LiveMap
@@ -987,6 +991,8 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
                 onPlaybackRequest={handlePlaybackRequest}
                 focusedVehicleId={focusedVehicleId || selectedVehicleId}
                 onFocusVehicleChange={setFocusedVehicleId}
+                isOverviewVisible={Boolean(mode === 'live' && view === 'map' && activeVehicle)}
+                locale={locale}
               />
             </div>
 
@@ -1087,20 +1093,25 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
           />
         </div>
 
-
-        {/* Bottom Overview Panel (Live Mode) */}
+        {/* Bottom Overview Panel (Live Mode - Docked) */}
         <div
           className={cn(
-            'shrink-0 bg-background transition-all duration-300 ease-in-out',
-            (mode === 'live' && activeVehicle) ? 'h-[135px] border-t border-border opacity-100 translate-y-0' : 'h-0 opacity-0 translate-y-10 pointer-events-none overflow-hidden'
+            'shrink-0 bg-gray-100 dark:bg-neutral-900 transition-all duration-300 ease-in-out relative z-20',
+            (mode === 'live' && view === 'map' && activeVehicle)
+              ? 'h-[120px] border-t border-gray-200 dark:border-neutral-800 opacity-100 translate-y-0'
+              : 'h-0 opacity-0 translate-y-10 pointer-events-none overflow-hidden'
           )}
-          aria-hidden={mode !== 'live' || !activeVehicle}
+          aria-hidden={mode !== 'live' || view !== 'map' || !activeVehicle}
         >
           {activeVehicle && (
             <VehicleOverviewPanel
               key={activeVehicle.id}
               vehicle={activeVehicle}
-              onClose={() => handleVehicleSelect(null)}
+              onClose={() => {
+                setSelectedVehicleId(null);
+                setFocusedVehicleId(null);
+                setPanToVehicleId(undefined);
+              }}
               locale={locale}
               onPlayback={() => handlePlaybackRequest(activeVehicle.id)}
               onShareLocation={() => console.log('Share clicked', activeVehicle.id)}
@@ -1109,7 +1120,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
         </div>
 
         {/* Tab Navigation (Map | Table) - Classic Design at Bottom */}
-        <div className="shrink-0 flex items-center justify-start border-t border-border bg-surface w-full px-4 h-[34px] z-10">
+        <div className="shrink-0 flex items-center justify-start border-t border-gray-200 dark:border-neutral-800 bg-background w-full px-4 h-[34px] z-10">
           <button
             type="button"
             onClick={() => {
@@ -1157,8 +1168,8 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
           className={cn(
             'shrink-0 h-full z-10 transition-all duration-300 ease-in-out flex flex-col',
             isVehicleListVisible
-              ? 'w-[320px] border-l border-neutral-200 dark:border-neutral-800 bg-background'
-              : 'w-[34px] py-2 items-center bg-transparent border-l border-neutral-200 dark:border-neutral-800'
+              ? 'w-[320px] border-l border-gray-200 dark:border-neutral-800 bg-background'
+              : 'w-[34px] py-2 items-center bg-transparent border-l border-gray-200 dark:border-neutral-800'
           )}
         >
           {isVehicleListVisible ? (
@@ -1185,7 +1196,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
                 type="button"
                 onClick={() => setIsVehicleListVisible(true)}
                 className="flex h-6 w-6 items-center justify-center text-foreground-muted hover:text-foreground transition-colors focus:outline-none shrink-0"
-                title="Buka Panel Pemantauan"
+                title={tTracking.showPanel}
               >
                 <ChevronLeft className="h-3.5 w-3.5" />
               </button>
@@ -1195,7 +1206,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
                 type="button"
                 onClick={() => setIsVehicleListVisible(true)}
                 className="flex flex-col items-center py-2 px-0.5 text-foreground group shrink-0 transition-opacity hover:opacity-80"
-                title="Buka Pemantauan"
+                title={tTracking.showPanel}
               >
                 {/* Vertical Text */}
                 <div className="font-bold text-[10px] tracking-[0.2em] text-foreground-muted group-hover:text-foreground uppercase select-none mb-4 mt-2 transition-colors [writing-mode:vertical-rl] rotate-180">
@@ -1213,8 +1224,8 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
           className={cn(
             'shrink-0 h-full z-10 transition-all duration-300 ease-in-out flex flex-col',
             isMapLayerPanelVisible
-              ? 'w-[320px] border-l border-neutral-200 dark:border-neutral-800 bg-background shadow-[-4px_0_15px_-3px_rgba(0,0,0,0.05)]'
-              : 'w-[34px] py-2 items-center bg-background border-l border-neutral-200 dark:border-neutral-800'
+              ? 'w-[320px] border-l border-gray-200 dark:border-neutral-800 bg-background shadow-[-4px_0_15px_-3px_rgba(0,0,0,0.05)]'
+              : 'w-[34px] py-2 items-center bg-background border-l border-gray-200 dark:border-neutral-800'
           )}
         >
           {isMapLayerPanelVisible ? (

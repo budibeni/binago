@@ -302,8 +302,8 @@ export function calculateRouteSimilarity(
 
   let matchedCorridorPoints = 0;
   for (const cs of corridorSamples) {
-    // Toleransi koridor: titik rute harus berjarak maksimal 2.5 km dari lintasan kendaraan
-    const isNearTrack = trackPoints.some(tp => getDistanceKm(tp.lat, tp.lng, cs.lat, cs.lng) <= 2.5);
+    // Toleransi koridor: titik rute harus berjarak maksimal 0.8 km (800 meter) dari lintasan kendaraan
+    const isNearTrack = trackPoints.some(tp => getDistanceKm(tp.lat, tp.lng, cs.lat, cs.lng) <= 0.8);
     if (isNearTrack) matchedCorridorPoints++;
   }
   const corridorOverlap = corridorSamples.length > 0 ? matchedCorridorPoints / corridorSamples.length : 0;
@@ -371,4 +371,58 @@ export function detectSimilarRoutes(
   const matchedRouteIds = scoredRoutes.length > 0 ? [scoredRoutes[0].routeId] : [];
 
   return { matchedRouteIds, eligibleRouteIds, routeSimilarityMap };
+}
+
+/**
+ * Mengecek apakah satu titik koordinat tertentu berada di dalam koridor rute (default toleransi 0.8 km / 800 meter).
+ */
+export function isPointNearRoute(
+  point: { lat: number; lng: number },
+  route: Route,
+  toleranceKm: number = 0.8
+): boolean {
+  const pathCoords =
+    route.plannedPath?.type === 'multiline' && route.plannedPath.coordinates.length >= 2
+      ? route.plannedPath.coordinates
+      : null;
+
+  if (pathCoords) {
+    return pathCoords.some((c) => getDistanceKm(point.lat, point.lng, c.lat, c.lng) <= toleranceKm);
+  }
+
+  // Fallback: cek ke origin dan destination jika plannedPath tidak ada
+  if (route.origin?.latitude && route.origin?.longitude) {
+    if (getDistanceKm(point.lat, point.lng, route.origin.latitude, route.origin.longitude) <= toleranceKm) {
+      return true;
+    }
+  }
+  if (route.destination?.latitude && route.destination?.longitude) {
+    if (getDistanceKm(point.lat, point.lng, route.destination.latitude, route.destination.longitude) <= toleranceKm) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+/**
+ * Memfilter daftar kendaraan yang posisinya saat ini berada di dalam geofence (toleransi 80 meter).
+ */
+export function findVehiclesInGeofence<T extends { id: string; location: { lat: number; lng: number } }>(
+  vehicles: T[],
+  geofence: Geofence,
+  proximityKm: number = 0.08
+): T[] {
+  return vehicles.filter((v) => isPointInGeofence(v.location, geofence, proximityKm));
+}
+
+/**
+ * Memfilter daftar kendaraan yang posisinya saat ini berada di koridor rute (toleransi 800 meter).
+ */
+export function findVehiclesOnRoute<T extends { id: string; location: { lat: number; lng: number } }>(
+  vehicles: T[],
+  route: Route,
+  toleranceKm: number = 0.8
+): T[] {
+  return vehicles.filter((v) => isPointNearRoute(v.location, route, toleranceKm));
 }

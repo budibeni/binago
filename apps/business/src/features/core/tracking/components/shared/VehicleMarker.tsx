@@ -216,13 +216,30 @@ export function VehicleMarker({ vehicle, selected, onClick }: VehicleMarkerProps
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         className={cn(
-          "relative flex flex-col items-center cursor-pointer pointer-events-auto transition-all duration-200 select-none",
-          selected ? "z-30 scale-105" : isHovered ? "z-20 scale-105" : "z-10"
+          "relative flex flex-col items-center cursor-pointer pointer-events-auto select-none",
+          selected ? "z-40" : isHovered ? "z-20" : "z-10"
         )}
         title={`${vehicle.plateNumber} · ${vehicle.speed} km/h · Arah: ${heading}° · ${status}`}
       >
-        {/* Pin Teardrop Body (Compact size ~26x33px) */}
-        <div className="relative flex flex-col items-center">
+        {/* Pin Teardrop Body (Enlarges prominently by 60% when selected) */}
+        <div
+          className={cn(
+            "relative flex flex-col items-center origin-bottom transition-transform duration-300 ease-out",
+            selected
+              ? "scale-[1.6] -translate-y-2"
+              : isHovered
+                ? "scale-110 -translate-y-0.5"
+                : "scale-100 translate-y-0"
+          )}
+        >
+          {/* Subtle selected pulsing halo behind pin */}
+          {selected && (
+            <div
+              className="absolute top-0 w-8 h-8 rounded-full pointer-events-none animate-ping opacity-35"
+              style={{ backgroundColor: colorConfig.main }}
+            />
+          )}
+
           <svg
             width="26"
             height="33"
@@ -230,8 +247,12 @@ export function VehicleMarker({ vehicle, selected, onClick }: VehicleMarkerProps
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
             className={cn(
-              "overflow-visible transition-transform",
-              selected ? "drop-shadow-md" : "drop-shadow-sm"
+              "overflow-visible transition-all duration-300",
+              selected
+                ? "drop-shadow-[0_12px_24px_rgba(0,0,0,0.45)]"
+                : isHovered
+                  ? "drop-shadow-md"
+                  : "drop-shadow-sm"
             )}
           >
             {/* Left Half (Lighter Tone) */}
@@ -250,7 +271,7 @@ export function VehicleMarker({ vehicle, selected, onClick }: VehicleMarkerProps
             <path
               d="M 19 46 C 16 42, 4 29, 4 19 A 15 15 0 1 1 34 19 C 34 29, 22 42, 19 46 Z"
               stroke={selected ? '#ffffff' : 'rgba(255,255,255,0.45)'}
-              strokeWidth={selected ? 1.5 : 0.75}
+              strokeWidth={selected ? 2 : 0.75}
             />
 
             {/* Inner White Circular Badge */}
@@ -262,18 +283,23 @@ export function VehicleMarker({ vehicle, selected, onClick }: VehicleMarkerProps
 
           {/* Ground Contact Shadow */}
           <div
-            className="w-3.5 h-1 rounded-full blur-[0.5px] pointer-events-none -mt-0.5 opacity-50"
-            style={{ backgroundColor: 'rgba(0, 0, 0, 0.45)' }}
+            className={cn(
+              "rounded-full blur-[0.5px] pointer-events-none -mt-0.5 transition-all duration-300",
+              selected ? "w-6 h-1.5 opacity-70 bg-black/60" : "w-3.5 h-1 opacity-50 bg-black/45"
+            )}
           />
         </div>
 
-        {/* Plate Number Pill Label with Heading Arrow (Always styled with primary border & high contrast) */}
+        {/* Plate Number Pill Label with Heading Arrow (Always stays at readable, natural scale) */}
         <div
           className={cn(
-            "mt-0.5 px-1.5 py-[2px] whitespace-nowrap rounded shadow-md transition-all duration-150 pointer-events-none select-none z-20 flex items-center gap-1 max-w-[105px]",
+            "mt-1 px-1.5 py-[2px] whitespace-nowrap rounded shadow-md pointer-events-none select-none z-20 flex items-center gap-1 max-w-[120px] transition-colors duration-200",
             "text-[8px] font-bold font-mono tracking-wide uppercase leading-none",
-            "bg-foreground text-background ring-1 ring-primary",
-            selected ? "scale-110 ring-2 z-30" : isHovered ? "scale-105 shadow-lg" : "scale-100"
+            selected
+              ? "bg-red-600 text-white ring-2 ring-white/90 shadow-lg font-black"
+              : isHovered
+                ? "bg-foreground text-background ring-1 ring-primary shadow-lg"
+                : "bg-foreground text-background ring-1 ring-primary"
           )}
         >
           {/* Panah arah heading */}
@@ -282,7 +308,7 @@ export function VehicleMarker({ vehicle, selected, onClick }: VehicleMarkerProps
             className="w-2.5 h-2.5 shrink-0 transition-transform duration-300 ease-out"
             style={{
               transform: `rotate(${heading}deg)`,
-              fill: colorConfig.main,
+              fill: selected ? '#ffffff' : colorConfig.main,
             }}
           >
             <path d="M6 1L10.5 10.5L6 8.5L1.5 10.5L6 1Z" />

@@ -164,13 +164,13 @@ function GeofenceMapInner({
       className="h-full w-full"
       toolbarSlot={
         <MapControlPanel
+          isLiveTracking={false}
           basemap={basemap}
           onBasemapChange={setBasemap}
           mapContainerRef={mapContainerRef}
           onFitSelected={handleFit}
           onResetNorth={handleResetNorth}
           onSearchAddress={defaultNominatimSearch}
-          showGeofenceTool={false}
           showMeasureTool={false}
         />
       }
