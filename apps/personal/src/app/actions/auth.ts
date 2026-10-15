@@ -8,18 +8,24 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1
 export async function login(formData: FormData) {
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
+  const company_code = formData.get('company_code') as string;
 
   if (!email || !password) {
     return { error: 'Email and password are required' };
   }
 
   try {
+    const body: any = { email, password };
+    if (company_code) {
+      body.company_code = company_code;
+    }
+
     const res = await fetch(`${API_URL}/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify(body),
     });
 
     const data = await res.json();
@@ -28,9 +34,23 @@ export async function login(formData: FormData) {
       return { error: data.message || data.error || 'Invalid credentials' };
     }
 
-    if (data.status === 'success' && data.data?.token) {
-      const token = data.data.token;
-      const user = data.data.user;
+    if (data.status === 'multiple_companies') {
+      const filteredCompanies = (data.data.companies || []).filter((c: any) => c.code !== 'DEFAULT');
+      if (filteredCompanies.length > 0 && !company_code) {
+        formData.set('company_code', filteredCompanies[0].code);
+        return login(formData);
+      }
+      return { error: 'No accessible company found for this user.' };
+    }
+
+    if (data.status === 'success' && (data.data?.token || data.data?.access_token)) {
+      const token = data.data?.token || data.data?.access_token;
+      const user = data.data.user || {
+        email: data.data.email,
+        role: data.data.role,
+        name: data.data.name,
+        modules: data.data.modules,
+      };
 
       // Store token in cookie
       cookies().set({
