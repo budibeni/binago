@@ -1,17 +1,15 @@
-'use client';
-import React from 'react';
-import { Hammer } from 'lucide-react';
+import type { Metadata } from 'next';
+import { DevicesFeature } from '../../../features/core/devices/DevicesFeature';
 
-export default function PlaceholderPage() {
+export const metadata: Metadata = {
+  title: 'Perangkat GPS & Smartphone - ADATRACK Business',
+  description: 'Kelola perangkat pelacak GPS fisik dan aplikasi tracking smartphone driver.',
+};
+
+export default function GPSDevicesPage() {
   return (
-    <div className="flex h-full w-full flex-col items-center justify-center p-8 text-center bg-background">
-      <div className="rounded-full bg-neutral-100 p-4 dark:bg-neutral-800 mb-4">
-        <Hammer className="h-8 w-8 text-neutral-500" />
-      </div>
-      <h1 className="text-xl font-bold text-foreground mb-2">Modul Sedang Dikembangkan</h1>
-      <p className="text-sm text-foreground-muted max-w-md">
-        Halaman ini masih dalam tahap pengembangan dan akan segera tersedia pada pembaruan berikutnya.
-      </p>
+    <div className="h-[calc(100vh-56px)] w-full">
+      <DevicesFeature />
     </div>
   );
 }
