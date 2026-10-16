@@ -30,6 +30,7 @@ ui-guidelines.md
 database-design.md
 api-standard.md
 coding-standard.md
+mock-data-architecture.md
 deployment.md
 task-roadmap.md
 ```

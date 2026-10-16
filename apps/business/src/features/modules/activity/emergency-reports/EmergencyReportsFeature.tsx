@@ -15,12 +15,12 @@ import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent,
   DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator,
 } from '@adatrack/ui';
-import {
-  emergencyReportStore,
-  type EmergencyReport,
-  type EmergencyStatus,
-  type EmergencyCategory,
-} from '../../portal/driver/emergencyReportStore';
+import { emergencyReportService } from '@/data/modules/activity';
+import type {
+  EmergencyReport,
+  EmergencyStatus,
+  EmergencyCategory,
+} from './types/emergencyReport';
 
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
 
@@ -475,17 +475,17 @@ export function EmergencyReportsFeature() {
   useEffect(() => { setPageIndex(0); }, [search, activeTab, selectedCategory]);
 
   const refresh = useCallback(() => {
-    setReports(emergencyReportStore.getAll());
+    setReports(emergencyReportService.getAll());
   }, []);
 
   useEffect(() => {
     refresh();
-    return emergencyReportStore.subscribe(refresh);
+    return emergencyReportService.subscribe(refresh);
   }, [refresh]);
 
   const handleStatusChange = useCallback(
     (id: string, status: EmergencyStatus, notes?: string) => {
-      emergencyReportStore.updateStatus(id, status, { handledBy: 'Super Admin', notes });
+      emergencyReportService.updateStatus(id, status, { handledBy: 'Super Admin', notes });
     },
     []
   );

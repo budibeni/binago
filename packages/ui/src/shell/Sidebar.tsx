@@ -34,21 +34,63 @@ export function Sidebar({
   onMobileOpenChange,
   className,
 }: SidebarProps) {
+  const normalizePath = (p: string) => p.split('?')[0].replace(/\/+$/, '') || '/';
+
+  const activeItem = React.useMemo(() => {
+    const allItems: NavItem[] = [
+      ...navigation.flatMap(group => group.items),
+      ...bottomNavigation,
+    ];
+
+    const normCurrent = normalizePath(currentPath);
+
+    // 1. Exact match
+    const exact = allItems.find(item => normalizePath(item.href) === normCurrent);
+    if (exact) return exact;
+
+    // 2. Prefix match (with path segment boundary, longest matching href first)
+    const prefixMatches = allItems
+      .filter(item => {
+        const normItem = normalizePath(item.href);
+        if (!normItem || normItem === '/') return false;
+        return (normCurrent + '/').startsWith(normItem + '/');
+      })
+      .sort((a, b) => normalizePath(b.href).length - normalizePath(a.href).length);
+
+    return prefixMatches[0] || null;
+  }, [navigation, bottomNavigation, currentPath]);
+
   const getInitialOpenSections = () => {
     const result: Record<string, boolean> = {};
+    const normCurrent = normalizePath(currentPath);
     navigation.forEach(group => {
       if (group.id === 'main') return;
       const groupId = group.id || '';
       if (!groupId) return;
-      const hasActive = group.items.some(
-        item => currentPath === item.href || (item.href !== '/' && currentPath.startsWith(item.href))
-      );
+      const hasActive = group.items.some(item => {
+        const normItem = normalizePath(item.href);
+        return normItem === normCurrent || (normItem !== '/' && (normCurrent + '/').startsWith(normItem + '/'));
+      });
       if (hasActive) result[groupId] = true;
     });
     return result;
   };
 
   const [openSections, setOpenSections] = React.useState<Record<string, boolean>>(getInitialOpenSections);
+
+  React.useEffect(() => {
+    if (!activeItem) return;
+    const targetGroup = navigation.find(group =>
+      group.id !== 'main' && group.items.some(item => item.id === activeItem.id && item.href === activeItem.href)
+    );
+    const groupId = targetGroup?.id;
+    if (groupId) {
+      setOpenSections(prev => {
+        if (prev[groupId]) return prev;
+        return { ...prev, [groupId]: true };
+      });
+    }
+  }, [activeItem, navigation]);
 
   const toggleSection = (groupId: string) => {
     if (!groupId || groupId === 'main') return;
@@ -82,9 +124,7 @@ export function Sidebar({
 
   const renderNavItems = (items: NavItem[], isMain = false) => {
     return items.map((item) => {
-      const isActive =
-        currentPath === item.href ||
-        (item.href !== '/' && currentPath.startsWith(item.href));
+      const isActive = activeItem ? (item.id === activeItem.id && item.href === activeItem.href) : false;
       const Icon = item.icon;
 
       return (

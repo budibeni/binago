@@ -15,6 +15,13 @@ adatrack/
 │   │   └── src/
 │   │       ├── app/
 │   │       ├── components/
+│   │       ├── data/
+│   │       │   ├── core/
+│   │       │   ├── mock/
+│   │       │   ├── repositories/
+│   │       │   ├── services/
+│   │       │   └── modules/
+│   │       │       └── [module]/
 │   │       ├── features/
 │   │       ├── hooks/
 │   │       ├── stores/
@@ -82,6 +89,20 @@ features/[domain]/
 
 Gunakan pola drawer (`[Domain]Form.tsx`) jika form cukup sederhana.
 Gunakan pola halaman terpisah jika form kompleks atau membutuhkan navigasi sendiri.
+
+## 4B. Data Layer Structure
+
+Seluruh data mentah (seed), repository, dan service diatur terpusat di `src/data/` (lihat panduan lengkap di [`docs/mock-data-architecture.md`](./mock-data-architecture.md)):
+
+```text
+data/modules/[module]/
+├── mock/            ← Raw dummy datasets & generators
+├── repositories/    ← In-memory stores & state management
+├── services/        ← Public service layer consumed by UI
+└── index.ts         ← Barrel export
+```
+
+Komponen UI di `features/` **dilarang keras** membuat dummy data atau state engine sendiri di dalam foldernya.
 
 ## 5. UI Label
 

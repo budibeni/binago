@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { EmergencyReportsFeature } from '@/features/modules/safety/emergency-reports/EmergencyReportsFeature';
+import { EmergencyReportsFeature } from '@/features/modules/activity/emergency-reports/EmergencyReportsFeature';
 
 export const metadata: Metadata = {
   title: 'Laporan Darurat - ADATRACK Business',

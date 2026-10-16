@@ -12,8 +12,13 @@ import { cn, applyPhotoWatermark } from '@adatrack/utils';
 import { VehicleFinderMap } from '@adatrack/maps';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
 import { getDriverPortalTranslation } from './i18n';
-import { emergencyReportStore } from './emergencyReportStore';
-import type { EmergencyCategory } from './emergencyReportStore';
+import {
+  emergencyReportService,
+  taskAttendanceService,
+  geofenceAttendanceService,
+  arrivalReportService,
+} from '@/data/modules/activity';
+import type { EmergencyCategory } from '@/features/modules/activity/emergency-reports/types/emergencyReport';
 
 export function DriverPortalFeature() {
   const locale = useBusinessLocale();
@@ -389,8 +394,8 @@ function VehiclesTab({ locale }: { locale: 'id' | 'en' }) {
                   <button
                     disabled={!sosCategory}
                     onClick={() => {
-                      // Simpan laporan ke emergencyReportStore (shared in-memory store)
-                      emergencyReportStore.add({
+                      // Simpan laporan ke emergencyReportService (centralized activity data layer)
+                      emergencyReportService.add({
                         timestamp: new Date().toISOString(),
                         driverName: 'Ahmad Fauzi',           // dummy: akan dari auth session
                         driverPhone: '08123456789',           // dummy
@@ -619,6 +624,47 @@ function AttendanceTab({ locale }: { locale: 'id' | 'en' }) {
   };
 
   const handleSubmit = () => {
+    if (attType === 'vehicle' && photo) {
+      taskAttendanceService.recordCheckIn({
+        driverName: 'Budi Beni',
+        driverPhone: '0812-3456-7890',
+        vehiclePlate: detectedGeofence || 'B 1234 CD',
+        vehicleModel: 'Mitsubishi Fuso Canter FE 74',
+        address: currentAddress || 'Pool Utama Balaraja, Tangerang',
+        coordinates: { lat: -6.2118, lng: 106.4529 },
+        distanceMeters: distance || 25,
+        photoDataUri: photo,
+        notes: 'Presensi via Driver Portal mobile.',
+      });
+    } else if (attType === 'geofence' && photo) {
+      geofenceAttendanceService.recordAttendance({
+        driverName: 'Budi Beni',
+        driverPhone: '0812-3456-7890',
+        vehiclePlate: 'B 1001 GHI',
+        vehicleModel: 'Hino Dutro Box 130 HD',
+        geofenceName: detectedGeofence || 'Pool Utama Balaraja',
+        geofenceCategory: 'Pool',
+        locationAddress: currentAddress || 'Pool Utama Balaraja, Tangerang',
+        coordinates: { lat: -6.2118, lng: 106.4529 },
+        distanceMeters: distance || 28,
+        photoDataUri: photo,
+        notes: 'Presensi lokasi geofence via Driver Portal mobile.',
+      });
+    } else if (attType === 'free' && photo) {
+      arrivalReportService.recordArrival({
+        driverName: 'Budi Beni',
+        driverPhone: '0812-3456-7890',
+        vehiclePlate: 'B 1001 GHI',
+        vehicleModel: 'Hino Dutro Box 130 HD',
+        destinationName: 'Lokasi Tujuan Pengiriman (Klien)',
+        destinationType: 'Gudang Klien',
+        address: currentAddress || 'Jl. Raya Serang KM 30, Balaraja',
+        coordinates: { lat: -6.2118, lng: 106.4529 },
+        photoDataUri: photo,
+        recipientName: 'Petugas Gudang Klien',
+        notes: 'Laporan tiba di tujuan pengiriman via Driver Portal mobile.',
+      });
+    }
     setStep('done');
   };
 
