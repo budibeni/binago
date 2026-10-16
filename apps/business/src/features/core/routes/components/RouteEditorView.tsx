@@ -62,25 +62,48 @@ export function RouteEditorView({
   const [activeLocationTarget, setActiveLocationTarget] = useState<ActiveLocationTarget>(null);
   const [isExpanded, setIsExpanded] = useState(true);
 
-
   const [isSearchingAddress, setIsSearchingAddress] = useState<Record<string, boolean>>({});
+
+  // Sync editorGeometry if initialData arrives after mount
+  useEffect(() => {
+    if (initialData?.plannedPath && !editorGeometry) {
+      setEditorGeometry(initialData.plannedPath);
+    }
+  }, [initialData]);
+
+  const isFirstRender = useRef(true);
 
   // Auto-calculate distance and duration
   useEffect(() => {
+    // If editing an existing route with saved plannedPath, do not overwrite on initial load
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      if (initialData?.plannedPath) {
+        return;
+      }
+    }
+
     const getLatLng = (loc: RouteLocation) => {
-      if (loc.type === 'coordinate' && loc.latitude && loc.longitude) {
+      if (loc.type === 'coordinate' && loc.latitude !== undefined && loc.longitude !== undefined) {
         return [loc.longitude, loc.latitude];
       }
       if (loc.type === 'geofence' && loc.geofenceId) {
-        const gf = geofences.find(g => String(g.id) === loc.geofenceId);
-        if (gf && gf.geometry && gf.geometry.coordinates) {
+        const gf = geofences.find(g => String(g.id) === String(loc.geofenceId));
+        if (gf?.geometry?.coordinates && gf.geometry.coordinates.length > 0) {
           let coords: any = gf.geometry.coordinates;
-          if (Array.isArray(coords) && coords.length > 0) {
-             if (Array.isArray(coords[0])) coords = coords[0]; // Polygon has array of array sometimes depending on implementation
-             else if (coords[0].lat !== undefined) coords = coords[0]; // take first point
-          }
-          if (coords && coords.lat !== undefined && coords.lng !== undefined) {
-             return [coords.lng, coords.lat];
+          const points = Array.isArray(coords[0]) ? coords[0] : coords;
+          let sumLng = 0, sumLat = 0, count = 0;
+          points.forEach((p: any) => {
+            const lng = Number(p.lng ?? p.longitude ?? p.lon ?? (Array.isArray(p) ? p[0] : 0));
+            const lat = Number(p.lat ?? p.latitude ?? (Array.isArray(p) ? p[1] : 0));
+            if (!isNaN(lng) && !isNaN(lat) && (lng !== 0 || lat !== 0)) {
+              sumLng += lng;
+              sumLat += lat;
+              count++;
+            }
+          });
+          if (count > 0) {
+            return [sumLng / count, sumLat / count];
           }
         }
       }
@@ -438,7 +461,8 @@ export function RouteEditorView({
     status,
     createdAt: '',
     updatedAt: '',
-    plannedPath: editorGeometry || undefined
+    plannedPath: editorGeometry || initialData?.plannedPath || undefined,
+    waypoints: initialData?.waypoints,
   };
 
   return (

@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { useInternalMap } from '../core/MapContext';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
+import { useInternalMap, useStyleLoadCallback } from '../core/MapContext';
 import { MapGeometry, Coordinate } from './types';
 import { geometryToGeoJSON } from './utils';
 
@@ -127,118 +127,140 @@ export function GeometryEditor({
   }, [map, mode, draftCoords]);
 
   // Render geometry
+  const updateSource = useCallback(() => {
+    if (!map || !map.isStyleLoaded()) return;
+
+    if (!map.getSource(sourceId)) {
+      map.addSource(sourceId, {
+        type: 'geojson',
+        data: { type: 'FeatureCollection', features: [] }
+      });
+      map.addLayer({
+        id: layerId,
+        type: 'fill',
+        source: sourceId,
+        filter: ['any', ['==', ['geometry-type'], 'Polygon'], ['==', ['geometry-type'], 'MultiPolygon']],
+        paint: {
+          'fill-color': '#0ea5e9',
+          'fill-opacity': 0.3,
+          'fill-outline-color': '#0284c7'
+        }
+      });
+      map.addLayer({
+        id: layerId + '-line',
+        type: 'line',
+        source: sourceId,
+        filter: ['any', ['==', ['geometry-type'], 'LineString'], ['==', ['geometry-type'], 'MultiLineString']],
+        paint: {
+          'line-color': '#0ea5e9',
+          'line-width': 3
+        }
+      });
+    }
+    
+    const source = map.getSource(sourceId) as any;
+    if (source && geometry) {
+      source.setData(geometryToGeoJSON(geometry));
+    } else if (source) {
+      source.setData({ type: 'FeatureCollection', features: [] });
+    }
+  }, [map, geometry]);
+
+  useStyleLoadCallback(updateSource);
+
   useEffect(() => {
     if (!map) return;
-    
-    const updateSource = () => {
-      if (!map.getSource(sourceId)) {
-        map.addSource(sourceId, {
-          type: 'geojson',
-          data: { type: 'FeatureCollection', features: [] }
-        });
-        map.addLayer({
-          id: layerId,
-          type: 'fill',
-          source: sourceId,
-          paint: {
-            'fill-color': '#0ea5e9',
-            'fill-opacity': 0.3,
-            'fill-outline-color': '#0284c7'
-          }
-        });
-      }
-      
-      const source = map.getSource(sourceId) as any;
-      if (source && geometry) {
-        source.setData(geometryToGeoJSON(geometry));
-      } else if (source) {
-        source.setData({ type: 'FeatureCollection', features: [] });
-      }
-    };
-    
     if (map.isStyleLoaded()) {
       updateSource();
     } else {
       map.once('styledata', updateSource);
     }
-    
+  }, [map, updateSource]);
+
+  useEffect(() => {
     return () => {
       if (map && map.getStyle()) {
         if (map.getLayer(layerId)) map.removeLayer(layerId);
+        if (map.getLayer(layerId + '-line')) map.removeLayer(layerId + '-line');
         if (map.getSource(sourceId)) map.removeSource(sourceId);
       }
     };
-  }, [map, geometry]);
+  }, [map]);
   
   // Render draft polygon
+  const updateDraftSource = useCallback(() => {
+    if (!map || !map.isStyleLoaded()) return;
+
+    if (!map.getSource(draftSourceId)) {
+      map.addSource(draftSourceId, {
+        type: 'geojson',
+        data: { type: 'FeatureCollection', features: [] }
+      });
+      
+      map.addLayer({
+        id: draftLayerId,
+        type: 'line',
+        source: draftSourceId,
+        paint: {
+          'line-color': '#0ea5e9',
+          'line-width': 2,
+          'line-dasharray': [2, 2]
+        }
+      });
+      
+      map.addLayer({
+        id: draftPointsLayerId,
+        type: 'circle',
+        source: draftSourceId,
+        paint: {
+          'circle-radius': 4,
+          'circle-color': '#0ea5e9',
+          'circle-stroke-width': 2,
+          'circle-stroke-color': '#ffffff'
+        }
+      });
+    }
+    
+    const source = map.getSource(draftSourceId) as any;
+    if (source && draftCoords.length > 0) {
+      source.setData({
+        type: 'FeatureCollection',
+        features: [
+          {
+            type: 'Feature',
+            geometry: {
+              type: 'LineString',
+              coordinates: draftCoords.map(c => [c.lng, c.lat])
+            },
+            properties: {}
+          },
+          ...draftCoords.map(c => ({
+            type: 'Feature',
+            geometry: {
+              type: 'Point',
+              coordinates: [c.lng, c.lat]
+            },
+            properties: {}
+          }))
+        ]
+      });
+    } else if (source) {
+      source.setData({ type: 'FeatureCollection', features: [] });
+    }
+  }, [map, draftCoords]);
+
+  useStyleLoadCallback(updateDraftSource);
+
   useEffect(() => {
     if (!map) return;
-    
-    const updateDraftSource = () => {
-      if (!map.getSource(draftSourceId)) {
-        map.addSource(draftSourceId, {
-          type: 'geojson',
-          data: { type: 'FeatureCollection', features: [] }
-        });
-        
-        map.addLayer({
-          id: draftLayerId,
-          type: 'line',
-          source: draftSourceId,
-          paint: {
-            'line-color': '#0ea5e9',
-            'line-width': 2,
-            'line-dasharray': [2, 2]
-          }
-        });
-        
-        map.addLayer({
-          id: draftPointsLayerId,
-          type: 'circle',
-          source: draftSourceId,
-          paint: {
-            'circle-radius': 4,
-            'circle-color': '#0ea5e9',
-            'circle-stroke-width': 2,
-            'circle-stroke-color': '#ffffff'
-          }
-        });
-      }
-      
-      const source = map.getSource(draftSourceId) as any;
-      if (source && draftCoords.length > 0) {
-        source.setData({
-          type: 'FeatureCollection',
-          features: [
-            {
-              type: 'Feature',
-              geometry: {
-                type: 'LineString',
-                coordinates: draftCoords.map(c => [c.lng, c.lat])
-              },
-              properties: {}
-            },
-            ...draftCoords.map(c => ({
-              type: 'Feature',
-              geometry: {
-                type: 'Point',
-                coordinates: [c.lng, c.lat]
-              },
-              properties: {}
-            }))
-          ]
-        });
-      } else if (source) {
-        source.setData({ type: 'FeatureCollection', features: [] });
-      }
-    };
-    
     if (map.isStyleLoaded()) {
       updateDraftSource();
     } else {
       map.once('styledata', updateDraftSource);
     }
-    
+  }, [map, updateDraftSource]);
+
+  useEffect(() => {
     return () => {
       if (map && map.getStyle()) {
         if (map.getLayer(draftLayerId)) map.removeLayer(draftLayerId);
@@ -246,7 +268,7 @@ export function GeometryEditor({
         if (map.getSource(draftSourceId)) map.removeSource(draftSourceId);
       }
     };
-  }, [map, draftCoords]);
+  }, [map]);
 
   return null;
 }

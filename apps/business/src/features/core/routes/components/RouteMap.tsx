@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import {
   MapContainer,
   MapControlPanel,
   GeometryEditor,
   useMapActions,
+  useStyleLoadCallback,
   MapContext,
   type MapGeometry,
   type BasemapId,
@@ -36,6 +37,22 @@ function createCirclePolygon(lat: number, lng: number, radiusInMeters: number, p
   };
 }
 
+const GF_SOURCE_ID = 'adatrack-route-geofences-source';
+const GF_FILL_LAYER_ID = 'adatrack-route-geofences-fill';
+const GF_OUTLINE_LAYER_ID = 'adatrack-route-geofences-outline';
+
+const RADIUS_SOURCE_ID = 'route-radius-source';
+const RADIUS_FILL_LAYER_ID = 'route-radius-fill';
+const RADIUS_OUTLINE_LAYER_ID = 'route-radius-outline';
+
+const COORD_SOURCE_ID = 'adatrack-route-coord-source';
+const COORD_POINT_LAYER_ID = 'adatrack-route-coord-point';
+
+const PATH_SOURCE_ID = 'adatrack-route-path-source';
+const PATH_CASING_LAYER_ID = 'adatrack-route-path-casing';
+const PATH_LAYER_SOLID_ID = 'adatrack-route-path-line-solid';
+const PATH_LAYER_DASHED_ID = 'adatrack-route-path-line-dashed';
+
 interface RouteMapProps {
   geofences: Geofence[];
   selectedRoute: Route | null;
@@ -59,30 +76,31 @@ function RouteMapInner({
   const [viewport, setViewport] = useState({ center: { lng: 106.8271, lat: -6.1751 }, zoom: 11 });
   const mapContainerRef = useRef<HTMLDivElement>(null);
 
-  const getRouteLocations = () => {
+  const getRouteLocations = useCallback(() => {
     if (!selectedRoute) return [];
     return [
       { loc: selectedRoute.origin, role: 'origin' },
       ...selectedRoute.stops.map(s => ({ loc: s.location, role: 'stop' })),
       { loc: selectedRoute.destination, role: 'destination' }
     ];
-  };
+  }, [selectedRoute]);
 
-  const getRouteGeofences = () => {
+  const getRouteGeofences = useCallback(() => {
     if (!selectedRoute) return geofences;
     
     const geofenceIds = new Set<string>();
     const routeLocs = getRouteLocations();
     routeLocs.forEach(({loc}) => {
-      if (loc.type === 'geofence' && loc.geofenceId) {
-        geofenceIds.add(loc.geofenceId);
+      if (loc && loc.type === 'geofence' && loc.geofenceId) {
+        geofenceIds.add(String(loc.geofenceId));
       }
     });
 
-    return geofences.filter(gf => geofenceIds.has(gf.id));
-  };
+    return geofences.filter(gf => geofenceIds.has(String(gf.id)));
+  }, [selectedRoute, geofences, getRouteLocations]);
 
-  const handleFit = () => {
+  const handleFit = useCallback(() => {
+    if (!map) return;
     const allCoords: {lat: number, lng: number}[] = [];
     
     // Fit Geofences
@@ -96,14 +114,17 @@ function RouteMapInner({
     // Fit Coordinates
     const routeLocs = getRouteLocations();
     routeLocs.forEach(({loc}) => {
-      if (loc.type === 'coordinate' && loc.latitude !== undefined && loc.longitude !== undefined) {
+      if (loc && loc.type === 'coordinate' && loc.latitude !== undefined && loc.longitude !== undefined) {
         allCoords.push({ lat: loc.latitude, lng: loc.longitude });
       }
     });
 
     // Fit Route Coordinates
     if (selectedRoute) {
-      const coords = extractRouteCoordinates(selectedRoute, targetGeofences);
+      const effectiveRoute = editorGeometry
+        ? { ...selectedRoute, plannedPath: editorGeometry }
+        : selectedRoute;
+      const coords = extractRouteCoordinates(effectiveRoute, targetGeofences);
       coords.forEach(([lng, lat]) => {
         allCoords.push({ lat, lng });
       });
@@ -115,13 +136,18 @@ function RouteMapInner({
     if (bounds) {
        actions.fitBounds(bounds, { padding: 50 });
     }
-  };
+  }, [map, selectedRoute, geofences, editorGeometry, actions, getRouteGeofences, getRouteLocations]);
 
-  // Pan to selected route when it changes
+  // Pan to selected route when it changes (only on route ID change, not on basemap switch)
+  const lastRouteIdRef = useRef<string | undefined>(undefined);
   useEffect(() => {
     if (!map || !selectedRoute) return;
-    handleFit();
-  }, [map, selectedRoute, geofences]);
+    const routeId = selectedRoute.id;
+    if (lastRouteIdRef.current !== routeId) {
+      lastRouteIdRef.current = routeId;
+      handleFit();
+    }
+  }, [map, selectedRoute, handleFit]);
 
   // Handle map clicks for selecting coordinate location
   useEffect(() => {
@@ -143,233 +169,265 @@ function RouteMapInner({
   }, [map, editorMode, onMapClick]);
 
   // Render geofences, coordinates and planned path
+  const render = useCallback(() => {
+    if (!map || !map.isStyleLoaded()) return;
+
+    const routeLocs = getRouteLocations();
+
+    // 1. Render Geofences
+    const targetGeofences = getRouteGeofences();
+    const gfFeatures = targetGeofences.map((gf) => {
+      const feature = geometryToGeoJSON(gf.geometry) as any;
+      
+      // Find role for this geofence
+      let role = 'stop';
+      if (routeLocs[0]?.loc?.type === 'geofence' && String(routeLocs[0]?.loc?.geofenceId) === String(gf.id)) role = 'origin';
+      else if (routeLocs[routeLocs.length - 1]?.loc?.type === 'geofence' && String(routeLocs[routeLocs.length - 1]?.loc?.geofenceId) === String(gf.id)) role = 'destination';
+      
+      feature.properties = { 
+        id: gf.id, 
+        name: gf.name,
+        role
+      };
+      return feature;
+    });
+
+    const gfData: GeoJSON.FeatureCollection = { type: 'FeatureCollection', features: gfFeatures };
+
+    if (!map.getSource(GF_SOURCE_ID)) {
+      map.addSource(GF_SOURCE_ID, { type: 'geojson', data: gfData });
+      map.addLayer({
+        id: GF_FILL_LAYER_ID,
+        type: 'fill',
+        source: GF_SOURCE_ID,
+        paint: {
+          'fill-color': [
+            'match', ['get', 'role'], 
+            'origin', '#3b82f6', // blue
+            'destination', '#10b981', // green
+            '#f59e0b' // yellow for stops
+          ],
+          'fill-opacity': 0.3,
+        },
+      });
+      map.addLayer({
+        id: GF_OUTLINE_LAYER_ID,
+        type: 'line',
+        source: GF_SOURCE_ID,
+        paint: {
+          'line-color': [
+            'match', ['get', 'role'], 
+            'origin', '#2563eb', 
+            'destination', '#059669',
+            '#d97706'
+          ],
+          'line-width': 2,
+        },
+      });
+    } else {
+      (map.getSource(GF_SOURCE_ID) as any).setData(gfData);
+    }
+
+    // 2. Render Coordinates (Markers) and Radius
+    const coordFeatures: any[] = [];
+    const coordRadiusFeatures: any[] = [];
+    
+    routeLocs.forEach(({loc, role}) => {
+      if (loc && loc.type === 'coordinate' && loc.latitude !== undefined && loc.longitude !== undefined) {
+        coordFeatures.push({
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: [loc.longitude, loc.latitude]
+          },
+          properties: {
+            role,
+            address: loc.address || 'Unknown'
+          }
+        });
+
+        if (loc.radius) {
+          coordRadiusFeatures.push({
+            type: 'Feature',
+            geometry: createCirclePolygon(loc.latitude, loc.longitude, loc.radius),
+            properties: { role }
+          });
+        }
+      }
+    });
+
+    const coordData: GeoJSON.FeatureCollection = { type: 'FeatureCollection', features: coordFeatures };
+    const coordRadiusData: GeoJSON.FeatureCollection = { type: 'FeatureCollection', features: coordRadiusFeatures };
+
+    if (!map.getSource(RADIUS_SOURCE_ID)) {
+      map.addSource(RADIUS_SOURCE_ID, { type: 'geojson', data: coordRadiusData });
+      map.addLayer({
+        id: RADIUS_FILL_LAYER_ID,
+        type: 'fill',
+        source: RADIUS_SOURCE_ID,
+        paint: {
+          'fill-color': [
+            'match', ['get', 'role'], 
+            'origin', '#3b82f6', // blue
+            'destination', '#10b981', // green
+            '#f59e0b' // yellow
+          ],
+          'fill-opacity': 0.15,
+        },
+      });
+      map.addLayer({
+        id: RADIUS_OUTLINE_LAYER_ID,
+        type: 'line',
+        source: RADIUS_SOURCE_ID,
+        paint: {
+          'line-color': [
+            'match', ['get', 'role'], 
+            'origin', '#2563eb', 
+            'destination', '#059669',
+            '#d97706'
+          ],
+          'line-width': 1,
+          'line-dasharray': [4, 4],
+        },
+      });
+    } else {
+      (map.getSource(RADIUS_SOURCE_ID) as any).setData(coordRadiusData);
+    }
+
+    if (!map.getSource(COORD_SOURCE_ID)) {
+      map.addSource(COORD_SOURCE_ID, { type: 'geojson', data: coordData });
+      map.addLayer({
+        id: COORD_POINT_LAYER_ID,
+        type: 'circle',
+        source: COORD_SOURCE_ID,
+        paint: {
+          'circle-radius': 8,
+          'circle-color': [
+            'match', ['get', 'role'], 
+            'origin', '#2563eb', 
+            'destination', '#059669',
+            '#d97706'
+          ],
+          'circle-stroke-width': 2,
+          'circle-stroke-color': '#ffffff'
+        },
+      });
+    } else {
+      (map.getSource(COORD_SOURCE_ID) as any).setData(coordData);
+    }
+
+    // 3. Render Planned Path
+    const pathData: GeoJSON.FeatureCollection = { type: 'FeatureCollection', features: [] };
+    const effectiveRoute = selectedRoute
+      ? {
+          ...selectedRoute,
+          plannedPath: editorGeometry || selectedRoute.plannedPath,
+        }
+      : null;
+
+    // Do NOT hide route when in 'select-location' mode; only hide if manually drawing new multiline
+    if (effectiveRoute && editorMode !== 'draw_multiline') {
+      const coords = extractRouteCoordinates(effectiveRoute, geofences);
+      if (coords.length > 1) {
+        pathData.features.push({
+          type: 'Feature',
+          properties: { isPlanned: !!effectiveRoute.plannedPath },
+          geometry: { type: 'LineString', coordinates: coords }
+        });
+      }
+    }
+
+    if (!map.getSource(PATH_SOURCE_ID)) {
+      map.addSource(PATH_SOURCE_ID, { type: 'geojson', data: pathData });
+      
+      // Contrast casing layer for clear visibility across all basemaps (satellite, dark, etc.)
+      map.addLayer({
+        id: PATH_CASING_LAYER_ID,
+        type: 'line',
+        source: PATH_SOURCE_ID,
+        layout: {
+          'line-join': 'round',
+          'line-cap': 'round',
+        },
+        paint: {
+          'line-color': '#3b0764',
+          'line-width': 6,
+          'line-opacity': 0.45,
+        },
+      });
+
+      // Solid layer for planned paths
+      map.addLayer({
+        id: PATH_LAYER_SOLID_ID,
+        type: 'line',
+        source: PATH_SOURCE_ID,
+        filter: ['==', ['get', 'isPlanned'], true],
+        layout: {
+          'line-join': 'round',
+          'line-cap': 'round',
+        },
+        paint: {
+          'line-color': '#8b5cf6',
+          'line-width': 4,
+        },
+      });
+      
+      // Dashed layer for fallback straight lines
+      map.addLayer({
+        id: PATH_LAYER_DASHED_ID,
+        type: 'line',
+        source: PATH_SOURCE_ID,
+        filter: ['!=', ['get', 'isPlanned'], true],
+        layout: {
+          'line-join': 'round',
+          'line-cap': 'round',
+        },
+        paint: {
+          'line-color': '#8b5cf6',
+          'line-width': 4,
+          'line-dasharray': [2, 2]
+        },
+      });
+    } else {
+      (map.getSource(PATH_SOURCE_ID) as any).setData(pathData);
+    }
+  }, [map, geofences, selectedRoute, editorMode, editorGeometry, getRouteLocations, getRouteGeofences]);
+
+  // Hook for style reload / basemap switch: automatic re-registration of layers
+  useStyleLoadCallback(render);
+
+  // Map effect on mount, style ready, or data change
   useEffect(() => {
     if (!map) return;
-    const gfSourceId = 'adatrack-route-geofences-source';
-    const gfFillLayerId = 'adatrack-route-geofences-fill';
-    const gfOutlineLayerId = 'adatrack-route-geofences-outline';
-    
-    const coordSourceId = 'adatrack-route-coord-source';
-    const coordPointLayerId = 'adatrack-route-coord-point';
-
-    const pathSourceId = 'adatrack-route-path-source';
-    const pathLayerId = 'adatrack-route-path-line';
-
-    const render = () => {
-      const routeLocs = getRouteLocations();
-
-      // 1. Render Geofences
-      const targetGeofences = getRouteGeofences();
-      const gfFeatures = targetGeofences.map((gf) => {
-        const feature = geometryToGeoJSON(gf.geometry) as any;
-        
-        // Find role for this geofence
-        let role = 'stop';
-        if (routeLocs[0].loc.type === 'geofence' && routeLocs[0].loc.geofenceId === gf.id) role = 'origin';
-        else if (routeLocs[routeLocs.length - 1].loc.type === 'geofence' && routeLocs[routeLocs.length - 1].loc.geofenceId === gf.id) role = 'destination';
-        
-        feature.properties = { 
-          id: gf.id, 
-          name: gf.name,
-          role
-        };
-        return feature;
-      });
-
-      const gfData: GeoJSON.FeatureCollection = { type: 'FeatureCollection', features: gfFeatures };
-
-      if (!map.getSource(gfSourceId)) {
-        map.addSource(gfSourceId, { type: 'geojson', data: gfData });
-        map.addLayer({
-          id: gfFillLayerId,
-          type: 'fill',
-          source: gfSourceId,
-          paint: {
-            'fill-color': [
-              'match', ['get', 'role'], 
-              'origin', '#3b82f6', // blue
-              'destination', '#10b981', // green
-              '#f59e0b' // yellow for stops
-            ],
-            'fill-opacity': 0.3,
-          },
-        });
-        map.addLayer({
-          id: gfOutlineLayerId,
-          type: 'line',
-          source: gfSourceId,
-          paint: {
-            'line-color': [
-              'match', ['get', 'role'], 
-              'origin', '#2563eb', 
-              'destination', '#059669',
-              '#d97706'
-            ],
-            'line-width': 2,
-          },
-        });
-      } else {
-        (map.getSource(gfSourceId) as any).setData(gfData);
-      }
-
-      // 2. Render Coordinates (Markers) and Radius
-      const coordFeatures: any[] = [];
-      const coordRadiusFeatures: any[] = [];
-      
-      routeLocs.forEach(({loc, role}) => {
-        if (loc.type === 'coordinate' && loc.latitude !== undefined && loc.longitude !== undefined) {
-          coordFeatures.push({
-            type: 'Feature',
-            geometry: {
-              type: 'Point',
-              coordinates: [loc.longitude, loc.latitude]
-            },
-            properties: {
-              role,
-              address: loc.address || 'Unknown'
-            }
-          });
-
-          if (loc.radius) {
-            coordRadiusFeatures.push({
-              type: 'Feature',
-              geometry: createCirclePolygon(loc.latitude, loc.longitude, loc.radius),
-              properties: { role }
-            });
-          }
-        }
-      });
-
-      const coordData: GeoJSON.FeatureCollection = { type: 'FeatureCollection', features: coordFeatures };
-      const coordRadiusData: GeoJSON.FeatureCollection = { type: 'FeatureCollection', features: coordRadiusFeatures };
-
-      const radiusSourceId = 'route-radius-source';
-      const radiusFillLayerId = 'route-radius-fill';
-      const radiusOutlineLayerId = 'route-radius-outline';
-
-      if (!map.getSource(radiusSourceId)) {
-        map.addSource(radiusSourceId, { type: 'geojson', data: coordRadiusData });
-        map.addLayer({
-          id: radiusFillLayerId,
-          type: 'fill',
-          source: radiusSourceId,
-          paint: {
-            'fill-color': [
-              'match', ['get', 'role'], 
-              'origin', '#3b82f6', // blue
-              'destination', '#10b981', // green
-              '#f59e0b' // yellow
-            ],
-            'fill-opacity': 0.15,
-          },
-        });
-        map.addLayer({
-          id: radiusOutlineLayerId,
-          type: 'line',
-          source: radiusSourceId,
-          paint: {
-            'line-color': [
-              'match', ['get', 'role'], 
-              'origin', '#2563eb', 
-              'destination', '#059669',
-              '#d97706'
-            ],
-            'line-width': 1,
-            'line-dasharray': [4, 4],
-          },
-        });
-      } else {
-        (map.getSource(radiusSourceId) as any).setData(coordRadiusData);
-      }
-
-      if (!map.getSource(coordSourceId)) {
-        map.addSource(coordSourceId, { type: 'geojson', data: coordData });
-        map.addLayer({
-          id: coordPointLayerId,
-          type: 'circle',
-          source: coordSourceId,
-          paint: {
-            'circle-radius': 8,
-            'circle-color': [
-              'match', ['get', 'role'], 
-              'origin', '#2563eb', 
-              'destination', '#059669',
-              '#d97706'
-            ],
-            'circle-stroke-width': 2,
-            'circle-stroke-color': '#ffffff'
-          },
-        });
-      } else {
-        (map.getSource(coordSourceId) as any).setData(coordData);
-      }
-
-      // 3. Render Planned Path
-      const pathData: GeoJSON.FeatureCollection = { type: 'FeatureCollection', features: [] };
-      if (selectedRoute && editorMode === 'idle') {
-        const coords = extractRouteCoordinates(selectedRoute, geofences);
-        if (coords.length > 1) {
-          pathData.features.push({
-            type: 'Feature',
-            properties: { isPlanned: !!selectedRoute.plannedPath },
-            geometry: { type: 'LineString', coordinates: coords }
-          });
-        }
-      }
-
-      if (!map.getSource(pathSourceId)) {
-        map.addSource(pathSourceId, { type: 'geojson', data: pathData });
-        
-        // Solid layer for planned paths
-        map.addLayer({
-          id: pathLayerId + '-solid',
-          type: 'line',
-          source: pathSourceId,
-          filter: ['==', ['get', 'isPlanned'], true],
-          paint: {
-            'line-color': '#8b5cf6',
-            'line-width': 4,
-          },
-        });
-        
-        // Dashed layer for fallback straight lines
-        map.addLayer({
-          id: pathLayerId + '-dashed',
-          type: 'line',
-          source: pathSourceId,
-          filter: ['!=', ['get', 'isPlanned'], true],
-          paint: {
-            'line-color': '#8b5cf6',
-            'line-width': 4,
-            'line-dasharray': [2, 2]
-          },
-        });
-      } else {
-        (map.getSource(pathSourceId) as any).setData(pathData);
-      }
-    };
-
     if (map.isStyleLoaded()) {
       render();
     } else {
       map.once('styledata', render);
     }
+  }, [map, render]);
 
+  // Clean up layers when component unmounts
+  useEffect(() => {
     return () => {
-      if (map?.getStyle()) {
-        if (map.getLayer(gfFillLayerId)) map.removeLayer(gfFillLayerId);
-        if (map.getLayer(gfOutlineLayerId)) map.removeLayer(gfOutlineLayerId);
-        if (map.getSource(gfSourceId)) map.removeSource(gfSourceId);
+      if (map && map.getStyle()) {
+        if (map.getLayer(GF_FILL_LAYER_ID)) map.removeLayer(GF_FILL_LAYER_ID);
+        if (map.getLayer(GF_OUTLINE_LAYER_ID)) map.removeLayer(GF_OUTLINE_LAYER_ID);
+        if (map.getSource(GF_SOURCE_ID)) map.removeSource(GF_SOURCE_ID);
         
-        if (map.getLayer(coordPointLayerId)) map.removeLayer(coordPointLayerId);
-        if (map.getSource(coordSourceId)) map.removeSource(coordSourceId);
+        if (map.getLayer(RADIUS_FILL_LAYER_ID)) map.removeLayer(RADIUS_FILL_LAYER_ID);
+        if (map.getLayer(RADIUS_OUTLINE_LAYER_ID)) map.removeLayer(RADIUS_OUTLINE_LAYER_ID);
+        if (map.getSource(RADIUS_SOURCE_ID)) map.removeSource(RADIUS_SOURCE_ID);
 
-        if (map.getLayer(pathLayerId + '-solid')) map.removeLayer(pathLayerId + '-solid');
-        if (map.getLayer(pathLayerId + '-dashed')) map.removeLayer(pathLayerId + '-dashed');
-        if (map.getSource(pathSourceId)) map.removeSource(pathSourceId);
+        if (map.getLayer(COORD_POINT_LAYER_ID)) map.removeLayer(COORD_POINT_LAYER_ID);
+        if (map.getSource(COORD_SOURCE_ID)) map.removeSource(COORD_SOURCE_ID);
+
+        if (map.getLayer(PATH_LAYER_SOLID_ID)) map.removeLayer(PATH_LAYER_SOLID_ID);
+        if (map.getLayer(PATH_LAYER_DASHED_ID)) map.removeLayer(PATH_LAYER_DASHED_ID);
+        if (map.getLayer(PATH_CASING_LAYER_ID)) map.removeLayer(PATH_CASING_LAYER_ID);
+        if (map.getSource(PATH_SOURCE_ID)) map.removeSource(PATH_SOURCE_ID);
       }
     };
-  }, [map, geofences, selectedRoute, editorMode]);
+  }, [map]);
 
   const handleResetNorth = () => {
     if (map) {
