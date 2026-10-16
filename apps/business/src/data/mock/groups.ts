@@ -1,8 +1,9 @@
 export const mockVehicleGroups = [
-  { id: 'grp-v-001', name: 'Logistik Area Jakarta', description: 'Armada pengiriman wilayah Jakarta', memberCount: 8, type: 'vehicle' as const },
-  { id: 'grp-v-002', name: 'Logistik Area Tangerang', description: 'Armada pengiriman wilayah Tangerang', memberCount: 5, type: 'vehicle' as const },
-  { id: 'grp-v-003', name: 'Armada Ekspedisi Jarak Jauh', description: 'Truk antar kota dan provinsi', memberCount: 4, type: 'vehicle' as const },
-  { id: 'grp-v-004', name: 'Armada Khusus B3', description: 'Kendaraan untuk bahan berbahaya', memberCount: 6, type: 'vehicle' as const },
+  { id: 'grp-v-001', name: 'Logistik Jakarta', description: 'Armada pengiriman wilayah Jakarta', memberCount: 14, type: 'vehicle' as const },
+  { id: 'grp-v-002', name: 'Logistik Tangerang', description: 'Armada pengiriman wilayah Tangerang', memberCount: 12, type: 'vehicle' as const },
+  { id: 'grp-v-003', name: 'Ekspedisi Antarkota', description: 'Truk antar kota dan provinsi', memberCount: 11, type: 'vehicle' as const },
+  { id: 'grp-v-004', name: 'Operasional B3', description: 'Kendaraan untuk bahan berbahaya', memberCount: 8, type: 'vehicle' as const },
+  { id: 'grp-v-005', name: 'Distribusi Reguler', description: 'Armada distribusi barang reguler harian', memberCount: 5, type: 'vehicle' as const },
 ];
 
 export const mockDriverGroups = [

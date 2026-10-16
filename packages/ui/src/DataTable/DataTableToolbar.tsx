@@ -201,6 +201,7 @@ export function DataTableToolbar<TData extends RowData = RowData>({
             <Popover open={isFilterOpen} onOpenChange={onFilterOpenChange}>
               <PopoverTrigger asChild>
                 <Button
+                  id="data-table-filter-btn"
                   variant="ghost"
                   size="sm"
                   className={cn(
@@ -241,6 +242,7 @@ export function DataTableToolbar<TData extends RowData = RowData>({
             <Popover open={isColumnOpen} onOpenChange={onColumnOpenChange}>
               <PopoverTrigger asChild>
                 <Button
+                  id="data-table-columns-btn"
                   variant="ghost"
                   size="sm"
                   className={cn(
@@ -268,6 +270,7 @@ export function DataTableToolbar<TData extends RowData = RowData>({
           {/* Export toggle button */}
           {showExport && exportConfig?.enabled !== false && (
             <Button
+              id="data-table-export-btn"
               variant="ghost"
               size="sm"
               onClick={() => {

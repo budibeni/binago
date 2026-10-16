@@ -147,7 +147,7 @@ export const rentalVehiclesDictionaries = {
     fieldWarna: 'Warna',
     fieldBahanBakar: 'Bahan Bakar',
     fieldNoStnk: 'No. STNK',
-    fieldBerlakuStnk: 'Berlaku STNK',
+    fieldBerlakuStnk: 'Masa Berlaku STNK',
 
     // Notes placeholder
     notesPlaceholder: 'Tulis catatan (opsional)',

@@ -71,4 +71,19 @@ export const vehicleService = {
   getVehicleGroups(): VehicleGroup[] {
     return vehicleRepository.getGroups();
   },
+
+  /**
+   * Create and register a new vehicle.
+   */
+  createVehicle(data: Partial<Vehicle>): Vehicle {
+    return vehicleRepository.create(data);
+  },
+
+  /**
+   * Update existing vehicle details.
+   */
+  updateVehicle(id: string, data: Partial<Vehicle>): Vehicle | undefined {
+    return vehicleRepository.update(id, data);
+  },
 };
+

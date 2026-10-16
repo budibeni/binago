@@ -15,7 +15,6 @@ import {
   Table,
   Bell,
   Clock,
-  SlidersHorizontal,
   Truck,
   ListFilter,
   Scissors,
@@ -61,6 +60,10 @@ import {
   getEmergencyReportsOverviewTourSteps,
   getEmergencyReportsListTourSteps,
   getEmergencyReportsDetailTourSteps,
+  getVehiclesOverviewTourSteps,
+  getVehiclesFilterTourSteps,
+  getVehiclesDetailTourSteps,
+  getVehiclesFormTourSteps,
 } from '@/components/tour';
 import type { DriveStep } from 'driver.js';
 
@@ -74,6 +77,7 @@ export function HeaderTourButton({ locale = 'id', className }: HeaderTourButtonP
   const router = useRouter();
   const isEn = locale === 'en';
   const isTrackingPage = pathname === '/tracking' || pathname.startsWith('/tracking');
+  const isVehiclesPage = pathname === '/vehicles' || pathname.startsWith('/vehicles');
   const isDriverPortalPage = pathname === '/portal/driver' || pathname.startsWith('/portal/driver');
   const isEmergencyReportsPage = pathname === '/activity/emergency-reports' || pathname.startsWith('/activity/emergency-reports');
 
@@ -99,6 +103,12 @@ export function HeaderTourButton({ locale = 'id', className }: HeaderTourButtonP
   const speedTableTourSteps = useMemo(() => getSpeedTableTourSteps(locale), [locale]);
   const activityTourSteps = useMemo(() => getActivityTourSteps(locale), [locale]);
 
+  // Vehicles Step definitions
+  const vehiclesOverviewTourSteps = useMemo(() => getVehiclesOverviewTourSteps(locale), [locale]);
+  const vehiclesFilterTourSteps = useMemo(() => getVehiclesFilterTourSteps(locale), [locale]);
+  const vehiclesDetailTourSteps = useMemo(() => getVehiclesDetailTourSteps(locale), [locale]);
+  const vehiclesFormTourSteps = useMemo(() => getVehiclesFormTourSteps(locale), [locale]);
+
   // Driver Portal Step definitions
   const driverPortalOverviewSteps = useMemo(() => getDriverPortalOverviewTourSteps(locale), [locale]);
   const driverPortalVehicleSteps = useMemo(() => getDriverPortalVehicleTourSteps(locale), [locale]);
@@ -113,6 +123,9 @@ export function HeaderTourButton({ locale = 'id', className }: HeaderTourButtonP
 
   // Active tour steps based on currently visible tab
   const currentDefaultSteps = useMemo(() => {
+    if (isVehiclesPage) {
+      return vehiclesOverviewTourSteps;
+    }
     if (isEmergencyReportsPage) {
       return emergencyReportsOverviewSteps;
     }
@@ -130,6 +143,8 @@ export function HeaderTourButton({ locale = 'id', className }: HeaderTourButtonP
     if (activeMode === 'heatmap') return heatmapTourSteps;
     return liveTourSteps;
   }, [
+    isVehiclesPage,
+    vehiclesOverviewTourSteps,
     isEmergencyReportsPage,
     emergencyReportsOverviewSteps,
     isDriverPortalPage,
@@ -143,12 +158,14 @@ export function HeaderTourButton({ locale = 'id', className }: HeaderTourButtonP
     activityTourSteps,
     playbackTourSteps,
     heatmapTourSteps,
-    liveTourSteps
+    liveTourSteps,
   ]);
 
   // Base tour hook
   const { startTour, resetTour } = useTour({
-    tourId: isEmergencyReportsPage
+    tourId: isVehiclesPage
+      ? 'vehicles_overview'
+      : isEmergencyReportsPage
       ? 'emergency_reports_overview'
       : isDriverPortalPage
       ? 'driver_portal_overview'
@@ -691,8 +708,82 @@ export function HeaderTourButton({ locale = 'id', className }: HeaderTourButtonP
           </>
         )}
 
+        {/* ── CONTEXT: VEHICLES MODULE ── */}
+        {isVehiclesPage && (
+          <>
+            <DropdownMenuItem
+              onClick={() => startTour(vehiclesOverviewTourSteps)}
+              className="flex items-start gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer hover:bg-surface-elevated transition-colors"
+            >
+              <Compass className="h-4 w-4 text-blue-500 mt-0.5 shrink-0" />
+              <div className="flex flex-col">
+                <span className="text-[12.5px] font-semibold text-foreground">
+                  {isEn ? 'Vehicles Overview Tour' : 'Tur Keseluruhan Kendaraan'}
+                </span>
+                <span className="text-[11px] text-foreground-muted leading-tight">
+                  {isEn ? 'Master table, metrics, quick search, & pagination' : 'Tabel data master, metrik, pencarian cepat, & paginasi'}
+                </span>
+              </div>
+            </DropdownMenuItem>
+
+            <DropdownMenuItem
+              onClick={() => {
+                window.dispatchEvent(new CustomEvent('adatrack:tour-open-filter'));
+                setTimeout(() => startTour(vehiclesFilterTourSteps), 200);
+              }}
+              className="flex items-start gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer hover:bg-surface-elevated transition-colors"
+            >
+              <ListFilter className="h-4 w-4 text-amber-500 mt-0.5 shrink-0" />
+              <div className="flex flex-col">
+                <span className="text-[12.5px] font-semibold text-foreground">
+                  {isEn ? 'Filter & Table Tools' : 'Filter & Alat Tabel'}
+                </span>
+                <span className="text-[11px] text-foreground-muted leading-tight">
+                  {isEn ? 'Multi-status pills, group filters, column visibility, & export' : 'Pills multi-status, filter grup, visibilitas kolom, & ekspor'}
+                </span>
+              </div>
+            </DropdownMenuItem>
+
+            <DropdownMenuItem
+              onClick={() => {
+                window.dispatchEvent(new CustomEvent('adatrack:tour-open-vehicle-detail'));
+                setTimeout(() => startTour(vehiclesDetailTourSteps), 300);
+              }}
+              className="flex items-start gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer hover:bg-surface-elevated transition-colors"
+            >
+              <Truck className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
+              <div className="flex flex-col">
+                <span className="text-[12.5px] font-semibold text-foreground">
+                  {isEn ? 'Vehicle Detail & Remote Actions' : 'Detail Kendaraan & Aksi Remote'}
+                </span>
+                <span className="text-[11px] text-foreground-muted leading-tight">
+                  {isEn ? 'Telemetry specs, efficiency score, GPS reboot, & immobilizer' : 'Spesifikasi telemetri, skor efisiensi, reboot GPS, & immobilizer'}
+                </span>
+              </div>
+            </DropdownMenuItem>
+
+            <DropdownMenuItem
+              onClick={() => {
+                window.dispatchEvent(new CustomEvent('adatrack:tour-open-vehicle-form'));
+                setTimeout(() => startTour(vehiclesFormTourSteps), 300);
+              }}
+              className="flex items-start gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer hover:bg-surface-elevated transition-colors"
+            >
+              <Wrench className="h-4 w-4 text-purple-500 mt-0.5 shrink-0" />
+              <div className="flex flex-col">
+                <span className="text-[12.5px] font-semibold text-foreground">
+                  {isEn ? 'Add Vehicle Form' : 'Formulir Tambah Kendaraan'}
+                </span>
+                <span className="text-[11px] text-foreground-muted leading-tight">
+                  {isEn ? 'Registration cards, engine specs, legal docs, & baseline data' : 'Kartu registrasi, spesifikasi mesin, dokumen legal, & data dasar'}
+                </span>
+              </div>
+            </DropdownMenuItem>
+          </>
+        )}
+
         {/* ── CONTEXT 4: OTHER MODULES / PAGES ── */}
-        {!isTrackingPage && !isDriverPortalPage && !isEmergencyReportsPage && (
+        {!isTrackingPage && !isDriverPortalPage && !isEmergencyReportsPage && !isVehiclesPage && (
           <>
             <div className="px-2.5 py-2 text-[12px] text-foreground-muted leading-relaxed">
               {isEn
@@ -712,8 +803,8 @@ export function HeaderTourButton({ locale = 'id', className }: HeaderTourButtonP
           </>
         )}
 
-        {/* Restart Tour Option (Tracking views, Driver Portal, & Emergency Reports) */}
-        {(isTrackingPage || isDriverPortalPage || isEmergencyReportsPage) && (
+        {/* Restart Tour Option (Tracking views, Driver Portal, Emergency Reports, & Vehicles) */}
+        {(isTrackingPage || isDriverPortalPage || isEmergencyReportsPage || isVehiclesPage) && (
           <>
             <DropdownMenuSeparator className="my-1 bg-border" />
             <DropdownMenuItem

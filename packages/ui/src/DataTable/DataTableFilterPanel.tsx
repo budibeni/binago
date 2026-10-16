@@ -58,7 +58,9 @@ export function DataTableFilterPanel({ config, isOpen, onClose, className }: Dat
   if (isSidePanel && !isOpen) return null;
 
   return (
-    <div className={cn(
+    <div
+      id="data-table-filter-panel"
+      className={cn(
       'flex flex-col bg-background',
       isSidePanel
         ? 'border border-border rounded-lg w-[220px] shrink-0 overflow-hidden'

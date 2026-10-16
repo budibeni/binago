@@ -17,7 +17,7 @@ const baseVehicles = [
   },
   {
     "id": "veh-002",
-    "plateNumber": "B 1002 ABC - BENI",
+    "plateNumber": "B 1002 ABC",
     "vehicleName": "Toyota Avanza",
     "vehicleCategory": "car",
     "brand": "Toyota",
@@ -645,13 +645,14 @@ export const mockVehicles = baseVehicles.map((v, i) => {
       if (name.includes('motor') || name.includes('beat') || name.includes('vario') || name.includes('nmax')) return 'motorcycle';
       return 'car';
     })(),
-    driverName: driver ? driver.name : 'Unknown Driver',
+    driverId: i % 5 === 0 ? null : v.driverId,
+    driverName: i % 5 === 0 ? null : (driver ? driver.name : null),
     groupName: group ? group.name : 'Unknown Group',
     status: 'active' as const,
     deviceImei: device ? device.imei : null,
     deviceSimNumber: device ? `0812${(10000000 + i).toString().padStart(8, '0')}` : null,
-    gpsDeviceBrand: device ? device.model.split(' ')[0] : undefined,
-    gpsDeviceType: device ? device.model.split(' ')[1] || device.model : undefined,
+    gpsDeviceBrand: device?.brand,
+    gpsDeviceType: device?.type,
     gpsInstallDate: device ? baseInstallDate.toISOString().split('T')[0] : undefined,
     vehicleId: `V-${v.id.split('-')[1]}`,
     color: colors[i % colors.length],

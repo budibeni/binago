@@ -424,6 +424,7 @@ export const dictionaries = {
       colVehicle: 'Kendaraan',
       colGroup: 'Grup',
       colDriver: 'Pengemudi',
+      colEfficiency: 'Efisiensi',
       colStatus: 'Status',
       colOdometer: 'Odometer',
       colLastUpdate: 'Update Terakhir',
@@ -496,7 +497,7 @@ export const dictionaries = {
       fieldOdometer: 'Odometer',
       fieldLastService: 'Servis Terakhir',
       fieldNextService: 'Servis Berikutnya',
-      fieldStnkExpiry: 'Berlaku STNK',
+      fieldStnkExpiry: 'Masa Berlaku STNK',
       fieldStnkNo: 'No. STNK',
       fieldKirNo: 'No. KIR',
       fieldBpkbNo: 'No. BPKB',
@@ -511,6 +512,65 @@ export const dictionaries = {
       btnTrack: 'Lacak Lokasi',
       btnTurnOffEngine: 'Matikan Mesin',
       alertTurnOffEngine: 'Fitur mematikan mesin sedang dalam pengembangan.',
+
+      // Actions & Dialogs
+      btnRestartGps: 'Restart GPS',
+      btnTurnOffEngineGradual: 'Matikan Mesin Bertahap',
+      btnResumeEngine: 'Aktifkan Mesin',
+      badgeImmobilizerActive: 'Immobilizer Aktif',
+      btnCancel: 'Batal',
+
+      // Restart GPS Dialog
+      dialogRestartGpsTitle: 'Restart Perangkat GPS',
+      dialogRestartGpsDesc: 'Kirim sinyal restart ke perangkat telemetri GPS pada kendaraan {plate} ({name})? Perangkat akan me-reboot koneksi dalam 1-2 menit.',
+      dialogRestartGpsConfirm: 'Restart Sekarang',
+      toastRestartGpsSuccess: 'Perintah restart GPS berhasil dikirim ke kendaraan {plate}. Perangkat akan me-reboot koneksi dalam 1-2 menit.',
+
+      // Turn Off Engine Dialog
+      dialogTurnOffTitle: 'Matikan Mesin Kendaraan',
+      dialogTurnOffSubtitle: 'Pemutusan Arus Relay Kelistrikan (Remote Immobilizer)',
+      dialogTurnOffTarget: 'Target Kendaraan',
+      dialogTurnOffGpsCondition: 'Kondisi GPS',
+      dialogTurnOffMovingStatus: 'Melaju',
+      dialogTurnOffStoppedStatus: 'Berhenti (0 km/h)',
+      dialogTurnOffNoticeMovingTitle: 'Perlambatan Bertahap Otomatis (Keamanan Berkendara)',
+      dialogTurnOffNoticeMovingDesc: 'Kendaraan sedang melaju ({speed} km/h). Untuk mencegah setir terkunci atau rem kehilangan tekanan vakum di kecepatan tinggi, perangkat telematika akan memutus suplai bahan bakar secara bertahap agar laju kendaraan melambat aman sebelum mesin dimatikan total saat kecepatan di bawah 10 km/h.',
+      dialogTurnOffNoticeStoppedTitle: 'Pemutusan Arus Langsung (Direct Immobilizer)',
+      dialogTurnOffNoticeStoppedDesc: 'Kendaraan dalam posisi berhenti aman. Perintah relay akan memutus arus starter dan pompa bahan bakar seketika sehingga mesin tidak dapat dihidupkan.',
+      dialogTurnOffSafetyCheckbox: 'Saya telah memverifikasi situasi keselamatan kendaraan di lapangan dan bertanggung jawab atas eksekusi perintah ini.',
+      dialogTurnOffPasswordLabel: 'Password Login Otorisasi',
+      dialogTurnOffPasswordPlaceholder: 'Masukkan password login akun Anda',
+      dialogTurnOffPasswordRequired: 'Kata sandi login wajib diisi untuk otorisasi keamanan',
+      dialogTurnOffSafetyRequired: 'Centang konfirmasi keselamatan operasional sebelum mengeksekusi',
+      dialogTurnOffSending: 'Mengirim Sinyal...',
+      toastTurnOffMovingSuccess: 'Perintah pemutusan mesin dikirim ke {plate}: Kendaraan sedang melaju ({speed} km/h), perlambatan bertahap aktif sebelum mesin dimatikan total.',
+      toastTurnOffStoppedSuccess: 'Perintah pemutusan relay mesin berhasil dieksekusi. Kendaraan {plate} telah terkunci (immobilized).',
+
+      // Resume Engine Dialog
+      dialogResumeTitle: 'Aktifkan Kembali Mesin Kendaraan',
+      dialogResumeDesc: 'Kirim sinyal pemulihan relay kelistrikan ke perangkat GPS pada kendaraan {plate} ({name})? Aliran relay starter dan pompa bahan bakar akan disambung kembali sehingga kendaraan dapat dihidupkan normal.',
+      dialogResumeConfirm: 'Aktifkan Mesin',
+      toastResumeSuccess: 'Perintah pemulihan relay berhasil. Aliran listrik mesin {plate} telah tersambung kembali.',
+
+      // Efficiency & Stability Card
+      cardEfficiency: 'Efisiensi & Stabilitas',
+      scorePrefix: 'Skor',
+      lblIdleRatio: 'Rasio Idle',
+      lblActiveHours: 'Jam Mesin Aktif',
+      lblSpeedingRatio: 'Pelanggaran Ngebut',
+      lblSignalStability: 'Stabilitas Sinyal',
+      lblDriverRating: 'Peringkat Pengemudi',
+      hoursUnit: 'Jam',
+      seatsUnit: 'Kursi',
+      fieldGpsBrandOnly: 'Merek GPS',
+      fieldGpsTypeOnly: 'Tipe GPS',
+
+      // Badges
+      badgeNeedService: 'Perlu Servis',
+      badgeGoodCondition: 'Kondisi Baik',
+      badgeStnkExpiring: 'STNK Segera Habis',
+      badgeStnkExpired: 'STNK Kedaluwarsa',
+      badgeStnkValid: 'STNK Masih Berlaku',
     },
 
     // Trips
@@ -1131,6 +1191,7 @@ export const dictionaries = {
       colVehicle: 'Vehicle',
       colGroup: 'Group',
       colDriver: 'Driver',
+      colEfficiency: 'Efficiency',
       colStatus: 'Status',
       colOdometer: 'Odometer',
       colLastUpdate: 'Last Update',
@@ -1218,6 +1279,65 @@ export const dictionaries = {
       btnTrack: 'Track Location',
       btnTurnOffEngine: 'Turn Off Engine',
       alertTurnOffEngine: 'Engine cut-off feature is currently under development.',
+
+      // Actions & Dialogs
+      btnRestartGps: 'Restart GPS',
+      btnTurnOffEngineGradual: 'Gradual Engine Cut-Off',
+      btnResumeEngine: 'Resume Engine',
+      badgeImmobilizerActive: 'Immobilizer Active',
+      btnCancel: 'Cancel',
+
+      // Restart GPS Dialog
+      dialogRestartGpsTitle: 'Restart GPS Device',
+      dialogRestartGpsDesc: 'Send restart signal to the GPS telemetry device on vehicle {plate} ({name})? The device will reboot connection within 1-2 minutes.',
+      dialogRestartGpsConfirm: 'Restart Now',
+      toastRestartGpsSuccess: 'GPS restart command successfully sent to vehicle {plate}. Device will reboot connection in 1-2 minutes.',
+
+      // Turn Off Engine Dialog
+      dialogTurnOffTitle: 'Turn Off Vehicle Engine',
+      dialogTurnOffSubtitle: 'Electrical Relay Disconnection (Remote Immobilizer)',
+      dialogTurnOffTarget: 'Target Vehicle',
+      dialogTurnOffGpsCondition: 'GPS Condition',
+      dialogTurnOffMovingStatus: 'Moving',
+      dialogTurnOffStoppedStatus: 'Stopped (0 km/h)',
+      dialogTurnOffNoticeMovingTitle: 'Automatic Gradual Deceleration (Driving Safety)',
+      dialogTurnOffNoticeMovingDesc: 'Vehicle is currently moving ({speed} km/h). To prevent steering lock or brake vacuum loss at high speeds, the telematics device will gradually disrupt fuel supply to safely slow down the vehicle before completely locking the engine below 10 km/h.',
+      dialogTurnOffNoticeStoppedTitle: 'Direct Electrical Cut-Off (Direct Immobilizer)',
+      dialogTurnOffNoticeStoppedDesc: 'Vehicle is stopped in a safe position. The relay command will immediately cut starter and fuel pump power so the engine cannot be started.',
+      dialogTurnOffSafetyCheckbox: 'I have verified the vehicle safety situation in the field and take responsibility for executing this command.',
+      dialogTurnOffPasswordLabel: 'Login Authorization Password',
+      dialogTurnOffPasswordPlaceholder: 'Enter your account login password',
+      dialogTurnOffPasswordRequired: 'Login password is required for security authorization',
+      dialogTurnOffSafetyRequired: 'Check the operational safety confirmation before executing',
+      dialogTurnOffSending: 'Sending Signal...',
+      toastTurnOffMovingSuccess: 'Engine cut-off command sent to {plate}: Vehicle is moving ({speed} km/h), gradual deceleration activated before complete shutdown.',
+      toastTurnOffStoppedSuccess: 'Engine relay cut-off executed successfully. Vehicle {plate} is now immobilized.',
+
+      // Resume Engine Dialog
+      dialogResumeTitle: 'Resume Vehicle Engine',
+      dialogResumeDesc: 'Send relay restore signal to the GPS device on vehicle {plate} ({name})? Starter and fuel pump relay circuits will be restored so the vehicle can be started normally.',
+      dialogResumeConfirm: 'Resume Engine',
+      toastResumeSuccess: 'Relay restoration command successful. Engine power on {plate} is now reconnected.',
+
+      // Efficiency & Stability Card
+      cardEfficiency: 'Efficiency & Stability',
+      scorePrefix: 'Score',
+      lblIdleRatio: 'Idle Ratio',
+      lblActiveHours: 'Active Engine Hours',
+      lblSpeedingRatio: 'Speeding Violations',
+      lblSignalStability: 'Signal Stability',
+      lblDriverRating: 'Driver Rating',
+      hoursUnit: 'Hours',
+      seatsUnit: 'Seats',
+      fieldGpsBrandOnly: 'GPS Brand',
+      fieldGpsTypeOnly: 'GPS Type',
+
+      // Badges
+      badgeNeedService: 'Service Due',
+      badgeGoodCondition: 'Good Condition',
+      badgeStnkExpiring: 'Registration Expiring Soon',
+      badgeStnkExpired: 'Registration Expired',
+      badgeStnkValid: 'Registration Valid',
     },
 
 

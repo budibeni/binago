@@ -2,7 +2,6 @@ import React from 'react';
 import {
   Dialog,
   Button,
-  Checkbox,
   DataTable,
   type DataTableColumnDef,
   type DataTableFilterConfig

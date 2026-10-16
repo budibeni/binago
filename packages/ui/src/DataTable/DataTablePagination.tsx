@@ -98,6 +98,7 @@ export function DataTablePagination<TData extends RowData = RowData>({
 
   return (
     <div
+      id="data-table-pagination"
       className={cn(
         'flex flex-wrap items-center justify-between gap-3 text-xs text-foreground-muted',
         className,

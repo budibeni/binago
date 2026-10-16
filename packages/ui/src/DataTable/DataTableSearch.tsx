@@ -49,6 +49,7 @@ export function DataTableSearch({
     <div className={cn('relative flex items-center w-full max-w-[280px] group', className)}>
       <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-foreground-muted group-focus-within:text-foreground transition-colors" />
       <input
+        id="data-table-search-input"
         type="text"
         value={localValue}
         onChange={(e) => setLocalValue(e.target.value)}

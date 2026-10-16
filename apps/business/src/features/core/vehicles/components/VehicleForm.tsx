@@ -9,7 +9,6 @@ import {
   InputDate,
   InputTextarea,
   useForm,
-  InfoRow
 } from '@adatrack/ui';
 import { getVehicleFormSchema, type Vehicle } from '../types/vehicle';
 import { vehicleService, driverService } from '@/data/services';
@@ -131,10 +130,12 @@ export function VehicleForm({
       onSubmit={handleSubmit}
       isSubmitting={isSubmitting}
       columns={2}
+      saveProps={{ id: 'vehicle-form-save-btn' }}
     >
       <div className="flex flex-col gap-6">
         {/* 1. Informasi Dasar */}
         <FormCard
+          id="vehicle-form-identity-card"
           title={tF.cardIdentity}
           description={tF.cardIdentityDesc}
           icon={<CarFront className="w-5 h-5 text-blue-500" />}
@@ -148,7 +149,7 @@ export function VehicleForm({
             required
           />
           <InputString
-            label="Nomor Aset"
+            label={tF.lblAssetNumber || 'Nomor Aset'}
             value={formData.assetNumber || ''}
             onChange={(val) => handleChange('assetNumber', val)}
             error={errors.assetNumber}
@@ -173,6 +174,7 @@ export function VehicleForm({
 
         {/* 2. Spesifikasi Kendaraan */}
         <FormCard
+          id="vehicle-form-specs-card"
           title={tF.cardSpecs}
           description={tF.cardSpecsDesc}
           icon={<Cpu className="w-5 h-5 text-indigo-500" />}
@@ -231,6 +233,7 @@ export function VehicleForm({
       <div className="flex flex-col gap-6">
         {/* 3. Operasional & Performa */}
         <FormCard
+          id="vehicle-form-ops-card"
           title={tF.cardOps}
           description={tF.cardOpsDesc}
           icon={<Wrench className="w-5 h-5 text-orange-500" />}
@@ -268,23 +271,24 @@ export function VehicleForm({
 
         {/* 4. Lisensi & Legalitas */}
         <FormCard
+          id="vehicle-form-legal-card"
           title={tF.cardLegal}
           description={tF.cardLegalDesc}
           icon={<Wrench className="w-5 h-5 text-green-500" />}
           columns={2}
         >
           <InputString
-            label="No. STNK"
+            label={tF.lblStnkNo || 'No. STNK'}
             value={formData.stnkNumber || ''}
             onChange={(val) => handleChange('stnkNumber', val)}
           />
           <InputDate
-            label="Berlaku STNK"
+            label={tF.lblRegExpiry || 'Masa Berlaku STNK'}
             value={formData.registrationExpiry || ''}
             onChange={(val) => handleChange('registrationExpiry', val)}
           />
           <InputString
-            label="No. KIR"
+            label={tF.lblKirNo || 'No. KIR'}
             value={formData.kirNumber || ''}
             onChange={(val) => handleChange('kirNumber', val)}
           />
@@ -307,6 +311,7 @@ export function VehicleForm({
 
         {/* 5. Administrasi & Perawatan */}
         <FormCard
+          id="vehicle-form-maintenance-card"
           title={tF.cardAdminMaintenance}
           description={tF.cardAdminMaintenanceDesc}
           icon={<FileText className="w-5 h-5 text-violet-500" />}
@@ -314,7 +319,7 @@ export function VehicleForm({
         >
           <div className="col-span-1 group-data-[layout=default]/form:md:col-span-2 group-data-[layout=fullscreen]/form:md:col-span-2">
             <p className="text-[11px] text-foreground-muted mb-4 bg-neutral-100 dark:bg-neutral-800 p-2.5 rounded border border-border/50">
-              <strong className="text-foreground">Info:</strong> Nilai di bawah ini berfungsi sebagai saldo awal (baseline). Nantinya angka ini akan diperbarui otomatis oleh sistem telematika dan modul perawatan.
+              <strong className="text-foreground">Info:</strong> {tF.lblInfoBaseline || 'Nilai di bawah ini berfungsi sebagai saldo awal (baseline). Nantinya angka ini akan diperbarui otomatis oleh sistem telematika dan modul perawatan.'}
             </p>
           </div>
           <InputNumber
@@ -346,6 +351,7 @@ export function VehicleForm({
       {/* 6. Perangkat GPS */}
       <div className="col-span-1 group-data-[layout=default]/form:lg:col-span-2 group-data-[layout=fullscreen]/form:lg:col-span-2 group-data-[layout=dialog]/form:lg:col-span-2">
         <FormCard
+          id="vehicle-form-device-card"
           title={tF.cardDeviceGroup}
           description={tF.cardDeviceGroupDesc}
           icon={<Cpu className="w-5 h-5 text-purple-500" />}

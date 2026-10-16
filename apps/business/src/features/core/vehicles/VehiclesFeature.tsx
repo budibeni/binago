@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { Car, Star } from 'lucide-react';
+import { Star } from 'lucide-react';
 import { cn, formatNumber } from '@adatrack/utils';
 import { getTranslation } from '../../../i18n';
 import { useBusinessLocale } from '../../../components/BusinessShellLayout';
@@ -12,7 +12,7 @@ import { VehicleTable } from './components/VehicleTable';
 import { VehicleView } from './components/VehicleView';
 import { VehicleForm } from './components/VehicleForm';
 import type { Vehicle, VehicleStatusFilter } from './types/vehicle';
-import type { DataTableFilterConfig, DataTableLabels } from '@adatrack/ui';
+import { toast, type DataTableFilterConfig, type DataTableLabels } from '@adatrack/ui';
 
 // ===========================================================================
 
@@ -46,6 +46,7 @@ export function VehiclesFeature() {
   const [drawerOpen, setDrawerOpen] = React.useState(false);
 
   const [editVehicle, setEditVehicle] = React.useState<Vehicle | null>(null);
+  const [isAddOpen, setIsAddOpen] = React.useState(false);
 
   // ===========================================================================
   const filteredVehicles = React.useMemo(
@@ -63,17 +64,27 @@ export function VehiclesFeature() {
 
   // ===========================================================================
   const handleViewDetail = React.useCallback((vehicle: Vehicle) => {
+    window.history.pushState(null, '', `/vehicles/${vehicle.id}`);
     setDetailVehicle(vehicle);
     setDrawerOpen(true);
   }, []);
 
   const handleCloseDrawer = React.useCallback(() => {
+    window.history.pushState(null, '', '/vehicles');
     setDrawerOpen(false);
   }, []);
 
   const handleEdit = React.useCallback((vehicle: Vehicle) => {
+    window.history.pushState(null, '', `/vehicles/edit/${vehicle.id}`);
     setDrawerOpen(false);
+    setIsAddOpen(false);
     setEditVehicle(vehicle);
+  }, []);
+
+  const handleAdd = React.useCallback(() => {
+    window.history.pushState(null, '', '/vehicles/create');
+    setEditVehicle(null);
+    setIsAddOpen(true);
   }, []);
 
   const handleTrack = React.useCallback((vehicle: Vehicle) => {
@@ -88,12 +99,54 @@ export function VehiclesFeature() {
     console.log('Delete vehicle:', vehicle.id);
   }, []);
 
+  // Event automation bridge for interactive tours
+  React.useEffect(() => {
+    const handleTourOpenFilter = () => setIsFilterOpen(true);
+    const handleTourCloseFilter = () => setIsFilterOpen(false);
+
+    const handleTourOpenDetail = () => {
+      const v = filteredVehicles[0] || vehicleService.getVehicles()[0];
+      if (v) {
+        setDetailVehicle(v);
+        setDrawerOpen(true);
+      }
+    };
+    const handleTourCloseDetail = () => setDrawerOpen(false);
+
+    const handleTourOpenForm = () => {
+      setDrawerOpen(false);
+      setEditVehicle(null);
+      setIsAddOpen(true);
+    };
+    const handleTourCloseForm = () => {
+      setIsAddOpen(false);
+      setEditVehicle(null);
+    };
+
+    window.addEventListener('adatrack:tour-open-filter', handleTourOpenFilter);
+    window.addEventListener('adatrack:tour-close-filter', handleTourCloseFilter);
+    window.addEventListener('adatrack:tour-open-vehicle-detail', handleTourOpenDetail);
+    window.addEventListener('adatrack:tour-close-vehicle-detail', handleTourCloseDetail);
+    window.addEventListener('adatrack:tour-open-vehicle-form', handleTourOpenForm);
+    window.addEventListener('adatrack:tour-close-vehicle-form', handleTourCloseForm);
+
+    return () => {
+      window.removeEventListener('adatrack:tour-open-filter', handleTourOpenFilter);
+      window.removeEventListener('adatrack:tour-close-filter', handleTourCloseFilter);
+      window.removeEventListener('adatrack:tour-open-vehicle-detail', handleTourOpenDetail);
+      window.removeEventListener('adatrack:tour-close-vehicle-detail', handleTourCloseDetail);
+      window.removeEventListener('adatrack:tour-open-vehicle-form', handleTourOpenForm);
+      window.removeEventListener('adatrack:tour-close-vehicle-form', handleTourCloseForm);
+    };
+  }, [filteredVehicles]);
+
   // Filter toggle/clear logic is now handled by DataTableFilterPanel internally via onStateChange
 
   // ===========================================================================
   const tableLabels = React.useMemo(() => ({
     colPlateNumber: tV.colPlateNumber,
     colVehicle: tV.colVehicle,
+    colStatus: tV.colStatus || 'Status',
     colGroup: tV.colGroup,
     colDriver: tV.colDriver,
     colCategory: tV.colCategory,
@@ -114,6 +167,17 @@ export function VehiclesFeature() {
     colCapacityCC: tV.colCapacityCC,
     colNotes: tV.detailNotes || (locale === 'en' ? 'Notes' : 'Catatan'),
     colActions: tV.colActions,
+    colEfficiency: tV.colEfficiency,
+    fieldStnkExpiry: tV.fieldStnkExpiry,
+    detailNotes: tV.detailNotes,
+    categoryTruck: tV.categoryTruck,
+    categoryMinibus: tV.categoryMinibus,
+    categoryPickup: tV.categoryPickup,
+    categoryMotorcycle: tV.categoryMotorcycle,
+    categoryOther: tV.categoryOther,
+    fuelSolar: tV.fuelSolar,
+    fuelBensin: tV.fuelBensin,
+    fuelElectric: tV.fuelElectric,
     noDriver: tV.noDriver,
     noDevice: tV.noDevice,
     statusDriving: tV.statusDriving,
@@ -245,7 +309,7 @@ export function VehiclesFeature() {
       },
       {
         id: 'stnkStatus',
-        label: 'Status STNK',
+        label: tV.stnkStatus || 'Status STNK',
         type: 'checkbox-group',
         options: [
           { value: 'active', label: tV.stnkActive || 'Masih Panjang' },
@@ -275,7 +339,7 @@ export function VehiclesFeature() {
           filterConfig={filterConfig}
           isFilterOpen={isFilterOpen}
           onFilterOpenChange={setIsFilterOpen}
-          onAdd={undefined}
+          onAdd={handleAdd}
           dtLabels={dtLabels}
         />
       </div>
@@ -286,28 +350,42 @@ export function VehiclesFeature() {
         open={drawerOpen}
         onClose={handleCloseDrawer}
         onEdit={handleEdit}
-        onDelete={handleDelete}
         onTrack={handleTrack}
       />
 
-      {!!editVehicle && (
+      {(isAddOpen || !!editVehicle) && (
         <VehicleForm
           vehicle={editVehicle}
-          open={!!editVehicle}
+          open={isAddOpen || !!editVehicle}
           onOpenChange={(open) => {
             if (!open) {
+              window.history.pushState(null, '', '/vehicles');
               setEditVehicle(null);
+              setIsAddOpen(false);
             }
           }}
           onSave={(data) => {
-            console.log('Saved vehicle:', data);
+            if (editVehicle) {
+              vehicleService.updateVehicle(editVehicle.id, data);
+              toast.success(locale === 'en' ? 'Vehicle data updated successfully' : 'Data kendaraan berhasil diperbarui');
+            } else {
+              vehicleService.createVehicle(data);
+              toast.success(locale === 'en' ? 'Vehicle registered successfully' : 'Kendaraan berhasil didaftarkan');
+            }
+            window.history.pushState(null, '', '/vehicles');
             setEditVehicle(null);
+            setIsAddOpen(false);
           }}
           onCancel={() => {
+            window.history.pushState(null, '', '/vehicles');
             setEditVehicle(null);
+            setIsAddOpen(false);
           }}
         />
       )}
     </div>
   );
 }
+
+export const VehicleFeature = VehiclesFeature;
+
