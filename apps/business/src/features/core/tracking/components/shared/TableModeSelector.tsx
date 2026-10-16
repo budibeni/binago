@@ -20,8 +20,22 @@ export function TableModeSelector({ mode, onModeChange, locale }: TableModeSelec
         setIsOpen(false);
       }
     };
+    const handleOpenDropdown = () => {
+      setIsOpen(true);
+    };
+    const handleCloseDropdown = () => {
+      setIsOpen(false);
+    };
+
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    window.addEventListener('adatrack:open-table-dropdown', handleOpenDropdown);
+    window.addEventListener('adatrack:close-table-dropdown', handleCloseDropdown);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('adatrack:open-table-dropdown', handleOpenDropdown);
+      window.removeEventListener('adatrack:close-table-dropdown', handleCloseDropdown);
+    };
   }, []);
 
   const options = [
@@ -65,9 +79,10 @@ export function TableModeSelector({ mode, onModeChange, locale }: TableModeSelec
   const currentOption = options.find(opt => opt.value === mode) || options[0];
 
   return (
-    <div className="flex justify-start sm:justify-center shrink-0">
+    <div id="table-mode-selector" className="flex justify-start sm:justify-center shrink-0">
       <div className="relative min-w-[145px]" ref={dropdownRef}>
         <button
+          id="table-mode-selector-btn"
           type="button"
           onClick={() => setIsOpen(!isOpen)}
           className={cn(
@@ -83,10 +98,14 @@ export function TableModeSelector({ mode, onModeChange, locale }: TableModeSelec
         </button>
 
         {isOpen && (
-          <div className="absolute top-full left-0 mt-1 w-full p-1 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md rounded-md border border-neutral-100 dark:border-neutral-800 z-50">
+          <div
+            id="table-mode-dropdown-menu"
+            className="absolute top-full left-0 mt-1 w-full p-1 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md rounded-md border border-neutral-100 dark:border-neutral-800 z-50 shadow-lg"
+          >
             {options.map((opt) => (
               <button
                 key={opt.value}
+                id={`table-mode-option-${opt.value}`}
                 type="button"
                 onClick={() => {
                   onModeChange(opt.value);

@@ -148,7 +148,7 @@ function EmergencyDetailPanel({
   };
 
   return (
-    <div className="p-4 md:p-6 lg:p-8 animate-in fade-in zoom-in-95 duration-200 w-full max-w-5xl mx-auto">
+    <div id="emergency-detail-panel" className="p-4 md:p-6 lg:p-8 animate-in fade-in zoom-in-95 duration-200 w-full max-w-5xl mx-auto">
       {/* Mobile back */}
       <button
         onClick={onClose}
@@ -164,120 +164,126 @@ function EmergencyDetailPanel({
         onCancel={onClose}
         cancelText="Tutup"
         saveText={isSubmitting ? 'Menyimpan...' : 'Simpan Perubahan'}
+        saveProps={{ id: 'emergency-save-action-btn' }}
         isSubmitting={isSubmitting}
       >
 
         {/* ── CARD 1: Informasi Laporan ── */}
-        <FormCard
-          title="Informasi Laporan"
-          description="Detail laporan darurat yang dikirim oleh pengemudi."
-          icon={<CatIcon className="w-5 h-5" />}
-          iconWrapperClassName={cn('text-white', catCfg.bg.replace('/10', '').replace('bg-', 'bg-'))}
-        >
-          {/* Status badge di atas grid */}
-          <div className="flex items-center gap-2 mb-3">
-            <StatusBadge status={report.status} />
-            <span className={cn('inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[10px] font-bold', catCfg.color, catCfg.bg, catCfg.border)}>
-              <CatIcon className="w-3 h-3" />
-              {catCfg.label}
-            </span>
-          </div>
-
-          {/* Grid info — 4 kolom, persis seperti ReturnForm */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            <InfoField
-              label="No. Laporan"
-              value={report.id}
-              sub={timeAgo(report.timestamp)}
-            />
-            <InfoField
-              label="Waktu Laporan"
-              value={formatTs(report.timestamp)}
-            />
-            <InfoField
-              label="Pengemudi"
-              value={report.driverName}
-              sub={<PhoneLink phone={report.driverPhone} />}
-            />
-            <InfoField
-              label="Kendaraan"
-              value={report.vehiclePlate}
-              sub={report.vehicleType}
-            />
-          </div>
-
-          {/* Lokasi Kejadian & Buka di Google Maps / Street View */}
-          <div className="mt-4 pt-3 border-t border-border flex flex-col md:flex-row md:items-center justify-between gap-3">
-            <div className="flex flex-col gap-1">
-              <span className="text-[10px] font-semibold tracking-wider text-slate-400 dark:text-slate-500 uppercase">
-                Lokasi Kejadian & Koordinat GPS
+        <div id="emergency-detail-info-card">
+          <FormCard
+            title="Informasi Laporan"
+            description="Detail laporan darurat yang dikirim oleh pengemudi."
+            icon={<CatIcon className="w-5 h-5" />}
+            iconWrapperClassName={cn('text-white', catCfg.bg.replace('/10', '').replace('bg-', 'bg-'))}
+          >
+            {/* Status badge di atas grid */}
+            <div className="flex items-center gap-2 mb-3">
+              <StatusBadge status={report.status} />
+              <span className={cn('inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[10px] font-bold', catCfg.color, catCfg.bg, catCfg.border)}>
+                <CatIcon className="w-3 h-3" />
+                {catCfg.label}
               </span>
-              <span className="text-[12px] font-semibold text-slate-800 dark:text-slate-200">
-                {report.location}
-              </span>
-              {report.coordinates && (
-                <span className="text-[11px] font-mono text-muted-foreground flex items-center gap-1 mt-0.5">
-                  <MapPin className="w-3 h-3 text-red-500 flex-none" />
-                  {report.coordinates.lat.toFixed(6)}, {report.coordinates.lng.toFixed(6)}
-                </span>
-              )}
             </div>
 
-            {report.coordinates && (
-              <div className="flex items-center gap-2 flex-wrap">
-                <a
-                  href={`https://www.google.com/maps/search/?api=1&query=${report.coordinates.lat},${report.coordinates.lng}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 h-7 px-2.5 rounded-md border border-border bg-background hover:bg-muted hover:border-slate-400 text-xs font-medium text-foreground transition-colors shadow-2xs"
-                  title="Buka di Google Maps"
-                >
-                  <MapPin className="w-3.5 h-3.5 text-red-500" />
-                  <span>Google Maps</span>
-                  <ExternalLink className="w-3 h-3 text-muted-foreground" />
-                </a>
+            {/* Grid info — 4 kolom, persis seperti ReturnForm */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              <InfoField
+                label="No. Laporan"
+                value={report.id}
+                sub={timeAgo(report.timestamp)}
+              />
+              <InfoField
+                label="Waktu Laporan"
+                value={formatTs(report.timestamp)}
+              />
+              <InfoField
+                label="Pengemudi"
+                value={report.driverName}
+                sub={<PhoneLink phone={report.driverPhone} />}
+              />
+              <InfoField
+                label="Kendaraan"
+                value={report.vehiclePlate}
+                sub={report.vehicleType}
+              />
+            </div>
 
-                <a
-                  href={`https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${report.coordinates.lat},${report.coordinates.lng}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 h-7 px-2.5 rounded-md border border-border bg-background hover:bg-muted hover:border-slate-400 text-xs font-medium text-foreground transition-colors shadow-2xs"
-                  title="Buka Google Maps Street View"
-                >
-                  <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-current text-amber-500 shrink-0">
-                    <circle cx="12" cy="4.5" r="2.5" />
-                    <path d="M15 8.5H9c-1.1 0-2 .9-2 2v4.5h2v6h1.5v-5.5h3v5.5H15v-6h2v-4.5c0-1.1-.9-2-2-2z" />
-                  </svg>
-                  <span>Street View</span>
-                  <ExternalLink className="w-3 h-3 text-muted-foreground" />
-                </a>
+            {/* Lokasi Kejadian & Buka di Google Maps / Street View */}
+            <div className="mt-4 pt-3 border-t border-border flex flex-col md:flex-row md:items-center justify-between gap-3">
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] font-semibold tracking-wider text-slate-400 dark:text-slate-500 uppercase">
+                  Lokasi Kejadian & Koordinat GPS
+                </span>
+                <span className="text-[12px] font-semibold text-slate-800 dark:text-slate-200">
+                  {report.location}
+                </span>
+                {report.coordinates && (
+                  <span className="text-[11px] font-mono text-muted-foreground flex items-center gap-1 mt-0.5">
+                    <MapPin className="w-3 h-3 text-red-500 flex-none" />
+                    {report.coordinates.lat.toFixed(6)}, {report.coordinates.lng.toFixed(6)}
+                  </span>
+                )}
               </div>
-            )}
-          </div>
-        </FormCard>
+
+              {report.coordinates && (
+                <div id="emergency-detail-maps-actions" className="flex items-center gap-2 flex-wrap">
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${report.coordinates.lat},${report.coordinates.lng}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 h-7 px-2.5 rounded-md border border-border bg-background hover:bg-muted hover:border-slate-400 text-xs font-medium text-foreground transition-colors shadow-2xs"
+                    title="Buka di Google Maps"
+                  >
+                    <MapPin className="w-3.5 h-3.5 text-red-500" />
+                    <span>Google Maps</span>
+                    <ExternalLink className="w-3 h-3 text-muted-foreground" />
+                  </a>
+
+                  <a
+                    href={`https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${report.coordinates.lat},${report.coordinates.lng}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 h-7 px-2.5 rounded-md border border-border bg-background hover:bg-muted hover:border-slate-400 text-xs font-medium text-foreground transition-colors shadow-2xs"
+                    title="Buka Google Maps Street View"
+                  >
+                    <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-current text-amber-500 shrink-0">
+                      <circle cx="12" cy="4.5" r="2.5" />
+                      <path d="M15 8.5H9c-1.1 0-2 .9-2 2v4.5h2v6h1.5v-5.5h3v5.5H15v-6h2v-4.5c0-1.1-.9-2-2-2z" />
+                    </svg>
+                    <span>Street View</span>
+                    <ExternalLink className="w-3 h-3 text-muted-foreground" />
+                  </a>
+                </div>
+              )}
+            </div>
+          </FormCard>
+        </div>
 
         {/* ── CARD 2: Deskripsi Kejadian ── */}
-        <FormCard
-          title="Deskripsi Kejadian"
-          description="Keterangan singkat yang disampaikan pengemudi."
-          icon={<FileText className="w-5 h-5 text-blue-500" />}
-          iconWrapperClassName="bg-blue-100 dark:bg-blue-900/30 text-blue-500"
-        >
-          <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed bg-slate-50 dark:bg-slate-800/40 rounded-lg border border-border p-3">
-            {report.description || (
-              <span className="text-muted-foreground italic">Tidak ada deskripsi kejadian.</span>
-            )}
-          </p>
-        </FormCard>
+        <div id="emergency-detail-desc-card">
+          <FormCard
+            title="Deskripsi Kejadian"
+            description="Keterangan singkat yang disampaikan pengemudi."
+            icon={<FileText className="w-5 h-5 text-blue-500" />}
+            iconWrapperClassName="bg-blue-100 dark:bg-blue-900/30 text-blue-500"
+          >
+            <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed bg-slate-50 dark:bg-slate-800/40 rounded-lg border border-border p-3">
+              {report.description || (
+                <span className="text-muted-foreground italic">Tidak ada deskripsi kejadian.</span>
+              )}
+            </p>
+          </FormCard>
+        </div>
 
         {/* ── CARD 3: Riwayat & Timeline Penanganan ── */}
         {(report.handledAt || report.resolvedAt || (report.activityLog && report.activityLog.length > 0) || report.notes) && (
-          <FormCard
-            title="Riwayat & Timeline Penanganan"
-            description="Rekam jejak tindakan, status, dan riwayat catatan berkala."
-            icon={<Eye className="w-5 h-5 text-slate-500" />}
-            iconWrapperClassName="bg-slate-100 dark:bg-slate-800 text-slate-500"
-          >
+          <div id="emergency-detail-timeline-card">
+            <FormCard
+              title="Riwayat & Timeline Penanganan"
+              description="Rekam jejak tindakan, status, dan riwayat catatan berkala."
+              icon={<Eye className="w-5 h-5 text-slate-500" />}
+              iconWrapperClassName="bg-slate-100 dark:bg-slate-800 text-slate-500"
+            >
             <div className="space-y-3">
               {/* Status milestones */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -343,9 +349,11 @@ function EmergencyDetailPanel({
               ) : null}
             </div>
           </FormCard>
-        )}
+        </div>
+      )}
 
-        {/* ── CARD 4: Tindakan & Catatan Admin ── */}
+      {/* ── CARD 4: Tindakan & Catatan Admin ── */}
+      <div id="emergency-detail-action-card">
         <FormCard
           title="Tindakan & Catatan Admin"
           description="Pilih status penanganan laporan dan tambahkan catatan progres baru."
@@ -359,6 +367,7 @@ function EmergencyDetailPanel({
                 Pilih Status Penanganan
               </span>
               <RadioGroup
+                id="emergency-status-radios"
                 value={selectedStatus}
                 onValueChange={(val) => setSelectedStatus(val as EmergencyStatus)}
                 className="grid grid-cols-1 sm:grid-cols-3 gap-3"
@@ -431,6 +440,7 @@ function EmergencyDetailPanel({
                 Tambah Catatan Progres
               </span>
               <textarea
+                id="emergency-progress-note-input"
                 value={newNote}
                 onChange={(e) => setNewNote(e.target.value)}
                 rows={3}
@@ -443,6 +453,7 @@ function EmergencyDetailPanel({
             </div>
           </div>
         </FormCard>
+      </div>
 
       </FormShell>
     </div>
@@ -483,6 +494,42 @@ export function EmergencyReportsFeature() {
     return emergencyReportService.subscribe(refresh);
   }, [refresh]);
 
+  useEffect(() => {
+    const handleSelectFirst = () => {
+      const all = emergencyReportService.getAll();
+      if (all.length > 0) {
+        setSelectedId(all[0].id);
+      }
+    };
+    const handleClearSelection = () => {
+      setSelectedId(null);
+    };
+    const handleSwitchTab = (e: Event) => {
+      const customEvent = e as CustomEvent<{ tab: EmergencyStatus | 'semua' }>;
+      if (customEvent.detail?.tab) {
+        setActiveTab(customEvent.detail.tab);
+        setSelectedId(null);
+      }
+    };
+    const handleResetFilters = () => {
+      setActiveTab('semua');
+      setSelectedCategory('semua');
+      setSearch('');
+    };
+
+    window.addEventListener('adatrack:emergency-tour-select-first', handleSelectFirst);
+    window.addEventListener('adatrack:emergency-tour-clear-selection', handleClearSelection);
+    window.addEventListener('adatrack:emergency-tour-switch-tab', handleSwitchTab);
+    window.addEventListener('adatrack:emergency-tour-reset-filters', handleResetFilters);
+
+    return () => {
+      window.removeEventListener('adatrack:emergency-tour-select-first', handleSelectFirst);
+      window.removeEventListener('adatrack:emergency-tour-clear-selection', handleClearSelection);
+      window.removeEventListener('adatrack:emergency-tour-switch-tab', handleSwitchTab);
+      window.removeEventListener('adatrack:emergency-tour-reset-filters', handleResetFilters);
+    };
+  }, []);
+
   const handleStatusChange = useCallback(
     (id: string, status: EmergencyStatus, notes?: string) => {
       emergencyReportService.updateStatus(id, status, { handledBy: 'Super Admin', notes });
@@ -515,10 +562,10 @@ export function EmergencyReportsFeature() {
     <div className="flex flex-col md:flex-row h-full bg-background overflow-hidden border-t border-border">
 
       {/* ── LEFT PANEL ── */}
-      <DataList className={cn(selectedId ? 'hidden md:flex' : 'flex')}>
+      <DataList id="emergency-reports-left-panel" className={cn(selectedId ? 'hidden md:flex' : 'flex')}>
         <DataListHeader className="gap-2.5">
           {/* Segmented Status Tabs */}
-          <div className="flex w-full bg-slate-100 dark:bg-slate-800/60 p-0.5 rounded-lg border border-border/40">
+          <div id="emergency-status-tabs" className="flex w-full bg-slate-100 dark:bg-slate-800/60 p-0.5 rounded-lg border border-border/40">
             {STATUS_TABS.map((tab) => {
               const count = tab.id === 'semua'
                 ? reports.length
@@ -527,6 +574,7 @@ export function EmergencyReportsFeature() {
               return (
                 <button
                   key={tab.id}
+                  id={`emergency-tab-${tab.id}`}
                   onClick={() => { setActiveTab(tab.id); setSelectedId(null); }}
                   className={cn(
                     'flex-1 flex items-center justify-center gap-1.5 py-1 px-1 rounded-md text-[11px] font-medium transition-all text-center',
@@ -547,18 +595,21 @@ export function EmergencyReportsFeature() {
           </div>
 
           {/* 1 Baris Terpadu: Search Box + Dropdown Filter Kategori */}
-          <div className="flex items-center gap-1.5 w-full">
-            <DataTableSearch
-              value={search}
-              onChange={setSearch}
-              placeholder="Cari driver, plat, lokasi..."
-              className="flex-1 max-w-none"
-            />
+          <div id="emergency-search-filter-bar" className="flex items-center gap-1.5 w-full">
+            <div id="emergency-search-box" className="flex-1 max-w-none">
+              <DataTableSearch
+                value={search}
+                onChange={setSearch}
+                placeholder="Cari driver, plat, lokasi..."
+                className="w-full max-w-none"
+              />
+            </div>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button
                   type="button"
+                  id="emergency-category-filter-btn"
                   title={
                     selectedCategory === 'semua'
                       ? 'Filter Kategori Laporan'
@@ -646,7 +697,7 @@ export function EmergencyReportsFeature() {
           </div>
         </DataListHeader>
 
-        <DataListContent>
+        <DataListContent id="emergency-reports-list">
           {paginated.length === 0 ? (
             <div className="flex flex-col items-center justify-center p-8 text-center text-muted-foreground">
               <Siren className="w-8 h-8 mb-3 opacity-20" />
@@ -675,6 +726,7 @@ export function EmergencyReportsFeature() {
               return (
                 <DataListItem
                   key={report.id}
+                  id={paginated.indexOf(report) === 0 ? "emergency-report-item-first" : undefined}
                   isSelected={isSelected}
                   onClick={() => setSelectedId(report.id)}
                 >
@@ -713,22 +765,27 @@ export function EmergencyReportsFeature() {
           )}
         </DataListContent>
 
-        <DataListPagination
-          pageIndex={pageIndex}
-          pageSize={pageSize}
-          totalRows={totalRows}
-          onNextPage={() => setPageIndex((p) => p + 1)}
-          onPrevPage={() => setPageIndex((p) => p - 1)}
-          canNextPage={pageIndex < pageCount - 1}
-          canPrevPage={pageIndex > 0}
-        />
+        <div id="emergency-reports-pagination">
+          <DataListPagination
+            pageIndex={pageIndex}
+            pageSize={pageSize}
+            totalRows={totalRows}
+            onNextPage={() => setPageIndex((p) => p + 1)}
+            onPrevPage={() => setPageIndex((p) => p - 1)}
+            canNextPage={pageIndex < pageCount - 1}
+            canPrevPage={pageIndex > 0}
+          />
+        </div>
       </DataList>
 
       {/* ── RIGHT PANEL ── */}
-      <div className={cn(
-        'flex-1 bg-neutral-50/50 dark:bg-neutral-950/20 overflow-y-auto relative',
-        !selectedId ? 'hidden md:block' : 'block'
-      )}>
+      <div
+        id="emergency-detail-container"
+        className={cn(
+          'flex-1 bg-neutral-50/50 dark:bg-neutral-950/20 overflow-y-auto relative',
+          !selectedId ? 'hidden md:block' : 'block'
+        )}
+      >
         {selectedReport ? (
           <EmergencyDetailPanel
             report={selectedReport}

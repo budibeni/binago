@@ -374,7 +374,9 @@ export function MapControlPanel({
       {/* ═══════════════════════════════════════════════════════════
           PRIMARY CONTROL PANEL
           ═══════════════════════════════════════════════════════════ */}
-      <div className={cn(
+      <div
+        id="map-control-panel"
+        className={cn(
         'flex bg-background rounded-[10px] border border-border shadow-lg overflow-visible p-1 gap-1',
         // Mobile: horizontal row, auto width
         'flex-row',

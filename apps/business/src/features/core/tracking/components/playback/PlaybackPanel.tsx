@@ -369,6 +369,7 @@ export function PlaybackPanel({
                 {/* Vehicle */}
                 <button
                   type="button"
+                  id="playback-vehicle-select-btn"
                   className="flex items-center justify-between w-[110px] sm:w-[140px] h-8 rounded-md bg-background border border-border px-2 sm:px-2.5 text-[11px] text-foreground focus:outline-none focus:ring-1 focus:ring-danger focus:border-danger disabled:opacity-50 transition-colors hover:bg-surface-elevated shrink-0"
                   disabled={isLoading}
                   onClick={() => setIsVehicleDialogOpen(true)}
@@ -383,53 +384,56 @@ export function PlaybackPanel({
 
                 <div className="w-px h-5 bg-border mx-0.5 sm:mx-1" />
 
-                {/* Start */}
-                <div className="flex items-center gap-0.5 sm:gap-1">
-                  <div className="relative w-[90px] sm:w-[110px] shrink-0">
-                    <input
-                      type="date"
-                      className="w-full h-8 rounded-md bg-background border border-border hover:border-foreground-muted px-1.5 sm:px-2 pr-6 sm:pr-7 text-[11px] font-medium text-foreground shadow-sm focus:outline-none focus:border-danger focus:ring-1 focus:ring-danger disabled:opacity-50 transition-all [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:w-full cursor-pointer"
-                      value={dateRange.startDate}
-                      onChange={(e) => onDateRangeChange({ ...dateRange, startDate: e.target.value })}
-                      disabled={isLoading}
-                    />
-                    <Calendar className="pointer-events-none absolute right-1.5 sm:right-2 top-1/2 -translate-y-1/2 h-3 w-3 sm:h-3.5 sm:w-3.5 text-foreground-muted" strokeWidth={2} />
+                {/* Date & Time Range */}
+                <div id="playback-date-range-section" className="flex items-center gap-1">
+                  {/* Start */}
+                  <div className="flex items-center gap-0.5 sm:gap-1">
+                    <div className="relative w-[90px] sm:w-[110px] shrink-0">
+                      <input
+                        type="date"
+                        className="w-full h-8 rounded-md bg-background border border-border hover:border-foreground-muted px-1.5 sm:px-2 pr-6 sm:pr-7 text-[11px] font-medium text-foreground shadow-sm focus:outline-none focus:border-danger focus:ring-1 focus:ring-danger disabled:opacity-50 transition-all [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:w-full cursor-pointer"
+                        value={dateRange.startDate}
+                        onChange={(e) => onDateRangeChange({ ...dateRange, startDate: e.target.value })}
+                        disabled={isLoading}
+                      />
+                      <Calendar className="pointer-events-none absolute right-1.5 sm:right-2 top-1/2 -translate-y-1/2 h-3 w-3 sm:h-3.5 sm:w-3.5 text-foreground-muted" strokeWidth={2} />
+                    </div>
+                    <div className="relative w-[60px] sm:w-[75px] shrink-0">
+                      <input
+                        type="time"
+                        className="w-full h-8 rounded-md bg-background border border-border hover:border-foreground-muted px-1.5 sm:px-2 pr-6 sm:pr-7 text-[11px] font-medium text-foreground shadow-sm focus:outline-none focus:border-danger focus:ring-1 focus:ring-danger disabled:opacity-50 transition-all [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:w-full cursor-pointer"
+                        value={dateRange.startTime}
+                        onChange={(e) => onDateRangeChange({ ...dateRange, startTime: e.target.value })}
+                        disabled={isLoading}
+                      />
+                      <Clock className="pointer-events-none absolute right-1.5 sm:right-2 top-1/2 -translate-y-1/2 h-3 w-3 sm:h-3.5 sm:w-3.5 text-foreground-muted" strokeWidth={2} />
+                    </div>
                   </div>
-                  <div className="relative w-[60px] sm:w-[75px] shrink-0">
-                    <input
-                      type="time"
-                      className="w-full h-8 rounded-md bg-background border border-border hover:border-foreground-muted px-1.5 sm:px-2 pr-6 sm:pr-7 text-[11px] font-medium text-foreground shadow-sm focus:outline-none focus:border-danger focus:ring-1 focus:ring-danger disabled:opacity-50 transition-all [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:w-full cursor-pointer"
-                      value={dateRange.startTime}
-                      onChange={(e) => onDateRangeChange({ ...dateRange, startTime: e.target.value })}
-                      disabled={isLoading}
-                    />
-                    <Clock className="pointer-events-none absolute right-1.5 sm:right-2 top-1/2 -translate-y-1/2 h-3 w-3 sm:h-3.5 sm:w-3.5 text-foreground-muted" strokeWidth={2} />
-                  </div>
-                </div>
 
-                <span className="text-foreground-muted text-[9px] sm:text-[10px] font-bold mx-0.5 sm:mx-1">{tTracking.playbackTo}</span>
+                  <span className="text-foreground-muted text-[9px] sm:text-[10px] font-bold mx-0.5 sm:mx-1">{tTracking.playbackTo}</span>
 
-                {/* End */}
-                <div className="flex items-center gap-0.5 sm:gap-1">
-                  <div className="relative w-[90px] sm:w-[110px] shrink-0">
-                    <input
-                      type="date"
-                      className="w-full h-8 rounded-md bg-background border border-border hover:border-foreground-muted px-1.5 sm:px-2 pr-6 sm:pr-7 text-[11px] font-medium text-foreground shadow-sm focus:outline-none focus:border-danger focus:ring-1 focus:ring-danger disabled:opacity-50 transition-all [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:w-full cursor-pointer"
-                      value={dateRange.endDate}
-                      onChange={(e) => onDateRangeChange({ ...dateRange, endDate: e.target.value })}
-                      disabled={isLoading}
-                    />
-                    <Calendar className="pointer-events-none absolute right-1.5 sm:right-2 top-1/2 -translate-y-1/2 h-3 w-3 sm:h-3.5 sm:w-3.5 text-foreground-muted" strokeWidth={2} />
-                  </div>
-                  <div className="relative w-[60px] sm:w-[75px] shrink-0">
-                    <input
-                      type="time"
-                      className="w-full h-8 rounded-md bg-background border border-border hover:border-foreground-muted px-1.5 sm:px-2 pr-6 sm:pr-7 text-[11px] font-medium text-foreground shadow-sm focus:outline-none focus:border-danger focus:ring-1 focus:ring-danger disabled:opacity-50 transition-all [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:w-full cursor-pointer"
-                      value={dateRange.endTime}
-                      onChange={(e) => onDateRangeChange({ ...dateRange, endTime: e.target.value })}
-                      disabled={isLoading}
-                    />
-                    <Clock className="pointer-events-none absolute right-1.5 sm:right-2 top-1/2 -translate-y-1/2 h-3 w-3 sm:h-3.5 sm:w-3.5 text-foreground-muted" strokeWidth={2} />
+                  {/* End */}
+                  <div className="flex items-center gap-0.5 sm:gap-1">
+                    <div className="relative w-[90px] sm:w-[110px] shrink-0">
+                      <input
+                        type="date"
+                        className="w-full h-8 rounded-md bg-background border border-border hover:border-foreground-muted px-1.5 sm:px-2 pr-6 sm:pr-7 text-[11px] font-medium text-foreground shadow-sm focus:outline-none focus:border-danger focus:ring-1 focus:ring-danger disabled:opacity-50 transition-all [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:w-full cursor-pointer"
+                        value={dateRange.endDate}
+                        onChange={(e) => onDateRangeChange({ ...dateRange, endDate: e.target.value })}
+                        disabled={isLoading}
+                      />
+                      <Calendar className="pointer-events-none absolute right-1.5 sm:right-2 top-1/2 -translate-y-1/2 h-3 w-3 sm:h-3.5 sm:w-3.5 text-foreground-muted" strokeWidth={2} />
+                    </div>
+                    <div className="relative w-[60px] sm:w-[75px] shrink-0">
+                      <input
+                        type="time"
+                        className="w-full h-8 rounded-md bg-background border border-border hover:border-foreground-muted px-1.5 sm:px-2 pr-6 sm:pr-7 text-[11px] font-medium text-foreground shadow-sm focus:outline-none focus:border-danger focus:ring-1 focus:ring-danger disabled:opacity-50 transition-all [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:w-full cursor-pointer"
+                        value={dateRange.endTime}
+                        onChange={(e) => onDateRangeChange({ ...dateRange, endTime: e.target.value })}
+                        disabled={isLoading}
+                      />
+                      <Clock className="pointer-events-none absolute right-1.5 sm:right-2 top-1/2 -translate-y-1/2 h-3 w-3 sm:h-3.5 sm:w-3.5 text-foreground-muted" strokeWidth={2} />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -437,6 +441,7 @@ export function PlaybackPanel({
 
             {/* Load Button */}
             <Button
+              id="playback-load-btn"
               className="bg-danger hover:bg-danger/90 text-white font-semibold h-8 px-3 sm:px-4 text-[11px] rounded-lg transition-all shrink-0"
               disabled={!canLoad || isLoading}
               onClick={onLoad}
@@ -464,7 +469,7 @@ export function PlaybackPanel({
             </div>
 
             {/* Media Controls */}
-            <div className="flex items-center gap-1.5 pl-3 shrink-0">
+            <div id="playback-media-controls" className="flex items-center gap-1.5 pl-3 shrink-0">
               <button
                 onClick={onStop}
                 className="flex items-center justify-center h-8 w-8 rounded-full text-foreground-muted hover:text-foreground hover:bg-surface-elevated transition-colors"
@@ -508,6 +513,7 @@ export function PlaybackPanel({
                    NORMAL PLAYBACK TIMELINE SCRUBBER
                    ========================================== */
                 <div
+                  id="playback-timeline-bar"
                   ref={trackRef}
                   className="relative w-full h-1.5 bg-border rounded-full cursor-pointer group hover:h-2 transition-all mt-3"
                   onClick={handleTimelineClick}
@@ -523,6 +529,7 @@ export function PlaybackPanel({
                    VIDEO TRIMMER MODE (SEPERTI CROP VIDEO - GOLD #F59E0B)
                    ========================================== */
                 <div
+                  id="playback-crop-timeline"
                   ref={trackRef}
                   className="relative w-full h-8 bg-neutral-900/40 dark:bg-neutral-950/80 border border-neutral-300 dark:border-neutral-700/80 rounded-lg flex items-center cursor-pointer select-none overflow-visible"
                   onClick={handleTimelineClick}
@@ -565,6 +572,7 @@ export function PlaybackPanel({
                   >
                     {/* Area Tengah Trimmer (Bisa di-drag untuk menggeser window rentang rute) */}
                     <div
+                      id="playback-crop-window"
                       className={cn(
                         "absolute inset-0 border-y-[3px] border-amber-500 bg-amber-500/20 cursor-grab active:cursor-grabbing hover:bg-amber-500/30 transition-colors z-10",
                         isDraggingWindow && "bg-amber-500/35 cursor-grabbing"
@@ -586,6 +594,7 @@ export function PlaybackPanel({
 
                     {/* Samping Kiri: Handle Trimmer Awal (Left Crop Bracket - Gold) */}
                     <div
+                      id="playback-crop-handle-start"
                       className={cn(
                         "absolute left-0 top-0 bottom-0 w-4 bg-amber-500 hover:bg-amber-400 active:bg-amber-600 rounded-l-[5px] flex items-center justify-center cursor-w-resize z-20 shadow-md touch-none group/left transition-all overflow-visible",
                         isDraggingStart && "bg-amber-400 ring-2 ring-amber-300"
@@ -623,6 +632,7 @@ export function PlaybackPanel({
 
                     {/* Samping Kanan: Handle Trimmer Akhir (Right Crop Bracket - Gold) */}
                     <div
+                      id="playback-crop-handle-end"
                       className={cn(
                         "absolute right-0 top-0 bottom-0 w-4 bg-amber-500 hover:bg-amber-400 active:bg-amber-600 rounded-r-[5px] flex items-center justify-center cursor-e-resize z-20 shadow-md touch-none group/right transition-all overflow-visible",
                         isDraggingEnd && "bg-amber-400 ring-2 ring-amber-300"
@@ -673,8 +683,9 @@ export function PlaybackPanel({
             {/* Speed & Close / Action Buttons */}
             <div className="flex items-center gap-2 pl-3 border-l border-border shrink-0">
               {isRouteCropMode ? (
-                <div className="flex items-center gap-2">
+                <div id="playback-crop-actions" className="flex items-center gap-2">
                   <button
+                    id="playback-crop-cancel-btn"
                     type="button"
                     onClick={onCancelRouteCrop}
                     className="flex items-center justify-center h-9 px-3 text-xs font-medium text-foreground-muted hover:text-foreground hover:bg-surface-elevated rounded-lg transition-colors shrink-0"
@@ -683,6 +694,7 @@ export function PlaybackPanel({
                     {tTracking.playbackCancelCrop}
                   </button>
                   <button
+                    id="playback-crop-confirm-btn"
                     type="button"
                     onClick={onConfirmRouteCrop}
                     className="flex items-center justify-center gap-1.5 h-8 px-4 rounded-lg bg-zinc-600 hover:bg-zinc-700 active:bg-zinc-800 text-white font-bold text-xs shadow-sm hover:shadow transition-all shrink-0"

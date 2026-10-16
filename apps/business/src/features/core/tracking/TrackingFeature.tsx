@@ -33,6 +33,7 @@ import type { MockPlaybackData, MockPlaybackTrackPoint } from './data/mockTracki
 import type { Route, RouteLocation, RouteStop } from '@/features/core/routes/types';
 import { getTranslation } from '../../../i18n';
 import { useBusinessLocale } from '../../../components/BusinessShellLayout';
+import { useTrackingTour } from '@/components/tour';
 import { getTrackingTranslation } from './i18n';
 import type { StatusFilter, DateRange, PlaybackState, TrackingView } from './types/tracking';
 import type { Locale } from '@adatrack/types';
@@ -69,6 +70,13 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
   // â"€â"€ Mode â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
   const [mode, setMode] = React.useState<TrackingMode>('live');
   const [view, setView] = React.useState<TrackingView>('map');
+
+  // Sync mode & view with global Tour Context
+  const tourContext = useTrackingTour();
+  const setTourTrackingState = tourContext?.setTrackingState;
+  React.useEffect(() => {
+    setTourTrackingState?.({ mode, view });
+  }, [mode, view, setTourTrackingState]);
 
   // â"€â"€ VehicleList state â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
   const [search, setSearch] = React.useState('');
@@ -254,6 +262,10 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
       return matchStatus && matchSearch;
     });
   }, [search, statusFilter]);
+
+  const selectedVehicles = React.useMemo(() => {
+    return allVehiclesUnfiltered.filter((v) => selectedVehicleIds.includes(v.id));
+  }, [allVehiclesUnfiltered, selectedVehicleIds]);
 
   const activeVehicleId = selectedVehicleId || focusedVehicleId;
   const activeVehicle = React.useMemo(() => {
@@ -538,6 +550,79 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
   const handleSelectAll = React.useCallback((checked: boolean) => {
     setSelectedVehicleIds(checked ? trackingService.getLiveVehicles().map((v) => v.id) : []);
   }, []);
+
+  // Tour integration: allow triggering vehicle selection and overview panel via custom event
+  React.useEffect(() => {
+    const handleTourSelectVehicle = (e?: Event) => {
+      const customEvent = e as CustomEvent<{ vehicleId?: string }>;
+      const targetId = customEvent?.detail?.vehicleId || allVehiclesUnfiltered[0]?.id;
+      if (mode !== 'live') {
+        setMode('live');
+      }
+      if (view !== 'map') {
+        setView('map');
+      }
+      if (targetId) {
+        handleVehicleSelect(targetId);
+      }
+    };
+
+    window.addEventListener('adatrack:tour-select-vehicle', handleTourSelectVehicle);
+    return () => {
+      window.removeEventListener('adatrack:tour-select-vehicle', handleTourSelectVehicle);
+    };
+  }, [allVehiclesUnfiltered, handleVehicleSelect, mode, view]);
+
+  // Tour integration: allow triggering playback route crop tour
+  React.useEffect(() => {
+    const handleTourRouteCrop = () => {
+      if (mode !== 'playback') setMode('playback');
+      if (view !== 'map') setView('map');
+      setIsMapLayerPanelVisible(true);
+      const targetVehicleId = playbackVehicleId || allVehiclesUnfiltered[0]?.id;
+      if (targetVehicleId && (!playbackData || playbackData.points.length === 0)) {
+        setPlaybackVehicleId(targetVehicleId);
+        const data = trackingService.getPlaybackData(targetVehicleId, new Date());
+        if (data) {
+          setPlaybackData(data);
+          setPlaybackPointIndex(0);
+          setCropStartIndex(0);
+          setCropEndIndex(data.points.length - 1);
+        }
+      }
+      setIsRouteCropMode(true);
+    };
+
+    window.addEventListener('adatrack:tour-playback-route-crop', handleTourRouteCrop);
+    return () => {
+      window.removeEventListener('adatrack:tour-playback-route-crop', handleTourRouteCrop);
+    };
+  }, [allVehiclesUnfiltered, mode, playbackData, playbackVehicleId, view]);
+
+  // Tour integration: Table view and mode switching
+  React.useEffect(() => {
+    const handleTourOpenTableModes = () => {
+      if (view !== 'table') setView('table');
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent('adatrack:open-table-dropdown'));
+      }, 150);
+    };
+
+    const handleTourSwitchTableMode = (e: Event) => {
+      const customEvent = e as CustomEvent<{ mode: TrackingMode }>;
+      if (view !== 'table') setView('table');
+      if (customEvent.detail?.mode) {
+        setMode(customEvent.detail.mode);
+      }
+    };
+
+    window.addEventListener('adatrack:tour-open-table-modes', handleTourOpenTableModes);
+    window.addEventListener('adatrack:tour-switch-table-mode', handleTourSwitchTableMode);
+    return () => {
+      window.removeEventListener('adatrack:tour-open-table-modes', handleTourOpenTableModes);
+      window.removeEventListener('adatrack:tour-switch-table-mode', handleTourSwitchTableMode);
+    };
+  }, [view]);
 
   // â"€â"€ Playback handlers â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
@@ -828,11 +913,11 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
 
         {/* View: Table */}
         {view === 'table' && (
-          <div className="flex flex-col flex-1 min-h-0 w-full bg-surface">
+          <div id="tracking-table-container" className="flex flex-col flex-1 min-h-0 w-full bg-surface">
             {mode === 'live' && (
               <LiveTable
                 modeSelector={<TableModeSelector mode={mode} onModeChange={setMode} locale={locale} />}
-                vehicles={allVehiclesUnfiltered.filter(v => selectedVehicleIds.includes(v.id))}
+                vehicles={selectedVehicles}
                 onVehicleSelect={handleVehicleSelect}
                 locale={locale}
               />
@@ -854,7 +939,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
             {mode === 'heatmap' && (
               <HeatmapTable
                 modeSelector={<TableModeSelector mode={mode} onModeChange={setMode} locale={locale} />}
-                vehicles={allVehiclesUnfiltered.filter(v => selectedVehicleIds.includes(v.id))}
+                vehicles={selectedVehicles}
                 locale={locale}
                 dateRange={heatmapDateRange}
                 onDateRangeChange={setHeatmapDateRange}
@@ -867,7 +952,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
             {mode === 'parking' && (
               <ParkingTable
                 modeSelector={<TableModeSelector mode={mode} onModeChange={setMode} locale={locale} />}
-                vehicles={allVehiclesUnfiltered.filter(v => selectedVehicleIds.includes(v.id))}
+                vehicles={selectedVehicles}
                 locale={locale}
                 dateRange={parkingDateRange}
                 onDateRangeChange={setParkingDateRange}
@@ -880,7 +965,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
             {mode === 'mileage' && (
               <MileageTable
                 modeSelector={<TableModeSelector mode={mode} onModeChange={setMode} locale={locale} />}
-                vehicles={allVehiclesUnfiltered.filter(v => selectedVehicleIds.includes(v.id))}
+                vehicles={selectedVehicles}
                 locale={locale}
                 dateRange={mileageDateRange}
                 onDateRangeChange={setMileageDateRange}
@@ -891,7 +976,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
             {mode === 'speed' && (
               <SpeedTable
                 modeSelector={<TableModeSelector mode={mode} onModeChange={setMode} locale={locale} />}
-                vehicles={allVehiclesUnfiltered.filter(v => selectedVehicleIds.includes(v.id))}
+                vehicles={selectedVehicles}
                 locale={locale}
                 dateRange={speedDateRange}
                 onDateRangeChange={setSpeedDateRange}
@@ -904,20 +989,23 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
 
         {/* View: Notification */}
         {view === 'notification' && (
-          <TrackingNotificationPanel
-            locale={locale}
-            visibleVehicleIds={allVehiclesUnfiltered.filter(v => selectedVehicleIds.includes(v.id)).map(v => v.id)}
-          />
+          <div id="tracking-notification-container" className="flex-1 flex flex-col min-h-0 w-full">
+            <TrackingNotificationPanel
+              locale={locale}
+              visibleVehicleIds={allVehiclesUnfiltered.filter(v => selectedVehicleIds.includes(v.id)).map(v => v.id)}
+            />
+          </div>
         )}
 
         {/* Wrapper for Map and Playback Sidebar with Padding / Margin */}
         <div className={cn("flex-1 flex min-h-0 relative w-full p-2 sm:p-2.5", view !== 'map' && 'hidden')}>
           {/* Map Area Wrapper (Card with Sharp Solid Gray Border) */}
-          <div className="flex-1 flex flex-col min-w-0 relative rounded-lg border border-gray-300 dark:border-neutral-700 bg-card overflow-hidden">
+          <div id="tracking-map-canvas" className="flex-1 flex flex-col min-w-0 relative rounded-lg border border-gray-300 dark:border-neutral-700 bg-card overflow-hidden">
 
-            {/* Mode Toggle (Floating inside Map Card - Clean Crisp Gray Border) */}
-            <div className="absolute top-3 left-3 z-20 transition-all duration-300 ease-out">
+            {/* Mode Toggle & Help Button (Floating inside Map Card) */}
+            <div className="absolute top-3 left-3 z-20 transition-all duration-300 ease-out flex items-center gap-2">
               <div
+                id="tracking-mode-toggle"
                 className="flex items-center bg-background rounded-lg border border-gray-300 dark:border-neutral-700 p-0.5 gap-0.5"
                 role="tablist"
                 aria-label="Mode Pemantauan"
@@ -948,7 +1036,19 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
                   role="tab"
                   type="button"
                   aria-selected={mode === 'playback'}
-                  onClick={() => setMode('playback')}
+                  onClick={() => {
+                    setMode('playback');
+                    if (!playbackVehicleId) {
+                      if (selectedVehicleId) {
+                        setPlaybackVehicleId(selectedVehicleId);
+                      } else {
+                        const first = trackingService.getLiveVehicles()[0];
+                        if (first) {
+                          setPlaybackVehicleId(first.id);
+                        }
+                      }
+                    }
+                  }}
                   className={cn(
                     'flex items-center justify-center h-7 px-2.5 rounded-md text-[12px] font-medium transition-all gap-1.5',
                     mode === 'playback'
@@ -1008,6 +1108,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
                 selectedRouteIds={selectedRouteIds}
                 cropTrack={isRouteCropMode ? cropTrack : undefined}
                 isRouteCropMode={isRouteCropMode}
+                isVisible={mode === 'playback' && view === 'map'}
               />
             </div>
 
@@ -1029,6 +1130,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
 
         {/* Bottom Playback Panel (Footer) */}
         <div
+          id="playback-panel-container"
           className={cn(
             'shrink-0 border-t border-border bg-background transition-all duration-300 ease-in-out relative z-[400]',
             (mode === 'playback' && view === 'map')
@@ -1075,6 +1177,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
 
         {/* Bottom Heatmap Panel (Footer) */}
         <div
+          id="heatmap-panel-container"
           className={cn(
             'shrink-0 border-t border-border bg-background transition-all duration-300 ease-in-out relative z-[400]',
             (mode === 'heatmap' && view === 'map')
@@ -1095,6 +1198,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
 
         {/* Bottom Overview Panel (Live Mode - Docked) */}
         <div
+          id="live-overview-panel-container"
           className={cn(
             'shrink-0 bg-gray-100 dark:bg-neutral-900 transition-all duration-300 ease-in-out relative z-20',
             (mode === 'live' && view === 'map' && activeVehicle)
@@ -1120,7 +1224,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
         </div>
 
         {/* Tab Navigation (Map | Table) - Classic Design at Bottom */}
-        <div className="shrink-0 flex items-center justify-start border-t border-gray-200 dark:border-neutral-800 bg-background w-full px-4 h-[34px] z-10">
+        <div id="tracking-bottom-dock" className="shrink-0 flex items-center justify-start border-t border-gray-200 dark:border-neutral-800 bg-background w-full px-4 h-[34px] z-10">
           <button
             type="button"
             onClick={() => {
@@ -1165,6 +1269,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
       {/* Right Sidebar for Live, Heatmap, Parking, Mileage & Speed */}
       {(mode === 'live' || mode === 'heatmap' || mode === 'parking' || mode === 'mileage' || mode === 'speed') && (
         <div
+          id="tracking-vehicle-list-panel"
           className={cn(
             'shrink-0 h-full z-10 transition-all duration-300 ease-in-out flex flex-col',
             isVehicleListVisible
@@ -1194,6 +1299,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
               {/* Expand button */}
               <button
                 type="button"
+                id="tracking-vehicle-list-expand-btn"
                 onClick={() => setIsVehicleListVisible(true)}
                 className="flex h-6 w-6 items-center justify-center text-foreground-muted hover:text-foreground transition-colors focus:outline-none shrink-0"
                 title={tTracking.showPanel}

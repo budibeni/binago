@@ -25,6 +25,19 @@ export function DriverPortalFeature() {
   const t = getDriverPortalTranslation(locale);
   const [activeTab, setActiveTab] = useState('vehicles');
 
+  useEffect(() => {
+    const handleSwitchTab = (e: Event) => {
+      const customEvent = e as CustomEvent<{ tab: string }>;
+      if (customEvent.detail?.tab) {
+        setActiveTab(customEvent.detail.tab);
+      }
+    };
+    window.addEventListener('adatrack:driver-portal-switch-tab', handleSwitchTab);
+    return () => {
+      window.removeEventListener('adatrack:driver-portal-switch-tab', handleSwitchTab);
+    };
+  }, []);
+
   const TABS = [
     { id: 'history', label: t.tabs.history, icon: Clock },
     { id: 'vehicles', label: t.tabs.vehicles, icon: Map },
@@ -52,6 +65,7 @@ export function DriverPortalFeature() {
 
       {/* ── BOTTOM NAV – always on top, never covered ── */}
       <nav
+        id="driver-portal-nav-bar"
         className="flex-none z-50 bg-card border-t border-border flex items-stretch"
         style={{ minHeight: 52, paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
       >
@@ -61,6 +75,7 @@ export function DriverPortalFeature() {
           return (
             <button
               key={tab.id}
+              id={`driver-portal-tab-${tab.id}`}
               onClick={() => setActiveTab(tab.id)}
               className={cn(
                 'flex flex-1 flex-col items-center justify-center gap-0.5 py-1 transition-colors relative',
@@ -129,13 +144,20 @@ function HistoryTab({ locale }: { locale: 'id' | 'en' }) {
     <div className="h-full overflow-y-auto bg-gray-100 dark:bg-gray-900">
       <div className="px-4 py-4 md:px-6 md:py-5 space-y-3 max-w-screen-md mx-auto animate-in fade-in duration-200 pb-24">
 
-        <div className="space-y-3">
+        <div id="driver-portal-history-list" className="space-y-3">
           {HISTORY.map((day, idx) => (
-            <div key={idx} className="bg-white dark:bg-gray-800 border border-border rounded-2xl overflow-hidden">
+            <div
+              key={idx}
+              id={idx === 0 ? "driver-portal-history-day-card" : undefined}
+              className="bg-white dark:bg-gray-800 border border-border rounded-2xl overflow-hidden"
+            >
               {/* Card Header */}
               <div className="flex items-center justify-between px-4 py-2.5 border-b border-border bg-muted/30">
                 <h3 className="text-[11px] font-extrabold text-foreground uppercase tracking-wider">{day.date}</h3>
-                <span className="flex items-center gap-1 text-[9px] font-extrabold text-amber-600 bg-amber-500/10 px-1.5 py-0.5 rounded leading-none flex-none">
+                <span
+                  id={idx === 0 ? "driver-portal-history-distance-badge" : undefined}
+                  className="flex items-center gap-1 text-[9px] font-extrabold text-amber-600 bg-amber-500/10 px-1.5 py-0.5 rounded leading-none flex-none"
+                >
                   <Route className="w-2.5 h-2.5" strokeWidth={3} />
                   {day.distance}
                 </span>
@@ -143,7 +165,10 @@ function HistoryTab({ locale }: { locale: 'id' | 'en' }) {
 
               {/* Card Body – Timeline */}
               <div className="px-4 py-3">
-                <div className="relative pl-6 border-l-2 border-border ml-2 space-y-4">
+                <div
+                  id={idx === 0 ? "driver-portal-history-timeline" : undefined}
+                  className="relative pl-6 border-l-2 border-border ml-2 space-y-4"
+                >
                   {day.items.map((item) => {
                     let Icon = MapPin;
                     let iconColor = "text-muted-foreground";
@@ -225,6 +250,31 @@ function VehiclesTab({ locale }: { locale: 'id' | 'en' }) {
   const [sosCategory, setSosCategory] = useState('');
   const [sosDescription, setSosDescription] = useState('');
 
+  useEffect(() => {
+    const handleToggleInfo = (e: Event) => {
+      const customEvent = e as CustomEvent<{ show?: boolean }>;
+      if (typeof customEvent.detail?.show === 'boolean') {
+        setShowVehicleInfo(customEvent.detail.show);
+      } else {
+        setShowVehicleInfo(prev => !prev);
+      }
+    };
+    const handleToggleSos = (e: Event) => {
+      const customEvent = e as CustomEvent<{ show?: boolean }>;
+      if (typeof customEvent.detail?.show === 'boolean') {
+        setShowSosForm(customEvent.detail.show);
+      } else {
+        setShowSosForm(prev => !prev);
+      }
+    };
+    window.addEventListener('adatrack:driver-portal-toggle-vehicle-info', handleToggleInfo);
+    window.addEventListener('adatrack:driver-portal-toggle-sos', handleToggleSos);
+    return () => {
+      window.removeEventListener('adatrack:driver-portal-toggle-vehicle-info', handleToggleInfo);
+      window.removeEventListener('adatrack:driver-portal-toggle-sos', handleToggleSos);
+    };
+  }, []);
+
   const handleUserLocation = (coord: { lat: number; lng: number }) => {
     setDriverCoord(coord);
     // Hitung jarak Haversine antara pengemudi dan kendaraan
@@ -245,7 +295,7 @@ function VehiclesTab({ locale }: { locale: 'id' | 'en' }) {
   return (
     <div className="flex flex-col w-full h-full animate-in fade-in duration-200">
       {/* MAP – fills all space except bottom card */}
-      <div className="relative flex-1 min-h-0">
+      <div id="driver-portal-map-area" className="relative flex-1 min-h-0">
         <VehicleFinderMap
           targetCoord={vehicleCoord}
           targetLabel="B 1001 GHI"
@@ -256,7 +306,7 @@ function VehiclesTab({ locale }: { locale: 'id' | 'en' }) {
 
         {/* ── VEHICLE INFO OVERLAY (FLOATING COMPACT CARD) ── */}
         {showVehicleInfo && (
-          <div className="absolute bottom-4 left-4 right-4 sm:left-auto sm:w-96 z-50 animate-in slide-in-from-bottom-4 fade-in duration-200">
+          <div id="driver-portal-vehicle-modal" className="absolute bottom-4 left-4 right-4 sm:left-auto sm:w-96 z-50 animate-in slide-in-from-bottom-4 fade-in duration-200">
             <div className="bg-background w-full rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.15)] border border-border p-4 flex flex-col gap-4">
               {/* Header */}
               <div className="flex items-start justify-between">
@@ -311,6 +361,7 @@ function VehiclesTab({ locale }: { locale: 'id' | 'en' }) {
 
               {/* SOS Button */}
               <button
+                id="driver-portal-sos-btn"
                 onClick={() => {
                   setShowVehicleInfo(false);
                   setShowSosForm(true);
@@ -325,7 +376,7 @@ function VehiclesTab({ locale }: { locale: 'id' | 'en' }) {
         )}
         {/* ── SOS FORM OVERLAY ── */}
         {showSosForm && (
-          <div className="absolute bottom-4 left-4 right-4 sm:left-auto sm:w-96 z-[200] animate-in slide-in-from-bottom-4 fade-in duration-200">
+          <div id="driver-portal-sos-form" className="absolute bottom-4 left-4 right-4 sm:left-auto sm:w-96 z-[200] animate-in slide-in-from-bottom-4 fade-in duration-200">
             <div className="bg-background w-full rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.15)] border border-border p-4 pb-5">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-bold text-base text-foreground flex items-center gap-2">
@@ -342,7 +393,7 @@ function VehiclesTab({ locale }: { locale: 'id' | 'en' }) {
 
               <div className="space-y-3">
                 {/* Kategori Insiden */}
-                <div className="space-y-1.5">
+                <div id="driver-portal-sos-categories" className="space-y-1.5">
                   <label className="text-[11px] font-semibold text-foreground">{t.vehicles.category} <span className="text-red-500">*</span></label>
                   <div className="grid grid-cols-2 gap-1.5">
                     {[
@@ -425,8 +476,9 @@ function VehiclesTab({ locale }: { locale: 'id' | 'en' }) {
       </div>
 
       {/* ── BOTTOM CARD ── */}
-      <div className="flex-none w-full bg-card border-t border-border px-3 py-2 flex items-center gap-2 relative z-50">
+      <div id="driver-portal-bottom-card" className="flex-none w-full bg-card border-t border-border px-3 py-2 flex items-center gap-2 relative z-50">
         <button
+          id="driver-portal-vehicle-info-btn"
           onClick={() => {
             setShowVehicleInfo(!showVehicleInfo);
             if (!showVehicleInfo) setShowSosForm(false); // hide SOS when toggling on Vehicle Info
@@ -442,7 +494,7 @@ function VehiclesTab({ locale }: { locale: 'id' | 'en' }) {
           <Info className="w-4 h-4" />
         </button>
 
-        <div className="flex-1 min-w-0 text-left">
+        <div id="driver-portal-vehicle-address-distance" className="flex-1 min-w-0 text-left">
           <p className="text-[11px] text-muted-foreground truncate">{VEHICLE_ADDRESS}</p>
           {distance !== null && (
             <p className="text-[10px] text-red-500 font-semibold mt-0 flex items-center gap-1">
@@ -454,6 +506,7 @@ function VehiclesTab({ locale }: { locale: 'id' | 'en' }) {
 
         <div className="flex-none">
           <button
+            id="driver-portal-navigation-btn"
             onClick={openGoogleMaps}
             className="flex items-center justify-center h-8 px-3 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-500 font-semibold text-xs transition-colors gap-1.5"
             title={t.vehicles.navGoogleMap}
@@ -668,13 +721,28 @@ function AttendanceTab({ locale }: { locale: 'id' | 'en' }) {
     setStep('done');
   };
 
+  useEffect(() => {
+    const handleResetAttendance = () => {
+      stopCamera();
+      setStep('select_type');
+      setPhoto(null);
+      setDetectedGeofence(null);
+      setCurrentAddress(null);
+    };
+    window.addEventListener('adatrack:driver-portal-reset-attendance', handleResetAttendance);
+    return () => {
+      window.removeEventListener('adatrack:driver-portal-reset-attendance', handleResetAttendance);
+    };
+  }, []);
+
   return (
     <div className="h-full overflow-y-auto bg-background relative flex flex-col">
       <div className="p-4 w-full max-w-sm mx-auto flex-1 flex flex-col justify-center animate-in fade-in duration-200 pb-20">
 
         {step === 'select_type' && (
-          <div className="space-y-4 pt-2">
+          <div id="driver-portal-attendance-types" className="space-y-4 pt-2">
             <button
+              id="driver-portal-att-type-vehicle"
               onClick={() => handleSelectType('vehicle')}
               className="w-full bg-card border border-border rounded-2xl p-4 flex items-center gap-4 transition-all text-left"
             >
@@ -688,6 +756,7 @@ function AttendanceTab({ locale }: { locale: 'id' | 'en' }) {
             </button>
 
             <button
+              id="driver-portal-att-type-geofence"
               onClick={() => handleSelectType('geofence')}
               className="w-full bg-card border border-border rounded-2xl p-4 flex items-center gap-4 transition-all text-left"
             >
@@ -701,6 +770,7 @@ function AttendanceTab({ locale }: { locale: 'id' | 'en' }) {
             </button>
 
             <button
+              id="driver-portal-att-type-free"
               onClick={() => handleSelectType('free')}
               className="w-full bg-card border border-border rounded-2xl p-4 flex items-center gap-4 transition-all text-left"
             >
@@ -925,7 +995,7 @@ function MessagesTab({ locale }: { locale: 'id' | 'en' }) {
   ];
 
   return (
-    <div className="h-full overflow-y-auto bg-background">
+    <div id="driver-portal-messages-inbox" className="h-full overflow-y-auto bg-background">
       <div className="px-6 py-5 md:px-8 md:py-6 space-y-4 max-w-screen-md mx-auto animate-in fade-in duration-200 pb-24">
 
         <div className="flex items-center justify-between mb-4">
@@ -933,8 +1003,8 @@ function MessagesTab({ locale }: { locale: 'id' | 'en' }) {
           <button className="text-[10px] font-bold text-blue-500 hover:text-blue-600 transition-colors">{t.messages.markAllRead}</button>
         </div>
 
-        <div className="space-y-3">
-          {MESSAGES.map((msg) => {
+        <div id="driver-portal-messages-list" className="space-y-3">
+          {MESSAGES.map((msg, idx) => {
             let Icon = Info;
             let iconColor = "text-blue-500";
             let bgIconColor = "bg-blue-500/10";
@@ -956,6 +1026,7 @@ function MessagesTab({ locale }: { locale: 'id' | 'en' }) {
             return (
               <button
                 key={msg.id}
+                id={idx === 0 ? "driver-portal-message-card-first" : undefined}
                 className={cn(
                   "w-full text-left p-4 rounded-xl border transition-all relative overflow-hidden group",
                   msg.read ? "bg-transparent border-border/60 hover:bg-muted/30" : "bg-card border-border shadow-sm hover:shadow-md"

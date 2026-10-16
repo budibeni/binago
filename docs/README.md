@@ -31,6 +31,7 @@ database-design.md
 api-standard.md
 coding-standard.md
 mock-data-architecture.md
+tour-rules.md
 deployment.md
 task-roadmap.md
 ```

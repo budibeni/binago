@@ -39,6 +39,7 @@ import { AppShell, UIProvider } from '@adatrack/ui';
 import type { NavGroup, NavItem, UserInfo, Locale } from '@adatrack/types';
 import { getTranslation } from '../i18n';
 import { ShareLocationProvider } from '../features/core/sharing/context/ShareLocationContext';
+import { HeaderTourButton, TrackingTourProvider } from './tour';
 
 const DUMMY_USER: UserInfo = {
   name: 'Budi Beni',
@@ -389,30 +390,33 @@ export function BusinessShellLayout({ children }: { children: React.ReactNode })
       editText: (t.common as any).editText || 'Edit',
       deleteText: (t.common as any).deleteText || 'Hapus',
     }}>
-      <AppShell
-        brandName="ADATRACK"
-        navigation={navigation}
-        bottomNavigation={buildBottomNavigation(locale)}
-        currentPath={activePath}
-        breadcrumbItems={breadcrumbItems}
-        user={DUMMY_USER}
-        currentLocale={locale}
-        onLocaleChange={handleLocaleChange}
-        currentTheme={theme}
-        onThemeChange={handleThemeChange}
-        userMenuLabels={t.userMenu}
-        onLogoutClick={() => {
-          if (typeof window !== 'undefined') {
-            window.location.href = '/login';
-          }
-        }}
-      >
-        <ShareLocationProvider>
-          <BusinessLocaleContext.Provider value={locale}>
-            {children}
-          </BusinessLocaleContext.Provider>
-        </ShareLocationProvider>
-      </AppShell>
+      <TrackingTourProvider>
+        <AppShell
+          brandName="ADATRACK"
+          navigation={navigation}
+          bottomNavigation={buildBottomNavigation(locale)}
+          currentPath={activePath}
+          breadcrumbItems={breadcrumbItems}
+          user={DUMMY_USER}
+          currentLocale={locale}
+          onLocaleChange={handleLocaleChange}
+          currentTheme={theme}
+          onThemeChange={handleThemeChange}
+          headerRightSlot={<HeaderTourButton locale={locale} />}
+          userMenuLabels={t.userMenu}
+          onLogoutClick={() => {
+            if (typeof window !== 'undefined') {
+              window.location.href = '/login';
+            }
+          }}
+        >
+          <ShareLocationProvider>
+            <BusinessLocaleContext.Provider value={locale}>
+              {children}
+            </BusinessLocaleContext.Provider>
+          </ShareLocationProvider>
+        </AppShell>
+      </TrackingTourProvider>
     </UIProvider>
   );
 }

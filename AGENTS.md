@@ -38,6 +38,7 @@ ADATRACK/
     ├── database-design.md
     ├── api-standard.md
     ├── coding-standard.md
+    ├── tour-rules.md
     ├── deployment.md
     ├── task-roadmap.md
     │

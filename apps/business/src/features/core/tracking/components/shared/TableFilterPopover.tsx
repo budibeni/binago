@@ -22,6 +22,7 @@ export function TableFilterPopover({ children, locale = 'id', triggerClassName, 
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
         <Button
+          id="table-filter-popover-btn"
           variant="outline"
           size="sm"
           className={cn(

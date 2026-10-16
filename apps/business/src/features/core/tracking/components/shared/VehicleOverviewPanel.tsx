@@ -138,21 +138,25 @@ export function VehicleOverviewPanel({
 
   const coords = `${vehicle.location.lat.toFixed(4)}, ${vehicle.location.lng.toFixed(4)}`;
   const heading = vehicle.heading ?? 0;
-  const headingTitle = locale === 'id' ? `Arah: ${heading}°` : `Heading: ${heading}°`; return (
+  const headingTitle = locale === 'id' ? `Arah: ${heading}°` : `Heading: ${heading}°`;
+
+  return (
     <div
+      id="vehicle-overview-panel"
       className={cn(
         'flex flex-col h-full w-full bg-gray-50 dark:bg-neutral-950 select-none justify-between overflow-hidden relative animate-overview-in',
         className
       )}
     >
       {/* -- Row 1: Header Bar (34px) --------------------------------- */}
-      <div className="flex items-center justify-between gap-2 px-3 py-1 border-b border-gray-200 dark:border-neutral-800 bg-gray-50 dark:bg-neutral-900 shrink-0 h-[34px]">
+      <div id="overview-header-bar" className="flex items-center justify-between gap-2 px-3 py-1 border-b border-gray-200 dark:border-neutral-800 bg-gray-50 dark:bg-neutral-900 shrink-0 h-[34px]">
 
         {/* Left: Plate + Status + Context Tabs */}
-        <div className="flex items-center gap-2.5 min-w-0">
+        <div id="overview-vehicle-info" className="flex items-center gap-2.5 min-w-0">
 
           {/* License Plate (Bold Clean Monospace) */}
           <div
+            id="overview-plate-info"
             className="flex items-center gap-1.5 shrink-0"
             title={headingTitle}
           >
@@ -170,6 +174,7 @@ export function VehicleOverviewPanel({
 
           {/* Status Badge */}
           <span
+            id="overview-status-badge"
             className={cn(
               'inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-medium border shrink-0',
               status.bg,
@@ -183,7 +188,7 @@ export function VehicleOverviewPanel({
 
           {/* Context Tab Switcher */}
           {vehicleContext && (
-            <div className="hidden sm:flex items-center h-full ml-1 shrink-0 gap-2 border-l border-gray-200 dark:border-neutral-800 pl-2">
+            <div id="overview-tab-switcher" className="hidden sm:flex items-center h-full ml-1 shrink-0 gap-2 border-l border-gray-200 dark:border-neutral-800 pl-2">
               <button
                 type="button"
                 onClick={() => setActiveTab('umum')}
@@ -213,9 +218,10 @@ export function VehicleOverviewPanel({
         </div>
 
         {/* Right: Actions */}
-        <div className="flex items-center gap-1 shrink-0">
+        <div id="overview-actions-bar" className="flex items-center gap-1 shrink-0">
           {/* 1. Playback */}
           <button
+            id="overview-action-playback"
             type="button"
             onClick={onPlayback}
             title={tTracking.popupPlayback}
@@ -227,6 +233,7 @@ export function VehicleOverviewPanel({
 
           {/* 2. Create Geofence */}
           <button
+            id="overview-action-geofence"
             type="button"
             onClick={() => setGeofenceModalOpen(true)}
             title={locale === 'id' ? 'Buat Geofence' : 'Create Geofence'}
@@ -238,6 +245,7 @@ export function VehicleOverviewPanel({
 
           {/* 3. Google Maps */}
           <button
+            id="overview-action-maps"
             type="button"
             onClick={() => {
               const url = `https://www.google.com/maps?q=${vehicle.location.lat},${vehicle.location.lng}`;
@@ -252,6 +260,7 @@ export function VehicleOverviewPanel({
 
           {/* 4. Google Maps Street View */}
           <button
+            id="overview-action-street"
             type="button"
             onClick={() => {
               const streetViewUrl = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${vehicle.location.lat},${vehicle.location.lng}${heading !== undefined ? `&heading=${heading}` : ''}`;
@@ -269,6 +278,7 @@ export function VehicleOverviewPanel({
 
           {/* 5. Share Location (Bagikan) */}
           <button
+            id="overview-action-share"
             type="button"
             onClick={() => {
               if (onShareLocation) onShareLocation();
@@ -290,6 +300,7 @@ export function VehicleOverviewPanel({
 
           {/* 6. Close button (X) */}
           <button
+            id="overview-action-close"
             type="button"
             onClick={onClose}
             className="flex h-6 w-6 items-center justify-center rounded border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-neutral-700 transition-colors focus:outline-none"
@@ -304,10 +315,10 @@ export function VehicleOverviewPanel({
       {/* -- Row 2: Modular KPI Cards Grid ---------------------------- */}
       <div className="flex-1 px-3 py-1.5 overflow-hidden flex flex-col justify-center">
         {activeTab === 'umum' ? (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-2.5 h-[74px] animate-overview-tab">
+          <div id="overview-kpi-grid" className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-2.5 h-[74px] animate-overview-tab">
 
             {/* KPI Card 1: Speed & Ignition */}
-            <div className="bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg p-2 flex flex-col justify-between min-w-0 transition-all hover:border-gray-300 dark:hover:border-neutral-600">
+            <div id="overview-kpi-speed" className="bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg p-2 flex flex-col justify-between min-w-0 transition-all hover:border-gray-300 dark:hover:border-neutral-600">
               <div className="flex items-center justify-between gap-1">
                 <span className="text-[10px] font-bold text-gray-500 dark:text-neutral-400 flex items-center gap-1 uppercase tracking-wider">
                   <Gauge className="w-3 h-3 text-primary shrink-0" />
@@ -339,7 +350,7 @@ export function VehicleOverviewPanel({
             </div>
 
             {/* KPI Card 2: Driver & Hardware */}
-            <div className="bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg p-2 flex flex-col justify-between min-w-0 transition-all hover:border-gray-300 dark:hover:border-neutral-600">
+            <div id="overview-kpi-driver" className="bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg p-2 flex flex-col justify-between min-w-0 transition-all hover:border-gray-300 dark:hover:border-neutral-600">
               <div className="flex items-center justify-between gap-1">
                 <span className="text-[10px] font-bold text-gray-500 dark:text-neutral-400 flex items-center gap-1 uppercase tracking-wider">
                   <User className="w-3 h-3 text-primary shrink-0" />
@@ -359,7 +370,7 @@ export function VehicleOverviewPanel({
             </div>
 
             {/* KPI Card 3: Location & Address */}
-            <div className="bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg p-2 flex flex-col justify-between min-w-0 transition-all hover:border-gray-300 dark:hover:border-neutral-600">
+            <div id="overview-kpi-location" className="bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg p-2 flex flex-col justify-between min-w-0 transition-all hover:border-gray-300 dark:hover:border-neutral-600">
               <div className="flex items-center justify-between gap-1">
                 <span className="text-[10px] font-bold text-gray-500 dark:text-neutral-400 flex items-center gap-1 uppercase tracking-wider">
                   <MapPin className="w-3 h-3 text-rose-500 shrink-0" />
@@ -391,7 +402,7 @@ export function VehicleOverviewPanel({
             </div>
 
             {/* KPI Card 4: Geofence & Heading */}
-            <div className="bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg p-2 flex flex-col justify-between min-w-0 transition-all hover:border-gray-300 dark:hover:border-neutral-600">
+            <div id="overview-kpi-geofence" className="bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg p-2 flex flex-col justify-between min-w-0 transition-all hover:border-gray-300 dark:hover:border-neutral-600">
               <div className="flex items-center justify-between gap-1">
                 <span className="text-[10px] font-bold text-gray-500 dark:text-neutral-400 flex items-center gap-1 uppercase tracking-wider">
                   <SquareDashedBottom className="w-3 h-3 text-sky-500 shrink-0" />

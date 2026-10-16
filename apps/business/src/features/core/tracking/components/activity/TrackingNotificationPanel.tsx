@@ -114,7 +114,7 @@ export function TrackingNotificationPanel({ open, onClose, locale = 'id', visibl
     <div className="flex-1 flex flex-col min-h-0 w-full bg-surface overflow-auto border-t border-border">
       <div className="p-3 lg:p-4 max-w-full lg:max-w-5xl mx-auto w-full">
         {/* Tabs */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-3 scrollbar-none mb-3 px-1">
+        <div id="tracking-activity-tabs" className="flex items-center gap-1.5 overflow-x-auto pb-3 scrollbar-none mb-3 px-1">
           {tabs.map((tab) => (
             <button
               key={tab.id}
@@ -133,7 +133,7 @@ export function TrackingNotificationPanel({ open, onClose, locale = 'id', visibl
         </div>
 
         {/* Notifications List */}
-        <div className="bg-background rounded-lg border border-border overflow-hidden">
+        <div id="tracking-activity-list" className="bg-background rounded-lg border border-border overflow-hidden">
           {filteredNotifications.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center text-foreground-muted p-8">
               <Bell className="h-8 w-8 mb-3 opacity-20" />

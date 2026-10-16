@@ -1,9 +1,9 @@
 import React, { ReactNode } from 'react';
 import { cn } from '@adatrack/utils';
 
-export function DataList({ children, className }: { children: ReactNode; className?: string }) {
+export function DataList({ id, children, className }: { id?: string; children: ReactNode; className?: string }) {
   return (
-    <div className={cn("w-full md:w-[280px] lg:w-[320px] shrink-0 border-r border-border bg-neutral-50/50 dark:bg-neutral-950/50 flex flex-col h-full", className)}>
+    <div id={id} className={cn("w-full md:w-[280px] lg:w-[320px] shrink-0 border-r border-border bg-neutral-50/50 dark:bg-neutral-950/50 flex flex-col h-full", className)}>
       {children}
     </div>
   );
@@ -17,9 +17,9 @@ export function DataListHeader({ children, className }: { children: ReactNode; c
   );
 }
 
-export function DataListContent({ children, className }: { children: ReactNode; className?: string }) {
+export function DataListContent({ id, children, className }: { id?: string; children: ReactNode; className?: string }) {
   return (
-    <div className={cn("flex-1 overflow-y-auto scrollbar-hide bg-background border-t border-border mt-3", className)}>
+    <div id={id} className={cn("flex-1 overflow-y-auto scrollbar-hide bg-background border-t border-border mt-3", className)}>
       <div className="flex flex-col divide-y divide-border/60">
         {children}
       </div>

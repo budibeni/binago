@@ -170,7 +170,7 @@ export function PlaybackMapLayerPanel({
   };
 
   return (
-    <div className="flex flex-col h-full w-full bg-background relative">
+    <div id="playback-map-layer-panel" className="flex flex-col h-full w-full bg-background relative">
       {/* Header */}
       <div className="shrink-0 flex items-center justify-between px-3 h-[40px] bg-white dark:bg-neutral-900 border-b border-border">
         <h2 className="text-[12px] font-bold text-foreground tracking-tight">
@@ -188,7 +188,7 @@ export function PlaybackMapLayerPanel({
       {/* Internal Scroll Body */}
       <div className="flex-1 overflow-y-auto">
         {/* Legend */}
-        <div className="flex flex-col gap-1.5 px-4 pt-3 pb-2 border-b border-border bg-surface">
+        <div id="playback-layer-legend" className="flex flex-col gap-1.5 px-4 pt-3 pb-2 border-b border-border bg-surface">
           <div className="flex items-center gap-2">
             <div className="w-4 h-1 bg-blue-500 rounded-full shrink-0" />
             <span className="text-[10px] font-medium text-foreground-muted leading-tight">
@@ -219,7 +219,7 @@ export function PlaybackMapLayerPanel({
         </div>
 
         {/* --- GEOFENCE SECTION --- */}
-        <div className="flex flex-col mb-1">
+        <div id="playback-geofence-section" className="flex flex-col mb-1">
           <div className="px-3 pt-3 pb-2 flex items-center justify-between gap-1">
             <div className="flex items-center gap-1.5 min-w-0">
               <h3 className="text-[11px] font-bold text-foreground-muted tracking-wider truncate">
@@ -231,7 +231,7 @@ export function PlaybackMapLayerPanel({
             </div>
 
             {/* Toggle Segment: Terkait vs Semua */}
-            <div className="flex items-center p-0.5 rounded bg-surface border border-border text-[9.5px] shrink-0">
+            <div id="playback-geofence-filter-toggle" className="flex items-center p-0.5 rounded bg-surface border border-border text-[9.5px] shrink-0">
               <button
                 type="button"
                 onClick={() => {
@@ -271,6 +271,7 @@ export function PlaybackMapLayerPanel({
             <div className="relative">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-foreground-muted" />
               <input
+                id="playback-geofence-search"
                 type="text"
                 value={geoSearch}
                 onChange={(e) => {
@@ -387,7 +388,7 @@ export function PlaybackMapLayerPanel({
         </div>
 
         {/* --- ROUTE SECTION --- */}
-        <div className="flex flex-col mb-1 border-t border-border">
+        <div id="playback-route-section" className="flex flex-col mb-1 border-t border-border">
           <div className="px-3 pt-3 pb-2 flex items-center justify-between gap-1">
             <div className="flex items-center gap-1.5 min-w-0">
               <h3 className="text-[11px] font-bold text-foreground-muted tracking-wider truncate">
@@ -399,7 +400,7 @@ export function PlaybackMapLayerPanel({
             </div>
 
             {/* Toggle Segment: Terkait vs Semua */}
-            <div className="flex items-center p-0.5 rounded bg-surface border border-border text-[9.5px] shrink-0">
+            <div id="playback-route-filter-toggle" className="flex items-center p-0.5 rounded bg-surface border border-border text-[9.5px] shrink-0">
               <button
                 type="button"
                 onClick={() => {
@@ -439,6 +440,7 @@ export function PlaybackMapLayerPanel({
             <div className="relative">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-foreground-muted" />
               <input
+                id="playback-route-search"
                 type="text"
                 value={routeSearch}
                 onChange={(e) => {
@@ -556,8 +558,9 @@ export function PlaybackMapLayerPanel({
         </div>
 
         {/* Actions */}
-        <div className="p-3 border-t border-border mt-2 flex flex-col gap-2">
+        <div id="playback-layer-actions" className="p-3 border-t border-border mt-2 flex flex-col gap-2">
           <button
+            id="playback-layer-reset-btn"
             onClick={handleReset}
             className="w-full py-1.5 text-[11px] font-semibold text-danger border border-danger/30 hover:bg-danger/5 rounded transition-colors"
           >
@@ -565,6 +568,7 @@ export function PlaybackMapLayerPanel({
           </button>
 
           <button
+            id="playback-create-route-btn"
             type="button"
             onClick={onCreateRoute}
             disabled={!hasPlaybackData}

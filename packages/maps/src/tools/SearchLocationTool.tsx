@@ -916,9 +916,10 @@ export function SearchLocationTool({
     : allTabs.filter((item) => item.id === 'address' || item.id === 'coordinate' || item.id === 'my_location');
 
   return (
-    <div className={cn('w-[316px] text-sm select-none flex flex-col', className)}>
+    <div id="search-location-card" className={cn('w-[316px] text-sm select-none flex flex-col', className)}>
       {/* ── Segmented Control Bar (Modern with Icons) ── */}
       <div
+        id="search-mode-tabs"
         className={cn(
           isLive ? 'grid-cols-5' : 'grid-cols-3',
           'grid p-1 bg-neutral-100/90 dark:bg-neutral-800/90 rounded-2xl border border-neutral-200/60 dark:border-neutral-700/60 gap-0.5 mb-3 shrink-0'
@@ -930,6 +931,7 @@ export function SearchLocationTool({
           return (
             <button
               key={item.id}
+              id={`search-tab-${item.id}`}
               type="button"
               onClick={() => handleTabChange(item.id)}
               className={cn(
@@ -957,7 +959,7 @@ export function SearchLocationTool({
         {tab === 'address' && (
           <div className="flex-1 flex flex-col gap-2 min-h-0">
             {/* Input Bar: Alamat & Radius (Radius hanya di Live Tracking) */}
-            <div className="shrink-0 space-y-1.5">
+            <div id="search-input-section" className="shrink-0 space-y-1.5">
               {/* 1. Baris Input Alamat & Tombol Cari */}
               <div>
                 <div className="flex items-center justify-between mb-1">
@@ -1026,7 +1028,7 @@ export function SearchLocationTool({
 
               {/* 2. Radius Input & Preset Chips (HANYA tampil di Live Tracking) */}
               {isLive && (
-                <div className="flex items-center justify-between gap-1.5 pt-0.5">
+                <div id="search-radius-section" className="flex items-center justify-between gap-1.5 pt-0.5">
                   <div className="flex items-center gap-1.5 shrink-0">
                     <span className="text-[11px] font-semibold text-neutral-500 dark:text-neutral-400">
                       Radius:
@@ -1079,7 +1081,7 @@ export function SearchLocationTool({
             </div>
 
             {/* Content Area: Hasil Alamat / Kendaraan di Radius (Live) / Card Lokasi Terpilih (Non-Live) / Placeholder */}
-            <div className="flex-1 min-h-0 flex flex-col pt-1 border-t border-neutral-100 dark:border-neutral-800/80">
+            <div id="search-results-section" className="flex-1 min-h-0 flex flex-col pt-1 border-t border-neutral-100 dark:border-neutral-800/80">
               {isSearching ? (
                 <div className="flex-1 flex flex-col items-center justify-center text-neutral-400 gap-2">
                   <Loader2 className="w-5 h-5 animate-spin text-red-600 dark:text-red-500" />

@@ -122,6 +122,8 @@ function VehicleListItem({
 }: VehicleListItemProps) {
   return (
     <div
+      id={`vehicle-item-${vehicle.id}`}
+      data-vehicle-id={vehicle.id}
       className={cn(
         'group flex items-center gap-2 py-2 px-3 cursor-pointer transition-colors',
         isSelected ? 'bg-surface-elevated' : 'hover:bg-surface-elevated/50'
@@ -356,7 +358,7 @@ export function VehicleList({
 
           {/* -- Tabs ------------------------------------------------------------ */}
           {!hideStatusFilterTabs && (
-            <div className="shrink-0 bg-background border-b border-border px-1">
+            <div id="tracking-status-filter-bar" className="shrink-0 bg-background border-b border-border px-1">
               <div className="flex items-center justify-between">
                 {statusFilters.map(({ key, label, count }) => {
                   const isSelected = statusFilter === key;
@@ -377,6 +379,7 @@ export function VehicleList({
                   return (
                     <button
                       key={key}
+                      id={`status-tab-${key}`}
                       onClick={() => onStatusFilterChange(key)}
                       className={cn(
                         "flex-1 flex flex-col items-center py-2 border-b-2 transition-colors focus:outline-none",
@@ -442,7 +445,7 @@ export function VehicleList({
           </div>
         )}
 
-        {filteredGroups.map((group) => {
+        {filteredGroups.map((group, groupIdx) => {
           const isExpanded = expandedGroups[group.id] ?? false;
           const groupVisibleIds = group.filteredVehicles.map(v => v.id);
 
@@ -464,8 +467,12 @@ export function VehicleList({
 
               {isExpanded && (
                 <div className="flex flex-col border-t border-border">
-                  {group.filteredVehicles.map((vehicle) => (
-                    <div key={vehicle.id} className="border-b border-border last:border-0">
+                  {group.filteredVehicles.map((vehicle, vIdx) => (
+                    <div
+                      key={vehicle.id}
+                      id={groupIdx === 0 && vIdx === 0 ? "tracking-first-vehicle-item" : undefined}
+                      className="border-b border-border last:border-0"
+                    >
                       <VehicleListItem
                         vehicle={vehicle}
                         isSelected={vehicle.id === selectedVehicleId}

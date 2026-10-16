@@ -52,12 +52,22 @@ export function SpeedTable({
     }
   };
 
-  // Augment vehicles with dummy speed data to keep it stable and compatible with DataTable
+function getSeedNumber(str: string): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash << 5) - hash + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash);
+}
+
+  // Augment vehicles with deterministic dummy speed data to keep it stable across renders
   const augmentedVehicles = useMemo(() => {
     return vehicles.map((v) => {
-      const minSpeed = Math.floor(Math.random() * 20);
-      const maxSpeed = 60 + Math.floor(Math.random() * 60);
-      const avgSpeed = minSpeed + Math.floor((maxSpeed - minSpeed) / 2) + Math.floor(Math.random() * 10 - 5);
+      const seed = getSeedNumber(v.id || v.plateNumber);
+      const minSpeed = 0;
+      const maxSpeed = 65 + (seed % 45); // e.g. 65 - 110 km/h
+      const avgSpeed = 35 + ((seed * 3) % 25); // e.g. 35 - 60 km/h
       return {
         ...v,
         speedData: {

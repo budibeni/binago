@@ -148,6 +148,7 @@ export function DataTableToolbar<TData extends RowData = RowData>({
 
   return (
     <div
+      id="data-table-toolbar"
       className={cn(
         'flex flex-wrap items-center justify-between gap-2',
         className,
@@ -159,7 +160,7 @@ export function DataTableToolbar<TData extends RowData = RowData>({
       <div className="flex flex-1 items-center gap-3 min-w-0">
         {customActions}
         {showSearch && onSearchChange && (
-          <div className="flex-1">
+          <div id="data-table-search" className="flex-1">
             <DataTableSearch
               value={searchValue}
               onChange={onSearchChange}
@@ -177,7 +178,7 @@ export function DataTableToolbar<TData extends RowData = RowData>({
       {/* Right area: utilities */}
       <div className="flex items-center gap-3 shrink-0">
         {/* Button Group: Refresh, Filter, Fullscreen, Kolom, Export */}
-        <div className="flex items-center h-8 divide-x divide-neutral-200 dark:divide-neutral-800 rounded-md border border-neutral-200 dark:border-neutral-800 bg-background overflow-hidden">
+        <div id="data-table-utilities" className="flex items-center h-8 divide-x divide-neutral-200 dark:divide-neutral-800 rounded-md border border-neutral-200 dark:border-neutral-800 bg-background overflow-hidden">
           
           {/* Refresh Button */}
           {onRefresh && (

@@ -56,14 +56,32 @@ export function ParkingTable({
     }
   };
 
-  // Augment vehicles with dummy parking data to keep it stable and compatible with DataTable
+function getSeedNumber(str: string): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash << 5) - hash + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash);
+}
+
+  // Augment vehicles with deterministic dummy parking data to keep it stable across renders
   const augmentedVehicles = useMemo(() => {
+    const addresses = [
+      "Jl. Sudirman No. 45, Jakarta Pusat",
+      "Jl. M.H. Thamrin No. 10, Jakarta Pusat",
+      "Jl. Gatot Subroto Kav. 52, Jakarta Selatan",
+      "Kawasan Industri Pulogadung, Jakarta Timur",
+      "Jl. Asia Afrika No. 8, Senayan, Jakarta",
+      "Jl. Letjen S. Parman No. 28, Jakarta Barat",
+    ];
     return vehicles.map((v) => {
-      const dummyDurationMinutes = minDuration + Math.floor(Math.random() * 120);
+      const seed = getSeedNumber(v.id || v.plateNumber);
+      const dummyDurationMinutes = minDuration + (seed % 95);
       const hours = Math.floor(dummyDurationMinutes / 60);
       const mins = dummyDurationMinutes % 60;
-      const address = "Jl. Sudirman No. 45, Jakarta Pusat";
-      const geofence = Math.random() > 0.5 ? "Kantor Pusat" : "-";
+      const address = addresses[seed % addresses.length];
+      const geofence = (seed % 3 === 0) ? "Kantor Pusat" : (seed % 3 === 1) ? "Gudang Logistik Cikarang" : "-";
       return {
         ...v,
         parkingData: {

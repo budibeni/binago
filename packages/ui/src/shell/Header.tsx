@@ -71,10 +71,8 @@ export function Header({
         </div>
       </div>
 
-      {/* Right Area: LanguageToggle + ThemeToggle + RightSlot + UserMenu (NO Global Search) */}
+      {/* Right Area: LanguageToggle -> ThemeToggle -> rightSlot (Panduan) -> UserMenu */}
       <div className="flex items-center gap-1.5 shrink-0">
-        {rightSlot}
-
         {onLocaleChange && (
           <LanguageToggle
             currentLocale={currentLocale}
@@ -88,6 +86,8 @@ export function Header({
             onThemeChange={onThemeChange}
           />
         )}
+
+        {rightSlot}
 
         {user && (
           <div className="ml-1 pl-1 border-l border-border">

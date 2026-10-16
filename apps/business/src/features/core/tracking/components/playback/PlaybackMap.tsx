@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useMemo, useEffect, useState } from 'react';
+import React, { useMemo, useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { TrackingMap, useMapActions, MapMarker, MapPopup } from '@adatrack/maps';
-import { Truck, Bus, CircleParking, Clock, ExternalLink, X, Gauge, Activity, MapPin, Crosshair, Shield, Plus } from 'lucide-react';
+import { TrackingMap, useMapActions, useInternalMap, MapMarker, MapPopup } from '@adatrack/maps';
+import { Truck, Bus, CircleParking, Clock, ExternalLink, X, Gauge, Activity, MapPin, Crosshair, Shield, Plus, History } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import type { TrackingVehicle } from '../../types/tracking';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
@@ -39,6 +39,7 @@ export interface PlaybackMapProps {
   selectedRouteIds?: string[];
   cropTrack?: { lat: number; lng: number }[];
   isRouteCropMode?: boolean;
+  isVisible?: boolean;
 }
 
 // --- Inner: auto-fit bounds when track loads -----------------------------------
@@ -68,6 +69,44 @@ function PlaybackFitBounds({ track }: { track?: { lat: number; lng: number }[] }
     return () => clearTimeout(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [track]);
+
+  return null;
+}
+
+// --- Inner: map resize trigger when tab visibility changes ----------------------
+
+function PlaybackMapResizer({ isVisible }: { isVisible?: boolean }) {
+  const map = useInternalMap();
+
+  useEffect(() => {
+    if (!map || isVisible === false) return;
+    map.resize();
+    const t1 = setTimeout(() => map.resize(), 50);
+    const t2 = setTimeout(() => map.resize(), 200);
+    const t3 = setTimeout(() => map.resize(), 500);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+    };
+  }, [map, isVisible]);
+
+  return null;
+}
+
+// --- Inner: center map on vehicle when selected before route loads --------------
+
+function PlaybackVehicleCenter({ vehicle, hasTrack }: { vehicle: TrackingVehicle | null; hasTrack: boolean }) {
+  const mapActions = useMapActions();
+  const prevVehicleIdRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!vehicle || hasTrack) return;
+    if (vehicle.id !== prevVehicleIdRef.current) {
+      prevVehicleIdRef.current = vehicle.id;
+      mapActions.panTo(vehicle.location);
+    }
+  }, [vehicle, hasTrack, mapActions]);
 
   return null;
 }
@@ -400,6 +439,7 @@ export function PlaybackMap({
   selectedRouteIds = [],
   cropTrack,
   isRouteCropMode,
+  isVisible = true,
 }: PlaybackMapProps) {
   const locale = useBusinessLocale();
   const tTracking = getTranslation(locale).tracking;
@@ -416,14 +456,6 @@ export function PlaybackMap({
   useEffect(() => {
     setActivePopupIndex(null);
   }, [vehicle?.id]);
-
-  if (!vehicle) {
-    return (
-      <div className="w-full h-full flex items-center justify-center bg-surface">
-        <p className="text-sm text-foreground-muted">{tTracking.playbackEmpty}</p>
-      </div>
-    );
-  }
 
   return (
     <div className="w-full h-full relative">
@@ -447,6 +479,12 @@ export function PlaybackMap({
         playbackParkingEvents={undefined}
         className="w-full h-full border-0 rounded-none min-h-0"
       >
+        {/* Resize controller when visibility toggles */}
+        <PlaybackMapResizer isVisible={isVisible} />
+
+        {/* Center map on vehicle if selected and no track loaded */}
+        <PlaybackVehicleCenter vehicle={vehicle} hasTrack={Boolean(playbackTrack && playbackTrack.length > 1)} />
+
         {/* Auto-fit to route bounds on load */}
         <PlaybackFitBounds track={playbackTrack} />
 
@@ -596,6 +634,16 @@ export function PlaybackMap({
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Floating guidance badge when no vehicle is selected */}
+      {!vehicle && (
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
+          <div className="flex items-center gap-2 px-3.5 py-2 rounded-lg bg-background/90 dark:bg-background/95 backdrop-blur-md border border-border dark:border-border-strong shadow-lg text-xs font-medium text-foreground">
+            <History className="h-4 w-4 text-accent shrink-0" />
+            <span>{tTracking.playbackEmpty}</span>
           </div>
         </div>
       )}

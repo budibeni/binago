@@ -52,18 +52,28 @@ export function MileageTable({
     }
   };
 
-  // Augment vehicles with dummy mileage data to keep it stable and compatible with DataTable
+function getSeedNumber(str: string): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash << 5) - hash + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash);
+}
+
+  // Augment vehicles with deterministic dummy mileage data to keep it stable across renders
   const augmentedVehicles = useMemo(() => {
     return vehicles.map((v) => {
-      const hours = Math.floor(Math.random() * 8);
-      const mins = Math.floor(Math.random() * 60);
-      const km = (Math.random() * 300);
+      const seed = getSeedNumber(v.id || v.plateNumber);
+      const hours = 2 + (seed % 6);
+      const mins = (seed * 7) % 60;
+      const km = 45 + ((seed % 2200) / 10);
       return {
         ...v,
         mileageData: {
           hours,
           mins,
-          km
+          km: Number(km.toFixed(1))
         }
       };
     });

@@ -50,7 +50,7 @@ export function HeatmapPanel({
 
         {/* Form */}
         <div className="flex items-center gap-1.5 sm:gap-2 flex-1 px-2 sm:px-3 justify-start min-w-max">
-          <div className="flex items-center gap-1 sm:gap-1.5">
+          <div id="heatmap-date-filter" className="flex items-center gap-1 sm:gap-1.5">
 
             {/* Start */}
             <div className="relative w-[110px] sm:w-[130px] shrink-0">
@@ -81,7 +81,7 @@ export function HeatmapPanel({
             <div className="w-px h-5 bg-border mx-0.5 sm:mx-1" />
 
             {/* Status Filter */}
-            <div className="relative w-[100px] shrink-0">
+            <div id="heatmap-status-filter" className="relative w-[100px] shrink-0">
               <select
                 value={statusFilter}
                 onChange={(e) => onStatusFilterChange(e.target.value as any)}
@@ -100,6 +100,7 @@ export function HeatmapPanel({
 
         {/* Generate Button */}
         <Button
+          id="heatmap-generate-btn"
           className="bg-danger hover:bg-danger/90 text-white font-semibold h-8 px-3 sm:px-4 text-[11px] rounded-lg transition-all shrink-0"
           disabled={!canGenerate || isGenerating}
           onClick={onGenerate}

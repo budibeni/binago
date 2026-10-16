@@ -57,6 +57,9 @@ importers:
       '@tanstack/react-table':
         specifier: ^9.1.2
         version: 9.1.2(react-dom@18.3.1)(react@18.3.1)
+      driver.js:
+        specifier: ^1.10.1
+        version: 1.10.1
       lucide-react:
         specifier: ^1.52.0
         version: 1.52.0(@types/react@18.3.31)(react@18.3.1)
@@ -247,9 +250,6 @@ importers:
       '@adatrack/types':
         specifier: workspace:*
         version: link:../types
-      '@adatrack/ui':
-        specifier: workspace:*
-        version: link:../ui
       '@adatrack/utils':
         specifier: workspace:*
         version: link:../utils
@@ -2988,6 +2988,10 @@ packages:
     resolution: {integrity: sha512-EUBjM+B+lkDE41iE82DDSCfkoPGfXx8IxFxPMjNzm/Uk4xDet77rTN9wqlxlVg71kK7XGuUMv6wUxJUwwv+Xyw==}
     optionalDependencies:
       '@types/trusted-types': 2.0.7
+
+  /driver.js@1.10.1:
+    resolution: {integrity: sha512-mpcJ15eIRWnGMykeIWjr0CdQF00/JzImFOEXy/VponYgMbP/y46t24MPBDO3PV/rH6CjdSe3T7WQ9cP3GvEPdQ==}
+    dev: false
 
   /dunder-proto@1.0.1:
     resolution: {integrity: sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A==}
