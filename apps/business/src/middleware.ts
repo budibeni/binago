@@ -45,7 +45,8 @@ export function middleware(request: NextRequest) {
         "/api/v1/groups",
         "/api/v1/assets",
         "/api/v1/organizations",
-        "/api/v1/integrations"
+        "/api/v1/integrations",
+        "/api/v1/geocoder"
       ];
       
       const isVehicleRoute = vehicleRoutes.some(route => backendPath.startsWith(route));

@@ -231,6 +231,9 @@ export function PlaybackTable({
           columns={columns}
           data={filteredPoints}
           searchable
+          pagination
+          pageSize={20}
+          pageSizeOptions={[10, 20, 50, 100]}
           columnVisibility
           searchValue={searchQuery}
           onSearchChange={setSearchQuery}

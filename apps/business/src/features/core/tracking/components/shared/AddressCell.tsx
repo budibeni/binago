@@ -39,21 +39,16 @@ export async function reverseGeocodeCoord(lat: number, lng: number): Promise<str
       }
     }
 
-    // 2. High-precision Reverse Geocoding via Nominatim (OpenStreetMap with accept-language: id)
+    // 2. High-precision Reverse Geocoding via internal API proxy endpoint
+    // This avoids CORS issues, benefits from server caching, and safely falls back
     try {
-      const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=id`;
-      const res = await fetch(url, {
-        headers: {
-          'Accept-Language': 'id-ID,id;q=0.9',
-          'User-Agent': 'Adatrack-Web-Tracker/1.0',
-        },
-      });
+      const res = await fetch(`/api/v1/geocoder/reverse?lat=${lat}&lon=${lng}`);
       if (res.ok) {
-        const data = await res.json();
-        const displayName = data.display_name;
-        if (displayName) {
-          addressCache.set(cacheKey, displayName);
-          return displayName;
+        const json = await res.json();
+        const addr = json?.data?.address;
+        if (addr && addr.trim() !== '') {
+          addressCache.set(cacheKey, addr);
+          return addr;
         }
       }
     } catch {

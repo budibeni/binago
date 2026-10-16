@@ -210,6 +210,9 @@ export function LiveTable({ modeSelector, vehicles, onVehicleSelect, locale }: L
           columns={columns}
           data={filteredVehicles}
           searchable
+          pagination
+          pageSize={20}
+          pageSizeOptions={[10, 20, 50, 100]}
           columnVisibility
           searchValue={searchQuery}
           onSearchChange={setSearchQuery}
