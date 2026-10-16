@@ -7,44 +7,113 @@ export interface GeometryEditorProps {
   mode: 'idle' | 'draw_polygon' | 'draw_rectangle' | 'draw_multiline' | 'edit';
   initialGeometry?: MapGeometry | null;
   onChange?: (geometry: MapGeometry | null) => void;
+  onFinish?: () => void;
+  renderGeometry?: boolean;
 }
 
 export function GeometryEditor({
   mode,
   initialGeometry = null,
   onChange,
+  onFinish,
+  renderGeometry = true,
 }: GeometryEditorProps) {
   const map = useInternalMap();
   const [geometry, setGeometry] = useState<MapGeometry | null>(initialGeometry);
   const [draftCoords, setDraftCoords] = useState<Coordinate[]>([]);
+  const draftCoordsRef = useRef<Coordinate[]>(draftCoords);
+  draftCoordsRef.current = draftCoords;
+
+  const isInternalUpdateRef = useRef(false);
+  const prevModeRef = useRef(mode);
   
   const sourceId = 'adatrack-geometry-editor-source';
   const layerId = 'adatrack-geometry-editor-layer';
   const draftSourceId = 'adatrack-geometry-draft-source';
   const draftLayerId = 'adatrack-geometry-draft-layer';
   const draftPointsLayerId = 'adatrack-geometry-draft-points';
+
+  const dedupCoords = (coords: Coordinate[]): Coordinate[] => {
+    const result: Coordinate[] = [];
+    for (const pt of coords) {
+      const last = result[result.length - 1];
+      if (!last || last.lat !== pt.lat || last.lng !== pt.lng) {
+        result.push(pt);
+      }
+    }
+    return result;
+  };
   
   // Sync initialGeometry
   useEffect(() => {
     if (initialGeometry !== undefined) {
+      if (isInternalUpdateRef.current) {
+        isInternalUpdateRef.current = false;
+        return;
+      }
       setGeometry(initialGeometry);
-      setDraftCoords([]); // Also clear drafts when initial geometry changes externally
     }
   }, [initialGeometry]);
   
-  // Clear draft when mode changes
+  // Commit draft when mode changes from drawing to idle
   useEffect(() => {
-    setDraftCoords([]);
-  }, [mode]);
-  
-  // Notify parent
-  useEffect(() => {
-    if (onChange) {
-      onChange(geometry);
-    }
-  }, [geometry]);
+    const prevMode = prevModeRef.current;
+    prevModeRef.current = mode;
 
-  // Handle map clicks for drawing
+    if (prevMode !== mode) {
+      if (prevMode === 'draw_multiline' && mode !== 'draw_multiline') {
+        const currentDraft = draftCoordsRef.current;
+        if (currentDraft && currentDraft.length >= 2) {
+          const deduped = dedupCoords(currentDraft);
+          if (deduped.length >= 2) {
+            const newGeom: MapGeometry = {
+              type: 'multiline',
+              coordinates: deduped,
+            };
+            isInternalUpdateRef.current = true;
+            setGeometry(newGeom);
+            onChange?.(newGeom);
+          }
+        }
+      } else if (prevMode === 'draw_polygon' && mode !== 'draw_polygon') {
+        const currentDraft = draftCoordsRef.current;
+        if (currentDraft && currentDraft.length >= 3) {
+          const deduped = dedupCoords(currentDraft);
+          if (deduped.length >= 3) {
+            const newGeom: MapGeometry = {
+              type: 'polygon',
+              coordinates: [...deduped, deduped[0]],
+            };
+            isInternalUpdateRef.current = true;
+            setGeometry(newGeom);
+            onChange?.(newGeom);
+          }
+        }
+      }
+      setDraftCoords([]);
+    }
+  }, [mode, onChange]);
+  
+  // Handle cursor and doubleClickZoom
+  useEffect(() => {
+    if (!map) return;
+    const canvas = map.getCanvas();
+    if (mode === 'draw_multiline' || mode === 'draw_polygon' || mode === 'draw_rectangle') {
+      canvas.style.cursor = 'crosshair';
+      map.doubleClickZoom.disable();
+    } else {
+      canvas.style.cursor = '';
+      map.doubleClickZoom.enable();
+    }
+    return () => {
+      if (map) {
+        canvas.style.cursor = '';
+        map.doubleClickZoom.enable();
+      }
+    };
+  }, [map, mode]);
+
+  // Handle map clicks and drawing
   useEffect(() => {
     if (!map || mode === 'idle' || mode === 'edit') return;
     
@@ -52,13 +121,10 @@ export function GeometryEditor({
       const coord = { lat: e.lngLat.lat, lng: e.lngLat.lng };
       
       if (mode === 'draw_rectangle') {
-        if (draftCoords.length === 0) {
+        if (draftCoordsRef.current.length === 0) {
           setDraftCoords([coord]);
-        } else if (draftCoords.length === 1) {
-          // Finish rectangle on second click
-          // To ensure [sw, ne], we could sort them, but let's just use them as-is
-          // getRectanglePolygon handles it.
-          const p1 = draftCoords[0];
+        } else if (draftCoordsRef.current.length === 1) {
+          const p1 = draftCoordsRef.current[0];
           const p2 = coord;
           
           const sw = {
@@ -70,26 +136,35 @@ export function GeometryEditor({
             lng: Math.max(p1.lng, p2.lng)
           };
           
-          setGeometry({
+          const newGeom: MapGeometry = {
             type: 'rectangle',
             coordinates: [sw, ne]
-          });
+          };
+          isInternalUpdateRef.current = true;
+          setGeometry(newGeom);
+          onChange?.(newGeom);
           setDraftCoords([]);
+          onFinish?.();
         }
       } else if (mode === 'draw_polygon') {
-        if (draftCoords.length >= 3) {
-          const firstPoint = map.project([draftCoords[0].lng, draftCoords[0].lat]);
+        if (draftCoordsRef.current.length >= 3) {
+          const firstPoint = map.project([draftCoordsRef.current[0].lng, draftCoordsRef.current[0].lat]);
           const dx = e.point.x - firstPoint.x;
           const dy = e.point.y - firstPoint.y;
           const distance = Math.sqrt(dx * dx + dy * dy);
           
           if (distance < 15) {
             // Close polygon
-            setGeometry({
+            const deduped = dedupCoords(draftCoordsRef.current);
+            const newGeom: MapGeometry = {
               type: 'polygon',
-              coordinates: [...draftCoords, draftCoords[0]]
-            });
+              coordinates: [...deduped, deduped[0]]
+            };
+            isInternalUpdateRef.current = true;
+            setGeometry(newGeom);
+            onChange?.(newGeom);
             setDraftCoords([]);
+            onFinish?.();
             return;
           }
         }
@@ -98,37 +173,100 @@ export function GeometryEditor({
         setDraftCoords(prev => [...prev, coord]);
       }
     };
+
+    const handleDblClick = (e: any) => {
+      if (mode === 'draw_multiline' || mode === 'draw_polygon') {
+        e.preventDefault();
+        if (e.originalEvent) {
+          e.originalEvent.stopPropagation();
+          e.originalEvent.preventDefault();
+        }
+        const coord = { lat: e.lngLat.lat, lng: e.lngLat.lng };
+        const combined = [...draftCoordsRef.current, coord];
+
+        if (mode === 'draw_multiline') {
+          const deduped = dedupCoords(combined);
+          if (deduped.length >= 2) {
+            const newGeom: MapGeometry = {
+              type: 'multiline',
+              coordinates: deduped,
+            };
+            isInternalUpdateRef.current = true;
+            setGeometry(newGeom);
+            onChange?.(newGeom);
+            setDraftCoords([]);
+            onFinish?.();
+          }
+        } else if (mode === 'draw_polygon') {
+          const deduped = dedupCoords(combined);
+          if (deduped.length >= 3) {
+            const newGeom: MapGeometry = {
+              type: 'polygon',
+              coordinates: [...deduped, deduped[0]],
+            };
+            isInternalUpdateRef.current = true;
+            setGeometry(newGeom);
+            onChange?.(newGeom);
+            setDraftCoords([]);
+            onFinish?.();
+          }
+        }
+      }
+    };
     
     const handleRightClick = (e: any) => {
-      if (mode === 'draw_polygon' && draftCoords.length >= 3) {
+      if (mode === 'draw_polygon' && draftCoordsRef.current.length >= 3) {
         e.preventDefault();
-        setGeometry({
+        const deduped = dedupCoords(draftCoordsRef.current);
+        const newGeom: MapGeometry = {
           type: 'polygon',
-          coordinates: [...draftCoords, draftCoords[0]] // Close the loop
-        });
-        setDraftCoords([]); // clear draft
-      } else if (mode === 'draw_multiline' && draftCoords.length >= 2) {
-        e.preventDefault();
-        setGeometry({
-          type: 'multiline',
-          coordinates: [...draftCoords] // Don't close loop
-        });
+          coordinates: [...deduped, deduped[0]]
+        };
+        isInternalUpdateRef.current = true;
+        setGeometry(newGeom);
+        onChange?.(newGeom);
         setDraftCoords([]);
+        onFinish?.();
+      } else if (mode === 'draw_multiline' && draftCoordsRef.current.length >= 2) {
+        e.preventDefault();
+        const deduped = dedupCoords(draftCoordsRef.current);
+        const newGeom: MapGeometry = {
+          type: 'multiline',
+          coordinates: deduped
+        };
+        isInternalUpdateRef.current = true;
+        setGeometry(newGeom);
+        onChange?.(newGeom);
+        setDraftCoords([]);
+        onFinish?.();
       }
     };
     
     map.on('click', handleMapClick);
+    map.on('dblclick', handleDblClick);
     map.on('contextmenu', handleRightClick);
     
     return () => {
       map.off('click', handleMapClick);
+      map.off('dblclick', handleDblClick);
       map.off('contextmenu', handleRightClick);
     };
-  }, [map, mode, draftCoords]);
+  }, [map, mode, onChange, onFinish]);
 
   // Render geometry
   const updateSource = useCallback(() => {
     if (!map || !map.getStyle()) return;
+
+    if (!renderGeometry) {
+      try {
+        if (map.getLayer(layerId)) map.removeLayer(layerId);
+        if (map.getLayer(layerId + '-line')) map.removeLayer(layerId + '-line');
+        if (map.getSource(sourceId)) map.removeSource(sourceId);
+      } catch (e) {
+        // ignore
+      }
+      return;
+    }
 
     try {
       if (!map.getSource(sourceId)) {
@@ -168,8 +306,7 @@ export function GeometryEditor({
     } catch (err) {
       console.warn('Failed to update geometry editor source:', err);
     }
-  }, [map, geometry]);
-
+  }, [map, geometry, renderGeometry]);
 
   useStyleLoadCallback(updateSource);
 

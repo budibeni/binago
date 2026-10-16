@@ -26,6 +26,16 @@ export function getDistance(coord1: Coordinate, coord2: Coordinate): number {
   return R * c;
 }
 
+// Calculate total distance along a path of coordinates in meters
+export function calculatePathDistance(coordinates: Coordinate[]): number {
+  if (!coordinates || coordinates.length < 2) return 0;
+  let total = 0;
+  for (let i = 0; i < coordinates.length - 1; i++) {
+    total += getDistance(coordinates[i], coordinates[i + 1]);
+  }
+  return total;
+}
+
 // Calculate bounding box corners for a rectangle
 export function getRectanglePolygon(sw: Coordinate, ne: Coordinate): Coordinate[] {
   return [

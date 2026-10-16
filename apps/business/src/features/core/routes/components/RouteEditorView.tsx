@@ -86,9 +86,34 @@ export function RouteEditorView({
 
   const isFirstRender = useRef(true);
   const prevLocationsKeyRef = useRef<string>('');
+  const isManualPathRef = useRef(false);
+
+  const handleEditorGeometryChange = (geom: MapGeometry | null) => {
+    setEditorGeometry(geom);
+    if (geom && geom.type === 'multiline' && Array.isArray(geom.coordinates) && geom.coordinates.length > 1) {
+      isManualPathRef.current = true;
+      let totalDistKm = 0;
+      for (let i = 0; i < geom.coordinates.length - 1; i++) {
+        const p1 = geom.coordinates[i];
+        const p2 = geom.coordinates[i + 1];
+        if (p1 && p2) {
+          totalDistKm += calculateHaversineDistance(p1.lat, p1.lng, p2.lat, p2.lng);
+        }
+      }
+      const distKm = Math.round(totalDistKm * 100) / 100;
+      setPlannedDistance(distKm);
+      const estMinutes = Math.max(1, Math.round((distKm / 40) * 60));
+      setEstimatedDuration(estMinutes);
+    }
+  };
 
   // Auto-calculate distance and duration
   useEffect(() => {
+    // If the user manually drew a path, do not overwrite with OSRM auto-route
+    if (isManualPathRef.current && editorGeometry) {
+      return;
+    }
+
     const currentLocationsKey = JSON.stringify({
       origin,
       destination,
@@ -506,7 +531,8 @@ export function RouteEditorView({
             selectedRoute={tempRoute}
             editorMode={editorMode}
             editorGeometry={editorGeometry}
-            onEditorGeometryChange={setEditorGeometry}
+            onEditorGeometryChange={handleEditorGeometryChange}
+            onFinishDrawing={() => setEditorMode('idle')}
             onMapClick={handleMapClick}
           />
         </div>
@@ -621,7 +647,16 @@ export function RouteEditorView({
                   {editorMode === 'draw_multiline' ? 'Selesai Menggambar' : (editorGeometry ? 'Ubah Jalur' : 'Gambar Jalur (Multiline)')}
                 </Button>
                 {editorGeometry && (
-                  <Button size="sm" variant="outline" className="text-red-500 border-red-200 hover:bg-red-50 px-2.5 h-8" onClick={() => { setEditorGeometry(null); setEditorMode('idle'); }}>
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    className="text-red-500 border-red-200 hover:bg-red-50 px-2.5 h-8" 
+                    onClick={() => { 
+                      setEditorGeometry(null); 
+                      setEditorMode('idle'); 
+                      isManualPathRef.current = false;
+                    }}
+                  >
                     <Trash2 className="w-3.5 h-3.5" />
                   </Button>
                 )}

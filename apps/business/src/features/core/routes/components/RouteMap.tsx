@@ -60,6 +60,7 @@ interface RouteMapProps {
   editorGeometry: MapGeometry | null;
   onEditorGeometryChange: (geometry: MapGeometry | null) => void;
   onMapClick?: (lat: number, lng: number) => void;
+  onFinishDrawing?: () => void;
 }
 
 function RouteMapInner({
@@ -69,6 +70,7 @@ function RouteMapInner({
   editorGeometry,
   onEditorGeometryChange,
   onMapClick,
+  onFinishDrawing,
 }: RouteMapProps) {
   const { map } = React.useContext(MapContext);
   const actions = useMapActions();
@@ -494,6 +496,8 @@ function RouteMapInner({
         mode={editorMode === 'select-location' ? 'idle' : editorMode}
         initialGeometry={editorGeometry}
         onChange={onEditorGeometryChange}
+        onFinish={onFinishDrawing}
+        renderGeometry={false}
       />
     </MapContainer>
   );
