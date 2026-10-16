@@ -5,6 +5,7 @@ import { getTrackingTranslation } from '../../i18n';
 import { getTranslation } from '@/i18n';
 import { MapPin, Link, Maximize, Minimize, RefreshCw } from 'lucide-react';
 import { DataTable, type DataTableColumnDef } from '@adatrack/ui';
+import { AddressCell, CoordinateCell } from '../shared/AddressCell';
 
 export interface LiveTableProps {
   modeSelector?: React.ReactNode;
@@ -88,7 +89,9 @@ export function LiveTable({ modeSelector, vehicles, onVehicleSelect, locale }: L
     return vehicles.filter((v) =>
       v.plateNumber.toLowerCase().includes(q) ||
       (v.driverName || '').toLowerCase().includes(q) ||
-      v.groupName.toLowerCase().includes(q)
+      v.groupName.toLowerCase().includes(q) ||
+      (v.location.address || '').toLowerCase().includes(q) ||
+      `${v.location.lat},${v.location.lng}`.includes(q)
     );
   }, [vehicles, searchQuery]);
 
@@ -130,24 +133,24 @@ export function LiveTable({ modeSelector, vehicles, onVehicleSelect, locale }: L
       accessorKey: 'location.address',
       id: 'location',
       header: tTrackingLocal.columns.location,
-      size: 250,
+      size: 260,
       cell: ({ row }) => {
         const v = row.original;
-        const gmapsUrl = `https://www.google.com/maps/search/?api=1&query=${v.location.lat},${v.location.lng}`;
         return (
-          <a
-            href={gmapsUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1.5 text-foreground-muted hover:text-primary transition-colors cursor-pointer max-w-[220px] truncate"
-            title={`${tTrackingLocal.columns.openMaps}: ${v.location.address}`}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <MapPin className="h-3 w-3 shrink-0 opacity-70" />
-            <span className="truncate hover:underline">{v.location.address || `${v.location.lat.toFixed(4)}, ${v.location.lng.toFixed(4)}`}</span>
-          </a>
+          <div onClick={() => onVehicleSelect(row.original.id)} className="cursor-pointer">
+            <AddressCell lat={v.location.lat} lng={v.location.lng} address={v.location.address} />
+          </div>
         );
       }
+    },
+    {
+      id: 'coordinate',
+      header: tTrackingLocal.columns.coordinate || 'Koordinat',
+      size: 180,
+      cell: ({ row }) => {
+        const v = row.original;
+        return <CoordinateCell lat={v.location.lat} lng={v.location.lng} tooltipTitle={tTrackingLocal.columns.openMaps} />;
+      },
     },
     {
       accessorKey: 'groupName',

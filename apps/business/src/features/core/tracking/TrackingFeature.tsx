@@ -469,6 +469,7 @@ export function TrackingFeature({ locale: localeProp }: TrackingFeatureProps) {
         heading: p.heading ?? 0,
         timestamp: p.timestamp,
         odometer: p.odometer ?? 0,
+        address: p.address || p.location_name || '',
       }));
       
       const totalDurationSecs = points.length > 0 ? (new Date(points[points.length-1].timestamp).getTime() - new Date(points[0].timestamp).getTime()) / 1000 : 0;

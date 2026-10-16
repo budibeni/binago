@@ -6,6 +6,7 @@ import { DataTable, type DataTableColumnDef } from '@adatrack/ui';
 import { TrackingVehicle, DateRange } from '../../types/tracking';
 import { TableFilterPopover } from '../shared/TableFilterPopover';
 import { VehicleSelect } from '../shared/VehicleSelect';
+import { AddressCell, CoordinateCell } from '../shared/AddressCell';
 import { getTrackingTranslation } from '../../i18n';
 import type { MockPlaybackData, MockPlaybackTrackPoint } from '../../data/mockTrackingData';
 
@@ -93,7 +94,8 @@ export function PlaybackTable({
     return points.filter((p) => {
       const addressMatch = p.address?.toLowerCase().includes(q) || false;
       const speedMatch = p.speed.toString().includes(q);
-      return addressMatch || speedMatch;
+      const coordMatch = `${p.lat},${p.lng}`.includes(q);
+      return addressMatch || speedMatch || coordMatch;
     });
   }, [points, searchQuery]);
 
@@ -134,23 +136,19 @@ export function PlaybackTable({
     {
       id: 'address',
       header: tTrackingLocal.columns.address,
-      size: 300,
+      size: 280,
       cell: ({ row }) => {
         const p = row.original;
-        const gmapsUrl = `https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lng}`;
-        return (
-          <a
-            href={gmapsUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1.5 text-foreground-muted hover:text-primary transition-colors cursor-pointer max-w-[280px] truncate"
-            title={`${tTrackingLocal.columns.openMaps}: ${p.address}`}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <MapPin className="h-3 w-3 shrink-0 opacity-70" />
-            <span className="truncate hover:underline">{p.address || `${p.lat.toFixed(4)}, ${p.lng.toFixed(4)}`}</span>
-          </a>
-        );
+        return <AddressCell lat={p.lat} lng={p.lng} address={p.address} />;
+      },
+    },
+    {
+      id: 'coordinate',
+      header: tTrackingLocal.columns.coordinate || 'Koordinat',
+      size: 180,
+      cell: ({ row }) => {
+        const p = row.original;
+        return <CoordinateCell lat={p.lat} lng={p.lng} tooltipTitle={tTrackingLocal.columns.openMaps} />;
       },
     },
   ], [tTracking, tTrackingLocal]);

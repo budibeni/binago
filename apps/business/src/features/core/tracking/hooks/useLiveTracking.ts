@@ -115,6 +115,7 @@ export function useLiveTracking() {
               ...oldV.location,
               lat: hasTelemetry ? Number(rawLat) : -6.2,
               lng: hasTelemetry ? Number(rawLon) : 106.8,
+              address: update.address || update.location_name || oldV.location.address,
             },
             lastUpdate: update.timestamp || new Date().toISOString(),
             hasTelemetry: hasTelemetry,
