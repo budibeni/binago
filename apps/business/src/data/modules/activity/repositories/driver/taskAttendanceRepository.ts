@@ -1,5 +1,5 @@
-import type { TaskAttendanceRecord } from '@/features/modules/activity/task-attendance/types/taskAttendance';
-import { SEED_TASK_ATTENDANCE } from '../mock/taskAttendanceMock';
+import type { TaskAttendanceRecord } from '@/features/modules/activity/driver/task-attendance/types/taskAttendance';
+import { SEED_TASK_ATTENDANCE } from '../../mock/driver/taskAttendanceMock';
 
 class TaskAttendanceRepository {
   private records: TaskAttendanceRecord[];

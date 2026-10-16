@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { GeofenceAttendanceFeature } from '@/features/modules/activity/geofence-attendance/GeofenceAttendanceFeature';
+import { GeofenceAttendanceFeature } from '@/features/modules/activity/driver/geofence-attendance/GeofenceAttendanceFeature';
 
 export const metadata: Metadata = {
   title: 'Absen Geofence - Aktivitas Pengemudi | ADATRACK Business',

@@ -3,8 +3,8 @@ import type {
   ArrivalReportStats,
   DestinationType,
   ArrivalStatus,
-} from '@/features/modules/activity/arrival-reports/types/arrivalReport';
-import { arrivalReportRepository } from '../repositories/arrivalReportRepository';
+} from '@/features/modules/activity/driver/arrival-reports/types/arrivalReport';
+import { arrivalReportRepository } from '../../repositories/driver/arrivalReportRepository';
 
 class ArrivalReportService {
   /** Ambil semua laporan tiba (sorted terbaru lebih dulu) */

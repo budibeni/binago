@@ -1,8 +1,8 @@
 import type {
   ArrivalReportRecord,
   ArrivalStatus,
-} from '@/features/modules/activity/arrival-reports/types/arrivalReport';
-import { SEED_ARRIVAL_REPORTS } from '../mock/arrivalReportsMock';
+} from '@/features/modules/activity/driver/arrival-reports/types/arrivalReport';
+import { SEED_ARRIVAL_REPORTS } from '../../mock/driver/arrivalReportsMock';
 
 class ArrivalReportRepository {
   private records: ArrivalReportRecord[];

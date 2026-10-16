@@ -1,6 +1,6 @@
 import type {
   ArrivalReportRecord,
-} from '@/features/modules/activity/arrival-reports/types/arrivalReport';
+} from '@/features/modules/activity/driver/arrival-reports/types/arrivalReport';
 
 /**
  * Helper untuk membuat foto selfie dummy dengan watermark ADATRACK untuk Laporan Tiba di Tujuan

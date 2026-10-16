@@ -1,5 +1,5 @@
-import type { GeofenceAttendanceRecord } from '@/features/modules/activity/geofence-attendance/types/geofenceAttendance';
-import { SEED_GEOFENCE_ATTENDANCE } from '../mock/geofenceAttendanceMock';
+import type { GeofenceAttendanceRecord } from '@/features/modules/activity/driver/geofence-attendance/types/geofenceAttendance';
+import { SEED_GEOFENCE_ATTENDANCE } from '../../mock/driver/geofenceAttendanceMock';
 
 class GeofenceAttendanceRepository {
   private records: GeofenceAttendanceRecord[];

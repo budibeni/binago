@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { ArrivalReportsFeature } from '@/features/modules/activity/arrival-reports/ArrivalReportsFeature';
+import { ArrivalReportsFeature } from '@/features/modules/activity/driver/arrival-reports/ArrivalReportsFeature';
 
 export const metadata: Metadata = {
   title: 'Laporan Tiba di Tujuan - Aktivitas Pengemudi | ADATRACK Business',

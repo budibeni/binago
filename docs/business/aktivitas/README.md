@@ -1,26 +1,24 @@
-# Rencana Implementasi: Modul Aktivitas Pengemudi
+# Rencana & Dokumentasi: Modul Aktivitas
 
 ## Ringkasan
-Membuat modul baru **AKTIVITAS PENGEMUDI** (`/activity`), memindahkan Laporan Darurat dari modul Safety, menghapus modul Safety, dan membangun 3 halaman admin baru secara bertahap.
+Modul **AKTIVITAS** (`/activity`) mencakup aktivitas operasional armada yang terbagi dalam kategori:
+1. **Pengemudi** (`/activity/driver/...`): Presensi tugas, absen geofence, laporan tiba di tujuan, dan laporan darurat.
+2. **Kendaraan** (`/activity/vehicles`): Log aktivitas, utilisasi, dan inspeksi armada kendaraan.
+3. **Customer** (`/activity/customers`): Riwayat interaksi, kunjungan, dan serah terima kargo/layanan pelanggan.
 
 ---
 
-## TAHAP 1 — Fondasi & Migrasi
+## Struktur Navigasi & Halaman
 
-**Tujuan:** Modul baru muncul di navigasi, route `/activity/emergency-reports` berjalan, modul Safety dihapus.
+### 1. Laporan Darurat (`/activity/emergency-reports`)
+### 2. Aktivitas Pengemudi (`/activity/driver/`)
+- Absensi Tugas → `/activity/driver/task-attendance`
+- Absen Geofence → `/activity/driver/geofence-attendance`
+- Laporan Tiba di Tujuan → `/activity/driver/arrival-reports`
+### 3. Aktivitas Kendaraan (`/activity/vehicles`)
+### 4. Aktivitas Customer (`/activity/customers`)
 
-### Pekerjaan:
-
-**1.1 Navigasi & i18n** · `BusinessShellLayout.tsx` + `i18n/index.ts`
-- Hapus nav group `safety` (beserta item: safety, incidents, emergencyReports)
-- Tambah nav group `activity` (Aktivitas Pengemudi) dengan 4 menu:
-  - Absensi Tugas → `/activity/task-attendance`
-  - Absen Geofence → `/activity/geofence-attendance`
-  - Laporan Tiba di Tujuan → `/activity/arrival-reports`
-  - Laporan Darurat → `/activity/emergency-reports`
-- Tambah key i18n baru (`navGroup.activity`, `nav.taskAttendance`, `nav.geofenceAttendance`, `nav.arrivalReports`)
-- Hapus key i18n lama (`navGroup.safety`, `nav.safety`, `nav.incidents`)
-- Hapus import icon: `ShieldCheck`, `CircleAlert`, `Siren` (jika tidak dipakai lain)
+---
 
 **1.2 Pindahkan file Emergency Reports**
 - `PINDAH` feature: `features/modules/safety/emergency-reports/EmergencyReportsFeature.tsx`  

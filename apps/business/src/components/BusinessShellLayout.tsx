@@ -105,10 +105,34 @@ function buildNavigation(locale: Locale): NavGroup[] {
       title: t.navGroup.activity,
       icon: Activity,
       items: [
-        { id: 'taskAttendance', label: t.nav.taskAttendance, href: '/activity/task-attendance', icon: ClipboardCheck },
-        { id: 'geofenceAttendance', label: t.nav.geofenceAttendance, href: '/activity/geofence-attendance', icon: MapPin },
-        { id: 'arrivalReports', label: t.nav.arrivalReports, href: '/activity/arrival-reports', icon: CheckCircle },
-        { id: 'emergencyReports', label: t.nav.emergencyReports, href: '/activity/emergency-reports', icon: Siren },
+        {
+          id: 'emergencyReports',
+          label: t.nav.emergencyReports,
+          href: '/activity/emergency-reports',
+          icon: Siren,
+        },
+        {
+          id: 'activityDriver',
+          label: t.nav.activityDriver,
+          icon: UserRound,
+          items: [
+            { id: 'taskAttendance', label: t.nav.taskAttendance, href: '/activity/driver/task-attendance', icon: ClipboardCheck },
+            { id: 'geofenceAttendance', label: t.nav.geofenceAttendance, href: '/activity/driver/geofence-attendance', icon: MapPin },
+            { id: 'arrivalReports', label: t.nav.arrivalReports, href: '/activity/driver/arrival-reports', icon: CheckCircle },
+          ],
+        },
+        {
+          id: 'activityVehicle',
+          label: t.nav.activityVehicle,
+          href: '/activity/vehicles',
+          icon: Truck,
+        },
+        {
+          id: 'activityCustomer',
+          label: t.nav.activityCustomer,
+          href: '/activity/customers',
+          icon: Users,
+        },
       ],
     },
     {

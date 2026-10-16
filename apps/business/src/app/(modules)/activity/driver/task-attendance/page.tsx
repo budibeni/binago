@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { TaskAttendanceFeature } from '@/features/modules/activity/task-attendance/TaskAttendanceFeature';
+import { TaskAttendanceFeature } from '@/features/modules/activity/driver/task-attendance/TaskAttendanceFeature';
 
 export const metadata: Metadata = {
   title: 'Absensi Tugas - Aktivitas Pengemudi | ADATRACK Business',

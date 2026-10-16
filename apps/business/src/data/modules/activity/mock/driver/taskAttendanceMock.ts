@@ -1,4 +1,4 @@
-import type { TaskAttendanceRecord } from '@/features/modules/activity/task-attendance/types/taskAttendance';
+import type { TaskAttendanceRecord } from '@/features/modules/activity/driver/task-attendance/types/taskAttendance';
 
 /**
  * Helper untuk membuat foto selfie dummy dengan watermark ADATRACK realistis

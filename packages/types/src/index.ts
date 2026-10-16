@@ -46,11 +46,12 @@ export interface FetchParams {
 export interface NavItem {
   id: string;
   label: string;
-  href: string;
+  href?: string;
   icon?: React.ElementType;
   badge?: string | number;
   badgeVariant?: 'default' | 'info' | 'success' | 'warning' | 'danger';
   disabled?: boolean;
+  items?: NavItem[];
 }
 
 export interface NavGroup {

@@ -1,8 +1,8 @@
 import type {
   TaskAttendanceRecord,
   TaskAttendanceStats,
-} from '@/features/modules/activity/task-attendance/types/taskAttendance';
-import { taskAttendanceRepository } from '../repositories/taskAttendanceRepository';
+} from '@/features/modules/activity/driver/task-attendance/types/taskAttendance';
+import { taskAttendanceRepository } from '../../repositories/driver/taskAttendanceRepository';
 
 class TaskAttendanceService {
   /** Ambil semua rekap absensi tugas (sorted terbaru lebih dulu) */

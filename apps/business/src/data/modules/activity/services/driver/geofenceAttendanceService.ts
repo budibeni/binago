@@ -1,8 +1,8 @@
 import type {
   GeofenceAttendanceRecord,
   GeofenceAttendanceStats,
-} from '@/features/modules/activity/geofence-attendance/types/geofenceAttendance';
-import { geofenceAttendanceRepository } from '../repositories/geofenceAttendanceRepository';
+} from '@/features/modules/activity/driver/geofence-attendance/types/geofenceAttendance';
+import { geofenceAttendanceRepository } from '../../repositories/driver/geofenceAttendanceRepository';
 
 class GeofenceAttendanceService {
   /** Ambil semua data absensi geofence (sorted terbaru lebih dulu) */

@@ -1,0 +1,38 @@
+import type { Metadata } from 'next';
+import { Users, Clock } from 'lucide-react';
+import { Card, Badge } from '@adatrack/ui';
+
+export const metadata: Metadata = {
+  title: 'Aktivitas Customer | ADATRACK Business',
+  description: 'Log riwayat interaksi dan aktivitas terkait customer.',
+};
+
+export default function ActivityCustomersPage() {
+  return (
+    <div className="p-6 max-w-7xl mx-auto space-y-6">
+      <div>
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">Aktivitas Customer</h1>
+          <Badge variant="warning" className="text-xs">Segera Hadir</Badge>
+        </div>
+        <p className="text-sm text-foreground-muted mt-1">
+          Modul monitoring riwayat kunjungan customer, serah terima muatan/unit, dan checklist interaksi.
+        </p>
+      </div>
+
+      <Card className="p-12 flex flex-col items-center justify-center text-center border-dashed">
+        <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4 text-primary">
+          <Users className="h-8 w-8" />
+        </div>
+        <h3 className="text-lg font-semibold text-foreground">Fitur Aktivitas Customer Sedang Disiapkan</h3>
+        <p className="text-sm text-foreground-muted max-w-md mt-1 mb-4">
+          Halaman ini akan memuat riwayat kunjungan ke lokasi klien, verifikasi kedatangan di customer, serah terima dokumen fisik, dan feedback layanan pengiriman/sewa.
+        </p>
+        <div className="flex items-center gap-2 text-xs text-foreground-muted">
+          <Clock className="h-4 w-4" />
+          <span>Pengembangan Tahap Lanjutan</span>
+        </div>
+      </Card>
+    </div>
+  );
+}

@@ -57,12 +57,13 @@ export function PersonalAppShell({
           <nav className="hidden md:flex items-center gap-1">
             {navigation.map((item) => {
               const Icon = item.icon;
-              const isActive = pathname === item.href || (item.href !== '/' && pathname?.startsWith(item.href));
+              const href = item.href || '#';
+              const isActive = item.href ? (pathname === item.href || (item.href !== '/' && pathname?.startsWith(item.href))) : false;
 
               return (
                 <Link
                   key={item.id}
-                  href={item.href}
+                  href={href}
                   className={cn(
                     'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors',
                     isActive
@@ -119,12 +120,13 @@ export function PersonalAppShell({
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-30 flex h-[60px] items-center justify-around border-t border-border bg-background pb-safe pt-1 shadow-[0_-1px_3px_rgba(0,0,0,0.05)]">
         {navigation.map((item) => {
           const Icon = item.icon;
-          const isActive = pathname === item.href || (item.href !== '/' && pathname?.startsWith(item.href));
+          const href = item.href || '#';
+          const isActive = item.href ? (pathname === item.href || (item.href !== '/' && pathname?.startsWith(item.href))) : false;
 
           return (
             <Link
               key={item.id}
-              href={item.href}
+              href={href}
               className={cn(
                 'flex flex-1 flex-col items-center justify-center gap-1 py-1 text-xs font-medium transition-colors',
                 isActive

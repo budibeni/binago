@@ -1,4 +1,4 @@
-import type { GeofenceAttendanceRecord } from '@/features/modules/activity/geofence-attendance/types/geofenceAttendance';
+import type { GeofenceAttendanceRecord } from '@/features/modules/activity/driver/geofence-attendance/types/geofenceAttendance';
 
 /**
  * Helper untuk membuat foto selfie dummy dengan watermark ADATRACK untuk Absen Geofence
