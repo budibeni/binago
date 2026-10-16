@@ -32,10 +32,6 @@ export function MapMarker({
   const markerRef = useRef<maplibregl.Marker | null>(null);
   const [markerElement, setMarkerElement] = useState<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    console.log(`[MapMarker ${id}] map:`, !!map, 'markerElement:', !!markerElement);
-  }, [map, markerElement, id]);
-
   // Initialize the DOM element exactly once
   useEffect(() => {
     const el = document.createElement('div');
@@ -59,8 +55,6 @@ export function MapMarker({
       })
         .setLngLat([position.lng, position.lat])
         .addTo(map);
-      
-      console.log(`[MapMarker ${id}] addTo(map) called! parentNode:`, markerElement.parentNode?.nodeName, 'in DOM?', document.body.contains(markerElement));
     } else {
       markerRef.current.setLngLat([position.lng, position.lat]);
       markerRef.current.setRotation(heading);
