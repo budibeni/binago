@@ -16,3 +16,4 @@ export * from './InputPhone';
 export * from './InputEmail';
 export * from './InputPassword';
 export * from './InputSearch';
+export * from './InputAutocomplete';

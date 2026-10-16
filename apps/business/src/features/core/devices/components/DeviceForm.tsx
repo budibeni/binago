@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { Smartphone, Truck, Phone } from 'lucide-react';
-import { FormShell, FormCard, InputString, InputSelect, useForm } from '@adatrack/ui';
+import { Smartphone, Users, Phone } from 'lucide-react';
+import { FormShell, FormCard, InputString, InputSelect, InputAutocomplete, useForm } from '@adatrack/ui';
 import { api } from '@adatrack/utils';
 import { getDeviceFormSchema, type Device } from '../types/device';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
@@ -17,6 +17,13 @@ interface DeviceFormProps {
   layout?: 'default' | 'drawer' | 'dialog' | 'fullscreen';
 }
 
+interface DriverOption {
+  id: string;
+  name: string;
+  phone?: string;
+  deviceImei?: string;
+}
+
 const DEFAULT_DEVICE: Partial<Device> = {
   imei: '',
   protocol: 'SMARTPHONE',
@@ -24,7 +31,7 @@ const DEFAULT_DEVICE: Partial<Device> = {
   deviceModel: 'Mobile Tracking App',
   simNumber: '',
   iccid: '',
-  vehicleId: undefined,
+  driverId: undefined,
   status: 'idle',
 };
 
@@ -41,39 +48,40 @@ export function DeviceForm({
   const tD = getDevicesTranslation(locale);
   const tF = tD.form;
 
-  const [vehicles, setVehicles] = React.useState<{ value: string; label: string }[]>([]);
+  const [drivers, setDrivers] = React.useState<DriverOption[]>([]);
 
   React.useEffect(() => {
     if (open) {
-      api.get('/vehicles')
+      api.get('/drivers')
         .then((res: any) => {
-          const vData = Array.isArray(res) ? res : res?.data || [];
-          const opts = [
-            { value: '', label: tF.vehicleNone },
-            ...vData.map((v: any) => ({
-              value: String(v.id),
-              label: `${v.plate_number || 'Tanpa Plat'} ${v.vehicle_name ? `(${v.vehicle_name})` : ''}`,
-            })),
-          ];
-          setVehicles(opts);
+          const dData = Array.isArray(res) ? res : res?.data || [];
+          setDrivers(dData.map((d: any) => ({
+            id: String(d.id),
+            name: d.name || 'Pengemudi',
+            phone: d.phone || '',
+            deviceImei: d.device_imei || '',
+          })));
         })
         .catch(console.error);
     }
-  }, [open, tF.vehicleNone]);
+  }, [open]);
 
   const { formData, errors, isSubmitting, handleChange, handleSubmit } = useForm<any>({
     initialData: device
       ? {
           ...device,
-          vehicleId: device.vehicleId ? String(device.vehicleId) : '',
+          driverId: device.driverId ? String(device.driverId) : '',
         }
-      : DEFAULT_DEVICE,
+      : {
+          ...DEFAULT_DEVICE,
+          driverId: '',
+        },
     resetOn: [open, device],
     schema: getDeviceFormSchema(tD.validation || {}),
     onSubmit: async (data) => {
       const payload: Partial<Device> = {
         ...data,
-        vehicleId: data.vehicleId ? Number(data.vehicleId) : undefined,
+        driverId: data.driverId ? Number(data.driverId) : undefined,
       };
       await onSave(payload);
     },
@@ -83,6 +91,41 @@ export function DeviceForm({
     { value: 'SMARTPHONE', label: 'Smartphone App Driver (Android / iOS)' },
     { value: 'HTTP_MOBILE', label: 'Mobile Tracking HTTP Protocol' },
   ];
+
+  // Driver options: show unassigned drivers or the driver currently linked to this device
+  const driverSelectOptions = React.useMemo(() => {
+    const available = drivers.filter(
+      (d) => !d.deviceImei || (device?.imei && d.deviceImei === device.imei)
+    );
+    return [
+      { value: '', label: tF.driverNone || 'Belum Ditugaskan (Idle)' },
+      ...available.map((d) => ({
+        value: d.id,
+        label: `${d.name} ${d.phone ? `(${d.phone})` : ''}`,
+      })),
+    ];
+  }, [drivers, device?.imei, tF.driverNone]);
+
+  // Phone autocomplete options: unassigned drivers with phone numbers
+  const phoneAutocompleteOptions = React.useMemo(() => {
+    return drivers
+      .filter((d) => d.phone && d.phone.trim() !== '' && (!d.deviceImei || (device?.imei && d.deviceImei === device.imei)))
+      .map((d) => ({
+        value: d.phone!,
+        label: `${d.phone} - ${d.name}`,
+        sublabel: d.name,
+      }));
+  }, [drivers, device?.imei]);
+
+  const handleDriverChange = (driverIdVal: string) => {
+    handleChange('driverId', driverIdVal);
+    if (driverIdVal) {
+      const selectedDriver = drivers.find((d) => d.id === driverIdVal);
+      if (selectedDriver?.phone && (!formData.simNumber || formData.simNumber.trim() === '')) {
+        handleChange('simNumber', selectedDriver.phone);
+      }
+    }
+  };
 
   return (
     <FormShell
@@ -154,20 +197,20 @@ export function DeviceForm({
 
       {/* Kolom Kanan */}
       <div className="flex flex-col gap-6">
-        {/* Penugasan Kendaraan */}
+        {/* Penugasan Pengemudi */}
         <FormCard
-          title={tF.sectionVehicle}
-          description={tF.descVehicle}
-          icon={<Truck className="w-5 h-5 text-blue-500" />}
+          title={tF.sectionDriver || 'Penugasan Pengemudi'}
+          description={tF.descDriver || 'Tautkan perangkat GPS Smartphone ini ke akun pengemudi'}
+          icon={<Users className="w-5 h-5 text-blue-500" />}
         >
           <div className="col-span-2">
             <InputSelect
-              label={tF.vehicle}
-              placeholder={tF.vehiclePlaceholder}
-              value={formData.vehicleId || ''}
-              onChange={(v) => handleChange('vehicleId', v)}
-              error={errors.vehicleId}
-              options={vehicles}
+              label={tF.driver || 'Pilih Pengemudi'}
+              placeholder={tF.driverPlaceholder || '-- Pilih Pengemudi (Opsional) --'}
+              value={formData.driverId || ''}
+              onChange={handleDriverChange}
+              error={errors.driverId}
+              options={driverSelectOptions}
             />
           </div>
         </FormCard>
@@ -180,12 +223,14 @@ export function DeviceForm({
           columns={2}
         >
           <div className="col-span-2">
-            <InputString
+            <InputAutocomplete
               label={tF.simNumber}
               placeholder={tF.simPlaceholder}
               value={formData.simNumber || ''}
               onChange={(v) => handleChange('simNumber', v)}
+              options={phoneAutocompleteOptions}
               error={errors.simNumber}
+              emptyText="Ketik nomor telepon manual atau pilih dari daftar supir"
             />
           </div>
 

@@ -41,6 +41,7 @@ export interface Driver {
   status: DriverStatus;
   assignedVehicleId?: string; // Currently driving
   assignedVehiclePlate?: string;
+  deviceImei?: string; // Linked smartphone tracker device IMEI
   
   // Performance
   performanceScore: number; // 0 - 100
@@ -59,6 +60,7 @@ export const getDriverFormSchema = (t: Record<string, string>) => z.object({
   placement: z.string().min(1, t.placementRequired || 'Penempatan wajib diisi'),
   groupId: z.string().min(1, t.groupRequired || 'Grup armada wajib dipilih'),
   assignedVehicleId: z.string().optional(),
+  deviceImei: z.string().optional(),
   licenseNumber: z.string().min(1, t.licenseRequired || 'Nomor SIM wajib diisi'),
   licenseExpiry: z.string().optional(),
   joinDate: z.string().optional(),

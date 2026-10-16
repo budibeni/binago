@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Smartphone, Radio, Truck, Phone, Calendar, Hash, Cpu, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Smartphone, Radio, Truck, Phone, Calendar, Hash, Cpu, CheckCircle2, AlertCircle, User } from 'lucide-react';
 import { Badge, DetailShell, Tabs } from '@adatrack/ui';
 import type { Device } from '../types/device';
 
@@ -15,6 +15,7 @@ interface DeviceViewProps {
     title: string;
     close: string;
     tabInfo: string;
+    tabDriver?: string;
     tabVehicle: string;
     imei: string;
     protocol: string;
@@ -23,6 +24,8 @@ interface DeviceViewProps {
     iccid: string;
     status: string;
     company: string;
+    driverName?: string;
+    driverPhone?: string;
     vehicleName: string;
     plateNumber: string;
     registeredAt: string;
@@ -80,7 +83,11 @@ export function DeviceView({
   if (!isOpen || !device) return null;
 
   const isMobile = device.protocol?.toUpperCase() === 'SMARTPHONE' || device.protocol?.toUpperCase() === 'HTTP_MOBILE';
-  const isAssigned = device.vehicleId != null;
+  const isAssigned = device.driverId != null || device.vehicleId != null;
+
+  const assignmentTabLabel = isMobile
+    ? (labels.tabDriver || 'Pengemudi Tertaut')
+    : (labels.tabVehicle || 'Armada Tertaut');
 
   return (
     <DetailShell
@@ -121,7 +128,7 @@ export function DeviceView({
           <Tabs
             tabs={[
               { id: 'info', label: labels.tabInfo },
-              { id: 'vehicle', label: labels.tabVehicle },
+              { id: 'assignment', label: assignmentTabLabel },
             ]}
             activeTab={activeTab}
             // @ts-expect-error - Tabs onChange signature
@@ -149,28 +156,70 @@ export function DeviceView({
           </div>
         )}
 
-        {activeTab === 'vehicle' && (
+        {activeTab === 'assignment' && (
           <div className="flex flex-col gap-4">
-            <SectionHeader icon={Truck} title="Status Penugasan Armada" />
-            {isAssigned ? (
-              <div className="p-4 rounded-xl border border-success/30 bg-success/5 flex flex-col gap-2">
-                <div className="flex items-center gap-2 text-success">
-                  <CheckCircle2 className="h-5 w-5" />
-                  <span className="text-[13px] font-bold">Perangkat Terpasang di Armada</span>
-                </div>
-                <div className="mt-2 space-y-1.5 text-[13px]">
-                  <p><span className="text-foreground-muted">Plat Nomor:</span> <strong className="font-semibold text-foreground">{device.plateNumber}</strong></p>
-                  {device.vehicleName && <p><span className="text-foreground-muted">Nama Kendaraan:</span> <span className="font-medium text-foreground">{device.vehicleName}</span></p>}
-                </div>
-              </div>
+            {isMobile ? (
+              <>
+                <SectionHeader icon={User} title="Status Penugasan Pengemudi" />
+                {device.driverName ? (
+                  <div className="p-4 rounded-xl border border-success/30 bg-success/5 flex flex-col gap-3">
+                    <div className="flex items-center gap-2 text-success">
+                      <CheckCircle2 className="h-5 w-5 shrink-0" />
+                      <span className="text-[13px] font-bold">Tertaut ke Pengemudi</span>
+                    </div>
+                    <div className="space-y-1.5 text-[13px]">
+                      <p>
+                        <span className="text-foreground-muted">Nama Pengemudi:</span>{' '}
+                        <strong className="font-semibold text-foreground">{device.driverName}</strong>
+                      </p>
+                      {device.driverPhone && (
+                        <p>
+                          <span className="text-foreground-muted">Nomor Telepon:</span>{' '}
+                          <span className="font-medium text-foreground">{device.driverPhone}</span>
+                        </p>
+                      )}
+                      {device.plateNumber && (
+                        <div className="pt-2 mt-2 border-t border-border/40 text-[12px] flex items-center gap-1.5 text-foreground-muted">
+                          <Truck className="h-3.5 w-3.5 text-primary shrink-0" />
+                          <span>Kendaraan yang sedang dikendarai: <strong className="text-foreground">{device.plateNumber}</strong> {device.vehicleName ? `(${device.vehicleName})` : ''}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="p-4 rounded-xl border border-dashed border-border text-center flex flex-col items-center justify-center gap-2 py-8">
+                    <AlertCircle className="h-6 w-6 text-foreground-muted" />
+                    <p className="text-[13px] font-medium text-foreground">Perangkat Belum Ditugaskan ke Pengemudi</p>
+                    <p className="text-[12px] text-foreground-muted max-w-xs">
+                      Perangkat smartphone ini masih berstatus idle dan belum ditautkan ke akun pengemudi mana pun.
+                    </p>
+                  </div>
+                )}
+              </>
             ) : (
-              <div className="p-4 rounded-xl border border-dashed border-border text-center flex flex-col items-center justify-center gap-2 py-8">
-                <AlertCircle className="h-6 w-6 text-foreground-muted" />
-                <p className="text-[13px] font-medium text-foreground">Perangkat Belum Ditugaskan</p>
-                <p className="text-[12px] text-foreground-muted max-w-xs">
-                  Perangkat ini masih berstatus idle dan siap dipasangkan ke salah satu kendaraan armada Anda melalui tombol Edit.
-                </p>
-              </div>
+              <>
+                <SectionHeader icon={Truck} title="Status Penugasan Armada" />
+                {device.vehicleId && device.plateNumber ? (
+                  <div className="p-4 rounded-xl border border-success/30 bg-success/5 flex flex-col gap-2">
+                    <div className="flex items-center gap-2 text-success">
+                      <CheckCircle2 className="h-5 w-5" />
+                      <span className="text-[13px] font-bold">Perangkat Terpasang di Armada</span>
+                    </div>
+                    <div className="mt-2 space-y-1.5 text-[13px]">
+                      <p><span className="text-foreground-muted">Plat Nomor:</span> <strong className="font-semibold text-foreground">{device.plateNumber}</strong></p>
+                      {device.vehicleName && <p><span className="text-foreground-muted">Nama Kendaraan:</span> <span className="font-medium text-foreground">{device.vehicleName}</span></p>}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="p-4 rounded-xl border border-dashed border-border text-center flex flex-col items-center justify-center gap-2 py-8">
+                    <AlertCircle className="h-6 w-6 text-foreground-muted" />
+                    <p className="text-[13px] font-medium text-foreground">Perangkat Belum Ditugaskan</p>
+                    <p className="text-[12px] text-foreground-muted max-w-xs">
+                      Perangkat ini masih berstatus idle dan siap dipasangkan ke salah satu kendaraan armada.
+                    </p>
+                  </div>
+                )}
+              </>
             )}
           </div>
         )}

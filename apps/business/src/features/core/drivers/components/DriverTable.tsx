@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { MoreVertical, IdCard, Edit2, Trash2, UserRound, MapPin, Truck, Users, Plus, Eye } from 'lucide-react';
+import { MoreVertical, IdCard, Edit2, Trash2, UserRound, MapPin, Truck, Users, Plus, Eye, Smartphone } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import {
   Badge, Button,
@@ -23,6 +23,7 @@ interface DriverTableLabels {
   colLicenseNo: string;
   colLicenseExpiry: string;
   colJoinDate: string;
+  colDeviceImei?: string;
   colActions: string;
   emptyTitle: string;
   emptyDescription: string;
@@ -114,6 +115,25 @@ function buildColumns(
       accessorFn: (row) => row.phone,
       enableSorting: true,
       size: 140,
+    },
+    {
+      id: 'deviceImei',
+      header: labels.colDeviceImei || 'Perangkat Smartphone',
+      accessorFn: (row) => row.deviceImei || '-',
+      enableSorting: true,
+      size: 180,
+      cell: ({ row }) => {
+        const imei = row.original.deviceImei;
+        if (!imei) {
+          return <span className="text-[11px] text-foreground-muted">-</span>;
+        }
+        return (
+          <span className="text-[12px] font-mono text-primary flex items-center gap-1.5 font-medium">
+            <Smartphone className="h-3.5 w-3.5 shrink-0" />
+            {imei}
+          </span>
+        );
+      },
     },
     {
       id: 'email',

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Smartphone, Radio, Eye, Edit2, Trash2, Plus, Truck, Cpu, Phone } from 'lucide-react';
+import { Smartphone, Radio, Eye, Edit2, Trash2, Plus, Truck, Cpu, Phone, User } from 'lucide-react';
 import { Badge, Button, DataTable } from '@adatrack/ui';
 import type { DataTableColumnDef, DataTableFilterConfig } from '@adatrack/ui';
 import type { Device } from '../types/device';
@@ -12,6 +12,7 @@ interface DeviceTableLabels {
   colProtocol: string;
   colBrandModel: string;
   colSim: string;
+  colDriver?: string;
   colVehicle: string;
   colStatus: string;
   colLastSeen: string;
@@ -136,11 +137,27 @@ function buildColumns(
     {
       id: 'vehicle',
       header: labels.colVehicle,
-      accessorFn: (row) => row.plateNumber || '-',
+      accessorFn: (row) => row.driverName || row.plateNumber || '-',
       enableSorting: true,
       size: 200,
       cell: ({ row }) => {
         const d = row.original;
+        if (d.driverName) {
+          return (
+            <div className="flex flex-col gap-0.5">
+              <div className="flex items-center gap-1.5">
+                <User className="h-3.5 w-3.5 text-blue-500 shrink-0" />
+                <span className="font-semibold text-[13px] text-foreground">{d.driverName}</span>
+              </div>
+              {d.plateNumber && (
+                <div className="flex items-center gap-1 text-[11px] text-foreground-muted ml-5">
+                  <Truck className="h-3 w-3 shrink-0" />
+                  <span>{d.plateNumber} {d.vehicleName ? `(${d.vehicleName})` : ''}</span>
+                </div>
+              )}
+            </div>
+          );
+        }
         if (d.vehicleId && d.plateNumber) {
           return (
             <div className="flex items-center gap-1.5">
@@ -167,7 +184,7 @@ function buildColumns(
       size: 130,
       cell: ({ row }) => {
         const s = row.original.status;
-        const isAssigned = row.original.vehicleId != null;
+        const isAssigned = row.original.driverId != null || row.original.vehicleId != null;
         let variant: 'success' | 'warning' | 'default' = 'default';
         let label = labels.statusLabels[s] || s;
 

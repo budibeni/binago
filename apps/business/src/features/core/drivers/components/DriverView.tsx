@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { X, UserRound, MapPin, Mail, Phone, Calendar, Hash, Truck, Clock, Edit2, Trash2 } from 'lucide-react';
+import { X, UserRound, MapPin, Mail, Phone, Calendar, Hash, Truck, Clock, Edit2, Trash2, Smartphone } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import { Button, Avatar, Tabs, Badge, DetailShell } from '@adatrack/ui';
 import type { Driver, DriverHistory } from '../types/driver';
@@ -27,6 +27,8 @@ interface DriverViewProps {
     licenseExpiry: string;
     phone: string;
     email: string;
+    deviceLinked?: string;
+    deviceNone?: string;
     historyEmpty: string;
     actionEdit: string;
     actionDelete: string;
@@ -150,6 +152,24 @@ function SectionHeader({ icon: Icon, title }: { icon: React.ElementType; title: 
             <div className="rounded-lg border border-border/60 bg-neutral-50/30 dark:bg-neutral-900/20 px-3">
               <InfoRow icon={Hash} label={labels.licenseNo} value={driver.licenseNumber} />
               <InfoRow icon={Calendar} label={labels.licenseExpiry} value={driver.licenseExpiry} />
+            </div>
+
+            {/* Perangkat Pelacak */}
+            <SectionHeader icon={Smartphone} title="Perangkat Pelacak" />
+            <div className="rounded-lg border border-border/60 bg-neutral-50/30 dark:bg-neutral-900/20 px-3">
+              <InfoRow
+                icon={Smartphone}
+                label="GPS Smartphone"
+                value={driver.deviceImei ? `Tertaut (${driver.deviceImei})` : 'Belum Ditautkan'}
+                highlight={!!driver.deviceImei}
+              />
+              {driver.assignedVehiclePlate && (
+                <InfoRow
+                  icon={Truck}
+                  label="Kendaraan Aktif"
+                  value={driver.assignedVehiclePlate}
+                />
+              )}
             </div>
           </div>
         )}

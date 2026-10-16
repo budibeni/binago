@@ -32,6 +32,7 @@ export function useDrivers(filters?: { search?: string; status?: string; groupId
         licenseExpiry: d.license_expiry || new Date().toISOString(),
         groupId: d.group_id ? String(d.group_id) : undefined,
         assignedVehicleId: d.assigned_vehicle_id ? String(d.assigned_vehicle_id) : undefined,
+        deviceImei: d.device_imei || undefined,
         status: 'active',
         performanceScore: 100,
         history: [],

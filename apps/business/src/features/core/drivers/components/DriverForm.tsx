@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { UserRound, MapPin, Phone, FileText } from 'lucide-react';
+import { UserRound, MapPin, Phone, FileText, Smartphone } from 'lucide-react';
 import { FormShell, FormCard, InputString, InputDate, InputTextarea, InputPhone, InputEmail, InputSelect, useForm } from '@adatrack/ui';
 import { groupService } from '@/data/services';
 import { getDriverFormSchema, type Driver } from '../types/driver';
@@ -30,6 +30,7 @@ const DEFAULT_DRIVER = {
   placement: '',
   groupId: '',
   assignedVehicleId: '',
+  deviceImei: '',
   licenseNumber: '',
   licenseExpiry: '',
   joinDate: new Date().toISOString().split('T')[0],
@@ -50,6 +51,7 @@ export function DriverForm({
 
   const [groups, setGroups] = React.useState<{ value: string; label: string }[]>([]);
   const [vehicles, setVehicles] = React.useState<{ value: string; label: string }[]>([]);
+  const [smartphoneDevices, setSmartphoneDevices] = React.useState<{ value: string; label: string }[]>([]);
 
   React.useEffect(() => {
     if (open) {
@@ -63,15 +65,31 @@ export function DriverForm({
           setVehicles(vData.map((v: any) => ({ value: String(v.id), label: v.plate_number })));
         })
         .catch(console.error);
+
+      api.get('/devices', { params: { protocol: 'SMARTPHONE' } })
+        .then((res: any) => {
+          const raw = Array.isArray(res) ? res : (res?.data || []);
+          const available = raw.filter((d: any) => {
+            return !d.driver_id || (driver?.id && String(d.driver_id) === String(driver.id)) || (driver?.deviceImei && d.imei === driver.deviceImei);
+          });
+          const opts = [
+            { value: '', label: tF.deviceNone || 'Tidak Ditautkan Perangkat' },
+            ...available.map((d: any) => ({
+              value: d.imei,
+              label: `${d.imei} (${d.device_brand || ''} ${d.device_model || ''}) ${d.sim_number ? `- ${d.sim_number}` : ''}`,
+            })),
+          ];
+          setSmartphoneDevices(opts);
+        })
+        .catch(console.error);
     }
-  }, [open]);
+  }, [open, driver?.id, driver?.deviceImei, tF.deviceNone]);
 
   const { formData, errors, isSubmitting, handleChange, handleSubmit } = useForm<Driver>({
-    initialData: driver || DEFAULT_DRIVER,
+    initialData: driver ? { ...driver, deviceImei: driver.deviceImei || '' } : DEFAULT_DRIVER,
     resetOn: [open, driver],
     schema: getDriverFormSchema(tD.validation || {}),
     onSubmit: async (data) => {
-      
       await onSave(data);
     },
   });
@@ -256,6 +274,24 @@ export function DriverForm({
               value={formData.joinDate || ''}
               onChange={(v) => handleChange('joinDate', v)}
               error={errors.joinDate}
+            />
+          </div>
+        </FormCard>
+
+        {/* Tautan Perangkat Smartphone */}
+        <FormCard
+          title={tF.sectionDevice || 'Tautan Perangkat Smartphone'}
+          description={tF.descDevice || 'Tautkan pengemudi ke aplikasi pelacak GPS smartphone.'}
+          icon={<Smartphone className="w-5 h-5 text-primary" />}
+        >
+          <div className="col-span-2">
+            <InputSelect
+              label={tF.deviceSelect || 'Perangkat GPS Smartphone'}
+              placeholder={tF.devicePlaceholder || '-- Pilih Perangkat Smartphone (Opsional) --'}
+              value={formData.deviceImei || ''}
+              onChange={(v) => handleChange('deviceImei', v)}
+              error={errors.deviceImei}
+              options={smartphoneDevices}
             />
           </div>
         </FormCard>

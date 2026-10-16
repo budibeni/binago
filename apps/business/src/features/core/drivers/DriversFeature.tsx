@@ -117,6 +117,7 @@ export function DriversFeature() {
     colLicenseNo: tD.labels.licenseNo,
     colLicenseExpiry: tD.labels.licenseExpiry,
     colJoinDate: tD.labels.joinDate,
+    colDeviceImei: tD.labels.deviceImei,
     colActions: tD.table.colActions,
     emptyTitle: tD.table.emptyTitle,
     emptyDescription: tD.table.emptyDescription,
@@ -165,6 +166,8 @@ export function DriversFeature() {
     licenseExpiry: tD.labels.licenseExpiry,
     phone: tD.labels.phone,
     email: tD.labels.email,
+    deviceLinked: tD.drawer.deviceLinked,
+    deviceNone: tD.drawer.deviceNone,
     historyEmpty: tD.drawer.historyEmpty,
     actionEdit: tD.actions.edit,
     actionDelete: tD.actions.delete,
@@ -260,6 +263,7 @@ export function DriversFeature() {
                 join_date: data.joinDate,
                 group_id: data.groupId ? parseInt(data.groupId.toString(), 10) : undefined,
                 license_expiry: data.licenseExpiry,
+                device_imei: data.deviceImei || null,
               };
               
               let savedDriverId = data.id;

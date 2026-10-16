@@ -15,6 +15,9 @@ export interface Device {
   vehicleId?: number;
   vehicleName?: string;
   plateNumber?: string;
+  driverId?: number;
+  driverName?: string;
+  driverPhone?: string;
   lastSeenAt?: string;
   createdAt: string;
   updatedAt: string;
@@ -34,5 +37,6 @@ export const getDeviceFormSchema = (t: Record<string, string>) => z.object({
   simNumber: z.string().optional(),
   iccid: z.string().optional(),
   vehicleId: z.string().optional(),
+  driverId: z.string().optional(),
   status: z.string().optional(),
 });
