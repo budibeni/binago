@@ -18,8 +18,30 @@ export async function reverseGeocodeCoord(lat: number, lng: number): Promise<str
   }
 
   const req = (async () => {
+    // 1. Google Maps Geocoding API if key configured
+    const googleKey = (process.env as any).NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+    if (googleKey) {
+      try {
+        const gUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${googleKey}&language=id`;
+        const gRes = await fetch(gUrl);
+        if (gRes.ok) {
+          const gData = await gRes.json();
+          if (gData.status === 'OK' && gData.results?.length > 0) {
+            const addr = gData.results[0].formatted_address;
+            if (addr) {
+              addressCache.set(cacheKey, addr);
+              return addr;
+            }
+          }
+        }
+      } catch {
+        // fallback to Nominatim
+      }
+    }
+
+    // 2. High-precision Reverse Geocoding via Nominatim (OpenStreetMap with accept-language: id)
     try {
-      const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`;
+      const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=id`;
       const res = await fetch(url, {
         headers: {
           'Accept-Language': 'id-ID,id;q=0.9',
@@ -52,6 +74,10 @@ function isValidAddress(addr?: string | null): addr is string {
   if (trimmed === '' || trimmed === '-' || trimmed.toLowerCase() === 'unknown') return false;
   // If it's pure coordinate numbers (e.g. "-6.2088, 106.8456")
   if (/^-?\d+(\.\d+)?,\s*-?\d+(\.\d+)?$/.test(trimmed)) return false;
+  // If it's just a generic province/country name alone (e.g. "Jawa Barat, Indonesia", "DKI Jakarta, Indonesia")
+  if (/^(jawa\s+(barat|timur|tengah)|dki\s+jakarta|daerah\s+khusus\s+ibukota\s+jakarta|banten|bali|di\s+yogyakarta|yogyakarta|sumatera|kalimantan|sulawesi|papua|indonesia)(,\s*(indonesia))?$/i.test(trimmed)) {
+    return false;
+  }
   return true;
 }
 
