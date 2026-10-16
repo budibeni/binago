@@ -16,6 +16,7 @@ import {
 } from '@adatrack/maps';
 import type { Route, RouteLocation, MapInteractionMode } from '../types';
 import type { Geofence } from '../../geofences/types';
+import { extractRouteCoordinates } from '../utils/routeGeometry';
 
 function createCirclePolygon(lat: number, lng: number, radiusInMeters: number, points = 64): any {
   const coords = [];
@@ -100,9 +101,12 @@ function RouteMapInner({
       }
     });
 
-    // Fit Planned Path
-    if (selectedRoute?.plannedPath?.coordinates) {
-      allCoords.push(...selectedRoute.plannedPath.coordinates);
+    // Fit Route Coordinates
+    if (selectedRoute) {
+      const coords = extractRouteCoordinates(selectedRoute, targetGeofences);
+      coords.forEach(([lng, lat]) => {
+        allCoords.push({ lat, lng });
+      });
     }
 
     if (allCoords.length === 0) return;
@@ -303,33 +307,13 @@ function RouteMapInner({
       // 3. Render Planned Path
       const pathData: GeoJSON.FeatureCollection = { type: 'FeatureCollection', features: [] };
       if (selectedRoute && editorMode === 'idle') {
-        if (selectedRoute.plannedPath) {
-          let pathFeature: any = selectedRoute.plannedPath;
-          if (typeof pathFeature === 'string') {
-            try { pathFeature = JSON.parse(pathFeature); } catch (e) {}
-          }
-          // Ensure it's a Feature
-          if (pathFeature && pathFeature.type !== 'Feature') {
-            pathFeature = { type: 'Feature', geometry: pathFeature, properties: {} };
-          }
-          if (pathFeature) {
-            pathFeature.properties = { ...pathFeature.properties, isPlanned: true };
-            pathData.features.push(pathFeature);
-          }
-        } else {
-          const points: number[][] = [];
-          routeLocs.forEach(({ loc }) => {
-            if (loc.type === 'coordinate' && loc.longitude && loc.latitude) {
-              points.push([loc.longitude, loc.latitude]);
-            }
+        const coords = extractRouteCoordinates(selectedRoute, geofences);
+        if (coords.length > 1) {
+          pathData.features.push({
+            type: 'Feature',
+            properties: { isPlanned: !!selectedRoute.plannedPath },
+            geometry: { type: 'LineString', coordinates: coords }
           });
-          if (points.length > 1) {
-            pathData.features.push({
-              type: 'Feature',
-              properties: {},
-              geometry: { type: 'LineString', coordinates: points }
-            } as any);
-          }
         }
       }
 

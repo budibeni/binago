@@ -49,10 +49,19 @@ export function useRoutes(filters?: { search?: string; status?: string; groupId?
           groupId: r.group_id ? String(r.group_id) : undefined,
           plannedDistance: r.planned_distance,
           estimatedDuration: r.estimated_duration,
-          plannedPath: (typeof r.planned_path_geojson === 'string' ? JSON.parse(r.planned_path_geojson) : r.planned_path_geojson) || (typeof r.planned_path === 'string' ? JSON.parse(r.planned_path) : r.planned_path),
+          plannedPath: (() => {
+            const raw = r.planned_path_geojson ?? r.planned_path;
+            if (!raw) return undefined;
+            if (typeof raw === 'object') return raw;
+            if (typeof raw === 'string') {
+              try { return JSON.parse(raw); } catch { return undefined; }
+            }
+            return undefined;
+          })(),
           origin: origin as any,
           destination: destination as any,
           stops,
+          waypoints: Array.isArray(r.waypoints) ? r.waypoints : [],
           status: r.status === 'active' ? 'active' : 'inactive',
           activeAssignments: r.active_assignments ? r.active_assignments.map((a: any) => ({
             id: a.id,

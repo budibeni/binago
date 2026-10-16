@@ -34,8 +34,9 @@ export interface Route {
   origin: RouteLocation;
   stops: RouteStop[];
   destination: RouteLocation;
+  waypoints?: any[];
 
-  plannedPath?: MapGeometry;
+  plannedPath?: MapGeometry | any;
   plannedDistance?: number;
   estimatedDuration?: number;
 
