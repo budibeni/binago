@@ -41,7 +41,7 @@ export function PlaybackRouteRenderer({ track, passedTrack }: PlaybackRouteRende
   const prevTrackRef = useRef<{ lat: number; lng: number }[] | undefined>(undefined);
 
   const renderMapSources = useCallback(() => {
-    if (!map || !map.isStyleLoaded()) return;
+    if (!map || !map.getStyle()) return;
 
     try {
       const baseData = createRouteFeatureCollection(track);
@@ -151,18 +151,10 @@ export function PlaybackRouteRenderer({ track, passedTrack }: PlaybackRouteRende
   // Initial registration & updates when props change
   useEffect(() => {
     if (!map) return;
-    if (map.isStyleLoaded()) {
+    if (map.getStyle()) {
       renderMapSources();
     } else {
-      const handleStyleData = () => {
-        if (map.isStyleLoaded()) {
-          renderMapSources();
-        }
-      };
-      map.once('styledata', handleStyleData);
-      return () => {
-        map.off('styledata', handleStyleData);
-      };
+      map.once('styledata', renderMapSources);
     }
   }, [map, renderMapSources]);
 

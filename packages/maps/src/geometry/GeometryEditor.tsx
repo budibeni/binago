@@ -128,7 +128,7 @@ export function GeometryEditor({
 
   // Render geometry
   const updateSource = useCallback(() => {
-    if (!map || !map.isStyleLoaded()) return;
+    if (!map || !map.getStyle()) return;
 
     try {
       if (!map.getSource(sourceId)) {
@@ -175,7 +175,7 @@ export function GeometryEditor({
 
   useEffect(() => {
     if (!map) return;
-    if (map.isStyleLoaded()) {
+    if (map.getStyle()) {
       updateSource();
     } else {
       map.once('styledata', updateSource);
@@ -194,7 +194,7 @@ export function GeometryEditor({
   
   // Render draft polygon
   const updateDraftSource = useCallback(() => {
-    if (!map || !map.isStyleLoaded()) return;
+    if (!map || !map.getStyle()) return;
 
     try {
       if (!map.getSource(draftSourceId)) {
@@ -263,7 +263,7 @@ export function GeometryEditor({
 
   useEffect(() => {
     if (!map) return;
-    if (map.isStyleLoaded()) {
+    if (map.getStyle()) {
       updateDraftSource();
     } else {
       map.once('styledata', updateDraftSource);

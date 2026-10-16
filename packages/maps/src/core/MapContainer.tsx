@@ -113,7 +113,7 @@ function MapContainerInner({
     map.on('styledata', () => {
       // styledata fires on every style change, including basemap switch.
       // This is more reliable than style.load when switching styles using setStyle()
-      if (map.isStyleLoaded()) {
+      if (map.getStyle()) {
         styleLoadListeners.current.forEach((l) => {
           try {
             l.callback();

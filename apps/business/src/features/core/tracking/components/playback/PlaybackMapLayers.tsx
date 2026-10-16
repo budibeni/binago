@@ -44,7 +44,7 @@ export function PlaybackMapLayers({ selectedGeofenceIds, selectedRouteIds }: Pla
   const { routes } = useRoutes();
 
   const updateSources = useCallback(() => {
-    if (!map || !map.isStyleLoaded()) return;
+    if (!map || !map.getStyle()) return;
 
     try {
       // --- Update Geofence Source ---
@@ -144,7 +144,7 @@ export function PlaybackMapLayers({ selectedGeofenceIds, selectedRouteIds }: Pla
   }, [map, selectedGeofenceIds, selectedRouteIds, geofences, routes]);
 
   const registerLayers = useCallback(() => {
-    if (!map || !map.isStyleLoaded()) return;
+    if (!map || !map.getStyle()) return;
 
     try {
       const beforeId = map.getLayer('playback-route-casing') 
@@ -268,18 +268,10 @@ export function PlaybackMapLayers({ selectedGeofenceIds, selectedRouteIds }: Pla
 
   useEffect(() => {
     if (!map) return;
-    if (map.isStyleLoaded()) {
+    if (map.getStyle()) {
       registerLayers();
     } else {
-      const handleStyleData = () => {
-        if (map.isStyleLoaded()) {
-          registerLayers();
-        }
-      };
-      map.once('styledata', handleStyleData);
-      return () => {
-        map.off('styledata', handleStyleData);
-      };
+      map.once('styledata', registerLayers);
     }
   }, [map, registerLayers]);
 

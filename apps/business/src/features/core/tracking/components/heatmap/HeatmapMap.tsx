@@ -91,7 +91,7 @@ function HeatmapLayer({
   }, [heatmapData]);
 
   const updateSource = useCallback(() => {
-    if (!map || !map.isStyleLoaded()) return;
+    if (!map || !map.getStyle()) return;
 
     if (!map.getSource(HEATMAP_SOURCE)) {
       map.addSource(HEATMAP_SOURCE, {

@@ -15,6 +15,7 @@ import {
   geometryToGeoJSON,
   calcEntityBounds,
   defaultNominatimSearch,
+  useStyleLoadCallback,
 } from '@adatrack/maps';
 import type { Geofence } from '../types';
 
@@ -94,77 +95,85 @@ function GeofenceMapInner({
   }, [map, selectedGeofenceId, geofences, actions]);
 
   // Render all geofences as GeoJSON layers
+  const sourceId = 'adatrack-geofences-source';
+  const fillLayerId = 'adatrack-geofences-fill';
+  const outlineLayerId = 'adatrack-geofences-outline';
+
+  const render = React.useCallback(() => {
+    if (!map || !map.getStyle()) return;
+    try {
+      const renderedGeofences = visibleGeofenceIds 
+        ? geofences.filter(gf => visibleGeofenceIds.includes(gf.id))
+        : geofences;
+
+      const features = renderedGeofences
+        .map((gf) => {
+          try {
+            if (!gf?.geometry) return null;
+            const feature = geometryToGeoJSON(gf.geometry) as any;
+            if (!feature || !feature.geometry) return null;
+            feature.properties = { id: gf.id, name: gf.name, status: gf.status };
+            return feature;
+          } catch {
+            return null;
+          }
+        })
+        .filter(Boolean);
+
+      const data: GeoJSON.FeatureCollection = { type: 'FeatureCollection', features };
+
+      if (!map.getSource(sourceId)) {
+        map.addSource(sourceId, { type: 'geojson', data });
+        map.addLayer({
+          id: fillLayerId,
+          type: 'fill',
+          source: sourceId,
+          paint: {
+            'fill-color': ['match', ['get', 'status'], 'active', '#10b981', '#ef4444'],
+            'fill-opacity': 0.2,
+          },
+        });
+        map.addLayer({
+          id: outlineLayerId,
+          type: 'line',
+          source: sourceId,
+          paint: {
+            'line-color': ['match', ['get', 'status'], 'active', '#059669', '#dc2626'],
+            'line-width': 2,
+          },
+        });
+      } else {
+        (map.getSource(sourceId) as any).setData(data);
+      }
+    } catch (err) {
+      console.warn('Failed to render geofence map layers:', err);
+    }
+  }, [map, geofences, visibleGeofenceIds]);
+
+  useStyleLoadCallback(render);
+
   useEffect(() => {
     if (!map) return;
-    const sourceId = 'adatrack-geofences-source';
-    const fillLayerId = 'adatrack-geofences-fill';
-    const outlineLayerId = 'adatrack-geofences-outline';
-
-    const render = () => {
-      try {
-        const renderedGeofences = visibleGeofenceIds 
-          ? geofences.filter(gf => visibleGeofenceIds.includes(gf.id))
-          : geofences;
-
-        const features = renderedGeofences
-          .map((gf) => {
-            try {
-              if (!gf?.geometry) return null;
-              const feature = geometryToGeoJSON(gf.geometry) as any;
-              if (!feature || !feature.geometry) return null;
-              feature.properties = { id: gf.id, name: gf.name, status: gf.status };
-              return feature;
-            } catch {
-              return null;
-            }
-          })
-          .filter(Boolean);
-
-        const data: GeoJSON.FeatureCollection = { type: 'FeatureCollection', features };
-
-        if (!map.getSource(sourceId)) {
-          map.addSource(sourceId, { type: 'geojson', data });
-          map.addLayer({
-            id: fillLayerId,
-            type: 'fill',
-            source: sourceId,
-            paint: {
-              'fill-color': ['match', ['get', 'status'], 'active', '#10b981', '#ef4444'],
-              'fill-opacity': 0.2,
-            },
-          });
-          map.addLayer({
-            id: outlineLayerId,
-            type: 'line',
-            source: sourceId,
-            paint: {
-              'line-color': ['match', ['get', 'status'], 'active', '#059669', '#dc2626'],
-              'line-width': 2,
-            },
-          });
-        } else {
-          (map.getSource(sourceId) as any).setData(data);
-        }
-      } catch (err) {
-        console.warn('Failed to render geofence map layers:', err);
-      }
-    };
-
-
-    if (map.isStyleLoaded()) {
+    if (map.getStyle()) {
       render();
     } else {
       map.once('styledata', render);
     }
+  }, [map, render]);
 
+  useEffect(() => {
     return () => {
       if (map?.getStyle()) {
-        if (map.getLayer(fillLayerId)) map.removeLayer(fillLayerId);
-        if (map.getLayer(outlineLayerId)) map.removeLayer(outlineLayerId);
-        if (map.getSource(sourceId)) map.removeSource(sourceId);
+        try {
+          if (map.getLayer(fillLayerId)) map.removeLayer(fillLayerId);
+          if (map.getLayer(outlineLayerId)) map.removeLayer(outlineLayerId);
+          if (map.getSource(sourceId)) map.removeSource(sourceId);
+        } catch (e) {
+          // ignore unmount errors
+        }
       }
     };
-  }, [map, geofences, visibleGeofenceIds]);
+  }, [map]);
 
   const handleResetNorth = () => {
     if (map) {

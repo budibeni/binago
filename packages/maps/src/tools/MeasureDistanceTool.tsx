@@ -158,10 +158,10 @@ export function MeasureDistanceTool({ active, onDeactivate, className, locale = 
   // Register sources/layers when tool becomes active and map is ready
   useEffect(() => {
     if (!map || !active) return;
-    if (map.isStyleLoaded()) {
+    if (map.getStyle()) {
       registerMapSources();
     } else {
-      map.once('style.load', registerMapSources);
+      map.once('styledata', registerMapSources);
     }
   }, [map, active, registerMapSources]);
 

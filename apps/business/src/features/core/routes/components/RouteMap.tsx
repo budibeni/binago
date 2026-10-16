@@ -170,7 +170,7 @@ function RouteMapInner({
 
   // Render geofences, coordinates and planned path
   const render = useCallback(() => {
-    if (!map || !map.isStyleLoaded()) return;
+    if (!map || !map.getStyle()) return;
 
     const routeLocs = getRouteLocations();
 
@@ -374,12 +374,16 @@ function RouteMapInner({
           },
         });
 
-        // Main route line layer (solid if planned, dashed if fallback straight line)
+        // Solid line layer (for routes with planned path)
         map.addLayer({
           id: PATH_LAYER_SOLID_ID,
           type: 'line',
           source: PATH_SOURCE_ID,
-          filter: ['==', ['geometry-type'], 'LineString'],
+          filter: [
+            'all',
+            ['==', ['geometry-type'], 'LineString'],
+            ['==', ['get', 'isPlanned'], true],
+          ],
           layout: {
             'line-join': 'round',
             'line-cap': 'round',
@@ -387,12 +391,27 @@ function RouteMapInner({
           paint: {
             'line-color': '#8b5cf6',
             'line-width': 4,
-            'line-dasharray': [
-              'case',
-              ['boolean', ['get', 'isPlanned'], false],
-              ['literal', [1, 0]],
-              ['literal', [2, 2]]
-            ],
+          },
+        });
+
+        // Dashed line layer (for fallback straight lines between waypoints)
+        map.addLayer({
+          id: PATH_LAYER_DASHED_ID,
+          type: 'line',
+          source: PATH_SOURCE_ID,
+          filter: [
+            'all',
+            ['==', ['geometry-type'], 'LineString'],
+            ['!=', ['get', 'isPlanned'], true],
+          ],
+          layout: {
+            'line-join': 'round',
+            'line-cap': 'round',
+          },
+          paint: {
+            'line-color': '#8b5cf6',
+            'line-width': 4,
+            'line-dasharray': [2, 2],
           },
         });
       } else {
@@ -410,7 +429,7 @@ function RouteMapInner({
   // Map effect on mount, style ready, or data change
   useEffect(() => {
     if (!map) return;
-    if (map.isStyleLoaded()) {
+    if (map.getStyle()) {
       render();
     } else {
       map.once('styledata', render);
