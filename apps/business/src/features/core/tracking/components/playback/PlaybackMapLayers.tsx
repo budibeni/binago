@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useEffect, useCallback } from 'react';
-import { useInternalMap, useStyleLoadCallback } from '@adatrack/maps';
+import { useInternalMap, useStyleLoadCallback, geometryToGeoJSON } from '@adatrack/maps';
 import { useGeofences } from '../../../geofences/hooks/useGeofences';
 import { useRoutes } from '../../../routes/hooks/useRoutes';
+import { extractRouteCoordinates } from '../../../routes/utils/routeGeometry';
 
 export interface PlaybackMapLayersProps {
   selectedGeofenceIds: string[];
@@ -18,9 +19,6 @@ const ROUTE_SOURCE = 'playback-layer-route-source';
 const ROUTE_CASING_LAYER = 'playback-layer-route-casing';
 const ROUTE_LINE_LAYER = 'playback-layer-route-line';
 const ROUTE_ENDPOINTS_LAYER = 'playback-layer-route-endpoints';
-
-// We want geofences and routes to render below the actual playback track
-const BEFORE_LAYER_ID = 'playback-route-layer';
 
 function createCirclePolygon(lat: number, lng: number, radiusInMeters: number, points = 64): any {
   const coords = [];
@@ -40,96 +38,6 @@ function createCirclePolygon(lat: number, lng: number, radiusInMeters: number, p
   };
 }
 
-export function extractRouteCoordinates(rt: any, geofences: any[] = []): number[][] {
-  // 1. Try plannedPath
-  if (rt.plannedPath) {
-    let parsed: any = rt.plannedPath;
-    if (typeof parsed === 'string') {
-      try { parsed = JSON.parse(parsed); } catch (e) {}
-    }
-
-    if (parsed?.type === 'Feature' && parsed?.geometry) {
-      parsed = parsed.geometry;
-    }
-
-    if (parsed && Array.isArray(parsed.coordinates) && parsed.coordinates.length > 0) {
-      const first = parsed.coordinates[0];
-      if (typeof first === 'object' && first !== null && !Array.isArray(first)) {
-        const coords: number[][] = parsed.coordinates
-          .filter((c: any) => c && (c.lat !== undefined || c.latitude !== undefined))
-          .map((c: any) => [
-            Number(c.lng ?? c.longitude ?? c.lon ?? 0),
-            Number(c.lat ?? c.latitude ?? 0)
-          ])
-          .filter(([lng, lat]: number[]) => !isNaN(lng) && !isNaN(lat) && (lng !== 0 || lat !== 0));
-        if (coords.length > 1) return coords;
-      } else if (Array.isArray(first)) {
-        const coords: number[][] = parsed.coordinates
-          .map((c: any) => [Number(c[0] ?? 0), Number(c[1] ?? 0)])
-          .filter(([lng, lat]: number[]) => !isNaN(lng) && !isNaN(lat) && (lng !== 0 || lat !== 0));
-        if (coords.length > 1) return coords;
-      }
-    }
-  }
-
-  // 2. Try waypoints array
-  if (Array.isArray(rt.waypoints) && rt.waypoints.length > 1) {
-    const coords: number[][] = rt.waypoints
-      .map((wp: any) => [
-        Number(wp.lng ?? wp.longitude ?? wp.lon ?? 0),
-        Number(wp.lat ?? wp.latitude ?? 0)
-      ])
-      .filter(([lng, lat]: number[]) => !isNaN(lng) && !isNaN(lat) && (lng !== 0 || lat !== 0));
-    if (coords.length > 1) return coords;
-  }
-
-  // 3. Fallback: connect origin -> stops -> destination
-  const points: number[][] = [];
-  const resolveLoc = (loc?: any): [number, number] | null => {
-    if (!loc) return null;
-    if (loc.type === 'coordinate' && loc.latitude !== undefined && loc.longitude !== undefined) {
-      const lng = Number(loc.longitude ?? loc.lng ?? loc.lon ?? 0);
-      const lat = Number(loc.latitude ?? loc.lat ?? 0);
-      if (!isNaN(lng) && !isNaN(lat) && (lng !== 0 || lat !== 0)) {
-        return [lng, lat];
-      }
-    }
-    if (loc.type === 'geofence' && loc.geofenceId) {
-      const gf = geofences.find(g => g.id === loc.geofenceId);
-      if (gf?.geometry?.coordinates && gf.geometry.coordinates.length > 0) {
-        let sumLng = 0, sumLat = 0;
-        gf.geometry.coordinates.forEach((c: any) => {
-          sumLng += Number(c.lng ?? c.lon ?? 0);
-          sumLat += Number(c.lat ?? 0);
-        });
-        const avgLng = sumLng / gf.geometry.coordinates.length;
-        const avgLat = sumLat / gf.geometry.coordinates.length;
-        if (!isNaN(avgLng) && !isNaN(avgLat) && (avgLng !== 0 || avgLat !== 0)) {
-          return [avgLng, avgLat];
-        }
-      }
-    }
-    return null;
-  };
-
-  const origCoord = resolveLoc(rt.origin);
-  if (origCoord) points.push(origCoord);
-
-  if (Array.isArray(rt.stops)) {
-    rt.stops.forEach((s: any) => {
-      const stopCoord = resolveLoc(s.location);
-      if (stopCoord) points.push(stopCoord);
-    });
-  }
-
-  const destCoord = resolveLoc(rt.destination);
-  if (destCoord) points.push(destCoord);
-
-  if (points.length > 1) return points;
-
-  return [];
-}
-
 export function PlaybackMapLayers({ selectedGeofenceIds, selectedRouteIds }: PlaybackMapLayersProps) {
   const map = useInternalMap();
   const { geofences } = useGeofences();
@@ -138,222 +46,240 @@ export function PlaybackMapLayers({ selectedGeofenceIds, selectedRouteIds }: Pla
   const updateSources = useCallback(() => {
     if (!map || !map.isStyleLoaded()) return;
 
-    // --- Update Geofence Source ---
-    const geofenceSource = map.getSource(GEOFENCE_SOURCE) as any;
-    if (geofenceSource) {
-      const activeGeofences = geofences.filter(gf => selectedGeofenceIds.includes(gf.id));
-      const geofenceFeatures: any[] = activeGeofences.map(gf => {
-        let geometry: any;
-        const geom = gf.geometry as any;
-        if (geom.type === 'polygon' || geom.type === 'rectangle') {
-          geometry = {
-            type: 'Polygon',
-            coordinates: [geom.coordinates.map((c: any) => [Number(c.lng ?? c.lon), Number(c.lat)])]
+    try {
+      // --- Update Geofence Source ---
+      const geofenceSource = map.getSource(GEOFENCE_SOURCE) as any;
+      if (geofenceSource) {
+        const activeGeofences = geofences.filter(gf => selectedGeofenceIds.includes(gf.id));
+        const geofenceFeatures: any[] = activeGeofences.map(gf => {
+          const geom = gf.geometry as any;
+          if (!geom) return null;
+
+          if (geom.type === 'circle' && geom.center && geom.radius) {
+            return {
+              type: 'Feature',
+              properties: { id: gf.id, name: gf.name },
+              geometry: createCirclePolygon(geom.center.lat, geom.center.lng, geom.radius),
+            };
+          }
+
+          const feat = geometryToGeoJSON(geom);
+          if (!feat || !feat.geometry || !feat.geometry.coordinates || feat.geometry.coordinates.length === 0) {
+            return null;
+          }
+
+          return {
+            ...feat,
+            properties: { id: gf.id, name: gf.name },
           };
-        } else if (geom.type === 'multiline') {
-          geometry = {
-            type: 'LineString',
-            coordinates: geom.coordinates.map((c: any) => [Number(c.lng ?? c.lon), Number(c.lat)])
-          };
-        } else if (geom.type === 'circle' && geom.center && geom.radius) {
-          geometry = createCirclePolygon(geom.center.lat, geom.center.lng, geom.radius);
-        } else {
-          geometry = { type: 'Point', coordinates: [0,0] }; 
-        }
-        
-        return {
-          type: 'Feature',
-          properties: { id: gf.id, name: gf.name },
-          geometry
-        };
-      }).filter(f => f.geometry.type !== 'Point');
+        }).filter(Boolean);
 
-      geofenceSource.setData({
-        type: 'FeatureCollection',
-        features: geofenceFeatures
-      });
-    }
+        geofenceSource.setData({
+          type: 'FeatureCollection',
+          features: geofenceFeatures
+        });
+      }
 
-    // --- Update Route Source ---
-    const routeSource = map.getSource(ROUTE_SOURCE) as any;
-    if (routeSource) {
-      const activeRoutes = routes.filter(rt => selectedRouteIds.includes(rt.id));
-      const routeFeatures: any[] = [];
+      // --- Update Route Source ---
+      const routeSource = map.getSource(ROUTE_SOURCE) as any;
+      if (routeSource) {
+        const activeRoutes = routes.filter(rt => selectedRouteIds.includes(rt.id));
+        const routeFeatures: any[] = [];
 
-      activeRoutes.forEach(rt => {
-        const coords = extractRouteCoordinates(rt, geofences);
-        if (coords.length < 2) return;
+        activeRoutes.forEach(rt => {
+          const coords = extractRouteCoordinates(rt, geofences);
+          if (coords.length < 2) return;
 
-        // 1. Line Feature
-        routeFeatures.push({
-          type: 'Feature',
-          properties: {
-            id: rt.id,
-            name: rt.name,
-            featureType: 'line',
-          },
-          geometry: {
-            type: 'LineString',
-            coordinates: coords,
-          }
+          // 1. Line Feature
+          routeFeatures.push({
+            type: 'Feature',
+            properties: {
+              id: rt.id,
+              name: rt.name,
+              featureType: 'line',
+            },
+            geometry: {
+              type: 'LineString',
+              coordinates: coords,
+            }
+          });
+
+          // 2. Start Point
+          routeFeatures.push({
+            type: 'Feature',
+            properties: {
+              id: `${rt.id}-start`,
+              name: `${rt.name} (Awal)`,
+              pointType: 'start',
+            },
+            geometry: {
+              type: 'Point',
+              coordinates: coords[0],
+            }
+          });
+
+          // 3. End Point
+          routeFeatures.push({
+            type: 'Feature',
+            properties: {
+              id: `${rt.id}-end`,
+              name: `${rt.name} (Tujuan)`,
+              pointType: 'end',
+            },
+            geometry: {
+              type: 'Point',
+              coordinates: coords[coords.length - 1],
+            }
+          });
         });
 
-        // 2. Start Point
-        routeFeatures.push({
-          type: 'Feature',
-          properties: {
-            id: `${rt.id}-start`,
-            name: `${rt.name} (Awal)`,
-            pointType: 'start',
-          },
-          geometry: {
-            type: 'Point',
-            coordinates: coords[0],
-          }
+        routeSource.setData({
+          type: 'FeatureCollection',
+          features: routeFeatures
         });
-
-        // 3. End Point
-        routeFeatures.push({
-          type: 'Feature',
-          properties: {
-            id: `${rt.id}-end`,
-            name: `${rt.name} (Tujuan)`,
-            pointType: 'end',
-          },
-          geometry: {
-            type: 'Point',
-            coordinates: coords[coords.length - 1],
-          }
-        });
-      });
-
-      routeSource.setData({
-        type: 'FeatureCollection',
-        features: routeFeatures
-      });
+      }
+    } catch (err) {
+      console.warn('Failed to update playback map layers sources:', err);
     }
   }, [map, selectedGeofenceIds, selectedRouteIds, geofences, routes]);
 
   const registerLayers = useCallback(() => {
     if (!map || !map.isStyleLoaded()) return;
 
-    const beforeId = map.getLayer(BEFORE_LAYER_ID) ? BEFORE_LAYER_ID : undefined;
+    try {
+      const beforeId = map.getLayer('playback-route-casing') 
+        ? 'playback-route-casing' 
+        : (map.getLayer('playback-route-layer') ? 'playback-route-layer' : undefined);
 
-    // --- Geofence Setup ---
-    if (!map.getSource(GEOFENCE_SOURCE)) {
-      map.addSource(GEOFENCE_SOURCE, {
-        type: 'geojson',
-        data: { type: 'FeatureCollection', features: [] }
-      });
-    }
-    
-    // Geofence Fill
-    if (!map.getLayer(GEOFENCE_FILL_LAYER)) {
-      map.addLayer({
-        id: GEOFENCE_FILL_LAYER,
-        type: 'fill',
-        source: GEOFENCE_SOURCE,
-        filter: ['==', ['geometry-type'], 'Polygon'],
-        paint: {
-          'fill-color': '#22c55e',
-          'fill-opacity': 0.1,
-        }
-      }, beforeId);
-    }
+      // --- Geofence Setup ---
+      if (!map.getSource(GEOFENCE_SOURCE)) {
+        map.addSource(GEOFENCE_SOURCE, {
+          type: 'geojson',
+          data: { type: 'FeatureCollection', features: [] }
+        });
+      }
+      
+      // Geofence Fill
+      if (!map.getLayer(GEOFENCE_FILL_LAYER)) {
+        map.addLayer({
+          id: GEOFENCE_FILL_LAYER,
+          type: 'fill',
+          source: GEOFENCE_SOURCE,
+          filter: ['==', ['geometry-type'], 'Polygon'],
+          paint: {
+            'fill-color': '#22c55e',
+            'fill-opacity': 0.1,
+          }
+        }, beforeId);
+      }
 
-    // Geofence Line
-    if (!map.getLayer(GEOFENCE_LINE_LAYER)) {
-      map.addLayer({
-        id: GEOFENCE_LINE_LAYER,
-        type: 'line',
-        source: GEOFENCE_SOURCE,
-        layout: {
-          'line-join': 'round',
-          'line-cap': 'round',
-        },
-        paint: {
-          'line-color': '#22c55e',
-          'line-width': 2,
-        }
-      }, beforeId);
-    }
+      // Geofence Line
+      if (!map.getLayer(GEOFENCE_LINE_LAYER)) {
+        map.addLayer({
+          id: GEOFENCE_LINE_LAYER,
+          type: 'line',
+          source: GEOFENCE_SOURCE,
+          layout: {
+            'line-join': 'round',
+            'line-cap': 'round',
+          },
+          paint: {
+            'line-color': '#22c55e',
+            'line-width': 2,
+          }
+        }, beforeId);
+      }
 
-    // --- Route Setup ---
-    if (!map.getSource(ROUTE_SOURCE)) {
-      map.addSource(ROUTE_SOURCE, {
-        type: 'geojson',
-        data: { type: 'FeatureCollection', features: [] }
-      });
-    }
+      // --- Route Setup ---
+      if (!map.getSource(ROUTE_SOURCE)) {
+        map.addSource(ROUTE_SOURCE, {
+          type: 'geojson',
+          data: { type: 'FeatureCollection', features: [] }
+        });
+      }
 
-    // Route Casing
-    if (!map.getLayer(ROUTE_CASING_LAYER)) {
-      map.addLayer({
-        id: ROUTE_CASING_LAYER,
-        type: 'line',
-        source: ROUTE_SOURCE,
-        filter: ['==', ['geometry-type'], 'LineString'],
-        layout: {
-          'line-join': 'round',
-          'line-cap': 'round',
-        },
-        paint: {
-          'line-color': '#78350F',
-          'line-width': 5,
-          'line-opacity': 0.4,
-        }
-      }, beforeId);
-    }
+      // Route Casing
+      if (!map.getLayer(ROUTE_CASING_LAYER)) {
+        map.addLayer({
+          id: ROUTE_CASING_LAYER,
+          type: 'line',
+          source: ROUTE_SOURCE,
+          filter: ['==', ['geometry-type'], 'LineString'],
+          layout: {
+            'line-join': 'round',
+            'line-cap': 'round',
+          },
+          paint: {
+            'line-color': '#78350F',
+            'line-width': 5,
+            'line-opacity': 0.4,
+          }
+        }, beforeId);
+      }
 
-    // Route Main Line (Dashed line matching the legend: --- Rute)
-    if (!map.getLayer(ROUTE_LINE_LAYER)) {
-      map.addLayer({
-        id: ROUTE_LINE_LAYER,
-        type: 'line',
-        source: ROUTE_SOURCE,
-        filter: ['==', ['geometry-type'], 'LineString'],
-        layout: {
-          'line-join': 'round',
-          'line-cap': 'round',
-        },
-        paint: {
-          'line-color': '#F59E0B',
-          'line-width': 3.5,
-          'line-dasharray': [3, 2],
-          'line-opacity': 0.95,
-        }
-      }, beforeId);
-    }
+      // Route Main Line (Dashed line matching the legend: --- Rute)
+      if (!map.getLayer(ROUTE_LINE_LAYER)) {
+        map.addLayer({
+          id: ROUTE_LINE_LAYER,
+          type: 'line',
+          source: ROUTE_SOURCE,
+          filter: ['==', ['geometry-type'], 'LineString'],
+          layout: {
+            'line-join': 'round',
+            'line-cap': 'round',
+          },
+          paint: {
+            'line-color': '#F59E0B',
+            'line-width': 3.5,
+            'line-dasharray': [3, 2],
+            'line-opacity': 0.95,
+          }
+        }, beforeId);
+      }
 
-    // Route Start & End Marker Dots
-    if (!map.getLayer(ROUTE_ENDPOINTS_LAYER)) {
-      map.addLayer({
-        id: ROUTE_ENDPOINTS_LAYER,
-        type: 'circle',
-        source: ROUTE_SOURCE,
-        filter: ['==', ['geometry-type'], 'Point'],
-        paint: {
-          'circle-radius': 5,
-          'circle-color': [
-            'match', ['get', 'pointType'],
-            'start', '#10B981',
-            'end', '#EF4444',
-            '#F59E0B'
-          ],
-          'circle-stroke-width': 2,
-          'circle-stroke-color': '#FFFFFF',
-        }
-      }, beforeId);
-    }
+      // Route Start & End Marker Dots
+      if (!map.getLayer(ROUTE_ENDPOINTS_LAYER)) {
+        map.addLayer({
+          id: ROUTE_ENDPOINTS_LAYER,
+          type: 'circle',
+          source: ROUTE_SOURCE,
+          filter: ['==', ['geometry-type'], 'Point'],
+          paint: {
+            'circle-radius': 5,
+            'circle-color': [
+              'match', ['get', 'pointType'],
+              'start', '#10B981',
+              'end', '#EF4444',
+              '#F59E0B'
+            ],
+            'circle-stroke-width': 2,
+            'circle-stroke-color': '#FFFFFF',
+          }
+        }, beforeId);
+      }
 
-    updateSources();
+      updateSources();
+    } catch (err) {
+      console.warn('Failed to register playback map layers:', err);
+    }
   }, [map, updateSources]);
 
   useStyleLoadCallback(registerLayers);
 
   useEffect(() => {
-    if (map && map.isStyleLoaded()) {
+    if (!map) return;
+    if (map.isStyleLoaded()) {
       registerLayers();
+    } else {
+      const handleStyleData = () => {
+        if (map.isStyleLoaded()) {
+          registerLayers();
+        }
+      };
+      map.once('styledata', handleStyleData);
+      return () => {
+        map.off('styledata', handleStyleData);
+      };
     }
   }, [map, registerLayers]);
 
@@ -361,6 +287,27 @@ export function PlaybackMapLayers({ selectedGeofenceIds, selectedRouteIds }: Pla
     updateSources();
   }, [updateSources]);
 
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (map && map.getStyle()) {
+        try {
+          if (map.getLayer(GEOFENCE_FILL_LAYER)) map.removeLayer(GEOFENCE_FILL_LAYER);
+          if (map.getLayer(GEOFENCE_LINE_LAYER)) map.removeLayer(GEOFENCE_LINE_LAYER);
+          if (map.getSource(GEOFENCE_SOURCE)) map.removeSource(GEOFENCE_SOURCE);
+
+          if (map.getLayer(ROUTE_ENDPOINTS_LAYER)) map.removeLayer(ROUTE_ENDPOINTS_LAYER);
+          if (map.getLayer(ROUTE_LINE_LAYER)) map.removeLayer(ROUTE_LINE_LAYER);
+          if (map.getLayer(ROUTE_CASING_LAYER)) map.removeLayer(ROUTE_CASING_LAYER);
+          if (map.getSource(ROUTE_SOURCE)) map.removeSource(ROUTE_SOURCE);
+        } catch (e) {
+          // ignore unmount errors
+        }
+      }
+    };
+  }, [map]);
+
   return null;
 }
+
 
