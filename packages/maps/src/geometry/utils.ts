@@ -37,41 +37,101 @@ export function getRectanglePolygon(sw: Coordinate, ne: Coordinate): Coordinate[
   ];
 }
 
-export function geometryToGeoJSON(geometry: MapGeometry): GeoJSON.Feature<GeoJSON.Polygon | GeoJSON.LineString> {
+function toLngLat(c: any): [number, number] | null {
+  if (!c) return null;
+  if (Array.isArray(c)) {
+    const lng = Number(c[0]);
+    const lat = Number(c[1]);
+    if (!isNaN(lng) && !isNaN(lat)) return [lng, lat];
+    return null;
+  }
+  if (typeof c === 'object') {
+    const lng = Number(c.lng ?? c.longitude ?? c.lon);
+    const lat = Number(c.lat ?? c.latitude);
+    if (!isNaN(lng) && !isNaN(lat) && (lng !== 0 || lat !== 0)) {
+      return [lng, lat];
+    }
+  }
+  return null;
+}
+
+export function geometryToGeoJSON(geometry: MapGeometry | any): GeoJSON.Feature<GeoJSON.Polygon | GeoJSON.LineString> {
+  const emptyPolygon: GeoJSON.Feature<GeoJSON.Polygon> = {
+    type: 'Feature',
+    properties: {},
+    geometry: {
+      type: 'Polygon',
+      coordinates: []
+    }
+  };
+
+  if (!geometry || typeof geometry !== 'object') {
+    return emptyPolygon;
+  }
+
+  const rawCoords = Array.isArray(geometry.coordinates) ? geometry.coordinates : [];
+  const coords: [number, number][] = rawCoords
+    .map(toLngLat)
+    .filter((pt: any): pt is [number, number] => pt !== null);
+
   if (geometry.type === 'polygon') {
+    if (coords.length < 3) return emptyPolygon;
+    // Ensure ring is closed
+    const first = coords[0];
+    const last = coords[coords.length - 1];
+    const closed = (first[0] === last[0] && first[1] === last[1]) ? coords : [...coords, first];
     return {
       type: 'Feature',
       properties: {},
       geometry: {
         type: 'Polygon',
-        coordinates: [geometry.coordinates.map(c => [c.lng, c.lat])]
+        coordinates: [closed]
       }
     };
   }
   
   if (geometry.type === 'rectangle') {
-    const [sw, ne] = geometry.coordinates;
-    const coords = getRectanglePolygon(sw, ne);
+    if (coords.length < 2) return emptyPolygon;
+    
+    if (coords.length === 2) {
+      const sw: Coordinate = { lng: coords[0][0], lat: coords[0][1] };
+      const ne: Coordinate = { lng: coords[1][0], lat: coords[1][1] };
+      const rectCoords = getRectanglePolygon(sw, ne).map(c => [c.lng, c.lat] as [number, number]);
+      return {
+        type: 'Feature',
+        properties: {},
+        geometry: {
+          type: 'Polygon',
+          coordinates: [rectCoords]
+        }
+      };
+    }
+
+    // Already 4+ corners
+    const first = coords[0];
+    const last = coords[coords.length - 1];
+    const closed = (first[0] === last[0] && first[1] === last[1]) ? coords : [...coords, first];
     return {
       type: 'Feature',
       properties: {},
       geometry: {
         type: 'Polygon',
-        coordinates: [coords.map(c => [c.lng, c.lat])]
+        coordinates: [closed]
       }
     };
   }
 
-  if (geometry.type === 'multiline') {
+  if (geometry.type === 'multiline' || geometry.type === 'linestring' || geometry.type === 'LineString') {
     return {
       type: 'Feature',
       properties: {},
       geometry: {
         type: 'LineString',
-        coordinates: geometry.coordinates.map(c => [c.lng, c.lat])
+        coordinates: coords
       }
     };
   }
   
-  throw new Error('Unsupported geometry type');
+  return emptyPolygon;
 }
+

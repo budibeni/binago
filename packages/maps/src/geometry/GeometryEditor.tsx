@@ -130,41 +130,46 @@ export function GeometryEditor({
   const updateSource = useCallback(() => {
     if (!map || !map.isStyleLoaded()) return;
 
-    if (!map.getSource(sourceId)) {
-      map.addSource(sourceId, {
-        type: 'geojson',
-        data: { type: 'FeatureCollection', features: [] }
-      });
-      map.addLayer({
-        id: layerId,
-        type: 'fill',
-        source: sourceId,
-        filter: ['any', ['==', ['geometry-type'], 'Polygon'], ['==', ['geometry-type'], 'MultiPolygon']],
-        paint: {
-          'fill-color': '#0ea5e9',
-          'fill-opacity': 0.3,
-          'fill-outline-color': '#0284c7'
-        }
-      });
-      map.addLayer({
-        id: layerId + '-line',
-        type: 'line',
-        source: sourceId,
-        filter: ['any', ['==', ['geometry-type'], 'LineString'], ['==', ['geometry-type'], 'MultiLineString']],
-        paint: {
-          'line-color': '#0ea5e9',
-          'line-width': 3
-        }
-      });
-    }
-    
-    const source = map.getSource(sourceId) as any;
-    if (source && geometry) {
-      source.setData(geometryToGeoJSON(geometry));
-    } else if (source) {
-      source.setData({ type: 'FeatureCollection', features: [] });
+    try {
+      if (!map.getSource(sourceId)) {
+        map.addSource(sourceId, {
+          type: 'geojson',
+          data: { type: 'FeatureCollection', features: [] }
+        });
+        map.addLayer({
+          id: layerId,
+          type: 'fill',
+          source: sourceId,
+          filter: ['any', ['==', ['geometry-type'], 'Polygon'], ['==', ['geometry-type'], 'MultiPolygon']],
+          paint: {
+            'fill-color': '#0ea5e9',
+            'fill-opacity': 0.3,
+            'fill-outline-color': '#0284c7'
+          }
+        });
+        map.addLayer({
+          id: layerId + '-line',
+          type: 'line',
+          source: sourceId,
+          filter: ['any', ['==', ['geometry-type'], 'LineString'], ['==', ['geometry-type'], 'MultiLineString']],
+          paint: {
+            'line-color': '#0ea5e9',
+            'line-width': 3
+          }
+        });
+      }
+      
+      const source = map.getSource(sourceId) as any;
+      if (source && geometry) {
+        source.setData(geometryToGeoJSON(geometry));
+      } else if (source) {
+        source.setData({ type: 'FeatureCollection', features: [] });
+      }
+    } catch (err) {
+      console.warn('Failed to update geometry editor source:', err);
     }
   }, [map, geometry]);
+
 
   useStyleLoadCallback(updateSource);
 
@@ -191,63 +196,68 @@ export function GeometryEditor({
   const updateDraftSource = useCallback(() => {
     if (!map || !map.isStyleLoaded()) return;
 
-    if (!map.getSource(draftSourceId)) {
-      map.addSource(draftSourceId, {
-        type: 'geojson',
-        data: { type: 'FeatureCollection', features: [] }
-      });
+    try {
+      if (!map.getSource(draftSourceId)) {
+        map.addSource(draftSourceId, {
+          type: 'geojson',
+          data: { type: 'FeatureCollection', features: [] }
+        });
+        
+        map.addLayer({
+          id: draftLayerId,
+          type: 'line',
+          source: draftSourceId,
+          paint: {
+            'line-color': '#0ea5e9',
+            'line-width': 2,
+            'line-dasharray': [2, 2]
+          }
+        });
+        
+        map.addLayer({
+          id: draftPointsLayerId,
+          type: 'circle',
+          source: draftSourceId,
+          paint: {
+            'circle-radius': 4,
+            'circle-color': '#0ea5e9',
+            'circle-stroke-width': 2,
+            'circle-stroke-color': '#ffffff'
+          }
+        });
+      }
       
-      map.addLayer({
-        id: draftLayerId,
-        type: 'line',
-        source: draftSourceId,
-        paint: {
-          'line-color': '#0ea5e9',
-          'line-width': 2,
-          'line-dasharray': [2, 2]
-        }
-      });
-      
-      map.addLayer({
-        id: draftPointsLayerId,
-        type: 'circle',
-        source: draftSourceId,
-        paint: {
-          'circle-radius': 4,
-          'circle-color': '#0ea5e9',
-          'circle-stroke-width': 2,
-          'circle-stroke-color': '#ffffff'
-        }
-      });
-    }
-    
-    const source = map.getSource(draftSourceId) as any;
-    if (source && draftCoords.length > 0) {
-      source.setData({
-        type: 'FeatureCollection',
-        features: [
-          {
-            type: 'Feature',
-            geometry: {
-              type: 'LineString',
-              coordinates: draftCoords.map(c => [c.lng, c.lat])
+      const source = map.getSource(draftSourceId) as any;
+      if (source && draftCoords.length > 0) {
+        source.setData({
+          type: 'FeatureCollection',
+          features: [
+            {
+              type: 'Feature',
+              geometry: {
+                type: 'LineString',
+                coordinates: draftCoords.map(c => [c.lng, c.lat])
+              },
+              properties: {}
             },
-            properties: {}
-          },
-          ...draftCoords.map(c => ({
-            type: 'Feature',
-            geometry: {
-              type: 'Point',
-              coordinates: [c.lng, c.lat]
-            },
-            properties: {}
-          }))
-        ]
-      });
-    } else if (source) {
-      source.setData({ type: 'FeatureCollection', features: [] });
+            ...draftCoords.map(c => ({
+              type: 'Feature',
+              geometry: {
+                type: 'Point',
+                coordinates: [c.lng, c.lat]
+              },
+              properties: {}
+            }))
+          ]
+        });
+      } else if (source) {
+        source.setData({ type: 'FeatureCollection', features: [] });
+      }
+    } catch (err) {
+      console.warn('Failed to update draft source:', err);
     }
   }, [map, draftCoords]);
+
 
   useStyleLoadCallback(updateDraftSource);
 

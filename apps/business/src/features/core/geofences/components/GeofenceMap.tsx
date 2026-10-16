@@ -101,42 +101,55 @@ function GeofenceMapInner({
     const outlineLayerId = 'adatrack-geofences-outline';
 
     const render = () => {
-      const renderedGeofences = visibleGeofenceIds 
-        ? geofences.filter(gf => visibleGeofenceIds.includes(gf.id))
-        : geofences;
+      try {
+        const renderedGeofences = visibleGeofenceIds 
+          ? geofences.filter(gf => visibleGeofenceIds.includes(gf.id))
+          : geofences;
 
-      const features = renderedGeofences.map((gf) => {
-        const feature = geometryToGeoJSON(gf.geometry) as any;
-        feature.properties = { id: gf.id, name: gf.name, status: gf.status };
-        return feature;
-      });
+        const features = renderedGeofences
+          .map((gf) => {
+            try {
+              if (!gf?.geometry) return null;
+              const feature = geometryToGeoJSON(gf.geometry) as any;
+              if (!feature || !feature.geometry) return null;
+              feature.properties = { id: gf.id, name: gf.name, status: gf.status };
+              return feature;
+            } catch {
+              return null;
+            }
+          })
+          .filter(Boolean);
 
-      const data: GeoJSON.FeatureCollection = { type: 'FeatureCollection', features };
+        const data: GeoJSON.FeatureCollection = { type: 'FeatureCollection', features };
 
-      if (!map.getSource(sourceId)) {
-        map.addSource(sourceId, { type: 'geojson', data });
-        map.addLayer({
-          id: fillLayerId,
-          type: 'fill',
-          source: sourceId,
-          paint: {
-            'fill-color': ['match', ['get', 'status'], 'active', '#10b981', '#ef4444'],
-            'fill-opacity': 0.2,
-          },
-        });
-        map.addLayer({
-          id: outlineLayerId,
-          type: 'line',
-          source: sourceId,
-          paint: {
-            'line-color': ['match', ['get', 'status'], 'active', '#059669', '#dc2626'],
-            'line-width': 2,
-          },
-        });
-      } else {
-        (map.getSource(sourceId) as any).setData(data);
+        if (!map.getSource(sourceId)) {
+          map.addSource(sourceId, { type: 'geojson', data });
+          map.addLayer({
+            id: fillLayerId,
+            type: 'fill',
+            source: sourceId,
+            paint: {
+              'fill-color': ['match', ['get', 'status'], 'active', '#10b981', '#ef4444'],
+              'fill-opacity': 0.2,
+            },
+          });
+          map.addLayer({
+            id: outlineLayerId,
+            type: 'line',
+            source: sourceId,
+            paint: {
+              'line-color': ['match', ['get', 'status'], 'active', '#059669', '#dc2626'],
+              'line-width': 2,
+            },
+          });
+        } else {
+          (map.getSource(sourceId) as any).setData(data);
+        }
+      } catch (err) {
+        console.warn('Failed to render geofence map layers:', err);
       }
     };
+
 
     if (map.isStyleLoaded()) {
       render();

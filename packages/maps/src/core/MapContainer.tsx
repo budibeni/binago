@@ -114,13 +114,26 @@ function MapContainerInner({
       // styledata fires on every style change, including basemap switch.
       // This is more reliable than style.load when switching styles using setStyle()
       if (map.isStyleLoaded()) {
-        styleLoadListeners.current.forEach((l) => l.callback());
+        styleLoadListeners.current.forEach((l) => {
+          try {
+            l.callback();
+          } catch (e) {
+            console.warn('Error executing style load listener on styledata:', e);
+          }
+        });
       }
     });
 
     map.on('style.load', () => {
-      styleLoadListeners.current.forEach((l) => l.callback());
+      styleLoadListeners.current.forEach((l) => {
+        try {
+          l.callback();
+        } catch (e) {
+          console.warn('Error executing style load listener on style.load:', e);
+        }
+      });
     });
+
 
     map.on('error', (e) => {
       const msg = e.error?.message || 'Unknown map error';

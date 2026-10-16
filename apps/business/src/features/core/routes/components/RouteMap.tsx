@@ -176,56 +176,68 @@ function RouteMapInner({
 
     // 1. Render Geofences
     const targetGeofences = getRouteGeofences();
-    const gfFeatures = targetGeofences.map((gf) => {
-      const feature = geometryToGeoJSON(gf.geometry) as any;
-      
-      // Find role for this geofence
-      let role = 'stop';
-      if (routeLocs[0]?.loc?.type === 'geofence' && String(routeLocs[0]?.loc?.geofenceId) === String(gf.id)) role = 'origin';
-      else if (routeLocs[routeLocs.length - 1]?.loc?.type === 'geofence' && String(routeLocs[routeLocs.length - 1]?.loc?.geofenceId) === String(gf.id)) role = 'destination';
-      
-      feature.properties = { 
-        id: gf.id, 
-        name: gf.name,
-        role
-      };
-      return feature;
-    });
+    const gfFeatures = targetGeofences
+      .map((gf) => {
+        try {
+          if (!gf?.geometry) return null;
+          const feature = geometryToGeoJSON(gf.geometry) as any;
+          if (!feature || !feature.geometry) return null;
+          
+          // Find role for this geofence
+          let role = 'stop';
+          if (routeLocs[0]?.loc?.type === 'geofence' && String(routeLocs[0]?.loc?.geofenceId) === String(gf.id)) role = 'origin';
+          else if (routeLocs[routeLocs.length - 1]?.loc?.type === 'geofence' && String(routeLocs[routeLocs.length - 1]?.loc?.geofenceId) === String(gf.id)) role = 'destination';
+          
+          feature.properties = { 
+            id: gf.id, 
+            name: gf.name,
+            role
+          };
+          return feature;
+        } catch (e) {
+          return null;
+        }
+      })
+      .filter(Boolean);
 
     const gfData: GeoJSON.FeatureCollection = { type: 'FeatureCollection', features: gfFeatures };
 
-    if (!map.getSource(GF_SOURCE_ID)) {
-      map.addSource(GF_SOURCE_ID, { type: 'geojson', data: gfData });
-      map.addLayer({
-        id: GF_FILL_LAYER_ID,
-        type: 'fill',
-        source: GF_SOURCE_ID,
-        paint: {
-          'fill-color': [
-            'match', ['get', 'role'], 
-            'origin', '#3b82f6', // blue
-            'destination', '#10b981', // green
-            '#f59e0b' // yellow for stops
-          ],
-          'fill-opacity': 0.3,
-        },
-      });
-      map.addLayer({
-        id: GF_OUTLINE_LAYER_ID,
-        type: 'line',
-        source: GF_SOURCE_ID,
-        paint: {
-          'line-color': [
-            'match', ['get', 'role'], 
-            'origin', '#2563eb', 
-            'destination', '#059669',
-            '#d97706'
-          ],
-          'line-width': 2,
-        },
-      });
-    } else {
-      (map.getSource(GF_SOURCE_ID) as any).setData(gfData);
+    try {
+      if (!map.getSource(GF_SOURCE_ID)) {
+        map.addSource(GF_SOURCE_ID, { type: 'geojson', data: gfData });
+        map.addLayer({
+          id: GF_FILL_LAYER_ID,
+          type: 'fill',
+          source: GF_SOURCE_ID,
+          paint: {
+            'fill-color': [
+              'match', ['get', 'role'], 
+              'origin', '#3b82f6', // blue
+              'destination', '#10b981', // green
+              '#f59e0b' // yellow for stops
+            ],
+            'fill-opacity': 0.3,
+          },
+        });
+        map.addLayer({
+          id: GF_OUTLINE_LAYER_ID,
+          type: 'line',
+          source: GF_SOURCE_ID,
+          paint: {
+            'line-color': [
+              'match', ['get', 'role'], 
+              'origin', '#2563eb', 
+              'destination', '#059669',
+              '#d97706'
+            ],
+            'line-width': 2,
+          },
+        });
+      } else {
+        (map.getSource(GF_SOURCE_ID) as any).setData(gfData);
+      }
+    } catch (err) {
+      console.warn('Failed to update geofence layers in RouteMap:', err);
     }
 
     // 2. Render Coordinates (Markers) and Radius
@@ -259,139 +271,138 @@ function RouteMapInner({
     const coordData: GeoJSON.FeatureCollection = { type: 'FeatureCollection', features: coordFeatures };
     const coordRadiusData: GeoJSON.FeatureCollection = { type: 'FeatureCollection', features: coordRadiusFeatures };
 
-    if (!map.getSource(RADIUS_SOURCE_ID)) {
-      map.addSource(RADIUS_SOURCE_ID, { type: 'geojson', data: coordRadiusData });
-      map.addLayer({
-        id: RADIUS_FILL_LAYER_ID,
-        type: 'fill',
-        source: RADIUS_SOURCE_ID,
-        paint: {
-          'fill-color': [
-            'match', ['get', 'role'], 
-            'origin', '#3b82f6', // blue
-            'destination', '#10b981', // green
-            '#f59e0b' // yellow
-          ],
-          'fill-opacity': 0.15,
-        },
-      });
-      map.addLayer({
-        id: RADIUS_OUTLINE_LAYER_ID,
-        type: 'line',
-        source: RADIUS_SOURCE_ID,
-        paint: {
-          'line-color': [
-            'match', ['get', 'role'], 
-            'origin', '#2563eb', 
-            'destination', '#059669',
-            '#d97706'
-          ],
-          'line-width': 1,
-          'line-dasharray': [4, 4],
-        },
-      });
-    } else {
-      (map.getSource(RADIUS_SOURCE_ID) as any).setData(coordRadiusData);
-    }
+    try {
+      if (!map.getSource(RADIUS_SOURCE_ID)) {
+        map.addSource(RADIUS_SOURCE_ID, { type: 'geojson', data: coordRadiusData });
+        map.addLayer({
+          id: RADIUS_FILL_LAYER_ID,
+          type: 'fill',
+          source: RADIUS_SOURCE_ID,
+          paint: {
+            'fill-color': [
+              'match', ['get', 'role'], 
+              'origin', '#3b82f6', // blue
+              'destination', '#10b981', // green
+              '#f59e0b' // yellow
+            ],
+            'fill-opacity': 0.15,
+          },
+        });
+        map.addLayer({
+          id: RADIUS_OUTLINE_LAYER_ID,
+          type: 'line',
+          source: RADIUS_SOURCE_ID,
+          paint: {
+            'line-color': [
+              'match', ['get', 'role'], 
+              'origin', '#2563eb', 
+              'destination', '#059669',
+              '#d97706'
+            ],
+            'line-width': 1,
+            'line-dasharray': [4, 4],
+          },
+        });
+      } else {
+        (map.getSource(RADIUS_SOURCE_ID) as any).setData(coordRadiusData);
+      }
 
-    if (!map.getSource(COORD_SOURCE_ID)) {
-      map.addSource(COORD_SOURCE_ID, { type: 'geojson', data: coordData });
-      map.addLayer({
-        id: COORD_POINT_LAYER_ID,
-        type: 'circle',
-        source: COORD_SOURCE_ID,
-        paint: {
-          'circle-radius': 8,
-          'circle-color': [
-            'match', ['get', 'role'], 
-            'origin', '#2563eb', 
-            'destination', '#059669',
-            '#d97706'
-          ],
-          'circle-stroke-width': 2,
-          'circle-stroke-color': '#ffffff'
-        },
-      });
-    } else {
-      (map.getSource(COORD_SOURCE_ID) as any).setData(coordData);
+      if (!map.getSource(COORD_SOURCE_ID)) {
+        map.addSource(COORD_SOURCE_ID, { type: 'geojson', data: coordData });
+        map.addLayer({
+          id: COORD_POINT_LAYER_ID,
+          type: 'circle',
+          source: COORD_SOURCE_ID,
+          paint: {
+            'circle-radius': 8,
+            'circle-color': [
+              'match', ['get', 'role'], 
+              'origin', '#2563eb', 
+              'destination', '#059669',
+              '#d97706'
+            ],
+            'circle-stroke-width': 2,
+            'circle-stroke-color': '#ffffff'
+          },
+        });
+      } else {
+        (map.getSource(COORD_SOURCE_ID) as any).setData(coordData);
+      }
+    } catch (err) {
+      console.warn('Failed to update coordinate layers in RouteMap:', err);
     }
 
     // 3. Render Planned Path
-    const pathData: GeoJSON.FeatureCollection = { type: 'FeatureCollection', features: [] };
-    const effectiveRoute = selectedRoute
-      ? {
-          ...selectedRoute,
-          plannedPath: editorGeometry || selectedRoute.plannedPath,
+    try {
+      const pathData: GeoJSON.FeatureCollection = { type: 'FeatureCollection', features: [] };
+      const effectiveRoute = selectedRoute
+        ? {
+            ...selectedRoute,
+            plannedPath: editorGeometry || selectedRoute.plannedPath,
+          }
+        : null;
+
+      // Do NOT hide route when in 'select-location' mode; only hide if manually drawing new multiline
+      if (effectiveRoute && editorMode !== 'draw_multiline') {
+        const coords = extractRouteCoordinates(effectiveRoute, geofences);
+        if (coords.length > 1) {
+          pathData.features.push({
+            type: 'Feature',
+            properties: { isPlanned: !!effectiveRoute.plannedPath },
+            geometry: { type: 'LineString', coordinates: coords }
+          });
         }
-      : null;
-
-    // Do NOT hide route when in 'select-location' mode; only hide if manually drawing new multiline
-    if (effectiveRoute && editorMode !== 'draw_multiline') {
-      const coords = extractRouteCoordinates(effectiveRoute, geofences);
-      if (coords.length > 1) {
-        pathData.features.push({
-          type: 'Feature',
-          properties: { isPlanned: !!effectiveRoute.plannedPath },
-          geometry: { type: 'LineString', coordinates: coords }
-        });
       }
-    }
 
-    if (!map.getSource(PATH_SOURCE_ID)) {
-      map.addSource(PATH_SOURCE_ID, { type: 'geojson', data: pathData });
-      
-      // Contrast casing layer for clear visibility across all basemaps (satellite, dark, etc.)
-      map.addLayer({
-        id: PATH_CASING_LAYER_ID,
-        type: 'line',
-        source: PATH_SOURCE_ID,
-        layout: {
-          'line-join': 'round',
-          'line-cap': 'round',
-        },
-        paint: {
-          'line-color': '#3b0764',
-          'line-width': 6,
-          'line-opacity': 0.45,
-        },
-      });
+      if (!map.getSource(PATH_SOURCE_ID)) {
+        map.addSource(PATH_SOURCE_ID, { type: 'geojson', data: pathData });
+        
+        // Contrast casing layer for clear visibility across all basemaps (satellite, dark, etc.)
+        map.addLayer({
+          id: PATH_CASING_LAYER_ID,
+          type: 'line',
+          source: PATH_SOURCE_ID,
+          filter: ['==', ['geometry-type'], 'LineString'],
+          layout: {
+            'line-join': 'round',
+            'line-cap': 'round',
+          },
+          paint: {
+            'line-color': '#3b0764',
+            'line-width': 6,
+            'line-opacity': 0.5,
+          },
+        });
 
-      // Solid layer for planned paths
-      map.addLayer({
-        id: PATH_LAYER_SOLID_ID,
-        type: 'line',
-        source: PATH_SOURCE_ID,
-        filter: ['==', ['get', 'isPlanned'], true],
-        layout: {
-          'line-join': 'round',
-          'line-cap': 'round',
-        },
-        paint: {
-          'line-color': '#8b5cf6',
-          'line-width': 4,
-        },
-      });
-      
-      // Dashed layer for fallback straight lines
-      map.addLayer({
-        id: PATH_LAYER_DASHED_ID,
-        type: 'line',
-        source: PATH_SOURCE_ID,
-        filter: ['!=', ['get', 'isPlanned'], true],
-        layout: {
-          'line-join': 'round',
-          'line-cap': 'round',
-        },
-        paint: {
-          'line-color': '#8b5cf6',
-          'line-width': 4,
-          'line-dasharray': [2, 2]
-        },
-      });
-    } else {
-      (map.getSource(PATH_SOURCE_ID) as any).setData(pathData);
+        // Main route line layer (solid if planned, dashed if fallback straight line)
+        map.addLayer({
+          id: PATH_LAYER_SOLID_ID,
+          type: 'line',
+          source: PATH_SOURCE_ID,
+          filter: ['==', ['geometry-type'], 'LineString'],
+          layout: {
+            'line-join': 'round',
+            'line-cap': 'round',
+          },
+          paint: {
+            'line-color': '#8b5cf6',
+            'line-width': 4,
+            'line-dasharray': [
+              'case',
+              ['boolean', ['get', 'isPlanned'], false],
+              ['literal', [1, 0]],
+              ['literal', [2, 2]]
+            ],
+          },
+        });
+      } else {
+        (map.getSource(PATH_SOURCE_ID) as any).setData(pathData);
+      }
+    } catch (err) {
+      console.warn('Failed to update path layers in RouteMap:', err);
     }
   }, [map, geofences, selectedRoute, editorMode, editorGeometry, getRouteLocations, getRouteGeofences]);
+
 
   // Hook for style reload / basemap switch: automatic re-registration of layers
   useStyleLoadCallback(render);
@@ -410,24 +421,29 @@ function RouteMapInner({
   useEffect(() => {
     return () => {
       if (map && map.getStyle()) {
-        if (map.getLayer(GF_FILL_LAYER_ID)) map.removeLayer(GF_FILL_LAYER_ID);
-        if (map.getLayer(GF_OUTLINE_LAYER_ID)) map.removeLayer(GF_OUTLINE_LAYER_ID);
-        if (map.getSource(GF_SOURCE_ID)) map.removeSource(GF_SOURCE_ID);
-        
-        if (map.getLayer(RADIUS_FILL_LAYER_ID)) map.removeLayer(RADIUS_FILL_LAYER_ID);
-        if (map.getLayer(RADIUS_OUTLINE_LAYER_ID)) map.removeLayer(RADIUS_OUTLINE_LAYER_ID);
-        if (map.getSource(RADIUS_SOURCE_ID)) map.removeSource(RADIUS_SOURCE_ID);
+        try {
+          if (map.getLayer(GF_FILL_LAYER_ID)) map.removeLayer(GF_FILL_LAYER_ID);
+          if (map.getLayer(GF_OUTLINE_LAYER_ID)) map.removeLayer(GF_OUTLINE_LAYER_ID);
+          if (map.getSource(GF_SOURCE_ID)) map.removeSource(GF_SOURCE_ID);
+          
+          if (map.getLayer(RADIUS_FILL_LAYER_ID)) map.removeLayer(RADIUS_FILL_LAYER_ID);
+          if (map.getLayer(RADIUS_OUTLINE_LAYER_ID)) map.removeLayer(RADIUS_OUTLINE_LAYER_ID);
+          if (map.getSource(RADIUS_SOURCE_ID)) map.removeSource(RADIUS_SOURCE_ID);
 
-        if (map.getLayer(COORD_POINT_LAYER_ID)) map.removeLayer(COORD_POINT_LAYER_ID);
-        if (map.getSource(COORD_SOURCE_ID)) map.removeSource(COORD_SOURCE_ID);
+          if (map.getLayer(COORD_POINT_LAYER_ID)) map.removeLayer(COORD_POINT_LAYER_ID);
+          if (map.getSource(COORD_SOURCE_ID)) map.removeSource(COORD_SOURCE_ID);
 
-        if (map.getLayer(PATH_LAYER_SOLID_ID)) map.removeLayer(PATH_LAYER_SOLID_ID);
-        if (map.getLayer(PATH_LAYER_DASHED_ID)) map.removeLayer(PATH_LAYER_DASHED_ID);
-        if (map.getLayer(PATH_CASING_LAYER_ID)) map.removeLayer(PATH_CASING_LAYER_ID);
-        if (map.getSource(PATH_SOURCE_ID)) map.removeSource(PATH_SOURCE_ID);
+          if (map.getLayer(PATH_LAYER_SOLID_ID)) map.removeLayer(PATH_LAYER_SOLID_ID);
+          if (map.getLayer(PATH_LAYER_DASHED_ID)) map.removeLayer(PATH_LAYER_DASHED_ID);
+          if (map.getLayer(PATH_CASING_LAYER_ID)) map.removeLayer(PATH_CASING_LAYER_ID);
+          if (map.getSource(PATH_SOURCE_ID)) map.removeSource(PATH_SOURCE_ID);
+        } catch (e) {
+          // ignore unmount errors
+        }
       }
     };
   }, [map]);
+
 
   const handleResetNorth = () => {
     if (map) {

@@ -64,24 +64,52 @@ export function RouteEditorView({
 
   const [isSearchingAddress, setIsSearchingAddress] = useState<Record<string, boolean>>({});
 
-  // Sync editorGeometry if initialData arrives after mount
+  // Sync state when initialData arrives or changes
+  const initialDataIdRef = useRef<string | undefined>(initialData?.id);
   useEffect(() => {
-    if (initialData?.plannedPath && !editorGeometry) {
+    if (initialData && initialData.id !== initialDataIdRef.current) {
+      initialDataIdRef.current = initialData.id;
+      setName(initialData.name || '');
+      setDescription(initialData.description || '');
+      setGroupId(initialData.groupId ? String(initialData.groupId) : 'none');
+      setOrigin(initialData.origin || { type: 'geofence' });
+      setDestination(initialData.destination || { type: 'geofence' });
+      setStops(initialData.stops || []);
+      setPlannedDistance(initialData.plannedDistance);
+      setEstimatedDuration(initialData.estimatedDuration);
+      setStatus(initialData.status || 'active');
+      setEditorGeometry(initialData.plannedPath || null);
+    } else if (initialData?.plannedPath && !editorGeometry) {
       setEditorGeometry(initialData.plannedPath);
     }
   }, [initialData]);
 
   const isFirstRender = useRef(true);
+  const prevLocationsKeyRef = useRef<string>('');
 
   // Auto-calculate distance and duration
   useEffect(() => {
+    const currentLocationsKey = JSON.stringify({
+      origin,
+      destination,
+      stops: stops.map(s => s.location),
+    });
+
     // If editing an existing route with saved plannedPath, do not overwrite on initial load
     if (isFirstRender.current) {
       isFirstRender.current = false;
+      prevLocationsKeyRef.current = currentLocationsKey;
       if (initialData?.plannedPath) {
         return;
       }
     }
+
+    // If locations haven't changed (e.g. background refetch of geofences or basemap change), do not recalculate
+    if (prevLocationsKeyRef.current === currentLocationsKey && (editorGeometry || initialData?.plannedPath)) {
+      return;
+    }
+    prevLocationsKeyRef.current = currentLocationsKey;
+
 
     const getLatLng = (loc: RouteLocation) => {
       if (loc.type === 'coordinate' && loc.latitude !== undefined && loc.longitude !== undefined) {
@@ -173,11 +201,13 @@ export function RouteEditorView({
             const data = await res.json();
             if (data.status === 'OK' && data.routes && data.routes.length > 0) {
               const route = data.routes[0];
-              const decodedCoords = decodePolyline(route.overview_polyline.points);
-              setEditorGeometry({
-                  type: 'multiline',
-                  coordinates: decodedCoords
-              });
+              if (editorMode !== 'draw_multiline') {
+                const decodedCoords = decodePolyline(route.overview_polyline.points);
+                setEditorGeometry({
+                    type: 'multiline',
+                    coordinates: decodedCoords
+                });
+              }
               
               let totalDistMeters = 0;
               let totalDurationSecs = 0;
@@ -205,7 +235,7 @@ export function RouteEditorView({
         if (data && data.routes && data.routes.length > 0) {
           const route = data.routes[0];
           
-          if (route.geometry && route.geometry.coordinates) {
+          if (route.geometry && route.geometry.coordinates && editorMode !== 'draw_multiline') {
              const mappedCoords = route.geometry.coordinates.map((c: number[]) => ({
                 lat: c[1],
                 lng: c[0]
@@ -215,6 +245,7 @@ export function RouteEditorView({
                 coordinates: mappedCoords
              });
           }
+
 
           if (route.distance) {
             setPlannedDistance(Math.round((route.distance / 1000) * 100) / 100);

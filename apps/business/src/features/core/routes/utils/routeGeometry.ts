@@ -64,22 +64,28 @@ export function extractRouteCoordinates(rt: Route | any, geofences: Geofence[] =
       }
     }
     if (loc.type === 'geofence' && loc.geofenceId) {
-      const gf = geofences.find(g => g.id === loc.geofenceId);
+      const gf = geofences.find(g => String(g.id) === String(loc.geofenceId));
       if (gf?.geometry?.coordinates && gf.geometry.coordinates.length > 0) {
-        let sumLng = 0, sumLat = 0;
-        gf.geometry.coordinates.forEach((c: any) => {
-          sumLng += Number(c.lng ?? c.lon ?? 0);
-          sumLat += Number(c.lat ?? 0);
+        let sumLng = 0, sumLat = 0, count = 0;
+        let coords: any = gf.geometry.coordinates;
+        if (Array.isArray(coords[0]) && Array.isArray(coords[0][0])) coords = coords[0];
+        coords.forEach((c: any) => {
+          const lng = Number(c?.lng ?? c?.longitude ?? c?.lon ?? (Array.isArray(c) ? c[0] : 0));
+          const lat = Number(c?.lat ?? c?.latitude ?? (Array.isArray(c) ? c[1] : 0));
+          if (!isNaN(lng) && !isNaN(lat) && (lng !== 0 || lat !== 0)) {
+            sumLng += lng;
+            sumLat += lat;
+            count++;
+          }
         });
-        const avgLng = sumLng / gf.geometry.coordinates.length;
-        const avgLat = sumLat / gf.geometry.coordinates.length;
-        if (!isNaN(avgLng) && !isNaN(avgLat) && (avgLng !== 0 || avgLat !== 0)) {
-          return [avgLng, avgLat];
+        if (count > 0) {
+          return [sumLng / count, sumLat / count];
         }
       }
     }
     return null;
   };
+
 
   const origCoord = resolveLoc(rt.origin);
   if (origCoord) points.push(origCoord);
