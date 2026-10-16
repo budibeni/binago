@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Smartphone, Users, Phone } from 'lucide-react';
+import { Smartphone, Phone } from 'lucide-react';
 import { FormShell, FormCard, InputString, InputSelect, InputAutocomplete, useForm } from '@adatrack/ui';
 import { api } from '@adatrack/utils';
 import { getDeviceFormSchema, type Device } from '../types/device';
@@ -31,9 +31,13 @@ const DEFAULT_DEVICE: Partial<Device> = {
   deviceModel: 'Mobile Tracking App',
   simNumber: '',
   iccid: '',
-  driverId: undefined,
   status: 'idle',
 };
+
+function formatImeiFromSim(simNumber: string): string {
+  const clean = (simNumber || '').trim().replace(/\s+/g, '');
+  return clean ? `PHONE${clean}` : '';
+}
 
 export function DeviceForm({
   device,
@@ -70,19 +74,17 @@ export function DeviceForm({
     initialData: device
       ? {
           ...device,
-          driverId: device.driverId ? String(device.driverId) : '',
         }
       : {
           ...DEFAULT_DEVICE,
-          driverId: '',
         },
     resetOn: [open, device],
     schema: getDeviceFormSchema(tD.validation || {}),
     onSubmit: async (data) => {
       const payload: Partial<Device> = {
         ...data,
-        driverId: data.driverId ? Number(data.driverId) : undefined,
       };
+      delete payload.driverId;
       await onSave(payload);
     },
   });
@@ -91,20 +93,6 @@ export function DeviceForm({
     { value: 'SMARTPHONE', label: 'Smartphone App Driver (Android / iOS)' },
     { value: 'HTTP_MOBILE', label: 'Mobile Tracking HTTP Protocol' },
   ];
-
-  // Driver options: show unassigned drivers or the driver currently linked to this device
-  const driverSelectOptions = React.useMemo(() => {
-    const available = drivers.filter(
-      (d) => !d.deviceImei || (device?.imei && d.deviceImei === device.imei)
-    );
-    return [
-      { value: '', label: tF.driverNone || 'Belum Ditugaskan (Idle)' },
-      ...available.map((d) => ({
-        value: d.id,
-        label: `${d.name} ${d.phone ? `(${d.phone})` : ''}`,
-      })),
-    ];
-  }, [drivers, device?.imei, tF.driverNone]);
 
   // Phone autocomplete options: unassigned drivers with phone numbers
   const phoneAutocompleteOptions = React.useMemo(() => {
@@ -117,13 +105,10 @@ export function DeviceForm({
       }));
   }, [drivers, device?.imei]);
 
-  const handleDriverChange = (driverIdVal: string) => {
-    handleChange('driverId', driverIdVal);
-    if (driverIdVal) {
-      const selectedDriver = drivers.find((d) => d.id === driverIdVal);
-      if (selectedDriver?.phone && (!formData.simNumber || formData.simNumber.trim() === '')) {
-        handleChange('simNumber', selectedDriver.phone);
-      }
+  const handleSimNumberChange = (val: string) => {
+    handleChange('simNumber', val);
+    if (!isEdit) {
+      handleChange('imei', formatImeiFromSim(val));
     }
   };
 
@@ -140,16 +125,29 @@ export function DeviceForm({
       isSubmitting={isSubmitting}
       columns={2}
     >
-      {/* Kolom Kiri */}
+      {/* Kolom Kiri: Identitas & Konektivitas SIM */}
       <div className="flex flex-col gap-6">
-        {/* Identitas Perangkat Smartphone */}
         <FormCard
           title={tF.sectionIdentity}
           description={tF.descIdentity}
           icon={<Smartphone className="w-5 h-5 text-primary" />}
           columns={2}
         >
-          <div className="col-span-1 group-data-[layout=default]/form:md:col-span-2 group-data-[layout=fullscreen]/form:md:col-span-2">
+          <div className="col-span-2">
+            <InputAutocomplete
+              label={tF.simNumber}
+              placeholder={tF.simPlaceholder}
+              value={formData.simNumber || ''}
+              onChange={handleSimNumberChange}
+              options={phoneAutocompleteOptions}
+              error={errors.simNumber}
+              emptyText="Ketik nomor telepon manual atau pilih dari daftar supir"
+              autoFocus={!isEdit}
+              required
+            />
+          </div>
+
+          <div className="col-span-2">
             <InputString
               label={tF.imei}
               placeholder={tF.imeiPlaceholder}
@@ -157,14 +155,34 @@ export function DeviceForm({
               onChange={(v) => handleChange('imei', v)}
               error={errors.imei}
               required
-              disabled={isEdit} // IMEI is primary identifier
+              disabled={true} // Auto-generated from PHONE + simNumber
             />
             <p className="text-[11px] text-foreground-muted mt-1">
               {tF.imeiDesc}
             </p>
           </div>
 
-          <div className="col-span-1 group-data-[layout=default]/form:md:col-span-2 group-data-[layout=fullscreen]/form:md:col-span-2">
+          <div className="col-span-2">
+            <InputString
+              label={tF.iccid}
+              placeholder={tF.iccidPlaceholder}
+              value={formData.iccid || ''}
+              onChange={(v) => handleChange('iccid', v)}
+              error={errors.iccid}
+            />
+          </div>
+        </FormCard>
+      </div>
+
+      {/* Kolom Kanan: Spesifikasi Aplikasi Smartphone */}
+      <div className="flex flex-col gap-6">
+        <FormCard
+          title={tF.sectionSpec}
+          description={tF.descSpec}
+          icon={<Phone className="w-5 h-5 text-blue-500" />}
+          columns={2}
+        >
+          <div className="col-span-2">
             <InputSelect
               label={tF.protocol}
               value={formData.protocol || 'SMARTPHONE'}
@@ -175,72 +193,25 @@ export function DeviceForm({
             />
           </div>
 
-          <InputString
-            label={tF.brand}
-            placeholder={tF.brandPlaceholder}
-            value={formData.deviceBrand || ''}
-            onChange={(v) => handleChange('deviceBrand', v)}
-            error={errors.deviceBrand}
-            required
-          />
-
-          <InputString
-            label={tF.model}
-            placeholder={tF.modelPlaceholder}
-            value={formData.deviceModel || ''}
-            onChange={(v) => handleChange('deviceModel', v)}
-            error={errors.deviceModel}
-            required
-          />
-        </FormCard>
-      </div>
-
-      {/* Kolom Kanan */}
-      <div className="flex flex-col gap-6">
-        {/* Penugasan Pengemudi */}
-        <FormCard
-          title={tF.sectionDriver || 'Penugasan Pengemudi'}
-          description={tF.descDriver || 'Tautkan perangkat GPS Smartphone ini ke akun pengemudi'}
-          icon={<Users className="w-5 h-5 text-blue-500" />}
-        >
           <div className="col-span-2">
-            <InputSelect
-              label={tF.driver || 'Pilih Pengemudi'}
-              placeholder={tF.driverPlaceholder || '-- Pilih Pengemudi (Opsional) --'}
-              value={formData.driverId || ''}
-              onChange={handleDriverChange}
-              error={errors.driverId}
-              options={driverSelectOptions}
-            />
-          </div>
-        </FormCard>
-
-        {/* Konektivitas SIM */}
-        <FormCard
-          title="Konektivitas SIM / Telepon"
-          description="Nomor kontak kartu SIM pada perangkat atau nomor telepon driver"
-          icon={<Phone className="w-5 h-5 text-green-500" />}
-          columns={2}
-        >
-          <div className="col-span-2">
-            <InputAutocomplete
-              label={tF.simNumber}
-              placeholder={tF.simPlaceholder}
-              value={formData.simNumber || ''}
-              onChange={(v) => handleChange('simNumber', v)}
-              options={phoneAutocompleteOptions}
-              error={errors.simNumber}
-              emptyText="Ketik nomor telepon manual atau pilih dari daftar supir"
+            <InputString
+              label={tF.brand}
+              placeholder={tF.brandPlaceholder}
+              value={formData.deviceBrand || ''}
+              onChange={(v) => handleChange('deviceBrand', v)}
+              error={errors.deviceBrand}
+              required
             />
           </div>
 
           <div className="col-span-2">
             <InputString
-              label={tF.iccid}
-              placeholder={tF.iccidPlaceholder}
-              value={formData.iccid || ''}
-              onChange={(v) => handleChange('iccid', v)}
-              error={errors.iccid}
+              label={tF.model}
+              placeholder={tF.modelPlaceholder}
+              value={formData.deviceModel || ''}
+              onChange={(v) => handleChange('deviceModel', v)}
+              error={errors.deviceModel}
+              required
             />
           </div>
         </FormCard>

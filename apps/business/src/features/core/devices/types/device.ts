@@ -34,7 +34,7 @@ export const getDeviceFormSchema = (t: Record<string, string>) => z.object({
   protocol: z.string().min(1, t.protocolRequired || 'Protokol perangkat wajib dipilih'),
   deviceBrand: z.string().min(1, t.brandRequired || 'Merk / Brand wajib diisi'),
   deviceModel: z.string().min(1, t.modelRequired || 'Model / Tipe perangkat wajib diisi'),
-  simNumber: z.string().optional(),
+  simNumber: z.string().min(3, t.simRequired || 'Nomor SIM / Telepon wajib diisi'),
   iccid: z.string().optional(),
   vehicleId: z.string().optional(),
   driverId: z.string().optional(),

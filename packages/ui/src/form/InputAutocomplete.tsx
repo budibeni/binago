@@ -44,6 +44,15 @@ export function InputAutocomplete({
   const [open, setOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  React.useEffect(() => {
+    if (autoFocus && inputRef.current) {
+      const timer = setTimeout(() => {
+        inputRef.current?.focus();
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [autoFocus]);
+
   const filteredOptions = useMemo(() => {
     if (!value || !value.trim()) return options;
     const lower = value.toLowerCase().trim();
