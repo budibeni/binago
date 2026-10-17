@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Route, RouteStop, RouteLocation, MapInteractionMode, ActiveLocationTarget } from '../types';
 import { Geofence } from '../../geofences/types';
 import { Button, Input, Label, InputString, InputNumber, InputSelect } from '@adatrack/ui';
-import { getRouteTranslation } from '../i18n';
+import { getRouteTranslation, type RouteDictionary } from '../i18n';
 import type { Locale } from '@adatrack/types';
 import {
   MapGeometry,
@@ -42,18 +42,18 @@ const MOCK_FALLBACK_ADDRESSES: LocationSearchResult[] = [
 ];
 
 interface CoordinateLocationFieldProps {
-  targetId: ActiveLocationTarget;
+  targetId?: ActiveLocationTarget;
   loc: RouteLocation;
   onChange: (val: RouteLocation) => void;
   isSelecting: boolean;
   onToggleSelect: () => void;
   error?: string;
   locale: Locale;
-  t: any;
+  t: RouteDictionary['editor'];
 }
 
 function CoordinateLocationField({
-  targetId,
+  targetId: _targetId,
   loc,
   onChange,
   isSelecting,
@@ -290,18 +290,18 @@ function CoordinateLocationField({
 }
 
 interface AddressLocationFieldProps {
-  targetId: ActiveLocationTarget;
+  targetId?: ActiveLocationTarget;
   loc: RouteLocation;
   onChange: (val: RouteLocation) => void;
   isSelecting: boolean;
   onToggleSelect: () => void;
   error?: string;
   locale: Locale;
-  t: any;
+  t: RouteDictionary['editor'];
 }
 
 function AddressLocationField({
-  targetId,
+  targetId: _targetId,
   loc,
   onChange,
   isSelecting,
@@ -558,18 +558,18 @@ function AddressLocationField({
 }
 
 interface MyLocationLocationFieldProps {
-  targetId: ActiveLocationTarget;
+  targetId?: ActiveLocationTarget;
   loc: RouteLocation;
   onChange: (val: RouteLocation) => void;
   isSelecting: boolean;
   onToggleSelect: () => void;
   error?: string;
   locale: Locale;
-  t: any;
+  t: RouteDictionary['editor'];
 }
 
 function MyLocationLocationField({
-  targetId,
+  targetId: _targetId,
   loc,
   onChange,
   isSelecting,
@@ -758,7 +758,7 @@ function MyLocationLocationField({
 interface RouteEditorViewProps {
   initialData?: Route;
   geofences: Geofence[];
-  groups?: any[]; // using any[] or GroupData[] (we can just use any to avoid importing GroupData if we don't have to)
+  groups?: Array<{ id: string; name: string }>;
   onSave: (route: Partial<Route>) => void;
   onCancel: () => void;
   locale?: Locale;
@@ -817,7 +817,7 @@ export function RouteEditorView({
   };
 
   const validate = () => {
-    const newErrors: any = {};
+    const newErrors: { name?: string; origin?: string; destination?: string } = {};
     if (!name.trim()) newErrors.name = t.validation.nameRequired;
     if (!isLocationValid(origin)) newErrors.origin = t.validation.locationRequired;
     if (!isLocationValid(destination)) newErrors.destination = t.validation.locationRequired;
@@ -1137,7 +1137,7 @@ export function RouteEditorView({
                     <div key={stop.id} className="flex gap-2 items-start p-2 rounded-md border border-border bg-surface relative">
                       <div className="w-5 pt-1 text-[10px] font-bold text-neutral-400 text-center shrink-0">{index + 1}</div>
                       <div className="flex-1 min-w-0">
-                        {renderLocationPicker(stop.id as any, stop.location, (loc) => handleUpdateStopLocation(stop.id, loc))}
+                        {renderLocationPicker((stop.id.startsWith('stop-') ? stop.id : `stop-${stop.id}`) as ActiveLocationTarget, stop.location, (loc) => handleUpdateStopLocation(stop.id, loc))}
                       </div>
                       <Button variant="ghost" onClick={() => handleRemoveStop(stop.id)} className="h-6 w-6 p-0 text-neutral-400 hover:text-red-500 absolute top-1.5 right-1.5 shrink-0">
                         <Trash2 className="w-3.5 h-3.5" />
@@ -1226,10 +1226,11 @@ export function RouteEditorView({
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <Button type="button" variant="outline" size="sm" onClick={onCancel} className="bg-background">
+          <Button id="route-form-cancel-btn" type="button" variant="outline" size="sm" onClick={onCancel} className="bg-background">
             {t.cancel}
           </Button>
           <Button 
+            id="route-form-save-btn"
             type="button" 
             variant="primary" 
             size="sm" 

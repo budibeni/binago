@@ -71,6 +71,8 @@ import {
   getDriversFormTourSteps,
   getGeofenceOverviewTourSteps,
   getGeofenceEditorTourSteps,
+  getRouteOverviewTourSteps,
+  getRouteBuilderTourSteps,
 } from '@/components/tour';
 import type { DriveStep } from 'driver.js';
 
@@ -87,6 +89,7 @@ export function HeaderTourButton({ locale = 'id', className }: HeaderTourButtonP
   const isVehiclesPage = pathname === '/vehicles' || pathname.startsWith('/vehicles');
   const isDriversPage = pathname === '/drivers' || pathname.startsWith('/drivers');
   const isGeofencesPage = pathname === '/geofences' || pathname.startsWith('/geofences');
+  const isRoutesPage = pathname === '/routes' || pathname.startsWith('/routes');
   const isDriverPortalPage = pathname === '/portal/driver' || pathname.startsWith('/portal/driver');
   const isEmergencyReportsPage = pathname === '/activity/emergency-reports' || pathname.startsWith('/activity/emergency-reports');
 
@@ -128,6 +131,10 @@ export function HeaderTourButton({ locale = 'id', className }: HeaderTourButtonP
   const geofenceOverviewTourSteps = useMemo(() => getGeofenceOverviewTourSteps(locale), [locale]);
   const geofenceEditorTourSteps = useMemo(() => getGeofenceEditorTourSteps(locale), [locale]);
 
+  // Route Step definitions
+  const routeOverviewTourSteps = useMemo(() => getRouteOverviewTourSteps(locale), [locale]);
+  const routeBuilderTourSteps = useMemo(() => getRouteBuilderTourSteps(locale), [locale]);
+
   // Driver Portal Step definitions
   const driverPortalOverviewSteps = useMemo(() => getDriverPortalOverviewTourSteps(locale), [locale]);
   const driverPortalVehicleSteps = useMemo(() => getDriverPortalVehicleTourSteps(locale), [locale]);
@@ -142,6 +149,9 @@ export function HeaderTourButton({ locale = 'id', className }: HeaderTourButtonP
 
   // Active tour steps based on currently visible tab
   const currentDefaultSteps = useMemo(() => {
+    if (isRoutesPage) {
+      return routeOverviewTourSteps;
+    }
     if (isGeofencesPage) {
       return geofenceOverviewTourSteps;
     }
@@ -190,7 +200,9 @@ export function HeaderTourButton({ locale = 'id', className }: HeaderTourButtonP
 
   // Base tour hook
   const { startTour, resetTour } = useTour({
-    tourId: isGeofencesPage
+    tourId: isRoutesPage
+      ? 'routes_overview'
+      : isGeofencesPage
       ? 'geofences_overview'
       : isDriversPage
       ? 'drivers_overview'
@@ -926,8 +938,46 @@ export function HeaderTourButton({ locale = 'id', className }: HeaderTourButtonP
           </>
         )}
 
+        {/* ── CONTEXT: ROUTES MODULE ── */}
+        {isRoutesPage && (
+          <>
+            <DropdownMenuItem
+              onClick={() => startTour(routeOverviewTourSteps)}
+              className="flex items-start gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer hover:bg-surface-elevated transition-colors"
+            >
+              <Compass className="h-4 w-4 text-blue-500 mt-0.5 shrink-0" />
+              <div className="flex flex-col">
+                <span className="text-[12.5px] font-semibold text-foreground">
+                  {isEn ? 'Route Overview Tour' : 'Tur Keseluruhan Rute'}
+                </span>
+                <span className="text-[11px] text-foreground-muted leading-tight">
+                  {isEn ? 'Planned path multiline, sequential stops, & distance/duration' : 'Koridor rute resmi, titik singgah berurutan, & estimasi jarak/durasi'}
+                </span>
+              </div>
+            </DropdownMenuItem>
+
+            <DropdownMenuItem
+              onClick={() => {
+                window.dispatchEvent(new CustomEvent('adatrack:tour-open-route-create'));
+                setTimeout(() => startTour(routeBuilderTourSteps), 300);
+              }}
+              className="flex items-start gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer hover:bg-surface-elevated transition-colors"
+            >
+              <Wrench className="h-4 w-4 text-purple-500 mt-0.5 shrink-0" />
+              <div className="flex flex-col">
+                <span className="text-[12.5px] font-semibold text-foreground">
+                  {isEn ? 'Visual Route Builder Tour' : 'Tur Visual Route Builder'}
+                </span>
+                <span className="text-[11px] text-foreground-muted leading-tight">
+                  {isEn ? 'Origin (A), transit waypoints, destination (B), & path drawing' : 'Titik asal (A), titik singgah transit, tujuan (B), & gambar garis jalur'}
+                </span>
+              </div>
+            </DropdownMenuItem>
+          </>
+        )}
+
         {/* ── CONTEXT 4: OTHER MODULES / PAGES ── */}
-        {!isTrackingPage && !isDriverPortalPage && !isEmergencyReportsPage && !isVehiclesPage && !isDriversPage && !isGeofencesPage && (
+        {!isTrackingPage && !isDriverPortalPage && !isEmergencyReportsPage && !isVehiclesPage && !isDriversPage && !isGeofencesPage && !isRoutesPage && (
           <>
             <div className="px-2.5 py-2 text-[12px] text-foreground-muted leading-relaxed">
               {isEn
@@ -947,8 +997,8 @@ export function HeaderTourButton({ locale = 'id', className }: HeaderTourButtonP
           </>
         )}
 
-        {/* Restart Tour Option (Tracking views, Driver Portal, Emergency Reports, Vehicles, Drivers, & Geofences) */}
-        {(isTrackingPage || isDriverPortalPage || isEmergencyReportsPage || isVehiclesPage || isDriversPage || isGeofencesPage) && (
+        {/* Restart Tour Option (Tracking views, Driver Portal, Emergency Reports, Vehicles, Drivers, Geofences, & Routes) */}
+        {(isTrackingPage || isDriverPortalPage || isEmergencyReportsPage || isVehiclesPage || isDriversPage || isGeofencesPage || isRoutesPage) && (
           <>
             <DropdownMenuSeparator className="my-1 bg-border" />
             <DropdownMenuItem

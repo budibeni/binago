@@ -19,10 +19,14 @@ import {
   type ActiveSearchAreaHighlight,
   type SearchAreaRouteResult,
 } from '@adatrack/maps';
-import type { Route, RouteLocation, MapInteractionMode } from '../types';
+import type { Route, RouteLocation, MapInteractionMode, RouteStop } from '../types';
 import type { Geofence } from '../../geofences/types';
 
-function createCirclePolygon(lat: number, lng: number, radiusInMeters: number, points = 64): any {
+interface GeoJSONSourceLike {
+  setData(data: GeoJSON.FeatureCollection | GeoJSON.Feature): void;
+}
+
+function createCirclePolygon(lat: number, lng: number, radiusInMeters: number, points = 64): GeoJSON.Polygon {
   const coords = [];
   const earthRadius = 6378137; // meters
   for (let i = 0; i < points; i++) {
@@ -90,7 +94,7 @@ interface RouteMapProps {
   onEditorGeometryChange: (geometry: MapGeometry | null) => void;
   onMapClick?: (lat: number, lng: number) => void;
   routes?: Route[];
-  groups?: any[];
+  groups?: Array<{ id: string; name: string }>;
   onSelectRoute?: (routeId: string | undefined) => void;
 }
 
@@ -116,7 +120,7 @@ function RouteMapInner({
     if (!selectedRoute) return [];
     return [
       { loc: selectedRoute.origin, role: 'origin' },
-      ...selectedRoute.stops.map(s => ({ loc: s.location, role: 'stop' })),
+      ...selectedRoute.stops.map((s: RouteStop) => ({ loc: s.location, role: 'stop' })),
       { loc: selectedRoute.destination, role: 'destination' }
     ];
   }, [selectedRoute]);
@@ -220,28 +224,34 @@ function RouteMapInner({
 
       // 1. Render Geofences
       const targetGeofences = getRouteGeofences();
-      const gfFeatures = targetGeofences.map((gf) => {
-        const feature = geometryToGeoJSON(gf.geometry) as any;
-        
-        // Find role for this geofence
-        let role = 'stop';
-        if (routeLocs[0]?.loc.type === 'geofence' && routeLocs[0]?.loc.geofenceId === gf.id) role = 'origin';
-        else if (routeLocs[routeLocs.length - 1]?.loc.type === 'geofence' && routeLocs[routeLocs.length - 1]?.loc.geofenceId === gf.id) role = 'destination';
-        
-        feature.properties = { 
-          id: gf.id, 
-          name: gf.name,
-          role
-        };
-        return feature;
-      });
+      const gfFeatures: GeoJSON.Feature[] = targetGeofences
+        .map((gf) => {
+          const feature = geometryToGeoJSON(gf.geometry);
+          if (!feature) return null;
+
+          // Find role for this geofence
+          let role = 'stop';
+          if (routeLocs[0]?.loc.type === 'geofence' && routeLocs[0]?.loc.geofenceId === gf.id) role = 'origin';
+          else if (routeLocs[routeLocs.length - 1]?.loc.type === 'geofence' && routeLocs[routeLocs.length - 1]?.loc.geofenceId === gf.id) role = 'destination';
+
+          return {
+            ...feature,
+            properties: {
+              id: gf.id,
+              name: gf.name,
+              role,
+            },
+          } as GeoJSON.Feature;
+        })
+        .filter((f): f is GeoJSON.Feature => f !== null);
 
       const gfData: GeoJSON.FeatureCollection = { type: 'FeatureCollection', features: gfFeatures };
 
-      if (!map.getSource(GF_SOURCE_ID)) {
+      const existingGfSource = map.getSource(GF_SOURCE_ID) as unknown as GeoJSONSourceLike | undefined;
+      if (!existingGfSource) {
         map.addSource(GF_SOURCE_ID, { type: 'geojson', data: gfData });
       } else {
-        (map.getSource(GF_SOURCE_ID) as any).setData(gfData);
+        existingGfSource.setData(gfData);
       }
 
       if (!map.getLayer(GF_FILL_LAYER_ID)) {
@@ -279,8 +289,8 @@ function RouteMapInner({
       }
 
       // 2. Render Coordinates (Markers) and Radius
-      const coordFeatures: any[] = [];
-      const coordRadiusFeatures: any[] = [];
+      const coordFeatures: GeoJSON.Feature[] = [];
+      const coordRadiusFeatures: GeoJSON.Feature[] = [];
       
       routeLocs.forEach(({loc, role}) => {
         if (loc.type === 'coordinate' && loc.latitude !== undefined && loc.longitude !== undefined) {
@@ -309,10 +319,11 @@ function RouteMapInner({
       const coordData: GeoJSON.FeatureCollection = { type: 'FeatureCollection', features: coordFeatures };
       const coordRadiusData: GeoJSON.FeatureCollection = { type: 'FeatureCollection', features: coordRadiusFeatures };
 
-      if (!map.getSource(RADIUS_SOURCE_ID)) {
+      const existingRadiusSource = map.getSource(RADIUS_SOURCE_ID) as unknown as GeoJSONSourceLike | undefined;
+      if (!existingRadiusSource) {
         map.addSource(RADIUS_SOURCE_ID, { type: 'geojson', data: coordRadiusData });
       } else {
-        (map.getSource(RADIUS_SOURCE_ID) as any).setData(coordRadiusData);
+        existingRadiusSource.setData(coordRadiusData);
       }
 
       if (!map.getLayer(RADIUS_FILL_LAYER_ID)) {
@@ -350,10 +361,11 @@ function RouteMapInner({
         });
       }
 
-      if (!map.getSource(COORD_SOURCE_ID)) {
+      const existingCoordSource = map.getSource(COORD_SOURCE_ID) as unknown as GeoJSONSourceLike | undefined;
+      if (!existingCoordSource) {
         map.addSource(COORD_SOURCE_ID, { type: 'geojson', data: coordData });
       } else {
-        (map.getSource(COORD_SOURCE_ID) as any).setData(coordData);
+        existingCoordSource.setData(coordData);
       }
 
       if (!map.getLayer(COORD_POINT_LAYER_ID)) {
@@ -379,13 +391,16 @@ function RouteMapInner({
       const pathData: GeoJSON.FeatureCollection = { type: 'FeatureCollection', features: [] };
       if (selectedRoute?.plannedPath && editorMode === 'idle') {
         const pathFeature = geometryToGeoJSON(selectedRoute.plannedPath);
-        pathData.features.push(pathFeature as any);
+        if (pathFeature) {
+          pathData.features.push(pathFeature as GeoJSON.Feature);
+        }
       }
 
-      if (!map.getSource(PATH_SOURCE_ID)) {
+      const existingPathSource = map.getSource(PATH_SOURCE_ID) as unknown as GeoJSONSourceLike | undefined;
+      if (!existingPathSource) {
         map.addSource(PATH_SOURCE_ID, { type: 'geojson', data: pathData });
       } else {
-        (map.getSource(PATH_SOURCE_ID) as any).setData(pathData);
+        existingPathSource.setData(pathData);
       }
 
       if (!map.getLayer(PATH_LAYER_ID)) {
@@ -447,7 +462,7 @@ function RouteMapInner({
   useEffect(() => {
     return () => {
       try {
-        if (!map || !(map as any).style || !map.getStyle()) return;
+        if (!map || !map.getStyle()) return;
         if (map.getLayer(GF_FILL_LAYER_ID)) map.removeLayer(GF_FILL_LAYER_ID);
         if (map.getLayer(GF_OUTLINE_LAYER_ID)) map.removeLayer(GF_OUTLINE_LAYER_ID);
         if (map.getSource(GF_SOURCE_ID)) map.removeSource(GF_SOURCE_ID);
@@ -484,7 +499,7 @@ function RouteMapInner({
     for (const rt of routes) {
       const { minDistance, coordinates } = getRouteDistance(center, rt, geofences);
       if (minDistance <= radiusMeters) {
-        const group = groups?.find((g: any) => g.id === rt.groupId);
+        const group = groups?.find((g) => g.id === rt.groupId);
         results.push({
           id: rt.id,
           name: rt.name,
@@ -502,7 +517,8 @@ function RouteMapInner({
   };
 
   return (
-    <MapContainer
+    <div id="route-map-container" className="h-full w-full relative">
+      <MapContainer
       ref={mapContainerRef}
       viewport={viewport}
       onViewportChange={setViewport}
@@ -531,6 +547,7 @@ function RouteMapInner({
         onChange={onEditorGeometryChange}
       />
     </MapContainer>
+    </div>
   );
 }
 

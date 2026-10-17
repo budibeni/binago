@@ -10,7 +10,7 @@ import { ChevronLeft } from 'lucide-react';
 interface RouteListViewProps {
   routes: Route[];
   geofences: Geofence[];
-  groups?: any[];
+  groups?: Array<{ id: string; name: string }>;
   selectedRouteId?: string;
   onSelectRoute: (id: string | undefined) => void;
   onCreateNew: () => void;
@@ -34,7 +34,7 @@ export function RouteListView({
   const selectedRoute = routes.find(r => r.id === selectedRouteId) || null;
 
   return (
-    <div className="flex h-full w-full overflow-hidden bg-surface">
+    <div id="route-list-container" className="flex h-full w-full overflow-hidden bg-surface">
       {/* Main Area: Map */}
       <div className="flex-1 flex flex-col h-full min-w-0 relative bg-background z-0">
         <RouteMap

@@ -1,11 +1,11 @@
-import { Locale } from '@adatrack/types';
+import type { Locale } from '@adatrack/types';
 
 export const routeDictionaries = {
   id: {
     title: 'Rute',
     subtitle: 'Kelola daftar rute untuk perjalanan operasional.',
     addBtn: 'Tambah',
-    searchPlaceholder: 'Cari...',
+    searchPlaceholder: 'Cari rute...',
     status: {
       active: 'Aktif',
       inactive: 'Nonaktif',
@@ -53,8 +53,8 @@ export const routeDictionaries = {
       save: 'Simpan',
       cancel: 'Batal',
       validation: {
-        nameRequired: 'Nama rute wajib diisi',
-        locationRequired: 'Lokasi wajib diisi',
+        nameRequired: 'Nama rute operasional wajib diisi',
+        locationRequired: 'Lokasi asal dan tujuan wajib ditentukan',
       },
     },
     delete: {
@@ -63,12 +63,18 @@ export const routeDictionaries = {
       confirm: 'Hapus',
       cancel: 'Batal',
     },
+    toast: {
+      createSuccess: 'Rute operasional berhasil dibuat',
+      updateSuccess: 'Rute operasional berhasil diperbarui',
+      deleteSuccess: 'Rute operasional berhasil dihapus',
+      deleteFailed: 'Gagal menghapus rute operasional',
+    },
   },
   en: {
     title: 'Routes',
     subtitle: 'Manage route list for operational trips.',
     addBtn: 'Add',
-    searchPlaceholder: 'Search...',
+    searchPlaceholder: 'Search routes...',
     status: {
       active: 'Active',
       inactive: 'Inactive',
@@ -117,7 +123,7 @@ export const routeDictionaries = {
       cancel: 'Cancel',
       validation: {
         nameRequired: 'Route name is required',
-        locationRequired: 'Location is required',
+        locationRequired: 'Origin and destination locations are required',
       },
     },
     delete: {
@@ -126,9 +132,18 @@ export const routeDictionaries = {
       confirm: 'Delete',
       cancel: 'Cancel',
     },
+    toast: {
+      createSuccess: 'Route created successfully',
+      updateSuccess: 'Route updated successfully',
+      deleteSuccess: 'Route deleted successfully',
+      deleteFailed: 'Failed to delete route',
+    },
   },
 };
 
 export function getRouteTranslation(locale: Locale = 'id') {
   return routeDictionaries[locale] || routeDictionaries.id;
 }
+
+export type RouteDictionary = typeof routeDictionaries.id;
+

@@ -10,7 +10,7 @@ import type { Locale } from '@adatrack/types';
 interface RouteListPanelProps {
   routes: Route[];
   geofences: Geofence[];
-  groups?: any[];
+  groups?: Array<{ id: string; name: string }>;
   selectedRouteId?: string;
   onSelectRoute: (id: string | undefined) => void;
   onCreateNew: () => void;
@@ -82,10 +82,11 @@ export function RouteListPanel({
     return 'Unknown Location';
   };
 
-  const RouteListItem = ({ route }: { route: Route }) => {
+  const RouteListItem = ({ route, domId }: { route: Route; domId?: string }) => {
     const isDetailed = viewMode === 'detailed' || selectedRouteId === route.id;
     return (
       <div
+        id={domId}
         onClick={() => onSelectRoute(route.id)}
         className={cn(
           "cursor-pointer transition-colors border-b border-border last:border-0",
@@ -170,15 +171,16 @@ export function RouteListPanel({
   };
 
   return (
-    <aside className="flex flex-col h-full bg-white dark:bg-neutral-950 border-none overflow-hidden w-full">
+    <aside id="route-list-panel" className="flex flex-col h-full bg-white dark:bg-neutral-950 border-none overflow-hidden w-full">
       {/* -- Header ---------------------------------------------------------- */}
       <div className="shrink-0 flex items-center justify-between px-3 h-[44px] bg-white dark:bg-neutral-900 border-b border-border">
         {/* Kiri: Button Tambah Rute */}
         <div className="flex items-center">
           <Button
+            id="route-btn-add"
             variant="destructive"
             onClick={onCreateNew}
-            className="h-8 gap-1.5 text-[12px] font-medium shadow-none"
+            className="h-8 gap-1.5 text-[12px] font-medium shadow-none bg-red-600 hover:bg-red-700 text-white"
           >
             <Plus className="h-3.5 w-3.5" />
             <span className="hidden sm:inline-block">{t.addBtn}</span>
@@ -203,16 +205,18 @@ export function RouteListPanel({
         <div className="relative flex-1 min-w-0">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-neutral-400 pointer-events-none" />
           <input
+            id="route-search-input"
             type="search"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Cari..."
+            placeholder={t.searchPlaceholder}
             className="w-full h-8 rounded-md border border-border bg-[#fafafa] dark:bg-neutral-900 pl-8 pr-3 text-[12px] text-foreground focus:outline-none focus:border-neutral-300 focus:bg-white transition-all placeholder:text-neutral-400"
           />
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
+              id="route-filter-btn"
               className={cn(
                 "flex h-8 w-8 items-center justify-center rounded-md border transition-colors shrink-0",
                 statusFilter !== 'all'
@@ -283,7 +287,13 @@ export function RouteListPanel({
                   </div>
                   {isExpanded && group.routes.length > 0 && (
                     <div className="flex flex-col border-t border-border bg-[#fafafa] dark:bg-neutral-950 p-1 space-y-0.5">
-                      {group.routes.map((route: Route) => <RouteListItem key={route.id} route={route} />)}
+                      {group.routes.map((route: Route, idx: number) => (
+                        <RouteListItem
+                          key={route.id}
+                          route={route}
+                          domId={idx === 0 ? 'route-first-item' : undefined}
+                        />
+                      ))}
                     </div>
                   )}
                 </div>
