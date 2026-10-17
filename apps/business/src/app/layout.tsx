@@ -33,6 +33,7 @@ export default function RootLayout({
     try {
       const parsed = JSON.parse(userProfileCookie);
       user = {
+        id: parsed.id || parsed.user_id,
         name: parsed.name || parsed.email || 'User',
         email: parsed.email || '',
         role: parsed.role || 'User',

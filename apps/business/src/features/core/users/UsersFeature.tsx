@@ -9,11 +9,15 @@ import type { DataTableColumnDef } from '@adatrack/ui';
 import { User, Edit2, Trash2, Plus, Sliders, CheckCircle2, XCircle } from 'lucide-react';
 import { UserForm } from './components/UserForm';
 import { UserMenuAccessModal } from './components/UserMenuAccessModal';
-import { useBusinessLocale } from '../../../components/BusinessShellLayout';
+import { useBusinessLocale, useBusinessUser } from '../../../components/BusinessShellLayout';
 
 export function UsersFeature() {
   const locale = useBusinessLocale();
   const isEn = locale === 'en';
+
+  const currentUser = useBusinessUser();
+  const userRole = (currentUser?.role || '').toUpperCase().replace(/[_ ]/g, '');
+  const isAdmin = userRole === 'ADMIN' || userRole === 'SUPERADMIN';
 
   const { users, loading, refetch } = useUsers();
   const { roles } = useRoles();
@@ -35,6 +39,17 @@ export function UsersFeature() {
   };
 
   const handleDelete = (user: TenantUser) => {
+    if (!isAdmin) {
+      toast.error('Hanya admin yang dapat menghapus pengguna');
+      return;
+    }
+    if (
+      (currentUser?.email && user.email.toLowerCase() === currentUser.email.toLowerCase()) ||
+      (currentUser?.id && user.id === currentUser.id)
+    ) {
+      toast.error('Anda tidak dapat menghapus akun Anda sendiri');
+      return;
+    }
     setUserToDelete(user);
   };
 
@@ -168,40 +183,51 @@ export function UsersFeature() {
         enableSorting: false,
         size: 110,
         meta: { fixedWidth: true, align: 'right' },
-        cell: ({ row }) => (
-          <div className="flex justify-end gap-1.5">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setMenuAccessUser(row.original)}
-              className="h-8 w-8 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-full"
-              title="Atur Hak Akses Menu Pengguna"
-            >
-              <Sliders className="w-4 h-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleEdit(row.original)}
-              className="h-8 w-8 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-full"
-              title="Edit Data Pengguna"
-            >
-              <Edit2 className="w-4 h-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleDelete(row.original)}
-              className="h-8 w-8 p-0 text-destructive hover:bg-destructive/10 rounded-full"
-              title="Hapus Pengguna"
-            >
-              <Trash2 className="w-4 h-4" />
-            </Button>
-          </div>
-        ),
+        cell: ({ row }) => {
+          const isRowSelf = Boolean(
+            (row.original.email && currentUser?.email && row.original.email.toLowerCase() === currentUser.email.toLowerCase()) ||
+            (row.original.id && currentUser?.id && row.original.id === currentUser.id)
+          );
+
+          return (
+            <div className="flex justify-end gap-1.5">
+              {isAdmin && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setMenuAccessUser(row.original)}
+                  className="h-8 w-8 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-full"
+                  title="Atur Hak Akses Menu Pengguna"
+                >
+                  <Sliders className="w-4 h-4" />
+                </Button>
+              )}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleEdit(row.original)}
+                className="h-8 w-8 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-full"
+                title="Edit Data Pengguna"
+              >
+                <Edit2 className="w-4 h-4" />
+              </Button>
+              {isAdmin && !isRowSelf && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleDelete(row.original)}
+                  className="h-8 w-8 p-0 text-destructive hover:bg-destructive/10 rounded-full"
+                  title="Hapus Pengguna"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              )}
+            </div>
+          );
+        },
       },
     ],
-    [isEn]
+    [isEn, isAdmin, currentUser]
   );
 
   return (
@@ -227,14 +253,16 @@ export function UsersFeature() {
               : 'Klik tombol di bawah untuk menambahkan pengguna baru.'
           }
           toolbarActions={
-            <Button
-              variant="destructive"
-              onClick={handleCreate}
-              className="h-8 gap-1.5 text-[13px] font-medium shadow-none"
-            >
-              <Plus className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline-block">{isEn ? 'Add User' : 'Tambah Pengguna'}</span>
-            </Button>
+            isAdmin ? (
+              <Button
+                variant="destructive"
+                onClick={handleCreate}
+                className="h-8 gap-1.5 text-[13px] font-medium shadow-none"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline-block">{isEn ? 'Add User' : 'Tambah Pengguna'}</span>
+              </Button>
+            ) : undefined
           }
         />
       </div>

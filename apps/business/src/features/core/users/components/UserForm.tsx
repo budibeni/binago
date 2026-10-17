@@ -6,6 +6,7 @@ import { FormShell, FormCard, InputString, InputEmail, InputPassword, InputSelec
 import { User, Shield, Lock } from 'lucide-react';
 import type { TenantUser } from '../hooks/useUsers';
 import type { Role } from '../../roles/hooks/useRoles';
+import { useBusinessUser } from '@/components/BusinessShellLayout';
 
 interface UserFormProps {
   user?: TenantUser | null;
@@ -18,6 +19,17 @@ interface UserFormProps {
 
 export function UserForm({ user, roles, open, onOpenChange, onSuccess, onCancel }: UserFormProps) {
   const isEditing = !!user;
+  const currentUser = useBusinessUser();
+
+  const userRole = (currentUser?.role || '').toUpperCase().replace(/[_ ]/g, '');
+  const isAdmin = userRole === 'ADMIN' || userRole === 'SUPERADMIN';
+
+  const isSelf = isEditing && Boolean(
+    (user?.email && currentUser?.email && user.email.toLowerCase() === currentUser.email.toLowerCase()) ||
+    (user?.id && currentUser?.id && user.id === currentUser.id)
+  );
+
+  const canToggleActive = isAdmin && !isSelf;
 
   const [formData, setFormData] = useState({
     email: '',
@@ -81,7 +93,7 @@ export function UserForm({ user, roles, open, onOpenChange, onSuccess, onCancel 
         await api.put(`/settings/users/${user.id}`, {
           full_name: formData.full_name,
           role_code: formData.role_code,
-          is_active: formData.is_active,
+          ...(canToggleActive ? { is_active: formData.is_active } : {}),
           ...(formData.password ? { password: formData.password } : {}),
         });
         toast.success('Pengguna berhasil diperbarui');
@@ -91,7 +103,7 @@ export function UserForm({ user, roles, open, onOpenChange, onSuccess, onCancel 
           full_name: formData.full_name,
           role_code: formData.role_code,
           password: formData.password,
-          is_active: formData.is_active,
+          is_active: canToggleActive ? formData.is_active : true,
         });
         toast.success('Pengguna baru berhasil ditambahkan');
       }
@@ -175,15 +187,22 @@ export function UserForm({ user, roles, open, onOpenChange, onSuccess, onCancel 
             />
           </div>
 
-          <div className="col-span-2 pt-2">
-            <Switch
-              id="is_active"
-              label="Status Pengguna Aktif"
-              helperText="Pengguna yang tidak aktif tidak dapat masuk ke sistem"
-              checked={formData.is_active}
-              onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
-            />
-          </div>
+          {canToggleActive ? (
+            <div className="col-span-2 pt-2">
+              <Switch
+                id="is_active"
+                label="Status Pengguna Aktif"
+                helperText="Pengguna yang tidak aktif tidak dapat masuk ke sistem"
+                checked={formData.is_active}
+                onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
+              />
+            </div>
+          ) : isSelf ? (
+            <div className="col-span-2 px-3.5 py-2.5 rounded-lg bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900/50 text-blue-700 dark:text-blue-300 text-xs flex items-center gap-2.5">
+              <Shield className="w-4 h-4 shrink-0 text-blue-600 dark:text-blue-400" />
+              <span>Status aktif pengguna terkunci karena Anda sedang mengubah data profil akun Anda sendiri.</span>
+            </div>
+          ) : null}
         </FormCard>
       </div>
     </FormShell>
