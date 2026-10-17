@@ -12,6 +12,7 @@ import {
   InputEmail,
   InputSelect,
   useForm,
+  toast,
 } from '@adatrack/ui';
 import { groupService } from '@/data/services';
 import { getDriverFormSchema, type Driver } from '../types/driver';
@@ -69,6 +70,9 @@ export function DriverForm({
     initialData: driver || DEFAULT_DRIVER,
     resetOn: [open, driver],
     schema: getDriverFormSchema(tD.validation || {}),
+    onError: () => {
+      toast.error(locale === 'en' ? 'Please complete the required driver fields' : 'Mohon lengkapi data pengemudi yang wajib diisi');
+    },
     onSubmit: async (data) => {
       await new Promise((r) => setTimeout(r, 600));
       onSave(data);

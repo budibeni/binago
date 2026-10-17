@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Route, RouteStop, RouteLocation, MapInteractionMode, ActiveLocationTarget } from '../types';
+import { Route, RouteStop, RouteLocation, MapInteractionMode, ActiveLocationTarget, getRouteFormSchema } from '../types';
 import { Geofence } from '../../geofences/types';
-import { Button, Input, Label, InputString, InputNumber, InputSelect } from '@adatrack/ui';
+import { Button, Input, Label, InputString, InputNumber, InputSelect, toast } from '@adatrack/ui';
 import { getRouteTranslation, type RouteDictionary } from '../i18n';
 import type { Locale } from '@adatrack/types';
 import {
@@ -817,12 +817,44 @@ export function RouteEditorView({
   };
 
   const validate = () => {
-    const newErrors: { name?: string; origin?: string; destination?: string } = {};
-    if (!name.trim()) newErrors.name = t.validation.nameRequired;
-    if (!isLocationValid(origin)) newErrors.origin = t.validation.locationRequired;
-    if (!isLocationValid(destination)) newErrors.destination = t.validation.locationRequired;
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    const schema = getRouteFormSchema({
+      nameRequired: t.validation.nameRequired,
+      locationRequired: t.validation.locationRequired,
+      originRequired: t.validation.originRequired || t.validation.locationRequired,
+      destinationRequired: t.validation.destinationRequired || t.validation.locationRequired,
+    });
+
+    const result = schema.safeParse({
+      name,
+      groupId: groupId || undefined,
+      description: description || undefined,
+      origin,
+      destination,
+      status,
+      plannedDistance,
+      estimatedDuration,
+    });
+
+    if (!result.success) {
+      const newErrors: { name?: string; origin?: string; destination?: string } = {};
+      result.error.issues.forEach((issue) => {
+        const path = issue.path[0];
+        if (path === 'name' && !newErrors.name) newErrors.name = issue.message;
+        if (path === 'origin' && !newErrors.origin) newErrors.origin = issue.message;
+        if (path === 'destination' && !newErrors.destination) newErrors.destination = issue.message;
+      });
+      setErrors(newErrors);
+      toast.error(
+        newErrors.name ||
+        newErrors.origin ||
+        newErrors.destination ||
+        (locale === 'en' ? 'Please complete the required route fields' : 'Mohon lengkapi data rute yang wajib diisi')
+      );
+      return false;
+    }
+
+    setErrors({});
+    return true;
   };
 
   const handleSave = () => {
@@ -1097,7 +1129,10 @@ export function RouteEditorView({
                 label={t.name}
                 required
                 value={name}
-                onChange={setName}
+                onChange={(val) => {
+                  setName(val);
+                  if (errors.name) setErrors((prev) => ({ ...prev, name: undefined }));
+                }}
                 placeholder={t.namePlaceholder}
                 error={errors.name}
               />
@@ -1124,7 +1159,10 @@ export function RouteEditorView({
               <div className="relative z-10 pl-6 pb-4">
                 <div className="absolute left-[7px] top-1 h-2.5 w-2.5 rounded-full border-2 border-blue-500 bg-background" />
                 <Label className="font-semibold text-xs text-blue-600 dark:text-blue-400">{t.origin}</Label>
-                {renderLocationPicker('origin', origin, setOrigin, errors.origin)}
+                {renderLocationPicker('origin', origin, (loc) => {
+                  setOrigin(loc);
+                  if (errors.origin) setErrors((prev) => ({ ...prev, origin: undefined }));
+                }, errors.origin)}
               </div>
 
               {/* Stops */}
@@ -1155,7 +1193,10 @@ export function RouteEditorView({
               <div className="relative z-10 pl-6">
                 <div className="absolute left-[7px] top-1 h-2.5 w-2.5 rounded-full border-2 border-emerald-500 bg-background" />
                 <Label className="font-semibold text-xs text-emerald-600 dark:text-emerald-400">{t.destination}</Label>
-                {renderLocationPicker('destination', destination, setDestination, errors.destination)}
+                {renderLocationPicker('destination', destination, (loc) => {
+                  setDestination(loc);
+                  if (errors.destination) setErrors((prev) => ({ ...prev, destination: undefined }));
+                }, errors.destination)}
               </div>
             </div>
 

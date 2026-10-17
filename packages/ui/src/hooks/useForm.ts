@@ -7,10 +7,11 @@ export interface UseFormOptions<T> {
   validate?: (data: Partial<T>) => Record<string, string>;
   schema?: z.ZodType<any>;
   onSubmit: (data: Partial<T>) => Promise<void> | void;
+  onError?: (errors: Record<string, string>) => void;
   resetOn?: any[];
 }
 
-export function useForm<T>({ initialData, validate, schema, onSubmit, resetOn = [] }: UseFormOptions<T>) {
+export function useForm<T>({ initialData, validate, schema, onSubmit, onError, resetOn = [] }: UseFormOptions<T>) {
   const [formData, setFormData] = React.useState<Partial<T>>(initialData);
   const [errors, setErrors] = React.useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -49,6 +50,7 @@ export function useForm<T>({ initialData, validate, schema, onSubmit, resetOn = 
           });
           setErrors(zErrors);
           setIsSubmitting(false);
+          onError?.(zErrors);
           return;
         }
       } else if (validate) {
@@ -56,6 +58,7 @@ export function useForm<T>({ initialData, validate, schema, onSubmit, resetOn = 
         if (Object.keys(validationErrors).length > 0) {
           setErrors(validationErrors);
           setIsSubmitting(false);
+          onError?.(validationErrors);
           return;
         }
       }

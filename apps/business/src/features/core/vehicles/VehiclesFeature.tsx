@@ -75,7 +75,7 @@ export function VehiclesFeature() {
   }, []);
 
   const handleEdit = React.useCallback((vehicle: Vehicle) => {
-    window.history.pushState(null, '', `/vehicles/edit/${vehicle.id}`);
+    window.history.pushState(null, '', '/vehicles/edit');
     setDrawerOpen(false);
     setIsAddOpen(false);
     setEditVehicle(vehicle);

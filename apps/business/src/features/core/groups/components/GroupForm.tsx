@@ -1,35 +1,29 @@
 'use client';
 
 import React from 'react';
-import { z } from 'zod';
-import { Folder, FileText } from 'lucide-react';
-import { FormShell, FormCard, InputString, InputTextarea, useForm } from '@adatrack/ui';
-import type { GroupData } from '../data/mockGroupsData';
-
-export type GroupType = 'vehicle' | 'driver' | 'geofence' | 'route';
-
-export const getGroupFormSchema = () => z.object({
-  name: z.string().min(1, 'Nama grup wajib diisi'),
-  description: z.string().optional(),
-  type: z.enum(['vehicle', 'driver', 'geofence', 'route']),
-});
+import { FormShell, FormCard, InputString, InputTextarea, useForm, toast } from '@adatrack/ui';
+import type { Locale } from '@adatrack/types';
+import type { Group, GroupType } from '../types';
+import { getGroupFormSchema } from '../types';
+import { getGroupTranslation } from '../i18n';
 
 interface GroupFormProps {
-  group: GroupData | null;
+  group: Group | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSave: (data: Partial<GroupData>) => void;
+  onSave: (data: Partial<Group>) => void;
   onCancel: () => void;
   layout?: 'default' | 'drawer' | 'dialog' | 'fullscreen';
   defaultType?: GroupType;
   title?: string;
+  locale?: Locale;
 }
 
-const DEFAULT_GROUP = {
+const DEFAULT_GROUP: Omit<Group, 'id' | 'memberCount'> = {
   name: '',
   description: '',
   type: 'vehicle',
-} as unknown as GroupData;
+};
 
 export function GroupForm({
   group,
@@ -37,56 +31,76 @@ export function GroupForm({
   onOpenChange,
   onSave,
   onCancel,
-  layout = 'default',
+  layout = 'drawer',
   defaultType = 'vehicle',
   title,
+  locale = 'id',
 }: GroupFormProps) {
   const isEdit = !!group;
-  
-  const { formData, errors, isSubmitting, handleChange, handleSubmit } = useForm<GroupData>({
-    initialData: group || { ...DEFAULT_GROUP, type: defaultType },
+  const t = getGroupTranslation(locale);
+  const formT = t.form;
+
+  const { formData, errors, isSubmitting, handleChange, handleSubmit } = useForm<Group>({
+    initialData: (group || { ...DEFAULT_GROUP, type: defaultType, id: '', memberCount: 0 }) as Group,
     resetOn: [open, group, defaultType],
-    schema: getGroupFormSchema(),
+    schema: getGroupFormSchema(t.validation),
+    onError: () => {
+      toast.error(t.validation?.incompleteForm || (locale === 'en' ? 'Please complete the required fields' : 'Mohon lengkapi formulir dengan benar'));
+    },
     onSubmit: async (data) => {
-      // simulate api delay
-      await new Promise(r => setTimeout(r, 500));
+      // Small simulated delay for enterprise feel
+      await new Promise((r) => setTimeout(r, 200));
       onSave(data);
     },
   });
 
+  const getPlaceholder = () => {
+    switch (formData.type) {
+      case 'vehicle':
+        return formT.placeholders.vehicle;
+      case 'driver':
+        return formT.placeholders.driver;
+      case 'geofence':
+        return formT.placeholders.geofence;
+      case 'route':
+        return formT.placeholders.route;
+      default:
+        return formT.placeholders.default;
+    }
+  };
+
   return (
     <FormShell
-      title={title || (isEdit ? 'Ubah Grup' : 'Tambah Grup')}
+      title={title || (isEdit ? formT.editTitle : formT.addTitle)}
       open={open}
       onOpenChange={onOpenChange}
       onCancel={onCancel}
+      onSave={() => handleSubmit()}
       onSubmit={handleSubmit}
       isSubmitting={isSubmitting}
       layout={layout}
+      saveProps={{ id: 'group-form-save-btn' }}
     >
-      <FormCard>
-        <InputString
-          label="Nama Grup"
-          value={formData.name || ''}
-          onChange={(v) => handleChange('name', v)}
-          error={errors.name}
-          placeholder={
-            formData.type === 'vehicle' ? 'Contoh: Armada Logistik Jakarta' :
-            formData.type === 'driver' ? 'Contoh: Tim Pengemudi Shift Pagi' :
-            formData.type === 'geofence' ? 'Contoh: Wilayah Pergudangan' :
-            formData.type === 'route' ? 'Contoh: Rute Distribusi Utama' :
-            'Masukkan nama grup...'
-          }
-        />
-        <InputTextarea
-          label="Deskripsi"
-          value={formData.description || ''}
-          onChange={(v) => handleChange('description', v)}
-          error={errors.description}
-          placeholder="Masukkan deskripsi grup..."
-          rows={3}
-        />
-      </FormCard>
+      <div id="group-form-card" className="space-y-4">
+        <FormCard>
+          <InputString
+            label={formT.name}
+            value={formData.name || ''}
+            onChange={(v) => handleChange('name', v)}
+            error={errors.name}
+            placeholder={getPlaceholder()}
+            required
+          />
+          <InputTextarea
+            label={formT.description}
+            value={formData.description || ''}
+            onChange={(v) => handleChange('description', v)}
+            error={errors.description}
+            placeholder={formT.descriptionPlaceholder}
+            rows={3}
+          />
+        </FormCard>
+      </div>
     </FormShell>
   );
 }

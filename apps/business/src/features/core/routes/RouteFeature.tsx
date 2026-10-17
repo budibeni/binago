@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import type { Locale } from '@adatrack/types';
-import { toast } from '@adatrack/ui';
+import { toast, ConfirmDialog } from '@adatrack/ui';
 import type { Route } from './types';
 import { routeService, geofenceService, groupService } from '@/data/services';
 import { RouteListView } from './components/RouteListView';
@@ -31,6 +31,8 @@ export function RouteFeature({
   );
   const [isEditing, setIsEditing] = useState(initialView === 'create' || initialView === 'edit');
   const [draftRouteData, setDraftRouteData] = useState<Route | undefined>(undefined);
+  const [deleteRouteId, setDeleteRouteId] = useState<string | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   // Reactive subscription: synchronize UI whenever repository data mutates
   useEffect(() => {
@@ -105,30 +107,33 @@ export function RouteFeature({
 
   const handleEdit = useCallback((id: string) => {
     if (typeof window !== 'undefined') {
-      window.history.pushState(null, '', `/routes/edit/${id}`);
+      window.history.pushState(null, '', '/routes/edit');
     }
     setDraftRouteData(undefined);
     setSelectedRouteId(id);
     setIsEditing(true);
   }, []);
 
-  const handleDelete = useCallback(
-    (id: string) => {
-      if (confirm(t.delete.description)) {
-        const deleted = routeService.deleteRoute(id);
-        if (deleted) {
-          toast.success(t.toast.deleteSuccess);
-          if (selectedRouteId === id) {
-            setSelectedRouteId(undefined);
-            setIsEditing(false);
-          }
-        } else {
-          toast.error(t.toast.deleteFailed);
-        }
+  const handleDelete = useCallback((id: string) => {
+    setDeleteRouteId(id);
+    setIsDeleteDialogOpen(true);
+  }, []);
+
+  const handleConfirmDelete = useCallback(() => {
+    if (!deleteRouteId) return;
+    const deleted = routeService.deleteRoute(deleteRouteId);
+    if (deleted) {
+      toast.success(t.toast.deleteSuccess);
+      if (selectedRouteId === deleteRouteId) {
+        setSelectedRouteId(undefined);
+        setIsEditing(false);
       }
-    },
-    [selectedRouteId, t],
-  );
+    } else {
+      toast.error(t.toast.deleteFailed);
+    }
+    setIsDeleteDialogOpen(false);
+    setDeleteRouteId(null);
+  }, [deleteRouteId, selectedRouteId, t]);
 
   const handleSave = useCallback(
     (route: Partial<Route>) => {
@@ -197,6 +202,8 @@ export function RouteFeature({
     );
   }
 
+  const targetRoute = routes.find((r) => r.id === deleteRouteId);
+
   return (
     <div className="relative w-full overflow-hidden" style={{ height: 'calc(100dvh - 52px)' }}>
       <RouteListView
@@ -209,6 +216,25 @@ export function RouteFeature({
         onEdit={handleEdit}
         onDelete={handleDelete}
         locale={locale}
+      />
+
+      <ConfirmDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        title={t.delete.title}
+        description={
+          <div className="flex flex-col gap-1 text-center">
+            <span>{t.delete.description}</span>
+            {targetRoute && (
+              <div className="mt-2 text-center">
+                <strong className="text-danger text-[14px]">{targetRoute.name}</strong>
+              </div>
+            )}
+          </div>
+        }
+        confirmLabel={t.delete.confirm}
+        cancelLabel={t.delete.cancel}
+        onConfirm={handleConfirmDelete}
       />
     </div>
   );

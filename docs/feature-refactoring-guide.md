@@ -64,7 +64,7 @@ const handleAdd = React.useCallback(() => {
 
 // 2. Edit Data
 const handleEdit = React.useCallback((item: [Domain]) => {
-  window.history.pushState(null, '', `/[domain]/edit/${item.id}`);
+  window.history.pushState(null, '', '/[domain]/edit');
   setDrawerOpen(false);
   setIsAddOpen(false);
   setEditItem(item);
@@ -108,6 +108,65 @@ const handleSave = (formData: Partial<[Domain]>) => {
 File ini hanya aktif jika user membuka link langsung atau me-refresh browser di halaman `/create` atau `/edit/[id]`:
 - Menggunakan `layout="default"` pada `[Domain]Form`.
 - Saat simpan atau batal, arahkan kembali menggunakan `router.push('/[domain]')`.
+
+### D. Dialog Konfirmasi Hapus Data (Wajib Menggunakan ConfirmDialog)
+
+**DILARANG KERAS** menggunakan popup native browser (`window.confirm()` atau `confirm()`), atau menghapus langsung tanpa konfirmasi pengguna.
+Seluruh aksi hapus data wajib menggunakan komponen `<ConfirmDialog />` dari `@adatrack/ui`:
+
+```tsx
+// State di orchestrator
+const [deleteTarget, setDeleteTarget] = React.useState<[Domain] | null>(null);
+const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
+
+// Handler pembuka modal
+const handleDelete = React.useCallback((item: [Domain]) => {
+  setDeleteTarget(item);
+  setIsDeleteDialogOpen(true);
+}, []);
+
+// Handler eksekusi konfirmasi
+const handleConfirmDelete = React.useCallback(() => {
+  if (!deleteTarget) return;
+  const success = domainService.delete[Domain](deleteTarget.id);
+  if (success) {
+    toast.success(locale === 'en' ? 'Data deleted successfully' : 'Data berhasil dihapus');
+    if (detailItem?.id === deleteTarget.id) {
+      setDrawerOpen(false);
+      setDetailItem(null);
+      window.history.pushState(null, '', '/[domain]');
+    }
+  } else {
+    toast.error(locale === 'en' ? 'Failed to delete data' : 'Gagal menghapus data');
+  }
+  setIsDeleteDialogOpen(false);
+  setDeleteTarget(null);
+}, [deleteTarget, detailItem, locale]);
+
+// Di dalam JSX:
+<ConfirmDialog
+  open={isDeleteDialogOpen}
+  onOpenChange={setIsDeleteDialogOpen}
+  title={locale === 'en' ? 'Delete Data?' : 'Hapus Data?'}
+  description={
+    <div className="flex flex-col gap-1 text-center">
+      <span>
+        {locale === 'en'
+          ? 'Are you sure you want to delete this item? This action cannot be undone.'
+          : 'Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat dibatalkan.'}
+      </span>
+      {deleteTarget && (
+        <div className="mt-2 text-center">
+          <strong className="text-danger text-[14px]">{deleteTarget.name}</strong>
+        </div>
+      )}
+    </div>
+  }
+  confirmLabel={locale === 'en' ? 'Delete' : 'Hapus'}
+  cancelLabel={locale === 'en' ? 'Cancel' : 'Batal'}
+  onConfirm={handleConfirmDelete}
+/>
+```
 
 ---
 
@@ -236,9 +295,32 @@ React.useEffect(() => {
 
 1. **Zero `any`**:
    - Seluruh props, state, form data, dan API response harus memiliki type/interface eksplisit.
-2. **Validasi Form dengan Zod**:
-   - Definisikan Zod schema di `types/[domain].ts`.
-   - Gunakan hook `useForm` dari `@adatrack/ui`.
+2. **Validasi Form dengan Zod & `useForm`**:
+   - Definisikan fungsi skema Zod di `types/[domain].ts` yang menerima dictionary `t` untuk pesan error dwi-bahasa:
+     ```ts
+     export const get[Domain]FormSchema = (t?: Record<string, string>) =>
+       z.object({
+         name: z.string().min(1, t?.nameRequired || 'Nama wajib diisi'),
+         ...
+       });
+     ```
+   - Gunakan hook `useForm` dari `@adatrack/ui`:
+     ```tsx
+     const { formData, errors, isSubmitting, handleChange, handleSubmit } = useForm<[Domain]>({
+       initialData: item || DEFAULT_ITEM,
+       resetOn: [open, item],
+       schema: get[Domain]FormSchema(t.validation),
+       onError: () => {
+         toast.error(locale === 'en' ? 'Please complete the required fields' : 'Mohon lengkapi data yang wajib diisi');
+       },
+       onSubmit: async (data) => {
+         onSave(data);
+       },
+     });
+     ```
+   - **Binding Error**: Seluruh input wajib mengikat prop `error={errors.[field]}` dan `required`.
+   - **`<FormShell>`**: Wajib menyertakan `onSave={() => handleSubmit()}` dan `onSubmit={handleSubmit}`.
+   - **DILARANG** menonaktifkan tombol simpan (`disabled={!isFormValid}`) tanpa pesan error. Tombol harus tetap aktif agar saat diklik memberikan feedback validasi instan (inline error + toast).
 3. **i18n & Multi-Bahasa**:
    - Hindari hardcode string dalam JSX. Gunakan `get[Domain]Translation(locale)`.
    - Label UI default menggunakan Bahasa Indonesia; sediakan terjemahan English yang akurat.
@@ -251,9 +333,11 @@ Sebelum menyatakan refaktor modul selesai, jalankan checklist berikut:
 
 - [ ] Struktur file memenuhi konvensi `[Domain]Feature.tsx`, `[Domain]CreateFeature.tsx`, `[Domain]EditFeature.tsx`, `[Domain]Table.tsx`, `[Domain]Form.tsx`, `[Domain]View.tsx`, `i18n.ts`.
 - [ ] Tombol Tambah membuka Drawer form dan mengubah URL ke `/[domain]/create` via `pushState`.
-- [ ] Tombol Edit membuka Drawer form dan mengubah URL ke `/[domain]/edit/[id]` via `pushState`.
+- [ ] Tombol Edit membuka Drawer form dan mengubah URL ke `/[domain]/edit` via `pushState`.
 - [ ] Direct link ke `/[domain]/create` dan `/[domain]/edit/[id]` berfungsi normal (merender standalone page).
+- [ ] Form input divalidasi dengan Zod schema (`types/[domain].ts`), terintegrasi hook `useForm` dengan `onError` toast, dan setiap input terikat `error={errors.[field]}` (tanpa menonaktifkan tombol simpan secara diam-diam).
 - [ ] DataTable memiliki tipografi rapi (`text-[13px]`, angka rata kanan, ID mono).
+- [ ] Aksi Hapus data wajib menggunakan komponen `ConfirmDialog` dari `@adatrack/ui` dengan highlight nama entitas (DILARANG menggunakan `window.confirm()` native browser).
 - [ ] Mock data telah dibersihkan dari nilai testing sembarangan, data deterministik, dan service mendukung CRUD.
 - [ ] Tur interaktif terdaftar di header dengan badge konteks aktif dan event automation berfungsi membuka drawer.
 - [ ] Validasi TypeScript lulus tanpa error:

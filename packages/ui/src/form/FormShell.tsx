@@ -145,6 +145,7 @@ export function FormShell({
     isSubmitting,
     actions,
     ...footerProps,
+    onSave: footerProps.onSave || (onSubmit ? () => onSubmit({ preventDefault: () => {} } as React.FormEvent) : undefined),
   };
 
   const renderContent = () => {

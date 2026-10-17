@@ -1,12 +1,13 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Hexagon, Square, Waypoints, ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
+import { Hexagon, Square, Waypoints, ChevronDown, ChevronUp, Trash2, AlertCircle } from 'lucide-react';
 import { cn } from '@adatrack/utils';
-import { Button, InputString, InputSelect, InputTextarea } from '@adatrack/ui';
+import { Button, InputString, InputSelect, InputTextarea, toast } from '@adatrack/ui';
 import { geofenceService } from '@/data/services';
 import { GeofenceMap } from './GeofenceMap';
 import type { Geofence, GeofenceDrawMode, GeofenceEditorMode, GeofenceStatus } from '../types';
+import { getGeofenceFormSchema } from '../types';
 import {
   type MapGeometry,
   calculateGeometryArea,
@@ -50,6 +51,8 @@ export function GeofenceEditorView({
     description: geofence?.description || '',
     status: (geofence?.status || 'active') as GeofenceStatus,
   });
+
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const [drawMode, setDrawMode] = useState<GeofenceDrawMode>('polygon');
   const [editorMode, setEditorMode] = useState<GeofenceEditorMode>(
@@ -96,6 +99,34 @@ export function GeofenceEditorView({
   }, [drawMode, editorMode, currentGeometry]);
 
   const handleSave = () => {
+    const schema = getGeofenceFormSchema({
+      nameRequired: t.nameRequired,
+      geometryRequired: t.geometryRequired,
+    });
+
+    const result = schema.safeParse({
+      name: formData.name,
+      groupId: formData.groupId || undefined,
+      description: formData.description || undefined,
+      status: formData.status,
+      geometry: currentGeometry ?? undefined,
+    });
+
+    if (!result.success) {
+      const newErrors: Record<string, string> = {};
+      result.error.issues.forEach((issue) => {
+        const key = issue.path.join('.');
+        if (!newErrors[key]) newErrors[key] = issue.message;
+      });
+      setErrors(newErrors);
+      toast.error(
+        newErrors.name ||
+        newErrors.geometry ||
+        (locale === 'en' ? 'Please complete the required fields' : 'Mohon lengkapi data yang wajib diisi')
+      );
+      return;
+    }
+
     onSave({
       ...formData,
       status: formData.status,
@@ -104,7 +135,6 @@ export function GeofenceEditorView({
   };
 
   const isGeometryValid = !!currentGeometry;
-  const isFormValid = !!formData.name.trim() && isGeometryValid;
 
   return (
     <div id="geofence-editor-container" className="flex h-full w-full flex-col bg-background relative">
@@ -118,7 +148,15 @@ export function GeofenceEditorView({
             editorGeometry={currentGeometry}
             onEditorGeometryChange={(geom) => {
               setCurrentGeometry(geom);
-              if (geom) setEditorMode('edit');
+              if (geom) {
+                setEditorMode('edit');
+                setErrors((prev) => {
+                  if (!prev.geometry) return prev;
+                  const next = { ...prev };
+                  delete next.geometry;
+                  return next;
+                });
+              }
             }}
           />
         </div>
@@ -150,7 +188,17 @@ export function GeofenceEditorView({
                   label={t.geofenceName}
                   required
                   value={formData.name}
-                  onChange={(val) => setFormData({ ...formData, name: val })}
+                  onChange={(val) => {
+                    setFormData({ ...formData, name: val });
+                    if (errors.name) {
+                      setErrors((prev) => {
+                        const next = { ...prev };
+                        delete next.name;
+                        return next;
+                      });
+                    }
+                  }}
+                  error={errors.name}
                   placeholder={t.geofenceNamePlaceholder}
                 />
               </div>
@@ -264,6 +312,13 @@ export function GeofenceEditorView({
                 )}
               </div>
 
+              {errors.geometry && (
+                <div className="p-2 rounded-md bg-danger/10 border border-danger/20 text-danger text-[11px] font-medium flex items-center gap-1.5 animate-in fade-in duration-200">
+                  <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                  <span>{errors.geometry}</span>
+                </div>
+              )}
+
               <div className="space-y-2">
                 <div className="flex justify-between items-center text-[11px]">
                   <span className="text-foreground-muted">{t.pointCount}</span>
@@ -350,7 +405,6 @@ export function GeofenceEditorView({
             variant="primary"
             size="sm"
             onClick={handleSave}
-            disabled={!isFormValid}
             className="bg-danger hover:bg-danger/90 text-white min-w-[100px]"
           >
             {t.save}

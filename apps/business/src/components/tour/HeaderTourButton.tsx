@@ -25,6 +25,7 @@ import {
   UserRound,
   MessageSquareText,
   ShieldAlert,
+  Folder,
 } from 'lucide-react';
 import {
   Button,
@@ -73,6 +74,10 @@ import {
   getGeofenceEditorTourSteps,
   getRouteOverviewTourSteps,
   getRouteBuilderTourSteps,
+  getGroupOverviewTourSteps,
+  getGroupFilterTourSteps,
+  getGroupDetailTourSteps,
+  getGroupFormTourSteps,
 } from '@/components/tour';
 import type { DriveStep } from 'driver.js';
 
@@ -90,6 +95,7 @@ export function HeaderTourButton({ locale = 'id', className }: HeaderTourButtonP
   const isDriversPage = pathname === '/drivers' || pathname.startsWith('/drivers');
   const isGeofencesPage = pathname === '/geofences' || pathname.startsWith('/geofences');
   const isRoutesPage = pathname === '/routes' || pathname.startsWith('/routes');
+  const isGroupsPage = pathname === '/groups' || pathname.startsWith('/groups');
   const isDriverPortalPage = pathname === '/portal/driver' || pathname.startsWith('/portal/driver');
   const isEmergencyReportsPage = pathname === '/activity/emergency-reports' || pathname.startsWith('/activity/emergency-reports');
 
@@ -135,6 +141,12 @@ export function HeaderTourButton({ locale = 'id', className }: HeaderTourButtonP
   const routeOverviewTourSteps = useMemo(() => getRouteOverviewTourSteps(locale), [locale]);
   const routeBuilderTourSteps = useMemo(() => getRouteBuilderTourSteps(locale), [locale]);
 
+  // Group Step definitions
+  const groupOverviewTourSteps = useMemo(() => getGroupOverviewTourSteps(locale), [locale]);
+  const groupFilterTourSteps = useMemo(() => getGroupFilterTourSteps(locale), [locale]);
+  const groupDetailTourSteps = useMemo(() => getGroupDetailTourSteps(locale), [locale]);
+  const groupFormTourSteps = useMemo(() => getGroupFormTourSteps(locale), [locale]);
+
   // Driver Portal Step definitions
   const driverPortalOverviewSteps = useMemo(() => getDriverPortalOverviewTourSteps(locale), [locale]);
   const driverPortalVehicleSteps = useMemo(() => getDriverPortalVehicleTourSteps(locale), [locale]);
@@ -149,6 +161,9 @@ export function HeaderTourButton({ locale = 'id', className }: HeaderTourButtonP
 
   // Active tour steps based on currently visible tab
   const currentDefaultSteps = useMemo(() => {
+    if (isGroupsPage) {
+      return groupOverviewTourSteps;
+    }
     if (isRoutesPage) {
       return routeOverviewTourSteps;
     }
@@ -178,6 +193,12 @@ export function HeaderTourButton({ locale = 'id', className }: HeaderTourButtonP
     if (activeMode === 'heatmap') return heatmapTourSteps;
     return liveTourSteps;
   }, [
+    isRoutesPage,
+    routeOverviewTourSteps,
+    isGroupsPage,
+    groupOverviewTourSteps,
+    isGeofencesPage,
+    geofenceOverviewTourSteps,
     isDriversPage,
     driversOverviewTourSteps,
     isVehiclesPage,
@@ -200,7 +221,9 @@ export function HeaderTourButton({ locale = 'id', className }: HeaderTourButtonP
 
   // Base tour hook
   const { startTour, resetTour } = useTour({
-    tourId: isRoutesPage
+    tourId: isGroupsPage
+      ? 'groups_overview'
+      : isRoutesPage
       ? 'routes_overview'
       : isGeofencesPage
       ? 'geofences_overview'
@@ -976,8 +999,79 @@ export function HeaderTourButton({ locale = 'id', className }: HeaderTourButtonP
           </>
         )}
 
+        {/* ── CONTEXT: GROUPS MODULE ── */}
+        {isGroupsPage && (
+          <>
+            <DropdownMenuItem
+              onClick={() => startTour(groupOverviewTourSteps)}
+              className="flex items-start gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer hover:bg-surface-elevated transition-colors"
+            >
+              <Compass className="h-4 w-4 text-blue-500 mt-0.5 shrink-0" />
+              <div className="flex flex-col">
+                <span className="text-[12.5px] font-semibold text-foreground">
+                  {isEn ? 'Groups Overview Tour' : 'Tur Keseluruhan Grup'}
+                </span>
+                <span className="text-[11px] text-foreground-muted leading-tight">
+                  {isEn ? 'Master table, domain switcher, quick search, & counts' : 'Tabel data master, pemilih kategori, pencarian cepat, & jumlah'}
+                </span>
+              </div>
+            </DropdownMenuItem>
+
+            <DropdownMenuItem
+              onClick={() => startTour(groupFilterTourSteps)}
+              className="flex items-start gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer hover:bg-surface-elevated transition-colors"
+            >
+              <ListFilter className="h-4 w-4 text-amber-500 mt-0.5 shrink-0" />
+              <div className="flex flex-col">
+                <span className="text-[12.5px] font-semibold text-foreground">
+                  {isEn ? 'Filter & Table Tools' : 'Filter Kategori & Alat Tabel'}
+                </span>
+                <span className="text-[11px] text-foreground-muted leading-tight">
+                  {isEn ? 'Domain categories, live search, and data export' : 'Kategori domain, pencarian instan, & ekspor data'}
+                </span>
+              </div>
+            </DropdownMenuItem>
+
+            <DropdownMenuItem
+              onClick={() => {
+                window.dispatchEvent(new CustomEvent('adatrack:tour-open-group-detail'));
+                setTimeout(() => startTour(groupDetailTourSteps), 300);
+              }}
+              className="flex items-start gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer hover:bg-surface-elevated transition-colors"
+            >
+              <Folder className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
+              <div className="flex flex-col">
+                <span className="text-[12.5px] font-semibold text-foreground">
+                  {isEn ? 'Group Detail Drawer' : 'Laci Rincian Grup'}
+                </span>
+                <span className="text-[11px] text-foreground-muted leading-tight">
+                  {isEn ? 'Group identity, type, description, & member units' : 'Identitas grup, kategori, deskripsi, & jumlah anggota unit'}
+                </span>
+              </div>
+            </DropdownMenuItem>
+
+            <DropdownMenuItem
+              onClick={() => {
+                window.dispatchEvent(new CustomEvent('adatrack:tour-open-group-create'));
+                setTimeout(() => startTour(groupFormTourSteps), 300);
+              }}
+              className="flex items-start gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer hover:bg-surface-elevated transition-colors"
+            >
+              <Wrench className="h-4 w-4 text-purple-500 mt-0.5 shrink-0" />
+              <div className="flex flex-col">
+                <span className="text-[12.5px] font-semibold text-foreground">
+                  {isEn ? 'Add / Edit Group Form' : 'Formulir Tambah / Edit Grup'}
+                </span>
+                <span className="text-[11px] text-foreground-muted leading-tight">
+                  {isEn ? 'Drawer form, category presets, validation, & save' : 'Laci formulir, preset kategori, validasi, & penyimpanan'}
+                </span>
+              </div>
+            </DropdownMenuItem>
+          </>
+        )}
+
         {/* ── CONTEXT 4: OTHER MODULES / PAGES ── */}
-        {!isTrackingPage && !isDriverPortalPage && !isEmergencyReportsPage && !isVehiclesPage && !isDriversPage && !isGeofencesPage && !isRoutesPage && (
+        {!isTrackingPage && !isDriverPortalPage && !isEmergencyReportsPage && !isVehiclesPage && !isDriversPage && !isGeofencesPage && !isRoutesPage && !isGroupsPage && (
           <>
             <div className="px-2.5 py-2 text-[12px] text-foreground-muted leading-relaxed">
               {isEn
@@ -997,8 +1091,8 @@ export function HeaderTourButton({ locale = 'id', className }: HeaderTourButtonP
           </>
         )}
 
-        {/* Restart Tour Option (Tracking views, Driver Portal, Emergency Reports, Vehicles, Drivers, Geofences, & Routes) */}
-        {(isTrackingPage || isDriverPortalPage || isEmergencyReportsPage || isVehiclesPage || isDriversPage || isGeofencesPage || isRoutesPage) && (
+        {/* Restart Tour Option (Tracking views, Driver Portal, Emergency Reports, Vehicles, Drivers, Geofences, Routes, & Groups) */}
+        {(isTrackingPage || isDriverPortalPage || isEmergencyReportsPage || isVehiclesPage || isDriversPage || isGeofencesPage || isRoutesPage || isGroupsPage) && (
           <>
             <DropdownMenuSeparator className="my-1 bg-border" />
             <DropdownMenuItem

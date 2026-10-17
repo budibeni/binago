@@ -9,6 +9,7 @@ import {
   InputDate,
   InputTextarea,
   useForm,
+  toast,
 } from '@adatrack/ui';
 import { getVehicleFormSchema, type Vehicle } from '../types/vehicle';
 import { vehicleService, driverService } from '@/data/services';
@@ -99,10 +100,15 @@ export function VehicleForm({
     { value: 'solar', label: tF.fuelSolar },
     { value: 'bensin', label: tF.fuelBensin },
     { value: 'listrik', label: tF.fuelListrik },
-  ], [tF]);  const { formData, errors, isSubmitting, handleChange, handleSubmit } = useForm<Vehicle>({
+  ], [tF]);
+
+  const { formData, errors, isSubmitting, handleChange, handleSubmit } = useForm<Vehicle>({
     initialData: vehicle || DEFAULT_VEHICLE,
     resetOn: [open, vehicle],
     schema: getVehicleFormSchema(tV.validation || {}),
+    onError: () => {
+      toast.error(locale === 'en' ? 'Please complete the required vehicle fields' : 'Mohon lengkapi data kendaraan yang wajib diisi');
+    },
     onSubmit: async (data) => {
       await new Promise(r => setTimeout(r, 800));
 
@@ -185,6 +191,7 @@ export function VehicleForm({
             value={formData.vehicleCategory || ''}
             onChange={(val) => handleChange('vehicleCategory', val)}
             options={VEHICLE_CATEGORY_OPTIONS}
+            error={errors.vehicleCategory}
             required
           />
           <InputString
@@ -250,6 +257,7 @@ export function VehicleForm({
             value={formData.fuelType || ''}
             onChange={(val) => handleChange('fuelType', val)}
             options={FUEL_TYPE_OPTIONS}
+            error={errors.fuelType}
             required
           />
           <InputNumber

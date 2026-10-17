@@ -1,10 +1,15 @@
-'use client';
+import type { Metadata } from 'next';
+import { GroupFeature } from '../../../features/core/groups/GroupFeature';
 
-import React from 'react';
-import { GroupsFeature } from '../../../features/core/groups/GroupsFeature';
-import { useBusinessLocale } from '../../../components/BusinessShellLayout';
+export const metadata: Metadata = {
+  title: 'Grup - ADATRACK Business',
+  description: 'Kelola grup kendaraan, pengemudi, geofence, dan rute operasional bisnis Anda.',
+};
 
 export default function GroupsPage() {
-  const locale = useBusinessLocale();
-  return <GroupsFeature locale={locale} />;
+  return (
+    <div className="h-[calc(100vh-56px)] w-full">
+      <GroupFeature />
+    </div>
+  );
 }

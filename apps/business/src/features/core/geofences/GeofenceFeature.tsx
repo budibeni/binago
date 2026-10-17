@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { toast } from '@adatrack/ui';
+import { toast, ConfirmDialog } from '@adatrack/ui';
 import { GeofenceListView } from './components/GeofenceListView';
 import { GeofenceEditorView } from './components/GeofenceEditorView';
 import { geofenceService } from '@/data/services';
@@ -30,6 +30,8 @@ export function GeofenceFeature({
     }
     return null;
   });
+  const [deleteGeofenceId, setDeleteGeofenceId] = useState<string | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   // Reactive subscription: synchronize UI whenever repository data mutates
   useEffect(() => {
@@ -111,7 +113,7 @@ export function GeofenceFeature({
 
   const handleEdit = useCallback((geofence: Geofence) => {
     if (typeof window !== 'undefined') {
-      window.history.pushState(null, '', `/geofences/edit/${geofence.id}`);
+      window.history.pushState(null, '', '/geofences/edit');
     }
     setEditingGeofence(geofence);
     setView('edit');
@@ -125,19 +127,22 @@ export function GeofenceFeature({
     setView('list');
   }, []);
 
-  const handleDelete = useCallback(
-    (id: string) => {
-      if (confirm(t.confirmDelete)) {
-        const deleted = geofenceService.deleteGeofence(id);
-        if (deleted) {
-          toast.success(t.deleteSuccess);
-        } else {
-          toast.error(t.deleteFailed);
-        }
-      }
-    },
-    [t],
-  );
+  const handleDelete = useCallback((id: string) => {
+    setDeleteGeofenceId(id);
+    setIsDeleteDialogOpen(true);
+  }, []);
+
+  const handleConfirmDelete = useCallback(() => {
+    if (!deleteGeofenceId) return;
+    const deleted = geofenceService.deleteGeofence(deleteGeofenceId);
+    if (deleted) {
+      toast.success(t.deleteSuccess);
+    } else {
+      toast.error(t.deleteFailed);
+    }
+    setIsDeleteDialogOpen(false);
+    setDeleteGeofenceId(null);
+  }, [deleteGeofenceId, t]);
 
   const handleSave = useCallback(
     (data: Partial<Geofence>) => {
@@ -191,6 +196,8 @@ export function GeofenceFeature({
     );
   }
 
+  const targetGeofence = geofences.find((g) => g.id === deleteGeofenceId);
+
   return (
     <div className="relative w-full overflow-hidden" style={{ height: 'calc(100dvh - 52px)' }}>
       <GeofenceListView
@@ -200,6 +207,25 @@ export function GeofenceFeature({
         onEdit={handleEdit}
         onDelete={handleDelete}
         locale={locale}
+      />
+
+      <ConfirmDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        title={t.delete}
+        description={
+          <div className="flex flex-col gap-1 text-center">
+            <span>{t.confirmDelete}</span>
+            {targetGeofence && (
+              <div className="mt-2 text-center">
+                <strong className="text-danger text-[14px]">{targetGeofence.name}</strong>
+              </div>
+            )}
+          </div>
+        }
+        confirmLabel={t.delete}
+        cancelLabel={t.cancel}
+        onConfirm={handleConfirmDelete}
       />
     </div>
   );

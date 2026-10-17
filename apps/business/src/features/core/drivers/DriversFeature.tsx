@@ -3,7 +3,7 @@
 import React from 'react';
 import { Star } from 'lucide-react';
 import { formatNumber } from '@adatrack/utils';
-import { toast, type DataTableLabels, type DataTableFilterConfig } from '@adatrack/ui';
+import { toast, ConfirmDialog, type DataTableLabels, type DataTableFilterConfig } from '@adatrack/ui';
 import { getDriversTranslation } from './i18n';
 import { useBusinessLocale } from '../../../components/BusinessShellLayout';
 import { driverService, vehicleService, groupService } from '@/data/services';
@@ -35,6 +35,8 @@ export function DriversFeature() {
 
   const [isFormOpen, setIsFormOpen] = React.useState(false);
   const [editDriver, setEditDriver] = React.useState<Driver | null>(null);
+  const [deleteTargetDriver, setDeleteTargetDriver] = React.useState<Driver | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
 
   // --- Filtered Data -----------------------------------------------------------
   const filteredDrivers = React.useMemo(() => {
@@ -77,7 +79,7 @@ export function DriversFeature() {
   }, []);
 
   const handleEdit = React.useCallback((driver: Driver) => {
-    window.history.pushState(null, '', `/drivers/edit/${driver.id}`);
+    window.history.pushState(null, '', '/drivers/edit');
     setDrawerOpen(false);
     setEditDriver(driver);
     setIsFormOpen(true);
@@ -120,20 +122,28 @@ export function DriversFeature() {
     [editDriver, locale],
   );
 
-  const handleDelete = React.useCallback(
-    (driver: Driver) => {
-      driverService.deleteDriver(driver.id);
-      toast.success(
-        locale === 'en'
-          ? 'Driver deleted successfully'
-          : 'Data pengemudi berhasil dihapus',
-      );
+  const handleDelete = React.useCallback((driver: Driver) => {
+    setDeleteTargetDriver(driver);
+    setIsDeleteDialogOpen(true);
+  }, []);
+
+  const handleConfirmDelete = React.useCallback(() => {
+    if (!deleteTargetDriver) return;
+    driverService.deleteDriver(deleteTargetDriver.id);
+    toast.success(
+      locale === 'en'
+        ? 'Driver deleted successfully'
+        : 'Data pengemudi berhasil dihapus',
+    );
+    if (detailDriver?.id === deleteTargetDriver.id) {
       setDrawerOpen(false);
       setDetailDriver(null);
-      setRefreshKey((k) => k + 1);
-    },
-    [locale],
-  );
+      window.history.pushState(null, '', '/drivers');
+    }
+    setRefreshKey((k) => k + 1);
+    setIsDeleteDialogOpen(false);
+    setDeleteTargetDriver(null);
+  }, [deleteTargetDriver, detailDriver, locale]);
 
   // --- Interactive Tour Event Listeners ----------------------------------------
   React.useEffect(() => {
@@ -392,6 +402,29 @@ export function DriversFeature() {
           onSave={handleSave}
         />
       )}
+
+      <ConfirmDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        title={locale === 'en' ? 'Delete Driver?' : 'Hapus Pengemudi?'}
+        description={
+          <div className="flex flex-col gap-1 text-center">
+            <span>
+              {locale === 'en'
+                ? 'Are you sure you want to delete this driver? This action cannot be undone.'
+                : 'Apakah Anda yakin ingin menghapus data pengemudi ini? Tindakan ini tidak dapat dibatalkan.'}
+            </span>
+            {deleteTargetDriver && (
+              <div className="mt-2 text-center">
+                <strong className="text-danger text-[14px]">{deleteTargetDriver.name}</strong>
+              </div>
+            )}
+          </div>
+        }
+        confirmLabel={locale === 'en' ? 'Delete' : 'Hapus'}
+        cancelLabel={locale === 'en' ? 'Cancel' : 'Batal'}
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   );
 }

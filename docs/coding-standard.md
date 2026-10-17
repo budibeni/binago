@@ -55,3 +55,25 @@ Jangan menelan error tanpa alasan.
 ## 9. Maintainability
 
 Utamakan code yang mudah dibaca dibanding abstraction yang terlalu kompleks.
+
+## 10. Form Validation Standard (Zod & useForm)
+
+Form input pada ADATRACK (baik di Master Data, Modul Rental, maupun modul lainnya) wajib divalidasi menggunakan kombinasi **Zod** dan hook **`useForm`** dari `@adatrack/ui`:
+
+1. **Definisi Skema Zod**:
+   - Definisikan fungsi skema di dalam file `types/[domain].ts`, misalnya `get[Domain]FormSchema(t?: Record<string, string>)`.
+   - Gunakan parameter kamus `t` agar pesan error mendukung dwi-bahasa (ID dan EN).
+   - Ekspor juga tipe inferensi: `export type [Domain]FormValues = z.infer<ReturnType<typeof get[Domain]FormSchema>>;`.
+
+2. **Penggunaan Hook `useForm`**:
+   - Gunakan hook `useForm<[Domain]>` dari `@adatrack/ui`.
+   - Konfigurasi `schema`, `initialData`, `resetOn: [open, item]`, `onSubmit`, dan `onError`.
+   - Callback `onError` wajib menampilkan `toast.error(...)` untuk memberi umpan balik visual global jika ada field yang gagal divalidasi.
+
+3. **Binding Error ke Komponen Form UI**:
+   - Setiap komponen input dari `@adatrack/ui` (`InputString`, `InputSelect`, `InputTextarea`, `InputDate`, `InputPhone`, dll.) wajib menerima prop `error={errors.[field]}`.
+   - DILARANG menonaktifkan tombol simpan secara diam-diam (`disabled={!isValid}`) tanpa memberikan pesan error; biarkan tombol dapat diklik agar memicu validasi dan menyorot field yang belum lengkap.
+   - Untuk form dengan peta interaktif (seperti Geofence dan Rute), sediakan banner peringatan visual jika area geometri belum digambar (`errors.geometry` / `errors.origin`).
+
+4. **Integrasi `<FormShell>`**:
+   - Selalu sertakan `onSave={() => handleSubmit()}` dan `onSubmit={handleSubmit}` pada `<FormShell>` agar tombol simpan di footer dapat memicu submit dengan benar.

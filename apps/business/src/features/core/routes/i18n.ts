@@ -55,6 +55,8 @@ export const routeDictionaries = {
       validation: {
         nameRequired: 'Nama rute operasional wajib diisi',
         locationRequired: 'Lokasi asal dan tujuan wajib ditentukan',
+        originRequired: 'Titik asal rute wajib ditentukan',
+        destinationRequired: 'Titik tujuan rute wajib ditentukan',
       },
     },
     delete: {
@@ -124,6 +126,8 @@ export const routeDictionaries = {
       validation: {
         nameRequired: 'Route name is required',
         locationRequired: 'Origin and destination locations are required',
+        originRequired: 'Origin location is required',
+        destinationRequired: 'Destination location is required',
       },
     },
     delete: {
