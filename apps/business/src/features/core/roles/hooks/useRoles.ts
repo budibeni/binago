@@ -19,7 +19,16 @@ export function useRoles() {
     setLoading(true);
     try {
       const data = await api.get<any>('/settings/roles');
-      setRoles(Array.isArray(data) ? data : data.data || []);
+      const rawRoles: Role[] = Array.isArray(data) ? data : data.data || [];
+      const uniqueRolesMap = new Map<string, Role>();
+      for (const r of rawRoles) {
+        const cleanCode = (r.code || '').toUpperCase().replace(/[_ ]/g, '');
+        if (cleanCode === 'SUPERADMIN') continue;
+        if (!uniqueRolesMap.has(r.code)) {
+          uniqueRolesMap.set(r.code, r);
+        }
+      }
+      setRoles(Array.from(uniqueRolesMap.values()));
       setError(null);
     } catch (err: any) {
       setError(err);

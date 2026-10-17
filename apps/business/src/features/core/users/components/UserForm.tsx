@@ -61,10 +61,15 @@ export function UserForm({ user, roles, open, onOpenChange, onSuccess, onCancel 
   }, [user, roles]);
 
   const roleOptions = React.useMemo(() => {
-    return roles.map((r) => ({
-      value: r.code,
-      label: `${r.name} (${r.code})`,
-    }));
+    return roles
+      .filter((r) => {
+        const cleanCode = (r.code || '').toUpperCase().replace(/[_ ]/g, '');
+        return cleanCode !== 'SUPERADMIN';
+      })
+      .map((r) => ({
+        value: r.code,
+        label: `${r.name} (${r.code})`,
+      }));
   }, [roles]);
 
   const handleSubmit = async (e?: React.FormEvent) => {
