@@ -94,7 +94,10 @@ function MapContainerInner({
     // Asynchronously resolve actual style (fetches Google API Key if needed)
     resolveStyle(effectiveBasemap).then(newStyle => {
         if (mapRef.current) {
-            mapRef.current.setStyle(newStyle as string | maplibregl.StyleSpecification);
+            const initialStyle = getBasemapStyle(effectiveBasemap);
+            if (JSON.stringify(newStyle) !== JSON.stringify(initialStyle)) {
+                mapRef.current.setStyle(newStyle as string | maplibregl.StyleSpecification, { diff: false });
+            }
         }
     }).catch(e => {
         console.error("Failed to load map style:", e);
@@ -178,12 +181,12 @@ function MapContainerInner({
     currentBasemapRef.current = effectiveBasemap;
     resolveStyle(effectiveBasemap).then(newStyle => {
       if (mapRef.current) {
-        mapRef.current.setStyle(newStyle as string | maplibregl.StyleSpecification);
+        mapRef.current.setStyle(newStyle as string | maplibregl.StyleSpecification, { diff: false });
       }
     }).catch(e => {
       console.error("Failed to update map style:", e);
       if (mapRef.current) {
-        mapRef.current.setStyle(getBasemapStyle('standard') as string | maplibregl.StyleSpecification);
+        mapRef.current.setStyle(getBasemapStyle('standard') as string | maplibregl.StyleSpecification, { diff: false });
       }
     });
     // After setStyle(), map fires 'style.load' → we dispatch to styleLoadListeners in the 'style.load' handler above
