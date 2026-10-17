@@ -38,14 +38,9 @@ export function UserMenuAccessModal({ user, open, onOpenChange, onSuccess }: Use
     if (!user) return;
     setLoading(true);
     try {
-      const res = await api.get<{ status: string; data: { user_id: number; role_code: string; menus: MenuItemAccess[] } }>(
-        `/access/users/${user.id}/menu`
-      );
-      if (res && res.data && res.data.menus) {
-        setMenus(res.data.menus);
-      } else {
-        setMenus([]);
-      }
+      const res: any = await api.get(`/access/users/${user.id}/menu`);
+      const menuList = res?.menus || res?.data?.menus || (Array.isArray(res) ? res : []);
+      setMenus(menuList);
     } catch (err: any) {
       console.error('Failed to fetch user menu access', err);
       toast.error(err.message || 'Gagal memuat konfigurasi akses menu pengguna');

@@ -35,14 +35,9 @@ export function RoleMenuAccessModal({ role, open, onOpenChange, onSuccess }: Rol
     if (!role) return;
     setLoading(true);
     try {
-      const res = await api.get<{ status: string; data: MenuItemAccess[] }>(
-        `/access/roles/${role.code}/menu`
-      );
-      if (res && res.data) {
-        setMenus(res.data);
-      } else {
-        setMenus([]);
-      }
+      const res: any = await api.get(`/access/roles/${role.code}/menu`);
+      const menuList = Array.isArray(res) ? res : res?.data || [];
+      setMenus(menuList);
     } catch (err: any) {
       console.error('Failed to fetch role menu access', err);
       toast.error(err.message || 'Gagal memuat konfigurasi akses menu role');

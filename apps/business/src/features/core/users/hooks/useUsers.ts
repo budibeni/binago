@@ -20,12 +20,9 @@ export function useUsers() {
     setLoading(true);
     setError(null);
     try {
-      const res = await api.get<{ status: string; data: TenantUser[] }>('/settings/users');
-      if (res && res.data) {
-        setUsers(res.data);
-      } else {
-        setUsers([]);
-      }
+      const res = await api.get<any>('/settings/users');
+      const list = Array.isArray(res) ? res : res?.data || [];
+      setUsers(list);
     } catch (err: any) {
       console.error('Failed to fetch tenant users', err);
       setError(err.message || 'Gagal memuat data pengguna');
