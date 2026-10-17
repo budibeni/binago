@@ -84,6 +84,19 @@ export interface SearchAreaVehicleResult {
 }
 
 /**
+ * Hasil geofence yang berada di dalam radius tertentu dari titik pencarian.
+ */
+export interface SearchAreaGeofenceResult {
+  id: string;
+  name: string;
+  groupName?: string;
+  geometryType?: 'polygon' | 'circle' | 'rectangle' | 'multiline';
+  distance: number; // Jarak dalam meter dari titik pencarian
+  status?: 'active' | 'inactive';
+  coordinates?: { lat: number; lng: number }[];
+}
+
+/**
  * Highlight area atau rute aktif di atas kanvas peta.
  */
 export interface ActiveSearchAreaHighlight {

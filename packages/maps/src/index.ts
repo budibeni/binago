@@ -16,6 +16,7 @@ export * from './tracking/types';
 export * from './tracking/utils';
 export * from './tracking/TrackingMap';
 export * from './tracking/EntityMarker';
+export * from './tracking/ActiveSearchAreaRenderer';
 
 // Finder
 export * from './finder/VehicleFinderMap';

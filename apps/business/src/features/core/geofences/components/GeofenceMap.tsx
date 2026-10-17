@@ -15,26 +15,67 @@ import {
   geometryToGeoJSON,
   calcEntityBounds,
   defaultNominatimSearch,
+  haversineMeters,
+  ActiveSearchAreaRenderer,
+  type ActiveSearchAreaHighlight,
+  type SearchAreaGeofenceResult,
 } from '@adatrack/maps';
-import type { Geofence } from '../types';
+import type { Geofence, GeofenceGroup } from '../types';
 
 interface GeofenceMapProps {
   geofences: Geofence[];
+  groups?: GeofenceGroup[];
   selectedGeofenceId?: string;
   visibleGeofenceIds?: string[];
   editorMode: 'idle' | 'draw_polygon' | 'draw_rectangle' | 'draw_multiline' | 'edit';
   editorGeometry: MapGeometry | null;
   onEditorGeometryChange: (geometry: MapGeometry | null) => void;
+  onSelectGeofence?: (geofenceId: string) => void;
+}
+
+function getGeofenceDistance(center: { lat: number; lng: number }, gf: Geofence): number {
+  const geom = gf.geometry;
+  if (!geom) return Infinity;
+
+  if (geom.type === 'rectangle') {
+    const sw = geom.coordinates[0];
+    const ne = geom.coordinates[1];
+    const minLat = Math.min(sw.lat, ne.lat);
+    const maxLat = Math.max(sw.lat, ne.lat);
+    const minLng = Math.min(sw.lng, ne.lng);
+    const maxLng = Math.max(sw.lng, ne.lng);
+    if (center.lat >= minLat && center.lat <= maxLat && center.lng >= minLng && center.lng <= maxLng) {
+      return 0;
+    }
+    const corners = [
+      sw,
+      ne,
+      { lat: minLat, lng: maxLng },
+      { lat: maxLat, lng: minLng },
+      { lat: (minLat + maxLat) / 2, lng: (minLng + maxLng) / 2 },
+    ];
+    return Math.min(...corners.map((c) => haversineMeters(center.lat, center.lng, c.lat, c.lng)));
+  }
+
+  if (geom.type === 'polygon' || geom.type === 'multiline') {
+    if (!geom.coordinates || geom.coordinates.length === 0) return Infinity;
+    const dists = geom.coordinates.map((c) => haversineMeters(center.lat, center.lng, c.lat, c.lng));
+    return Math.min(...dists);
+  }
+
+  return Infinity;
 }
 
 // Inner component that uses MapContext hooks
 function GeofenceMapInner({
   geofences,
+  groups,
   selectedGeofenceId,
   visibleGeofenceIds,
   editorMode,
   editorGeometry,
   onEditorGeometryChange,
+  onSelectGeofence,
 }: GeofenceMapProps) {
   const { map } = React.useContext(MapContext);
   const actions = useMapActions();
@@ -149,10 +190,51 @@ function GeofenceMapInner({
     };
   }, [map, geofences, visibleGeofenceIds]);
 
+  const [highlightedArea, setHighlightedArea] = useState<ActiveSearchAreaHighlight | null>(null);
+
   const handleResetNorth = () => {
     if (map) {
       map.resetNorthPitch({ duration: 1000 });
     }
+  };
+
+  const handleFindGeofencesInRadius = (
+    center: { lat: number; lng: number },
+    radiusMeters: number
+  ): SearchAreaGeofenceResult[] => {
+    const results: SearchAreaGeofenceResult[] = [];
+
+    for (const gf of geofences) {
+      const dist = getGeofenceDistance(center, gf);
+      if (dist <= radiusMeters) {
+        const group = groups?.find((g) => g.id === gf.groupId);
+        let coords: { lat: number; lng: number }[] = [];
+        if (gf.geometry.type === 'rectangle') {
+          const sw = gf.geometry.coordinates[0];
+          const ne = gf.geometry.coordinates[1];
+          coords = [
+            sw,
+            { lat: sw.lat, lng: ne.lng },
+            ne,
+            { lat: ne.lat, lng: sw.lng },
+          ];
+        } else if (gf.geometry.coordinates) {
+          coords = gf.geometry.coordinates;
+        }
+
+        results.push({
+          id: gf.id,
+          name: gf.name,
+          groupName: group?.name,
+          distance: Math.round(dist),
+          status: gf.status,
+          geometryType: gf.geometry.type,
+          coordinates: coords,
+        });
+      }
+    }
+
+    return results.sort((a, b) => a.distance - b.distance);
   };
 
   return (
@@ -172,9 +254,13 @@ function GeofenceMapInner({
           onResetNorth={handleResetNorth}
           onSearchAddress={defaultNominatimSearch}
           showMeasureTool={false}
+          onFindGeofencesInRadius={handleFindGeofencesInRadius}
+          onSelectSearchGeofence={onSelectGeofence}
+          onHighlightArea={setHighlightedArea}
         />
       }
     >
+      <ActiveSearchAreaRenderer highlight={highlightedArea} />
       <GeometryEditor
         mode={editorMode}
         initialGeometry={editorGeometry}

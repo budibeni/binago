@@ -54,11 +54,16 @@ export function GeofenceListView({
       <div className="flex-1 flex flex-col h-full min-w-0 relative bg-background">
         <GeofenceMap
           geofences={geofences}
+          groups={groups}
           selectedGeofenceId={selectedId}
           visibleGeofenceIds={visibleIds}
           editorMode="idle"
           editorGeometry={null}
           onEditorGeometryChange={() => {}}
+          onSelectGeofence={(id) => {
+            setSelectedId(id);
+            setIsPanelVisible(true);
+          }}
         />
       </div>
 

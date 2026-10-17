@@ -12,20 +12,24 @@ import {
   X,
   Loader2,
   Link2,
-  LocateFixed,
   RefreshCw,
+  CircleDot,
+  Hexagon,
+  Square,
+  Waypoints,
   User,
 } from 'lucide-react';
 import { useMapActions, useInternalMap } from '../core/MapContext';
 import maplibregl from 'maplibre-gl';
 import { cn } from '@adatrack/utils';
 import { Locale, getMapTranslation } from '../i18n';
-import { isGoogleMapsShortLink, parseCoordinateInput } from './coordinateParser';
+import { parseCoordinateInput } from './coordinateParser';
 import type {
   LocationSearchResult,
   SearchGeofenceOption,
   SearchRouteOption,
   SearchAreaVehicleResult,
+  SearchAreaGeofenceResult,
   ActiveSearchAreaHighlight,
 } from './types';
 
@@ -58,6 +62,10 @@ export interface SearchLocationToolProps {
   onFindVehiclesInRadius?: (center: { lat: number; lng: number }, radiusMeters: number) => SearchAreaVehicleResult[];
   /** Callback ketika nopol unit diklik (fokus dan buka overview) */
   onSelectVehicle?: (vehicleId: string) => void;
+  /** Callback untuk mencari geofence di dalam radius koordinat tertentu */
+  onFindGeofencesInRadius?: (center: { lat: number; lng: number }, radiusMeters: number) => SearchAreaGeofenceResult[];
+  /** Callback ketika salah satu geofence dari hasil radius diklik */
+  onSelectGeofence?: (geofenceId: string) => void;
   /** Callback untuk menyorot area geofence / garis rute di kanvas peta */
   onHighlightArea?: (highlight: ActiveSearchAreaHighlight | null) => void;
   /** Callback opsional untuk mengurai link Google Maps (maps.app.goo.gl) ke koordinat */
@@ -438,6 +446,142 @@ function CompactVehicleResultList({
   );
 }
 
+interface CompactGeofenceResultListProps {
+  geofences: SearchAreaGeofenceResult[];
+  onSelectGeofence?: (id: string) => void;
+  panTo: (coords: { lat: number; lng: number }) => void;
+  fitBounds: (bounds: [[number, number], [number, number]], options?: { padding?: number }) => void;
+  title?: string;
+  locale?: Locale;
+}
+
+function CompactGeofenceResultList({
+  geofences,
+  onSelectGeofence,
+  panTo,
+  fitBounds,
+  title = 'Geofence Terdekat',
+  locale = 'id',
+}: CompactGeofenceResultListProps) {
+  const activeCount = useMemo(
+    () => geofences.filter((g) => g.status === 'active').length,
+    [geofences]
+  );
+  const inactiveCount = useMemo(
+    () => geofences.length - activeCount,
+    [geofences, activeCount]
+  );
+
+  return (
+    <div className="flex-1 flex flex-col min-h-0 justify-between gap-1.5">
+      {/* Header */}
+      <div className="flex items-center justify-between shrink-0 py-0.5 px-0.5">
+        <div className="flex items-center gap-1.5">
+          <Shield className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-500" />
+          <span className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+            {title}
+          </span>
+          <span className="text-xs font-mono font-bold text-neutral-500 dark:text-neutral-400 tabular-nums">
+            ({geofences.length})
+          </span>
+        </div>
+        <div className="flex items-center gap-1.5 text-[10px] text-neutral-400 font-medium">
+          <span className="flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            <span className="tabular-nums font-semibold text-neutral-700 dark:text-neutral-300">{activeCount}</span> {locale === 'en' ? 'Active' : 'Aktif'}
+          </span>
+          {inactiveCount > 0 && (
+            <span className="flex items-center gap-1 ml-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-neutral-400 dark:bg-neutral-500" />
+              <span className="tabular-nums font-semibold text-neutral-700 dark:text-neutral-300">{inactiveCount}</span> {locale === 'en' ? 'Inactive' : 'Nonaktif'}
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Results List */}
+      <div className="flex-1 min-h-0 flex flex-col gap-1 overflow-y-auto custom-scrollbar p-0.5">
+        {geofences.map((gf) => {
+          const isActive = gf.status === 'active';
+          const shapeIcon =
+            gf.geometryType === 'circle'
+              ? CircleDot
+              : gf.geometryType === 'multiline'
+              ? Waypoints
+              : gf.geometryType === 'rectangle'
+              ? Square
+              : Hexagon;
+          const ShapeComp = shapeIcon;
+
+          return (
+            <button
+              key={gf.id}
+              type="button"
+              onClick={() => {
+                if (gf.coordinates && gf.coordinates.length > 0) {
+                  const lats = gf.coordinates.map((c) => c.lat);
+                  const lngs = gf.coordinates.map((c) => c.lng);
+                  const minLat = Math.min(...lats);
+                  const maxLat = Math.max(...lats);
+                  const minLng = Math.min(...lngs);
+                  const maxLng = Math.max(...lngs);
+                  if (minLat === maxLat && minLng === maxLng) {
+                    panTo({ lat: minLat, lng: minLng });
+                  } else {
+                    fitBounds([[minLng, minLat], [maxLng, maxLat]], { padding: 60 });
+                  }
+                }
+                onSelectGeofence?.(gf.id);
+              }}
+              className={cn(
+                'group flex items-center justify-between px-2.5 py-1.5 rounded-xl text-left min-h-[36px]',
+                'bg-white dark:bg-neutral-850 hover:bg-neutral-50 dark:hover:bg-neutral-800',
+                'border border-neutral-200/90 dark:border-neutral-700/80 hover:border-neutral-300 dark:hover:border-neutral-600',
+                'shadow-2xs hover:shadow-xs transition-all duration-150 active:scale-[0.98]'
+              )}
+              title={`Fokus ke ${gf.name}`}
+            >
+              <div className="flex items-center gap-2 min-w-0 pr-1 flex-1">
+                <div className="w-6 h-6 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center shrink-0 border border-neutral-200/60 dark:border-neutral-700/60">
+                  <ShapeComp
+                    className={cn(
+                      'w-3.5 h-3.5',
+                      isActive ? 'text-emerald-600 dark:text-emerald-400' : 'text-neutral-400'
+                    )}
+                  />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[11.5px] font-semibold text-neutral-800 dark:text-neutral-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 truncate transition-colors leading-tight">
+                    {gf.name}
+                  </p>
+                  {gf.groupName && (
+                    <p className="text-[10px] text-neutral-400 dark:text-neutral-500 truncate leading-tight mt-0.5">
+                      {gf.groupName}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-1.5 shrink-0 pl-1">
+                <span className="text-[10px] font-mono font-medium text-neutral-500 dark:text-neutral-400 tabular-nums px-1.5 py-0.5 rounded-md bg-neutral-100 dark:bg-neutral-800 border border-neutral-200/50 dark:border-neutral-700/50">
+                  {gf.distance < 1000 ? `${gf.distance} m` : `${(gf.distance / 1000).toFixed(1)} km`}
+                </span>
+                <span
+                  className={cn(
+                    'w-1.5 h-1.5 rounded-full shrink-0',
+                    isActive ? 'bg-emerald-500' : 'bg-neutral-400 dark:bg-neutral-600'
+                  )}
+                  title={isActive ? 'Aktif' : 'Nonaktif'}
+                />
+              </div>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function createPersonMarkerElement(label: string = 'Saya') {
   const wrapper = document.createElement('div');
   wrapper.className = 'adatrack-user-person-marker';
@@ -475,6 +619,8 @@ export function SearchLocationTool({
   onFindVehiclesOnRoute,
   onFindVehiclesInRadius,
   onSelectVehicle,
+  onFindGeofencesInRadius,
+  onSelectGeofence,
   onHighlightArea,
   onResolveMapsUrl,
 }: SearchLocationToolProps) {
@@ -484,9 +630,14 @@ export function SearchLocationTool({
   const [tab, setTab] = useState<Tab>('address');
   const markerRef = useRef<maplibregl.Marker | null>(null);
 
+  const isGeofenceSearch = Boolean(onFindGeofencesInRadius);
   const isLive = isLiveTracking !== undefined
     ? isLiveTracking
     : Boolean(onFindVehiclesInRadius || onFindVehiclesInGeofence || onFindVehiclesOnRoute);
+  const hasRadiusScanning = isLive || isGeofenceSearch;
+
+  const radiusPresets = isGeofenceSearch ? [500, 1000, 3000, 5000, 10000] : [250, 500, 1000, 2000];
+  const defaultRadius = isGeofenceSearch ? 1000 : 500;
 
   // Address tab state
   const [query, setQuery] = useState('');
@@ -494,17 +645,19 @@ export function SearchLocationTool({
   const [isSearching, setIsSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
   const [selectedAddress, setSelectedAddress] = useState<LocationSearchResult | null>(null);
-  const [addressRadius, setAddressRadius] = useState<number>(500);
+  const [addressRadius, setAddressRadius] = useState<number>(defaultRadius);
   const [addressVehicles, setAddressVehicles] = useState<SearchAreaVehicleResult[] | null>(null);
+  const [addressGeofences, setAddressGeofences] = useState<SearchAreaGeofenceResult[] | null>(null);
 
   // Coordinate & Radius tab state
   const [coordInput, setCoordInput] = useState('');
   const [activeCenter, setActiveCenter] = useState<{ lat: number; lng: number } | null>(null);
-  const [radius, setRadius] = useState<number>(500);
+  const [radius, setRadius] = useState<number>(defaultRadius);
   const [isResolvingUrl, setIsResolvingUrl] = useState(false);
   const [smartParseNotice, setSmartParseNotice] = useState<string | null>(null);
   const [coordError, setCoordError] = useState<string | null>(null);
   const [radiusVehicles, setRadiusVehicles] = useState<SearchAreaVehicleResult[] | null>(null);
+  const [radiusGeofences, setRadiusGeofences] = useState<SearchAreaGeofenceResult[] | null>(null);
 
   // Geofence tab state
   const [selectedGeofenceId, setSelectedGeofenceId] = useState<string>('');
@@ -516,8 +669,9 @@ export function SearchLocationTool({
 
   // My Location tab state
   const [myLocationCoord, setMyLocationCoord] = useState<{ lat: number; lng: number } | null>(null);
-  const [myLocationRadius, setMyLocationRadius] = useState<number>(500);
+  const [myLocationRadius, setMyLocationRadius] = useState<number>(defaultRadius);
   const [myLocationVehicles, setMyLocationVehicles] = useState<SearchAreaVehicleResult[] | null>(null);
+  const [myLocationGeofences, setMyLocationGeofences] = useState<SearchAreaGeofenceResult[] | null>(null);
   const [isLocating, setIsLocating] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
 
@@ -566,7 +720,7 @@ export function SearchLocationTool({
         });
       }
     } else if (newTab === 'coordinate' && activeCenter) {
-      if (isLive) {
+      if (hasRadiusScanning) {
         onHighlightArea?.({
           type: 'geofence',
           geofenceType: 'circle',
@@ -578,7 +732,7 @@ export function SearchLocationTool({
       }
       placeTemporaryMarker(activeCenter.lat, activeCenter.lng);
     } else if (newTab === 'address' && selectedAddress) {
-      if (isLive) {
+      if (hasRadiusScanning) {
         onHighlightArea?.({
           type: 'geofence',
           geofenceType: 'circle',
@@ -623,14 +777,14 @@ export function SearchLocationTool({
         [center.lng - lngDelta, center.lat - latDelta],
         [center.lng + lngDelta, center.lat + latDelta],
       ],
-      { padding: 45, duration: 800 } as any
+      { padding: 45 }
     );
   };
 
   const applyCoordinateCenter = (center: { lat: number; lng: number }, r: number) => {
     setActiveCenter(center);
     placeTemporaryMarker(center.lat, center.lng);
-    if (isLive) {
+    if (hasRadiusScanning) {
       onHighlightArea?.({
         type: 'geofence',
         geofenceType: 'circle',
@@ -638,18 +792,25 @@ export function SearchLocationTool({
         radius: r,
       });
       fitRadiusBounds(center, r);
-      const found = onFindVehiclesInRadius?.(center, r) ?? [];
-      setRadiusVehicles(found);
+      if (isLive) {
+        const found = onFindVehiclesInRadius?.(center, r) ?? [];
+        setRadiusVehicles(found);
+      }
+      if (isGeofenceSearch) {
+        const found = onFindGeofencesInRadius?.(center, r) ?? [];
+        setRadiusGeofences(found);
+      }
     } else {
       onHighlightArea?.(null);
       panTo(center);
       setRadiusVehicles(null);
+      setRadiusGeofences(null);
     }
   };
 
   const handleRadiusChange = (newRadius: number) => {
     setRadius(newRadius);
-    if (activeCenter && isLive) {
+    if (activeCenter && hasRadiusScanning) {
       onHighlightArea?.({
         type: 'geofence',
         geofenceType: 'circle',
@@ -657,14 +818,20 @@ export function SearchLocationTool({
         radius: newRadius,
       });
       fitRadiusBounds(activeCenter, newRadius);
-      const found = onFindVehiclesInRadius?.(activeCenter, newRadius) ?? [];
-      setRadiusVehicles(found);
+      if (isLive) {
+        const found = onFindVehiclesInRadius?.(activeCenter, newRadius) ?? [];
+        setRadiusVehicles(found);
+      }
+      if (isGeofenceSearch) {
+        const found = onFindGeofencesInRadius?.(activeCenter, newRadius) ?? [];
+        setRadiusGeofences(found);
+      }
     }
   };
 
   const applyAddressCenter = (center: { lat: number; lng: number }, r: number) => {
     placeTemporaryMarker(center.lat, center.lng);
-    if (isLive) {
+    if (hasRadiusScanning) {
       onHighlightArea?.({
         type: 'geofence',
         geofenceType: 'circle',
@@ -672,25 +839,32 @@ export function SearchLocationTool({
         radius: r,
       });
       fitRadiusBounds(center, r);
-      const found = onFindVehiclesInRadius?.(center, r) ?? [];
-      setAddressVehicles(found);
+      if (isLive) {
+        const found = onFindVehiclesInRadius?.(center, r) ?? [];
+        setAddressVehicles(found);
+      }
+      if (isGeofenceSearch) {
+        const found = onFindGeofencesInRadius?.(center, r) ?? [];
+        setAddressGeofences(found);
+      }
     } else {
       onHighlightArea?.(null);
       panTo(center);
       setAddressVehicles(null);
+      setAddressGeofences(null);
     }
   };
 
   const handleAddressRadiusChange = (newRadius: number) => {
     setAddressRadius(newRadius);
-    if (selectedAddress && isLive) {
+    if (selectedAddress && hasRadiusScanning) {
       applyAddressCenter({ lat: selectedAddress.lat, lng: selectedAddress.lng }, newRadius);
     }
   };
 
   const applyMyLocationCenter = (center: { lat: number; lng: number }, r: number) => {
     placeTemporaryMarker(center.lat, center.lng, true);
-    if (isLive) {
+    if (hasRadiusScanning) {
       onHighlightArea?.({
         type: 'geofence',
         geofenceType: 'circle',
@@ -698,18 +872,25 @@ export function SearchLocationTool({
         radius: r,
       });
       fitRadiusBounds(center, r);
-      const found = onFindVehiclesInRadius?.(center, r) ?? [];
-      setMyLocationVehicles(found);
+      if (isLive) {
+        const found = onFindVehiclesInRadius?.(center, r) ?? [];
+        setMyLocationVehicles(found);
+      }
+      if (isGeofenceSearch) {
+        const found = onFindGeofencesInRadius?.(center, r) ?? [];
+        setMyLocationGeofences(found);
+      }
     } else {
       onHighlightArea?.(null);
       panTo(center);
       setMyLocationVehicles(null);
+      setMyLocationGeofences(null);
     }
   };
 
   const handleMyLocationRadiusChange = (newRadius: number) => {
     setMyLocationRadius(newRadius);
-    if (myLocationCoord && isLive) {
+    if (myLocationCoord && hasRadiusScanning) {
       applyMyLocationCenter(myLocationCoord, newRadius);
     }
   };
@@ -758,6 +939,7 @@ export function SearchLocationTool({
     setSelectedAddress(null);
     setQuery('');
     setAddressVehicles(null);
+    setAddressGeofences(null);
     setResults([]);
     setSearchError(null);
     onHighlightArea?.(null);
@@ -774,6 +956,7 @@ export function SearchLocationTool({
     setResults([]);
     setSelectedAddress(null);
     setAddressVehicles(null);
+    setAddressGeofences(null);
     try {
       const fn = onSearchAddress ?? mockSearchAddress;
       const res = await fn(query.trim());
@@ -799,6 +982,7 @@ export function SearchLocationTool({
     if (!trimmed) {
       setActiveCenter(null);
       setRadiusVehicles(null);
+      setRadiusGeofences(null);
       onHighlightArea?.(null);
       if (markerRef.current) {
         markerRef.current.remove();
@@ -856,7 +1040,7 @@ export function SearchLocationTool({
     if (minLat === maxLat && minLng === maxLng) {
       panTo({ lat: minLat, lng: minLng });
     } else {
-      fitBounds([[minLng, minLat], [maxLng, maxLat]], { padding: 60, duration: 800 } as any);
+      fitBounds([[minLng, minLat], [maxLng, maxLat]], { padding: 60 });
     }
   };
 
@@ -1026,8 +1210,8 @@ export function SearchLocationTool({
                 </div>
               </div>
 
-              {/* 2. Radius Input & Preset Chips (HANYA tampil di Live Tracking) */}
-              {isLive && (
+              {/* 2. Radius Input & Preset Chips (Tampil di Live Tracking atau Pemindaian Geofence) */}
+              {hasRadiusScanning && (
                 <div id="search-radius-section" className="flex items-center justify-between gap-1.5 pt-0.5">
                   <div className="flex items-center gap-1.5 shrink-0">
                     <span className="text-[11px] font-semibold text-neutral-500 dark:text-neutral-400">
@@ -1054,7 +1238,7 @@ export function SearchLocationTool({
 
                   {/* Quick Preset Buttons */}
                   <div className="flex items-center gap-1 shrink-0">
-                    {[250, 500, 1000, 2000].map((r) => (
+                    {radiusPresets.map((r) => (
                       <button
                         key={r}
                         type="button"
@@ -1080,7 +1264,7 @@ export function SearchLocationTool({
               )}
             </div>
 
-            {/* Content Area: Hasil Alamat / Kendaraan di Radius (Live) / Card Lokasi Terpilih (Non-Live) / Placeholder */}
+            {/* Content Area: Hasil Alamat / Kendaraan di Radius (Live) / Geofence di Radius / Card Lokasi Terpilih (Non-Live) / Placeholder */}
             <div id="search-results-section" className="flex-1 min-h-0 flex flex-col pt-1 border-t border-neutral-100 dark:border-neutral-800/80">
               {isSearching ? (
                 <div className="flex-1 flex flex-col items-center justify-center text-neutral-400 gap-2">
@@ -1091,7 +1275,7 @@ export function SearchLocationTool({
                 /* List Hasil Pencarian Alamat untuk Dipilih */
                 <div className="flex-1 min-h-0 flex flex-col gap-1">
                   <span className="text-[10px] font-semibold text-neutral-400 dark:text-neutral-500 px-0.5">
-                    {isLive ? 'Pilih lokasi untuk dipindai:' : 'Pilih lokasi:'}
+                    {hasRadiusScanning ? 'Pilih lokasi untuk dipindai:' : 'Pilih lokasi:'}
                   </span>
                   <div className="flex-1 min-h-0 rounded-xl border border-neutral-200 dark:border-neutral-700/80 overflow-hidden divide-y divide-neutral-100 dark:divide-neutral-800 overflow-y-auto custom-scrollbar bg-white dark:bg-neutral-850 shadow-2xs">
                     {results.map((r, i) => (
@@ -1116,7 +1300,29 @@ export function SearchLocationTool({
                 </div>
               ) : selectedAddress ? (
                 /* Alamat Terpilih */
-                isLive ? (
+                isGeofenceSearch ? (
+                  /* Mode Geofence Search: List Geofence di Sekitar Alamat Terpilih */
+                  addressGeofences !== null && (
+                    addressGeofences.length > 0 ? (
+                      <CompactGeofenceResultList
+                        geofences={addressGeofences}
+                        onSelectGeofence={onSelectGeofence}
+                        panTo={panTo}
+                        fitBounds={fitBounds}
+                        locale={locale}
+                      />
+                    ) : (
+                      <div className="flex-1 flex flex-col items-center justify-center py-4 px-3 rounded-2xl bg-neutral-50/80 dark:bg-neutral-850/50 border border-dashed border-neutral-200 dark:border-neutral-750 text-center">
+                        <p className="text-xs text-neutral-500 dark:text-neutral-400 font-medium">
+                          Tidak ada geofence di radius {addressRadius >= 1000 ? `${addressRadius / 1000} km` : `${addressRadius} m`}
+                        </p>
+                        <p className="text-[11px] text-neutral-400 dark:text-neutral-500 mt-0.5">
+                          Coba perbesar radius di atas
+                        </p>
+                      </div>
+                    )
+                  )
+                ) : isLive ? (
                   /* Mode Live: List Armada di Sekitar Alamat Terpilih */
                   addressVehicles !== null && (
                     addressVehicles.length > 0 ? (
@@ -1191,7 +1397,9 @@ export function SearchLocationTool({
                     {locale === 'id' ? 'Ketik nama jalan atau landmark lalu klik Cari' : 'Type a street or landmark name then click Search'}
                   </p>
                   <p className="text-[11px] text-neutral-400 dark:text-neutral-500 mt-0.5">
-                    {isLive
+                    {isGeofenceSearch
+                      ? (locale === 'id' ? 'Geofence di sekitar radius akan otomatis dipindai' : 'Geofences in radius will be scanned')
+                      : isLive
                       ? (locale === 'id' ? 'Armada di sekitar radius akan otomatis dipindai' : 'Fleet vehicles in radius will be scanned')
                       : (locale === 'id' ? 'Peta akan langsung menuju lokasi terpilih' : 'Map will navigate to the selected location')}
                   </p>
@@ -1263,8 +1471,8 @@ export function SearchLocationTool({
                 </div>
               </div>
 
-              {/* 2. Radius Input & Preset Chips (HANYA tampil di Live Tracking) */}
-              {isLive && (
+              {/* 2. Radius Input & Preset Chips (Tampil di Live Tracking atau Pemindaian Geofence) */}
+              {hasRadiusScanning && (
                 <div className="flex items-center justify-between gap-1.5 pt-0.5">
                   <div className="flex items-center gap-1.5 shrink-0">
                     <span className="text-[11px] font-semibold text-neutral-500 dark:text-neutral-400">
@@ -1291,7 +1499,7 @@ export function SearchLocationTool({
 
                   {/* Quick Preset Buttons */}
                   <div className="flex items-center gap-1 shrink-0">
-                    {[250, 500, 1000, 2000].map((r) => (
+                    {radiusPresets.map((r) => (
                       <button
                         key={r}
                         type="button"
@@ -1317,10 +1525,31 @@ export function SearchLocationTool({
               )}
             </div>
 
-            {/* Content Area: Daftar Kendaraan di Radius (Live) / Card Koordinat Terpilih (Non-Live) / Placeholder */}
+            {/* Content Area: Daftar Kendaraan di Radius (Live) / Geofence di Radius / Card Koordinat Terpilih (Non-Live) / Placeholder */}
             <div className="flex-1 min-h-0 flex flex-col pt-1 border-t border-neutral-100 dark:border-neutral-800/80">
               {activeCenter ? (
-                isLive ? (
+                isGeofenceSearch ? (
+                  radiusGeofences !== null && (
+                    radiusGeofences.length > 0 ? (
+                      <CompactGeofenceResultList
+                        geofences={radiusGeofences}
+                        onSelectGeofence={onSelectGeofence}
+                        panTo={panTo}
+                        fitBounds={fitBounds}
+                        locale={locale}
+                      />
+                    ) : (
+                      <div className="flex-1 flex flex-col items-center justify-center p-3 rounded-2xl bg-neutral-50/80 dark:bg-neutral-850/50 border border-dashed border-neutral-200 dark:border-neutral-750 text-center">
+                        <p className="text-xs text-neutral-500 dark:text-neutral-400 font-medium">
+                          Tidak ada geofence di dalam radius {radius >= 1000 ? `${radius / 1000} km` : `${radius} m`}.
+                        </p>
+                        <p className="text-[11px] text-neutral-400 dark:text-neutral-500 mt-0.5">
+                          Coba perbesar radius di atas
+                        </p>
+                      </div>
+                    )
+                  )
+                ) : isLive ? (
                   radiusVehicles !== null && (
                     radiusVehicles.length > 0 ? (
                       <CompactVehicleResultList
@@ -1389,7 +1618,9 @@ export function SearchLocationTool({
                     <Navigation className="w-4 h-4" />
                   </div>
                   <p className="text-xs text-neutral-500 dark:text-neutral-400 font-medium leading-relaxed max-w-[220px]">
-                    {isLive
+                    {isGeofenceSearch
+                      ? (locale === 'id' ? 'Ketik koordinat atau paste tautan Google Maps untuk memindai geofence di sekitar radius.' : 'Enter coordinates or paste Google Maps link to scan geofences in radius.')
+                      : isLive
                       ? (locale === 'id' ? 'Ketik koordinat atau paste tautan Google Maps untuk memindai armada di sekitar radius.' : 'Enter coordinates or paste Google Maps link to scan fleet in radius.')
                       : (locale === 'id' ? 'Ketik koordinat atau paste tautan Google Maps untuk menuju lokasi di peta.' : 'Enter coordinates or paste Google Maps link to navigate on map.')}
                   </p>
@@ -1458,8 +1689,8 @@ export function SearchLocationTool({
                 </div>
               </div>
 
-              {/* 2. Radius Input & Preset Chips (HANYA tampil di Live Tracking) */}
-              {isLive && (
+              {/* 2. Radius Input & Preset Chips (Tampil di Live Tracking atau Pemindaian Geofence) */}
+              {hasRadiusScanning && (
                 <div className="flex items-center justify-between gap-1.5 pt-0.5">
                   <div className="flex items-center gap-1.5 shrink-0">
                     <span className="text-[11px] font-semibold text-neutral-500 dark:text-neutral-400">
@@ -1486,7 +1717,7 @@ export function SearchLocationTool({
 
                   {/* Quick Preset Buttons */}
                   <div className="flex items-center gap-1 shrink-0">
-                    {[250, 500, 1000, 2000].map((r) => (
+                    {radiusPresets.map((r) => (
                       <button
                         key={r}
                         type="button"
@@ -1512,7 +1743,7 @@ export function SearchLocationTool({
               )}
             </div>
 
-            {/* Content Area: Daftar Kendaraan di Radius (Live) / Card Lokasi Saya Terpilih (Non-Live) / State Deteksi */}
+            {/* Content Area: Daftar Kendaraan di Radius (Live) / Geofence di Radius / Card Lokasi Saya Terpilih (Non-Live) / State Deteksi */}
             <div className="flex-1 min-h-0 flex flex-col pt-1 border-t border-neutral-100 dark:border-neutral-800/80">
               {isLocating ? (
                 <div className="flex-1 flex flex-col items-center justify-center text-neutral-400 gap-2">
@@ -1536,7 +1767,28 @@ export function SearchLocationTool({
                   </button>
                 </div>
               ) : myLocationCoord ? (
-                isLive ? (
+                isGeofenceSearch ? (
+                  myLocationGeofences !== null && (
+                    myLocationGeofences.length > 0 ? (
+                      <CompactGeofenceResultList
+                        geofences={myLocationGeofences}
+                        onSelectGeofence={onSelectGeofence}
+                        panTo={panTo}
+                        fitBounds={fitBounds}
+                        locale={locale}
+                      />
+                    ) : (
+                      <div className="flex-1 flex flex-col items-center justify-center p-3 rounded-2xl bg-neutral-50/80 dark:bg-neutral-850/50 border border-dashed border-neutral-200 dark:border-neutral-750 text-center">
+                        <p className="text-xs text-neutral-500 dark:text-neutral-400 font-medium">
+                          Tidak ada geofence di dalam radius {myLocationRadius >= 1000 ? `${myLocationRadius / 1000} km` : `${myLocationRadius} m`}.
+                        </p>
+                        <p className="text-[11px] text-neutral-400 dark:text-neutral-500 mt-0.5">
+                          Coba perbesar radius di atas
+                        </p>
+                      </div>
+                    )
+                  )
+                ) : isLive ? (
                   myLocationVehicles !== null && (
                     myLocationVehicles.length > 0 ? (
                       <CompactVehicleResultList
@@ -1611,7 +1863,9 @@ export function SearchLocationTool({
                     <User className="w-4 h-4" />
                   </div>
                   <p className="text-xs text-neutral-600 dark:text-neutral-300 font-medium leading-relaxed max-w-[220px]">
-                    {isLive
+                    {isGeofenceSearch
+                      ? 'Izinkan akses lokasi untuk mencari geofence di sekitar Anda'
+                      : isLive
                       ? 'Izinkan akses lokasi untuk mencari armada di sekitar Anda'
                       : (locale === 'id' ? 'Klik tombol deteksi di atas untuk menemukan posisi GPS Anda.' : 'Click detect button above to find your GPS location.')}
                   </p>

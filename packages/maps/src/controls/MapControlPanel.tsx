@@ -40,6 +40,7 @@ import type {
   SearchGeofenceOption,
   SearchRouteOption,
   SearchAreaVehicleResult,
+  SearchAreaGeofenceResult,
   ActiveSearchAreaHighlight,
 } from '../tools/types';
 
@@ -52,6 +53,7 @@ export type {
   SearchGeofenceOption,
   SearchRouteOption,
   SearchAreaVehicleResult,
+  SearchAreaGeofenceResult,
   ActiveSearchAreaHighlight,
 };
 
@@ -75,6 +77,8 @@ export interface MapControlPanelProps {
   onFindVehiclesOnRoute?: (routeId: string) => SearchAreaVehicleResult[];
   onFindVehiclesInRadius?: (center: { lat: number; lng: number }, radiusMeters: number) => SearchAreaVehicleResult[];
   onSelectSearchVehicle?: (vehicleId: string) => void;
+  onFindGeofencesInRadius?: (center: { lat: number; lng: number }, radiusMeters: number) => SearchAreaGeofenceResult[];
+  onSelectSearchGeofence?: (geofenceId: string) => void;
   onHighlightArea?: (highlight: ActiveSearchAreaHighlight | null) => void;
   onResolveMapsUrl?: (url: string) => Promise<{ lat: number; lng: number } | null>;
 
@@ -122,6 +126,8 @@ export function MapControlPanel({
   onFindVehiclesOnRoute,
   onFindVehiclesInRadius,
   onSelectSearchVehicle,
+  onFindGeofencesInRadius,
+  onSelectSearchGeofence,
   onHighlightArea,
   onResolveMapsUrl,
 }: MapControlPanelProps) {
@@ -352,6 +358,8 @@ export function MapControlPanel({
                     onFindVehiclesOnRoute={onFindVehiclesOnRoute}
                     onFindVehiclesInRadius={onFindVehiclesInRadius}
                     onSelectVehicle={onSelectSearchVehicle}
+                    onFindGeofencesInRadius={onFindGeofencesInRadius}
+                    onSelectGeofence={onSelectSearchGeofence}
                     onHighlightArea={onHighlightArea}
                     onResolveMapsUrl={onResolveMapsUrl}
                     locale={locale}
