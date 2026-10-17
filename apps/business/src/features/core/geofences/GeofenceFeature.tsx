@@ -1,26 +1,56 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { toast } from '@adatrack/ui';
 import { GeofenceListView } from './components/GeofenceListView';
 import { GeofenceEditorView } from './components/GeofenceEditorView';
 import { geofenceService } from '@/data/services';
 import type { Geofence } from './types';
 import { type GeofenceLocale, getGeofencesTranslation } from './i18n';
 
-type GeofenceView = 'list' | 'create' | 'edit';
+export type GeofenceView = 'list' | 'create' | 'edit';
 
-interface GeofenceFeatureProps {
+export interface GeofenceFeatureProps {
   locale?: GeofenceLocale;
+  initialView?: GeofenceView;
+  initialGeofenceId?: string;
 }
 
-export function GeofenceFeature({ locale = 'id' }: GeofenceFeatureProps) {
+export function GeofenceFeature({
+  locale = 'id',
+  initialView = 'list',
+  initialGeofenceId,
+}: GeofenceFeatureProps) {
   const t = getGeofencesTranslation(locale);
-  const [view, setView] = useState<GeofenceView>('list');
+  const [view, setView] = useState<GeofenceView>(initialView);
   const [geofences, setGeofences] = useState<Geofence[]>(() => geofenceService.getGeofences());
-  const [editingGeofence, setEditingGeofence] = useState<Geofence | null>(null);
+  const [editingGeofence, setEditingGeofence] = useState<Geofence | null>(() => {
+    if (initialGeofenceId) {
+      return geofenceService.getGeofenceById(initialGeofenceId) || null;
+    }
+    return null;
+  });
+
+  // Reactive subscription: synchronize UI whenever repository data mutates
+  useEffect(() => {
+    return geofenceService.subscribe(() => {
+      setGeofences(geofenceService.getGeofences());
+    });
+  }, []);
+
+  // Sync initial props if navigated via direct link/deep link
+  useEffect(() => {
+    if (initialView && initialView !== 'list') {
+      setView(initialView);
+      if (initialGeofenceId) {
+        const found = geofenceService.getGeofenceById(initialGeofenceId);
+        if (found) setEditingGeofence(found);
+      }
+    }
+  }, [initialView, initialGeofenceId]);
 
   // Load draft geofence from playback / parking spot if present in sessionStorage
-  React.useEffect(() => {
+  useEffect(() => {
     try {
       const raw = sessionStorage.getItem('adatrack_draft_geofence');
       if (raw) {
@@ -36,8 +66,8 @@ export function GeofenceFeature({ locale = 'id' }: GeofenceFeatureProps) {
           updatedAt: new Date().toISOString(),
         });
         setView('create');
-        if (typeof window !== 'undefined' && window.location.search) {
-          window.history.replaceState(null, '', '/geofences');
+        if (typeof window !== 'undefined') {
+          window.history.pushState(null, '', '/geofences/create');
         }
       }
     } catch (err) {
@@ -45,52 +75,115 @@ export function GeofenceFeature({ locale = 'id' }: GeofenceFeatureProps) {
     }
   }, []);
 
-  const handleAdd = () => {
+  // Listen to browser Back/Forward (popstate)
+  useEffect(() => {
+    const handlePopState = () => {
+      const path = window.location.pathname;
+      if (path.includes('/geofences/create')) {
+        setEditingGeofence(null);
+        setView('create');
+      } else if (path.includes('/geofences/edit/')) {
+        const id = path.split('/geofences/edit/')[1];
+        const found = geofenceService.getGeofenceById(id);
+        if (found) {
+          setEditingGeofence(found);
+          setView('edit');
+        } else {
+          setView('list');
+        }
+      } else {
+        setView('list');
+        setEditingGeofence(null);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  const handleAdd = useCallback(() => {
+    if (typeof window !== 'undefined') {
+      window.history.pushState(null, '', '/geofences/create');
+    }
     setEditingGeofence(null);
     setView('create');
-  };
+  }, []);
 
-  const handleEdit = (geofence: Geofence) => {
+  const handleEdit = useCallback((geofence: Geofence) => {
+    if (typeof window !== 'undefined') {
+      window.history.pushState(null, '', `/geofences/edit/${geofence.id}`);
+    }
     setEditingGeofence(geofence);
     setView('edit');
-  };
+  }, []);
 
-  const handleDelete = (id: string) => {
-    if (confirm(t.confirmDelete)) {
-      setGeofences((prev) => prev.filter((g) => g.id !== id));
+  const handleCancel = useCallback(() => {
+    if (typeof window !== 'undefined') {
+      window.history.pushState(null, '', '/geofences');
     }
-  };
-
-  const handleSave = (data: Partial<Geofence>) => {
-    if (view === 'edit' && editingGeofence) {
-      setGeofences((prev) =>
-        prev.map((g) =>
-          g.id === editingGeofence.id
-            ? ({ ...g, ...data, updatedAt: new Date().toISOString() } as Geofence)
-            : g,
-        ),
-      );
-    } else {
-      const newGeofence: Geofence = {
-        id: `gf-${Date.now()}`,
-        name: data.name || '',
-        description: data.description,
-        status: (data.status as 'active' | 'inactive') ?? 'active',
-        geometry: data.geometry!,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-      setGeofences((prev) => [newGeofence, ...prev]);
-    }
+    setEditingGeofence(null);
     setView('list');
-  };
+  }, []);
+
+  const handleDelete = useCallback(
+    (id: string) => {
+      if (confirm(t.confirmDelete)) {
+        const deleted = geofenceService.deleteGeofence(id);
+        if (deleted) {
+          toast.success(t.deleteSuccess);
+        } else {
+          toast.error(t.deleteFailed);
+        }
+      }
+    },
+    [t],
+  );
+
+  const handleSave = useCallback(
+    (data: Partial<Geofence>) => {
+      if (view === 'edit' && editingGeofence) {
+        const updated = geofenceService.updateGeofence(editingGeofence.id, data);
+        if (updated) {
+          toast.success(t.updateSuccess);
+        }
+      } else {
+        geofenceService.createGeofence(data);
+        toast.success(t.createSuccess);
+      }
+
+      if (typeof window !== 'undefined') {
+        window.history.pushState(null, '', '/geofences');
+      }
+      setEditingGeofence(null);
+      setView('list');
+    },
+    [view, editingGeofence, t],
+  );
+
+  // Interactive Tour Event Bridge
+  useEffect(() => {
+    const handleTourCreate = () => {
+      handleAdd();
+    };
+    const handleTourClose = () => {
+      handleCancel();
+    };
+
+    window.addEventListener('adatrack:tour-open-geofence-create', handleTourCreate);
+    window.addEventListener('adatrack:tour-close-geofence-editor', handleTourClose);
+
+    return () => {
+      window.removeEventListener('adatrack:tour-open-geofence-create', handleTourCreate);
+      window.removeEventListener('adatrack:tour-close-geofence-editor', handleTourClose);
+    };
+  }, [handleAdd, handleCancel]);
 
   if (view === 'create' || view === 'edit') {
     return (
       <div className="relative w-full overflow-hidden" style={{ height: 'calc(100dvh - 52px)' }}>
         <GeofenceEditorView
           geofence={editingGeofence}
-          onCancel={() => setView('list')}
+          onCancel={handleCancel}
           onSave={handleSave}
           locale={locale}
         />
@@ -111,3 +204,6 @@ export function GeofenceFeature({ locale = 'id' }: GeofenceFeatureProps) {
     </div>
   );
 }
+
+// Named alias per ADATRACK guidelines
+export const GeofencesFeature = GeofenceFeature;

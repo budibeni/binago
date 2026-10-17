@@ -1,12 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Hexagon, Square, Waypoints, MapPin, ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
+import { Hexagon, Square, Waypoints, ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
 import { cn } from '@adatrack/utils';
 import { Button, InputString, InputSelect, InputTextarea } from '@adatrack/ui';
 import { geofenceService } from '@/data/services';
 import { GeofenceMap } from './GeofenceMap';
-import type { Geofence } from '../types';
+import type { Geofence, GeofenceDrawMode, GeofenceEditorMode, GeofenceStatus } from '../types';
 import {
   type MapGeometry,
   calculateGeometryArea,
@@ -23,6 +23,18 @@ interface GeofenceEditorViewProps {
   locale?: GeofenceLocale;
 }
 
+function getDrawModeEditorState(mode: GeofenceDrawMode): GeofenceEditorMode {
+  switch (mode) {
+    case 'rectangle':
+      return 'draw_rectangle';
+    case 'multiline':
+      return 'draw_multiline';
+    case 'polygon':
+    default:
+      return 'draw_polygon';
+  }
+}
+
 export function GeofenceEditorView({
   geofence,
   onCancel,
@@ -36,11 +48,11 @@ export function GeofenceEditorView({
     name: geofence?.name || '',
     groupId: geofence?.groupId || '',
     description: geofence?.description || '',
-    status: geofence?.status || 'active',
+    status: (geofence?.status || 'active') as GeofenceStatus,
   });
 
-  const [drawMode, setDrawMode] = useState<'polygon' | 'rectangle' | 'multiline'>('polygon');
-  const [editorMode, setEditorMode] = useState<'idle' | 'draw_polygon' | 'draw_rectangle' | 'draw_multiline' | 'edit'>(
+  const [drawMode, setDrawMode] = useState<GeofenceDrawMode>('polygon');
+  const [editorMode, setEditorMode] = useState<GeofenceEditorMode>(
     geofence?.geometry ? 'edit' : 'idle'
   );
   const [currentGeometry, setCurrentGeometry] = useState<MapGeometry | null>(geofence?.geometry || null);
@@ -79,27 +91,27 @@ export function GeofenceEditorView({
 
   useEffect(() => {
     if (editorMode !== 'idle' && editorMode !== 'edit' && !currentGeometry) {
-      setEditorMode(`draw_${drawMode}` as any);
+      setEditorMode(getDrawModeEditorState(drawMode));
     }
-  }, [drawMode]);
+  }, [drawMode, editorMode, currentGeometry]);
 
   const handleSave = () => {
     onSave({
       ...formData,
-      status: formData.status as 'active' | 'inactive',
+      status: formData.status,
       geometry: currentGeometry ?? geofence?.geometry,
     });
   };
 
   const isGeometryValid = !!currentGeometry;
-  const isFormValid = !!formData.name && isGeometryValid;
+  const isFormValid = !!formData.name.trim() && isGeometryValid;
 
   return (
-    <div className="flex h-full w-full flex-col bg-background relative">
+    <div id="geofence-editor-container" className="flex h-full w-full flex-col bg-background relative">
       <div className="flex flex-1 overflow-hidden relative">
 
         {/* Middle Panel - Map */}
-        <div className="relative flex-1 bg-neutral-100 dark:bg-neutral-900">
+        <div id="geofence-editor-map" className="relative flex-1 bg-neutral-100 dark:bg-neutral-900">
           <GeofenceMap
             geofences={[]}
             editorMode={editorMode}
@@ -113,6 +125,7 @@ export function GeofenceEditorView({
 
         {/* Floating Left Panel - Form */}
         <div 
+          id="geofence-editor-panel"
           data-layout="drawer"
           className={cn(
             "group/form absolute left-4 top-4 w-[320px] bg-background rounded-xl shadow-lg border border-border flex flex-col z-20 overflow-hidden transition-all duration-300",
@@ -125,32 +138,36 @@ export function GeofenceEditorView({
             className="flex items-center justify-between px-3 py-2 border-b border-border bg-surface cursor-pointer hover:bg-surface-hover shrink-0"
           >
             <h3 className="text-[11px] font-bold text-foreground uppercase tracking-wider">{t.geofenceDetail}</h3>
-            <button className="text-foreground-muted hover:text-foreground">
+            <button type="button" className="text-foreground-muted hover:text-foreground">
               {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
             </button>
           </div>
 
           <div className="flex-1 overflow-y-auto p-3 space-y-3">
             <div className="space-y-2.5">
-              <InputString
-                label={t.geofenceName}
-                required
-                value={formData.name}
-                onChange={(val) => setFormData({ ...formData, name: val })}
-                placeholder={t.geofenceNamePlaceholder}
-              />
+              <div id="geofence-form-name">
+                <InputString
+                  label={t.geofenceName}
+                  required
+                  value={formData.name}
+                  onChange={(val) => setFormData({ ...formData, name: val })}
+                  placeholder={t.geofenceNamePlaceholder}
+                />
+              </div>
 
-              <InputSelect
-                label={t.geofenceGroup}
-                value={formData.groupId || 'none'}
-                onChange={(val) => setFormData({ ...formData, groupId: val === 'none' ? '' : val })}
-                options={[
-                  { value: 'none', label: `-- ${t.unassigned} --` },
-                  ...geofenceService.getGeofenceGroups().map(group => ({ value: group.id, label: group.name }))
-                ]}
-              />
+              <div id="geofence-form-group">
+                <InputSelect
+                  label={t.geofenceGroup}
+                  value={formData.groupId || 'none'}
+                  onChange={(val) => setFormData({ ...formData, groupId: val === 'none' ? '' : val })}
+                  options={[
+                    { value: 'none', label: `-- ${t.unassigned} --` },
+                    ...geofenceService.getGeofenceGroups().map(group => ({ value: group.id, label: group.name }))
+                  ]}
+                />
+              </div>
 
-              <div className="space-y-1.5">
+              <div id="geofence-form-type" className="space-y-1.5">
                 <label className="text-[11px] font-semibold text-foreground">{t.geofenceType} <span className="text-red-500">*</span></label>
                 <div className="grid grid-cols-2 gap-1.5">
                   <div
@@ -194,10 +211,11 @@ export function GeofenceEditorView({
                 </div>
               </div>
 
-              <div className="space-y-1.5">
+              <div id="geofence-form-status" className="space-y-1.5">
                 <label className="text-[11px] font-semibold text-foreground">{t.status} <span className="text-red-500">*</span></label>
                 <div className="grid grid-cols-2 gap-1.5">
                   <button
+                    type="button"
                     onClick={() => setFormData({ ...formData, status: 'active' })}
                     className={cn(
                       "flex items-center justify-center gap-2 rounded-md border py-1 text-[11px] font-semibold transition-all bg-background",
@@ -207,6 +225,7 @@ export function GeofenceEditorView({
                     {t.active}
                   </button>
                   <button
+                    type="button"
                     onClick={() => setFormData({ ...formData, status: 'inactive' })}
                     className={cn(
                       "flex items-center justify-center gap-2 rounded-md border py-1 text-[11px] font-semibold transition-all bg-background",
@@ -227,14 +246,15 @@ export function GeofenceEditorView({
               />
             </div>
 
-            <div className="space-y-3 pt-2 border-t border-border/50">
+            <div id="geofence-editor-area-info" className="space-y-3 pt-2 border-t border-border/50">
               <div className="flex items-center justify-between">
                 <h3 className="text-xs font-bold text-foreground">{t.areaInformation}</h3>
                 {isGeometryValid && (
                   <button
+                    type="button"
                     onClick={() => {
                       setCurrentGeometry(null);
-                      setEditorMode(`draw_${drawMode}` as any);
+                      setEditorMode(getDrawModeEditorState(drawMode));
                     }}
                     className="flex items-center gap-1 text-[10px] font-semibold text-red-500 hover:text-red-600 transition-colors"
                   >
@@ -277,6 +297,7 @@ export function GeofenceEditorView({
                 {isGeometryValid && currentGeometry?.coordinates && currentGeometry.coordinates.length > 0 && (
                   <div className="pt-2 space-y-1.5 border-t border-border/50">
                     <button
+                      type="button"
                       onClick={() => setShowCoordinates(!showCoordinates)}
                       className="flex items-center justify-between w-full text-[11px] font-semibold text-foreground hover:text-foreground-muted transition-colors"
                     >
@@ -313,10 +334,18 @@ export function GeofenceEditorView({
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <Button type="button" variant="outline" size="sm" onClick={onCancel} className="bg-background">
+          <Button
+            id="geofence-btn-cancel"
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={onCancel}
+            className="bg-background"
+          >
             {t.cancel}
           </Button>
           <Button
+            id="geofence-btn-save"
             type="button"
             variant="primary"
             size="sm"

@@ -26,30 +26,42 @@ export function GeofenceListView({
   locale = 'id',
 }: GeofenceListViewProps) {
   const [selectedId, setSelectedId] = useState<string | undefined>();
-  const [visibleIds, setVisibleIds] = useState<string[]>(() => geofences.map(g => g.id));
+  const [visibleIds, setVisibleIds] = useState<string[]>(() => geofences.map((g) => g.id));
   const [isPanelVisible, setIsPanelVisible] = useState(true);
 
+  // Sync visibleIds if new geofences are added
+  React.useEffect(() => {
+    setVisibleIds((prev) => {
+      const currentIds = geofences.map((g) => g.id);
+      const newIds = currentIds.filter((id) => !prev.includes(id));
+      if (newIds.length > 0) {
+        return [...prev, ...newIds];
+      }
+      return prev;
+    });
+  }, [geofences]);
+
   const handleCheck = (ids: string[], checked: boolean) => {
-    setVisibleIds(prev => {
+    setVisibleIds((prev) => {
       if (checked) {
-        const toAdd = ids.filter(id => !prev.includes(id));
+        const toAdd = ids.filter((id) => !prev.includes(id));
         return [...prev, ...toAdd];
       } else {
-        return prev.filter(id => !ids.includes(id));
+        return prev.filter((id) => !ids.includes(id));
       }
     });
   };
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setVisibleIds(geofences.map(g => g.id));
+      setVisibleIds(geofences.map((g) => g.id));
     } else {
       setVisibleIds([]);
     }
   };
 
   return (
-    <div className="flex h-full w-full overflow-hidden bg-surface">
+    <div id="geofence-list-container" className="flex h-full w-full overflow-hidden bg-surface">
       {/* Main Area: Map */}
       <div className="flex-1 flex flex-col h-full min-w-0 relative bg-background">
         <GeofenceMap
@@ -73,7 +85,7 @@ export function GeofenceListView({
           'shrink-0 h-full z-10 transition-all duration-300 ease-in-out flex flex-col',
           isPanelVisible
             ? 'w-[320px] border-l border-neutral-200 dark:border-neutral-800 bg-background shadow-[-4px_0_15px_-3px_rgba(0,0,0,0.05)]'
-            : 'w-[34px] py-2 items-center bg-transparent border-l border-neutral-200 dark:border-neutral-800'
+            : 'w-[34px] py-2 items-center bg-transparent border-l border-neutral-200 dark:border-neutral-800',
         )}
       >
         {isPanelVisible ? (

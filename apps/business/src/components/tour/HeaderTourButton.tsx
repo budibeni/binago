@@ -69,6 +69,8 @@ import {
   getDriversFilterTourSteps,
   getDriversDetailTourSteps,
   getDriversFormTourSteps,
+  getGeofenceOverviewTourSteps,
+  getGeofenceEditorTourSteps,
 } from '@/components/tour';
 import type { DriveStep } from 'driver.js';
 
@@ -84,6 +86,7 @@ export function HeaderTourButton({ locale = 'id', className }: HeaderTourButtonP
   const isTrackingPage = pathname === '/tracking' || pathname.startsWith('/tracking');
   const isVehiclesPage = pathname === '/vehicles' || pathname.startsWith('/vehicles');
   const isDriversPage = pathname === '/drivers' || pathname.startsWith('/drivers');
+  const isGeofencesPage = pathname === '/geofences' || pathname.startsWith('/geofences');
   const isDriverPortalPage = pathname === '/portal/driver' || pathname.startsWith('/portal/driver');
   const isEmergencyReportsPage = pathname === '/activity/emergency-reports' || pathname.startsWith('/activity/emergency-reports');
 
@@ -121,6 +124,10 @@ export function HeaderTourButton({ locale = 'id', className }: HeaderTourButtonP
   const driversDetailTourSteps = useMemo(() => getDriversDetailTourSteps(locale), [locale]);
   const driversFormTourSteps = useMemo(() => getDriversFormTourSteps(locale), [locale]);
 
+  // Geofence Step definitions
+  const geofenceOverviewTourSteps = useMemo(() => getGeofenceOverviewTourSteps(locale), [locale]);
+  const geofenceEditorTourSteps = useMemo(() => getGeofenceEditorTourSteps(locale), [locale]);
+
   // Driver Portal Step definitions
   const driverPortalOverviewSteps = useMemo(() => getDriverPortalOverviewTourSteps(locale), [locale]);
   const driverPortalVehicleSteps = useMemo(() => getDriverPortalVehicleTourSteps(locale), [locale]);
@@ -135,6 +142,9 @@ export function HeaderTourButton({ locale = 'id', className }: HeaderTourButtonP
 
   // Active tour steps based on currently visible tab
   const currentDefaultSteps = useMemo(() => {
+    if (isGeofencesPage) {
+      return geofenceOverviewTourSteps;
+    }
     if (isDriversPage) {
       return driversOverviewTourSteps;
     }
@@ -180,7 +190,9 @@ export function HeaderTourButton({ locale = 'id', className }: HeaderTourButtonP
 
   // Base tour hook
   const { startTour, resetTour } = useTour({
-    tourId: isDriversPage
+    tourId: isGeofencesPage
+      ? 'geofences_overview'
+      : isDriversPage
       ? 'drivers_overview'
       : isVehiclesPage
       ? 'vehicles_overview'
@@ -876,8 +888,46 @@ export function HeaderTourButton({ locale = 'id', className }: HeaderTourButtonP
           </>
         )}
 
+        {/* ── CONTEXT: GEOFENCES MODULE ── */}
+        {isGeofencesPage && (
+          <>
+            <DropdownMenuItem
+              onClick={() => startTour(geofenceOverviewTourSteps)}
+              className="flex items-start gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer hover:bg-surface-elevated transition-colors"
+            >
+              <Compass className="h-4 w-4 text-blue-500 mt-0.5 shrink-0" />
+              <div className="flex flex-col">
+                <span className="text-[12.5px] font-semibold text-foreground">
+                  {isEn ? 'Geofence Overview Tour' : 'Tur Keseluruhan Geofence'}
+                </span>
+                <span className="text-[11px] text-foreground-muted leading-tight">
+                  {isEn ? 'Spatial map canvas, zone sidebar, quick search, & visibility' : 'Peta batas spasial, panel zona, pencarian cepat, & visibilitas'}
+                </span>
+              </div>
+            </DropdownMenuItem>
+
+            <DropdownMenuItem
+              onClick={() => {
+                window.dispatchEvent(new CustomEvent('adatrack:tour-open-geofence-create'));
+                setTimeout(() => startTour(geofenceEditorTourSteps), 300);
+              }}
+              className="flex items-start gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer hover:bg-surface-elevated transition-colors"
+            >
+              <Wrench className="h-4 w-4 text-purple-500 mt-0.5 shrink-0" />
+              <div className="flex flex-col">
+                <span className="text-[12.5px] font-semibold text-foreground">
+                  {isEn ? 'Drawing & Parameter Editor' : 'Editor Gambar & Parameter Wilayah'}
+                </span>
+                <span className="text-[11px] text-foreground-muted leading-tight">
+                  {isEn ? 'Polygons, rectangles, real-time area calculation, & save' : 'Poligon, persegi, kalkulasi luas real-time, & simpan zona'}
+                </span>
+              </div>
+            </DropdownMenuItem>
+          </>
+        )}
+
         {/* ── CONTEXT 4: OTHER MODULES / PAGES ── */}
-        {!isTrackingPage && !isDriverPortalPage && !isEmergencyReportsPage && !isVehiclesPage && !isDriversPage && (
+        {!isTrackingPage && !isDriverPortalPage && !isEmergencyReportsPage && !isVehiclesPage && !isDriversPage && !isGeofencesPage && (
           <>
             <div className="px-2.5 py-2 text-[12px] text-foreground-muted leading-relaxed">
               {isEn
@@ -897,8 +947,8 @@ export function HeaderTourButton({ locale = 'id', className }: HeaderTourButtonP
           </>
         )}
 
-        {/* Restart Tour Option (Tracking views, Driver Portal, Emergency Reports, Vehicles, & Drivers) */}
-        {(isTrackingPage || isDriverPortalPage || isEmergencyReportsPage || isVehiclesPage || isDriversPage) && (
+        {/* Restart Tour Option (Tracking views, Driver Portal, Emergency Reports, Vehicles, Drivers, & Geofences) */}
+        {(isTrackingPage || isDriverPortalPage || isEmergencyReportsPage || isVehiclesPage || isDriversPage || isGeofencesPage) && (
           <>
             <DropdownMenuSeparator className="my-1 bg-border" />
             <DropdownMenuItem

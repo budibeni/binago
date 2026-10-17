@@ -4,6 +4,6 @@ export * from './tours/vehiclesTour';
 export * from './tours/driversTour';
 export * from './tours/driverPortalTour';
 export * from './tours/emergencyReportsTour';
+export * from './tours/geofenceTour';
 export * from './HeaderTourButton';
 export * from './TrackingTourContext';
-

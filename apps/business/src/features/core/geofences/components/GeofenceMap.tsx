@@ -1,11 +1,12 @@
 'use client';
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
+interface GeoJSONSourceLike {
+  setData(data: GeoJSON.FeatureCollection | GeoJSON.Feature): void;
+}
 import {
   MapProvider,
   MapContainer,
-  BasemapSwitcher,
-  MapControls,
   GeometryEditor,
   useMapActions,
   MapContext,
@@ -21,14 +22,14 @@ import {
   type ActiveSearchAreaHighlight,
   type SearchAreaGeofenceResult,
 } from '@adatrack/maps';
-import type { Geofence, GeofenceGroup } from '../types';
+import type { Geofence, GeofenceGroup, GeofenceEditorMode } from '../types';
 
 interface GeofenceMapProps {
   geofences: Geofence[];
   groups?: GeofenceGroup[];
   selectedGeofenceId?: string;
   visibleGeofenceIds?: string[];
-  editorMode: 'idle' | 'draw_polygon' | 'draw_rectangle' | 'draw_multiline' | 'edit';
+  editorMode: GeofenceEditorMode;
   editorGeometry: MapGeometry | null;
   onEditorGeometryChange: (geometry: MapGeometry | null) => void;
   onSelectGeofence?: (geofenceId: string) => void;
@@ -90,22 +91,22 @@ function GeofenceMapInner({
       : geofences;
 
     if (selectedGeofenceId) {
-       const selected = geofences.find(g => g.id === selectedGeofenceId);
-       if (selected) targetGeofences = [selected];
+      const selected = geofences.find(g => g.id === selectedGeofenceId);
+      if (selected) targetGeofences = [selected];
     }
     
     if (targetGeofences.length === 0) return;
 
     const allCoords: {lat: number, lng: number}[] = [];
     targetGeofences.forEach(gf => {
-       if (gf.geometry?.coordinates) {
-          allCoords.push(...gf.geometry.coordinates);
-       }
+      if (gf.geometry?.coordinates) {
+        allCoords.push(...gf.geometry.coordinates);
+      }
     });
 
     const bounds = calcEntityBounds(allCoords);
     if (bounds) {
-       actions.fitBounds(bounds, { padding: 50 });
+      actions.fitBounds(bounds, { padding: 50 });
     }
   };
 
@@ -149,18 +150,24 @@ function GeofenceMapInner({
         ? geofences.filter(gf => visibleGeofenceIds.includes(gf.id))
         : geofences;
 
-      const features = renderedGeofences.map((gf) => {
-        const feature = geometryToGeoJSON(gf.geometry) as any;
-        feature.properties = { id: gf.id, name: gf.name, status: gf.status };
-        return feature;
-      });
+      const features: GeoJSON.Feature[] = renderedGeofences
+        .map((gf) => {
+          const feature = geometryToGeoJSON(gf.geometry);
+          if (!feature) return null;
+          return {
+            ...feature,
+            properties: { id: gf.id, name: gf.name, status: gf.status },
+          } as GeoJSON.Feature;
+        })
+        .filter((f): f is GeoJSON.Feature => f !== null);
 
       const data: GeoJSON.FeatureCollection = { type: 'FeatureCollection', features };
 
-      if (!map.getSource(SOURCE_ID)) {
+      const existingSource = map.getSource(SOURCE_ID) as unknown as GeoJSONSourceLike | undefined;
+      if (!existingSource) {
         map.addSource(SOURCE_ID, { type: 'geojson', data });
       } else {
-        (map.getSource(SOURCE_ID) as any).setData(data);
+        existingSource.setData(data);
       }
 
       if (!map.getLayer(FILL_LAYER_ID)) {
@@ -229,7 +236,7 @@ function GeofenceMapInner({
   useEffect(() => {
     return () => {
       try {
-        if (!map || !(map as any).style || !map.getStyle()) return;
+        if (!map || !map.getStyle()) return;
         if (map.getLayer(FILL_LAYER_ID)) map.removeLayer(FILL_LAYER_ID);
         if (map.getLayer(OUTLINE_LAYER_ID)) map.removeLayer(OUTLINE_LAYER_ID);
         if (map.getSource(SOURCE_ID)) map.removeSource(SOURCE_ID);
@@ -287,35 +294,37 @@ function GeofenceMapInner({
   };
 
   return (
-    <MapContainer
-      ref={mapContainerRef}
-      viewport={viewport}
-      onViewportChange={setViewport}
-      basemap={basemap}
-      className="h-full w-full"
-      toolbarSlot={
-        <MapControlPanel
-          isLiveTracking={false}
-          basemap={basemap}
-          onBasemapChange={setBasemap}
-          mapContainerRef={mapContainerRef}
-          onFitSelected={handleFit}
-          onResetNorth={handleResetNorth}
-          onSearchAddress={defaultNominatimSearch}
-          showMeasureTool={false}
-          onFindGeofencesInRadius={handleFindGeofencesInRadius}
-          onSelectSearchGeofence={onSelectGeofence}
-          onHighlightArea={setHighlightedArea}
+    <div id="geofence-map-container" className="h-full w-full relative">
+      <MapContainer
+        ref={mapContainerRef}
+        viewport={viewport}
+        onViewportChange={setViewport}
+        basemap={basemap}
+        className="h-full w-full"
+        toolbarSlot={
+          <MapControlPanel
+            isLiveTracking={false}
+            basemap={basemap}
+            onBasemapChange={setBasemap}
+            mapContainerRef={mapContainerRef}
+            onFitSelected={handleFit}
+            onResetNorth={handleResetNorth}
+            onSearchAddress={defaultNominatimSearch}
+            showMeasureTool={false}
+            onFindGeofencesInRadius={handleFindGeofencesInRadius}
+            onSelectSearchGeofence={onSelectGeofence}
+            onHighlightArea={setHighlightedArea}
+          />
+        }
+      >
+        <ActiveSearchAreaRenderer highlight={highlightedArea} />
+        <GeometryEditor
+          mode={editorMode}
+          initialGeometry={editorGeometry}
+          onChange={onEditorGeometryChange}
         />
-      }
-    >
-      <ActiveSearchAreaRenderer highlight={highlightedArea} />
-      <GeometryEditor
-        mode={editorMode}
-        initialGeometry={editorGeometry}
-        onChange={onEditorGeometryChange}
-      />
-    </MapContainer>
+      </MapContainer>
+    </div>
   );
 }
 
