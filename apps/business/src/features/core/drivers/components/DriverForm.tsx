@@ -2,7 +2,17 @@
 
 import React from 'react';
 import { UserRound, MapPin, Phone, FileText } from 'lucide-react';
-import { FormShell, FormCard, InputString, InputDate, InputTextarea, InputPhone, InputEmail, InputSelect, useForm } from '@adatrack/ui';
+import {
+  FormShell,
+  FormCard,
+  InputString,
+  InputDate,
+  InputTextarea,
+  InputPhone,
+  InputEmail,
+  InputSelect,
+  useForm,
+} from '@adatrack/ui';
 import { groupService } from '@/data/services';
 import { getDriverFormSchema, type Driver } from '../types/driver';
 import { useBusinessLocale } from '@/components/BusinessShellLayout';
@@ -49,7 +59,9 @@ export function DriverForm({
 
   React.useEffect(() => {
     if (open) {
-      setGroups(groupService.getDriverGroups().map(group => ({ value: group.id, label: group.name })));
+      setGroups(
+        groupService.getDriverGroups().map((group) => ({ value: group.id, label: group.name })),
+      );
     }
   }, [open]);
 
@@ -58,7 +70,7 @@ export function DriverForm({
     resetOn: [open, driver],
     schema: getDriverFormSchema(tD.validation || {}),
     onSubmit: async (data) => {
-      await new Promise((r) => setTimeout(r, 800));
+      await new Promise((r) => setTimeout(r, 600));
       onSave(data);
     },
   });
@@ -75,11 +87,13 @@ export function DriverForm({
       onSubmit={handleSubmit}
       isSubmitting={isSubmitting}
       columns={2}
+      saveProps={{ id: 'driver-form-save-btn' }}
     >
       {/* Kolom Kiri */}
       <div className="flex flex-col gap-6">
         {/* Identitas Card */}
         <FormCard
+          id="driver-form-identity-card"
           title={tF.sectionIdentity}
           description={tF.descIdentity}
           icon={<UserRound className="w-5 h-5 text-danger" />}
@@ -126,6 +140,7 @@ export function DriverForm({
 
         {/* Alamat Card */}
         <FormCard
+          id="driver-form-address-card"
           title={tF.sectionAddress}
           description={tF.descAddress}
           icon={<MapPin className="w-5 h-5 text-blue-500" />}
@@ -145,6 +160,7 @@ export function DriverForm({
       <div className="flex flex-col gap-6">
         {/* Kontak Card */}
         <FormCard
+          id="driver-form-contact-card"
           title={tF.sectionContact}
           description={tF.descContact}
           icon={<Phone className="w-5 h-5 text-green-500" />}
@@ -169,6 +185,7 @@ export function DriverForm({
 
         {/* Lisensi & Pekerjaan Card */}
         <FormCard
+          id="driver-form-work-card"
           title={tF.sectionWork}
           description={tF.descWork}
           icon={<FileText className="w-5 h-5 text-purple-500" />}

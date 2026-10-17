@@ -1,6 +1,7 @@
 export * from './useTour';
 export * from './tours/trackingTour';
 export * from './tours/vehiclesTour';
+export * from './tours/driversTour';
 export * from './tours/driverPortalTour';
 export * from './tours/emergencyReportsTour';
 export * from './HeaderTourButton';

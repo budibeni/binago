@@ -1,245 +1,350 @@
 'use client';
 
 import React from 'react';
-import { MoreVertical, IdCard, Edit2, Trash2, UserRound, MapPin, Truck, Users, Plus, Eye, Star } from 'lucide-react';
+import { Star, Plus } from 'lucide-react';
 import { cn } from '@adatrack/utils';
-import {
-  Badge, Button,
-  DataTable,
-} from '@adatrack/ui';
-import type { DataTableColumnDef, DataTableFilterConfig } from '@adatrack/ui';
+import { DataTable, Button } from '@adatrack/ui';
+import type { DataTableColumnDef, DataTableFilterConfig, DataTableLabels } from '@adatrack/ui';
 import type { Driver } from '../types/driver';
+import { getDriversTranslation } from '../i18n';
+import { useBusinessLocale } from '@/components/BusinessShellLayout';
 
-interface DriverTableLabels {
-  colDriver: string;
-  colGroup: string;
-  colPlacement: string;
-  colPhone: string;
-  colEmail: string;
-  colAddress: string;
-  colKtp: string;
-  colPob: string;
-  colDob: string;
-  colLicenseNo: string;
-  colLicenseExpiry: string;
-  colJoinDate: string;
-  colStatus: string;
-  colVehicle: string;
-  colPerformance: string;
-  colActions: string;
-  emptyTitle: string;
-  emptyDescription: string;
-  noResultTitle: string;
-  noResultDescription: string;
-  searchPlaceholder: string;
-  addDriver: string;
-  exportFilename: string;
-  actionDetail: string;
-  actionEdit: string;
-  actionDelete: string;
+export interface DriverTableLabels {
+  colDriver?: string;
+  colGroup?: string;
+  colPlacement?: string;
+  colPhone?: string;
+  colEmail?: string;
+  colAddress?: string;
+  colKtp?: string;
+  colPob?: string;
+  colDob?: string;
+  colLicenseNo?: string;
+  colLicenseExpiry?: string;
+  colJoinDate?: string;
+  colStatus?: string;
+  colVehicle?: string;
+  colPerformance?: string;
+  colActions?: string;
+  emptyTitle?: string;
+  emptyDescription?: string;
+  noResultTitle?: string;
+  noResultDescription?: string;
+  searchPlaceholder?: string;
+  addDriver?: string;
+  exportFilename?: string;
+  actionDetail?: string;
+  actionEdit?: string;
+  actionDelete?: string;
+  actionAdd?: string;
+  statusActive?: string;
+  statusInactive?: string;
+  statusOnLeave?: string;
 }
 
-interface DriverTableProps {
+export interface DriverTableProps {
+  labels?: DriverTableLabels;
   data: Driver[];
-  labels: DriverTableLabels;
   onViewDetail: (driver: Driver) => void;
-  onEdit: (driver: Driver) => void;
-  onDelete: (driver: Driver) => void;
-  onAdd: () => void;
+  onEdit?: (driver: Driver) => void;
+  onDelete?: (driver: Driver) => void;
   searchValue: string;
   onSearchChange: (value: string) => void;
   filterConfig: DataTableFilterConfig;
   isFilterOpen: boolean;
   onFilterOpenChange: (open: boolean) => void;
+  onAdd?: () => void;
   className?: string;
-  dtLabels?: any;
+  dtLabels?: DataTableLabels;
 }
 
 function buildColumns(
   labels: DriverTableLabels,
+  locale: 'id' | 'en',
   onViewDetail: (d: Driver) => void,
-  onEdit: (d: Driver) => void,
-  onDelete: (d: Driver) => void,
+  _onEdit?: (d: Driver) => void,
+  _onDelete?: (d: Driver) => void,
 ): DataTableColumnDef<Driver>[] {
   return [
     {
       id: 'name',
-      header: labels.colDriver,
-      accessorFn: (row) => row.name,
-      cell: ({ row }) => (
-        <span className="font-semibold text-foreground uppercase tracking-wider">
-          {row.original.name}
-        </span>
-      ),
+      accessorKey: 'name',
+      header: labels.colDriver || 'Pengemudi',
       enableSorting: true,
-      size: 200,
+      size: 180,
       meta: { pin: 'left' },
+      cell: ({ row }) => (
+        <button
+          type="button"
+          id={row.index === 0 ? 'drivers-first-item-btn' : undefined}
+          onClick={(e) => {
+            e.stopPropagation();
+            onViewDetail(row.original);
+          }}
+          className="whitespace-nowrap uppercase tracking-wider text-inherit font-inherit hover:text-primary transition-colors hover:underline text-left focus:outline-none"
+        >
+          {row.original.name}
+        </button>
+      ),
     },
     {
       id: 'status',
-      header: labels.colStatus,
-      accessorFn: (row) => row.status,
-      cell: ({ row }) => {
-        const s = row.original.status;
-        let variant: 'default' | 'danger' | 'warning' | 'success' | 'outline' = 'default';
-        let label: string = s;
-        if (s === 'active') {
-          variant = 'success';
-          label = 'Aktif';
-        } else if (s === 'on_leave') {
-          variant = 'warning';
-          label = 'Cuti';
-        } else if (s === 'inactive') {
-          variant = 'danger';
-          label = 'Nonaktif';
-        }
-        return <Badge variant={variant} dot className="capitalize border-transparent">{label}</Badge>;
-      },
+      accessorKey: 'status',
+      header: labels.colStatus || 'Status',
       enableSorting: true,
       size: 130,
-    },
-    {
-      id: 'assignedVehiclePlate',
-      header: labels.colVehicle,
-      accessorFn: (row) => row.assignedVehiclePlate || '-',
-      cell: ({ getValue }) => <span className="font-semibold text-[12px] text-foreground tracking-wider uppercase">{getValue() as string}</span>,
-      enableSorting: true,
-      size: 140,
-    },
-    {
-      id: 'performanceScore',
-      header: labels.colPerformance,
-      accessorFn: (row) => row.performanceScore || 0,
-      cell: ({ getValue }) => {
-        const val = getValue() as number;
-        const rating = val >= 100 ? 5 : Math.floor(val / 20); // 100 -> 5, 80-99 -> 4, 60-79 -> 3, 40-59 -> 2, <40 -> 1
+      cell: ({ row }) => {
+        const s = row.original.status;
+        let label = labels.statusInactive || (locale === 'en' ? 'Inactive' : 'Nonaktif');
+        let dotClass = 'bg-neutral-400 dark:bg-neutral-600';
+
+        if (s === 'active') {
+          label = labels.statusActive || (locale === 'en' ? 'Active' : 'Aktif');
+          dotClass = 'bg-success';
+        } else if (s === 'on_leave') {
+          label = labels.statusOnLeave || (locale === 'en' ? 'On Leave' : 'Cuti');
+          dotClass = 'bg-warning';
+        } else if (s === 'inactive') {
+          label = labels.statusInactive || (locale === 'en' ? 'Inactive' : 'Nonaktif');
+          dotClass = 'bg-neutral-400 dark:bg-neutral-600';
+        }
+
         return (
-          <div className="flex flex-col gap-0.5">
-            <div className="flex items-center gap-0.5" title={`${val} / 100`}>
-              {[1, 2, 3, 4, 5].map((star) => (
-                <Star
-                  key={star}
-                  className={cn(
-                    'w-3.5 h-3.5',
-                    star <= rating
-                      ? 'fill-warning text-warning'
-                      : 'fill-neutral-200 text-neutral-200 dark:fill-neutral-800 dark:text-neutral-800'
-                  )}
-                />
-              ))}
-            </div>
-            <span className="font-bold text-[11px] tabular-nums text-foreground">{val} Poin</span>
+          <div className="flex items-center gap-1.5 text-inherit whitespace-nowrap">
+            <span className={cn('h-1.5 w-1.5 shrink-0 rounded-full', dotClass)} />
+            <span className="truncate">{label}</span>
           </div>
         );
       },
+    },
+    {
+      id: 'assignedVehiclePlate',
+      accessorKey: 'assignedVehiclePlate',
+      header: labels.colVehicle || 'Kendaraan',
+      enableSorting: true,
+      size: 140,
+      cell: ({ row }) => (
+        <span
+          className={cn(
+            'font-mono uppercase tracking-wider truncate',
+            !row.original.assignedVehiclePlate && 'text-foreground-muted/50 italic',
+          )}
+        >
+          {row.original.assignedVehiclePlate || '-'}
+        </span>
+      ),
+    },
+    {
+      id: 'performanceScore',
+      accessorFn: (row) => row.performanceScore || 0,
+      header: labels.colPerformance || 'Performa',
       enableSorting: true,
       size: 130,
+      meta: { align: 'center' },
+      cell: ({ row }) => {
+        const score = row.original.performanceScore || 0;
+        const rating = score >= 100 ? 5 : Math.floor(score / 20);
+
+        return (
+          <div className="flex items-center justify-center gap-0.5" title={`${score} / 100`}>
+            {[1, 2, 3, 4, 5].map((star) => (
+              <Star
+                key={star}
+                className={cn(
+                  'w-3.5 h-3.5',
+                  star <= rating
+                    ? 'fill-warning text-warning'
+                    : 'fill-neutral-200 text-neutral-200 dark:fill-neutral-800 dark:text-neutral-800',
+                )}
+              />
+            ))}
+          </div>
+        );
+      },
     },
     {
       id: 'groupName',
-      header: labels.colGroup,
-      accessorFn: (row) => row.groupName || '-',
-      cell: ({ getValue }) => <span className="text-[12px] text-info">{getValue() as string}</span>,
+      accessorKey: 'groupName',
+      header: labels.colGroup || 'Grup',
       enableSorting: true,
       size: 150,
-    },
-    {
-      id: 'placement',
-      header: labels.colPlacement,
-      accessorFn: (row) => row.placement,
-      cell: ({ getValue }) => <span className="text-[12px] text-foreground-muted">{getValue() as string}</span>,
-      enableSorting: true,
-      size: 150,
-    },
-    {
-      id: 'licenseNumber',
-      header: labels.colLicenseNo,
-      accessorFn: (row) => row.licenseNumber,
-      cell: ({ getValue }) => <span className="text-[12px] text-foreground-muted">{getValue() as string}</span>,
-      enableSorting: true,
-      size: 160,
-    },
-    {
-      id: 'licenseExpiry',
-      header: labels.colLicenseExpiry,
-      accessorFn: (row) => row.licenseExpiry || '-',
-      cell: ({ getValue }) => <span className="text-[12px] tabular-nums text-foreground-muted">{getValue() as string}</span>,
-      enableSorting: true,
-      size: 150,
+      cell: ({ row }) => (
+        <span
+          className="block max-w-[130px] truncate"
+          title={row.original.groupName}
+        >
+          {row.original.groupName || '-'}
+        </span>
+      ),
     },
     {
       id: 'phone',
-      header: labels.colPhone,
-      accessorFn: (row) => row.phone,
-      cell: ({ getValue }) => <span className="text-[12px] tabular-nums text-foreground-muted">{getValue() as string}</span>,
+      accessorKey: 'phone',
+      header: labels.colPhone || 'No. Telepon',
       enableSorting: true,
       size: 140,
+      cell: ({ row }) => (
+        <span className="tabular-nums text-foreground-muted whitespace-nowrap">
+          {row.original.phone || '-'}
+        </span>
+      ),
+    },
+    {
+      id: 'placement',
+      accessorKey: 'placement',
+      header: labels.colPlacement || 'Penempatan',
+      enableSorting: true,
+      size: 150,
+      cell: ({ row }) => (
+        <span
+          className="block max-w-[130px] truncate text-foreground-muted"
+          title={row.original.placement}
+        >
+          {row.original.placement || '-'}
+        </span>
+      ),
+    },
+    {
+      id: 'licenseNumber',
+      accessorKey: 'licenseNumber',
+      header: labels.colLicenseNo || 'No. SIM',
+      enableSorting: true,
+      size: 150,
+      cell: ({ row }) => (
+        <span className="font-mono text-foreground-muted truncate">
+          {row.original.licenseNumber || '-'}
+        </span>
+      ),
+    },
+    {
+      id: 'licenseExpiry',
+      accessorKey: 'licenseExpiry',
+      header: labels.colLicenseExpiry || 'Masa Berlaku SIM',
+      enableSorting: true,
+      size: 140,
+      cell: ({ row }) => {
+        if (!row.original.licenseExpiry) return <span className="text-foreground-muted">-</span>;
+        const expiry = new Date(row.original.licenseExpiry);
+        const isExpired = expiry.getTime() < Date.now();
+        const isExpiring = expiry.getTime() - Date.now() < 60 * 24 * 60 * 60 * 1000;
+
+        return (
+          <span
+            className={cn(
+              'tabular-nums whitespace-nowrap',
+              isExpired
+                ? 'text-danger font-semibold'
+                : isExpiring
+                  ? 'text-warning font-semibold'
+                  : 'text-foreground-muted',
+            )}
+          >
+            {expiry.toLocaleDateString(locale === 'en' ? 'en-US' : 'id-ID', {
+              day: '2-digit',
+              month: 'short',
+              year: 'numeric',
+            })}
+          </span>
+        );
+      },
     },
     {
       id: 'email',
-      header: labels.colEmail,
-      accessorFn: (row) => row.email,
-      cell: ({ getValue }) => <span className="text-[12px] text-foreground-muted">{getValue() as string}</span>,
+      accessorKey: 'email',
+      header: labels.colEmail || 'Email',
       enableSorting: true,
-      size: 180,
+      size: 170,
+      cell: ({ row }) => (
+        <span
+          className="block max-w-[150px] truncate text-foreground-muted"
+          title={row.original.email}
+        >
+          {row.original.email || '-'}
+        </span>
+      ),
     },
     {
       id: 'address',
-      header: labels.colAddress,
-      accessorFn: (row) => row.address,
-      cell: ({ getValue }) => <span className="text-[12px] text-foreground-muted">{getValue() as string}</span>,
-      enableSorting: true,
-      size: 250,
+      accessorKey: 'address',
+      header: labels.colAddress || 'Alamat',
+      enableSorting: false,
+      size: 200,
+      cell: ({ row }) => (
+        <span
+          className="block max-w-[180px] truncate text-foreground-muted"
+          title={row.original.address}
+        >
+          {row.original.address || '-'}
+        </span>
+      ),
     },
     {
       id: 'ktpNumber',
-      header: labels.colKtp,
-      accessorFn: (row) => row.ktpNumber,
-      cell: ({ getValue }) => <span className="text-[12px] tabular-nums text-foreground-muted">{getValue() as string}</span>,
+      accessorKey: 'ktpNumber',
+      header: labels.colKtp || 'No. KTP',
       enableSorting: true,
       size: 160,
+      cell: ({ row }) => (
+        <span className="font-mono text-foreground-muted truncate">
+          {row.original.ktpNumber || '-'}
+        </span>
+      ),
     },
     {
       id: 'placeOfBirth',
-      header: labels.colPob,
-      accessorFn: (row) => row.placeOfBirth || '-',
-      cell: ({ getValue }) => <span className="text-[12px] text-foreground-muted">{getValue() as string}</span>,
+      accessorKey: 'placeOfBirth',
+      header: labels.colPob || 'Tempat Lahir',
       enableSorting: true,
-      size: 150,
+      size: 130,
+      cell: ({ row }) => (
+        <span className="text-foreground-muted truncate">
+          {row.original.placeOfBirth || '-'}
+        </span>
+      ),
     },
     {
       id: 'dateOfBirth',
-      header: labels.colDob,
-      accessorFn: (row) => row.dateOfBirth || '-',
-      cell: ({ getValue }) => <span className="text-[12px] tabular-nums text-foreground-muted">{getValue() as string}</span>,
+      accessorKey: 'dateOfBirth',
+      header: labels.colDob || 'Tanggal Lahir',
       enableSorting: true,
-      size: 140,
+      size: 120,
+      cell: ({ row }) => (
+        <span className="tabular-nums text-foreground-muted whitespace-nowrap">
+          {row.original.dateOfBirth
+            ? new Date(row.original.dateOfBirth).toLocaleDateString(locale === 'en' ? 'en-US' : 'id-ID')
+            : '-'}
+        </span>
+      ),
     },
     {
       id: 'joinDate',
-      header: labels.colJoinDate,
-      accessorFn: (row) => row.joinDate || '-',
-      cell: ({ getValue }) => <span className="text-[12px] tabular-nums text-foreground-muted">{getValue() as string}</span>,
+      accessorKey: 'joinDate',
+      header: labels.colJoinDate || 'Tanggal Bergabung',
       enableSorting: true,
-      size: 140,
-    }
+      size: 120,
+      cell: ({ row }) => (
+        <span className="tabular-nums text-foreground-muted whitespace-nowrap">
+          {row.original.joinDate
+            ? new Date(row.original.joinDate).toLocaleDateString(locale === 'en' ? 'en-US' : 'id-ID')
+            : '-'}
+        </span>
+      ),
+    },
   ];
 }
 
 const DEFAULT_COLUMN_VISIBILITY = {
-  groupName: false,
   email: false,
   address: false,
   ktpNumber: false,
   placeOfBirth: false,
   dateOfBirth: false,
   joinDate: false,
-  licenseExpiry: false,
 };
 
 export function DriverTable({
+  labels: propLabels,
   data,
-  labels,
   onViewDetail,
   onEdit,
   onDelete,
@@ -252,44 +357,88 @@ export function DriverTable({
   className,
   dtLabels,
 }: DriverTableProps) {
-  const columns = React.useMemo(() => buildColumns(labels, onViewDetail, onEdit, onDelete), [labels, onViewDetail, onEdit, onDelete]);
+  const locale = useBusinessLocale();
+  const labels = React.useMemo(() => {
+    const tD = getDriversTranslation(locale);
+    return {
+      colDriver: tD.table.colDriver,
+      colGroup: tD.filterGroup,
+      colPlacement: tD.labels.placement,
+      colPhone: tD.labels.phone,
+      colEmail: tD.labels.email,
+      colAddress: tD.labels.address,
+      colKtp: tD.labels.ktp,
+      colPob: tD.labels.pob,
+      colDob: tD.labels.dob,
+      colLicenseNo: tD.labels.licenseNo,
+      colLicenseExpiry: tD.labels.licenseExpiry,
+      colJoinDate: tD.labels.joinDate,
+      colStatus: tD.table.colStatus,
+      colVehicle: tD.table.colVehicle,
+      colPerformance: tD.table.colPerformance,
+      emptyTitle: tD.table.emptyTitle,
+      emptyDescription: tD.table.emptyDescription,
+      noResultTitle: tD.table.noResultTitle,
+      noResultDescription: tD.table.noResultDescription,
+      searchPlaceholder: tD.searchPlaceholder,
+      addDriver: tD.addDriver,
+      exportFilename: tD.exportFilename,
+      actionAdd: locale === 'en' ? 'Add' : 'Tambah',
+      statusActive: tD.status.active,
+      statusInactive: tD.status.inactive,
+      statusOnLeave: tD.status.onLeave,
+      ...propLabels,
+    };
+  }, [propLabels, locale]);
+
+  const columns = React.useMemo(
+    () => buildColumns(labels, locale, onViewDetail, onEdit, onDelete),
+    [labels, locale, onViewDetail, onEdit, onDelete],
+  );
 
   return (
-    <DataTable<Driver>
-      className={className}
-      data={data}
-      columns={columns}
-      onRowActionClick={onViewDetail}
-      // Capabilities
-      searchable
-      sortable
-      pagination
-      columnVisibility
-      exportable
-      // Initial state
-      columnVisibilityState={DEFAULT_COLUMN_VISIBILITY}
-      // Search
-      searchValue={searchValue}
-      onSearchChange={onSearchChange}
-      searchPlaceholder={labels.searchPlaceholder}
-      // Filter
-      filterConfig={filterConfig}
-      isFilterOpen={isFilterOpen}
-      onFilterOpenChange={onFilterOpenChange}
-      // Export
-      exportFilename={labels.exportFilename}
-      labels={dtLabels}
-      // UI Slots
-      emptyTitle={labels.emptyTitle}
-      emptyDescription={labels.emptyDescription}
-      toolbarActions={
-        onAdd ? (
-          <Button variant="destructive" onClick={onAdd} className="h-8 gap-1.5 text-[12px] font-medium shadow-none">
-            <Plus className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline-block">{labels.addDriver}</span>
-          </Button>
-        ) : undefined
-      }
-    />
+    <div id="drivers-table-container" className="h-full w-full">
+      <DataTable<Driver>
+        className={className}
+        data={data}
+        columns={columns}
+        onRowActionClick={onViewDetail}
+        // Capabilities
+        searchable
+        sortable
+        pagination
+        columnVisibility
+        exportable
+        // Initial state
+        columnVisibilityState={DEFAULT_COLUMN_VISIBILITY}
+        // Search
+        searchValue={searchValue}
+        onSearchChange={onSearchChange}
+        searchPlaceholder={labels.searchPlaceholder}
+        // Filter
+        filterConfig={filterConfig}
+        isFilterOpen={isFilterOpen}
+        onFilterOpenChange={onFilterOpenChange}
+        // Export
+        exportFilename={labels.exportFilename}
+        // UI Customizations
+        emptyTitle={labels.emptyTitle}
+        emptyDescription={labels.emptyDescription}
+        toolbarActions={
+          onAdd ? (
+            <Button
+              id="drivers-btn-add"
+              variant="destructive"
+              onClick={onAdd}
+              className="h-8 gap-1.5 text-[12px] font-medium shadow-none"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline-block">{labels.actionAdd || labels.addDriver || 'Tambah'}</span>
+            </Button>
+          ) : undefined
+        }
+        labels={dtLabels}
+      />
+    </div>
   );
 }

@@ -42,4 +42,16 @@ export const driverService = {
   getDriverById(id: string): Driver | undefined {
     return driverRepository.getById(id);
   },
+
+  createDriver(data: Partial<Driver>): Driver {
+    return driverRepository.create(data);
+  },
+
+  updateDriver(id: string, data: Partial<Driver>): Driver | undefined {
+    return driverRepository.update(id, data);
+  },
+
+  deleteDriver(id: string): boolean {
+    return driverRepository.delete(id);
+  },
 };

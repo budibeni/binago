@@ -233,7 +233,7 @@ export const driversDictionaries = {
       ktpRequired: 'KTP Number is required',
       phoneRequired: 'Phone number is required',
       placementRequired: 'Placement is required',
-      groupRequired: 'Fleet group is required',
+      groupRequired: 'Vehicle group is required',
       licenseRequired: 'License number is required',
     }
   }

@@ -62,7 +62,7 @@ export const getDriverFormSchema = (t: Record<string, string>) => z.object({
   phone: z.string().min(1, t.phoneRequired || 'Nomor telepon wajib diisi'),
   address: z.string().optional(),
   placement: z.string().min(1, t.placementRequired || 'Penempatan wajib diisi'),
-  groupId: z.string().min(1, t.groupRequired || 'Grup armada wajib dipilih'),
+  groupId: z.string().min(1, t.groupRequired || 'Grup kendaraan wajib dipilih'),
   licenseNumber: z.string().min(1, t.licenseRequired || 'Nomor SIM wajib diisi'),
   licenseExpiry: z.string().optional(),
   joinDate: z.string().optional(),

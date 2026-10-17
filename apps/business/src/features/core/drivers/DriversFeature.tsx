@@ -2,22 +2,22 @@
 
 import React from 'react';
 import { Star } from 'lucide-react';
-import { cn, formatNumber } from '@adatrack/utils';
+import { formatNumber } from '@adatrack/utils';
+import { toast, type DataTableLabels, type DataTableFilterConfig } from '@adatrack/ui';
 import { getDriversTranslation } from './i18n';
 import { useBusinessLocale } from '../../../components/BusinessShellLayout';
 import { driverService, vehicleService, groupService } from '@/data/services';
-import { DriverTable } from './components/DriverTable';
+import { DriverTable, type DriverTableLabels } from './components/DriverTable';
 import { DriverView } from './components/DriverView';
 import { DriverForm } from './components/DriverForm';
 import type { Driver, DriverStatusFilter } from './types/driver';
-import { useRouter } from 'next/navigation';
 
 export function DriversFeature() {
   const locale = useBusinessLocale();
-  const router = useRouter();
   const tD = getDriversTranslation(locale);
 
   // --- State -------------------------------------------------------------------
+  const [refreshKey, setRefreshKey] = React.useState(0);
   const [search, setSearch] = React.useState('');
   const [filterState, setFilterState] = React.useState<Record<string, string | string[]>>({
     status: '',
@@ -38,82 +38,188 @@ export function DriversFeature() {
 
   // --- Filtered Data -----------------------------------------------------------
   const filteredDrivers = React.useMemo(() => {
+    // refreshKey dependency ensures re-fetch on create/update/delete
+    void refreshKey;
     const filtered = driverService.getDrivers(search, statusFilter, selectedGroupIds, performanceFilter);
     // Enrich with plate number & group name
-    return filtered.map(driver => {
-      let enriched = { ...driver };
-      
+    return filtered.map((driver) => {
+      const enriched = { ...driver };
+
       if (driver.assignedVehicleId) {
-        const vehicle = vehicleService.getVehicles().find(v => v.id === driver.assignedVehicleId);
+        const vehicle = vehicleService.getVehicles().find((v) => v.id === driver.assignedVehicleId);
         if (vehicle) {
           enriched.assignedVehiclePlate = vehicle.plateNumber;
         }
       }
-      
+
       if (driver.groupId) {
-        const group = groupService.getDriverGroups().find(g => g.id === driver.groupId);
+        const group = groupService.getDriverGroups().find((g) => g.id === driver.groupId);
         if (group) {
           enriched.groupName = group.name;
         }
       }
-      
+
       return enriched;
     });
-  }, [search, statusFilter, selectedGroupIds, performanceFilter]);
+  }, [search, statusFilter, selectedGroupIds, performanceFilter, refreshKey]);
 
-  // --- Handlers ----------------------------------------------------------------
+  // --- Handlers with URL synchronization ---------------------------------------
   const handleViewDetail = React.useCallback((driver: Driver) => {
+    window.history.pushState(null, '', `/drivers/${driver.id}`);
     setDetailDriver(driver);
     setDrawerOpen(true);
   }, []);
 
+  const handleCloseDetail = React.useCallback(() => {
+    window.history.pushState(null, '', '/drivers');
+    setDrawerOpen(false);
+    setDetailDriver(null);
+  }, []);
+
   const handleEdit = React.useCallback((driver: Driver) => {
+    window.history.pushState(null, '', `/drivers/edit/${driver.id}`);
     setDrawerOpen(false);
     setEditDriver(driver);
-  }, []);
-
-  const handleDelete = React.useCallback((driver: Driver) => {
-    console.log('Delete driver:', driver.id);
-  }, []);
-
-  const handleAdd = React.useCallback(() => {
     setIsFormOpen(true);
   }, []);
 
-  // --- Configs -----------------------------------------------------------------
-  const tableLabels = React.useMemo(() => ({
-    colDriver: tD.table.colDriver,
-    colGroup: tD.filterGroup,
-    colPlacement: tD.labels.placement,
-    colPhone: tD.labels.phone,
-    colEmail: tD.labels.email,
-    colAddress: tD.labels.address,
-    colKtp: tD.labels.ktp,
-    colPob: tD.labels.pob,
-    colDob: tD.labels.dob,
-    colLicenseNo: tD.labels.licenseNo,
-    colLicenseExpiry: tD.labels.licenseExpiry,
-    colJoinDate: tD.labels.joinDate,
-    colStatus: tD.table.colStatus,
-    colVehicle: tD.table.colVehicle,
-    colPerformance: tD.table.colPerformance,
-    colActions: tD.table.colActions,
-    emptyTitle: tD.table.emptyTitle,
-    emptyDescription: tD.table.emptyDescription,
-    noResultTitle: tD.table.noResultTitle,
-    noResultDescription: tD.table.noResultDescription,
-    searchPlaceholder: tD.searchPlaceholder,
-    addDriver: tD.addDriver,
-    exportFilename: tD.exportFilename,
-    actionDetail: tD.actions.detail,
-    actionEdit: tD.actions.edit,
-    actionDelete: tD.actions.delete,
-  }), [tD]);
+  const handleAdd = React.useCallback(() => {
+    window.history.pushState(null, '', '/drivers/create');
+    setEditDriver(null);
+    setIsFormOpen(true);
+  }, []);
 
-  const dtLabels = React.useMemo(() => {
+  const handleCloseForm = React.useCallback(() => {
+    window.history.pushState(null, '', '/drivers');
+    setIsFormOpen(false);
+    setEditDriver(null);
+  }, []);
+
+  const handleSave = React.useCallback(
+    (data: Partial<Driver>) => {
+      if (editDriver) {
+        driverService.updateDriver(editDriver.id, data);
+        toast.success(
+          locale === 'en'
+            ? 'Driver data updated successfully'
+            : 'Data pengemudi berhasil diperbarui',
+        );
+      } else {
+        driverService.createDriver(data);
+        toast.success(
+          locale === 'en'
+            ? 'Driver registered successfully'
+            : 'Data pengemudi baru berhasil ditambahkan',
+        );
+      }
+      window.history.pushState(null, '', '/drivers');
+      setIsFormOpen(false);
+      setEditDriver(null);
+      setRefreshKey((k) => k + 1);
+    },
+    [editDriver, locale],
+  );
+
+  const handleDelete = React.useCallback(
+    (driver: Driver) => {
+      driverService.deleteDriver(driver.id);
+      toast.success(
+        locale === 'en'
+          ? 'Driver deleted successfully'
+          : 'Data pengemudi berhasil dihapus',
+      );
+      setDrawerOpen(false);
+      setDetailDriver(null);
+      setRefreshKey((k) => k + 1);
+    },
+    [locale],
+  );
+
+  // --- Interactive Tour Event Listeners ----------------------------------------
+  React.useEffect(() => {
+    const handleTourOpenDetail = () => {
+      const item = filteredDrivers[0];
+      if (item) {
+        setDetailDriver(item);
+        setDrawerOpen(true);
+      }
+    };
+    const handleTourCloseDetail = () => {
+      setDrawerOpen(false);
+    };
+    const handleTourOpenForm = () => {
+      setDrawerOpen(false);
+      setEditDriver(null);
+      setIsFormOpen(true);
+    };
+    const handleTourCloseForm = () => {
+      setIsFormOpen(false);
+      setEditDriver(null);
+    };
+    const handleTourOpenFilter = () => {
+      setIsFilterOpen(true);
+    };
+    const handleTourCloseFilter = () => {
+      setIsFilterOpen(false);
+    };
+
+    window.addEventListener('adatrack:tour-open-driver-detail', handleTourOpenDetail);
+    window.addEventListener('adatrack:tour-close-driver-detail', handleTourCloseDetail);
+    window.addEventListener('adatrack:tour-open-driver-form', handleTourOpenForm);
+    window.addEventListener('adatrack:tour-close-driver-form', handleTourCloseForm);
+    window.addEventListener('adatrack:tour-open-filter', handleTourOpenFilter);
+    window.addEventListener('adatrack:tour-close-filter', handleTourCloseFilter);
+
+    return () => {
+      window.removeEventListener('adatrack:tour-open-driver-detail', handleTourOpenDetail);
+      window.removeEventListener('adatrack:tour-close-driver-detail', handleTourCloseDetail);
+      window.removeEventListener('adatrack:tour-open-driver-form', handleTourOpenForm);
+      window.removeEventListener('adatrack:tour-close-driver-form', handleTourCloseForm);
+      window.removeEventListener('adatrack:tour-open-filter', handleTourOpenFilter);
+      window.removeEventListener('adatrack:tour-close-filter', handleTourCloseFilter);
+    };
+  }, [filteredDrivers]);
+
+  // --- Configs -----------------------------------------------------------------
+  const tableLabels: DriverTableLabels = React.useMemo(
+    () => ({
+      colDriver: tD.table.colDriver,
+      colGroup: tD.filterGroup,
+      colPlacement: tD.labels.placement,
+      colPhone: tD.labels.phone,
+      colEmail: tD.labels.email,
+      colAddress: tD.labels.address,
+      colKtp: tD.labels.ktp,
+      colPob: tD.labels.pob,
+      colDob: tD.labels.dob,
+      colLicenseNo: tD.labels.licenseNo,
+      colLicenseExpiry: tD.labels.licenseExpiry,
+      colJoinDate: tD.labels.joinDate,
+      colStatus: tD.table.colStatus,
+      colVehicle: tD.table.colVehicle,
+      colPerformance: tD.table.colPerformance,
+      emptyTitle: tD.table.emptyTitle,
+      emptyDescription: tD.table.emptyDescription,
+      noResultTitle: tD.table.noResultTitle,
+      noResultDescription: tD.table.noResultDescription,
+      searchPlaceholder: tD.searchPlaceholder,
+      addDriver: tD.addDriver,
+      exportFilename: tD.exportFilename,
+      actionAdd: locale === 'en' ? 'Add' : 'Tambah',
+      statusActive: tD.status.active,
+      statusInactive: tD.status.inactive,
+      statusOnLeave: tD.status.onLeave,
+    }),
+    [tD, locale],
+  );
+
+  const dtLabels: DataTableLabels = React.useMemo(() => {
     const isEn = locale === 'en';
     return {
-      paginationShowing: (from: number, to: number, total: number) => isEn ? `Showing ${from}-${to} of ${total.toLocaleString('en-US')} items` : `Menampilkan ${from}-${to} dari ${formatNumber(total)} data`,
+      paginationShowing: (from: number, to: number, total: number) =>
+        isEn
+          ? `Showing ${from}-${to} of ${total.toLocaleString('en-US')} items`
+          : `Menampilkan ${from}-${to} dari ${formatNumber(total)} data`,
       paginationPerPage: isEn ? '/ page' : '/ halaman',
       toolbarRefresh: isEn ? 'Refresh' : 'Refresh',
       toolbarFilter: isEn ? 'Filter' : 'Filter',
@@ -126,71 +232,123 @@ export function DriversFeature() {
       errorTryAgain: isEn ? 'Try Again' : 'Coba Lagi',
       errorTitle: isEn ? 'An error occurred' : 'Terjadi Kesalahan',
       noResultTitle: isEn ? 'No results found' : 'Hasil Tidak Ditemukan',
-      noResultDesc: isEn ? 'No data matches your search or filters.' : 'Tidak ada data yang sesuai dengan pencarian atau filter Anda.',
+      noResultDesc: isEn
+        ? 'No data matches your search or filters.'
+        : 'Tidak ada data yang sesuai dengan pencarian atau filter Anda.',
     };
   }, [locale]);
 
-  const drawerLabels = React.useMemo(() => ({
-    title: tD.drawer.title,
-    close: tD.drawer.close,
-    tabInfo: tD.drawer.tabInfo,
-    tabHistory: tD.drawer.tabHistory,
-    ktp: tD.labels.ktp,
-    pob: tD.labels.pob,
-    dob: tD.labels.dob,
-    joinDate: tD.labels.joinDate,
-    address: tD.labels.address,
-    placement: tD.labels.placement,
-    group: tD.filterGroup,
-    licenseNo: tD.labels.licenseNo,
-    licenseExpiry: tD.labels.licenseExpiry,
-    phone: tD.labels.phone,
-    email: tD.labels.email,
-    historyEmpty: tD.drawer.historyEmpty,
-    actionEdit: tD.actions.edit,
-    actionDelete: tD.actions.delete,
-  }), [tD]);
+  const drawerLabels = React.useMemo(
+    () => ({
+      title: tD.drawer.title,
+      close: tD.drawer.close,
+      tabInfo: tD.drawer.tabInfo,
+      tabHistory: tD.drawer.tabHistory,
+      ktp: tD.labels.ktp,
+      pob: tD.labels.pob,
+      dob: tD.labels.dob,
+      joinDate: tD.labels.joinDate,
+      address: tD.labels.address,
+      placement: tD.labels.placement,
+      group: tD.filterGroup,
+      licenseNo: tD.labels.licenseNo,
+      licenseExpiry: tD.labels.licenseExpiry,
+      phone: tD.labels.phone,
+      email: tD.labels.email,
+      historyEmpty: tD.drawer.historyEmpty,
+      actionEdit: tD.actions.edit,
+      actionDelete: tD.actions.delete,
+    }),
+    [tD],
+  );
 
-  const filterConfig = React.useMemo(() => ({
-    fields: [
-      {
-        id: 'status',
-        label: tD.filterStatus,
-        type: 'pills-single' as const,
-        options: [
-          { value: 'active', label: tD.status.active },
-          { value: 'inactive', label: tD.status.inactive },
-          { value: 'on_leave', label: tD.status.onLeave },
-        ]
-      },
-      {
-        id: 'performance',
-        label: 'Performa',
-        type: 'pills-multi' as const,
-        options: [
-          { value: '5', label: <div className="flex items-center gap-0.5 py-0.5">{Array.from({length: 5}).map((_,i) => <Star key={i} className="w-3.5 h-3.5 fill-warning text-warning" />)}</div> },
-          { value: '4', label: <div className="flex items-center gap-0.5 py-0.5">{Array.from({length: 4}).map((_,i) => <Star key={i} className="w-3.5 h-3.5 fill-warning text-warning" />)}</div> },
-          { value: '3', label: <div className="flex items-center gap-0.5 py-0.5">{Array.from({length: 3}).map((_,i) => <Star key={i} className="w-3.5 h-3.5 fill-warning text-warning" />)}</div> },
-          { value: '2', label: <div className="flex items-center gap-0.5 py-0.5">{Array.from({length: 2}).map((_,i) => <Star key={i} className="w-3.5 h-3.5 fill-warning text-warning" />)}</div> },
-          { value: '1', label: <div className="flex items-center gap-0.5 py-0.5">{Array.from({length: 1}).map((_,i) => <Star key={i} className="w-3.5 h-3.5 fill-warning text-warning" />)}</div> },
-        ]
-      },
-      // Note: Groups filter would normally load from an API. We'll use static options for now.
-      {
-        id: 'groupIds',
-        label: tD.filterGroup,
-        type: 'pills-multi' as const,
-        options: groupService.getDriverGroups().map(g => ({
-          value: g.id,
-          label: g.name
-        }))
-      }
-    ],
-    state: filterState,
-    onStateChange: setFilterState,
-    onClearAll: () => setFilterState({ status: '', performance: [], groupIds: [] }),
-    labels: { title: 'Filter', clearAll: tD.clearFilters }
-  }), [tD, filterState]);
+  const filterConfig: DataTableFilterConfig = React.useMemo(
+    () => ({
+      fields: [
+        {
+          id: 'status',
+          label: tD.filterStatus,
+          type: 'pills-single' as const,
+          options: [
+            { value: 'active', label: tD.status.active },
+            { value: 'inactive', label: tD.status.inactive },
+            { value: 'on_leave', label: tD.status.onLeave },
+          ],
+        },
+        {
+          id: 'performance',
+          label: 'Performa',
+          type: 'pills-multi' as const,
+          options: [
+            {
+              value: '5',
+              label: (
+                <div className="flex items-center gap-0.5 py-0.5">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star key={i} className="w-3.5 h-3.5 fill-warning text-warning" />
+                  ))}
+                </div>
+              ),
+            },
+            {
+              value: '4',
+              label: (
+                <div className="flex items-center gap-0.5 py-0.5">
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <Star key={i} className="w-3.5 h-3.5 fill-warning text-warning" />
+                  ))}
+                </div>
+              ),
+            },
+            {
+              value: '3',
+              label: (
+                <div className="flex items-center gap-0.5 py-0.5">
+                  {Array.from({ length: 3 }).map((_, i) => (
+                    <Star key={i} className="w-3.5 h-3.5 fill-warning text-warning" />
+                  ))}
+                </div>
+              ),
+            },
+            {
+              value: '2',
+              label: (
+                <div className="flex items-center gap-0.5 py-0.5">
+                  {Array.from({ length: 2 }).map((_, i) => (
+                    <Star key={i} className="w-3.5 h-3.5 fill-warning text-warning" />
+                  ))}
+                </div>
+              ),
+            },
+            {
+              value: '1',
+              label: (
+                <div className="flex items-center gap-0.5 py-0.5">
+                  {Array.from({ length: 1 }).map((_, i) => (
+                    <Star key={i} className="w-3.5 h-3.5 fill-warning text-warning" />
+                  ))}
+                </div>
+              ),
+            },
+          ],
+        },
+        {
+          id: 'groupIds',
+          label: tD.filterGroup,
+          type: 'pills-multi' as const,
+          options: groupService.getDriverGroups().map((g) => ({
+            value: g.id,
+            label: g.name,
+          })),
+        },
+      ],
+      state: filterState,
+      onStateChange: setFilterState,
+      onClearAll: () => setFilterState({ status: '', performance: [], groupIds: [] }),
+      labels: { title: 'Filter', clearAll: tD.clearFilters },
+    }),
+    [tD, filterState],
+  );
 
   return (
     <div className="flex flex-col h-full w-full">
@@ -214,7 +372,7 @@ export function DriversFeature() {
       <DriverView
         driver={detailDriver}
         isOpen={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
+        onClose={handleCloseDetail}
         onEdit={() => detailDriver && handleEdit(detailDriver)}
         onDelete={() => detailDriver && handleDelete(detailDriver)}
         labels={drawerLabels}
@@ -222,26 +380,20 @@ export function DriversFeature() {
 
       {(isFormOpen || !!editDriver) && (
         <DriverForm
-          layout="default"
+          layout="drawer"
           open={isFormOpen || !!editDriver}
           onOpenChange={(open) => {
             if (!open) {
-              setIsFormOpen(false);
-              setEditDriver(null);
+              handleCloseForm();
             }
           }}
           driver={editDriver}
-          onCancel={() => {
-            setIsFormOpen(false);
-            setEditDriver(null);
-          }}
-          onSave={(data) => {
-            console.log('Saved driver:', data);
-            setIsFormOpen(false);
-            setEditDriver(null);
-          }}
+          onCancel={handleCloseForm}
+          onSave={handleSave}
         />
       )}
     </div>
   );
 }
+
+export const DriverFeature = DriversFeature;
