@@ -120,40 +120,44 @@ export function RolesFeature({ locale = 'id' }: RolesFeatureProps) {
       enableSorting: false,
       size: 110,
       meta: { fixedWidth: true, align: 'right' },
-      cell: ({ row }) => (
-        <div className="flex justify-end gap-1.5">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setMenuAccessRole(row.original)}
-            className="h-8 w-8 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-full"
-            title="Atur Hak Akses Menu"
-          >
-            <Sliders className="w-4 h-4" />
-          </Button>
-          {!row.original.is_system ? (
-            <>
-              <Button variant="ghost" size="sm" onClick={() => handleEdit(row.original)} className="h-8 w-8 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-full" title="Edit Role">
-                <Edit2 className="w-4 h-4" />
-              </Button>
-              <Button variant="ghost" size="sm" onClick={() => handleDelete(row.original)} className="h-8 w-8 p-0 text-destructive hover:bg-destructive/10 rounded-full" title="Hapus Role">
-                <Trash2 className="w-4 h-4" />
-              </Button>
-            </>
-          ) : (
-            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-full" onClick={() => handleEdit(row.original)} title="Detail Role">
-                <Info className="w-4 h-4" />
+      cell: ({ row }) => {
+        const isProtectedRole = row.original.is_system || row.original.code === 'ADMIN' || row.original.code === 'SUPER_ADMIN';
+
+        return (
+          <div className="flex justify-end gap-1.5">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setMenuAccessRole(row.original)}
+              className="h-8 w-8 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-full"
+              title="Atur Hak Akses Menu"
+            >
+              <Sliders className="w-4 h-4" />
             </Button>
-          )}
-        </div>
-      ),
+            {!isProtectedRole ? (
+              <>
+                <Button variant="ghost" size="sm" onClick={() => handleEdit(row.original)} className="h-8 w-8 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-full" title="Edit Role">
+                  <Edit2 className="w-4 h-4" />
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => handleDelete(row.original)} className="h-8 w-8 p-0 text-destructive hover:bg-destructive/10 rounded-full" title="Hapus Role">
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </>
+            ) : (
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-full" onClick={() => handleEdit(row.original)} title="Detail Role">
+                  <Info className="w-4 h-4" />
+              </Button>
+            )}
+          </div>
+        );
+      },
     }
   ], [t]);
 
 
   const handleDelete = (role: Role) => {
-    if (role.is_system) {
-      toast.error('Role sistem bawaan tidak dapat dihapus'); // System error, usually not translated, but let's keep it
+    if (role.is_system || role.code === 'ADMIN' || role.code === 'SUPER_ADMIN') {
+      toast.error('Role admin atau sistem bawaan dari portal admin tidak dapat dihapus');
       return;
     }
     setRoleToDelete(role);
@@ -161,6 +165,11 @@ export function RolesFeature({ locale = 'id' }: RolesFeatureProps) {
 
   const confirmDelete = async () => {
     if (!roleToDelete) return;
+    if (roleToDelete.is_system || roleToDelete.code === 'ADMIN' || roleToDelete.code === 'SUPER_ADMIN') {
+      toast.error('Role admin atau sistem bawaan tidak dapat dihapus');
+      setRoleToDelete(null);
+      return;
+    }
     try {
       await api.delete(`/settings/roles/${roleToDelete.id}`);
       toast.success(t.successUpdate); // Reusing general success msg for now or we could add successDelete

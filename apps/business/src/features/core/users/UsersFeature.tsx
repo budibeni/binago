@@ -43,6 +43,11 @@ export function UsersFeature() {
       toast.error('Hanya admin yang dapat menghapus pengguna');
       return;
     }
+    const targetRole = (user.role_code || '').toUpperCase().replace(/[_ ]/g, '');
+    if (targetRole === 'ADMIN' || targetRole === 'SUPERADMIN') {
+      toast.error('Pengguna dengan role Admin yang dibuat dari Portal Admin tidak dapat dihapus');
+      return;
+    }
     if (
       (currentUser?.email && user.email.toLowerCase() === currentUser.email.toLowerCase()) ||
       (currentUser?.id && user.id === currentUser.id)
@@ -55,6 +60,12 @@ export function UsersFeature() {
 
   const confirmDelete = async () => {
     if (!userToDelete) return;
+    const targetRole = (userToDelete.role_code || '').toUpperCase().replace(/[_ ]/g, '');
+    if (targetRole === 'ADMIN' || targetRole === 'SUPERADMIN') {
+      toast.error('Pengguna dengan role Admin tidak dapat dihapus');
+      setUserToDelete(null);
+      return;
+    }
     try {
       await api.delete(`/settings/users/${userToDelete.id}`);
       toast.success(isEn ? 'User deleted successfully' : 'Pengguna berhasil dihapus dari perusahaan');
@@ -189,6 +200,9 @@ export function UsersFeature() {
             (row.original.id && currentUser?.id && row.original.id === currentUser.id)
           );
 
+          const targetRole = (row.original.role_code || '').toUpperCase().replace(/[_ ]/g, '');
+          const isTargetAdmin = targetRole === 'ADMIN' || targetRole === 'SUPERADMIN';
+
           return (
             <div className="flex justify-end gap-1.5">
               {isAdmin && (
@@ -211,7 +225,7 @@ export function UsersFeature() {
               >
                 <Edit2 className="w-4 h-4" />
               </Button>
-              {isAdmin && !isRowSelf && (
+              {isAdmin && !isRowSelf && !isTargetAdmin && (
                 <Button
                   variant="ghost"
                   size="sm"
