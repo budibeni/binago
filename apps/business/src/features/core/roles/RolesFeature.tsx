@@ -3,8 +3,9 @@ import { useRoles, Role } from './hooks/useRoles';
 import { api } from '@adatrack/utils';
 import { Button, Dialog, ConfirmDialog, toast, DataTable } from '@adatrack/ui';
 import type { DataTableColumnDef } from '@adatrack/ui';
-import { Shield, Edit2, Trash2, Plus, Info, Eye } from 'lucide-react';
+import { Shield, Edit2, Trash2, Plus, Info, Eye, Sliders } from 'lucide-react';
 import { RoleForm } from './components/RoleForm';
+import { RoleMenuAccessModal } from './components/RoleMenuAccessModal';
 import { getRolesTranslation, RolesLocale } from './i18n';
 
 interface RolesFeatureProps {
@@ -17,6 +18,7 @@ export function RolesFeature({ locale = 'id' }: RolesFeatureProps) {
   const [editingRole, setEditingRole] = useState<Role | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [roleToDelete, setRoleToDelete] = useState<Role | null>(null);
+  const [menuAccessRole, setMenuAccessRole] = useState<Role | null>(null);
 
   const handleCreate = () => {
     setEditingRole(null);
@@ -116,21 +118,30 @@ export function RolesFeature({ locale = 'id' }: RolesFeatureProps) {
       id: 'actions',
       header: t.actions,
       enableSorting: false,
-      size: 80,
+      size: 110,
       meta: { fixedWidth: true, align: 'right' },
       cell: ({ row }) => (
-        <div className="flex justify-end gap-2">
+        <div className="flex justify-end gap-1.5">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setMenuAccessRole(row.original)}
+            className="h-8 w-8 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-full"
+            title="Atur Hak Akses Menu"
+          >
+            <Sliders className="w-4 h-4" />
+          </Button>
           {!row.original.is_system ? (
             <>
-              <Button variant="ghost" size="sm" onClick={() => handleEdit(row.original)} className="h-8 w-8 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-full">
+              <Button variant="ghost" size="sm" onClick={() => handleEdit(row.original)} className="h-8 w-8 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-full" title="Edit Role">
                 <Edit2 className="w-4 h-4" />
               </Button>
-              <Button variant="ghost" size="sm" onClick={() => handleDelete(row.original)} className="h-8 w-8 p-0 text-destructive hover:bg-destructive/10 rounded-full">
+              <Button variant="ghost" size="sm" onClick={() => handleDelete(row.original)} className="h-8 w-8 p-0 text-destructive hover:bg-destructive/10 rounded-full" title="Hapus Role">
                 <Trash2 className="w-4 h-4" />
               </Button>
             </>
           ) : (
-            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-full" onClick={() => handleEdit(row.original)}>
+            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-full" onClick={() => handleEdit(row.original)} title="Detail Role">
                 <Info className="w-4 h-4" />
             </Button>
           )}
@@ -217,6 +228,15 @@ export function RolesFeature({ locale = 'id' }: RolesFeatureProps) {
         title={t.deleteRole}
         description={roleToDelete ? t.deleteConfirm.replace('{name}', roleToDelete.name) : ''}
         onConfirm={confirmDelete}
+      />
+
+      <RoleMenuAccessModal
+        role={menuAccessRole}
+        open={!!menuAccessRole}
+        onOpenChange={(open) => !open && setMenuAccessRole(null)}
+        onSuccess={() => {
+          refetch();
+        }}
       />
     </div>
   );

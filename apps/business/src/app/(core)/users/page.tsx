@@ -1,13 +1,14 @@
 'use client';
 
 import React, { useState } from 'react';
+import { UsersFeature } from '../../../features/core/users/UsersFeature';
 import { RolesFeature } from '../../../features/core/roles/RolesFeature';
 import { Users, Shield } from 'lucide-react';
 import { useBusinessLocale } from '../../../components/BusinessShellLayout';
 import { getRolesTranslation, RolesLocale } from '../../../features/core/roles/i18n';
 
 export default function UsersAccessPage() {
-  const [activeTab, setActiveTab] = useState<'users' | 'roles'>('roles');
+  const [activeTab, setActiveTab] = useState<'users' | 'roles'>('users');
   const locale = useBusinessLocale();
   const t = getRolesTranslation(locale as RolesLocale);
 
@@ -44,15 +45,7 @@ export default function UsersAccessPage() {
         {activeTab === 'roles' ? (
           <RolesFeature locale={locale as RolesLocale} />
         ) : (
-          <div className="flex flex-col items-center justify-center h-full p-8 text-center">
-            <div className="rounded-full bg-neutral-100 p-4 dark:bg-neutral-800 mb-4">
-              <Users className="h-8 w-8 text-neutral-500" />
-            </div>
-            <h2 className="text-xl font-bold text-neutral-900 dark:text-white mb-2">{t.usersModule}</h2>
-            <p className="text-neutral-500 max-w-md">
-              {t.usersModuleDesc}
-            </p>
-          </div>
+          <UsersFeature />
         )}
       </div>
     </div>

@@ -37,12 +37,18 @@ import {
   Database, Tag
 } from 'lucide-react';
 import { AppShell, UIProvider } from '@adatrack/ui';
+import { api } from '@adatrack/utils';
 import type { NavGroup, NavItem, UserInfo, Locale } from '@adatrack/types';
 import { getTranslation } from '../i18n';
 import { ShareLocationProvider } from '../features/core/sharing/context/ShareLocationContext';
 
 
-function buildNavigation(locale: Locale, userRole?: string, userModules?: string[]): NavGroup[] {
+function buildNavigation(
+  locale: Locale,
+  userRole?: string,
+  userModules?: string[],
+  accessiblePaths?: Set<string> | null
+): NavGroup[] {
   const t = getTranslation(locale);
   const allGroups: NavGroup[] = [
     {
@@ -242,26 +248,40 @@ function buildNavigation(locale: Locale, userRole?: string, userModules?: string
 
   const assignedModules = userModules || [];
 
-  return allGroups.filter(group => {
-    if (!group.id) return false;
-    
-    // 1. Always open modules for B2B
-    if (alwaysOpen.includes(group.id)) return true;
-    
-    // 2. Platform Admins see everything
-    if (role === 'superadmin') return true; // only platform superadmin bypasses module checks
-    
-    // 3. Database assigned modules
-    const backendModuleCode = moduleMap[group.id];
-    if (backendModuleCode && assignedModules.includes(backendModuleCode)) {
-      return true;
-    }
-    
-    // Fallback for role-based legacy check if needed
-    if (role === group.id.toLowerCase()) return true;
+  return allGroups
+    .map((group) => {
+      if (!group.id) return null;
 
-    return false;
-  });
+      // 1. Module-level permission
+      let isModuleAllowed = false;
+      if (alwaysOpen.includes(group.id) || role === 'superadmin') {
+        isModuleAllowed = true;
+      } else {
+        const backendModuleCode = moduleMap[group.id];
+        if (backendModuleCode && assignedModules.includes(backendModuleCode)) {
+          isModuleAllowed = true;
+        } else if (role === group.id.toLowerCase()) {
+          isModuleAllowed = true;
+        }
+      }
+
+      if (!isModuleAllowed) return null;
+
+      // 2. Menu-level accessibility filter
+      // If superadmin or if accessiblePaths hasn't loaded yet, show full module items
+      if (role === 'superadmin' || !accessiblePaths) {
+        return group;
+      }
+
+      const filteredItems = group.items.filter((item) => accessiblePaths.has(item.href));
+      if (filteredItems.length === 0) return null;
+
+      return {
+        ...group,
+        items: filteredItems,
+      };
+    })
+    .filter((g): g is NavGroup => g !== null);
 }
 
 function buildBottomNavigation(locale: Locale): NavItem[] {
@@ -353,8 +373,33 @@ export function BusinessShellLayout({ children, user }: { children: React.ReactN
 
   }, []);
 
+  const isAuthRoute = currentPath.startsWith('/login') || currentPath.startsWith('/register');
+  const [accessiblePaths, setAccessiblePaths] = React.useState<Set<string> | null>(null);
+
+  React.useEffect(() => {
+    if (!currentUser || isAuthRoute) return;
+    if (currentUser.role?.toLowerCase() === 'superadmin') return;
+
+    let mounted = true;
+    api.get<Array<{ path: string }>>('/access/menu')
+      .then((res) => {
+        if (!mounted || !res) return;
+        const list = Array.isArray(res) ? res : (res as any).data || [];
+        setAccessiblePaths(new Set(list.map((m: any) => m.path)));
+      })
+      .catch((err) => {
+        console.warn('Failed to fetch accessible menus', err);
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, [currentUser, isAuthRoute]);
+
   const t = getTranslation(locale);
-  const navigation = buildNavigation(locale, currentUser?.role, currentUser?.modules);
+  const navigation = React.useMemo(() => {
+    return buildNavigation(locale, currentUser?.role, currentUser?.modules, accessiblePaths);
+  }, [locale, currentUser?.role, currentUser?.modules, accessiblePaths]);
 
   const breadcrumbItems: { label: string; href?: string }[] = [];
   let foundItem = null;
@@ -377,8 +422,6 @@ export function BusinessShellLayout({ children, user }: { children: React.ReactN
   } else {
     breadcrumbItems.push({ label: t.nav.home });
   }
-
-  const isAuthRoute = currentPath.startsWith('/login') || currentPath.startsWith('/register');
 
   if (!currentUser && !isAuthRoute) return null;
 
