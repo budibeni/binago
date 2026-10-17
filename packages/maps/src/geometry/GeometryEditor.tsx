@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { useInternalMap } from '../core/MapContext';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
+import { useInternalMap, useStyleLoadCallback } from '../core/MapContext';
 import { MapGeometry, Coordinate } from './types';
 import { geometryToGeoJSON } from './utils';
 
@@ -127,15 +127,23 @@ export function GeometryEditor({
   }, [map, mode, draftCoords]);
 
   // Render geometry
-  useEffect(() => {
+  const updateSource = useCallback(() => {
     if (!map) return;
-    
-    const updateSource = () => {
+    try {
+      if (!map.getStyle()) return;
+    } catch {
+      return;
+    }
+
+    try {
       if (!map.getSource(sourceId)) {
         map.addSource(sourceId, {
           type: 'geojson',
           data: { type: 'FeatureCollection', features: [] }
         });
+      }
+
+      if (!map.getLayer(layerId)) {
         map.addLayer({
           id: layerId,
           type: 'fill',
@@ -155,33 +163,29 @@ export function GeometryEditor({
       } else if (source) {
         source.setData({ type: 'FeatureCollection', features: [] });
       }
-    };
-    
-    if (map.isStyleLoaded()) {
-      updateSource();
-    } else {
-      map.once('styledata', updateSource);
+    } catch {
+      // Style might be reloading
     }
-    
-    return () => {
-      if (map && map.getStyle()) {
-        if (map.getLayer(layerId)) map.removeLayer(layerId);
-        if (map.getSource(sourceId)) map.removeSource(sourceId);
-      }
-    };
   }, [map, geometry]);
-  
+
   // Render draft polygon
-  useEffect(() => {
+  const updateDraftSource = useCallback(() => {
     if (!map) return;
-    
-    const updateDraftSource = () => {
+    try {
+      if (!map.getStyle()) return;
+    } catch {
+      return;
+    }
+
+    try {
       if (!map.getSource(draftSourceId)) {
         map.addSource(draftSourceId, {
           type: 'geojson',
           data: { type: 'FeatureCollection', features: [] }
         });
-        
+      }
+
+      if (!map.getLayer(draftLayerId)) {
         map.addLayer({
           id: draftLayerId,
           type: 'line',
@@ -192,7 +196,9 @@ export function GeometryEditor({
             'line-dasharray': [2, 2]
           }
         });
-        
+      }
+
+      if (!map.getLayer(draftPointsLayerId)) {
         map.addLayer({
           id: draftPointsLayerId,
           type: 'circle',
@@ -232,22 +238,72 @@ export function GeometryEditor({
       } else if (source) {
         source.setData({ type: 'FeatureCollection', features: [] });
       }
+    } catch {
+      // Style might be reloading
+    }
+  }, [map, draftCoords]);
+
+  const refreshAll = useCallback(() => {
+    updateSource();
+    updateDraftSource();
+  }, [updateSource, updateDraftSource]);
+
+  useStyleLoadCallback(refreshAll);
+
+  useEffect(() => {
+    if (!map) return;
+
+    if (map.isStyleLoaded()) {
+      refreshAll();
+    }
+
+    const handleStyleEvent = () => {
+      if (map.isStyleLoaded()) {
+        refreshAll();
+      }
     };
-    
+
+    map.on('style.load', handleStyleEvent);
+    map.on('styledata', handleStyleEvent);
+
+    return () => {
+      try {
+        map.off('style.load', handleStyleEvent);
+        map.off('styledata', handleStyleEvent);
+      } catch {
+        // ignore
+      }
+    };
+  }, [map, refreshAll]);
+
+  useEffect(() => {
+    if (!map) return;
+    if (map.isStyleLoaded()) {
+      updateSource();
+    }
+  }, [map, geometry, updateSource]);
+
+  useEffect(() => {
+    if (!map) return;
     if (map.isStyleLoaded()) {
       updateDraftSource();
-    } else {
-      map.once('styledata', updateDraftSource);
     }
-    
+  }, [map, draftCoords, updateDraftSource]);
+
+  useEffect(() => {
     return () => {
-      if (map && map.getStyle()) {
+      try {
+        if (!map || !(map as any).style || !map.getStyle()) return;
+        if (map.getLayer(layerId)) map.removeLayer(layerId);
+        if (map.getSource(sourceId)) map.removeSource(sourceId);
         if (map.getLayer(draftLayerId)) map.removeLayer(draftLayerId);
         if (map.getLayer(draftPointsLayerId)) map.removeLayer(draftPointsLayerId);
         if (map.getSource(draftSourceId)) map.removeSource(draftSourceId);
+      } catch {
+        // ignore
       }
     };
-  }, [map, draftCoords]);
+  }, [map]);
 
   return null;
 }

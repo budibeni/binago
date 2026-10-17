@@ -99,10 +99,7 @@ function MapContainerInner({
       (window as unknown as { _map?: maplibregl.Map })._map = map;
     });
 
-    // Fire style load listeners whenever style reloads (basemap switch)
-    map.on('style.load', () => {
-      styleLoadListeners.current.forEach((l) => l.callback());
-    });
+
 
     map.on('error', (e) => {
       const msg = e.error?.message || 'Unknown map error';
@@ -139,16 +136,58 @@ function MapContainerInner({
     };
   }, []);
 
-  // Basemap change - calls setStyle() and preserves custom sources/layers via style.load event
+  // Basemap change - calls setStyle() and preserves custom sources/layers via styledata / idle completion
   useEffect(() => {
-    if (!mapRef.current) return;
+    const map = mapRef.current;
+    if (!map) return;
     if (currentBasemapRef.current === effectiveBasemap) return;
 
     currentBasemapRef.current = effectiveBasemap;
     const newStyle = resolveStyle(effectiveBasemap) as string | maplibregl.StyleSpecification;
 
-    mapRef.current.setStyle(newStyle, { diff: false });
-    // After setStyle({ diff: false }), map reliably fires 'style.load' → dispatches to styleLoadListeners
+    let hasNotified = false;
+    const notifyStyleReady = () => {
+      if (hasNotified) return;
+      if (!map.isStyleLoaded()) return;
+
+      hasNotified = true;
+      map.off('styledata', onStyleData);
+      map.off('idle', onIdle);
+
+      // 1. Dispatch to all styleLoadListeners registered via useStyleLoadCallback
+      styleLoadListeners.current.forEach((l) => {
+        try {
+          l.callback();
+        } catch (e) {
+          console.error('Error in styleLoadListener:', e);
+        }
+      });
+
+      // 2. Fire synthetic style.load event on map instance for backward compatibility
+      try {
+        map.fire('style.load');
+      } catch {
+        // ignore
+      }
+    };
+
+    const onStyleData = () => {
+      notifyStyleReady();
+    };
+
+    const onIdle = () => {
+      notifyStyleReady();
+    };
+
+    map.on('styledata', onStyleData);
+    map.on('idle', onIdle);
+
+    map.setStyle(newStyle, { diff: false });
+
+    return () => {
+      map.off('styledata', onStyleData);
+      map.off('idle', onIdle);
+    };
   }, [effectiveBasemap]);
 
   // Active attribution from current basemap

@@ -97,6 +97,20 @@ export interface SearchAreaGeofenceResult {
 }
 
 /**
+ * Hasil rute yang berada di dalam radius tertentu dari titik pencarian.
+ */
+export interface SearchAreaRouteResult {
+  id: string;
+  name: string;
+  groupName?: string;
+  distance: number; // Jarak terdekat dalam meter dari titik pencarian ke rute
+  status?: 'active' | 'inactive';
+  coordinates?: { lat: number; lng: number }[];
+  plannedDistance?: number;
+  estimatedDuration?: number;
+}
+
+/**
  * Highlight area atau rute aktif di atas kanvas peta.
  */
 export interface ActiveSearchAreaHighlight {

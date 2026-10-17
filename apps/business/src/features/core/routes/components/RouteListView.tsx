@@ -43,6 +43,12 @@ export function RouteListView({
           editorMode="idle"
           editorGeometry={null}
           onEditorGeometryChange={() => { }}
+          routes={routes}
+          groups={groups}
+          onSelectRoute={(id) => {
+            onSelectRoute(id);
+            setIsPanelVisible(true);
+          }}
         />
       </div>
 

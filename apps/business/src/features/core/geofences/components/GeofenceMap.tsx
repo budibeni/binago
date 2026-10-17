@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import {
   MapProvider,
   MapContainer,
@@ -9,6 +9,7 @@ import {
   GeometryEditor,
   useMapActions,
   MapContext,
+  useStyleLoadCallback,
   type MapGeometry,
   type BasemapId,
   MapControlPanel,
@@ -130,14 +131,20 @@ function GeofenceMapInner({
     }
   }, [map, editorGeometry, actions]);
 
-  // Render all geofences as GeoJSON layers
-  useEffect(() => {
-    if (!map) return;
-    const sourceId = 'adatrack-geofences-source';
-    const fillLayerId = 'adatrack-geofences-fill';
-    const outlineLayerId = 'adatrack-geofences-outline';
+  const SOURCE_ID = 'adatrack-geofences-source';
+  const FILL_LAYER_ID = 'adatrack-geofences-fill';
+  const OUTLINE_LAYER_ID = 'adatrack-geofences-outline';
 
-    const render = () => {
+  // Render all geofences as GeoJSON layers
+  const renderGeofenceLayers = useCallback(() => {
+    if (!map) return;
+    try {
+      if (!map.getStyle()) return;
+    } catch {
+      return;
+    }
+
+    try {
       const renderedGeofences = visibleGeofenceIds 
         ? geofences.filter(gf => visibleGeofenceIds.includes(gf.id))
         : geofences;
@@ -150,45 +157,87 @@ function GeofenceMapInner({
 
       const data: GeoJSON.FeatureCollection = { type: 'FeatureCollection', features };
 
-      if (!map.getSource(sourceId)) {
-        map.addSource(sourceId, { type: 'geojson', data });
+      if (!map.getSource(SOURCE_ID)) {
+        map.addSource(SOURCE_ID, { type: 'geojson', data });
+      } else {
+        (map.getSource(SOURCE_ID) as any).setData(data);
+      }
+
+      if (!map.getLayer(FILL_LAYER_ID)) {
         map.addLayer({
-          id: fillLayerId,
+          id: FILL_LAYER_ID,
           type: 'fill',
-          source: sourceId,
+          source: SOURCE_ID,
           paint: {
             'fill-color': ['match', ['get', 'status'], 'active', '#10b981', '#ef4444'],
             'fill-opacity': 0.2,
           },
         });
+      }
+
+      if (!map.getLayer(OUTLINE_LAYER_ID)) {
         map.addLayer({
-          id: outlineLayerId,
+          id: OUTLINE_LAYER_ID,
           type: 'line',
-          source: sourceId,
+          source: SOURCE_ID,
           paint: {
             'line-color': ['match', ['get', 'status'], 'active', '#059669', '#dc2626'],
             'line-width': 2,
           },
         });
-      } else {
-        (map.getSource(sourceId) as any).setData(data);
       }
-    };
+    } catch {
+      // Style might be reloading
+    }
+  }, [map, geofences, visibleGeofenceIds]);
+
+  useStyleLoadCallback(renderGeofenceLayers);
+
+  useEffect(() => {
+    if (!map) return;
 
     if (map.isStyleLoaded()) {
-      render();
-    } else {
-      map.once('styledata', render);
+      renderGeofenceLayers();
     }
 
-    return () => {
-      if (map?.getStyle()) {
-        if (map.getLayer(fillLayerId)) map.removeLayer(fillLayerId);
-        if (map.getLayer(outlineLayerId)) map.removeLayer(outlineLayerId);
-        if (map.getSource(sourceId)) map.removeSource(sourceId);
+    const handleStyleEvent = () => {
+      if (map.isStyleLoaded()) {
+        renderGeofenceLayers();
       }
     };
-  }, [map, geofences, visibleGeofenceIds]);
+
+    map.on('style.load', handleStyleEvent);
+    map.on('styledata', handleStyleEvent);
+
+    return () => {
+      try {
+        map.off('style.load', handleStyleEvent);
+        map.off('styledata', handleStyleEvent);
+      } catch {
+        // ignore
+      }
+    };
+  }, [map, renderGeofenceLayers]);
+
+  useEffect(() => {
+    if (!map) return;
+    if (map.isStyleLoaded()) {
+      renderGeofenceLayers();
+    }
+  }, [map, basemap, renderGeofenceLayers]);
+
+  useEffect(() => {
+    return () => {
+      try {
+        if (!map || !(map as any).style || !map.getStyle()) return;
+        if (map.getLayer(FILL_LAYER_ID)) map.removeLayer(FILL_LAYER_ID);
+        if (map.getLayer(OUTLINE_LAYER_ID)) map.removeLayer(OUTLINE_LAYER_ID);
+        if (map.getSource(SOURCE_ID)) map.removeSource(SOURCE_ID);
+      } catch {
+        // ignore
+      }
+    };
+  }, [map]);
 
   const [highlightedArea, setHighlightedArea] = useState<ActiveSearchAreaHighlight | null>(null);
 

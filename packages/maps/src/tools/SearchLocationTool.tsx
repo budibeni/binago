@@ -30,6 +30,7 @@ import type {
   SearchRouteOption,
   SearchAreaVehicleResult,
   SearchAreaGeofenceResult,
+  SearchAreaRouteResult,
   ActiveSearchAreaHighlight,
 } from './types';
 
@@ -66,6 +67,10 @@ export interface SearchLocationToolProps {
   onFindGeofencesInRadius?: (center: { lat: number; lng: number }, radiusMeters: number) => SearchAreaGeofenceResult[];
   /** Callback ketika salah satu geofence dari hasil radius diklik */
   onSelectGeofence?: (geofenceId: string) => void;
+  /** Callback untuk mencari rute di dalam radius koordinat tertentu */
+  onFindRoutesInRadius?: (center: { lat: number; lng: number }, radiusMeters: number) => SearchAreaRouteResult[];
+  /** Callback ketika salah satu rute dari hasil radius diklik */
+  onSelectRoute?: (routeId: string) => void;
   /** Callback untuk menyorot area geofence / garis rute di kanvas peta */
   onHighlightArea?: (highlight: ActiveSearchAreaHighlight | null) => void;
   /** Callback opsional untuk mengurai link Google Maps (maps.app.goo.gl) ke koordinat */
@@ -582,6 +587,136 @@ function CompactGeofenceResultList({
   );
 }
 
+interface CompactRouteResultListProps {
+  routes: SearchAreaRouteResult[];
+  onSelectRoute?: (id: string) => void;
+  panTo: (coords: { lat: number; lng: number }) => void;
+  fitBounds: (bounds: [[number, number], [number, number]], options?: { padding?: number }) => void;
+  title?: string;
+  locale?: Locale;
+}
+
+function CompactRouteResultList({
+  routes,
+  onSelectRoute,
+  panTo,
+  fitBounds,
+  title = 'Rute Terdekat',
+  locale = 'id',
+}: CompactRouteResultListProps) {
+  const activeCount = useMemo(
+    () => routes.filter((r) => r.status === 'active').length,
+    [routes]
+  );
+  const inactiveCount = useMemo(
+    () => routes.length - activeCount,
+    [routes, activeCount]
+  );
+
+  return (
+    <div className="flex-1 flex flex-col min-h-0 justify-between gap-1.5">
+      {/* Header */}
+      <div className="flex items-center justify-between shrink-0 py-0.5 px-0.5">
+        <div className="flex items-center gap-1.5">
+          <RouteIcon className="w-3.5 h-3.5 text-blue-600 dark:text-blue-500" />
+          <span className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+            {title}
+          </span>
+          <span className="text-xs font-mono font-bold text-neutral-500 dark:text-neutral-400 tabular-nums">
+            ({routes.length})
+          </span>
+        </div>
+        <div className="flex items-center gap-1.5 text-[10px] text-neutral-400 font-medium">
+          <span className="flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            <span className="tabular-nums font-semibold text-neutral-700 dark:text-neutral-300">{activeCount}</span> {locale === 'en' ? 'Active' : 'Aktif'}
+          </span>
+          {inactiveCount > 0 && (
+            <span className="flex items-center gap-1 ml-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-neutral-400 dark:bg-neutral-500" />
+              <span className="tabular-nums font-semibold text-neutral-700 dark:text-neutral-300">{inactiveCount}</span> {locale === 'en' ? 'Inactive' : 'Nonaktif'}
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Results List */}
+      <div className="flex-1 min-h-0 flex flex-col gap-1 overflow-y-auto custom-scrollbar p-0.5">
+        {routes.map((rt) => {
+          const isActive = rt.status === 'active';
+
+          return (
+            <button
+              key={rt.id}
+              type="button"
+              onClick={() => {
+                if (rt.coordinates && rt.coordinates.length > 0) {
+                  const lats = rt.coordinates.map((c) => c.lat);
+                  const lngs = rt.coordinates.map((c) => c.lng);
+                  const minLat = Math.min(...lats);
+                  const maxLat = Math.max(...lats);
+                  const minLng = Math.min(...lngs);
+                  const maxLng = Math.max(...lngs);
+                  if (minLat === maxLat && minLng === maxLng) {
+                    panTo({ lat: minLat, lng: minLng });
+                  } else {
+                    fitBounds([[minLng, minLat], [maxLng, maxLat]], { padding: 60 });
+                  }
+                }
+                onSelectRoute?.(rt.id);
+              }}
+              className={cn(
+                'group flex items-center justify-between px-2.5 py-1.5 rounded-xl text-left min-h-[36px]',
+                'bg-white dark:bg-neutral-850 hover:bg-neutral-50 dark:hover:bg-neutral-800',
+                'border border-neutral-200/90 dark:border-neutral-700/80 hover:border-neutral-300 dark:hover:border-neutral-600',
+                'shadow-2xs hover:shadow-xs transition-all duration-150 active:scale-[0.98]'
+              )}
+              title={`Fokus ke ${rt.name}`}
+            >
+              <div className="flex items-center gap-2 min-w-0 pr-1 flex-1">
+                <div className="w-6 h-6 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center shrink-0 border border-neutral-200/60 dark:border-neutral-700/60">
+                  <RouteIcon
+                    className={cn(
+                      'w-3.5 h-3.5',
+                      isActive ? 'text-blue-600 dark:text-blue-400' : 'text-neutral-400'
+                    )}
+                  />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[11.5px] font-semibold text-neutral-800 dark:text-neutral-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 truncate transition-colors leading-tight">
+                    {rt.name}
+                  </p>
+                  <div className="flex items-center gap-1.5 text-[10px] text-neutral-400 dark:text-neutral-500 mt-0.5 truncate">
+                    {rt.groupName && <span className="truncate">{rt.groupName}</span>}
+                    {typeof rt.plannedDistance === 'number' && (
+                      <span className="font-mono text-neutral-500 dark:text-neutral-400 shrink-0">
+                        • {rt.plannedDistance < 1000 ? `${rt.plannedDistance}m` : `${(rt.plannedDistance / 1000).toFixed(1)}km`}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-1.5 shrink-0 pl-1">
+                <span className="text-[10px] font-mono font-medium text-neutral-500 dark:text-neutral-400 tabular-nums px-1.5 py-0.5 rounded-md bg-neutral-100 dark:bg-neutral-800 border border-neutral-200/50 dark:border-neutral-700/50">
+                  {rt.distance < 1000 ? `${rt.distance} m` : `${(rt.distance / 1000).toFixed(1)} km`}
+                </span>
+                <span
+                  className={cn(
+                    'w-1.5 h-1.5 rounded-full shrink-0',
+                    isActive ? 'bg-emerald-500' : 'bg-neutral-400 dark:bg-neutral-600'
+                  )}
+                  title={isActive ? 'Aktif' : 'Nonaktif'}
+                />
+              </div>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function createPersonMarkerElement(label: string = 'Saya') {
   const wrapper = document.createElement('div');
   wrapper.className = 'adatrack-user-person-marker';
@@ -621,6 +756,8 @@ export function SearchLocationTool({
   onSelectVehicle,
   onFindGeofencesInRadius,
   onSelectGeofence,
+  onFindRoutesInRadius,
+  onSelectRoute,
   onHighlightArea,
   onResolveMapsUrl,
 }: SearchLocationToolProps) {
@@ -631,13 +768,14 @@ export function SearchLocationTool({
   const markerRef = useRef<maplibregl.Marker | null>(null);
 
   const isGeofenceSearch = Boolean(onFindGeofencesInRadius);
+  const isRouteSearch = Boolean(onFindRoutesInRadius);
   const isLive = isLiveTracking !== undefined
     ? isLiveTracking
     : Boolean(onFindVehiclesInRadius || onFindVehiclesInGeofence || onFindVehiclesOnRoute);
-  const hasRadiusScanning = isLive || isGeofenceSearch;
+  const hasRadiusScanning = isLive || isGeofenceSearch || isRouteSearch;
 
-  const radiusPresets = isGeofenceSearch ? [500, 1000, 3000, 5000, 10000] : [250, 500, 1000, 2000];
-  const defaultRadius = isGeofenceSearch ? 1000 : 500;
+  const radiusPresets = (isGeofenceSearch || isRouteSearch) ? [500, 1000, 3000, 5000, 10000] : [250, 500, 1000, 2000];
+  const defaultRadius = (isGeofenceSearch || isRouteSearch) ? 1000 : 500;
 
   // Address tab state
   const [query, setQuery] = useState('');
@@ -648,6 +786,7 @@ export function SearchLocationTool({
   const [addressRadius, setAddressRadius] = useState<number>(defaultRadius);
   const [addressVehicles, setAddressVehicles] = useState<SearchAreaVehicleResult[] | null>(null);
   const [addressGeofences, setAddressGeofences] = useState<SearchAreaGeofenceResult[] | null>(null);
+  const [addressRoutes, setAddressRoutes] = useState<SearchAreaRouteResult[] | null>(null);
 
   // Coordinate & Radius tab state
   const [coordInput, setCoordInput] = useState('');
@@ -658,6 +797,7 @@ export function SearchLocationTool({
   const [coordError, setCoordError] = useState<string | null>(null);
   const [radiusVehicles, setRadiusVehicles] = useState<SearchAreaVehicleResult[] | null>(null);
   const [radiusGeofences, setRadiusGeofences] = useState<SearchAreaGeofenceResult[] | null>(null);
+  const [radiusRoutes, setRadiusRoutes] = useState<SearchAreaRouteResult[] | null>(null);
 
   // Geofence tab state
   const [selectedGeofenceId, setSelectedGeofenceId] = useState<string>('');
@@ -672,6 +812,7 @@ export function SearchLocationTool({
   const [myLocationRadius, setMyLocationRadius] = useState<number>(defaultRadius);
   const [myLocationVehicles, setMyLocationVehicles] = useState<SearchAreaVehicleResult[] | null>(null);
   const [myLocationGeofences, setMyLocationGeofences] = useState<SearchAreaGeofenceResult[] | null>(null);
+  const [myLocationRoutes, setMyLocationRoutes] = useState<SearchAreaRouteResult[] | null>(null);
   const [isLocating, setIsLocating] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
 
@@ -800,11 +941,16 @@ export function SearchLocationTool({
         const found = onFindGeofencesInRadius?.(center, r) ?? [];
         setRadiusGeofences(found);
       }
+      if (isRouteSearch) {
+        const found = onFindRoutesInRadius?.(center, r) ?? [];
+        setRadiusRoutes(found);
+      }
     } else {
       onHighlightArea?.(null);
       panTo(center);
       setRadiusVehicles(null);
       setRadiusGeofences(null);
+      setRadiusRoutes(null);
     }
   };
 
@@ -825,6 +971,10 @@ export function SearchLocationTool({
       if (isGeofenceSearch) {
         const found = onFindGeofencesInRadius?.(activeCenter, newRadius) ?? [];
         setRadiusGeofences(found);
+      }
+      if (isRouteSearch) {
+        const found = onFindRoutesInRadius?.(activeCenter, newRadius) ?? [];
+        setRadiusRoutes(found);
       }
     }
   };
@@ -847,11 +997,16 @@ export function SearchLocationTool({
         const found = onFindGeofencesInRadius?.(center, r) ?? [];
         setAddressGeofences(found);
       }
+      if (isRouteSearch) {
+        const found = onFindRoutesInRadius?.(center, r) ?? [];
+        setAddressRoutes(found);
+      }
     } else {
       onHighlightArea?.(null);
       panTo(center);
       setAddressVehicles(null);
       setAddressGeofences(null);
+      setAddressRoutes(null);
     }
   };
 
@@ -880,11 +1035,16 @@ export function SearchLocationTool({
         const found = onFindGeofencesInRadius?.(center, r) ?? [];
         setMyLocationGeofences(found);
       }
+      if (isRouteSearch) {
+        const found = onFindRoutesInRadius?.(center, r) ?? [];
+        setMyLocationRoutes(found);
+      }
     } else {
       onHighlightArea?.(null);
       panTo(center);
       setMyLocationVehicles(null);
       setMyLocationGeofences(null);
+      setMyLocationRoutes(null);
     }
   };
 
@@ -940,6 +1100,7 @@ export function SearchLocationTool({
     setQuery('');
     setAddressVehicles(null);
     setAddressGeofences(null);
+    setAddressRoutes(null);
     setResults([]);
     setSearchError(null);
     onHighlightArea?.(null);
@@ -957,6 +1118,7 @@ export function SearchLocationTool({
     setSelectedAddress(null);
     setAddressVehicles(null);
     setAddressGeofences(null);
+    setAddressRoutes(null);
     try {
       const fn = onSearchAddress ?? mockSearchAddress;
       const res = await fn(query.trim());
@@ -983,6 +1145,7 @@ export function SearchLocationTool({
       setActiveCenter(null);
       setRadiusVehicles(null);
       setRadiusGeofences(null);
+      setRadiusRoutes(null);
       onHighlightArea?.(null);
       if (markerRef.current) {
         markerRef.current.remove();
@@ -1300,7 +1463,29 @@ export function SearchLocationTool({
                 </div>
               ) : selectedAddress ? (
                 /* Alamat Terpilih */
-                isGeofenceSearch ? (
+                isRouteSearch ? (
+                  /* Mode Route Search: List Rute di Sekitar Alamat Terpilih */
+                  addressRoutes !== null && (
+                    addressRoutes.length > 0 ? (
+                      <CompactRouteResultList
+                        routes={addressRoutes}
+                        onSelectRoute={onSelectRoute}
+                        panTo={panTo}
+                        fitBounds={fitBounds}
+                        locale={locale}
+                      />
+                    ) : (
+                      <div className="flex-1 flex flex-col items-center justify-center py-4 px-3 rounded-2xl bg-neutral-50/80 dark:bg-neutral-850/50 border border-dashed border-neutral-200 dark:border-neutral-750 text-center">
+                        <p className="text-xs text-neutral-500 dark:text-neutral-400 font-medium">
+                          Tidak ada rute di radius {addressRadius >= 1000 ? `${addressRadius / 1000} km` : `${addressRadius} m`}
+                        </p>
+                        <p className="text-[11px] text-neutral-400 dark:text-neutral-500 mt-0.5">
+                          Coba perbesar radius di atas
+                        </p>
+                      </div>
+                    )
+                  )
+                ) : isGeofenceSearch ? (
                   /* Mode Geofence Search: List Geofence di Sekitar Alamat Terpilih */
                   addressGeofences !== null && (
                     addressGeofences.length > 0 ? (
@@ -1397,7 +1582,9 @@ export function SearchLocationTool({
                     {locale === 'id' ? 'Ketik nama jalan atau landmark lalu klik Cari' : 'Type a street or landmark name then click Search'}
                   </p>
                   <p className="text-[11px] text-neutral-400 dark:text-neutral-500 mt-0.5">
-                    {isGeofenceSearch
+                    {isRouteSearch
+                      ? (locale === 'id' ? 'Rute di sekitar radius akan otomatis dipindai' : 'Routes in radius will be scanned')
+                      : isGeofenceSearch
                       ? (locale === 'id' ? 'Geofence di sekitar radius akan otomatis dipindai' : 'Geofences in radius will be scanned')
                       : isLive
                       ? (locale === 'id' ? 'Armada di sekitar radius akan otomatis dipindai' : 'Fleet vehicles in radius will be scanned')
@@ -1528,7 +1715,28 @@ export function SearchLocationTool({
             {/* Content Area: Daftar Kendaraan di Radius (Live) / Geofence di Radius / Card Koordinat Terpilih (Non-Live) / Placeholder */}
             <div className="flex-1 min-h-0 flex flex-col pt-1 border-t border-neutral-100 dark:border-neutral-800/80">
               {activeCenter ? (
-                isGeofenceSearch ? (
+                isRouteSearch ? (
+                  radiusRoutes !== null && (
+                    radiusRoutes.length > 0 ? (
+                      <CompactRouteResultList
+                        routes={radiusRoutes}
+                        onSelectRoute={onSelectRoute}
+                        panTo={panTo}
+                        fitBounds={fitBounds}
+                        locale={locale}
+                      />
+                    ) : (
+                      <div className="flex-1 flex flex-col items-center justify-center p-3 rounded-2xl bg-neutral-50/80 dark:bg-neutral-850/50 border border-dashed border-neutral-200 dark:border-neutral-750 text-center">
+                        <p className="text-xs text-neutral-500 dark:text-neutral-400 font-medium">
+                          Tidak ada rute di dalam radius {radius >= 1000 ? `${radius / 1000} km` : `${radius} m`}.
+                        </p>
+                        <p className="text-[11px] text-neutral-400 dark:text-neutral-500 mt-0.5">
+                          Coba perbesar radius di atas
+                        </p>
+                      </div>
+                    )
+                  )
+                ) : isGeofenceSearch ? (
                   radiusGeofences !== null && (
                     radiusGeofences.length > 0 ? (
                       <CompactGeofenceResultList
@@ -1618,7 +1826,9 @@ export function SearchLocationTool({
                     <Navigation className="w-4 h-4" />
                   </div>
                   <p className="text-xs text-neutral-500 dark:text-neutral-400 font-medium leading-relaxed max-w-[220px]">
-                    {isGeofenceSearch
+                    {isRouteSearch
+                      ? (locale === 'id' ? 'Ketik koordinat atau paste tautan Google Maps untuk memindai rute di sekitar radius.' : 'Enter coordinates or paste Google Maps link to scan routes in radius.')
+                      : isGeofenceSearch
                       ? (locale === 'id' ? 'Ketik koordinat atau paste tautan Google Maps untuk memindai geofence di sekitar radius.' : 'Enter coordinates or paste Google Maps link to scan geofences in radius.')
                       : isLive
                       ? (locale === 'id' ? 'Ketik koordinat atau paste tautan Google Maps untuk memindai armada di sekitar radius.' : 'Enter coordinates or paste Google Maps link to scan fleet in radius.')
@@ -1767,7 +1977,28 @@ export function SearchLocationTool({
                   </button>
                 </div>
               ) : myLocationCoord ? (
-                isGeofenceSearch ? (
+                isRouteSearch ? (
+                  myLocationRoutes !== null && (
+                    myLocationRoutes.length > 0 ? (
+                      <CompactRouteResultList
+                        routes={myLocationRoutes}
+                        onSelectRoute={onSelectRoute}
+                        panTo={panTo}
+                        fitBounds={fitBounds}
+                        locale={locale}
+                      />
+                    ) : (
+                      <div className="flex-1 flex flex-col items-center justify-center p-3 rounded-2xl bg-neutral-50/80 dark:bg-neutral-850/50 border border-dashed border-neutral-200 dark:border-neutral-750 text-center">
+                        <p className="text-xs text-neutral-500 dark:text-neutral-400 font-medium">
+                          Tidak ada rute di dalam radius {myLocationRadius >= 1000 ? `${myLocationRadius / 1000} km` : `${myLocationRadius} m`}.
+                        </p>
+                        <p className="text-[11px] text-neutral-400 dark:text-neutral-500 mt-0.5">
+                          Coba perbesar radius di atas
+                        </p>
+                      </div>
+                    )
+                  )
+                ) : isGeofenceSearch ? (
                   myLocationGeofences !== null && (
                     myLocationGeofences.length > 0 ? (
                       <CompactGeofenceResultList
